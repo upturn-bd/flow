@@ -1,33 +1,36 @@
-# Flow
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-# Database structure docs
+## Getting Started
 
-**Common fields for records**
-| Name       | Type      | Description               |
-| :--------- | :-------- | :------------------------ |
-| created_at | timestamp | Record creation timestamp |
-| updated_at | timestamp | Record update timestamp   |
+First, run the development server:
 
-## Employee Data *Schema: employee*
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-**Table:** user
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-| Name       | Type      | Description          | Values |
-| :--------- | :-------- | :------------------- | :----- |
-| uuid       | string    | User ID              |
-| last_login | timestamp | Last login timestamp |
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-**Table:** employee
+## Learn More
 
-| Name         | Type   | Description              | Values                      |
-| :----------- | :----- | :----------------------- | :-------------------------- |
-| uuid         | string | User ID                  |
-| has_approval | string | If approved by org admin | ACCEPTED, PENDING, REJECTED |
-| is_active    | bool   | Is user active           |
-| email        | string | E-mail                   |
-| company_id   | int    | Company ID               |
-| first_name   | string | First Name               |
-| last_name    | string | Last Name                |
-| phone_number | string | Phone Number             |
-| hire_date    | date   | Joining Date             |
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
