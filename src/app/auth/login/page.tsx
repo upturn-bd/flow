@@ -2,8 +2,10 @@
 import { useState, FormEvent } from 'react';
 import { supabase } from '@/lib/supabase';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const LogIn = () => {
+    const router = useRouter();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
@@ -13,7 +15,7 @@ const LogIn = () => {
         setError(null);
 
         try {
-            const { data, error } = await supabase.auth.signUp({
+            const { error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
@@ -22,10 +24,13 @@ const LogIn = () => {
                 throw error;
             }
 
-            console.log('Login Successful:', data);
-        } catch (err:any) {
-            console.error('Login Error:', err.message);
-            setError(err.message);
+            console.log('Login Successful');
+            router.push('/');
+        } catch (err) {
+            if (err instanceof Error) {
+                console.error('Login Error:', err.message);
+                setError(err.message);
+            }
         }
     };
 
@@ -40,8 +45,8 @@ const LogIn = () => {
                         <form onSubmit={handleLogin} className='grid grid-cols-1 gap-4'>
                             <input
                                 className='p-3 py-5 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none'
-                                type="email"
-                                placeholder="Email"
+                                type="text"
+                                placeholder="Company Name"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
@@ -49,7 +54,7 @@ const LogIn = () => {
                             <input
                                 className='p-3 py-5 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none'
                                 type="password"
-                                placeholder="Password"
+                                placeholder="Company Code"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
