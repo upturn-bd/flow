@@ -8,14 +8,12 @@ import { supabase } from "@/lib/supabase";
 import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
 
 interface FormData {
-    email: string;
-    firstName: string;
-    lastName: string;
+    code:number;
     password: string;
     confirmPassword: string;
 }
 
-const Signup = () => {
+const page = () => {
     const router = useRouter();
     const { register, handleSubmit, setError, getValues, formState: { errors } } = useForm<FormData>();
     const [showPassword, setShowPassword] = useState(false);
@@ -31,28 +29,7 @@ const Signup = () => {
     };
 
     const handleSignup = async (data: FormData) => {
-        if (!isChecked) {
-            alert("You must agree to the terms and conditions.");
-            return;
-        }
-        try {
-            const { error } = await supabase.auth.signUp({
-                email: data.email,
-                password: data.password,
-            });
-
-            if (error) {
-                throw error;
-            }
-
-            console.log('Signup Successful');
-            router.push('/');
-        } catch (err) {
-            if (err instanceof Error) {
-                console.error('Signup Error:', err.message);
-                setError("email", { type: "manual", message: err.message });
-            }
-        }
+        
     };
 
     return (
@@ -67,25 +44,9 @@ const Signup = () => {
 
                             <input
                                 className='p-3 py-5 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none'
-                                type="email"
-                                placeholder="Email"
-                                {...register("email", { required: "Email is required" })}
-                            />
-                            {errors.email && <p className="text-red-500">{errors.email.message}</p>}
-
-                            <input
-                                className='p-3 py-5 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none'
-                                type="text"
-                                placeholder="First Name"
-                                {...register("firstName", { required: "First Name is required" })}
-                            />
-                            {errors.firstName && <p className="text-red-500">{errors.firstName.message}</p>}
-
-                            <input
-                                className='p-3 py-5 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none'
-                                type="text"
-                                placeholder="Last Name"
-                                {...register("lastName", { required: "Last Name is required" })}
+                                type="number"
+                                placeholder="Enter Code"
+                                {...register("code", { required: "Last Name is required" })}
                             />
                             {errors.lastName && <p className="text-red-500">{errors.lastName.message}</p>}
 
@@ -133,20 +94,10 @@ const Signup = () => {
                                 </button>
                             </div>
                             {errors.confirmPassword && <p className="text-red-500">{errors.confirmPassword.message}</p>}
-
-                            <div className="flex items-center gap-2 ">
-                                <input type="checkbox"
-                                className="orange-400"
-                                id="terms" onChange={(e) => setIsChecked(e.target.checked)} />
-                                <label htmlFor="terms">I agree to the Terms & Conditions</label>
-                            </div>
-
                             <input
                                 type="submit"
                                 value="Create Account"
-                                className={`px-10 py-4 my-5 rounded-full bg-amber-400 text-black shadow-xl cursor-pointer ${!isChecked ? "opacity-50 cursor-not-allowed" : ""}`}
-                                disabled={!isChecked}
-                            />
+                                className="px-10 py-4 my-5 rounded-full bg-amber-400 text-black shadow-xl cursor-pointer"/>
                         </form>
                         <div className="flex justify-between mt-5 items-center">
                             <button className="text-[#002568]">
@@ -161,4 +112,4 @@ const Signup = () => {
     );
 };
 
-export default Signup;
+export default page;

@@ -1,11 +1,12 @@
 'use client';
 
 import Image from "next/image";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { supabase } from "@/lib/supabase";
 import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
+import Link from "next/link";
+
+import {login} from "../_actions";
 
 interface SignInFormData {
     email: string;
@@ -13,10 +14,17 @@ interface SignInFormData {
 }
 
 const SignIn = () => {
-    const router = useRouter();
-    const { register, handleSubmit, setError, formState: { errors } } = useForm<SignInFormData>();
+    const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>();
     const [generalError, setGeneralError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            setRedirectUrl(window.location.origin + "/");
+        }
+    }, []);
 
     const togglePasswordVisibility = () => {
         setShowPassword((prev) => !prev);
@@ -24,46 +32,35 @@ const SignIn = () => {
 
     const handleSignIn = async (data: SignInFormData) => {
         setGeneralError(null);
+        setLoading(true);
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
-                email: data.email,
-                password: data.password,
-            });
-
-            if (error) {
-                throw error;
-            }
-
-            console.log('Login Successful');
-            router.push('/');
+            await login({email: data.email, password: data.password});
         } catch (err) {
             if (err instanceof Error) {
                 console.error('Login Error:', err.message);
                 setGeneralError(err.message);
             }
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleGoogleSignIn = async () => {
+        if (!redirectUrl) return;
+
+        setGeneralError(null);
+        setLoading(true);
+
         try {
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: "google",
-                options: {
-                    redirectTo: `${window.location.origin}/`,
-                },
-            });
-
-            if (error) {
-                throw error;
-            }
-
-            console.log('Google Sign-In Successful');
+            
         } catch (err) {
             if (err instanceof Error) {
                 console.error("Google Sign-In Error:", err.message);
                 setGeneralError("Google sign-in failed. Please try again.");
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -83,6 +80,7 @@ const SignIn = () => {
                                 {...register("email", { required: "Email is required" })}
                             />
                             {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+
                             <div className="relative">
                                 <input
                                     className='p-3 py-5 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none w-full pr-10'
@@ -100,24 +98,28 @@ const SignIn = () => {
                             </div>
                             {errors.password && <p className="text-red-500">{errors.password.message}</p>}
 
-                            <input
+                            <button
                                 type="submit"
-                                value="Login"
-                                className='px-10 py-4 my-5 rounded-full bg-amber-400 text-black shadow-xl cursor-pointer'
-                            />
+                                className='px-10 py-4 my-5 rounded-full bg-amber-400 text-black shadow-xl cursor-pointer disabled:opacity-50'
+                                disabled={loading}
+                            >
+                                {loading ? "Logging in..." : "Login"}
+                            </button>
                         </form>
+                        
                         {generalError && <p className="text-red-500 text-center">{generalError}</p>}
+
                         <button
                             onClick={handleGoogleSignIn}
-                            className="w-full px-10 py-4 rounded-full border border-yellow-950 text-black shadow-2xl"
+                            className="w-full px-10 py-4 rounded-full border border-yellow-950 text-black shadow-2xl disabled:opacity-50"
+                            disabled={loading}
                         >
-                            Sign In with Google
+                            {loading ? "Signing in..." : "Sign In with Google"}
                         </button>
+
                         <div className="flex justify-between mt-5 items-center">
-                            <button className="text-[#002568]">
-                                Don’t have an account?
-                            </button>
-                            <a href="/signup" className="text-[#FFAB2C]">Sign Up</a>
+                            <span className="text-[#002568]">Don’t have an account?</span>
+                            <Link href="/signup" className="text-[#FFAB2C]">Sign Up</Link>
                         </div>
                     </div>
                 </div>
