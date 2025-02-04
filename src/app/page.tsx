@@ -1,15 +1,20 @@
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation";
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from "@/lib/supabase/server";
+import Profile from "./(home)/profile/page";
 
 export default async function Home() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data, error } = await supabase.auth.getUser()
+  const { data, error } = await supabase.auth.getUser();
   if (error || !data?.user) {
-    redirect('/login')
+    redirect("/login");
   }
 
-  return <p>Hello {data.user.email}</p>
-
+  return (
+    <section>
+      <p>Hello {data.user.email}</p>
+      <Profile />
+    </section>
+  );
 }
