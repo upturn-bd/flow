@@ -1,4 +1,3 @@
-import Link from "next/link";
 import React from "react";
 import {
   UserCircle as UserCircleIcon,
@@ -10,6 +9,7 @@ import {
   UserGear as UserGearIcon,
   ArrowFatRight as ArrowFatRightIcon,
 } from "@phosphor-icons/react/dist/ssr";
+import Link from "next/link";
 
 const navItems = [
   {
@@ -49,27 +49,34 @@ const navItems = [
   },
 ];
 
-export default function Sidebar() {
+export default function MobileBottomNav() {
   return (
     <div
-      className="w-full relative h-dvh md:flex flex-col items-center justify-center hidden"
+      className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 h-20 rounded-t-lg block md:hidden"
       style={{
         background: "linear-gradient(135.32deg, #001731 24.86%, #002363 100%)",
       }}
     >
-      <div className="absolute top-10 right-0 translate-x-1/2 p-10 rounded-full bg-[#001731] flex items-center justify-center">
-        <ArrowFatRightIcon
-          size={80}
-          className="-rotate-45 text-yellow-500"
-          weight="fill"
-        />
-      </div>
-      <nav className="w-full flex flex-col gap-6 items-center justify-center text-white">
+      <nav className="relative w-full h-full flex items-center text-white">
+        <Link
+          href="/"
+          className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[60%] h-14 w-14 rounded-full bg-[#001731] flex items-center justify-center"
+        >
+          <ArrowFatRightIcon
+            size={30}
+            className="-rotate-45 text-yellow-500"
+            weight="fill"
+          />
+        </Link>
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
-            <Link href={item.href} key={item.label}>
-              <Icon size={45} />
+            <Link
+              href={item.href}
+              key={item.label}
+              className="px-3 flex-1 flex items-center justify-center border-r last:border-r-0 border-zinc-600"
+            >
+              <Icon size={30} />
             </Link>
           );
         })}
