@@ -1,6 +1,7 @@
 "use client";
 
 import BasicInfo from '@/components/(profile)/basic-info/basicinfo';
+import Education from '@/components/(profile)/education/education';
 import PersonalInfo from '@/components/(profile)/personal-info/personalinfo';
 import React, { useState } from 'react';
 
@@ -60,7 +61,9 @@ const TabView = () => {
         {activeTab === 1 && <div>
           <PersonalInfo/>
           </div>}
-        {activeTab === 2 && <div>Content for Education & Experience</div>}
+        {activeTab === 2 && <div>
+          <Education/>
+          </div>}
         {activeTab === 3 && <div>Content for Key Performance Indicator</div>}
         {activeTab === 4 && <div>Content for Performance Evaluation</div>}
       </div>
