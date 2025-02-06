@@ -1,3 +1,7 @@
+"use client"
+import Image from "next/image"
+import { useState } from "react"
+
 interface EmployeeInfo {
   name: string
   employeeId: string
@@ -10,8 +14,9 @@ interface EmployeeInfo {
   supervisor: string
 }
 
-export default function EmployeeInfoCard() {
-  const employeeInfo: EmployeeInfo = {
+export default function BasicInfo() {
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [employeeInfo, setEmployeeInfo] = useState<EmployeeInfo>({
     name: "Mahir Hossain",
     employeeId: "24175004",
     designation: "Founder",
@@ -21,29 +26,77 @@ export default function EmployeeInfoCard() {
     jobStatus: "Permanent",
     joiningDate: "22 October, 2022",
     supervisor: "Not Applicable",
-  }
+  });
+
+  const handleInputChange = (key: keyof EmployeeInfo, value: string) => {
+    setEmployeeInfo((prev) => ({ ...prev, [key]: value }));
+  };
 
   const formatLabel = (key: string) => {
     return key
       .replace(/([A-Z])/g, " $1")
       .toLowerCase()
-      .replace(/^\w/, (c) => c.toUpperCase())
-  }
+      .replace(/^\w/, (c) => c.toUpperCase());
+  };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <div className="space-y-4">
-        {Object.entries(employeeInfo).map(([key, value]) => (
-          <div key={key} className="flex items-center border-b border-gray-100 pb-2">
-            <div className="w-40 text-right text-blue-600 pr-2">{formatLabel(key)}</div>
-            <div className="flex-1">
-              <span className="inline-block min-w-[12px]">:</span>
-              <span className="ml-1">{value}</span>
-            </div>
+    <div>
+      <div className="my-10 flex gap-5">
+        <div>
+          <h2 className="text-3xl font-semibold text-[#1D65E9]">Basic Information</h2>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div
+            className="relative w-16 h-8 rounded-full cursor-pointer"
+            onClick={() => setIsEnabled(!isEnabled)}
+          >
+            <div
+              className={`absolute w-full h-full rounded-full transition-colors duration-200 ${
+                isEnabled ? "bg-blue-400" : "bg-gray-200"
+              }`}
+            />
+            <div
+              className={`absolute w-7 h-7 bg-white rounded-full shadow transform transition-transform duration-200 ${
+                isEnabled ? "translate-x-8" : "translate-x-1"
+              } top-0.5`}
+            />
           </div>
-        ))}
+          <span
+            className="text-blue-600 cursor-pointer select-none text-lg"
+            onClick={() => setIsEnabled(!isEnabled)}
+          >
+            Edit Mode
+          </span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2">
+        <div className="space-y-4">
+          {Object.entries(employeeInfo).map(([key, value]) => (
+            <div key={key} className="flex items-center pb-2">
+              <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
+                {formatLabel(key)}
+              </div>
+              <div className="flex-1">
+                <span className="inline-block min-w-[12px]">:</span>
+                {isEnabled ? (
+                  <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => handleInputChange(key as keyof EmployeeInfo, e.target.value)}
+                    className="pl-5 bg-[#E3F3FF]  text-2xl p-1 rounded "
+                  />
+                ) : (
+                  <span className="pl-5 text-2xl p-1">{value}</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div>
+          <Image src="/src/app/Account.png" alt="signature" width={500} height={100} />
+        </div>
       </div>
     </div>
-  )
+  );
 }
-
