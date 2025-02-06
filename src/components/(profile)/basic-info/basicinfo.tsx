@@ -78,7 +78,6 @@ export default function BasicInfo() {
                 {formatLabel(key)}
               </div>
               <div className="flex-1">
-                <span className="inline-block min-w-[12px]">:</span>
                 {isEnabled ? (
                   <input
                     type="text"
@@ -87,7 +86,10 @@ export default function BasicInfo() {
                     className="pl-5 bg-[#E3F3FF]  text-2xl p-1 rounded "
                   />
                 ) : (
-                  <span className="pl-5 text-2xl p-1">{value}</span>
+                  <>
+                <span className="inline-block ">:</span>
+                <span className="pl-5 text-2xl p-1">{value}</span>
+                </>
                 )}
               </div>
             </div>
