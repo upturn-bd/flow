@@ -18,7 +18,6 @@ const navItems = [
       { label: "Process", icon: ArrowsClockwiseIcon, href: "/process" },
       { label: "Stakeholder", icon: UsersIcon, href: "/stakeholder" },
     ],
-    gridCols: "grid-cols-4", // Layout for this section
   },
   {
     category: "Operations",
@@ -27,7 +26,6 @@ const navItems = [
       { label: "Non-cash items", icon: CurrencyDollarIcon, href: "/non-cash-items" },
       { label: "Roles, JD & KPI", icon: BuildingsIcon, href: "/roles-jd-kpi" },
     ],
-    gridCols: "grid-cols-3", // Layout for this section
   },
 ];
 
@@ -36,18 +34,18 @@ export default function Page() {
     <div className="container mx-auto p-6">
       {navItems.map((section) => (
         <div key={section.category} className="mb-8">
-          <h2 className="text-lg font-semibold mb-4">{section.category}</h2>
-          <div className={`grid ${section.gridCols} gap-4`}>
+          <h2 className="text-3xl text-blue-600 font-semibold mb-4">{section.category}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4">
             {section.items.map((item) => {
               const Icon = item.icon;
               return (
                 <a
                   href={item.href}
                   key={item.label}
-                  className="w-32 h-32 flex flex-col items-center justify-center border border-gray-300 rounded-lg shadow-md p-4 hover:bg-gray-100 transition"
+                  className="w-60 h-40 flex flex-col items-center justify-center border border-gray-300 rounded-lg shadow-md p-4 hover:bg-gray-100 transition"
                 >
-                  <Icon size={45} className="text-blue-500" />
-                  <p className="mt-2 text-sm text-gray-700">{item.label}</p>
+                  <Icon size={72} className="text-blue-500" />
+                  <p className="mt-2 text-xl text-gray-700">{item.label}</p>
                 </a>
               );
             })}
