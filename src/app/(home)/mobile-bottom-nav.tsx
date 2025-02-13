@@ -19,7 +19,7 @@ const navItems = [
   },
   {
     label: "task",
-    href: "/task",
+    href: "/entry",
     icon: ShoppingBagIcon,
   },
   {

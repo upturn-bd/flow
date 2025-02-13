@@ -1,5 +1,5 @@
 import React from "react";
-import TabView from "./top-navigation";
+import TabView from "./profile";
 
 
 export default function ProfilePage() {

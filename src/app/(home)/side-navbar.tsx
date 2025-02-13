@@ -18,8 +18,8 @@ const navItems = [
     icon: UserCircleIcon,
   },
   {
-    label: "task",
-    href: "/task",
+    label: "entry",
+    href: "/entry",
     icon: ShoppingBagIcon,
   },
   {
