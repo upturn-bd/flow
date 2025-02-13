@@ -24,7 +24,7 @@ const navItems = [
   },
   {
     label: "Panel",
-    href: "/",
+    href: "/table",
     icon: GridFourIcon,
   },
   {

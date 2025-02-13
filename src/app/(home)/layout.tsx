@@ -1,7 +1,7 @@
 import React from "react";
 
 import Sidebar from "./sidebar";
-import TopNavigation from "./top-navigation";
+
 import MobileBottomNav from "./mobile-bottom-nav";
 
 export default function HomeLayout({
@@ -14,7 +14,6 @@ export default function HomeLayout({
       <Sidebar />
       <MobileBottomNav />
       <div className="mt-32">
-        <TopNavigation />
         <main>{children}</main>
       </div>
     </div>
