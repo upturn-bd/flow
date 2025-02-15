@@ -19,7 +19,6 @@ const Signup = () => {
   const {
     register,
     handleSubmit,
-    setError,
     getValues,
     formState: { errors },
   } = useForm<FormData>();
@@ -40,18 +39,10 @@ const Signup = () => {
       alert("You must agree to the terms and conditions.");
       return;
     }
-    try {
-      //   await signup({ email: data.email, password: data.password });
-      await signup({
-        email: values.email,
-        password: values.password,
-      });
-    } catch (err) {
-      if (err instanceof Error) {
-        console.error("Signup Error:", err.message);
-        setError("email", { type: "manual", message: err.message });
-      }
-    }
+    await signup({
+      email: values.email,
+      password: values.password,
+    });
   };
 
   return (
