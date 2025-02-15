@@ -78,7 +78,7 @@ const SearchableTable: React.FC = () => {
   };
 
   return (
-    <div className="p-5 max-w-4xl mx-auto">
+    <div className="p-5 container mx-auto">
       <div className="flex gap-2 mb-4">
         <input
           type="text"
