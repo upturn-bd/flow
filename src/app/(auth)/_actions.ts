@@ -1,39 +1,58 @@
-'use server'
+"use server";
 
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from "@/lib/supabase/server";
 
-export async function login({ email, password }: { email: string; password: string }) {
-    const supabase = await createClient()
+export async function login({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) {
+  const supabase = await createClient();
 
-    const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-    })
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email,
+    password,
+  };
 
-    if (error) {
-        console.error("🔴", error);
-        redirect('/error')
-    }
+  const { error } = await supabase.auth.signInWithPassword(data);
 
-    revalidatePath('/')
-    redirect('/')
+  if (error) {
+    redirect("/error");
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/");
 }
 
-export async function signup({ email, password }: { email: string; password: string }) {
-    const supabase = await createClient()
+export async function signup({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) {
+  const supabase = await createClient();
 
-    const { error } = await supabase.auth.signUp({
-        email,
-        password,
-    })
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email,
+    password,
+  };
 
-    if (error) {
-        redirect('/error')
-    }
+  const { error } = await supabase.auth.signUp(data);
 
-    revalidatePath('/', 'layout')
-    redirect('/')
+  if (error) {
+    redirect("/error");
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/");
 }
