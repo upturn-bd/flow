@@ -23,13 +23,13 @@ const navItems = [
     icon: ShoppingBagIcon,
   },
   {
-    label: "Panel",
+    label: "table",
     href: "/table",
     icon: GridFourIcon,
   },
   {
-    label: "Notes",
-    href: "/",
+    label: "adminmgt",
+    href: "/adminmgt",
     icon: NotePencilIcon,
   },
   {
