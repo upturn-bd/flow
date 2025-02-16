@@ -1,9 +1,9 @@
 "use client";
 
-import BasicInfo from '@/components/(profile)/basic-info/basicinfo';
-import Education from '@/components/(profile)/education/education';
-import Experience from '@/components/(profile)/experience/experience';
-import PersonalInfo from '@/components/(profile)/personal-info/personalinfo';
+import BasicInfo from '@/components/(user)/basic-info/basicinfo';
+import Education from '@/components/(user)/education/education';
+import Experience from '@/components/(user)/experience/experience';
+import PersonalInfo from '@/components/(user)/personal-info/personalinfo';
 import React, { useState } from 'react';
 
 

@@ -53,9 +53,9 @@ export default function Education() {
   };
 
   return (
-    <div className="p-6 bg-white shadow rounded-lg">
+    <div className="my-10">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold">Education</h2>
+        <h2 className="text-3xl font-semibold text-[#1D65E9]">Education</h2>
         <div className="flex items-center space-x-2">
           <div
             className="relative w-16 h-8 rounded-full cursor-pointer"
@@ -88,7 +88,7 @@ export default function Education() {
       </div>
       <table className="w-full border-collapse border border-gray-300">
         <thead>
-          <tr className="bg-gray-100">
+          <tr className="bg-gray-100  text-[#002568]">
             <th className="border p-2">Degree</th>
             <th className="border p-2">Institution</th>
             <th className="border p-2">From</th>
@@ -96,7 +96,7 @@ export default function Education() {
             <th className="border p-2">CGPA</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="text-blue-500">
           {education.map((entry) => (
             <tr
               key={entry.id}
