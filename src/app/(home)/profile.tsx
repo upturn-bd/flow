@@ -9,29 +9,28 @@ import React, { useState } from 'react';
 
 interface NavItem {
   label: string;
-  href: string;
 }
 
 const navItems: NavItem[] = [
   {
     label: 'Basic Information',
-    href: '/',
+   
   },
   {
     label: 'Personal Information',
-    href: '/',
+    
   },
   {
     label: 'Education & Experience',
-    href: '/',
+   
   },
   {
     label: 'Key Performance Indicator',
-    href: '/',
+   
   },
   {
     label: 'Performance Evaluation',
-    href: '/',
+  
   },
 ];
 
