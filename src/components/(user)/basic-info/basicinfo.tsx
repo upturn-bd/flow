@@ -96,7 +96,7 @@ export default function BasicInfo() {
           ))}
         </div>
         <div>
-          <Image src="/src/app/Account.png" alt="signature" width={500} height={100} />
+          <Image src="/Account.png" alt="signature" width={300} height={100} />
         </div>
       </div>
     </div>
