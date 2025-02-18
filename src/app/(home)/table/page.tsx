@@ -33,7 +33,19 @@ const Page: React.FC = () => {
       </div>
 
       <div>
-        <Table key={activeTab} />
+      {
+        activeTab === 0 && <Table />
+      }
+      </div>
+      <div>
+      {
+        activeTab === 1 && <Table />
+      }
+      </div>
+      <div>
+      {
+        activeTab === 2 && <Table />
+      }
       </div>
     </div>
   );
