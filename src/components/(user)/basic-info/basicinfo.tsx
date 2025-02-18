@@ -1,4 +1,4 @@
-"use client"
+import { getBasicEmployeeInfo } from "@/lib/api/getEmployeeInfo"
 import Image from "next/image"
 import { useState } from "react"
 
@@ -38,6 +38,8 @@ export default function BasicInfo() {
       .toLowerCase()
       .replace(/^\w/, (c) => c.toUpperCase());
   };
+
+  getBasicEmployeeInfo();
 
   return (
     <div>

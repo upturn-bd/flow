@@ -70,8 +70,6 @@ export async function googleSignIn(){
 
   const error = response.error;
 
-  console.log("Google Sign-In Error:", response.data);
-
   if (error) {
     throw error;
   }
