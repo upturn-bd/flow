@@ -34,7 +34,7 @@ const navItems = [
   },
   {
     label: "Messages",
-    href: "/",
+    href: "/request&issues",
     icon: EnvelopeIcon,
   },
   {
