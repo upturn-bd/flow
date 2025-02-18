@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
 import Link from "next/link";
 
-import { login } from "../_actions";
+import { googleSignIn, login } from "../_actions";
 
 interface SignInFormData {
   email: string;
@@ -37,8 +37,10 @@ const SignIn = () => {
   const handleSignIn = async (data: SignInFormData) => {
     setGeneralError(null);
     setLoading(true);
-
-    await login({ email: data.email, password: data.password });
+    const { error } = await login({ email: data.email, password: data.password });
+    if(error) {
+      setGeneralError("Login failed. " + error.message);
+    }
     setLoading(false);
   };
 
@@ -49,6 +51,7 @@ const SignIn = () => {
     setLoading(true);
 
     try {
+      await googleSignIn();
     } catch (err) {
       if (err instanceof Error) {
         console.error("Google Sign-In Error:", err.message);
