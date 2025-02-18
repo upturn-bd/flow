@@ -1,5 +1,6 @@
 "use client"
 
+import Leave from '@/components/(request&issues)/leave/leave';
 import React, { useState } from 'react';
 
 interface NavItem {
@@ -36,6 +37,7 @@ const Page: React.FC = () => {
       <div>
       {
         activeTab === 0 && <div>   
+            <Leave/>
         </div>
       }
       </div>
