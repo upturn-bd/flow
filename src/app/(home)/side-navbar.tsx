@@ -43,8 +43,8 @@ const navItems = [
     icon: ScrollIcon,
   },
   {
-    label: "Settings",
-    href: "/",
+    label: "admin-settings",
+    href: "/admin-settings",
     icon: UserGearIcon,
   },
 ];
