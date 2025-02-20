@@ -45,13 +45,15 @@ const Page: React.FC = () => {
       <div>
       {
         activeTab === 1 && <div>
+            <Leave/>
         </div>
       }
       </div>
 
       <div>
       {
-        activeTab === 2 && <div>  
+        activeTab === 2 && <div>
+            <Leave/>  
         </div>
       }
       </div>
@@ -59,6 +61,7 @@ const Page: React.FC = () => {
       <div>
       {
         activeTab === 3 && <div>  
+            <Leave/>
         </div>
       }
       </div>
@@ -66,6 +69,7 @@ const Page: React.FC = () => {
       <div>
       {
         activeTab === 4 && <div>  
+            <Leave/>
         </div>
       }
       </div>
