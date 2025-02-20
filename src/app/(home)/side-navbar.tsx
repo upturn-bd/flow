@@ -38,8 +38,8 @@ const navItems = [
     icon: EnvelopeIcon,
   },
   {
-    label: "Scroll",
-    href: "/",
+    label: "reports",
+    href: "/reports",
     icon: ScrollIcon,
   },
   {
