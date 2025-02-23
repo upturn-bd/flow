@@ -44,17 +44,17 @@ export default function CompanyBasics() {
 
   return (
     <div className="">
-      <h2 className="text-xl font-bold text-blue-600 mb-4">Step 1: Company Basics</h2>
+      <h2 className="text-3xl font-bold text-blue-600 mb-4">Step 1: Company Basics</h2>
       <div className="space-y-4">
-        <div>
+        <div className="flex">
           <label className="block font-semibold mb-1">Company Name</label>
           <input type="text" name="companyName" value={company.companyName} onChange={handleChange} className="w-full border p-2 rounded" />
         </div>
-        <div>
+        <div className="flex">
           <label className="block font-semibold mb-1">Company Code</label>
           <input type="text" name="companyCode" value={company.companyCode} onChange={handleChange} className="w-full border p-2 rounded" />
         </div>
-        <div>
+        <div className="flex">
           <label className="block font-semibold mb-1">Industry</label>
           <select name="industry" value={company.industry} onChange={handleChange} className="w-full border p-2 rounded">
             <option value="">Select Industry</option>
@@ -63,7 +63,7 @@ export default function CompanyBasics() {
             <option value="Healthcare">Healthcare</option>
           </select>
         </div>
-        <div>
+        <div className="flex">
           <label className="block font-semibold mb-1">Country</label>
           <input type="text" name="country" value={company.country} onChange={handleChange} className="w-full border p-2 rounded" />
         </div>
