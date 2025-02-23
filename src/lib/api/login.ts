@@ -1,10 +1,8 @@
-"use server";
+"use client";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
-import { createClient } from "@/lib/supabase/server";
-import { AuthError } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/client";
 
 export async function login({
   email,
@@ -12,8 +10,8 @@ export async function login({
 }: {
   email: string;
   password: string;
-}) : Promise<{ error?: AuthError }> {
-  const supabase = await createClient();
+}) {
+  const supabase = createClient();
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -29,7 +27,6 @@ export async function login({
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
 }
 
 export async function signup({
@@ -39,7 +36,7 @@ export async function signup({
   email: string;
   password: string;
 }) {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -51,21 +48,20 @@ export async function signup({
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    redirect("/error");
+    console.error(error);
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
 }
 
 export async function googleSignIn(){
-  const supabase = await createClient();
+  const supabase = createClient();
 
   const response = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options:{
-      redirectTo: "http://localhost:3000/auth/callback",
-    }
+    // options:{
+    //   redirectTo: "http://localhost:3000/auth/callback",
+    // }
   });
 
   const error = response.error;
@@ -75,5 +71,4 @@ export async function googleSignIn(){
   }
 
   revalidatePath("/", "layout");
-  redirect(response.data.url);
 }

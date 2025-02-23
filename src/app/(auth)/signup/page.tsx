@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
 
-import { signup } from "../_actions";
+import { signup } from "../../../lib/api/login";
 
 interface FormData {
   email: string;

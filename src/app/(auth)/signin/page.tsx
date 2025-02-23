@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
 import Link from "next/link";
 
-import { googleSignIn, login } from "../_actions";
+import { googleSignIn, login } from "../../../lib/api/login";
 
 interface SignInFormData {
   email: string;
