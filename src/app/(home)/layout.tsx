@@ -11,11 +11,11 @@ export default function HomeLayout({
 }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-[100px_1fr]">
-      <Sidebar />
-      <MobileBottomNav />
-      <div className="mt-32">
+      <div className="mt-32 absolute h-full md:ml-[120px] md:mt-[0px]">
         <main>{children}</main>
       </div>
+      <MobileBottomNav />
+      <Sidebar />
     </div>
   );
 }

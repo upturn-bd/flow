@@ -54,14 +54,14 @@ const navItems = [
 export default function Sidebar() {
   return (
     <div
-      className="w-full relative h-dvh md:flex flex-col items-center justify-center hidden"
+      className="w-[100px] fixed h-dvh md:flex flex-col items-center justify-center hidden"
       style={{
         background: "linear-gradient(135.32deg, #001731 24.86%, #002363 100%)",
       }}
     >
-      <div className="absolute top-10 right-0 translate-x-1/2 p-10 rounded-full bg-[#001731] flex items-center justify-center">
+      <div className="absolute top-10 right-0 translate-x-1/3 p-5 rounded-full bg-[#001731] flex items-center justify-center">
         <ArrowFatRightIcon
-          size={80}
+          size={70}
           className="-rotate-45 text-yellow-500"
           weight="fill"
         />
