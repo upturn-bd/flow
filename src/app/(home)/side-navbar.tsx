@@ -3,53 +3,10 @@
 import Link from "next/link";
 
 import {
-  UserCircle as UserCircleIcon,
-  ShoppingBag as ShoppingBagIcon,
-  GridFour as GridFourIcon,
-  NotePencil as NotePencilIcon,
-  Envelope as EnvelopeIcon,
-  Scroll as ScrollIcon,
-  UserGear as UserGearIcon,
   ArrowFatRight as ArrowFatRightIcon,
 } from "@phosphor-icons/react/dist/ssr";
+import { navItems } from "./nav-items";
 
-const navItems = [
-  {
-    label: "Profile",
-    href: "/",
-    icon: UserCircleIcon,
-  },
-  {
-    label: "entry",
-    href: "/entry",
-    icon: ShoppingBagIcon,
-  },
-  {
-    label: "table",
-    href: "/table",
-    icon: GridFourIcon,
-  },
-  {
-    label: "adminmgt",
-    href: "/adminmgt",
-    icon: NotePencilIcon,
-  },
-  {
-    label: "Messages",
-    href: "/request&issues",
-    icon: EnvelopeIcon,
-  },
-  {
-    label: "reports",
-    href: "/reports",
-    icon: ScrollIcon,
-  },
-  {
-    label: "admin-settings",
-    href: "/admin-settings",
-    icon: UserGearIcon,
-  },
-];
 
 export default function Sidebar() {
   return (

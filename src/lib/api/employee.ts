@@ -66,7 +66,7 @@ export interface EmployeeInfo {
 }
 
 export async function getEmployeeBasicInfo(uid: string): Promise<EmployeeInfo> {
-    const client = await createClient();
+    const client = createClient();
     const { data, error } = await client.from('employees').select(`
     first_name,
     last_name,

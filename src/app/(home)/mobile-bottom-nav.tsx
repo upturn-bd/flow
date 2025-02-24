@@ -2,54 +2,10 @@
 
 
 import {
-  UserCircle as UserCircleIcon,
-  ShoppingBag as ShoppingBagIcon,
-  GridFour as GridFourIcon,
-  NotePencil as NotePencilIcon,
-  Envelope as EnvelopeIcon,
-  Scroll as ScrollIcon,
-  UserGear as UserGearIcon,
   ArrowFatRight as ArrowFatRightIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
-
-const navItems = [
-  {
-    label: "Profile",
-    href: "/",
-    icon: UserCircleIcon,
-  },
-  {
-    label: "task",
-    href: "/entry",
-    icon: ShoppingBagIcon,
-  },
-  {
-    label: "Panel",
-    href: "/",
-    icon: GridFourIcon,
-  },
-  {
-    label: "Notes",
-    href: "/",
-    icon: NotePencilIcon,
-  },
-  {
-    label: "Messages",
-    href: "/",
-    icon: EnvelopeIcon,
-  },
-  {
-    label: "Scroll",
-    href: "/",
-    icon: ScrollIcon,
-  },
-  {
-    label: "Settings",
-    href: "/",
-    icon: UserGearIcon,
-  },
-];
+import { navItems } from "./nav-items";
 
 export default function MobileBottomNav() {
   return (
