@@ -1,6 +1,7 @@
-"use client"
+"use client";
+
 import CompanyBasics from "@/components/(admin-settings)/company-basics/company-basics";
-import React from "react";
+
 
 export default function page() {
   return (

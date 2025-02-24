@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
+
 import {
   UserCircle as UserCircleIcon,
   ShoppingBag as ShoppingBagIcon,

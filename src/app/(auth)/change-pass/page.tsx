@@ -1,10 +1,9 @@
 'use client';
 
 import Image from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { supabase } from "@/lib/supabase";
 import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
 
 interface FormData {
@@ -48,7 +47,7 @@ const page = () => {
                                 placeholder="Enter Code"
                                 {...register("code", { required: "Last Name is required" })}
                             />
-                            {errors.lastName && <p className="text-red-500">{errors.lastName.message}</p>}
+                            {errors.code && <p className="text-red-500">{errors.code.message}</p>}
 
                             <div className="relative">
                                 <input

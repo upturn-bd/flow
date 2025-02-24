@@ -1,4 +1,6 @@
-import type { Metadata } from "next";
+"use client";
+
+// import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import "./globals.css";
@@ -8,10 +10,10 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Upturn",
-  description: "Upturn",
-};
+// export const metadata: Metadata = {
+//   title: "Upturn",
+//   description: "Upturn",
+// };
 
 export default function RootLayout({
   children,
@@ -20,6 +22,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <title>
+          {/* {metadata.title} */}
+          Upturn
+        </title>
+        <meta
+          name="description"
+          content={
+            // metadata.description
+            "Your all in one business solution"
+          } />
+      </head>
       <body className={`${geistSans.className} antialiased`}>{children}</body>
     </html>
   );

@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+
 import {
   Note as NoteIcon,
   ChartBar as ChartBarIcon,

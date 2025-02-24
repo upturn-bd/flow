@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+import { useState, useEffect } from "react";
 
 const dummyData = [
     { id: "001", name: "John Doe", industry: "Tech", address: "123 Main St", contact: "Alice", phone: "123-456-7890" },

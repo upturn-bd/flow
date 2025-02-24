@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+
 import {
   UserCircle as UserCircleIcon,
   ShoppingBag as ShoppingBagIcon,

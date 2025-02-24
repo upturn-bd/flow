@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
 import Link from "next/link";

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+
 import Sidebar from "./side-navbar";
 import MobileBottomNav from "./mobile-bottom-nav";
 
