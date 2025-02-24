@@ -1,40 +1,21 @@
 "use client";
 
-import { Employee, EmployeeBasicInfo } from "@/lib/models/employee";
-import { revalidatePath } from "next/cache";
+import { EmployeeInfo, getEmployeeBasicInfo } from "@/lib/api/employee";
 import Image from "next/image"
-import { useEffect, useState } from "react"
+import { useState } from "react";
+import { useEffect } from "react";
 
-// interface EmployeeInfo {
-//   name: string
-//   employeeId: string
-//   designation: string
-//   department: string
-//   phoneNo: string
-//   emailId: string
-//   jobStatus: string
-//   joiningDate: string
-//   supervisor: string
-// }
+export default function BasicInfo({ uid }: { uid: string }) {
+  const [isEnabled, setIsEnabled] = useState(true);
+  const [currentEmployee, setCurrentEmployee] = useState<EmployeeInfo | null>(null);
 
-export default function BasicInfo() {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [currentEmployee, setCurrentEmployee] = useState<Employee>(new Employee());
-  // const [employeeInfo, setEmployeeInfo] = useState<EmployeeInfo>({
-  //   name: "Mahir Hossain",
-  //   employeeId: "24175004",
-  //   designation: "Founder",
-  //   department: "Management",
-  //   phoneNo: "+8801640480530",
-  //   emailId: "mahir@upturn.com.bd",
-  //   jobStatus: "Permanent",
-  //   joiningDate: "22 October, 2022",
-  //   supervisor: "Not Applicable",
-  // });
-
-  const handleInputChange = (key: keyof EmployeeBasicInfo, value: string) => {
-    setCurrentEmployee(currentEmployee);
-  };
+  useEffect(() => {
+    const fetchEmployeeInfo = async () => {
+      const data = await getEmployeeBasicInfo(uid);
+      setCurrentEmployee(data);
+    };
+    fetchEmployeeInfo();
+  }, [uid]);
 
   const formatLabel = (key: string) => {
     return key
@@ -44,17 +25,19 @@ export default function BasicInfo() {
   };
 
 
+  const handleInputChange = (key: keyof EmployeeInfo, value: string) => {
+    setCurrentEmployee((prev) => {
+      if (prev) {
+        return { ...prev, [key]: value };
+      }
+      return prev;
+    });
+  };
+
   useEffect(() => {
-    const fetchEmployeeInfo = async () => {
-      const updatedEmployee = new Employee();
-      await updatedEmployee.getBasicInfo();
-      console.log(updatedEmployee.basicInfo);
-      setCurrentEmployee(updatedEmployee);
-    };
-    fetchEmployeeInfo();
     
   }, []);
-
+  
   return (
     <div>
       <div className="my-10 flex gap-5">
@@ -86,8 +69,8 @@ export default function BasicInfo() {
 
       <div className="grid grid-cols-2">
         <div className="space-y-4">
-            {currentEmployee?.basicInfo && Object.entries(currentEmployee.basicInfo).length > 0 ? (
-            Object.entries(currentEmployee.basicInfo).map(([key, value]) => (
+          {currentEmployee && Object.entries(currentEmployee).length > 0 ? (
+            Object.entries(currentEmployee).map(([key, value]) => (
               <div key={key} className="flex items-center pb-2">
               <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
                 {formatLabel(key)}
@@ -97,7 +80,7 @@ export default function BasicInfo() {
                 <input
                   type="text"
                   value={value}
-                  onChange={(e) => handleInputChange(key as keyof EmployeeBasicInfo, e.target.value)}
+                  onChange={(e) => handleInputChange(key as keyof EmployeeInfo, e.target.value)}
                   className="pl-5 bg-[#E3F3FF]  text-2xl p-1 rounded "
                 />
                 ) : (
@@ -110,7 +93,7 @@ export default function BasicInfo() {
               </div>
             ))
             ) : (
-            <div>{JSON.stringify(currentEmployee?.basicInfo)}</div>
+            <div>Loading...</div>
             )}
         </div>
         <div>

@@ -1,6 +1,6 @@
-import { EmployeeBasicInfo, EmployeeEducationInfo, EmployeeExperienceInfo, EmployeePersonalInfo } from "../employee";
+import { UserBasicInfo, EmployeeEducationInfo, EmployeeExperienceInfo, EmployeePersonalInfo } from "../employee";
 
-export const dummyEmployeeBasicInfos: EmployeeBasicInfo[] = [
+export const dummyEmployeeBasicInfos: UserBasicInfo[] = [
     ({
         username: "alice",
         email: "alice@example.com",

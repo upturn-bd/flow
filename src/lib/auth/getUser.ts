@@ -1,10 +1,10 @@
-"use client";
+"use server";
 
-import { createClient } from "../supabase/client";
+import { createClient } from "../supabase/server";
 import { User } from "@supabase/supabase-js";
 
-export async function getUser(): Promise<{ user: User | null }> {
-    const supabase = createClient();
+export async function getUser(): Promise<{ user: User | null; }> {
+    const supabase = await createClient();
     const { data, error } = await supabase.auth.getUser();
 
     if (data.user) {

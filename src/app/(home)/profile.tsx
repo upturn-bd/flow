@@ -34,7 +34,7 @@ const navItems: NavItem[] = [
   },
 ];
 
-const TabView = () => {
+export default function TabView({uid}: {uid: string}) {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
@@ -55,7 +55,7 @@ const TabView = () => {
       <div className="container mx-auto  ">
         {activeTab === 0 && 
         <div>
-          <BasicInfo />
+          <BasicInfo uid={uid}/>
         </div>
         }
         {activeTab === 1 && <div>
@@ -71,5 +71,3 @@ const TabView = () => {
     </section>
   );
 };
-
-export default TabView;
