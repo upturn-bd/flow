@@ -1,37 +1,39 @@
 "use client";
 
-import { getBasicEmployeeInfo } from "@/lib/api/getEmployeeInfo"
+import { Employee, EmployeeBasicInfo } from "@/lib/models/employee";
+import { revalidatePath } from "next/cache";
 import Image from "next/image"
 import { useEffect, useState } from "react"
 
-interface EmployeeInfo {
-  name: string
-  employeeId: string
-  designation: string
-  department: string
-  phoneNo: string
-  emailId: string
-  jobStatus: string
-  joiningDate: string
-  supervisor: string
-}
+// interface EmployeeInfo {
+//   name: string
+//   employeeId: string
+//   designation: string
+//   department: string
+//   phoneNo: string
+//   emailId: string
+//   jobStatus: string
+//   joiningDate: string
+//   supervisor: string
+// }
 
 export default function BasicInfo() {
   const [isEnabled, setIsEnabled] = useState(false);
-  const [employeeInfo, setEmployeeInfo] = useState<EmployeeInfo>({
-    name: "Mahir Hossain",
-    employeeId: "24175004",
-    designation: "Founder",
-    department: "Management",
-    phoneNo: "+8801640480530",
-    emailId: "mahir@upturn.com.bd",
-    jobStatus: "Permanent",
-    joiningDate: "22 October, 2022",
-    supervisor: "Not Applicable",
-  });
+  const [currentEmployee, setCurrentEmployee] = useState<Employee>(new Employee());
+  // const [employeeInfo, setEmployeeInfo] = useState<EmployeeInfo>({
+  //   name: "Mahir Hossain",
+  //   employeeId: "24175004",
+  //   designation: "Founder",
+  //   department: "Management",
+  //   phoneNo: "+8801640480530",
+  //   emailId: "mahir@upturn.com.bd",
+  //   jobStatus: "Permanent",
+  //   joiningDate: "22 October, 2022",
+  //   supervisor: "Not Applicable",
+  // });
 
-  const handleInputChange = (key: keyof EmployeeInfo, value: string) => {
-    setEmployeeInfo((prev) => ({ ...prev, [key]: value }));
+  const handleInputChange = (key: keyof EmployeeBasicInfo, value: string) => {
+    setCurrentEmployee(currentEmployee);
   };
 
   const formatLabel = (key: string) => {
@@ -43,7 +45,14 @@ export default function BasicInfo() {
 
 
   useEffect(() => {
-    getBasicEmployeeInfo();
+    const fetchEmployeeInfo = async () => {
+      const updatedEmployee = new Employee();
+      await updatedEmployee.getBasicInfo();
+      console.log(updatedEmployee.basicInfo);
+      setCurrentEmployee(updatedEmployee);
+    };
+    fetchEmployeeInfo();
+    
   }, []);
 
   return (
@@ -77,28 +86,32 @@ export default function BasicInfo() {
 
       <div className="grid grid-cols-2">
         <div className="space-y-4">
-          {Object.entries(employeeInfo).map(([key, value]) => (
-            <div key={key} className="flex items-center pb-2">
+            {currentEmployee?.basicInfo && Object.entries(currentEmployee.basicInfo).length > 0 ? (
+            Object.entries(currentEmployee.basicInfo).map(([key, value]) => (
+              <div key={key} className="flex items-center pb-2">
               <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
                 {formatLabel(key)}
               </div>
               <div className="flex-1">
                 {isEnabled ? (
-                  <input
-                    type="text"
-                    value={value}
-                    onChange={(e) => handleInputChange(key as keyof EmployeeInfo, e.target.value)}
-                    className="pl-5 bg-[#E3F3FF]  text-2xl p-1 rounded "
-                  />
+                <input
+                  type="text"
+                  value={value}
+                  onChange={(e) => handleInputChange(key as keyof EmployeeBasicInfo, e.target.value)}
+                  className="pl-5 bg-[#E3F3FF]  text-2xl p-1 rounded "
+                />
                 ) : (
-                  <>
-                    <span className="inline-block ">:</span>
-                    <span className="pl-5 text-2xl p-1">{value}</span>
-                  </>
+                <>
+                  <span className="inline-block ">:</span>
+                  <span className="pl-5 text-2xl p-1">{value !== undefined ? value.toString() : ''}</span>
+                </>
                 )}
               </div>
-            </div>
-          ))}
+              </div>
+            ))
+            ) : (
+            <div>{JSON.stringify(currentEmployee?.basicInfo)}</div>
+            )}
         </div>
         <div>
           <Image src="/Account.png" alt="signature" width={300} height={100} />

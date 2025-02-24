@@ -1,6 +1,6 @@
 "use client"
 
-import Leave from '@/components/(request&issues)/leave/leave';
+import Leave from '@/components/(request-and-issues)/leave/leave';
 import React, { useState } from 'react';
 
 interface NavItem {
