@@ -1,6 +1,8 @@
+"use client";
+
 import { getBasicEmployeeInfo } from "@/lib/api/getEmployeeInfo"
 import Image from "next/image"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface EmployeeInfo {
   name: string
@@ -39,7 +41,10 @@ export default function BasicInfo() {
       .replace(/^\w/, (c) => c.toUpperCase());
   };
 
-  getBasicEmployeeInfo();
+
+  useEffect(() => {
+    getBasicEmployeeInfo();
+  }, []);
 
   return (
     <div>
@@ -53,14 +58,12 @@ export default function BasicInfo() {
             onClick={() => setIsEnabled(!isEnabled)}
           >
             <div
-              className={`absolute w-full h-full rounded-full transition-colors duration-200 ${
-                isEnabled ? "bg-blue-400" : "bg-gray-200"
-              }`}
+              className={`absolute w-full h-full rounded-full transition-colors duration-200 ${isEnabled ? "bg-blue-400" : "bg-gray-200"
+                }`}
             />
             <div
-              className={`absolute w-7 h-7 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                isEnabled ? "translate-x-8" : "translate-x-1"
-              } top-0.5`}
+              className={`absolute w-7 h-7 bg-white rounded-full shadow transform transition-transform duration-200 ${isEnabled ? "translate-x-8" : "translate-x-1"
+                } top-0.5`}
             />
           </div>
           <span
@@ -89,9 +92,9 @@ export default function BasicInfo() {
                   />
                 ) : (
                   <>
-                <span className="inline-block ">:</span>
-                <span className="pl-5 text-2xl p-1">{value}</span>
-                </>
+                    <span className="inline-block ">:</span>
+                    <span className="pl-5 text-2xl p-1">{value}</span>
+                  </>
                 )}
               </div>
             </div>
