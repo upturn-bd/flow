@@ -25,13 +25,13 @@ export const navItems = [
       icon: GridFourIcon,
     },
     {
-      label: "adminmgt",
-      href: "/adminmgt",
+      label: "admin-management",
+      href: "/admin-management",
       icon: NotePencilIcon,
     },
     {
-      label: "Messages",
-      href: "/request&issues",
+      label: "request-and-issues",
+      href: "/request-and-issues",
       icon: EnvelopeIcon,
     },
     {
