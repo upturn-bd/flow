@@ -19,7 +19,7 @@ const Page: React.FC = () => {
   const [activeTab, setTab] = useState<number>(0);
 
   return (
-    <div className="p-5 container mx-auto">
+    <div>
       <div className="flex mb-10 w-fit rounded-lg shadow-md">
         {navItems.map((item, index) => (
           <button

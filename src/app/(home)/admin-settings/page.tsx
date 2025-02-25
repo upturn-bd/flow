@@ -5,7 +5,7 @@ import CompanyBasics from "@/components/(admin-settings)/company-basics/company-
 
 export default function page() {
   return (
-    <div className="container mx-auto">
+    <div>
       <div>
         <CompanyBasics />
       </div>

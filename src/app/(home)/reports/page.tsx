@@ -2,7 +2,7 @@
 
 export default function page() {
   return (
-    <div className='container mx-auto '>
+    <div >
         <p>Individual Performance Statement</p>
         <p>Stakeholders’ Invoice</p>
         <p>Salary Statement</p>

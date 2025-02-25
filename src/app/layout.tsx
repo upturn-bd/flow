@@ -8,10 +8,10 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-// export const metadata: Metadata = {
-//   title: "Upturn",
-//   description: "Upturn",
-// };
+export const metadata: Metadata = {
+  title: "Upturn",
+  description: "Upturn",
+};
 
 export default function RootLayout({
   children,

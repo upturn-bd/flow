@@ -39,7 +39,7 @@ export default function ProfilePage() {
   };
   return (
     <div>
-      <div className="my-10 flex gap-5">
+      <div className="flex gap-5">
         <div>
           <h2 className="text-3xl font-semibold text-[#1D65E9]">Basic Information</h2>
         </div>

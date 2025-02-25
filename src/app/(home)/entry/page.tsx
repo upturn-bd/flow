@@ -32,11 +32,11 @@ const navItems = [
 
 export default function Page() {
   return (
-    <div className="container mx-auto p-6">
+    <div className=" ">
       {navItems.map((section) => (
         <div key={section.category} className="mb-8">
           <h2 className="text-3xl text-blue-600 font-semibold mb-4">{section.category}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
             {section.items.map((item) => {
               const Icon = item.icon;
               return (

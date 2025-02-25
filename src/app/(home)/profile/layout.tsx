@@ -8,9 +8,9 @@ export default async function HomeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div >
       <TabView />
-      <main>{children}</main>
+      <main >{children}</main>
     </div>
   );
 }
