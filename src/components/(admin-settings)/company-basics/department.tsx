@@ -1,54 +1,71 @@
 import { useState } from "react";
 
 interface Department {
-  companyName: string;
-  companyCode: string;
-  industry: string;
-  country: string;
-  divisions: string[];
-  departments: { name: string; details: string; position: string }[];
+  name: string;
+  details?: string;
+  position?: string;
 }
 
 export default function DepartmentComponent() {
-  const [company, setCompany] = useState<Department>({
+  const [company, setCompany] = useState({
     companyName: "Unilever Bangladesh Limited",
     companyCode: "Ubl_1979@",
     industry: "",
     country: "Bangladesh",
     divisions: ["Sales", "Marketing", "Operations", "Finance", "HR"],
     departments: [
-      { name: "Digital Sales", details: "View Details", position: "View Position" },
+      { name: "Digital Sales" },
+      { name: "Marketing" },
     ],
   });
 
-  const [newDept, setNewDept] = useState({ name: "", details: "View Details", position: "View Position" });
   const [showInput, setShowInput] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDept, setSelectedDept] = useState<Department | null>(null);
+
+  const [newDept, setNewDept] = useState({
+    name: "",
+    details: "",
+    position: "",
+  });
 
   const handleAddDepartment = () => {
     if (newDept.name.trim()) {
       setCompany((prev) => ({
         ...prev,
-        departments: [...prev.departments, newDept],
+        departments: [...prev.departments, { ...newDept }],
       }));
-      setNewDept({ name: "", details: "View Details", position: "View Position" });
+      setNewDept({ name: "", details: "", position: "" });
       setShowInput(false);
     }
+  };
+
+  const handleOpenModal = (dept: Department) => {
+    setSelectedDept(dept);
+    setShowModal(true);
   };
 
   return (
     <div className="my-10">
       <label className="block font-bold text-3xl mb-4">Department</label>
+
       <div className="space-y-3">
         {company.departments.map((dept, index) => (
           <div key={index} className="grid grid-cols-3 gap-4 items-center">
             <div className="bg-blue-100 text-black px-4 py-2 rounded-lg text-lg font-medium">
               {dept.name}
             </div>
-            <button className="bg-gray-200 text-black px-4 py-2 rounded-lg text-lg">
-              {dept.details}
+            <button
+              onClick={() => handleOpenModal(dept)}
+              className="bg-gray-200 text-black px-4 py-2 rounded-lg text-lg"
+            >
+              {dept.details ? "View Details" : "Add Details"}
             </button>
-            <button className="bg-gray-200 text-black px-4 py-2 rounded-lg text-lg">
-              {dept.position}
+            <button
+              onClick={() => handleOpenModal(dept)}
+              className="bg-gray-200 text-black px-4 py-2 rounded-lg text-lg"
+            >
+              {dept.position ? "View Position" : "Add Position"}
             </button>
           </div>
         ))}
@@ -86,6 +103,27 @@ export default function DepartmentComponent() {
       >
         +
       </button>
+
+      {/* Modal Window */}
+      {showModal && selectedDept && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4">{selectedDept.name}</h2>
+            <p className="text-gray-700">
+              {selectedDept.details ? `Details: ${selectedDept.details}` : "No details available"}
+            </p>
+            <p className="text-gray-700">
+              {selectedDept.position ? `Position: ${selectedDept.position}` : "No position available"}
+            </p>
+            <button
+              onClick={() => setShowModal(false)}
+              className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
