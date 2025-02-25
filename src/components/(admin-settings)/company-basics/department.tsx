@@ -18,9 +18,22 @@ export default function DepartmentComponent() {
     divisions: ["Sales", "Marketing", "Operations", "Finance", "HR"],
     departments: [
       { name: "Digital Sales", details: "View Details", position: "View Position" },
-      { name: "Inbound Marketing", details: "Add Details", position: "Add Position" },
     ],
   });
+
+  const [newDept, setNewDept] = useState({ name: "", details: "View Details", position: "View Position" });
+  const [showInput, setShowInput] = useState(false);
+
+  const handleAddDepartment = () => {
+    if (newDept.name.trim()) {
+      setCompany((prev) => ({
+        ...prev,
+        departments: [...prev.departments, newDept],
+      }));
+      setNewDept({ name: "", details: "View Details", position: "View Position" });
+      setShowInput(false);
+    }
+  };
 
   return (
     <div className="my-10">
@@ -41,11 +54,38 @@ export default function DepartmentComponent() {
         ))}
       </div>
 
+      {/* Input field to add new department */}
+      {showInput && (
+        <div className="mt-4 flex gap-3 items-center">
+          <input
+            type="text"
+            className="border px-4 py-2 rounded-lg text-lg"
+            placeholder="Department Name"
+            value={newDept.name}
+            onChange={(e) => setNewDept({ ...newDept, name: e.target.value })}
+          />
+          <button
+            onClick={handleAddDepartment}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-lg hover:bg-green-600"
+          >
+            Add
+          </button>
+          <button    
+            onClick={() => setShowInput(false)}
+            className="bg-red-600 text-white px-4 py-2 rounded-lg text-lg hover:bg-red-700"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
       {/* Floating Add Button */}
-      <button className="fixed bottom-5 left-5 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 text-xl">
+      <button
+        onClick={() => setShowInput(true)}
+        className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white rounded-full hover:bg-blue-700 text-2xl shadow-lg my-5"
+      >
         +
       </button>
-      
     </div>
   );
 }

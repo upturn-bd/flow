@@ -153,7 +153,7 @@ export default function CompanyBasics() {
               ) : (
                 <button
                   onClick={() => setShowAddDivision(true)}
-                  className="bg-blue-600 text-white px-4 py-2  rounded-full hover:bg-blue-700 text-2xl"
+                  className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white rounded-full hover:bg-blue-700 text-2xl shadow-lg"
                 >
                   +
                 </button>
