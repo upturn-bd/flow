@@ -224,38 +224,58 @@ export default function DepartmentComponent() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-[500px]">
             <h2 className="text-xl font-bold mb-4">Position Details</h2>
-            <div>
-              <div className="mb-4">
-                <label className="block font-semibold">Position Name</label>
-                <input
-                  type="text"
-                  className="w-full border px-4 py-2 rounded-lg"
-                  value={positionFormData.name}
-                  onChange={(e) => setPositionFormData({ ...positionFormData, name: e.target.value })}
-                />
+
+            {selectedDept.positions && selectedDept.positions.length > 0 ? (
+              <div>
+                {selectedDept.positions.map((position, index) => (
+                  <div key={index} className="mb-4">
+                    <p><strong>Position Name:</strong> {position.name}</p>
+                    <p><strong>Grade:</strong> {position.grade}</p>
+                    <p><strong>Description:</strong> {position.description}</p>
+                  </div>
+                ))}
               </div>
-              <div className="mb-4">
-                <label className="block font-semibold">Position Grade</label>
-                <input
-                  type="text"
-                  className="w-full border px-4 py-2 rounded-lg"
-                  value={positionFormData.grade}
-                  onChange={(e) => setPositionFormData({ ...positionFormData, grade: e.target.value })}
-                />
+            ) : (
+              <div>
+                <div className="mb-4">
+                  <label className="block font-semibold">Position Name</label>
+                  <input
+                    type="text"
+                    className="w-full border px-4 py-2 rounded-lg"
+                    value={positionFormData.name}
+                    onChange={(e) => setPositionFormData({ ...positionFormData, name: e.target.value })}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block font-semibold">Position Grade</label>
+                  <input
+                    type="text"
+                    className="w-full border px-4 py-2 rounded-lg"
+                    value={positionFormData.grade}
+                    onChange={(e) => setPositionFormData({ ...positionFormData, grade: e.target.value })}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block font-semibold">Description</label>
+                  <textarea
+                    className="w-full border px-4 py-2 rounded-lg"
+                    value={positionFormData.description}
+                    onChange={(e) => setPositionFormData({ ...positionFormData, description: e.target.value })}
+                  />
+                </div>
+                <button
+                  onClick={handlePositionSubmit}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  Submit
+                </button>
               </div>
-              <div className="mb-4">
-                <label className="block font-semibold">Description</label>
-                <textarea
-                  className="w-full border px-4 py-2 rounded-lg"
-                  value={positionFormData.description}
-                  onChange={(e) => setPositionFormData({ ...positionFormData, description: e.target.value })}
-                />
-              </div>
-              <button onClick={handlePositionSubmit} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                Submit
-              </button>
-            </div>
-            <button onClick={() => setShowPositionModal(false)} className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+            )}
+
+            <button
+              onClick={() => setShowPositionModal(false)}
+              className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+            >
               Close
             </button>
           </div>
