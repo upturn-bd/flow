@@ -1,45 +1,73 @@
 'use client';
 
-import { EmployeeInfo, getEmployeeBasicInfo } from "@/lib/api/employee";
+import { EmployeeInfo, getEmployeeBasicInfo, setEmployeeBasicInfo } from "@/lib/api/employee";
 import Image from "next/image"
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { set } from "react-hook-form";
 
 export default function ProfilePage() {
 
   const searchParams = useSearchParams();
   const uid = searchParams.get("uid") || "";
 
-  const [isEnabled, setIsEnabled] = useState(true);
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [updating, setUpdating] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState<EmployeeInfo | null>(null);
+  const [updatedEmployee, setUpdatedEmployee] = useState<EmployeeInfo | null>(null);
 
   useEffect(() => {
     const fetchEmployeeInfo = async () => {
       const data = await getEmployeeBasicInfo(uid);
       setCurrentEmployee(data);
+      setUpdatedEmployee(data);
     };
     fetchEmployeeInfo();
   }, [uid]);
 
   const formatLabel = (key: string) => {
     return key
-      .replace(/([A-Z])/g, " $1")
-      .toLowerCase()
-      .replace(/^\w/, (c) => c.toUpperCase());
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
   };
 
 
   const handleInputChange = (key: keyof EmployeeInfo, value: string) => {
-    setCurrentEmployee((prev) => {
+    setUpdatedEmployee((prev) => {
       if (prev) {
         return { ...prev, [key]: value };
       }
       return prev;
     });
   };
+
+  const handleSave = async () => {
+    setUpdating(true);
+    if (!updatedEmployee) {
+      return;
+    }
+    // get partial updatedEmployee according to changes
+    const toUpdate: Partial<EmployeeInfo> = Object.entries(updatedEmployee).reduce(
+      (acc, [key, value]) => {
+        if (currentEmployee && currentEmployee[key as keyof EmployeeInfo] !== value) {
+          return { ...acc, [key]: value };
+        }
+        return acc;
+      },
+      {} as Partial<EmployeeInfo>
+    );
+    const { error } = await setEmployeeBasicInfo(uid, toUpdate);
+    if (error) {
+      console.error(error);
+    } else {
+      setIsEnabled(false);
+    }
+    setUpdating(false);
+  }
+
   return (
     <div>
-      <div className="flex gap-5">
+      <div className="flex gap-5 mb-5">
         <div>
           <h2 className="text-3xl font-semibold text-[#1D65E9]">Basic Information</h2>
         </div>
@@ -68,8 +96,8 @@ export default function ProfilePage() {
 
       <div className="grid grid-cols-2">
         <div className="space-y-4">
-          {currentEmployee && Object.entries(currentEmployee).length > 0 ? (
-            Object.entries(currentEmployee).map(([key, value]) => (
+          {updatedEmployee && Object.entries(updatedEmployee).length > 0 ? (
+            Object.entries(updatedEmployee).map(([key, value]) => (
               <div key={key} className="flex items-center pb-2">
                 <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
                   {formatLabel(key)}
@@ -95,8 +123,18 @@ export default function ProfilePage() {
             <div>Loading...</div>
           )}
         </div>
+        {/* Save button */}
         <div>
           <Image src="/Account.png" alt="signature" width={300} height={100} />
+        </div>
+        <div className="flex justify-center items-center">
+          <button
+            className="bg-[#1D65E9] text-white px-5 py-2 rounded-lg"
+            onClick={handleSave}
+            disabled={updating}
+          >
+            {updating ? "Saving..." : "Save"}
+          </button>
         </div>
       </div>
     </div>
