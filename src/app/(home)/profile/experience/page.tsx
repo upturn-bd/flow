@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Education from "../education/page";
 
 interface ExperienceEntry {
   id: number;
@@ -180,6 +181,7 @@ export default function Experience() {
           </button>
         </div>
       )}
+      <Education/>
     </div>
   );
 }
