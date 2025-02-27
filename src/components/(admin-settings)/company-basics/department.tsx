@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
 interface Department {
   name: string;
@@ -16,6 +18,19 @@ interface Position {
   department: string;
   description: string;
 }
+
+// Reusable TipTap Editor Component
+const TipTapEditor = ({ content, onChange }) => {
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
+  });
+
+  return <EditorContent editor={editor} className="tiptap-editor" />;
+};
 
 export default function DepartmentComponent() {
   const [company, setCompany] = useState({
@@ -94,6 +109,14 @@ export default function DepartmentComponent() {
     }
   };
 
+  const handleDescriptionChange = (html) => {
+    setFormData((prev) => ({ ...prev, description: html }));
+  };
+
+  const handlePositionDescriptionChange = (html) => {
+    setPositionFormData((prev) => ({ ...prev, description: html }));
+  };
+
   return (
     <div className="my-10">
       <label className="block font-bold text-3xl mb-4">Department</label>
@@ -135,7 +158,7 @@ export default function DepartmentComponent() {
           >
             Add
           </button>
-          <button    
+          <button
             onClick={() => setShowInput(false)}
             className="bg-red-600 text-white px-4 py-2 rounded-lg text-lg hover:bg-red-700"
           >
@@ -161,7 +184,7 @@ export default function DepartmentComponent() {
                 <p><strong>Department Name:</strong> {selectedDept.name}</p>
                 <p><strong>Department Head:</strong> {selectedDept.details.head}</p>
                 <p><strong>Division:</strong> {selectedDept.details.division}</p>
-                <p><strong>Description:</strong> {selectedDept.details.description}</p>
+                <p><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: selectedDept.details.description }} /></p>
               </div>
             ) : (
               <div>
@@ -194,12 +217,7 @@ export default function DepartmentComponent() {
                 </div>
                 <div className="mb-4">
                   <label className="block font-semibold">Description</label>
-                  <textarea
-                    className="w-full border px-4 py-2 rounded-lg"
-                    rows={3}
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  />
+                  <TipTapEditor content={formData.description} onChange={handleDescriptionChange} />
                 </div>
                 <button
                   onClick={handleSubmit}
@@ -231,7 +249,7 @@ export default function DepartmentComponent() {
                   <div key={index} className="mb-4">
                     <p><strong>Position Name:</strong> {position.name}</p>
                     <p><strong>Grade:</strong> {position.grade}</p>
-                    <p><strong>Description:</strong> {position.description}</p>
+                    <p><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: position.description }} /></p>
                   </div>
                 ))}
               </div>
@@ -257,11 +275,7 @@ export default function DepartmentComponent() {
                 </div>
                 <div className="mb-4">
                   <label className="block font-semibold">Description</label>
-                  <textarea
-                    className="w-full border px-4 py-2 rounded-lg"
-                    value={positionFormData.description}
-                    onChange={(e) => setPositionFormData({ ...positionFormData, description: e.target.value })}
-                  />
+                  <TipTapEditor content={positionFormData.description} onChange={handlePositionDescriptionChange} />
                 </div>
                 <button
                   onClick={handlePositionSubmit}
