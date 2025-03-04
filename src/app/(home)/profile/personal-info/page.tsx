@@ -14,7 +14,7 @@ export default function PersonalInfo() {
   const uid = searchParams.get("uid") || "";
 
   const [isEnabled, setIsEnabled] = useState(false);
-  const [updating, setUpdating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [currentPersonalInfo, setCurrentPersonalInfo] =
     useState<EmployeePersonalInfo | null>(null);
   const [updatedPersonalInfo, setUpdatedPersonalInfo] =
@@ -37,7 +37,7 @@ export default function PersonalInfo() {
   };
 
   const handleSave = async () => {
-    setUpdating(true);
+    setIsUpdating(true);
     if (!updatedPersonalInfo) {
       return;
     }
@@ -59,7 +59,7 @@ export default function PersonalInfo() {
     } else {
       setIsEnabled(false);
     }
-    setUpdating(false);
+    setIsUpdating(false);
   };
 
   return (
@@ -140,9 +140,9 @@ export default function PersonalInfo() {
           <button
             className="bg-[#1D65E9] text-white px-5 py-2 rounded-lg"
             onClick={handleSave}
-            disabled={updating}
+            disabled={isUpdating}
           >
-            {updating ? "Saving..." : "Save"}
+            {isUpdating ? "Saving..." : "Save"}
           </button>
         </div>
       ) : null}

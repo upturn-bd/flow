@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import {
   ArrowFatRight as ArrowFatRightIcon,
-} from "@phosphor-icons/react/dist/ssr";
+} from "@phosphor-icons/react";
 import { navItems } from "./nav-items";
 
 

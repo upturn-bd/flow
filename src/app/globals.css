@@ -110,3 +110,9 @@ body {
   margin: 1rem 0;
   overflow-x: auto;
 }
+
+input,select{
+  display: block;
+  flex: content;
+  width: 100%;
+}
