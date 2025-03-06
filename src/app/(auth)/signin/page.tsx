@@ -22,13 +22,6 @@ const SignIn = () => {
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setRedirectUrl(window.location.origin + "/");
-    }
-  }, []);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -45,7 +38,6 @@ const SignIn = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    if (!redirectUrl) return;
 
     setGeneralError(null);
     setLoading(true);

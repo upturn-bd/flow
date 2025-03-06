@@ -1,7 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { getUser } from "../auth/getUser";
-import { cookies } from "next/headers";
 
 const authRoutes = ["/signup", "/signin", "/auth"];
 
@@ -74,25 +72,6 @@ export async function updateSession(request: NextRequest) {
   //    return myNewResponse
   // If this is not done, you may be causing the browser and server to go out
   // of sync and terminate the user's session prematurely!
-
-  if (request.nextUrl.pathname.startsWith("/profile")) {
-    if (request.nextUrl.searchParams.get("uid") === null) {
-      const cookiestore = await cookies();
-      const uid = cookiestore.get("uid")?.value;
-      const url = request.nextUrl.clone();
-      if (uid) {
-        url.searchParams.set("uid", uid);
-        return NextResponse.redirect(url);
-      } else{
-        const { user } = await getUser();
-        if (user) {
-          url.searchParams.set("uid", user.id);
-          cookiestore.set("uid", user.id);
-          return NextResponse.redirect(url);
-        }
-      }
-    }
-  }
 
   return supabaseResponse;
 }
