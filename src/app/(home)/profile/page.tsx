@@ -1,385 +1,234 @@
 "use client";
 
-import { getDepartments, getDesignations } from "@/lib/api/company";
-import {
-  EmployeeInfo,
-  getEmployeeBasicInfo,
-  setEmployeeBasicInfo,
-} from "@/lib/api/employee";
-import Image from "next/image";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { ProfileTabs } from "@/components/profile/tab-bar";
 
-export default function ProfilePage() {
-  const searchParams = useSearchParams();
-  const uid = searchParams.get("uid") || "";
+const formSchema = z.object({
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email address"),
+  phone_number: z.string().min(1, "Phone number is required"),
+  department: z.string().min(1, "Department is required"),
+  designation: z.string().min(1, "Designation is required"),
+  job_status: z.string().min(1, "Job status is required"),
+  hire_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Please enter a valid date",
+  }),
+  id_input: z.string().min(1, "ID is required"),
+});
 
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [currentEmployee, setCurrentEmployee] = useState<EmployeeInfo | null>(
-    null
-  );
-  const [updatedEmployee, setUpdatedEmployee] = useState<EmployeeInfo | null>(
-    null
-  );
+type FormData = z.infer<typeof formSchema>;
 
-  useEffect(() => {
-    const fetchEmployeeInfo = async () => {
-      const data = await getEmployeeBasicInfo(uid);
-      setCurrentEmployee(data);
-      setUpdatedEmployee(data);
-    };
-    fetchEmployeeInfo();
-  }, [uid]);
+const basicInfoFields: Array<{
+  name: keyof FormData;
+  label: string;
+  type: "text" | "email" | "tel" | "date";
+}> = [
+  { name: "first_name", label: "First Name", type: "text" },
+  { name: "last_name", label: "Last Name", type: "text" },
+  { name: "email", label: "Email", type: "email" },
+  { name: "phone_number", label: "Phone Number", type: "tel" },
+  { name: "department", label: "Department", type: "text" },
+  { name: "designation", label: "Designation", type: "text" },
+  { name: "job_status", label: "Job Status", type: "text" },
+  { name: "hire_date", label: "Hire Date", type: "date" },
+  { name: "id_input", label: "Employee ID", type: "text" },
+];
 
-  // get all designations and departments
-  const [designations, setDesignations] = useState<any[]>([]);
-  const [departments, setDepartments] = useState<any[]>([]);
+export default function BasicInfoForm() {
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [basicInfo, setBasicInfo] = useState<FormData | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchDesignations = async () => {
-      const data = await getDesignations(uid);
-      setDesignations(data);
-    };
-    const fetchDepartments = async () => {
-      const data = await getDepartments(uid);
-      console.log(data);
-      setDepartments(data);
-    };
-    fetchDesignations();
-    fetchDepartments();
-  }, []);
+  const { control, handleSubmit, formState, reset } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: basicInfo || {
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone_number: "",
+      department: "",
+      designation: "",
+      job_status: "",
+      hire_date: "",
+      id_input: "",
+    },
+    mode: "onChange",
+  });
 
-  const handleInputChange = (key: keyof EmployeeInfo, value: string) => {
-    setUpdatedEmployee((prev) => {
-      if (prev) {
-        return { ...prev, [key]: value };
+  const onSubmit = async (data: FormData) => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    setSubmitSuccess(false);
+
+    try {
+      const response = await fetch("/api/basic-info", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
       }
-      return prev;
-    });
+
+      const result = await response.json();
+      setBasicInfo(result.data);
+      setSubmitSuccess(true);
+      setIsEditMode(false);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : "An unknown error occurred"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleSave = async () => {
-    setIsUpdating(true);
-    if (!updatedEmployee) {
-      return;
-    }
-    // get partial updatedEmployee according to changes
-    const toUpdate: Partial<EmployeeInfo> = Object.entries(
-      updatedEmployee
-    ).reduce((acc, [key, value]) => {
-      if (
-        currentEmployee &&
-        currentEmployee[key as keyof EmployeeInfo] !== value
-      ) {
-        return { ...acc, [key]: value };
-      }
-      return acc;
-    }, {} as Partial<EmployeeInfo>);
-    const { error } = await setEmployeeBasicInfo(uid, toUpdate);
-    if (error) {
-      console.error(error);
+  const handleEdit = () => {
+    if (isEditMode) {
+      reset(basicInfo || {});
+      setIsEditMode(false);
     } else {
-      setIsEnabled(false);
+      reset(basicInfo || {});
+      setIsEditMode(true);
+      setSubmitSuccess(false);
     }
-    setIsUpdating(false);
   };
+
+  useEffect(() => {
+    const fetchBasicInfo = async () => {
+      try {
+        const response = await fetch("/api/basic-info");
+        if (response.ok) {
+          const { data } = await response.json();
+          setBasicInfo(data);
+          if (data && isEditMode) {
+            reset(data);
+          }
+        } else if (response.status === 204) {
+          setBasicInfo(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch basic info:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBasicInfo();
+  }, [isEditMode, reset]);
+
+  if (loading) {
+    return <div className="p-4">Loading basic information...</div>;
+  }
 
   return (
-    <>
-      <div className="flex gap-5 mb-5">
-        <div>
-          <h2 className="text-3xl font-semibold text-[#1D65E9]">
-            Basic Information
-          </h2>
-        </div>
+    <div className="max-w-6xl mx-auto p-6 bg-white">
+      <ProfileTabs />
+      <div className="flex items-center mb-6 space-x-12">
+        <h2 className="text-2xl font-bold text-blue-700">
+          Basic Information
+        </h2>
         <div className="flex items-center space-x-2">
           <div
-            className="relative w-16 h-8 rounded-full cursor-pointer"
-            onClick={() => setIsEnabled(!isEnabled)}
+            className="relative w-16 h-6 rounded-full cursor-pointer"
+            onClick={handleEdit}
           >
             <div
               className={`absolute w-full h-full rounded-full transition-colors duration-200 ${
-                isEnabled ? "bg-blue-400" : "bg-gray-200"
+                isEditMode ? "bg-[#192D46]" : "bg-gray-200"
               }`}
             />
             <div
-              className={`absolute w-7 h-7 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                isEnabled ? "translate-x-8" : "translate-x-1"
-              } top-0.5`}
+              className={`absolute w-6 h-6 bg-white rounded-full shadow transform transition-transform duration-200 ${
+                isEditMode ? "translate-x-10" : "translate-x-0"
+              } top-0.25`}
             />
           </div>
-          <span
-            className="text-blue-600 cursor-pointer select-none text-lg"
-            onClick={() => setIsEnabled(!isEnabled)}
-          >
+          <span className="text-blue-700 select-none text-[17px]">
             Edit Mode
           </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-2">
-        <div className="space-y-4">
-          {updatedEmployee && Object.entries(updatedEmployee).length > 0 ? (
-            <>
-              <div className="flex items-center pb-5">
-                <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
-                  First Name
-                </div>
-                <div className="flex-1">
-                  {isEnabled ? (
-                    <input
-                      type="text"
-                      value={updatedEmployee?.first_name || ""}
-                      onChange={(e) =>
-                        handleInputChange("first_name", e.target.value)
-                      }
-                      className="pl-6 bg-[#E3F3FF] text-2xl rounded"
-                    />
-                  ) : (
-                    <>
-                      <span className="inline-block">:</span>
-                      <span className="pl-5 text-2xl p-1">
-                        {updatedEmployee?.first_name || ""}
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center pb-5">
-                <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
-                  Last Name
-                </div>
-                <div className="flex-1">
-                  {isEnabled ? (
-                    <input
-                      type="text"
-                      value={updatedEmployee?.last_name || ""}
-                      onChange={(e) =>
-                        handleInputChange("last_name", e.target.value)
-                      }
-                      className="pl-6 bg-[#E3F3FF] text-2xl rounded"
-                    />
-                  ) : (
-                    <>
-                      <span className="inline-block">:</span>
-                      <span className="pl-5 text-2xl p-1">
-                        {updatedEmployee?.last_name || ""}
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center pb-5">
-                <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
-                  Email
-                </div>
-                <div className="flex-1">
-                  {isEnabled ? (
-                    <input
-                      type="text"
-                      value={updatedEmployee?.email || ""}
-                      onChange={(e) =>
-                        handleInputChange("email", e.target.value)
-                      }
-                      className="pl-6 bg-[#E3F3FF] text-2xl rounded"
-                    />
-                  ) : (
-                    <>
-                      <span className="inline-block">:</span>
-                      <span className="pl-5 text-2xl p-1">
-                        {updatedEmployee?.email || ""}
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center pb-5">
-                <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
-                  Phone Number
-                </div>
-                <div className="flex-1">
-                  {isEnabled ? (
-                    <input
-                      type="text"
-                      value={updatedEmployee?.phone_number || ""}
-                      onChange={(e) =>
-                        handleInputChange("phone_number", e.target.value)
-                      }
-                      className="pl-6 bg-[#E3F3FF] text-2xl rounded"
-                    />
-                  ) : (
-                    <>
-                      <span className="inline-block">:</span>
-                      <span className="pl-5 text-2xl p-1">
-                        {updatedEmployee?.phone_number || ""}
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center pb-5">
-                <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
-                  Department
-                </div>
-                <div className="flex-1">
-                    {isEnabled ? (
-                    <select
-                      value={updatedEmployee?.department || ""}
-                      onChange={(e) =>
-                      handleInputChange("department", e.target.value)
-                      }
-                      className="pl-6 bg-[#E3F3FF] text-2xl rounded"
-                    >
-                      {departments.map((dept) => (
-                      <option key={dept.id} value={dept.name}>
-                        {dept.name}
-                      </option>
-                      ))}
-                    </select>
-                    ) : (
-                    <>
-                      <span className="inline-block">:</span>
-                      <span className="pl-5 text-2xl p-1">
-                      {updatedEmployee?.department || ""}
-                      </span>
-                    </>
-                    )}
-                </div>
-              </div>
-              <div className="flex items-center pb-5">
-                <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
-                  Designation
-                </div>
-                <div className="flex-1">
-                    {isEnabled ? (
-                    <select
-                      value={updatedEmployee?.designation || ""}
-                      onChange={(e) =>
-                      handleInputChange("designation", e.target.value)
-                      }
-                      className="pl-6 bg-[#E3F3FF] text-2xl rounded flex w-full"
-                    >
-                      {designations.map((designation) => (
-                      <option key={designation.id} value={designation.positions.name}>
-                        {designation.positions.name}
-                      </option>
-                      ))}
-                    </select>
-                    ) : (
-                    <>
-                      <span className="inline-block">:</span>
-                      <span className="pl-5 text-2xl p-1">
-                      {updatedEmployee?.designation || ""}
-                      </span>
-                    </>
-                    )}
-                </div>
-              </div>
-              <div className="flex items-center pb-5">
-                <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
-                  Job Status
-                </div>
-                <div className="flex-1">
-                  {isEnabled ? (
-                    <input
-                      type="text"
-                      value={updatedEmployee?.job_status || ""}
-                      onChange={(e) =>
-                        handleInputChange("job_status", e.target.value)
-                      }
-                      className="pl-6 bg-[#E3F3FF] text-2xl rounded"
-                    />
-                  ) : (
-                    <>
-                      <span className="inline-block">:</span>
-                      <span className="pl-5 text-2xl p-1">
-                        {updatedEmployee?.job_status || ""}
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center pb-5">
-                <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
-                  Hire Date
-                </div>
-                <div className="flex-1">
-                  {isEnabled ? (
-                    <input
-                      type="text"
-                      value={updatedEmployee?.hire_date || ""}
-                      onChange={(e) =>
-                        handleInputChange("hire_date", e.target.value)
-                      }
-                      className="pl-6 bg-[#E3F3FF] text-2xl rounded"
-                    />
-                  ) : (
-                    <>
-                      <span className="inline-block">:</span>
-                      <span className="pl-5 text-2xl p-1">
-                        {updatedEmployee?.hire_date || ""}
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center pb-5">
-                <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
-                  Supervisor
-                </div>
-                <div className="flex-1">
-                  {isEnabled ? (
-                    <input
-                      type="text"
-                      value={updatedEmployee?.supervisor || ""}
-                      onChange={(e) =>
-                        handleInputChange("supervisor", e.target.value)
-                      }
-                      className="pl-6 bg-[#E3F3FF] text-2xl rounded"
-                    />
-                  ) : (
-                    <>
-                      <span className="inline-block">:</span>
-                      <span className="pl-5 text-2xl p-1">
-                        {updatedEmployee?.supervisor || ""}
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center pb-5">
-                <div className="w-40 text-left text-[#002568] pr-2 font-semibold text-2xl">
-                  Employee ID
-                </div>
-                <div className="flex-1">
-                  <span className="inline-block">:</span>
-                  <span className="pl-5 text-2xl p-1">
-                    {updatedEmployee?.employee_id || ""}
-                  </span>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div>Loading...</div>
-          )}
+      {submitError && (
+        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          {submitError}
         </div>
-        <div>
-          <Image src="/Account.png" alt="signature" width={300} height={100} />
+      )}
+
+      {submitSuccess && (
+        <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+          Basic information updated successfully!
         </div>
-        {/* Save button */}
-        {isEnabled ? (
-          <div className="flex justify-center items-center">
+      )}
+
+      {isEditMode ? (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-6 gap-x-12">
+            {basicInfoFields.map((field) => (
+              <Controller
+                key={field.name}
+                name={field.name}
+                control={control}
+                render={({ field: formField }) => (
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                    <label className="w-32 text-md font-semibold text-gray-800">
+                      {field.label}
+                    </label>
+                    <input
+                      type={field.type}
+                      {...formField}
+                      className="w-full sm:w-[20rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    {formState.errors[field.name] && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {formState.errors[field.name]?.message}
+                      </p>
+                    )}
+                  </div>
+                )}
+              />
+            ))}
+          </div>
+          <div className="mt-8 flex justify-end space-x-4">
             <button
-              className="bg-[#1D65E9] text-white px-5 py-2 rounded-lg"
-              onClick={handleSave}
-              disabled={isUpdating}
+              type="submit"
+              className={"px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"}
+              disabled={
+                isSubmitting || !formState.isValid || Object.keys(formState.dirtyFields).length === 0
+              }
             >
-              {isUpdating ? "Saving..." : "Save"}
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </button>
           </div>
-        ) : null}
-      </div>
-    </>
+        </form>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 space-y-6">
+          {basicInfoFields.map((field) => {
+            const fieldValue = basicInfo?.[field.name];
+            const displayValue = fieldValue || "Data unavailable";
+
+            return (
+              <div key={field.name} className="flex items-start space-x-4">
+                <span className="w-32 text-md font-semibold text-gray-800">
+                  {field.label}
+                </span>
+                <span className="text-gray-600">{displayValue}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
