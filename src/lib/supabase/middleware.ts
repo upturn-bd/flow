@@ -17,7 +17,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
+          cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
           supabaseResponse = NextResponse.next({
@@ -50,10 +50,7 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/signin";
     return NextResponse.redirect(url);
-  } else if (
-    user &&
-    startsWithAuthRoutes
-  ) {
+  } else if (user && startsWithAuthRoutes) {
     // user is logged in, potentially respond by redirecting the user to the home page
     const url = request.nextUrl.clone();
     url.pathname = "/profile";
