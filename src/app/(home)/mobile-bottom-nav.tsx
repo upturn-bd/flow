@@ -1,13 +1,24 @@
 "use client";
 
-
-import {
-  ArrowFatRight as ArrowFatRightIcon,
-} from "@phosphor-icons/react/dist/ssr";
+import { ArrowFatRight as ArrowFatRightIcon } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { navItems } from "./nav-items";
+import { useUserData } from "@/hooks/useUserData";
 
 export default function MobileBottomNav() {
+  const { userData, loading } = useUserData();
+
+  if (loading) {
+    return (
+      <div className="fixed bottom-0 inset-x-0 h-20 rounded-t-lg block md:hidden bg-gradient-to-br from-[#001731] to-[#002363]">
+        {/* Loading spinner or skeleton */}
+        <div className="animate-pulse h-full flex items-center justify-center text-white">
+          Loading...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 h-20 rounded-t-lg block md:hidden"
@@ -27,6 +38,11 @@ export default function MobileBottomNav() {
           />
         </Link>
         {navItems.map((item) => {
+          // Hide admin-settings if not admin
+          if (item.label === "admin-settings" && userData?.role !== "Admin") {
+            return null;
+          }
+          
           const Icon = item.icon;
           return (
             <Link

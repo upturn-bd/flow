@@ -8,7 +8,7 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Upturn",
   description: "Upturn",
 };
@@ -30,7 +30,8 @@ export default function RootLayout({
           content={
             // metadata.description
             "Your all in one business solution"
-          } />
+          }
+        />
       </head>
       <body className={`${geistSans.className} antialiased`}>{children}</body>
     </html>

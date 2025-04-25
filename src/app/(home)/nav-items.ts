@@ -10,34 +10,14 @@ import {
 
 export const navItems = [
     {
-      label: "Profile",
+      label: "profile",
       href: "/profile",
       icon: UserCircleIcon,
     },
     {
-      label: "entry",
-      href: "/entry",
-      icon: ShoppingBagIcon,
-    },
-    {
-      label: "table",
-      href: "/table",
-      icon: GridFourIcon,
-    },
-    {
-      label: "admin-management",
-      href: "/admin-management",
-      icon: NotePencilIcon,
-    },
-    {
-      label: "request-and-issues",
-      href: "/request-and-issues",
+      label: "operations-and-services",
+      href: "/operations-and-services",
       icon: EnvelopeIcon,
-    },
-    {
-      label: "reports",
-      href: "/reports",
-      icon: ScrollIcon,
     },
     {
       label: "admin-settings",
