@@ -10,15 +10,16 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const currentPath = url.pathname;
 
-  const isApi = currentPath.startsWith("/api");
+  const excludePaths = ["/signin", "/signup", "/auth", "/unauthorized", "/api"];
 
-  // Allow unauthenticated access to these paths
-  const excludePaths = ["/signin", "/signup", "/auth", "/unauthorized"];
-  if (!isApi && excludePaths.some((p) => currentPath.startsWith(p))) {
+  if (
+    excludePaths.some(
+      (path) => currentPath === path || currentPath.startsWith(`${path}/`)
+    )
+  ) {
     return response;
   }
 
-  // Auth check
   const { user } = await getUser();
   if (!user) {
     url.pathname = "/signin";
@@ -40,7 +41,7 @@ export async function middleware(request: NextRequest) {
 
   const isOnboardingRoute = currentPath === "/onboarding";
 
-  // No employee record → allow onboarding
+  // If no employee record found then allow onboarding
   if (!employee || error) {
     if (!isOnboardingRoute) {
       url.pathname = "/onboarding";
@@ -53,7 +54,10 @@ export async function middleware(request: NextRequest) {
   const role = queriedRole as Role;
 
   if (has_approval === "PENDING") {
-    if (!url.searchParams.has("status") || url.searchParams.get("status") !== "pending") {
+    if (
+      !url.searchParams.has("status") ||
+      url.searchParams.get("status") !== "pending"
+    ) {
       url.pathname = "/onboarding";
       url.searchParams.set("status", "pending");
       return NextResponse.redirect(url);
@@ -70,7 +74,10 @@ export async function middleware(request: NextRequest) {
   }
 
   if (has_approval === "REJECTED") {
-    if (!url.searchParams.has("status") || url.searchParams.get("status") !== "rejected") {
+    if (
+      !url.searchParams.has("status") ||
+      url.searchParams.get("status") !== "rejected"
+    ) {
       url.pathname = "/onboarding";
       url.searchParams.set("status", "rejected");
       // Include rejection reason in query params if available
@@ -93,22 +100,25 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // If approved and trying to access /onboarding, redirect to profile
   if (isOnboardingRoute) {
     url.pathname = "/profile";
     url.search = "";
     return NextResponse.redirect(url);
   }
 
-  // Role-based access check
   const rolePermissions: Record<Role, string[]> = {
-    Employee: ["/profile", "/operations-and-services"],
-    Manager: ["/profile", "/operations-and-services", "/admin-management"],
-    Admin: ["/profile", "/operations-and-services", "/admin-management", "/dashboard"],
+    Employee: ["/dashboard","/profile", "/operations-and-services"],
+    Manager: ["/dashboard","/profile", "/operations-and-services"],
+    Admin: [
+      "/profile",
+      "/operations-and-services",
+      "/admin-management",
+      "/dashboard",
+    ],
   };
 
-  const isAllowed = rolePermissions[role]?.some((path) =>
-    currentPath.startsWith(path)
+  const isAllowed = rolePermissions[role]?.some((allowedPath) => 
+    currentPath === allowedPath || currentPath.startsWith(`${allowedPath}/`)
   );
 
   if (!isAllowed) {
