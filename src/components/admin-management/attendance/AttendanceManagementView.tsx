@@ -9,7 +9,7 @@ import { Site, useSites } from "@/hooks/useAttendanceManagement";
 import { TrashSimple } from "@phosphor-icons/react";
 
 export default function AttendanceManagementView() {
-  const { sites, loading, fetchSites, createSite, deleteSite, updateSite } =
+  const { sites, fetchSites, createSite, deleteSite, updateSite } =
     useSites();
   const [editSite, setEditSite] = useState<number | null>(null);
   const [isCreatingSite, setIsCreatingSite] = useState(false);
@@ -75,7 +75,7 @@ export default function AttendanceManagementView() {
                 <p>Description</p>
                 <button
                   onClick={() => {
-                    setEditSite(parseInt(site.id));
+                    setEditSite(site.id!);
                   }}
                   className="w-full px-3 py-1 rounded-md bg-gray-300 text-left"
                 >
@@ -83,7 +83,7 @@ export default function AttendanceManagementView() {
                 </button>
               </div>
               <button
-                onClick={() => handleDeleteSite(parseInt(site.id))}
+                onClick={() => handleDeleteSite(site.id!)}
                 className="p-1"
               >
                 <TrashSimple className="text-red-600" size={24} />

@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, data }, { status: 201 });
   } catch (error) {
     console.log(error);
-    console.error(error.message);
+    console.error(error instanceof Error ? error.message : error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
@@ -139,7 +139,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ success: true, data }, { status: 200 });
   } catch (error) {
-    console.error(error.message);
+    console.error(error instanceof Error ? error.message : error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
@@ -173,7 +173,7 @@ export async function DELETE(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(error.message);
+    console.error(error instanceof Error ? error.message : error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

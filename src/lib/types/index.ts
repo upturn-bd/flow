@@ -117,12 +117,12 @@ export const requisitionInventorySchema = z.object({
 
 export const claimTypeSchema = z.object({
   id: z.number().optional(),
-  claim_item: z
+  settlement_item: z
     .string()
     .min(1, { message: "Please enter a valid name" })
     .max(25),
   allowance: z.number().min(1, { message: "Please enter a valid allowance" }),
-  claim_level_id: z.number().min(1, { message: "Please select a claim level" }),
+  settlement_level_id: z.number().min(1, { message: "Please select a settlement level" }),
   settler_id: z.string().min(1, { message: "Please select a settler" }),
   company_id: z.number().optional(),
 });

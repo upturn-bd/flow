@@ -10,7 +10,7 @@ export async function getClaimTypes() {
   const company_id = await getCompanyId();
 
   const { data, error } = await client
-    .from("claim_types")
+    .from("settlement_types")
     .select("*")
     .eq("company_id", company_id);
 
@@ -29,7 +29,7 @@ export async function createClaimType(
 
   const { id, ...rest } = payload;
 
-  const { data, error } = await client.from("claim_types").insert({
+  const { data, error } = await client.from("settlement_types").insert({
     ...rest,
     company_id,
   });
@@ -48,7 +48,7 @@ export async function updateClaimType(
   if (!validated.success) throw validated.error;
 
   const { data, error } = await client
-    .from("claim_types")
+    .from("settlement_types")
     .update(payload)
     .eq("id", payload.id)
     .eq("company_id", company_id);
@@ -62,7 +62,7 @@ export async function deleteClaimType(id: number) {
   const company_id = await getCompanyId();
 
   const { error } = await client
-    .from("claim_types")
+    .from("settlement_types")
     .delete()
     .eq("id", id)
     .eq("company_id", company_id);

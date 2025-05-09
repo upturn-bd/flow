@@ -153,7 +153,7 @@ export default function LeaveManagementView() {
                 <p>Description</p>
                 <button
                   onClick={() => {
-                    setEditHolidayConfig(parseInt(holidayConfig.id));
+                    setEditHolidayConfig(holidayConfig.id!);
                   }}
                   className="w-full px-3 py-1 rounded-md bg-gray-300 text-left"
                 >
@@ -162,7 +162,7 @@ export default function LeaveManagementView() {
               </div>
               <button
                 onClick={() =>
-                  handleDeleteHolidayConfig(parseInt(holidayConfig.id))
+                  handleDeleteHolidayConfig(holidayConfig.id!)
                 }
                 className="p-1"
               >
@@ -197,7 +197,7 @@ export default function LeaveManagementView() {
                 <p>Description</p>
                 <button
                   onClick={() => {
-                    setEditLeaveType(parseInt(leaveType.id));
+                    setEditLeaveType(leaveType.id!);
                   }}
                   className="w-full px-3 py-1 rounded-md bg-gray-300 text-left"
                 >
@@ -205,7 +205,7 @@ export default function LeaveManagementView() {
                 </button>
               </div>
               <button
-                onClick={() => handleDeleteLeaveType(parseInt(leaveType.id))}
+                onClick={() => handleDeleteLeaveType(leaveType.id!)}
                 className="p-1"
               >
                 <TrashSimple className="text-red-600" size={24} />

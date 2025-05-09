@@ -31,10 +31,10 @@ export function ClaimTypeCreateModal({
 }: ClaimTypeCreateModalProps) {
   const [formValues, setFormValues] = useState<ClaimTypeFormValues>({
     id: 1,
-    claim_item: "",
+    settlement_item: "",
     allowance: 0,
     settler_id: "",
-    claim_level_id: 0,
+    settlement_level_id: 0,
     company_id: 1,
   });
   const [errors, setErrors] = useState<Partial<ClaimTypeFormValues>>({});
@@ -66,7 +66,7 @@ export function ClaimTypeCreateModal({
     >
   ) => {
     const { name, value } = e.target;
-    if (name === "allowance" || name === "claim_level_id") {
+    if (name === "allowance" || name === "settlement_level_id") {
       setFormValues((prev) => ({
         ...prev,
         [name]: Number(value),
@@ -144,14 +144,14 @@ export function ClaimTypeCreateModal({
               Item Name
             </label>
             <input
-              name="claim_item"
-              value={formValues.claim_item}
+              name="settlement_item"
+              value={formValues.settlement_item}
               onChange={handleChange}
               className="w-full rounded-md bg-blue-50 p-2"
               placeholder="Enter Name"
             />
-            {errors.claim_item && (
-              <p className="text-red-500 text-sm">{errors.claim_item}</p>
+            {errors.settlement_item && (
+              <p className="text-red-500 text-sm">{errors.settlement_item}</p>
             )}
           </div>
           <div>
@@ -159,8 +159,8 @@ export function ClaimTypeCreateModal({
               Claim Level
             </label>
             <select
-              name="claim_level_id"
-              value={formValues.claim_level_id}
+              name="settlement_level_id"
+              value={formValues.settlement_level_id}
               onChange={handleChange}
               className="w-full rounded-md bg-blue-50 p-2"
             >
@@ -171,8 +171,8 @@ export function ClaimTypeCreateModal({
                 </option>
               ))}
             </select>
-            {errors.claim_level_id && (
-              <p className="text-red-500 text-sm">{errors.claim_level_id}</p>
+            {errors.settlement_level_id && (
+              <p className="text-red-500 text-sm">{errors.settlement_level_id}</p>
             )}
           </div>
           <div>
@@ -248,10 +248,10 @@ export function ClaimTypeUpdateModal({
 }: ClaimTypeUpdateModalProps) {
   const [formValues, setFormValues] = useState<ClaimTypeFormValues>({
     id: 1,
-    claim_item: "",
+    settlement_item: "",
     allowance: 0,
     settler_id: "",
-    claim_level_id: 0,
+    settlement_level_id: 0,
     company_id: 1,
   });
   const [errors, setErrors] = useState<Partial<ClaimTypeFormValues>>({});
@@ -290,7 +290,7 @@ export function ClaimTypeUpdateModal({
     const { name, value } = e.target;
     if (
       name === "allowance" ||
-      name === "claim_level_id"
+      name === "settlement_level_id"
     ) {
       setFormValues((prev) => ({
         ...prev,
@@ -377,14 +377,14 @@ export function ClaimTypeUpdateModal({
               Item Name
             </label>
             <input
-              name="claim_item"
-              value={formValues.claim_item}
+              name="settlement_item"
+              value={formValues.settlement_item}
               onChange={handleChange}
               className="w-full rounded-md bg-blue-50 p-2"
               placeholder="Enter Name"
             />
-            {errors.claim_item && (
-              <p className="text-red-500 text-sm">{errors.claim_item}</p>
+            {errors.settlement_item && (
+              <p className="text-red-500 text-sm">{errors.settlement_item}</p>
             )}
           </div>
           <div>
@@ -392,8 +392,8 @@ export function ClaimTypeUpdateModal({
               Claim Level
             </label>
             <select
-              name="claim_level_id"
-              value={formValues.claim_level_id}
+              name="settlement_level_id"
+              value={formValues.settlement_level_id}
               onChange={handleChange}
               className="w-full rounded-md bg-blue-50 p-2"
             >
@@ -404,8 +404,8 @@ export function ClaimTypeUpdateModal({
                 </option>
               ))}
             </select>
-            {errors.claim_level_id && (
-              <p className="text-red-500 text-sm">{errors.claim_level_id}</p>
+            {errors.settlement_level_id && (
+              <p className="text-red-500 text-sm">{errors.settlement_level_id}</p>
             )}
           </div>
           <div>

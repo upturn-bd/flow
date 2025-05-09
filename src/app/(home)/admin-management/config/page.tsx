@@ -7,6 +7,7 @@ import InventoryManagementView from "@/components/admin-management/inventory/Inv
 import LeaveManagementView from "@/components/admin-management/leave/LeaveManagementView";
 import NewsAndNoticeView from "@/components/admin-management/news-and-notice/NewsAndNoticeManagementView";
 import SupervisorLineageView from "@/components/admin-management/supervisor-lineage/SupervisorLineageView";
+import { Suspense } from "react";
 
 export default function AdministrativeManagement() {
   return (
@@ -14,13 +15,15 @@ export default function AdministrativeManagement() {
       <h2 className="text-2xl font-bold text-blue-700">
         Step 2: Administrative Management
       </h2>
-      <SupervisorLineageView />
-      <AttendanceManagementView />
-      <LeaveManagementView />
-      <InventoryManagementView />
-      <ClaimSettlementView />
-      <NewsAndNoticeView />
-      <ComplaintsView/>
+      <Suspense fallback={<div className="p-4 text-center">Loading administrative management components...</div>}>
+        {/* <SupervisorLineageView /> */}
+        <AttendanceManagementView />
+        <LeaveManagementView />
+        <InventoryManagementView />
+        <ClaimSettlementView />
+        <NewsAndNoticeView />
+        <ComplaintsView/>
+      </Suspense>
     </div>
   );
 }

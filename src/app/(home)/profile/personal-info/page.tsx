@@ -29,27 +29,19 @@ export enum MaritalStatus {
 }
 
 const formSchema = z.object({
-  gender: z.string().refine((val) => {
-    return Object.values(Gender).includes(val as Gender);
-  }),
-  date_of_birth: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Please enter a valid date",
-  }),
-  religion: z.string().min(1, "Religion is required"),
-  blood_group: z.string().refine((val) => {
-    return Object.values(BloodGroup).includes(val as BloodGroup);
-  }),
-  marital_status: z.string().refine((val) => {
-    return Object.values(MaritalStatus).includes(val as MaritalStatus);
-  }),
-  nid_no: z.string().min(1, "NID is required"),
-  father_name: z.string().min(1, "Father's name is required"),
-  mother_name: z.string().min(1, "Mother's name is required"),
+  gender: z.string().optional(),
+  date_of_birth: z.string().optional(),
+  religion: z.string().optional(),
+  blood_group: z.string().optional(),
+  marital_status: z.string().optional(),
+  nid_no: z.string().optional(),
+  father_name: z.string().optional(),
+  mother_name: z.string().optional(),
   spouse_name: z.string().optional(),
-  emergency_contact_name: z.string().min(1, "Emergency contact is required"),
-  emergency_contact_relation: z.string().min(1, "Relation is required"),
-  emergency_contact_phone: z.string().min(1, "Phone number is required"),
-  permanent_address: z.string().min(1, "Address is required"),
+  emergency_contact_name: z.string().optional(),
+  emergency_contact_relation: z.string().optional(),
+  emergency_contact_phone: z.string().optional(),
+  permanent_address: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -139,7 +131,7 @@ export default function PersonalInfoForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formValues,
-          date_of_birth: new Date(formValues.date_of_birth).toISOString(),
+          date_of_birth: formValues.date_of_birth ? new Date(formValues.date_of_birth).toISOString() : undefined,
           spouse_name: formValues.spouse_name || null,
         }),
       });

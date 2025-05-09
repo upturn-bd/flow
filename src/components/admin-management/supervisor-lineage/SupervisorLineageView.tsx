@@ -10,7 +10,7 @@ import { TrashSimple } from "@phosphor-icons/react";
 
 const groupLineageData = (lineages: any[]) => {
   return lineages.reduce((acc, lineage) => {
-    const existingGroup = acc.find((group) => group.name === lineage.name);
+    const existingGroup = acc.find((group: any) => group.name === lineage.name);
 
     if (existingGroup) {
       existingGroup.details.push(lineage);
@@ -26,14 +26,7 @@ const groupLineageData = (lineages: any[]) => {
 };
 
 export default function SupervisorLineageView() {
-  const {
-    lineages,
-    loading,
-    fetchLineages,
-    createLineage,
-    deleteLineage,
-    updateLineage,
-  } = useLineage();
+  const { lineages, fetchLineages, createLineage, deleteLineage, updateLineage } = useLineage();
   const [editLineage, setEditLineage] = useState<string | null>(null);
   const [isCreatingLineage, setIsCreatingLineage] = useState(false);
   const [selectedLineageEdit, setSelectedLineageEdit] = useState<
@@ -79,7 +72,7 @@ export default function SupervisorLineageView() {
   useEffect(() => {
     if (editLineage && groupLineageData(lineages).length > 0) {
       const selectedL = groupLineageData(lineages).filter(
-        (lineage) => lineage.name === editLineage
+        (lineage: Lineage) => lineage.name === editLineage
       );
       console.log("selectedL", selectedL);
       setSelectedLineageEdit(selectedL);

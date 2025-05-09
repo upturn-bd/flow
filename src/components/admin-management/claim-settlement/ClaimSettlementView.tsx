@@ -83,14 +83,14 @@ export default function ClaimSettlementView() {
               <div className="w-1/2 md:w-1/3 space-y-1">
                 <p>Item Name</p>
                 <div className="px-3 py-1 rounded-md bg-gray-300">
-                  {claimType.claim_item}
+                    {claimType.settlement_item}
                 </div>
               </div>
               <div className="w-1/2 md:w-1/3 space-y-1">
                 <p>Description</p>
                 <button
                   onClick={() => {
-                    setEditClaimType(parseInt(claimType.id));
+                    if (claimType.id !== undefined) setEditClaimType(claimType.id);
                   }}
                   className="w-full px-3 py-1 rounded-md bg-gray-300 text-left"
                 >
@@ -98,7 +98,7 @@ export default function ClaimSettlementView() {
                 </button>
               </div>
               <button
-                onClick={() => handleDeleteClaimType(parseInt(claimType.id))}
+                onClick={() => claimType.id !== undefined && handleDeleteClaimType(claimType.id)}
                 className="p-1"
               >
                 <TrashSimple className="text-red-600" size={24} />

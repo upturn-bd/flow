@@ -129,7 +129,7 @@ export default function InventoryManagementView() {
                 <button
                   type="button"
                   className="ml-2 text-gray-600"
-                  onClick={() => handleDeleteRequisitionType(type.id)}
+                  onClick={() => handleDeleteRequisitionType(type.id!)}
                 >
                   ✕
                 </button>
@@ -175,7 +175,7 @@ export default function InventoryManagementView() {
                   <button
                     onClick={() => {
                       setEditRequisitionInventory(
-                        parseInt(requisitionInventory.id)
+                        requisitionInventory.id!
                       );
                     }}
                     className="w-full px-3 py-1 rounded-md bg-gray-300 text-left"
@@ -186,7 +186,7 @@ export default function InventoryManagementView() {
                 <button
                   onClick={() =>
                     handleDeleteRequisitionInventory(
-                      parseInt(requisitionInventory.id)
+                      requisitionInventory.id!
                     )
                   }
                   className="p-1"

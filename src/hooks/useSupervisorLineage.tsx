@@ -29,12 +29,12 @@ export function useLineage() {
   }, []);
 
   const createLineage = async (lineage: Omit<Lineage, "id">) => {
-    const data = await cLineage(lineage);
+    const data = await cLineage([lineage]);
     return { success: true, status: 200, data };
   };
 
   const updateLineage = async (lineage: Omit<Lineage, "id">) => {
-    const data = await uLineage(lineage);
+    const data = await uLineage([lineage]);
     return { success: true, status: 200, data };
   };
 
