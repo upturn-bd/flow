@@ -6,15 +6,7 @@ import { navItems } from "./nav-items";
 import { useUserData } from "@/hooks/useUserData";
 
 export default function Sidebar() {
-  const { userData, loading } = useUserData();
-
-  if (loading) {
-    return (
-      <div className="w-[100px] fixed h-dvh md:flex flex-col items-center justify-center hidden bg-gradient-to-br from-[#001731] to-[#002363]">
-        <div className="animate-pulse">Loading...</div>
-      </div>
-    );
-  }
+  const { userData } = useUserData();
 
   return (
     <div
@@ -31,19 +23,27 @@ export default function Sidebar() {
         />
       </div>
       <nav className="absolute top-[30%] w-full flex flex-col gap-6 items-center text-white">
-        {navItems.map((item) => {
-          // Hide admin-settings if not admin
-          if (item.label === "admin-settings" && userData?.role !== "Admin") {
-            return null;
-          }
-          
-          const Icon = item.icon;
-          return (
-            <Link href={item.href} key={item.label}>
-              <Icon size={45} />
-            </Link>
-          );
-        })}
+        {navItems
+          .filter((item) => item.label !== "admin-settings")
+          .map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link href={item.href} key={item.label}>
+                <Icon size={45} />
+              </Link>
+            );
+          })}
+        {userData?.role === "Admin" &&
+          navItems
+            .filter((item) => item.label === "admin-settings")
+            .map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link href={item.href} key={item.label}>
+                  <Icon size={45} />
+                </Link>
+              );
+            })}
       </nav>
     </div>
   );

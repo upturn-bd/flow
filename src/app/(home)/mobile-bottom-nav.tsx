@@ -6,18 +6,7 @@ import { navItems } from "./nav-items";
 import { useUserData } from "@/hooks/useUserData";
 
 export default function MobileBottomNav() {
-  const { userData, loading } = useUserData();
-
-  if (loading) {
-    return (
-      <div className="fixed bottom-0 inset-x-0 h-20 rounded-t-lg block md:hidden bg-gradient-to-br from-[#001731] to-[#002363]">
-        {/* Loading spinner or skeleton */}
-        <div className="animate-pulse h-full flex items-center justify-center text-white">
-          Loading...
-        </div>
-      </div>
-    );
-  }
+  const { userData } = useUserData();
 
   return (
     <div
@@ -37,23 +26,35 @@ export default function MobileBottomNav() {
             weight="fill"
           />
         </Link>
-        {navItems.map((item) => {
-          // Hide admin-settings if not admin
-          if (item.label === "admin-settings" && userData?.role !== "Admin") {
-            return null;
-          }
-          
-          const Icon = item.icon;
-          return (
-            <Link
-              href={item.href}
-              key={item.label}
-              className="px-3 flex-1 flex items-center justify-center border-r last:border-r-0 border-zinc-600"
-            >
-              <Icon size={30} />
-            </Link>
-          );
-        })}
+        {navItems
+          .filter((item) => item.label !== "admin-settings")
+          .map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                href={item.href}
+                key={item.label}
+                className="px-3 flex-1 flex items-center justify-center border-r last:border-r-0 border-zinc-600"
+              >
+                <Icon size={30} />
+              </Link>
+            );
+          })}
+        {userData?.role === "Admin" &&
+          navItems
+            .filter((item) => item.label === "admin-settings")
+            .map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  href={item.href}
+                  key={item.label}
+                  className="px-3 flex-1 flex items-center justify-center border-r last:border-r-0 border-zinc-600"
+                >
+                  <Icon size={30} />
+                </Link>
+              );
+            })}
       </nav>
     </div>
   );

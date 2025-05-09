@@ -20,8 +20,8 @@ export const navItems = [
       icon: EnvelopeIcon,
     },
     {
-      label: "admin-settings",
-      href: "/admin-settings",
+      label: "admin-management",
+      href: "/admin-management",
       icon: UserGearIcon,
     },
   ];

@@ -1,75 +1,66 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowFatRight as ArrowFatRightIcon } from "@phosphor-icons/react";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowFatRight as ArrowFatRightIcon } from "@phosphor-icons/react";
+import { validateCompanyCode } from "@/lib/api/company";
+import { useDepartments } from "@/hooks/useDepartments";
+import { getUser } from "@/lib/auth/getUser";
+
+const jobStatuses = [
+  "Active",
+  "Inactive",
+  "Probation",
+  "Resigned",
+  "Terminated",
+] as const;
 
 const formSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   phone_number: z.string().min(1, "Phone number is required"),
-  department: z.string().min(1, "Department is required"),
+  department_id: z.number().min(1, "Department is required"),
   designation: z.string().min(1, "Designation is required"),
-  job_status: z.string().min(1, "Job status is required"),
+  job_status: z.enum(jobStatuses, {
+    errorMap: () => ({ message: "Job status is required" }),
+  }),
   hire_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Please enter a valid date",
   }),
   company_name: z.string().min(1, "Company name is required"),
-  company_id: z.string().min(1, "Company ID is required"),
+  company_id: z.number().min(1, "Company ID is required"),
 });
 
-type FormData = z.infer<typeof formSchema>;
-
 export default function EmployeeOnboardingPage() {
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone_number: "",
+    department_id: 0,
+    designation: "",
+    job_status: "",
+    hire_date: "",
+    company_name: "",
+    company_id: 0,
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const status = searchParams.get("status");
   const reason = searchParams.get("reason");
-  const [rejectedData, setRejectedData] = useState<FormData | null>(null);
-
-  const { control, handleSubmit, formState, reset } = useForm<FormData>({
-    mode: "onChange",
-    resolver: zodResolver(formSchema),
-    defaultValues: rejectedData || {
-      first_name: "",
-      last_name: "",
-      email: "",
-      phone_number: "",
-      department: "",
-      designation: "",
-      job_status: "",
-      hire_date: "",
-      company_name: "",
-      company_id: "",
-    },
-  });
-
-  const onSubmit = async (data: FormData) => {
-    try {
-      const res = await fetch("/api/onboarding", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        alert(result.error || "Something went wrong");
-        return;
-      }
-
-      router.push("/onboarding?status=pending");
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      alert("Something went wrong. Please try again later.");
-    }
-  };
+  const [isCompanyCodeValid, setIsCompanyCodeValid] = useState(false);
+  const [companyCode, setCompanyCode] = useState("");
+  const { departments, fetchDepartments } = useDepartments();
+  const [supervisorId, setSupervisorId] = useState<string>("Not Applicable");
+  const [employees, setEmployees] = useState<{ id: string; name: string }[]>(
+    []
+  );
+  const [userId, setUserId] = useState<string>("");
 
   useEffect(() => {
     const fetchRejectedData = async () => {
@@ -80,25 +71,143 @@ export default function EmployeeOnboardingPage() {
           if (res.ok) {
             const { data } = await res.json();
             if (data) {
-              const formattedData = {
-                ...data,
-                company_name: data.company_name || "",
-                company_id: data.company_id.toString() || "",
-                hire_date: data.hire_date || "",
+              const formatted = {
+                ...formData,
+                ...data.userData,
+                company_name: data.companyData.name,
+                company_id: data.userData.company_id,
               };
-              setRejectedData(formattedData);
-              reset(formattedData);
+              setCompanyCode(data.companyData.code);
+              setIsCompanyCodeValid(true);
+              setFormData(formatted);
             }
           }
-        } catch (error) {
-          console.error("Failed to fetch rejected data:", error);
+        } catch (e) {
+          console.error("Failed to fetch rejected data:", e);
         } finally {
           setLoading(false);
         }
       }
     };
     fetchRejectedData();
-  }, [status, reset]);
+  }, [status]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "department_id" ? parseInt(value) : value,
+    }));
+    setDirty(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const parsed = formSchema.parse(formData);
+      setErrors({});
+      setLoading(true);
+      const res = await fetch("/api/onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed),
+      });
+      const result = await res.json();
+      if (!res.ok) return alert(result.error || "Something went wrong");
+      router.push("/onboarding?status=pending");
+    } catch (err: any) {
+      const errorMap: Record<string, string> = {};
+      if (err?.errors) {
+        err.errors.forEach((e: any) => (errorMap[e.path[0]] = e.message));
+        setErrors(errorMap);
+      } else {
+        alert("Something went wrong. Please try again later.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleValidateCompanyCode = async () => {
+    try {
+      setLoading(true);
+      const { isValid, id } = await validateCompanyCode(
+        formData.company_name,
+        companyCode
+      );
+      if (isValid && id) {
+        setFormData((prev) => ({ ...prev, company_id: id }));
+        setIsCompanyCodeValid(isValid);
+      } else {
+        alert("Invalid company code or name. Please check and try again.");
+      }
+    } catch (error) {
+      console.error("Error verifying company code:", error);
+      alert("Failed to verify company code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDepartments();
+    console.log("Fetched departments:", departments);
+  }, [fetchDepartments]);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/company-info/employees");
+        const data = await res.json();
+        console.log("Fetched employees:", data);
+        setEmployees(data.employees || []);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    async function fetchUser() {
+      const { user } = await getUser();
+      if (user) {
+        setUserId(user.id);
+      }
+    }
+    fetchUser();
+    fetchEmployees();
+  }, []);
+
+  const renderInput = (
+    name: keyof typeof formData,
+    label: string,
+    type = "text",
+    readOnly = false
+  ) => (
+    <div className="flex items-center space-x-4">
+      <label className="w-32 text-md font-semibold text-gray-800">
+        {label}
+      </label>
+      <input
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+        type={type}
+        readOnly={readOnly}
+        className={`w-full lg:w-[20rem] xl:w-[25rem] rounded-md border px-4 py-2 text-sm ${
+          readOnly
+            ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+            : "bg-blue-50 border-gray-200 text-gray-900"
+        } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+      />
+      {errors[name] && (
+        <p className="mt-1 text-sm text-red-600 ml-36">{errors[name]}</p>
+      )}
+    </div>
+  );
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col lg:flex-row">
@@ -121,19 +230,18 @@ export default function EmployeeOnboardingPage() {
         <h1 className="text-3xl font-semibold text-blue-700 mb-6">
           Employee Onboarding
         </h1>
-        {status === "pending" && (
+
+        {status === "pending" ? (
           <div className="mt-20 lg:w-4/5 mb-6 p-4 rounded-lg bg-[#FFC700] border border-yellow-300">
             <h2 className="text-xl font-bold">Data sent for review.</h2>
             <p className="mt-2 text-gray-800">
               Please wait while your data is being reviewed by the admins.
-              Please contact your supervisor/ admin if you feel like there is a
-              problem.
+              Contact your supervisor if needed.
             </p>
           </div>
-        )}
-        {status != "pending" && (
+        ) : (
           <form
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit}
             className="w-full flex flex-col lg:flex-row lg:justify-between gap-6 mt-12"
           >
             <div className="space-y-6 lg:max-w-5xl">
@@ -142,137 +250,149 @@ export default function EmployeeOnboardingPage() {
                   Company Information
                 </h2>
                 <div className="grid grid-cols-1 gap-4">
-                  <Controller
-                    name="company_name"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                      <div className="flex items-center space-x-4">
-                        <label className="w-32 text-md font-semibold text-gray-800">
-                          Company Name
-                        </label>
-                        <input
-                          {...field}
-                          className="w-full lg:w-[20rem] xl:w-[25rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        {fieldState.error && (
-                          <p className="mt-1 text-sm text-red-600 ml-36">
-                            {fieldState.error.message}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  />
-                  <Controller
-                    name="company_id"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                      <div className="flex items-center space-x-4">
-                        <label className="w-32 text-md font-semibold text-gray-800">
-                          Company Code
-                        </label>
-                        <input
-                          {...field}
-                          className="w-full lg:w-[20rem] xl:w-[25rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        {fieldState.error && (
-                          <p className="mt-1 text-sm text-red-600 ml-36">
-                            {fieldState.error.message}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div className="bg-white p-4 space-y-4">
-                <h2 className="text-xl font-bold text-blue-700">
-                  Basic Information
-                </h2>
-                <div className="grid grid-cols-1 gap-4">
-                  {[
-                    ["first_name", "First Name"],
-                    ["last_name", "Last Name"],
-                    ["email", "Email"],
-                    ["phone_number", "Phone Number"],
-                    ["department", "Department"],
-                    ["designation", "Designation"],
-                    ["job_status", "Job Status"],
-                    ["hire_date", "Joining Date"],
-                  ].map(([name, label]) => (
-                    <Controller
-                      key={name}
-                      name={name as keyof FormData}
-                      control={control}
-                      render={({ field, fieldState }) => (
-                        <div className="flex items-center space-x-4">
-                          <label className="w-32 text-md font-semibold text-gray-800">
-                            {label}
-                          </label>
-
-                          <input
-                            {...field}
-                            type={name === "hire_date" ? "date" : "text"}
-                            className="w-full lg:w-[20rem] xl:w-[25rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          />
-
-                          {fieldState.error && (
-                            <p className="mt-1 text-sm text-red-600 ml-36">
-                              {fieldState.error.message}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    />
-                  ))}
+                  {renderInput("company_name", "Company Name")}
                   <div className="flex items-center space-x-4">
                     <label className="w-32 text-md font-semibold text-gray-800">
-                      Supervisor
+                      Company Code
                     </label>
                     <input
-                      value="Not Applicable"
-                      readOnly
-                      className="w-full lg:w-[20rem] xl:w-[25rem] rounded-md border border-gray-200 bg-gray-100 px-4 py-2 text-sm text-gray-500 cursor-not-allowed"
+                      name="companyCode"
+                      value={companyCode}
+                      onChange={(e) => setCompanyCode(e.target.value)}
+                      type="text"
+                      required
+                      className={
+                        "w-full lg:w-[20rem] xl:w-[25rem] rounded-md border px-4 py-2 text-sm bg-blue-50 border-gray-200 text-gray-900$ focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      }
                     />
                   </div>
+                  {(isCompanyCodeValid || status === "rejected") && (
+                    <button
+                      disabled
+                      className="md:w-1/3 bg-[#192D46] text-white px-6 py-2 rounded-md hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Verified
+                    </button>
+                  )}
+
+                  {!isCompanyCodeValid && status !== "rejected" && (
+                    <button
+                      onClick={handleValidateCompanyCode}
+                      type="button"
+                      disabled={!formData.company_name || !companyCode}
+                      className="md:w-1/3 bg-[#192D46] text-white px-6 py-2 rounded-md hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Verify
+                    </button>
+                  )}
                 </div>
               </div>
+
+              {isCompanyCodeValid && (
+                <div className="bg-white p-4 space-y-4">
+                  <h2 className="text-xl font-bold text-blue-700">
+                    Basic Information
+                  </h2>
+                  <div className="grid grid-cols-1 gap-4">
+                    {renderInput("first_name", "First Name")}
+                    {renderInput("last_name", "Last Name")}
+                    {renderInput("email", "Email")}
+                    {renderInput("phone_number", "Phone Number")}
+                    <div className="flex items-center space-x-4">
+                      <label className="w-32 text-md font-semibold text-gray-800">
+                        Department
+                      </label>
+                      <select
+                        name="department_id"
+                        value={formData.department_id}
+                        onChange={(e) => handleChange(e)}
+                        className="w-full lg:w-[20rem] xl:w-[25rem] rounded-md border px-4 py-2 text-sm bg-blue-50 border-gray-200 text-gray-900$ focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select Department</option>
+                        {departments.map((department) => (
+                          <option key={department.id} value={department.id}>
+                            {department.name}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.department_id && (
+                        <p className="text-red-500 text-sm">
+                          {errors.department_id}
+                        </p>
+                      )}
+                    </div>
+                    {renderInput("designation", "Designation")}
+                    <div className="flex items-center space-x-4">
+                      <label className="w-32 text-md font-semibold text-gray-800">
+                        Job Status
+                      </label>
+                      <select
+                        name="job_status"
+                        value={formData.job_status}
+                        onChange={(e) => handleChange(e)}
+                        className="w-full lg:w-[20rem] xl:w-[25rem] rounded-md border px-4 py-2 text-sm bg-blue-50 border-gray-200 text-gray-900$ focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select Job Status</option>
+                        {jobStatuses.map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.department_id && (
+                        <p className="text-red-500 text-sm">
+                          {errors.department_id}
+                        </p>
+                      )}
+                    </div>
+                    {renderInput("hire_date", "Joining Date", "date")}
+                    <div className="flex items-center space-x-4">
+                      <label className="w-32 text-md font-semibold text-gray-800">
+                        Supervisor
+                      </label>
+                      <select
+                        value={supervisorId}
+                        onChange={(e) => setSupervisorId(e.target.value)}
+                        className="w-full lg:w-[20rem] xl:w-[25rem] rounded-md border px-4 py-2 text-sm bg-blue-50 border-gray-200 text-gray-900$ focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="Not Applicable">Not Applicable</option>
+                        {status !== "rejected" &&
+                          employees.map((employee) => (
+                            <option key={employee.id} value={employee.id}>
+                              {employee.name}
+                            </option>
+                          ))}
+                        {status === "rejected" &&
+                          employees
+                            .filter((employee) => employee.id !== userId)
+                            .map((employee) => (
+                              <option key={employee.id} value={employee.id}>
+                                {employee.name}
+                              </option>
+                            ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
+
             <div>
-              {status === "rejected" && reason && (
-                <div className="mb-4 p-4 rounded-md bg-[#FF4646] text-white border border-red-300">
-                  <h2 className="text-xl font-bold">Reason for rejection:</h2>
-                  <p className="mt-2">{reason}</p>
-                </div>
-              )}
-              {status === "rejected" && !reason && (
-                <div className="mb-4 p-4 rounded-md bg-[#FF4646] text-white border border-red-300">
-                  <h2 className="text-xl font-bold">Reason for rejection:</h2>
-                  <p className="mt-2">Reason unavailable</p>
-                </div>
-              )}
-              {!status && (
-                <button
-                  className={`bg-[#192D46] text-white px-6 py-2 rounded-md hover:bg-blue-800 disabled:opacity-50 disbaled:cursor-not-allowed`}
-                  disabled={!formState.isValid || loading}
-                  type="submit"
-                >
-                  Send for review
-                </button>
-              )}
               {status === "rejected" && (
+                <div className="mb-4 p-4 rounded-md bg-[#FF4646] text-white border border-red-300">
+                  <h2 className="text-xl font-bold">Reason for rejection:</h2>
+                  <p className="mt-2">{reason || "Reason unavailable"}</p>
+                </div>
+              )}
+              {!status || status === "rejected" ? (
                 <button
-                  className={`
-      bg-[#192D46] text-white px-6 py-2 rounded-md 
-      hover:bg-blue-800 transition-colors
-      disabled:opacity-50 disabled:cursor-not-allowed
-    `}
-                  disabled={
-                    !formState.isValid ||
-                    loading ||
-                    Object.keys(formState.dirtyFields).length === 0
-                  }
                   type="submit"
+                  disabled={
+                    loading ||
+                    (status === "rejected" && !dirty) ||
+                    !formSchema.safeParse(formData).success
+                  }
+                  className="bg-[#192D46] text-white px-6 py-2 rounded-md hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
@@ -289,20 +409,22 @@ export default function EmployeeOnboardingPage() {
                           r="10"
                           stroke="currentColor"
                           strokeWidth="4"
-                        ></circle>
+                        />
                         <path
                           className="opacity-75"
                           fill="currentColor"
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
+                        />
                       </svg>
                       Loading...
                     </span>
-                  ) : (
+                  ) : status === "rejected" ? (
                     "Resubmit"
+                  ) : (
+                    "Send for review"
                   )}
                 </button>
-              )}
+              ) : null}
             </div>
           </form>
         )}
