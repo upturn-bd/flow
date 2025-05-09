@@ -16,7 +16,7 @@ export default function AdministrativeManagement() {
         Step 2: Administrative Management
       </h2>
       <Suspense fallback={<div className="p-4 text-center">Loading administrative management components...</div>}>
-        {/* <SupervisorLineageView /> */}
+        <SupervisorLineageView />
         <AttendanceManagementView />
         <LeaveManagementView />
         <InventoryManagementView />
