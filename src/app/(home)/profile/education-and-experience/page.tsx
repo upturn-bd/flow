@@ -1,276 +1,262 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Education from "../education/page";
-import {
-  deleteEmployeeExperienceInfo,
-  EmployeeExperienceInfo,
-  getEmployeeExperienceInfos,
-  setEmployeeExperienceInfos,
-} from "@/lib/api/employee";
-import { useSearchParams } from "next/navigation";
-import { Trash } from "@phosphor-icons/react";
+import { useEffect, useState } from "react";
+import EducationModal from "@/components/education-and-experience/EducationModal";
+import { useEducation } from "@/hooks/useEducation";
+import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
+import { useExperience } from "@/hooks/useExperience";
+import ExperienceModal from "@/components/education-and-experience/ExperienceModal";
 
-export default function Experience() {
-  const searchParams = useSearchParams();
-  const uid = searchParams.get("uid") || "";
-
-  const [editMode, setEditMode] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [currentExperiences, setCurrentExperiences] = useState<
-    EmployeeExperienceInfo[]
-  >([]);
-  const [updatedExperiences, setUpdatedExperiences] = useState<
-    EmployeeExperienceInfo[]
-  >([]);
+export default function EducationExperiencePage() {
+  const {
+    education,
+    fetchEducation,
+    createEducation,
+    updateEducation,
+    deleteEducation,
+  } = useEducation();
+  const [editEducation, setEditEducation] = useState<number | null>(null);
+  const [isCreatingEducation, setIsCreatingEducation] = useState(false);
 
   useEffect(() => {
-    const fetchEmployeeInfo = async () => {
-      const data = await getEmployeeExperienceInfos(uid);
-      setCurrentExperiences(data);
-      setUpdatedExperiences(data);
-    };
-    fetchEmployeeInfo();
-  }, [uid]);
+    fetchEducation();
+  }, [fetchEducation]);
 
-  const handleAdd = () => {
-    const newInfos = [];
-    if (updatedExperiences) {
-      newInfos.push(...updatedExperiences);
+  const handleCreateEducation = async (values: any) => {
+    try {
+      await createEducation(values);
+      alert("Education created!");
+      setIsCreatingEducation(false);
+      fetchEducation();
+    } catch {
+      alert("Error creating education.");
     }
-    newInfos.push({
-      company_name: "",
-      designation: "",
-      description: "",
-      company_id: "",
-      from: new Date(),
-      to: new Date(),
-      id: Math.floor(Math.random() * 10000000000000),
-    });
-    setUpdatedExperiences(newInfos);
   };
 
-  const handleDelete = async (id: number) => {
-    const { error } = await deleteEmployeeExperienceInfo(id);
-    if (error) {
-      console.error(error);
-      return;
+  const handleUpdateEducation = async (values: any) => {
+    try {
+      await updateEducation(values);
+      alert("Education updated!");
+      setEditEducation(null);
+      fetchEducation();
+    } catch {
+      alert("Error updating education.");
     }
-    setUpdatedExperiences(
-      updatedExperiences.filter((entry) => entry.id !== id)
-    );
-    setCurrentExperiences(
-      currentExperiences.filter((entry) => entry.id !== id)
-    );
   };
 
-  const handleChange = (
-    id: number,
-    field: keyof EmployeeExperienceInfo,
-    value: string
-  ) => {
-    setUpdatedExperiences(
-      updatedExperiences.map((entry) =>
-        entry.id === id ? { ...entry, [field]: value } : entry
-      )
-    );
+  const handleDeleteEducation = async (id: number) => {
+    try {
+      await deleteEducation(id);
+      alert("Education deleted!");
+      fetchEducation();
+    } catch {
+      alert("Error deleting education.");
+    }
   };
 
-  async function handleSave() {
-    setIsUpdating(true);
-    if (!updatedExperiences) {
-      return;
+  const selectedEducationEdit = education.find((d) => d.id === editEducation);
+
+  //Experience states and functions
+  const {
+    experience,
+    fetchExperience,
+    createExperience,
+    updateExperience,
+    deleteExperience,
+  } = useExperience();
+  const [editExperience, setEditExperience] = useState<number | null>(null);
+  const [isCreatingExperience, setIsCreatingExperience] = useState(false);
+
+  useEffect(() => {
+    fetchExperience();
+  }, [fetchExperience]);
+
+  const handleCreateExperience = async (values: any) => {
+    try {
+      await createExperience(values);
+      alert("Experience created!");
+      setIsCreatingExperience(false);
+      fetchExperience();
+    } catch {
+      alert("Error creating experience.");
     }
+  };
 
-    // separate new entries from current ones, updatedEducation - currentEducation
-    const newEntries = updatedExperiences.filter(
-      (entry) => !currentExperiences?.find((e) => e.id === entry.id)
-    );
-
-    const oldEntries = updatedExperiences.filter((entry) =>
-      currentExperiences?.find((e) => e.id === entry.id)
-    );
-
-    newEntries.forEach((entry) => {
-      delete entry.id;
-    });
-
-    const toUpdate = [...oldEntries, ...newEntries];
-
-    const { error, insertError } = await setEmployeeExperienceInfos(
-      toUpdate,
-      uid
-    );
-
-    //trigger reload of data
-    const data = await getEmployeeExperienceInfos(uid);
-    setCurrentExperiences(data);
-    setUpdatedExperiences(data);
-
-    if (error) {
-      console.error(error);
-    } else {
-      setEditMode(false);
+  const handleUpdateExperience = async (values: any) => {
+    try {
+      await updateExperience(values);
+      alert("Experience updated!");
+      setEditExperience(null);
+      fetchExperience();
+    } catch {
+      alert("Error updating experience.");
     }
-    setIsUpdating(false);
-  }
+  };
+
+  const handleDeleteExperience = async (id: number) => {
+    try {
+      await deleteExperience(id);
+      alert("Experience deleted!");
+      fetchExperience();
+    } catch {
+      alert("Error deleting experience.");
+    }
+  };
+
+  const selectedExperienceEdit = experience.find(
+    (d) => d.id === editExperience
+  );
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-3xl font-semibold text-[#1D65E9]">Experience</h2>
-        <div className="flex items-center space-x-2">
-          <div
-            className="relative w-16 h-8 rounded-full cursor-pointer"
-            onClick={() => setEditMode(!editMode)}
-          >
-            <div
-              className={`absolute w-full h-full rounded-full transition-colors duration-200 ${
-                editMode ? "bg-blue-400" : "bg-gray-200"
-              }`}
-            />
-            <div
-              className={`absolute w-7 h-7 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                editMode ? "translate-x-8" : "translate-x-1"
-              } top-0.5`}
-            />
-          </div>
-          <span
-            className="text-blue-600 cursor-pointer select-none text-lg"
-            onClick={() => setEditMode(!editMode)}
-          >
-            Edit Mode
-          </span>
-        </div>
-      </div>
-      <table
-        className="w-full border-collapse border border-gray-300"
-        key={"experiences"}
-      >
-        <thead>
-          <tr className="bg-gray-100 text-[#002568]">
-            <th className="border p-2">Company Name</th>
-            <th className="border p-2">Position</th>
-            <th className="border p-2">From</th>
-            <th className="border p-2">To</th>
-            <th className="border p-2">Description</th>
-            {editMode ? <th className="border p-2">Action</th> : null}
-          </tr>
-        </thead>
-        <tbody className="text-blue-500">
-          {updatedExperiences && updatedExperiences.length > 0 ? (
-            updatedExperiences.map((entry) => (
-              <tr key={entry.id} className={`border cursor-pointer`}>
-                <td className="border p-2">
-                  {editMode ? (
-                    <input
-                      value={entry.company_name || ""}
-                      onChange={(e) =>
-                        handleChange(entry.id!, "company_name", e.target.value)
-                      }
-                    />
-                  ) : (
-                    entry.company_name
-                  )}
-                </td>
-                <td className="border p-2">
-                  {editMode ? (
-                    <input
-                      value={entry.designation || ""}
-                      onChange={(e) =>
-                        handleChange(entry.id!, "designation", e.target.value)
-                      }
-                    />
-                  ) : (
-                    entry.designation
-                  )}
-                </td>
-                <td className="border p-2">
-                  {editMode ? (
-                    <input
-                      type="date"
-                      value={
-                        entry.from
-                          ? new Date(entry.from).toISOString().split("T")[0]
-                          : ""
-                      }
-                      onChange={(e) =>
-                        handleChange(entry.id!, "from", e.target.value)
-                      }
-                    />
-                  ) : (
-                    new Date(entry.from).toLocaleDateString()
-                  )}
-                </td>
-                <td className="border p-2">
-                  {editMode ? (
-                    <input
-                      type="date"
-                      value={
-                        entry.to
-                          ? new Date(entry.to).toISOString().split("T")[0]
-                          : ""
-                      }
-                      onChange={(e) =>
-                        handleChange(entry.id!, "to", e.target.value)
-                      }
-                    />
-                  ) : (
-                    new Date(entry.to).toLocaleDateString()
-                  )}
-                </td>
-                <td className="border p-2">
-                  {editMode ? (
-                    <input
-                      value={entry.description || ""}
-                      onChange={(e) =>
-                        handleChange(entry.id!, "description", e.target.value)
-                      }
-                    />
-                  ) : (
-                    entry.description
-                  )}
-                </td>
-                {editMode ? (
-                  <td className="border p-2 text-center">
+    <div className="min-h-screen bg-white p-6 md:p-10 md:px-20 text-gray-900">
+      <h2 className="text-2xl font-bold text-blue-700">Education</h2>
+      <div className="overflow-x-auto border rounded-md mb-6">
+        <table className="w-full text-sm text-left">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-4 py-2 border">Degree</th>
+              <th className="px-4 py-2 border">Institution</th>
+              <th className="px-4 py-2 border">From</th>
+              <th className="px-4 py-2 border">To</th>
+              <th className="px-4 py-2 border">CGPA</th>
+              <th className="px-4 py-2 border">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {education.length > 0 ? (
+              education.map((edu, i) => (
+                <tr key={i} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 border">{edu.name}</td>
+                  <td className="px-4 py-2 border">{edu.institute}</td>
+                  <td className="px-4 py-2 border">{edu.from_date}</td>
+                  <td className="px-4 py-2 border">{edu.to_date}</td>
+                  <td className="px-4 py-2 border">{edu.result}</td>
+                  <td className="px-4 py-2 border flex gap-2">
                     <button
-                      className="text-red-500"
-                      onClick={() => {
-                        handleDelete(entry.id!);
-                      }}
+                      onClick={() => setEditEducation(edu.id ?? 0)}
+                      className="p-2"
                     >
-                      <Trash size={32} />
+                      <PencilSimple size={24} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteEducation(edu.id ?? 0)}
+                      className="p-2"
+                    >
+                      <TrashSimple className="text-red-600" size={24} />
                     </button>
                   </td>
-                ) : null}
+                </tr>
+              ))
+            ) : (
+              <tr className="hover:bg-gray-50">
+                <td
+                  className="px-4 py-2 border text-center font-medium text-lg"
+                  colSpan={6}
+                >
+                  No education records found.
+                </td>
               </tr>
-            ))
-          ) : (
+            )}
+          </tbody>
+        </table>
+      </div>
+      <button
+        onClick={() => setIsCreatingEducation(true)}
+        type="button"
+        className="text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
+      >
+        +
+      </button>
+
+      <h2 className="text-2xl font-bold text-blue-700 mb-6 mt-12">
+        Experience
+      </h2>
+
+      <div className="overflow-x-auto border rounded-md">
+        <table className="w-full text-sm text-left">
+          <thead className="bg-gray-100">
             <tr>
-              <td colSpan={6} className="text-center">
-                No data
-              </td>
+              <th className="px-4 py-2 border">Company Name</th>
+              <th className="px-4 py-2 border">Position</th>
+              <th className="px-4 py-2 border">From</th>
+              <th className="px-4 py-2 border">To</th>
+              <th className="px-4 py-2 border">Description</th>
+              <th className="px-4 py-2 border">Actions</th>
             </tr>
-          )}
-        </tbody>
-      </table>
-      {editMode && (
-        <div className="mt-4 flex space-x-2">
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-            onClick={handleAdd}
-          >
-            Add Entry
-          </button>
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-            onClick={handleSave}
-          >
-            {isUpdating ? "Saving..." : "Save"}
-          </button>
-        </div>
+          </thead>
+          <tbody>
+            {experience.length > 0 ? (
+              experience.map((exp, i) => (
+                <tr key={i} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 border">{exp.company_name}</td>
+                  <td className="px-4 py-2 border">{exp.designation}</td>
+                  <td className="px-4 py-2 border">{exp.from_date}</td>
+                  <td className="px-4 py-2 border">{exp.to_date}</td>
+                  <td className="px-4 py-2 border">{exp.description}</td>
+                  <td className="px-4 py-2 border flex gap-2">
+                    <button
+                      onClick={() => setEditExperience(exp.id ?? 0)}
+                      className="p-2"
+                    >
+                      <PencilSimple size={24} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteExperience(exp.id ?? 0)}
+                      className="p-2"
+                    >
+                      <TrashSimple className="text-red-600" size={24} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr className="hover:bg-gray-50">
+                <td
+                  className="px-4 py-2 border text-center font-medium text-lg"
+                  colSpan={6}
+                >
+                  No experience records found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      <button
+        onClick={() => setIsCreatingExperience(true)}
+        type="button"
+        className="mt-6 text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
+      >
+        +
+      </button>
+
+      {isCreatingEducation && (
+        <EducationModal
+          onSubmit={handleCreateEducation}
+          onClose={() => setIsCreatingEducation(false)}
+        />
       )}
-      <Education />
+      {selectedEducationEdit && (
+        <EducationModal
+          initialData={selectedEducationEdit}
+          onSubmit={handleUpdateEducation}
+          onClose={() => setEditEducation(null)}
+        />
+      )}
+
+      {isCreatingExperience && (
+        <ExperienceModal
+          onSubmit={handleCreateExperience}
+          onClose={() => setIsCreatingExperience(false)}
+        />
+      )}
+      {selectedExperienceEdit && (
+        <ExperienceModal
+          initialData={selectedExperienceEdit}
+          onSubmit={handleUpdateExperience}
+          onClose={() => setEditExperience(null)}
+        />
+      )}
     </div>
   );
 }

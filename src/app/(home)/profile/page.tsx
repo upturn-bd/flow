@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { z } from "zod";
 import { ProfileTabs } from "@/components/profile/tab-bar";
+import { dirtyValuesChecker } from "@/lib/utils";
+import { useDepartments } from "@/hooks/useDepartments";
 
-const formSchema = z.object({
+const schema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   phone_number: z.string().min(1, "Phone number is required"),
-  department: z.string().min(1, "Department is required"),
+  department_id: z.number().min(1, "Department is required"),
   designation: z.string().min(1, "Designation is required"),
   job_status: z.string().min(1, "Job status is required"),
   hire_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
@@ -20,18 +20,18 @@ const formSchema = z.object({
   id_input: z.string().min(1, "ID is required"),
 });
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<typeof schema>;
 
-const basicInfoFields: Array<{
+const fields: Array<{
   name: keyof FormData;
   label: string;
-  type: "text" | "email" | "tel" | "date";
+  type: string;
 }> = [
   { name: "first_name", label: "First Name", type: "text" },
   { name: "last_name", label: "Last Name", type: "text" },
   { name: "email", label: "Email", type: "email" },
   { name: "phone_number", label: "Phone Number", type: "tel" },
-  { name: "department", label: "Department", type: "text" },
+  { name: "department_id", label: "Department", type: "number" },
   { name: "designation", label: "Designation", type: "text" },
   { name: "job_status", label: "Job Status", type: "text" },
   { name: "hire_date", label: "Hire Date", type: "date" },
@@ -39,109 +39,135 @@ const basicInfoFields: Array<{
 ];
 
 export default function BasicInfoForm() {
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [basicInfo, setBasicInfo] = useState<FormData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const { control, handleSubmit, formState, reset } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: basicInfo || {
-      first_name: "",
-      last_name: "",
-      email: "",
-      phone_number: "",
-      department: "",
-      designation: "",
-      job_status: "",
-      hire_date: "",
-      id_input: "",
-    },
-    mode: "onChange",
+  const [formValues, setFormValues] = useState<FormData>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone_number: "",
+    department_id: 0,
+    designation: "",
+    job_status: "",
+    hire_date: "",
+    id_input: "",
   });
 
-  const onSubmit = async (data: FormData) => {
+  const [initialData, setInitialData] = useState<FormData | null>(null);
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>(
+    {}
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isDirty, setIsDirty] = useState(false);
+  const [isValid, setIsValid] = useState(false);
+  const { departments, fetchDepartments } = useDepartments();
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormValues((prev) => ({
+      ...prev,
+      [name]: name === "department_id" ? Number(value) : value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsSubmitting(true);
     setSubmitError(null);
     setSubmitSuccess(false);
 
+    const result = schema.safeParse(formValues);
+    if (!result.success) {
+      const fieldErrors: typeof errors = {};
+      for (const issue of result.error.issues) {
+        fieldErrors[issue.path[0] as keyof FormData] = issue.message;
+      }
+      setErrors(fieldErrors);
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const response = await fetch("/api/basic-info", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(result.data),
       });
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
 
-      const result = await response.json();
-      setBasicInfo(result.data);
+      const json = await response.json();
+      setInitialData(json.data);
       setSubmitSuccess(true);
       setIsEditMode(false);
     } catch (error) {
-      setSubmitError(
-        error instanceof Error ? error.message : "An unknown error occurred"
-      );
+      setSubmitError(error instanceof Error ? error.message : "Unknown error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleEdit = () => {
-    if (isEditMode) {
-      reset(basicInfo || {});
-      setIsEditMode(false);
-    } else {
-      reset(basicInfo || {});
-      setIsEditMode(true);
-      setSubmitSuccess(false);
-    }
+  const handleEditToggle = () => {
+    if (!isEditMode) setSubmitSuccess(false);
+    setFormValues(initialData ?? formValues);
+    setIsEditMode(!isEditMode);
   };
 
   useEffect(() => {
-    const fetchBasicInfo = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("/api/basic-info");
-        if (response.ok) {
-          const { data } = await response.json();
-          setBasicInfo(data);
-          if (data && isEditMode) {
-            reset(data);
-          }
-        } else if (response.status === 204) {
-          setBasicInfo(null);
+        const res = await fetch("/api/basic-info");
+        if (res.ok) {
+          const { data } = await res.json();
+          setInitialData(data);
+          setFormValues(data);
         }
       } catch (error) {
-        console.error("Failed to fetch basic info:", error);
+        console.error("Fetch error:", error);
       } finally {
         setLoading(false);
       }
     };
+    fetchData();
+    fetchDepartments();
+  }, []);
 
-    fetchBasicInfo();
-  }, [isEditMode, reset]);
+  useEffect(() => {
+    if (initialData) {
+      setIsDirty(dirtyValuesChecker(initialData, formValues));
+    }
+  }, [initialData, formValues]);
 
-  if (loading) {
-    return <div className="p-4">Loading basic information...</div>;
-  }
+  useEffect(() => {
+    const result = schema.safeParse(formValues);
+    if (result.success) {
+      setIsValid(true);
+      setErrors({});
+    } else {
+      setIsValid(false);
+      const newErrors: Partial<FormData> = {};
+      result.error.issues.forEach((issue) => {
+        newErrors[issue.path[0] as keyof FormData] = issue.message;
+      });
+      setErrors(newErrors);
+    }
+  }, [formValues]);
+
+  if (loading) return <div className="p-4">Loading basic information...</div>;
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white">
       <ProfileTabs />
       <div className="flex items-center mb-6 space-x-12">
-        <h2 className="text-2xl font-bold text-blue-700">
-          Basic Information
-        </h2>
+        <h2 className="text-2xl font-bold text-blue-700">Basic Information</h2>
         <div className="flex items-center space-x-2">
           <div
             className="relative w-16 h-6 rounded-full cursor-pointer"
-            onClick={handleEdit}
+            onClick={handleEditToggle}
           >
             <div
               className={`absolute w-full h-full rounded-full transition-colors duration-200 ${
@@ -173,39 +199,74 @@ export default function BasicInfoForm() {
       )}
 
       {isEditMode ? (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-6 gap-x-12">
-            {basicInfoFields.map((field) => (
-              <Controller
-                key={field.name}
-                name={field.name}
-                control={control}
-                render={({ field: formField }) => (
-                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                    <label className="w-32 text-md font-semibold text-gray-800">
-                      {field.label}
-                    </label>
-                    <input
-                      type={field.type}
-                      {...formField}
-                      className="w-full sm:w-[20rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    {formState.errors[field.name] && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {formState.errors[field.name]?.message}
-                      </p>
-                    )}
-                  </div>
+            {fields.map(({ name, label, type }) => (
+              <div
+                key={name}
+                className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4"
+              >
+                <label className="w-32 text-md font-semibold text-gray-800">
+                  {label}
+                </label>
+                {name === "job_status" ? (
+                  <select
+                    name={name}
+                    value={formValues[name]}
+                    onChange={handleChange}
+                    className="w-full sm:w-[20rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Job Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Probation">Probation</option>
+                    <option value="Resigned">Resigned</option>
+                    <option value="Terminated">Terminated</option>
+                  </select>
+                ) : name === "department_id" ? (
+                  <select
+                    name={name}
+                    value={formValues[name]}
+                    onChange={handleChange}
+                    className="w-full sm:w-[20rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Department</option>
+                    {departments.map((dept) => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : name === "id_input" ? (
+                  <input
+                    type={type}
+                    name={name}
+                    value={formValues[name]}
+                    readOnly
+                    className="w-full sm:w-[20rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <input
+                    type={type}
+                    name={name}
+                    value={formValues[name]}
+                    onChange={handleChange}
+                    className="w-full sm:w-[20rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 )}
-              />
+
+                {errors[name] && (
+                  <p className="mt-1 text-sm text-red-600">{errors[name]}</p>
+                )}
+              </div>
             ))}
           </div>
           <div className="mt-8 flex justify-end space-x-4">
             <button
               type="submit"
-              className={"px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"}
+              className="px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={
-                isSubmitting || !formState.isValid || Object.keys(formState.dirtyFields).length === 0
+                isSubmitting || !isValid || (initialData ? !isDirty : false)
               }
             >
               {isSubmitting ? "Saving..." : "Save Changes"}
@@ -214,19 +275,20 @@ export default function BasicInfoForm() {
         </form>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 space-y-6">
-          {basicInfoFields.map((field) => {
-            const fieldValue = basicInfo?.[field.name];
-            const displayValue = fieldValue || "Data unavailable";
-
-            return (
-              <div key={field.name} className="flex items-start space-x-4">
-                <span className="w-32 text-md font-semibold text-gray-800">
-                  {field.label}
-                </span>
-                <span className="text-gray-600">{displayValue}</span>
-              </div>
-            );
-          })}
+          {fields.map(({ name, label }) => (
+            <div key={name} className="flex items-start space-x-4">
+              <span className="w-32 text-md font-semibold text-gray-800">
+                {label}
+              </span>
+              <span className="text-gray-600">
+                {(name !== "department_id"
+                  ? formValues[name]
+                  : departments.filter(
+                      (dep) => dep.id === formValues.department_id
+                    )[0]?.name) || "Data unavailable"}
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </div>

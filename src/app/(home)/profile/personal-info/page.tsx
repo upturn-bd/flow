@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { ProfileTabs } from "@/components/profile/tab-bar";
+import { dirtyValuesChecker } from "@/lib/utils";
+
 export enum Gender {
   MALE = "Male",
   FEMALE = "Female",
@@ -29,13 +29,19 @@ export enum MaritalStatus {
 }
 
 const formSchema = z.object({
-  gender: z.nativeEnum(Gender),
+  gender: z.string().refine((val) => {
+    return Object.values(Gender).includes(val as Gender);
+  }),
   date_of_birth: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Please enter a valid date",
   }),
   religion: z.string().min(1, "Religion is required"),
-  blood_group: z.nativeEnum(BloodGroup),
-  marital_status: z.nativeEnum(MaritalStatus),
+  blood_group: z.string().refine((val) => {
+    return Object.values(BloodGroup).includes(val as BloodGroup);
+  }),
+  marital_status: z.string().refine((val) => {
+    return Object.values(MaritalStatus).includes(val as MaritalStatus);
+  }),
   nid_no: z.string().min(1, "NID is required"),
   father_name: z.string().min(1, "Father's name is required"),
   mother_name: z.string().min(1, "Mother's name is required"),
@@ -48,148 +54,97 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-const personalInfoFields: Array<{
-  name: keyof FormData;
-  label: string;
-  type: "select" | "text" | "date" | "tel" | "textarea";
-  options?: string[];
-
-  optional?: boolean;
-}> = [
-  {
-    name: "gender",
-    label: "Gender",
-    type: "select",
-    options: Object.values(Gender),
-  },
-  {
-    name: "date_of_birth",
-    label: "Date of Birth",
-    type: "date",
-  },
-  {
-    name: "religion",
-    label: "Religion",
-    type: "text",
-  },
-  {
-    name: "blood_group",
-    label: "Blood Group",
-    type: "select",
-    options: Object.values(BloodGroup),
-  },
-  {
-    name: "marital_status",
-    label: "Marital Status",
-    type: "select",
-    options: Object.values(MaritalStatus),
-  },
-  {
-    name: "nid_no",
-    label: "NID Number",
-    type: "text",
-  },
-  {
-    name: "father_name",
-    label: "Father's Name",
-    type: "text",
-  },
-  {
-    name: "mother_name",
-    label: "Mother's Name",
-    type: "text",
-  },
-  {
-    name: "spouse_name",
-    label: "Spouse's Name",
-    type: "text",
-
-    optional: true,
-  },
-  {
-    name: "emergency_contact_name",
-    label: "Emergency Contact",
-    type: "text",
-  },
-  {
-    name: "emergency_contact_relation",
-    label: "Relation with EC",
-    type: "text",
-  },
-  {
-    name: "emergency_contact_phone",
-    label: "Phone No. of EC",
-    type: "tel",
-  },
-  {
-    name: "permanent_address",
-    label: "Permanent Address",
-    type: "textarea",
-  },
-];
+const defaultFormValues: FormData = {
+  gender: "",
+  date_of_birth: "",
+  religion: "",
+  blood_group: "",
+  marital_status: "",
+  nid_no: "",
+  father_name: "",
+  mother_name: "",
+  spouse_name: "",
+  emergency_contact_name: "",
+  emergency_contact_relation: "",
+  emergency_contact_phone: "",
+  permanent_address: "",
+};
 
 export default function PersonalInfoForm() {
+  const [formValues, setFormValues] = useState<FormData>(defaultFormValues);
+  const [formErrors, setFormErrors] = useState<
+    Partial<Record<keyof FormData, string>>
+  >({});
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [personalInfo, setPersonalInfo] = useState<FormData | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialData, setInitialData] = useState<FormData | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const [isValid, setIsValid] = useState(false);
 
-  const { control, handleSubmit, formState, reset } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: personalInfo || {
-      gender: Gender.MALE,
-      date_of_birth: "",
-      religion: "",
-      blood_group: BloodGroup.AB_POSITIVE,
-      marital_status: MaritalStatus.UNMARRIED,
-      nid_no: "",
-      father_name: "",
-      mother_name: "",
-      spouse_name: "",
-      emergency_contact_name: "",
-      emergency_contact_relation: "",
-      emergency_contact_phone: "",
-      permanent_address: "",
-    },
-    mode: "onChange",
-  });
+  useEffect(() => {
+    const fetchPersonalInfo = async () => {
+      try {
+        const res = await fetch("/api/personal-info");
+        if (res.ok) {
+          const { data } = await res.json();
+          if (data) {
+            setFormValues((prev) => ({ ...prev, ...data }));
+            setInitialData(data);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch personal info:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const onSubmit = async (data: FormData) => {
+    fetchPersonalInfo();
+  }, []);
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormValues((prev) => ({ ...prev, [name]: value }));
+    setFormErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsSubmitting(true);
     setSubmitError(null);
     setSubmitSuccess(false);
 
+    const result = formSchema.safeParse(formValues);
+    if (!result.success) {
+      const fieldErrors: Partial<Record<keyof FormData, string>> = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof FormData;
+        fieldErrors[field] = err.message;
+      });
+      setFormErrors(fieldErrors);
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const response = await fetch("/api/personal-info", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          gender: data.gender,
-          date_of_birth: new Date(data.date_of_birth).toISOString(),
-          blood_group: data.blood_group,
-          marital_status: data.marital_status,
-          nid_no: data.nid_no,
-          religion: data.religion,
-          father_name: data.father_name,
-          mother_name: data.mother_name,
-          spouse_name: data.spouse_name || null,
-          emergency_contact_name: data.emergency_contact_name,
-          emergency_contact_phone: data.emergency_contact_phone,
-          emergency_contact_relation: data.emergency_contact_relation,
-          permanent_address: data.permanent_address,
+          ...formValues,
+          date_of_birth: new Date(formValues.date_of_birth).toISOString(),
+          spouse_name: formValues.spouse_name || null,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const result = await response.json();
-      setPersonalInfo(result.data);
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
       setSubmitSuccess(true);
       setIsEditMode(false);
     } catch (error) {
@@ -201,45 +156,72 @@ export default function PersonalInfoForm() {
     }
   };
 
-  const handleEdit = () => {
-    if (isEditMode) {
-      // When turning off edit mode, reset to original values
-      reset(personalInfo || {});
-      setIsEditMode(false);
+  useEffect(() => {
+    const result = formSchema.safeParse(formValues);
+    if (!result.success) {
+      const fieldErrors: Partial<Record<keyof FormData, string>> = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof FormData;
+        fieldErrors[field] = err.message;
+      });
+      setFormErrors(fieldErrors);
+      setIsValid(false);
     } else {
-      // When entering edit mode, ensure form has current data
-      reset(personalInfo || {});
-      setIsEditMode(true);
-      setSubmitSuccess(false);
+      setIsValid(true);
+      setFormErrors({});
     }
-  };
+  }, [formValues]);
 
   useEffect(() => {
-    const fetchPersonalInfo = async () => {
-      try {
-        const response = await fetch("/api/personal-info");
-        if (response.ok) {
-          const { data } = await response.json();
-          setPersonalInfo(data);
-          if (data && isEditMode) {
-            reset(data);
-          }
-        } else if (response.status === 204) {
-          setPersonalInfo(null);
-        }
-      } catch (error) {
-        console.error("Failed to fetch personal info:", error);
-      } finally {
-        setLoading(false);
-      }
+    const dirty = initialData
+      ? dirtyValuesChecker(initialData, formValues)
+      : false;
+    setIsDirty(dirty);
+  }, [formValues, initialData]);
+
+  if (loading)
+    return <div className="p-4">Loading personal information...</div>;
+
+  const renderField = (
+    name: keyof FormData,
+    label: string,
+    type: "text" | "date" | "tel" | "textarea" | "select",
+    options?: string[]
+  ) => {
+    const value = formValues[name] ?? "";
+    const error = formErrors[name];
+
+    const inputProps = {
+      name,
+      value,
+      onChange: handleChange,
+      className:
+        "w-full sm:w-[20rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500",
     };
 
-    fetchPersonalInfo();
-  }, [isEditMode, reset]);
-
-  if (loading) {
-    return <div className="p-4">Loading personal information...</div>;
-  }
+    return (
+      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+        <label className="w-32 text-md font-semibold text-gray-800">
+          {label}
+        </label>
+        {type === "select" ? (
+          <select {...inputProps}>
+            <option value="" disabled>
+              Select {label}
+            </option>
+            {options?.map((opt) => (
+              <option key={opt}>{opt}</option>
+            ))}
+          </select>
+        ) : type === "textarea" ? (
+          <textarea {...inputProps} rows={3} />
+        ) : (
+          <input {...inputProps} type={type} />
+        )}
+        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      </div>
+    );
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white">
@@ -251,7 +233,7 @@ export default function PersonalInfoForm() {
         <div className="flex items-center space-x-2">
           <div
             className="relative w-16 h-6 rounded-full cursor-pointer"
-            onClick={handleEdit}
+            onClick={() => setIsEditMode((prev) => !prev)}
           >
             <div
               className={`absolute w-full h-full rounded-full transition-colors duration-200 ${
@@ -271,120 +253,81 @@ export default function PersonalInfoForm() {
       </div>
 
       {submitError && (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mb-4 p-4 bg-red-100 text-red-700 border border-red-400 rounded">
           {submitError}
         </div>
       )}
-
       {submitSuccess && (
-        <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+        <div className="mb-4 p-4 bg-green-100 text-green-700 border border-green-400 rounded">
           Personal information updated successfully!
         </div>
       )}
 
-      {isEditMode && (
-        <form onSubmit={handleSubmit(onSubmit)}>
+      {isEditMode ? (
+        <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-6 gap-x-12">
-            {personalInfoFields.map((field) => {
-              return (
-                <Controller
-                  key={field.name}
-                  name={field.name}
-                  control={control}
-                  rules={{ required: !field.optional }}
-                  render={({ field: formField }) => (
-                    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                      <label className="w-32 text-md font-semibold text-gray-800">
-                        {field.label}
-                      </label>
-                      {field.type === "select" ? (
-                        <select
-                          {...formField}
-                          className="w-full sm:w-[20rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          {field.options?.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      ) : field.type === "textarea" ? (
-                        <textarea
-                          {...formField}
-                          rows={3}
-                          className="w-full sm:w-[20rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      ) : (
-                        <input
-                          type={field.type}
-                          {...formField}
-                          className="w-full sm:w-[20rem] rounded-md border border-gray-200 bg-blue-50 px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      )}
-                      {formState.errors[field.name] && (
-                        <p className="mt-1 text-sm text-red-600">
-                          {formState.errors[field.name]?.message}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                />
-              );
-            })}
+            {renderField("gender", "Gender", "select", Object.values(Gender))}
+            {renderField("date_of_birth", "Date of Birth", "date")}
+            {renderField("religion", "Religion", "text")}
+            {renderField(
+              "blood_group",
+              "Blood Group",
+              "select",
+              Object.values(BloodGroup)
+            )}
+            {renderField(
+              "marital_status",
+              "Marital Status",
+              "select",
+              Object.values(MaritalStatus)
+            )}
+            {renderField("nid_no", "NID Number", "text")}
+            {renderField("father_name", "Father's Name", "text")}
+            {renderField("mother_name", "Mother's Name", "text")}
+            {renderField("spouse_name", "Spouse's Name", "text")}
+            {renderField("emergency_contact_name", "Emergency Contact", "text")}
+            {renderField(
+              "emergency_contact_relation",
+              "Relation with EC",
+              "text"
+            )}
+            {renderField("emergency_contact_phone", "Phone No. of EC", "tel")}
+            {renderField("permanent_address", "Permanent Address", "textarea")}
           </div>
-          <div className="mt-8 flex justify-end space-x-4">
+          <div className="mt-8 flex justify-end">
             <button
               type="submit"
-              className={
-                "px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              }
               disabled={
-                isSubmitting ||
-                !formState.isValid ||
-                Object.keys(formState.dirtyFields).length === 0
+                isSubmitting || (initialData ? !isDirty : false) || !isValid
               }
+              className="px-4 py-2 bg-[#192D46] text-white rounded-md disabled:opacity-50"
             >
               {isSubmitting ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>
-      )}
-
-      {!isEditMode && (
+      ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 space-y-6">
-          {personalInfoFields.map((field) => {
-            const fieldValue = personalInfo?.[field.name as keyof FormData];
-            const displayValue =
-              fieldValue === null ||
-              fieldValue === undefined ||
-              fieldValue === ""
-                ? "Data unavailable"
-                : fieldValue;
-
-            return (
-              <div key={field.name} className="flex items-start space-x-4">
-                <span className="w-32 text-md font-semibold text-gray-800">
-                  {field.label}
-                </span>
-                <span className="text-gray-600">
-                  {field.name === "permanent_address" ? (
-                    <>
-                      {displayValue === "Data unavailable"
-                        ? "Data unavailable"
-                        : displayValue?.split("\n").map((line, i) => (
-                            <span key={i}>
-                              {line}
-                              <br />
-                            </span>
-                          ))}
-                    </>
-                  ) : (
-                    displayValue
-                  )}
-                </span>
-              </div>
-            );
-          })}
+          {Object.entries(formValues).map(([key, value]) => (
+            <div key={key} className="flex items-start space-x-4">
+              <span className="w-32 text-md font-semibold text-gray-800">
+                {key
+                  .replaceAll("_", " ")
+                  .replace(/\b\w/g, (l) => l.toUpperCase())}
+              </span>
+              <span className="text-gray-600">
+                {value && key === "permanent_address"
+                  ? value?.split("\n").map((line, i) => (
+                      <span key={i}>
+                        {line}
+                        <br />
+                      </span>
+                    ))
+                  : value}
+                {!value && "Data not available"}
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </div>
