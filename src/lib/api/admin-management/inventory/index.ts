@@ -133,9 +133,3 @@ export async function getEmployeesInfo() {
   if (error) throw error;
   return { data: employees, error: null };
 }
-
-// Create Inventory Modal
-// Add Inventory Logic
-// Create Claim Modal
-// Add Claim Logic
-// Rewrite notice and complaint logic

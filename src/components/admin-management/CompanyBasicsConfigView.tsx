@@ -12,12 +12,9 @@ import GradeModal from "./grades/GradeModal";
 import { usePositions } from "@/hooks/usePositions";
 import PositionDetailsModal from "./positions/PositionDetailsModal";
 import PositionModal from "./positions/PositionModal";
+import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
 
-export default function CompanyBasicsConfigView({
-  employees,
-}: {
-  employees: { id: number; name: string }[];
-}) {
+export default function CompanyBasicsConfigView() {
   const {
     divisions,
     fetchDivisions,
@@ -28,6 +25,22 @@ export default function CompanyBasicsConfigView({
   const [viewDivision, setViewDivision] = useState<number | null>(null);
   const [editDivision, setEditDivision] = useState<number | null>(null);
   const [isCreatingDivision, setIsCreatingDivision] = useState(false);
+  const [employees, setEmployees] = useState<{ id: number; name: string }[]>(
+    []
+  );
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await getEmployeesInfo();
+        setEmployees(response.data);
+      } catch (error) {
+        setEmployees([]);
+        console.error("Error fetching asset owners:", error);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
 
   useEffect(() => {
     fetchDivisions();
@@ -202,6 +215,7 @@ export default function CompanyBasicsConfigView({
 
   const selectedPositionView = positions.find((d) => d.id === viewPosition);
   const selectedPositionEdit = positions.find((d) => d.id === editPosition);
+
   return (
     <div>
       <div className="space-y-2">

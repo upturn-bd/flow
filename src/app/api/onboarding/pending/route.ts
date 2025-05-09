@@ -26,7 +26,7 @@ export async function GET() {
       designation,
       job_status,
       hire_date,
-      supervisor:first_name,
+      supervisor_id,
       has_approval
     `
     )

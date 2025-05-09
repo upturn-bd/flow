@@ -62,11 +62,6 @@ const sections = [
         icon: Bell,
       },
       {
-        name: "Requests",
-        path: "/opeartions-and-services/services/requests",
-        icon: HandWaving,
-      },
-      {
         name: "Requisition",
         path: "/opeartions-and-services/services/requisition",
         icon: Note,
@@ -86,11 +81,6 @@ const sections = [
   {
     title: "Operations",
     items: [
-      {
-        name: "Inventory",
-        path: "/opeartions-and-services/operations/inventory",
-        icon: Package,
-      },
       {
         name: "Onboarding",
         path: "/operations-and-services/operations/onboarding",

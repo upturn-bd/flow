@@ -86,6 +86,7 @@ export async function POST(request: Request) {
     hire_date,
     company_id,
     job_status,
+    supervisor_id,
   } = body;
 
   const {
@@ -114,6 +115,7 @@ export async function POST(request: Request) {
       rejection_reason: null,
       has_approval: "PENDING",
       id_input: generateIdInput(),
+      supervisor_id: supervisor_id || null,
     },
   ]);
 

@@ -1,6 +1,7 @@
 // app/(dashboard)/onboarding/page.tsx
 "use client";
 
+import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
 import { useEffect, useState } from "react";
 
 interface PendingEmployee {
@@ -13,7 +14,7 @@ interface PendingEmployee {
   designation: string;
   job_status: string;
   hire_date: string;
-  supervisor: string;
+  supervisor_id: string;
 }
 
 const Button = ({
@@ -48,6 +49,9 @@ export default function OnboardingApprovalPage() {
     type: "success" | "error";
     message: string;
   } | null>(null);
+  const [employees, setEmployees] = useState<{ id: string; name: string }[]>(
+    []
+  );
 
   useEffect(() => {
     if (toast) {
@@ -63,6 +67,15 @@ export default function OnboardingApprovalPage() {
         if (data?.data) setRequests(data.data);
       })
       .finally(() => setLoading(false));
+    const fetchEmployees = async () => {
+      try {
+        const response = await getEmployeesInfo();
+        setEmployees(response.data);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+    fetchEmployees();
   }, []);
 
   const handleInputChange = (id: string, value: string) => {
@@ -138,7 +151,8 @@ export default function OnboardingApprovalPage() {
               <strong>Joining Date:</strong> {emp.hire_date}
             </p>
             <p>
-              <strong>Supervisor:</strong> {emp.supervisor}
+              <strong>Supervisor:</strong>
+              {employees.length > 0 && employees.filter((e) => e.id === emp.supervisor_id)[0]?.name}
             </p>
           </div>
 

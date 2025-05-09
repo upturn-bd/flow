@@ -6,7 +6,11 @@ import { z } from "zod";
 import { ArrowFatRight as ArrowFatRightIcon } from "@phosphor-icons/react";
 import { validateCompanyCode } from "@/lib/api/company";
 import { useDepartments } from "@/hooks/useDepartments";
-import { getUser } from "@/lib/auth/getUser";
+import {
+  getDepartmentsByCompanyId,
+  getEmployeesByCompanyId,
+  getUser,
+} from "@/lib/auth/getUser";
 
 const jobStatuses = [
   "Active",
@@ -31,6 +35,7 @@ const formSchema = z.object({
   }),
   company_name: z.string().min(1, "Company name is required"),
   company_id: z.number().min(1, "Company ID is required"),
+  supervisor_id: z.string().optional(),
 });
 
 export default function EmployeeOnboardingPage() {
@@ -45,6 +50,7 @@ export default function EmployeeOnboardingPage() {
     hire_date: "",
     company_name: "",
     company_id: 0,
+    supervisor_id: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -55,11 +61,12 @@ export default function EmployeeOnboardingPage() {
   const reason = searchParams.get("reason");
   const [isCompanyCodeValid, setIsCompanyCodeValid] = useState(false);
   const [companyCode, setCompanyCode] = useState("");
-  const { departments, fetchDepartments } = useDepartments();
-  const [supervisorId, setSupervisorId] = useState<string>("Not Applicable");
-  const [employees, setEmployees] = useState<{ id: string; name: string }[]>(
-    []
-  );
+  const [departments, setDepartments] = useState<
+    { id: number; name: string }[]
+  >([]);
+  const [employees, setEmployees] = useState<
+    { id: string; name: string; role: string }[]
+  >([]);
   const [userId, setUserId] = useState<string>("");
 
   useEffect(() => {
@@ -152,34 +159,41 @@ export default function EmployeeOnboardingPage() {
   };
 
   useEffect(() => {
-    fetchDepartments();
-    console.log("Fetched departments:", departments);
-  }, [fetchDepartments]);
-
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      setLoading(true);
+    const fetchDepartments = async (companyId: number) => {
       try {
-        const res = await fetch("/api/company-info/employees");
-        const data = await res.json();
-        console.log("Fetched employees:", data);
-        setEmployees(data.employees || []);
+        const res = await getDepartmentsByCompanyId(companyId);
+        setDepartments(res);
       } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching departments:", error);
       }
     };
 
-    async function fetchUser() {
-      const { user } = await getUser();
-      if (user) {
-        setUserId(user.id);
+    const fetchEmployees = async (companyId: number) => {
+      try {
+        const res = await getEmployeesByCompanyId(companyId);
+        setEmployees(res);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
       }
+    };
+
+    const getUserId = async () => {
+      try {
+        const { user } = await getUser();
+        if (user) {
+          setUserId(user.id);
+        }
+      } catch (error) {
+        console.error("Error fetching user ID:", error);
+      }
+    };
+
+    if (isCompanyCodeValid && formData.company_id) {
+      fetchDepartments(formData.company_id);
+      fetchEmployees(formData.company_id);
+      getUserId();
     }
-    fetchUser();
-    fetchEmployees();
-  }, []);
+  }, [formData.company_id, isCompanyCodeValid]);
 
   const renderInput = (
     name: keyof typeof formData,
@@ -351,11 +365,12 @@ export default function EmployeeOnboardingPage() {
                         Supervisor
                       </label>
                       <select
-                        value={supervisorId}
-                        onChange={(e) => setSupervisorId(e.target.value)}
+                        value={formData.supervisor_id}
+                        name="supervisor_id"
+                        onChange={handleChange}
                         className="w-full lg:w-[20rem] xl:w-[25rem] rounded-md border px-4 py-2 text-sm bg-blue-50 border-gray-200 text-gray-900$ focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
-                        <option value="Not Applicable">Not Applicable</option>
+                        <option value="">Not Applicable</option>
                         {status !== "rejected" &&
                           employees.map((employee) => (
                             <option key={employee.id} value={employee.id}>

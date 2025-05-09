@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { createClient } from "../supabase/server";
 import { User } from "@supabase/supabase-js";
@@ -52,4 +52,34 @@ export async function getCompanyId() {
   }
 
   return employee.company_id;
+}
+
+export async function getDepartmentsByCompanyId(companyId: number) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("departments")
+    .select("id, name")
+    .eq("company_id", companyId);
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getEmployeesByCompanyId(companyId: number) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("employees")
+    .select("id, first_name, last_name, role")
+    .eq("company_id", companyId);
+
+  const formattedData = data?.map((employee) => {
+    return {
+      id: employee.id,
+      name: `${employee.first_name} ${employee.last_name}`,
+      role: employee.role,
+    };
+  });
+
+  if (error) throw error;
+  return formattedData;
 }
