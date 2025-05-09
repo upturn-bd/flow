@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
-const generateIdInput= () => {
+const generateIdInput = () => {
   const letters = Array(3)
     .fill(null)
     .map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26)))
@@ -9,7 +9,7 @@ const generateIdInput= () => {
 
   const digits = String(Math.floor(1000 + Math.random() * 9000));
   return letters + digits;
-}
+};
 
 export async function GET() {
   const supabase = await createClient();
@@ -31,11 +31,12 @@ export async function GET() {
         last_name,
         email,
         phone_number,
-        department,
+        department_id,
         designation,
         job_status,
         hire_date,
-        company_id
+        company_id,
+        role
       `
     )
     .eq("id", user.id)
@@ -51,12 +52,27 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ data });
+  const { data: companyData, error: companyError } = await supabase
+    .from("companies")
+    .select(
+      `name, code
+      `
+    )
+    .eq("id", data.company_id)
+    .single();
+
+  if (companyError) {
+    console.log("Fetch error:", companyError);
+    return NextResponse.json({ error: companyError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    data: { userData: data, companyData: companyData },
+  });
 }
 
-
 export async function POST(request: Request) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   const body = await request.json();
 
@@ -66,7 +82,7 @@ export async function POST(request: Request) {
     email,
     phone_number,
     designation,
-    department,
+    department_id,
     hire_date,
     company_id,
     job_status,
@@ -89,10 +105,10 @@ export async function POST(request: Request) {
       email,
       phone_number,
       designation,
-      department,
+      department_id,
       job_status,
       role: "Employee",
-      is_supervisor: true,
+      is_supervisor: false,
       hire_date,
       company_id,
       rejection_reason: null,

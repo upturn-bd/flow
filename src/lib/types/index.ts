@@ -86,7 +86,7 @@ export const holidayConfigSchema = z.object({
 
 export const requisitionTypeSchema = z.object({
   id: z.number().optional(),
-  name: z.string().min(1, {message:"Please enter a name"}).max(50),
+  name: z.string().min(1, { message: "Please enter a valid name" }).max(50),
   company_id: z.number().optional(),
 });
 
@@ -104,22 +104,25 @@ export const complaintsTypeSchema = z.object({
 
 export const requisitionInventorySchema = z.object({
   id: z.number().optional(),
-  name: z.string().min(1,{message:"Please enter a name"}).max(50),
+  name: z.string().min(1, { message: "Please enter a valid name" }).max(50),
   requisition_category_id: z
     .number()
     .min(1, { message: "Please select a category" }),
   description: z.string().optional(),
-  asset_owner: z.string().min(1,{message: "Please select an asset owner"}),
+  asset_owner: z.string().min(1, { message: "Please select an asset owner" }),
   quantity: z.number().min(1),
   company_id: z.number().optional(),
-  department_id: z.number().min(1,{message: "Please select a department"}),
+  department_id: z.number().min(1, { message: "Please select a department" }),
 });
 
 export const claimTypeSchema = z.object({
   id: z.number().optional(),
-  claim_item: z.string().min(1).max(25),
-  allowance: z.number(),
-  claim_level: z.number(),
-  settler: z.string(),
+  claim_item: z
+    .string()
+    .min(1, { message: "Please enter a valid name" })
+    .max(25),
+  allowance: z.number().min(1, { message: "Please enter a valid allowance" }),
+  claim_level_id: z.number().min(1, { message: "Please select a claim level" }),
+  settler_id: z.string().min(1, { message: "Please select a settler" }),
   company_id: z.number().optional(),
 });

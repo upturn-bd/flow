@@ -2,6 +2,7 @@
 import { Geist } from "next/font/google";
 
 import "./globals.css";
+import 'leaflet/dist/leaflet.css';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

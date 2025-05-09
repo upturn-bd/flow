@@ -22,7 +22,7 @@ export async function GET() {
       last_name,
       email,
       phone_number,
-      department,
+      department_id,
       designation,
       job_status,
       hire_date,
