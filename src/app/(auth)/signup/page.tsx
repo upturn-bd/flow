@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
+import Link from "next/link";
 
 import { signup } from "../auth-actions";
 
@@ -46,54 +47,69 @@ const Signup = () => {
   };
 
   return (
-    <section className="bg-white text-black">
-      <div className="h-screen grid grid-cols-6 gap-10">
-        <div className="bg-[#001731] w-full flex items-start justify-start p-8 col-span-2">
-          <Image src="/Logo.png" width={150} height={150} alt="Company Logo" />
+    <section className="bg-white text-black min-h-screen flex flex-col">
+      <div className="flex flex-col md:flex-row h-full min-h-screen">
+        {/* Logo Section */}
+        <div className="bg-[#001731] flex items-center justify-center p-8 md:w-2/6 w-full min-h-[120px] md:min-h-0">
+          <Image src="/Logo.png" width={150} height={150} alt="Company Logo" className="mx-auto" />
         </div>
-        <div className="col-span-4 flex items-center justify-center md:mx-40">
-          <div className="bg-[#eff8ff] p-28 rounded-3xl shadow-2xl w-full">
+        {/* Form Section */}
+        <div className="flex flex-1 items-center justify-center px-4 py-8 md:px-16 lg:px-32">
+          <div className="bg-[#eff8ff] w-full max-w-md md:max-w-lg p-8 md:p-12 rounded-3xl shadow-2xl">
             <form
               onSubmit={handleSubmit(handleSignup)}
-              className="grid grid-cols-1 gap-4"
+              className="flex flex-col gap-4"
             >
-              <input
-                className="p-3 py-5 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none"
-                type="email"
-                placeholder="Email"
-                {...register("email", { required: "Email is required" })}
-              />
-              {errors.email && (
-                <p className="text-red-500">{errors.email.message}</p>
-              )}
+              <div>
+                <input
+                  className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full placeholder:text-gray-500"
+                  type="email"
+                  placeholder="Email"
+                  autoComplete="email"
+                  {...register("email", { required: "Email is required" })}
+                  disabled={false}
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                )}
+              </div>
 
-              <input
-                className="p-3 py-5 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none"
-                type="text"
-                placeholder="First Name"
-                {...register("firstName", {
-                  required: "First Name is required",
-                })}
-              />
-              {errors.firstName && (
-                <p className="text-red-500">{errors.firstName.message}</p>
-              )}
+              <div>
+                <input
+                  className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full placeholder:text-gray-500"
+                  type="text"
+                  placeholder="First Name"
+                  autoComplete="given-name"
+                  {...register("firstName", {
+                    required: "First Name is required",
+                  })}
+                  disabled={false}
+                />
+                {errors.firstName && (
+                  <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
+                )}
+              </div>
 
-              <input
-                className="p-3 py-5 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none"
-                type="text"
-                placeholder="Last Name"
-                {...register("lastName", { required: "Last Name is required" })}
-              />
-              {errors.lastName && (
-                <p className="text-red-500">{errors.lastName.message}</p>
-              )}
+              <div>
+                <input
+                  className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full placeholder:text-gray-500"
+                  type="text"
+                  placeholder="Last Name"
+                  autoComplete="family-name"
+                  {...register("lastName", { required: "Last Name is required" })}
+                  disabled={false}
+                />
+                {errors.lastName && (
+                  <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
+                )}
+              </div>
 
               <div className="relative">
                 <input
-                  className="p-3 py-5 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none w-full pr-10"
+                  className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full pr-12 placeholder:text-gray-500"
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
+                  autoComplete="new-password"
                   {...register("password", {
                     required: "Password is required",
                     minLength: {
@@ -105,16 +121,18 @@ const Signup = () => {
                       message: "Password must be less than 20 characters",
                     },
                     pattern: {
-                      value: /(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z])/,
+                      value: /(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z])/, // at least one upper, lower, number, special
                       message:
                         "Password must include uppercase, lowercase, number, and special character",
                     },
                   })}
+                  disabled={false}
                 />
                 <button
                   type="button"
-                  className="absolute top-5 right-3"
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 hover:text-black"
                   onClick={togglePasswordVisibility}
+                  tabIndex={-1}
                 >
                   {showPassword ? (
                     <AiOutlineEyeInvisible className="text-2xl" />
@@ -122,27 +140,30 @@ const Signup = () => {
                     <AiFillEye className="text-2xl" />
                   )}
                 </button>
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                )}
               </div>
-              {errors.password && (
-                <p className="text-red-500">{errors.password.message}</p>
-              )}
 
               <div className="relative">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm Password"
-                  className="p-3 py-5 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none w-full pr-10"
+                  className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full pr-12 placeholder:text-gray-500"
+                  autoComplete="new-password"
                   {...register("confirmPassword", {
                     required: "Confirm Password is required",
                     validate: (value) =>
                       value === getValues("password") ||
                       "Passwords do not match",
                   })}
+                  disabled={false}
                 />
                 <button
                   type="button"
-                  className="absolute top-5 right-3"
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 hover:text-black"
                   onClick={toggleConfirmPasswordVisibility}
+                  tabIndex={-1}
                 >
                   {showConfirmPassword ? (
                     <AiOutlineEyeInvisible className="text-2xl" />
@@ -150,35 +171,38 @@ const Signup = () => {
                     <AiFillEye className="text-2xl" />
                   )}
                 </button>
+                {errors.confirmPassword && (
+                  <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
+                )}
               </div>
-              {errors.confirmPassword && (
-                <p className="text-red-500">{errors.confirmPassword.message}</p>
-              )}
 
-              <div className="flex items-center gap-2 ">
+              <div className="flex items-center gap-2 mt-2">
                 <input
                   type="checkbox"
-                  className="orange-400"
+                  className="accent-amber-400 w-4 h-4"
                   id="terms"
                   onChange={(e) => setIsChecked(e.target.checked)}
                 />
-                <label htmlFor="terms">I agree to the Terms & Conditions</label>
+                <label htmlFor="terms" className="text-sm select-none cursor-pointer">
+                  I agree to the <span className="underline">Terms & Conditions</span>
+                </label>
               </div>
 
-              <input
+              <button
                 type="submit"
-                value="Create Account"
-                className={`px-10 py-4 my-5 rounded-full bg-amber-400 text-black shadow-xl cursor-pointer ${
+                className={`px-8 py-3 mt-4 rounded-full bg-amber-400 text-black font-semibold shadow-xl cursor-pointer transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 ${
                   !isChecked ? "opacity-50 cursor-not-allowed" : ""
                 }`}
                 disabled={!isChecked}
-              />
+              >
+                Create Account
+              </button>
             </form>
-            <div className="flex justify-between mt-5 items-center">
-              <button className="text-[#002568]">Don’t have an account?</button>
-              <a href="/signin" className="text-[#FFAB2C]">
+            <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-2 text-sm">
+              <span className="text-[#002568]">Already have an account?</span>
+              <Link href="/signin" className="text-[#FFAB2C] font-semibold hover:underline">
                 Sign In
-              </a>
+              </Link>
             </div>
           </div>
         </div>

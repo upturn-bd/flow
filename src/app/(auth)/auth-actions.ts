@@ -58,13 +58,22 @@ export async function signup({
   redirect("/");
 }
 
+function getSiteUrl(){
+  console.log(process.env.NODE_ENV);
+  
+  if (process.env.NODE_ENV === "production") {
+    return "https://flow.upturn.com.bd";
+  }
+  return "http://localhost:3000";
+}
+
 export async function googleSignIn(){
   const supabase = await createClient();
 
   const response = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options:{
-      redirectTo: "http://localhost:3000/auth/callback",
+      redirectTo: getSiteUrl() + "/auth/callback",
     }
   });
 

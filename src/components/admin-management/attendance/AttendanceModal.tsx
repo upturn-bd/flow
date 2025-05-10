@@ -48,7 +48,7 @@ export default function AttendanceCreateModal({
       setIsValid(false);
       const newErrors: Partial<FormValues> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof FormVaues] = err.message;
       });
       setErrors(newErrors);
     }
