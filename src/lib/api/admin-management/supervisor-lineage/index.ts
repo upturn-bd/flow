@@ -26,19 +26,11 @@ export async function createLineage(payload: z.infer<typeof lineageSchema>[]) {
     return { ...lineage, company_id };
   });
 
-  for (const lineage of validatedLineageData) {
-    console.log("lineage", lineage);
-    const { data, error } = await client
-      .from("lineages")
-      .insert(lineage);
+  const { data, error } = await client
+    .from("lineages")
+    .insert(validatedLineageData);
 
-    if (error) throw error;
-  }
-  // const { data, error } = await client
-  //   .from("lineages")
-  //   .insert(validatedLineageData);
-
-  // if (error) throw error;
+  if (error) throw error;
   return;
 }
 

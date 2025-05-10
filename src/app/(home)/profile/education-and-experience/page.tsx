@@ -6,6 +6,7 @@ import { useEducation } from "@/hooks/useEducation";
 import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
 import { useExperience } from "@/hooks/useExperience";
 import ExperienceModal from "@/components/education-and-experience/ExperienceModal";
+import { ProfileTabs } from "@/components/profile/tab-bar";
 
 export default function EducationExperiencePage() {
   const {
@@ -109,6 +110,7 @@ export default function EducationExperiencePage() {
 
   return (
     <div className="min-h-screen bg-white p-6 md:p-10 md:px-20 text-gray-900">
+      <ProfileTabs />
       <h2 className="text-2xl font-bold text-blue-700">Education</h2>
       <div className="overflow-x-auto border rounded-md mb-6">
         <table className="w-full text-sm text-left">

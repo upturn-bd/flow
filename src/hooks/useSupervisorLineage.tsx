@@ -28,17 +28,17 @@ export function useLineage() {
     }
   }, []);
 
-  const createLineage = async (lineage: Omit<Lineage, "id">) => {
-    const data = await cLineage([lineage]);
+  const createLineage = async (lineage: Omit<Lineage, "id">[]) => {
+    const data = await cLineage(lineage);
     return { success: true, status: 200, data };
   };
 
-  const updateLineage = async (lineage: Omit<Lineage, "id">) => {
-    const data = await uLineage([lineage]);
+  const updateLineage = async (lineage: Omit<Lineage, "id">[]) => {
+    const data = await uLineage(lineage);
     return { success: true, status: 200, data };
   };
 
-  const deleteLineage = async (name:string) => {
+  const deleteLineage = async (name: string) => {
     const data = await dLineage(name);
     return { success: true, status: 200, data };
   };
@@ -49,6 +49,6 @@ export function useLineage() {
     fetchLineages,
     createLineage,
     deleteLineage,
-    updateLineage
+    updateLineage,
   };
 }
