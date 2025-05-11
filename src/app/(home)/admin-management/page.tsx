@@ -69,7 +69,7 @@ export default function CompanyBasicsForm() {
   }, [reset]);
 
   return (
-    <div className="space-y-6 py-12">
+    <div className="space-y-6 py-12 max-w-6xl mx-auto p-6">
       <h2 className="text-2xl font-bold text-blue-700">
         Step 1: Company Basics
       </h2>

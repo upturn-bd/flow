@@ -8,3 +8,5 @@ export function createClient(options?: (SupabaseClientOptions<any>) | undefined)
     options
   );
 }
+
+export const supabase = createClient();
