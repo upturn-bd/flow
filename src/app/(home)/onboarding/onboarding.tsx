@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { ArrowFatRight as ArrowFatRightIcon } from "@phosphor-icons/react";
-import { validateCompanyCode } from "@/lib/api/company";
+import { validateCompanyCode } from "@/lib/api/company-ss";
 import {
   getDepartmentsByCompanyId,
   getEmployeesByCompanyId,
