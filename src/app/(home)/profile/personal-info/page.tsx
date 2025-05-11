@@ -218,6 +218,7 @@ export default function PersonalInfoForm() {
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white">
       <ProfileTabs />
+      <div className="mb-6" />
       <div className="flex items-center mb-6 space-x-12">
         <h2 className="text-2xl font-bold text-blue-700">
           Personal Information

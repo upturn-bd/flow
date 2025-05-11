@@ -109,8 +109,9 @@ export default function EducationExperiencePage() {
   );
 
   return (
-    <div className="min-h-screen bg-white p-6 md:p-10 md:px-20 text-gray-900">
+    <div className="max-w-6xl mx-auto p-6 bg-white">
       <ProfileTabs />
+      <div className="mb-6" />
       <h2 className="text-2xl font-bold text-blue-700">Education</h2>
       <div className="overflow-x-auto border rounded-md mb-6">
         <table className="w-full text-sm text-left">
