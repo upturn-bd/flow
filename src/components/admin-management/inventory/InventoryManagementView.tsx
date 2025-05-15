@@ -165,7 +165,7 @@ export default function InventoryManagementView() {
                 className="flex items-end gap-x-6"
               >
                 <div className="w-1/2 md:w-1/3 space-y-1">
-                  <p>Holiday Name</p>
+                  <p>Item Name</p>
                   <div className="px-3 py-1 rounded-md bg-gray-300">
                     {requisitionInventory.name}
                   </div>

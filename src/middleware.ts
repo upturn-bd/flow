@@ -107,13 +107,13 @@ export async function middleware(request: NextRequest) {
   }
 
   const rolePermissions: Record<Role, string[]> = {
-    Employee: ["/dashboard","/profile", "/operations-and-services", "/notifications", "/account"],
-    Manager: ["/dashboard","/profile", "/operations-and-services", "/notifications" , "/account"],
+    Employee: ["/home","/profile", "/operations-and-services", "/notifications", "/account"],
+    Manager: ["/home","/profile", "/operations-and-services", "/notifications" , "/account"],
     Admin: [
       "/profile",
       "/operations-and-services",
       "/admin-management",
-      "/dashboard",
+      "/home",
       "/notifications",
       "/account",
     ],

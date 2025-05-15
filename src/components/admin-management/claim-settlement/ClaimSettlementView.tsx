@@ -11,7 +11,7 @@ import {
 import { claimTypeSchema } from "@/lib/types";
 import { z } from "zod";
 
-type ClaimType = z.infer<typeof claimTypeSchema>;
+type SettlementType = z.infer<typeof claimTypeSchema>;
 
 export default function ClaimSettlementView() {
   const {
@@ -22,40 +22,40 @@ export default function ClaimSettlementView() {
     updateClaimType,
   } = useClaimTypes();
   const [editClaimType, setEditClaimType] = useState<number | null>(null);
-  const [isCreatingClaimType, setIsCreatingClaimType] = useState(false);
+  const [isCreatingClaimType, setIsCreatingSettlementType] = useState(false);
   const [selectedClaimTypeEdit, setSelectedClaimTypeEdit] =
-    useState<ClaimType | null>(null);
+    useState<SettlementType | null>(null);
 
   const handleCreateClaimType = async (values: any) => {
     try {
       await createClaimType(values);
-      alert("ClaimType created!");
-      setIsCreatingClaimType(false);
+      alert("SettlementType created!");
+      setIsCreatingSettlementType(false);
       fetchClaimTypes();
     } catch {
-      alert("Error creating ClaimType.");
+      alert("Error creating SettlementType.");
     }
   };
 
   const handleUpdateClaimType = async (values: any) => {
     try {
       await updateClaimType(values);
-      alert("ClaimType updated!");
+      alert("SettlementType updated!");
       setSelectedClaimTypeEdit(null);
       setEditClaimType(null);
       fetchClaimTypes();
     } catch {
-      alert("Error updating ClaimType.");
+      alert("Error updating SettlementType.");
     }
   };
 
   const handleDeleteClaimType = async (id: number) => {
     try {
       await deleteClaimType(id);
-      alert("ClaimType deleted!");
+      alert("SettlementType deleted!");
       fetchClaimTypes();
     } catch {
-      alert("Error deleting ClaimType.");
+      alert("Error deleting SettlementType.");
     }
   };
 
@@ -66,31 +66,30 @@ export default function ClaimSettlementView() {
   useEffect(() => {
     if (editClaimType) {
       const selectedClaimType = claimTypes.filter(
-        (ClaimType: ClaimType) => ClaimType.id === editClaimType
+        (SettlementType: SettlementType) => SettlementType.id === editClaimType
       )[0];
-      console.log("Selected Leave Type:", selectedClaimType);
       setSelectedClaimTypeEdit(selectedClaimType);
     }
   }, [editClaimType, claimTypes]);
 
   return (
-    <Collapsible title="Claim Settlement">
+    <Collapsible title="Settlement">
       <div className="px-4 space-y-2 py-2">
-        <label className="block font-bold text-blue-800 mb-2">Claim Type</label>
+        <label className="block font-bold text-blue-800 mb-2">Settlement type</label>
         {claimTypes.length > 0 ? (
-          claimTypes.map((claimType: ClaimType) => (
-            <div key={claimType.id} className="flex items-end gap-x-6">
+          claimTypes.map((settlementType: SettlementType) => (
+            <div key={settlementType.id} className="flex items-end gap-x-6">
               <div className="w-1/2 md:w-1/3 space-y-1">
                 <p>Item Name</p>
                 <div className="px-3 py-1 rounded-md bg-gray-300">
-                    {claimType.settlement_item}
+                    {settlementType.settlement_item}
                 </div>
               </div>
               <div className="w-1/2 md:w-1/3 space-y-1">
                 <p>Description</p>
                 <button
                   onClick={() => {
-                    if (claimType.id !== undefined) setEditClaimType(claimType.id);
+                    if (settlementType.id !== undefined) setEditClaimType(settlementType.id);
                   }}
                   className="w-full px-3 py-1 rounded-md bg-gray-300 text-left"
                 >
@@ -98,7 +97,7 @@ export default function ClaimSettlementView() {
                 </button>
               </div>
               <button
-                onClick={() => claimType.id !== undefined && handleDeleteClaimType(claimType.id)}
+                onClick={() => settlementType.id !== undefined && handleDeleteClaimType(settlementType.id)}
                 className="p-1"
               >
                 <TrashSimple className="text-red-600" size={24} />
@@ -107,12 +106,12 @@ export default function ClaimSettlementView() {
           ))
         ) : (
           <div className="w-full flex items-center gap-x-6 text-center text-lg font-semibold">
-            <p>No claim type found.</p>
+            <p>No settlement type found.</p>
           </div>
         )}
         <button
           type="button"
-          onClick={() => setIsCreatingClaimType(true)}
+          onClick={() => setIsCreatingSettlementType(true)}
           className="mt-4 text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
         >
           +
@@ -120,7 +119,7 @@ export default function ClaimSettlementView() {
         {isCreatingClaimType && (
           <ClaimTypeCreateModal
             onSubmit={handleCreateClaimType}
-            onClose={() => setIsCreatingClaimType(false)}
+            onClose={() => setIsCreatingSettlementType(false)}
           />
         )}
 

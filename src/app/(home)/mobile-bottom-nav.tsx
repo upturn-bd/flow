@@ -3,10 +3,25 @@
 import { ArrowFatRight as ArrowFatRightIcon } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { navItems } from "./nav-items";
-import { useUserData } from "@/hooks/useUserData";
+import { getUserInfo } from "@/lib/auth/getUser";
+import { useEffect, useState } from "react";
 
 export default function MobileBottomNav() {
-  const { userData } = useUserData();
+  const [user, setUser] = useState<
+      { id: string; name: string; role: string } | undefined
+    >();
+  
+    useEffect(() => {
+      async function fetchUserData() {
+        try {
+          const user = await getUserInfo();
+          setUser(user);
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
+        }
+      }
+      fetchUserData();
+    }, []);
 
   return (
     <div
@@ -27,7 +42,7 @@ export default function MobileBottomNav() {
           />
         </Link>
         {navItems
-          .filter((item) => item.label !== "admin-settings")
+          .filter((item) => item.label !== "admin-management")
           .map((item) => {
             const Icon = item.icon;
             return (
@@ -40,9 +55,9 @@ export default function MobileBottomNav() {
               </Link>
             );
           })}
-        {userData?.role === "Admin" &&
+        {user?.role === "Admin" &&
           navItems
-            .filter((item) => item.label === "admin-settings")
+            .filter((item) => item.label === "admin-management")
             .map((item) => {
               const Icon = item.icon;
               return (

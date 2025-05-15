@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { dirtyValuesChecker } from "@/lib/utils";
+import { dirtyValuesChecker, extractFilenameFromUrl } from "@/lib/utils";
 import { Education } from "@/hooks/useEducation";
 import { schoolingSchema, schoolingTypes } from "@/lib/types";
 import { uploadFile } from "@/lib/api/education-and-experience";
+import { FiUploadCloud } from "react-icons/fi";
+import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
 
 interface EducationModalProps {
   initialData?: Education | null;
@@ -24,7 +26,7 @@ export default function EducationModal({
     from_date: "",
     to_date: "",
     result: "",
-    file_path: "",
+    attachments: [],
     id: 0,
     employee_id: "",
     company_id: 0,
@@ -33,6 +35,7 @@ export default function EducationModal({
   useEffect(() => {
     if (initialData) {
       setFormValues(initialData);
+      setAttachments(initialData.attachments || []);
     }
   }, [initialData]);
 
@@ -40,7 +43,7 @@ export default function EducationModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
+  const [attachments, setAttachments] = useState<File[]>([]);
 
   useEffect(() => {
     const result = schoolingSchema.safeParse(formValues);
@@ -66,14 +69,6 @@ export default function EducationModal({
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setFormValues((prev) => ({ ...prev, file_path: selectedFile.name }));
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -89,22 +84,26 @@ export default function EducationModal({
       return;
     }
 
-    if (file) {
-      const uploadResult = await uploadFile(file);
-      if (uploadResult.error) {
-        setErrors({ file_path: "File upload failed" });
-        setIsSubmitting(false);
-        return;
-      } else {
-        onSubmit(result.data);
-        setErrors({});
-        setIsSubmitting(false);
-      }
+    if (attachments.length > 0) {
+      const { uploadedFilePaths, error: uploadError } = await uploadManyFiles(
+        attachments,
+        "education-certificates"
+      );
+
+      if (uploadError) throw uploadError;
+
+      onSubmit({ ...result.data, attachments: uploadedFilePaths });
+      setErrors({});
+      setIsSubmitting(false);
     } else {
       onSubmit(result.data);
       setErrors({});
       setIsSubmitting(false);
     }
+  };
+
+  const removeFile = (name: string) => {
+    setAttachments((prev) => prev.filter((file) => file.name !== name));
   };
 
   useEffect(() => {
@@ -221,19 +220,54 @@ export default function EducationModal({
         </div>
 
         <div>
-          <label className="block font-semibold text-blue-800 mb-1">
-            Certificate
+          <label className="block font-bold text-[#003366] mb-1">
+            Attachment
           </label>
-          <input
-            name="file_path"
-            type="file"
-            accept="application/pdf, image/*"
-            onChange={handleFileChange}
-            className="w-full rounded-md bg-blue-50 p-2"
-          />
-          {errors.file_path && (
-            <p className="text-red-500 text-sm">{errors.file_path}</p>
-          )}
+          <div className="bg-gray-100 rounded-md border border-gray-300 p-6 text-center text-sm text-gray-500">
+            <FiUploadCloud className="mx-auto mb-4 text-2xl" />
+            <label
+              htmlFor="file_upload"
+              className="px-4 py-2 bg-white border border-gray-400 text-sm rounded-md cursor-pointer hover:bg-gray-200 transition"
+            >
+              Browse File
+            </label>
+            <input
+              type="file"
+              id="file_upload"
+              name="attachments"
+              className="hidden"
+              accept=".pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt"
+              multiple
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []);
+                setAttachments((prev) => [
+                  ...prev,
+                  ...files.filter(
+                    (file) => !prev.some((f) => f.name === file.name)
+                  ),
+                ]);
+              }}
+            />
+            <div className="flex gap-3 mt-8 text-gray-600">
+              {attachments.length > 0
+                ? attachments.map((file, index) => (
+                    <div
+                      key={index}
+                      className="px-3 py-2 bg-blue-100 text-sm rounded-sm"
+                    >
+                      <span>{initialData ? extractFilenameFromUrl(file) : file.name}</span>
+                      <button
+                        type="button"
+                        className="ml-2 text-red-500 text-xl"
+                        onClick={() => removeFile(file.name)}
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ))
+                : "No files selected"}
+            </div>
+          </div>
         </div>
 
         <div className="mt-8 flex justify-end space-x-4">

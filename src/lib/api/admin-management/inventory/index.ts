@@ -27,10 +27,8 @@ export async function createRequisitionType(
   const validated = requisitionTypeSchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { id, ...rest } = payload;
-
   const { data, error } = await client.from("requisition_types").insert({
-    ...rest,
+    payload,
     company_id,
   });
 
@@ -73,10 +71,8 @@ export async function createRequisitionInventory(
   const validated = requisitionInventorySchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { id, created_at, updated_at, ...rest } = payload;
-
   const { data, error } = await client.from("requisition_inventories").insert({
-    ...rest,
+    ...payload,
     company_id,
   });
 

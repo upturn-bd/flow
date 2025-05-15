@@ -11,7 +11,7 @@ import { Suspense } from "react";
 
 export default function AdministrativeManagement() {
   return (
-    <div className="space-y-2 py-12">
+    <div className="space-y-2 py-12 px-6 max-w-4xl mx-auto lg:mx-20">
       <h2 className="text-2xl font-bold text-blue-700">
         Step 2: Administrative Management
       </h2>

@@ -7,6 +7,8 @@ import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
 import { useExperience } from "@/hooks/useExperience";
 import ExperienceModal from "@/components/education-and-experience/ExperienceModal";
 import { ProfileTabs } from "@/components/profile/tab-bar";
+import { FaFilePdf } from "react-icons/fa";
+import { extractFilenameFromUrl } from "@/lib/utils";
 
 export default function EducationExperiencePage() {
   const {
@@ -122,6 +124,7 @@ export default function EducationExperiencePage() {
               <th className="px-4 py-2 border">From</th>
               <th className="px-4 py-2 border">To</th>
               <th className="px-4 py-2 border">CGPA</th>
+              <th className="px-4 py-2 border">Attachments</th>
               <th className="px-4 py-2 border">Actions</th>
             </tr>
           </thead>
@@ -134,6 +137,26 @@ export default function EducationExperiencePage() {
                   <td className="px-4 py-2 border">{edu.from_date}</td>
                   <td className="px-4 py-2 border">{edu.to_date}</td>
                   <td className="px-4 py-2 border">{edu.result}</td>
+                  <td className="px-4 py-2 border">
+                    {edu.attachments?.length > 0 ? (
+                      edu.attachments.map((attachment) => (
+                        <div
+                          key={attachment}
+                          onClick={() => {
+                            window.open(attachment, "_blank");
+                          }}
+                          className="flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 gap-3 max-w-xs cursor-pointer hover:bg-gray-50 transition duration-200"
+                        >
+                          <FaFilePdf className="text-red-600 text-xl" />
+                          <div className="text-sm">
+                            <p>{extractFilenameFromUrl(attachment)}</p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500">No attachments</p>
+                    )}
+                  </td>
                   <td className="px-4 py-2 border flex gap-2">
                     <button
                       onClick={() => setEditEducation(edu.id ?? 0)}

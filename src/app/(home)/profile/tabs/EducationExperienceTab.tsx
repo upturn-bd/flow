@@ -8,6 +8,8 @@ import ExperienceModal from "@/components/education-and-experience/ExperienceMod
 import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
 import { Education } from "@/hooks/useEducation";
 import { Experience } from "@/hooks/useExperience";
+import { FaFilePdf } from "react-icons/fa";
+import { extractFilenameFromUrl } from "@/lib/utils";
 
 export default function EducationExperienceTab() {
   const {
@@ -20,7 +22,8 @@ export default function EducationExperienceTab() {
   } = useEducation();
   const [editEducation, setEditEducation] = useState<number | null>(null);
   const [isCreatingEducation, setIsCreatingEducation] = useState(false);
-  const [isEducationActionLoading, setIsEducationActionLoading] = useState(false);
+  const [isEducationActionLoading, setIsEducationActionLoading] =
+    useState(false);
 
   const {
     experience,
@@ -32,7 +35,8 @@ export default function EducationExperienceTab() {
   } = useExperience();
   const [editExperience, setEditExperience] = useState<number | null>(null);
   const [isCreatingExperience, setIsCreatingExperience] = useState(false);
-  const [isExperienceActionLoading, setIsExperienceActionLoading] = useState(false);
+  const [isExperienceActionLoading, setIsExperienceActionLoading] =
+    useState(false);
 
   useEffect(() => {
     fetchEducation();
@@ -85,7 +89,10 @@ export default function EducationExperienceTab() {
     );
 
   const handleDeleteEducation = (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this education record?")) return;
+    if (
+      !window.confirm("Are you sure you want to delete this education record?")
+    )
+      return;
     handleAsyncAction(
       async () => {
         await deleteEducation(id);
@@ -125,7 +132,10 @@ export default function EducationExperienceTab() {
     );
 
   const handleDeleteExperience = (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this experience record?")) return;
+    if (
+      !window.confirm("Are you sure you want to delete this experience record?")
+    )
+      return;
     handleAsyncAction(
       async () => {
         await deleteExperience(id);
@@ -162,6 +172,7 @@ export default function EducationExperienceTab() {
                 <th className="px-4 py-2 border">From</th>
                 <th className="px-4 py-2 border">To</th>
                 <th className="px-4 py-2 border">CGPA</th>
+                <th className="px-4 py-2 border">Attachments</th>
                 <th className="px-4 py-2 border">Actions</th>
               </tr>
             </thead>
@@ -174,7 +185,27 @@ export default function EducationExperienceTab() {
                     <td className="px-4 py-2 border">{edu.from_date}</td>
                     <td className="px-4 py-2 border">{edu.to_date}</td>
                     <td className="px-4 py-2 border">{edu.result}</td>
-                    <td className="px-4 py-2 border flex gap-2">
+                    <td className="px-4 py-2 border space-y-2">
+                      {edu.attachments?.length > 0 ? (
+                        edu.attachments.map((attachment) => (
+                          <div
+                            key={attachment}
+                            onClick={() => {
+                              window.open(attachment, "_blank");
+                            }}
+                            className="flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 gap-3 max-w-xs cursor-pointer hover:bg-gray-50 transition duration-200"
+                          >
+                            <FaFilePdf className="text-red-600 text-xl" />
+                            <div className="text-sm">
+                              <p>{extractFilenameFromUrl(attachment)}</p>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500">No attachments</p>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 flex gap-2">
                       <button
                         onClick={() => setEditEducation(edu.id ?? 0)}
                         className="p-2"
@@ -238,7 +269,10 @@ export default function EducationExperienceTab() {
             <tbody>
               {experience.length > 0 ? (
                 experience.map((exp) => (
-                  <tr key={exp.id ?? exp.company_name} className="hover:bg-gray-50">
+                  <tr
+                    key={exp.id ?? exp.company_name}
+                    className="hover:bg-gray-50"
+                  >
                     <td className="px-4 py-2 border">{exp.company_name}</td>
                     <td className="px-4 py-2 border">{exp.designation}</td>
                     <td className="px-4 py-2 border">{exp.from_date}</td>
@@ -315,4 +349,4 @@ export default function EducationExperienceTab() {
       )}
     </>
   );
-} 
+}

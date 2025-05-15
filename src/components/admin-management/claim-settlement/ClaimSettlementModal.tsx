@@ -137,7 +137,7 @@ export function ClaimTypeCreateModal({
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto"
       >
-        <h2 className="text-xl font-semibold">Inventory/Equipment/Supplies</h2>
+        <h2 className="text-xl font-semibold">Add Settlement Type</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <div>
             <label className="block font-semibold text-blue-800 mb-1">
@@ -172,7 +172,9 @@ export function ClaimTypeCreateModal({
               ))}
             </select>
             {errors.settlement_level_id && (
-              <p className="text-red-500 text-sm">{errors.settlement_level_id}</p>
+              <p className="text-red-500 text-sm">
+                {errors.settlement_level_id}
+              </p>
             )}
           </div>
           <div>
@@ -247,7 +249,6 @@ export function ClaimTypeUpdateModal({
   onClose,
 }: ClaimTypeUpdateModalProps) {
   const [formValues, setFormValues] = useState<ClaimTypeFormValues>({
-    id: 1,
     settlement_item: "",
     allowance: 0,
     settler_id: "",
@@ -276,10 +277,6 @@ export function ClaimTypeUpdateModal({
       });
       setErrors(newErrors);
     }
-
-    console.log(errors);
-
-    console.log("Validation Result:", result.success);
   }, [formValues]);
 
   const handleChange = (
@@ -288,10 +285,7 @@ export function ClaimTypeUpdateModal({
     >
   ) => {
     const { name, value } = e.target;
-    if (
-      name === "allowance" ||
-      name === "settlement_level_id"
-    ) {
+    if (name === "allowance" || name === "settlement_level_id") {
       setFormValues((prev) => ({
         ...prev,
         [name]: Number(value),
@@ -323,10 +317,6 @@ export function ClaimTypeUpdateModal({
     onSubmit(result.data);
     setIsSubmitting(false);
   };
-
-  useEffect(() => {
-    console.log("Form Values:", formValues);
-  }, [formValues]);
 
   useEffect(() => {
     async function fetchPositions() {
@@ -405,7 +395,9 @@ export function ClaimTypeUpdateModal({
               ))}
             </select>
             {errors.settlement_level_id && (
-              <p className="text-red-500 text-sm">{errors.settlement_level_id}</p>
+              <p className="text-red-500 text-sm">
+                {errors.settlement_level_id}
+              </p>
             )}
           </div>
           <div>

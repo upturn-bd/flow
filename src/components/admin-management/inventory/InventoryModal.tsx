@@ -16,7 +16,6 @@ export default function RequisitionTypeCreateModal({
   onClose,
 }: RequisitionTypesModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
-    id: 0,
     name: "",
     company_id: 0,
   });
@@ -146,7 +145,6 @@ export function RequisitionInventoryCreateModal({
   onClose,
 }: RequisitionInventoryCreateModalProps) {
   const [formValues, setFormValues] = useState<RequisitionInventoryFormValues>({
-    id: 1,
     name: "",
     description: "",
     quantity: 1,
@@ -178,10 +176,6 @@ export function RequisitionInventoryCreateModal({
       });
       setErrors(newErrors);
     }
-
-    console.log(errors);
-
-    console.log("Validation Result:", result.success);
   }, [formValues]);
 
   const handleChange = (
@@ -404,7 +398,6 @@ export function RequisitionInventoryUpdateModal({
   onClose,
 }: RequisitionInventoryUpdateModalProps) {
   const [formValues, setFormValues] = useState<RequisitionInventoryFormValues>({
-    id: 1,
     name: "",
     description: "",
     quantity: 1,
@@ -437,10 +430,6 @@ export function RequisitionInventoryUpdateModal({
       });
       setErrors(newErrors);
     }
-
-    console.log(errors);
-
-    console.log("Validation Result:", result.success);
   }, [formValues]);
 
   const handleChange = (
@@ -486,10 +475,6 @@ export function RequisitionInventoryUpdateModal({
     onSubmit(result.data);
     setIsSubmitting(false);
   };
-
-  useEffect(() => {
-    console.log("Form Values:", formValues);
-  }, [formValues]);
 
   useEffect(() => {
     fetchDepartments();

@@ -3,10 +3,25 @@
 import Link from "next/link";
 import { ArrowFatRight as ArrowFatRightIcon } from "@phosphor-icons/react";
 import { navItems } from "./nav-items";
-import { useUserData } from "@/hooks/useUserData";
+import { useEffect, useState } from "react";
+import { getUserInfo } from "@/lib/auth/getUser";
 
 export default function Sidebar() {
-  const { userData } = useUserData();
+  const [user, setUser] = useState<
+    { id: string; name: string; role: string } | undefined
+  >();
+
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const user = await getUserInfo();
+        setUser(user);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    }
+    fetchUserData();
+  }, []);
 
   return (
     <div
@@ -24,7 +39,7 @@ export default function Sidebar() {
       </div>
       <nav className="absolute top-[30%] w-full flex flex-col gap-6 items-center text-white">
         {navItems
-          .filter((item) => item.label !== "admin-settings")
+          .filter((item) => item.label !== "admin-management")
           .map((item) => {
             const Icon = item.icon;
             return (
@@ -33,9 +48,9 @@ export default function Sidebar() {
               </Link>
             );
           })}
-        {userData?.role === "Admin" &&
+        {user?.role === "Admin" &&
           navItems
-            .filter((item) => item.label === "admin-settings")
+            .filter((item) => item.label === "admin-management")
             .map((item) => {
               const Icon = item.icon;
               return (

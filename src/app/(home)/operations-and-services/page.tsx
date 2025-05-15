@@ -33,12 +33,12 @@ const sections = [
     items: [
       {
         name: "Task",
-        path: "/opeartions-and-services/workflow/task",
+        path: "/operations-and-services/workflow/task",
         icon: ClipboardText,
       },
       {
         name: "Project",
-        path: "/opeartions-and-services/workflow/project",
+        path: "/operations-and-services/workflow/project",
         icon: ProjectorScreenChart,
       },
     ],
@@ -48,32 +48,32 @@ const sections = [
     items: [
       {
         name: "Attendance",
-        path: "/opeartions-and-services/services/attendance",
+        path: "/operations-and-services/services/attendance",
         icon: SignIn,
       },
       {
         name: "Leave",
-        path: "/opeartions-and-services/services/leave",
+        path: "/operations-and-services/services/leave",
         icon: CalendarX,
       },
       {
         name: "Notice",
-        path: "/opeartions-and-services/services/notice",
+        path: "/operations-and-services/services/notice",
         icon: Bell,
       },
       {
         name: "Requisition",
-        path: "/opeartions-and-services/services/requisition",
+        path: "/operations-and-services/services/requisition",
         icon: Note,
       },
       {
         name: "Settlement",
-        path: "/opeartions-and-services/services/settlement",
+        path: "/operations-and-services/services/settlement",
         icon: CurrencyDollar,
       },
       {
         name: "Complaint",
-        path: "/opeartions-and-services/services/complaint",
+        path: "/operations-and-services/services/complaint",
         icon: WarningCircle,
       },
     ],

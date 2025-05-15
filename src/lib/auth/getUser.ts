@@ -83,3 +83,25 @@ export async function getEmployeesByCompanyId(companyId: number) {
   if (error) throw error;
   return formattedData;
 }
+
+export async function getUserInfo() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data, error } = await supabase
+    .from("employees")
+    .select("id, first_name, last_name, role, company_id, supervisor_id, department_id")
+    .eq("id", user?.id)
+    .single();
+
+  if (error) throw error;
+  return {
+    id: data.id,
+    name: `${data.first_name} ${data.last_name}`,
+    role: data.role,
+    company_id: data.company_id,
+    supervisor_id: data.supervisor_id,
+    department_id: data.department_id,
+  };
+}
