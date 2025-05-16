@@ -214,7 +214,7 @@ export default function CreateNewProjectPage() {
       setIsValid(false);
       const newErrors: Partial<ProjectDetails> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof ProjectDetails] = err.message as any;
       });
       setErrors(newErrors);
     }
@@ -229,7 +229,7 @@ export default function CreateNewProjectPage() {
       setIsMilestoneValid(false);
       const newErrors: Partial<Milestone> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof Milestone] = err.message as any;
       });
       setMilestoneErrors(newErrors);
     }
@@ -243,7 +243,7 @@ export default function CreateNewProjectPage() {
     const fetchEmployees = async () => {
       try {
         const response = await getEmployeesInfo();
-        setEmployees(response.data);
+        setEmployees(response.data || []);
       } catch (error) {
         setEmployees([]);
         console.error("Error fetching asset owners:", error);
@@ -262,7 +262,7 @@ export default function CreateNewProjectPage() {
       setIsValid(false);
       const newErrors: Partial<ProjectDetails> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof ProjectDetails] = err.message as any;
       });
       setErrors(newErrors);
     }
@@ -997,7 +997,7 @@ export function UpdateProjectPage({
       setIsValid(false);
       const newErrors: Partial<ProjectDetails> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof ProjectDetails] = err.message as any;
       });
       setErrors(newErrors);
     }
@@ -1007,7 +1007,7 @@ export function UpdateProjectPage({
     const fetchEmployees = async () => {
       try {
         const response = await getEmployeesInfo();
-        setEmployees(response.data);
+        setEmployees(response.data || []);
       } catch (error) {
         setEmployees([]);
         console.error("Error fetching asset owners:", error);
@@ -1026,7 +1026,7 @@ export function UpdateProjectPage({
       setIsValid(false);
       const newErrors: Partial<ProjectDetails> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof ProjectDetails] = err.message as any;
       });
       setErrors(newErrors);
     }

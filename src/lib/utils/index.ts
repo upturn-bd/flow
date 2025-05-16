@@ -32,7 +32,24 @@ export function generateRandomId() {
 
 export function extractFilenameFromUrl(url: string) {
   const lastSlashIndex = url.lastIndexOf("/");
-  return url.substring(lastSlashIndex + 1);
+  let name = url.substring(lastSlashIndex + 1);
+  name = name.replaceAll("%20", " ");
+  name = name.replaceAll("%28", "(");
+  name = name.replaceAll("%29", ")");
+  name = name.replaceAll("%2C", ",");
+  name = name.replaceAll("%2E", ".");
+  name = name.replaceAll("%2F", "/");
+  name = name.replaceAll("%3A", ":");
+  name = name.replaceAll("%3B", ";");
+  name = name.replaceAll("%3D", "=");
+  name = name.replaceAll("%5B", "[");
+  name = name.replaceAll("%5D", "]");
+  name = name.replaceAll("%5F", "_");
+  name = name.replaceAll("%7B", "{");
+  name = name.replaceAll("%7D", "}");
+
+  name = name.split("-")[1];
+  return name;
 }
 
 export function formatDate(dateStr: string): string {

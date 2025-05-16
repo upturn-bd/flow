@@ -47,7 +47,7 @@ export default function ExperienceModal({
       setIsValid(false);
       const newErrors: Partial<Experience> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof Experience] = err.message as any;
       });
       setErrors(newErrors);
     }
@@ -70,7 +70,7 @@ export default function ExperienceModal({
     if (!result.success) {
       const fieldErrors: Partial<Experience> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof Experience] = issue.message;
+        fieldErrors[issue.path[0] as keyof Experience] = issue.message as any;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);

@@ -35,7 +35,8 @@ export default function EducationModal({
   useEffect(() => {
     if (initialData) {
       setFormValues(initialData);
-      setAttachments(initialData.attachments || []);
+      setExistingAttachments(initialData.attachments || []);
+      setAttachments([]);
     }
   }, [initialData]);
 
@@ -43,6 +44,7 @@ export default function EducationModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
+  const [existingAttachments, setExistingAttachments] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<File[]>([]);
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export default function EducationModal({
       setIsValid(false);
       const newErrors: Partial<Education> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof Education] = err.message as any;
       });
       setErrors(newErrors);
     }
@@ -77,7 +79,7 @@ export default function EducationModal({
     if (!result.success) {
       const fieldErrors: Partial<Education> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof Education] = issue.message;
+        fieldErrors[issue.path[0] as keyof Education] = issue.message as any;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -92,7 +94,7 @@ export default function EducationModal({
 
       if (uploadError) throw uploadError;
 
-      onSubmit({ ...result.data, attachments: uploadedFilePaths });
+      onSubmit({ ...result.data, attachments: [...existingAttachments, ...(uploadedFilePaths || [])] });
       setErrors({});
       setIsSubmitting(false);
     } else {
@@ -106,11 +108,18 @@ export default function EducationModal({
     setAttachments((prev) => prev.filter((file) => file.name !== name));
   };
 
+  const removeExistingAttachment = (url: string) => {
+    setExistingAttachments((prev) => prev.filter((f) => f !== url));
+  };
+
   useEffect(() => {
     if (initialData) {
       setIsDirty(dirtyValuesChecker(initialData, formValues));
     }
-  }, [initialData, formValues]);
+    if (attachments.length > 0 || existingAttachments.length !== (initialData?.attachments?.length || 0)) {
+      setIsDirty(true);
+    }
+  }, [initialData, formValues, attachments, existingAttachments]);
 
   return (
     <div className="fixed max-h-screen overflow-y-auto inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -242,30 +251,36 @@ export default function EducationModal({
                 const files = Array.from(e.target.files || []);
                 setAttachments((prev) => [
                   ...prev,
-                  ...files.filter(
-                    (file) => !prev.some((f) => f.name === file.name)
-                  ),
+                  ...files.filter((file) => !prev.some((f) => f.name === file.name)),
                 ]);
               }}
             />
             <div className="flex gap-3 mt-8 text-gray-600">
-              {attachments.length > 0
-                ? attachments.map((file, index) => (
-                    <div
-                      key={index}
-                      className="px-3 py-2 bg-blue-100 text-sm rounded-sm"
-                    >
-                      <span>{initialData ? extractFilenameFromUrl(file) : file.name}</span>
-                      <button
-                        type="button"
-                        className="ml-2 text-red-500 text-xl"
-                        onClick={() => removeFile(file.name)}
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  ))
-                : "No files selected"}
+              {existingAttachments.map((url, index) => (
+                <div key={"existing-" + index} className="px-3 py-2 bg-blue-100 text-sm rounded-sm">
+                  <span>{extractFilenameFromUrl(url)}</span>
+                  <button
+                    type="button"
+                    className="ml-2 text-red-500 text-xl"
+                    onClick={() => removeExistingAttachment(url)}
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+              {attachments.map((file, index) => (
+                <div key={"new-" + index} className="px-3 py-2 bg-blue-100 text-sm rounded-sm">
+                  <span>{file.name}</span>
+                  <button
+                    type="button"
+                    className="ml-2 text-red-500 text-xl"
+                    onClick={() => removeFile(file.name)}
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+              {existingAttachments.length === 0 && attachments.length === 0 && "No files selected"}
             </div>
           </div>
         </div>

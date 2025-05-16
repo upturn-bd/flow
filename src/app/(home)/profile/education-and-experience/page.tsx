@@ -138,20 +138,26 @@ export default function EducationExperiencePage() {
                   <td className="px-4 py-2 border">{edu.to_date}</td>
                   <td className="px-4 py-2 border">{edu.result}</td>
                   <td className="px-4 py-2 border">
-                    {edu.attachments?.length > 0 ? (
+                    {edu.attachments && edu.attachments.length > 0 ? (
                       edu.attachments.map((attachment) => (
-                        <div
+                        <button
                           key={attachment}
-                          onClick={() => {
-                            window.open(attachment, "_blank");
+                          type="button"
+                          onClick={() => window.open(attachment, "_blank")}
+                          onKeyDown={e => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              window.open(attachment, "_blank");
+                            }
                           }}
-                          className="flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 gap-3 max-w-xs cursor-pointer hover:bg-gray-50 transition duration-200"
+                          aria-label={`Open attachment ${extractFilenameFromUrl(attachment)}`}
+                          className="flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 gap-3 max-w-xs cursor-pointer hover:bg-gray-50 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          title={extractFilenameFromUrl(attachment)}
                         >
                           <FaFilePdf className="text-red-600 text-xl" />
-                          <div className="text-sm">
-                            <p>{extractFilenameFromUrl(attachment)}</p>
+                          <div className="text-sm truncate max-w-[120px]">
+                            <p className="truncate">{extractFilenameFromUrl(attachment)}</p>
                           </div>
-                        </div>
+                        </button>
                       ))
                     ) : (
                       <p className="text-gray-500">No attachments</p>

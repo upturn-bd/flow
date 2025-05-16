@@ -26,11 +26,11 @@ export function useEmployees() {
         .from("employees")
         .select("id, first_name, last_name, role")
         .eq("company_id", company_id);
-      const formattedData = res.data.map((employee) => ({
+      const formattedData = res.data?.map((employee) => ({
         id: employee.id,
         name: `${employee.first_name} ${employee.last_name}`,
         role: employee.role,
-      }));
+      })) || [];
       setEmployees(formattedData);
     } catch (error) {
       console.error(error);
