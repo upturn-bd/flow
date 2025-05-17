@@ -31,16 +31,6 @@ export default function MobileBottomNav() {
       }}
     >
       <nav className="relative w-full h-full flex items-center text-white">
-        <Link
-          href="/"
-          className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[60%] h-14 w-14 rounded-full bg-[#001731] flex items-center justify-center"
-        >
-          <ArrowFatRightIcon
-            size={30}
-            className="-rotate-45 text-yellow-500"
-            weight="fill"
-          />
-        </Link>
         {navItems
           .filter((item) => item.label !== "admin-management")
           .map((item) => {
