@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { dirtyValuesChecker } from "@/lib/utils";
+import { useEmployees } from "@/hooks/useEmployees";
 
 const schema = z.object({
   id: z.number().optional(),
@@ -16,13 +17,11 @@ interface DivisionModalProps {
   initialData?: { id: number; name: string; head_id: string } | null;
   onSubmit: (values: FormValues) => void;
   onClose: () => void;
-  employees: { id: number; name: string }[];
 }
 
 export default function DivisionModal({
   initialData,
   onSubmit,
-  employees,
   onClose,
 }: DivisionModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
@@ -37,6 +36,7 @@ export default function DivisionModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
+  const { employees, fetchEmployees } = useEmployees();
 
   useEffect(() => {
     const result = schema.safeParse(formValues);
@@ -88,6 +88,10 @@ export default function DivisionModal({
     onSubmit(result.data);
     setIsSubmitting(false);
   };
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">

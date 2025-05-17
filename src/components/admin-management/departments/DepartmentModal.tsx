@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Department } from "@/hooks/useDepartments";
 import { z } from "zod";
 import { dirtyValuesChecker } from "@/lib/utils";
+import { useEmployees } from "@/hooks/useEmployees";
 
 const schema = z.object({
   id: z.number().optional(),
@@ -19,14 +20,12 @@ interface DepartmentModalProps {
   initialData?: Department | null;
   onSubmit: (values: FormValues) => void;
   onClose: () => void;
-  employees: { id: number; name: string }[];
   divisions: { id: number; name: string }[];
 }
 
 export default function DepartmentModal({
   initialData,
   onSubmit,
-  employees,
   divisions,
   onClose,
 }: DepartmentModalProps) {
@@ -37,6 +36,12 @@ export default function DepartmentModal({
     description: "",
     division_id: 0,
   });
+
+  const { employees, fetchEmployees } = useEmployees();
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   useEffect(() => {
     if (initialData) {
@@ -103,7 +108,6 @@ export default function DepartmentModal({
       setIsDirty(dirtyValuesChecker(initialData, formValues));
     }
   }, [initialData, formValues]);
-  
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
