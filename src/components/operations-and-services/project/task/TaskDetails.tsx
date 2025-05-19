@@ -4,13 +4,12 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { Task } from "@/hooks/useTasks";
 import { getCompanyId } from "@/lib/auth/getUser";
 import { createClient } from "@/lib/supabase/client";
-import {
-  CalendarBlank,
-} from "@phosphor-icons/react";
+import { CalendarBlank } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 interface TaskDetailsProps {
   id: number;
+  onClose: () => void;
 }
 function formatDate(dateStr: string): string {
   const [year, month, dayStr] = dateStr.split("-");
@@ -34,7 +33,7 @@ function formatDate(dateStr: string): string {
   return `${day} ${monthName}, ${year}`;
 }
 
-export default function TaskDetails({ id }: TaskDetailsProps) {
+export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
   const [taskDetails, setTaskDetails] = useState<Task | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -113,9 +112,18 @@ export default function TaskDetails({ id }: TaskDetailsProps) {
 
   return (
     <div className="md:max-w-6xl mx-auto p-6 md:p-10 text-[#2F2F2F] font-sans">
-      <h2 className="text-xl md:text-2xl font-bold text-[#0074FF] mb-4">
-        Task Details
-      </h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl md:text-2xl font-bold text-[#0074FF] mb-4">
+          Task Details
+        </h2>
+        <button
+          type="button"
+          onClick={onClose}
+          className="bg-blue-900 text-white px-4 py-2 rounded-md"
+        >
+          Back
+        </button>
+      </div>
 
       <div className="grid gap-2">
         <div className="flex gap-2">
@@ -167,8 +175,8 @@ export default function TaskDetails({ id }: TaskDetailsProps) {
         </div>
       </div>
       <div className="mt-6">
-          <p>{taskDetails?.task_description}</p>
-        </div>
+        <p>{taskDetails?.task_description}</p>
+      </div>
     </div>
   );
 }

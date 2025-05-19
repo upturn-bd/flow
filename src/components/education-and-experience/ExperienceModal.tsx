@@ -89,10 +89,10 @@ export default function ExperienceModal({
   }, [initialData, formValues]);
 
   return (
-    <div className="fixed max-h-screen overflow-y-auto inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
       <form
         onSubmit={handleSubmit}
-        className="bg-white px-6 pt-48 pb-12 rounded-lg w-full max-w-md space-y-4"
+        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto"
       >
         <h2 className="text-xl font-semibold">
           {initialData ? "Edit Experience" : "Create Experience"}

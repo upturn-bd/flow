@@ -193,11 +193,13 @@ export default function EducationExperienceTab() {
                             onClick={() => {
                               window.open(attachment, "_blank");
                             }}
-                            className="flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 gap-3 max-w-xs cursor-pointer hover:bg-gray-50 transition duration-200"
+                            className="flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 gap-3 max-w-full cursor-pointer hover:bg-gray-50 transition duration-200"
                           >
                             <FaFilePdf className="text-red-600 text-xl" />
                             <div className="text-sm">
-                              <p>{extractFilenameFromUrl(attachment)}</p>
+                              <p className="truncate whitespace-nowrap overflow-hidden max-w-[200px]">
+                                {extractFilenameFromUrl(attachment)}
+                              </p>
                             </div>
                           </div>
                         ))

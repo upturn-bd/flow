@@ -207,7 +207,7 @@ export const taskSchema = z.object({
   company_id: z.number().optional(),
   assignees: z.array(z.string()).optional(),
   priority: z.string().min(1, { message: "Please select a priority" }),
-  created_by: z.string().optional(),
+  created_by: z.string().optional().nullable(),
 });
 
 export const requisitionSchema = z.object({

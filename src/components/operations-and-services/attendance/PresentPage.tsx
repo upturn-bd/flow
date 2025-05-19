@@ -106,10 +106,10 @@ export default function AttendancePresentPage() {
                       {sites.length === 0 && "Loading..."}
                     </td>
                     <td className="py-2 px-4">
-                      {formatTimeFromISO(entry.check_in_time)}
+                      {entry.check_in_time && formatTimeFromISO(entry.check_in_time)}
                     </td>
                     <td className="py-2 px-4">
-                      {formatTimeFromISO(entry.check_out_time)}
+                      {entry.check_out_time? formatTimeFromISO(entry.check_out_time): "N/A"}
                     </td>
                     <td className="py-2 px-4">
                       <span>Present</span>

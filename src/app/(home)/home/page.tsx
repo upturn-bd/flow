@@ -9,15 +9,10 @@ import { getUserInfo } from "@/lib/auth/getUser";
 import { createClient } from "@/lib/supabase/client";
 import { formatDateToDayMonth } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import {
-  FiRefreshCcw,
-  FiTrash2,
-  FiAlertCircle,
-  FiChevronDown,
-} from "react-icons/fi";
+import { FiRefreshCcw, FiAlertCircle, FiChevronDown } from "react-icons/fi";
 
 const initialAttendanceRecord = {
-  tag: "Pending",
+  tag: "Present",
   site_id: 0,
 };
 
@@ -208,7 +203,7 @@ export default function HomePage() {
                   </span>
                 </div>
               )}
-            {!statusLoading &&
+            {/* {!statusLoading &&
               (attendanceStatus.checkIn || attendanceStatus.checkOut) && (
                 <div className="flex items-center gap-2">
                   <label className="font-semibold text-gray-700">
@@ -232,7 +227,55 @@ export default function HomePage() {
                     ))}
                   </select>
                 </div>
-              )}
+              )} */}
+            {!statusLoading && attendanceStatus.checkIn && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <label className="font-semibold text-gray-700">
+                    Site Name
+                  </label>
+                  <select
+                    value={attendanceRecord.site_id}
+                    onChange={(e) =>
+                      setAttendanceRecord({
+                        ...attendanceRecord,
+                        site_id: Number(e.target.value),
+                      })
+                    }
+                    className="border rounded-md px-3 py-1 bg-blue-50"
+                  >
+                    <option value="">Select site</option>
+                    {sites.map((site) => (
+                      <option key={site.id} value={site.id}>
+                        {site.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="font-semibold text-gray-700">Status</label>
+                  <select
+                    value={attendanceRecord.tag}
+                    onChange={(e) =>
+                      setAttendanceRecord({
+                        ...attendanceRecord,
+                        tag: e.target.value,
+                      })
+                    }
+                    className="border rounded-md px-3 py-1 bg-blue-50"
+                  >
+                    <option value="">Select status</option>
+                    {["Present", "Absent", "Late", "Wrong_Location"].map(
+                      (status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      )
+                    )}
+                  </select>
+                </div>
+              </div>
+            )}
           </div>
           {statusLoading && <div>Loading...</div>}
           {!statusLoading &&
@@ -241,7 +284,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={handleCheckIn}
-                disabled={!attendanceRecord.site_id}
+                disabled={!attendanceRecord.site_id || !attendanceRecord.tag}
                 className="ml-auto bg-yellow-400 text-black text-sm rounded-full px-4 py-1 h-10 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Check-in <FiChevronDown size={14} className="ml-1" />
@@ -254,7 +297,6 @@ export default function HomePage() {
               <button
                 onClick={handleCheckOut}
                 type="button"
-                disabled={!attendanceRecord.site_id}
                 className="ml-auto bg-yellow-400 text-black text-sm rounded-full px-4 py-1 h-10 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Check-out <FiChevronDown size={14} className="ml-1" />

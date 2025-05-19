@@ -94,7 +94,10 @@ export default function EducationModal({
 
       if (uploadError) throw uploadError;
 
-      onSubmit({ ...result.data, attachments: [...existingAttachments, ...(uploadedFilePaths || [])] });
+      onSubmit({
+        ...result.data,
+        attachments: [...existingAttachments, ...(uploadedFilePaths || [])],
+      });
       setErrors({});
       setIsSubmitting(false);
     } else {
@@ -116,16 +119,19 @@ export default function EducationModal({
     if (initialData) {
       setIsDirty(dirtyValuesChecker(initialData, formValues));
     }
-    if (attachments.length > 0 || existingAttachments.length !== (initialData?.attachments?.length || 0)) {
+    if (
+      attachments.length > 0 ||
+      existingAttachments.length !== (initialData?.attachments?.length || 0)
+    ) {
       setIsDirty(true);
     }
   }, [initialData, formValues, attachments, existingAttachments]);
 
   return (
-    <div className="fixed max-h-screen overflow-y-auto inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
       <form
         onSubmit={handleSubmit}
-        className="bg-white px-6 pt-48 pb-12 rounded-lg w-full max-w-md space-y-4"
+        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto"
       >
         <h2 className="text-xl font-semibold">
           {initialData ? "Edit Education" : "Create Education"}
@@ -251,14 +257,21 @@ export default function EducationModal({
                 const files = Array.from(e.target.files || []);
                 setAttachments((prev) => [
                   ...prev,
-                  ...files.filter((file) => !prev.some((f) => f.name === file.name)),
+                  ...files.filter(
+                    (file) => !prev.some((f) => f.name === file.name)
+                  ),
                 ]);
               }}
             />
             <div className="flex gap-3 mt-8 text-gray-600">
               {existingAttachments.map((url, index) => (
-                <div key={"existing-" + index} className="px-3 py-2 bg-blue-100 text-sm rounded-sm">
-                  <span>{extractFilenameFromUrl(url)}</span>
+                <div
+                  key={"existing-" + index}
+                  className="px-3 py-2 bg-blue-100 text-sm rounded-sm flex items-center max-w-full"
+                >
+                  <span className="truncate whitespace-nowrap overflow-hidden max-w-[200px]">
+                    {extractFilenameFromUrl(url)}
+                  </span>
                   <button
                     type="button"
                     className="ml-2 text-red-500 text-xl"
@@ -269,8 +282,13 @@ export default function EducationModal({
                 </div>
               ))}
               {attachments.map((file, index) => (
-                <div key={"new-" + index} className="px-3 py-2 bg-blue-100 text-sm rounded-sm">
-                  <span>{file.name}</span>
+                <div
+                  key={"new-" + index}
+                  className="px-3 py-2 bg-blue-100 text-sm rounded-sm flex items-center max-w-full"
+                >
+                  <span className="truncate whitespace-nowrap overflow-hidden max-w-[200px]">
+                    {file.name}
+                  </span>
                   <button
                     type="button"
                     className="ml-2 text-red-500 text-xl"
@@ -280,7 +298,10 @@ export default function EducationModal({
                   </button>
                 </div>
               ))}
-              {existingAttachments.length === 0 && attachments.length === 0 && "No files selected"}
+
+              {existingAttachments.length === 0 &&
+                attachments.length === 0 &&
+                "No files selected"}
             </div>
           </div>
         </div>

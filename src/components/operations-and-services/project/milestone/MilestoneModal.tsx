@@ -3,7 +3,7 @@
 import { Milestone } from "@/hooks/useMilestones";
 import { useEmployees } from "@/hooks/useEmployees";
 import { milestoneSchema } from "@/lib/types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getCompanyId } from "@/lib/auth/getUser";
 
 interface MilestoneCreateModalProps {
@@ -124,6 +124,41 @@ export default function MilestoneCreateModal({
     }));
   }, [projectId]);
 
+  const [milestoneSearchTerm, setMilestoneSearchTerm] = useState("");
+  const [isMilestoneDropdownOpen, setIsMilestoneDropdownOpen] = useState(false);
+  const milestoneInputRef = useRef<HTMLInputElement>(null);
+  const milestoneDropdownRef = useRef<HTMLDivElement>(null);
+
+  const filteredMilestoneEmployees = employees.filter(
+    (emp) =>
+      !milestoneAssignees.includes(emp.id) &&
+      emp.name.toLowerCase().includes(milestoneSearchTerm.toLowerCase())
+  );
+
+  const handleAddMilestoneAssignee = (id: string) => {
+    setMilestoneAssignees((prev) => [...prev, id]);
+    setMilestoneSearchTerm("");
+    setIsMilestoneDropdownOpen(false);
+    milestoneInputRef.current?.focus();
+  };
+
+  const handleRemoveMilestoneAssignee = (id: string) => {
+    setMilestoneAssignees((prev) => prev.filter((a) => a !== id));
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        milestoneDropdownRef.current &&
+        !milestoneDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsMilestoneDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
       <form
@@ -195,53 +230,64 @@ export default function MilestoneCreateModal({
           )}
         </div>
         <div>
-          <label className="block text-lg font-bold text-blue-700">
+          <label className="block text-lg font-bold text-blue-700 mb-1">
             Assignees
           </label>
-          <div className="relative">
-            <select
-              onChange={(e) =>
-                setMilestoneAssignees((prev) => [...prev, e.target.value])
-              }
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select assignee</option>
-              {employees.length > 0 &&
-                employees
-                  .filter((emp) => !milestoneAssignees.includes(emp.id))
-                  .map((employee) => (
-                    <option key={employee.id} value={employee.id}>
-                      {employee.name}
-                    </option>
-                  ))}
-            </select>
 
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          <div className="relative" ref={milestoneDropdownRef}>
+            <input
+              type="text"
+              ref={milestoneInputRef}
+              value={milestoneSearchTerm}
+              onChange={(e) => {
+                setMilestoneSearchTerm(e.target.value);
+                setIsMilestoneDropdownOpen(true);
+              }}
+              onFocus={() => setIsMilestoneDropdownOpen(true)}
+              placeholder="Select assignee"
+              className="w-full bg-blue-100 rounded p-3 appearance-none"
+            />
+            <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
               <svg className="fill-yellow-400" width="10" height="10">
                 <polygon points="0,0 10,0 5,6" />
               </svg>
             </div>
+
+            {isMilestoneDropdownOpen &&
+              filteredMilestoneEmployees.length > 0 && (
+                <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
+                  {filteredMilestoneEmployees.map((emp) => (
+                    <li
+                      key={emp.id}
+                      onClick={() => handleAddMilestoneAssignee(emp.id)}
+                      className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
+                    >
+                      {emp.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
           </div>
-          <div className="flex gap-2 mt-2">
-            {milestoneAssignees.map((assignee) => (
-              <span
-                key={assignee}
-                className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm"
-              >
-                {employees.find((e) => e.id === assignee)?.name}
-                <button
-                  type="button"
-                  className="ml-2 text-red-500"
-                  onClick={() =>
-                    setMilestoneAssignees((prev) =>
-                      prev.filter((a) => a !== assignee)
-                    )
-                  }
+
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {milestoneAssignees.map((assignee) => {
+              const emp = employees.find((e) => e.id === assignee);
+              return (
+                <span
+                  key={assignee}
+                  className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
                 >
-                  &times;
-                </button>
-              </span>
-            ))}
+                  {emp?.name}
+                  <button
+                    type="button"
+                    className="ml-2 text-red-500"
+                    onClick={() => handleRemoveMilestoneAssignee(assignee)}
+                  >
+                    &times;
+                  </button>
+                </span>
+              );
+            })}
           </div>
         </div>
         <div>
@@ -400,6 +446,41 @@ export function MilestoneUpdateModal({
     }));
   }, [milestoneAssignees]);
 
+  const [milestoneSearchTerm, setMilestoneSearchTerm] = useState("");
+  const [isMilestoneDropdownOpen, setIsMilestoneDropdownOpen] = useState(false);
+  const milestoneInputRef = useRef<HTMLInputElement>(null);
+  const milestoneDropdownRef = useRef<HTMLDivElement>(null);
+
+  const filteredMilestoneEmployees = employees.filter(
+    (emp) =>
+      !milestoneAssignees.includes(emp.id) &&
+      emp.name.toLowerCase().includes(milestoneSearchTerm.toLowerCase())
+  );
+
+  const handleAddMilestoneAssignee = (id: string) => {
+    setMilestoneAssignees((prev) => [...prev, id]);
+    setMilestoneSearchTerm("");
+    setIsMilestoneDropdownOpen(false);
+    milestoneInputRef.current?.focus();
+  };
+
+  const handleRemoveMilestoneAssignee = (id: string) => {
+    setMilestoneAssignees((prev) => prev.filter((a) => a !== id));
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        milestoneDropdownRef.current &&
+        !milestoneDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsMilestoneDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
       <form
@@ -471,53 +552,64 @@ export function MilestoneUpdateModal({
           )}
         </div>
         <div>
-          <label className="block text-lg font-bold text-blue-700">
+          <label className="block text-lg font-bold text-blue-700 mb-1">
             Assignees
           </label>
-          <div className="relative">
-            <select
-              onChange={(e) =>
-                setMilestoneAssignees((prev) => [...prev, e.target.value])
-              }
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select assignee</option>
-              {employees.length > 0 &&
-                employees
-                  .filter((emp) => !milestoneAssignees.includes(emp.id))
-                  .map((employee) => (
-                    <option key={employee.id} value={employee.id}>
-                      {employee.name}
-                    </option>
-                  ))}
-            </select>
 
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          <div className="relative" ref={milestoneDropdownRef}>
+            <input
+              type="text"
+              ref={milestoneInputRef}
+              value={milestoneSearchTerm}
+              onChange={(e) => {
+                setMilestoneSearchTerm(e.target.value);
+                setIsMilestoneDropdownOpen(true);
+              }}
+              onFocus={() => setIsMilestoneDropdownOpen(true)}
+              placeholder="Select assignee"
+              className="w-full bg-blue-100 rounded p-3 appearance-none"
+            />
+            <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
               <svg className="fill-yellow-400" width="10" height="10">
                 <polygon points="0,0 10,0 5,6" />
               </svg>
             </div>
+
+            {isMilestoneDropdownOpen &&
+              filteredMilestoneEmployees.length > 0 && (
+                <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
+                  {filteredMilestoneEmployees.map((emp) => (
+                    <li
+                      key={emp.id}
+                      onClick={() => handleAddMilestoneAssignee(emp.id)}
+                      className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
+                    >
+                      {emp.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
           </div>
-          <div className="flex gap-2 mt-2">
-            {milestoneAssignees.map((assignee) => (
-              <span
-                key={assignee}
-                className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm"
-              >
-                {employees.find((e) => e.id === assignee)?.name}
-                <button
-                  type="button"
-                  className="ml-2 text-red-500"
-                  onClick={() =>
-                    setMilestoneAssignees((prev) =>
-                      prev.filter((a) => a !== assignee)
-                    )
-                  }
+
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {milestoneAssignees.map((assignee) => {
+              const emp = employees.find((e) => e.id === assignee);
+              return (
+                <span
+                  key={assignee}
+                  className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
                 >
-                  &times;
-                </button>
-              </span>
-            ))}
+                  {emp?.name}
+                  <button
+                    type="button"
+                    className="ml-2 text-red-500"
+                    onClick={() => handleRemoveMilestoneAssignee(assignee)}
+                  >
+                    &times;
+                  </button>
+                </span>
+              );
+            })}
           </div>
         </div>
         <div>

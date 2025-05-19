@@ -2,18 +2,19 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { getEmployeeId, getCompanyId } from "@/lib/auth/getUser";
+import { getEmployeeId, getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { schoolingSchema, experienceSchema } from "@/lib/types";
 
 export async function getSchoolings() {
   const client = await createClient();
-
+  const user = await getUserInfo();
   const company_id = await getCompanyId();
 
   const { data, error } = await client
     .from("schoolings")
     .select("*")
-    .eq("company_id", company_id);
+    .eq("company_id", company_id)
+    .eq("employee_id", user.id);
 
   if (error) throw error;
   return data;
@@ -102,11 +103,13 @@ export async function deleteSchooling(id: number) {
 export async function getExperiences() {
   const client = await createClient();
   const company_id = await getCompanyId();
+  const user = await getUserInfo();
 
   const { data, error } = await client
     .from("experiences")
     .select("*")
-    .eq("company_id", company_id);
+    .eq("company_id", company_id)
+    .eq("employee_id", user.id);
 
   if (error) throw error;
   return data;

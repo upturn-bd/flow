@@ -8,7 +8,13 @@ import { FaChevronDown, FaEllipsisV } from "react-icons/fa";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 
-const ClickableStatusCell = ({ tag, handleRequest }: { tag: string; handleRequest: ()=> void; }) => {
+const ClickableStatusCell = ({
+  tag,
+  handleRequest,
+}: {
+  tag: string;
+  handleRequest: () => void;
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -20,9 +26,9 @@ const ClickableStatusCell = ({ tag, handleRequest }: { tag: string; handleReques
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -30,16 +36,19 @@ const ClickableStatusCell = ({ tag, handleRequest }: { tag: string; handleReques
     <div className="w-full flex py-2 px-4 justify-between items-center">
       <span>{tag === "Late" ? "Late" : "Wrong Location"}</span>
       <div className="relative" ref={menuRef}>
-        <button 
+        <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="focus:outline-none"
           aria-label="Toggle menu"
         >
           <FaEllipsisV className="cursor-pointer text-gray-500" />
         </button>
-        
+
         {isMenuOpen && (
-          <button onClick={handleRequest} className="absolute right-0 mt-2 bg-white border shadow-md rounded-md px-4 py-2 text-xs whitespace-nowrap z-10 hover:bg-gray-100">
+          <button
+            onClick={handleRequest}
+            className="absolute right-0 mt-2 bg-white border shadow-md rounded-md px-4 py-2 text-xs whitespace-nowrap z-10 hover:bg-gray-100"
+          >
             Send to Request
           </button>
         )}
@@ -60,7 +69,9 @@ export default function AttendanceLatePage() {
     try {
       const { data, error } = await supabase
         .from("attendance_records")
-        .select("check_in_time, check_out_time, site_id, attendance_date, tag")
+        .select(
+          "id, check_in_time, check_out_time, site_id, attendance_date, tag"
+        )
         .eq("employee_id", user.id)
         .eq("company_id", user.company_id)
         .or("tag.eq.Late, tag.eq.Wrong_Location")
@@ -76,9 +87,11 @@ export default function AttendanceLatePage() {
     }
   }
 
-  async function handleRequest(id:number){
+  async function handleRequest(id: number) {
     const supabase = createClient();
     const user = await getUserInfo();
+    console.log("user", user);
+    console.log("id", id);
     try {
       const { error } = await supabase
         .from("attendance_records")
@@ -158,21 +171,25 @@ export default function AttendanceLatePage() {
                       {formatDateToDayMonth(entry.attendance_date)}
                     </td>
                     <td className="py-2 px-4">
-                      {
-                        sites.length > 0 && sites.filter((site) => site.id === entry.site_id)[0]
-                          .name
-                      }
+                      {sites.length > 0 &&
+                        sites.filter((site) => site.id === entry.site_id)[0]
+                          .name}
                       {sites.length === 0 && "Loading..."}
                     </td>
                     <td className="py-2 px-4">
-                      {formatTimeFromISO(entry.check_in_time)}
+                      {entry.check_in_time &&
+                        formatTimeFromISO(entry.check_in_time)}
                     </td>
                     <td className="py-2 px-4">
-                      {formatTimeFromISO(entry.check_out_time)}
+                      {entry.check_out_time
+                        ? formatTimeFromISO(entry.check_out_time)
+                        : "N/A"}
                     </td>
                     <td className="flex py-2 px-4 justify-between items-center">
-                      <ClickableStatusCell tag={entry.tag} handleRequest={()=> handleRequest(entry.id)}/>
-                      
+                      <ClickableStatusCell
+                        tag={entry.tag}
+                        handleRequest={() => handleRequest(entry.id)}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -190,4 +207,3 @@ export default function AttendanceLatePage() {
     </div>
   );
 }
-

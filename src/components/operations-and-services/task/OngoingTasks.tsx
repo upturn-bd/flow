@@ -4,15 +4,21 @@ import TaskCreateModal, {
 } from "@/components/operations-and-services/task/TaskModal";
 import { useTasks } from "@/hooks/useTasks";
 import { taskSchema } from "@/lib/types";
-import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
+import {
+  ArrowSquareOut,
+  PencilSimple,
+  TrashSimple,
+} from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
+import TaskDetails from "../project/task/TaskDetails";
 
 type Task = z.infer<typeof taskSchema>;
 
 export default function TaskPage() {
   const { tasks, loading, fetchTasks, updateTask, deleteTask } = useTasks();
   const [editTask, setEditTask] = useState<Task | null>(null);
+  const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
 
   const handleUpdateTask = async (values: any) => {
     try {
@@ -48,7 +54,7 @@ export default function TaskPage() {
 
   return (
     <div>
-      {!loading && !editTask && (
+      {!loading && !editTask && !taskDetailsId && (
         <div className="space-y-6 py-12 max-w-6xl mx-auto p-6">
           <h1 className="text-2xl font-bold text-blue-700">Task List</h1>
           <div className="grid grid-cols-1 gap-4">
@@ -81,6 +87,15 @@ export default function TaskPage() {
                         className="text-red-600 cursor-pointer"
                       />
                     </button>
+                    <button
+                      onClick={() => setTaskDetailsId(task.id)}
+                      className="px-3 py-2 text-white hover:text-gray-300"
+                    >
+                      <ArrowSquareOut
+                        size={18}
+                        className="text-slate-800 hover:text-blue-800 cursor-pointer ml-4 md:ml-8"
+                      />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -97,6 +112,12 @@ export default function TaskPage() {
           onSubmit={handleUpdateTask}
           onClose={() => setEditTask(null)}
           initialData={editTask}
+        />
+      )}
+      {taskDetailsId && (
+        <TaskDetails
+          onClose={() => setTaskDetailsId(null)}
+          id={taskDetailsId}
         />
       )}
     </div>

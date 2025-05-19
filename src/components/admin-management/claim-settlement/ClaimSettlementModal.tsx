@@ -100,10 +100,6 @@ export function ClaimTypeCreateModal({
   };
 
   useEffect(() => {
-    console.log("Form Values:", formValues);
-  }, [formValues]);
-
-  useEffect(() => {
     async function fetchPositions() {
       try {
         const res = await fetch("/api/company-info/positions");

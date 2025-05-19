@@ -17,6 +17,7 @@ import TaskDetails from "../task/TaskDetails";
 
 interface MilestoneDetailsProps {
   id: number;
+  onClose: () => void;
 }
 function formatDate(dateStr: string): string {
   const [year, month, dayStr] = dateStr.split("-");
@@ -39,7 +40,10 @@ function formatDate(dateStr: string): string {
 
   return `${day} ${monthName}, ${year}`;
 }
-export default function MilestoneDetails({ id }: MilestoneDetailsProps) {
+export default function MilestoneDetails({
+  id,
+  onClose,
+}: MilestoneDetailsProps) {
   const [milestoneId, setMilestoneId] = useState<number>(id);
   const [milestoneDetails, setMilestoneDetails] = useState<Milestone | null>(
     null
@@ -186,9 +190,18 @@ export default function MilestoneDetails({ id }: MilestoneDetailsProps) {
     <div>
       {!taskDetailsId && (
         <div className="md:max-w-6xl mx-auto p-6 md:p-10 text-[#2F2F2F] font-sans">
-          <h2 className="text-xl md:text-2xl font-bold text-[#0074FF] mb-4">
-            Milestone Details
-          </h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl md:text-2xl font-bold text-[#0074FF] mb-4">
+              Milestone Details
+            </h2>
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-blue-900 text-white px-4 py-2 rounded-md"
+            >
+              Back
+            </button>
+          </div>
 
           <div className="grid gap-2">
             <div className="flex gap-2">
@@ -260,7 +273,7 @@ export default function MilestoneDetails({ id }: MilestoneDetailsProps) {
                 tasks.map((task) => (
                   <div
                     key={task.id}
-                    className="bg-gray-300 rounded p-4 space-y-1"
+                    className="bg-gray-200 rounded p-4 space-y-1"
                   >
                     <div className="font-semibold text-lg text-black">
                       {task.task_title}
@@ -314,7 +327,12 @@ export default function MilestoneDetails({ id }: MilestoneDetailsProps) {
           )}
         </div>
       )}
-      {taskDetailsId && <TaskDetails id={taskDetailsId} />}
+      {taskDetailsId && (
+        <TaskDetails
+          id={taskDetailsId}
+          onClose={() => setTaskDetailsId(null)}
+        />
+      )}
     </div>
   );
 }

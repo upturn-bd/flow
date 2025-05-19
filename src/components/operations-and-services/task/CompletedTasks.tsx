@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { z } from "zod";
 import { taskSchema } from "@/lib/types";
+import TaskDetails from "../project/task/TaskDetails";
 
 type Task = z.infer<typeof taskSchema>;
 
@@ -58,6 +59,11 @@ function TaskCard({
               size={18}
               className="text-red-600 hover:text-red-800 cursor-pointer"
             />
+            <ArrowSquareOut
+              onClick={() => setTaskDetailsId(task.id)}
+              size={18}
+              className="text-slate-800 hover:text-blue-800 cursor-pointer ml-4 md:ml-8"
+            />
           </div>
         </div>
         <div className="mt-4 text-sm text-gray-700">
@@ -70,7 +76,7 @@ function TaskCard({
 }
 
 function CompletedTasksList() {
-  const { deleteTask, updateTask } = useTasks();
+  const { deleteTask } = useTasks();
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -122,17 +128,6 @@ function CompletedTasksList() {
     }
   };
 
-  const handleUpdateTask = async (values: any) => {
-    try {
-      await updateTask(values);
-      alert("Task updated!");
-      setSelectedTask(null);
-      fetchTasks();
-    } catch {
-      alert("Error updating Task.");
-    }
-  };
-
   return (
     <div>
       {loading && (
@@ -162,6 +157,12 @@ function CompletedTasksList() {
             </div>
           )}
         </div>
+      )}
+      {taskDetailsId && (
+        <TaskDetails
+          onClose={() => setTaskDetailsId(null)}
+          id={taskDetailsId}
+        />
       )}
     </div>
   );

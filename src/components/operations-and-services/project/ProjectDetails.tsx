@@ -658,7 +658,7 @@ export default function ProjectDetails({
           </form>
         </div>
       )}
-      {milestoneDetailsId && <MilestoneDetails id={milestoneDetailsId} />}
+      {milestoneDetailsId && <MilestoneDetails id={milestoneDetailsId} onClose={()=> setMilestoneDetailsId(null)}/>}
     </div>
   );
 }

@@ -1,8 +1,10 @@
 "use client";
+
+import { useState } from "react";
 import SettlementHistoryPage from "@/components/operations-and-services/settlement/SettlementHistory";
 import SettlementRequestsPage from "@/components/operations-and-services/settlement/SettlementRequestsPage";
 import UpcomingPage from "@/components/operations-and-services/settlement/UpcomingPage";
-import { useState } from "react";
+
 const tabs = [
   { key: "upcoming", label: "Upcoming" },
   { key: "requests", label: "Requests" },
@@ -15,7 +17,8 @@ export default function SettlementPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white">
-      <div className="flex items-center justify-center gap-2 bg-white/80 rounded-xl shadow-sm mb-10 p-1 border border-gray-100">
+      {/* Desktop/Laptop Tab Layout */}
+      <div className="hidden sm:flex flex-wrap justify-center gap-2 bg-white/80 rounded-xl shadow-sm mb-10 p-1 border border-gray-100 overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -35,14 +38,33 @@ export default function SettlementPage() {
           </button>
         ))}
       </div>
-      {activeTab === "upcoming" && <UpcomingPage />}
-      {activeTab === "requests" && <SettlementRequestsPage />}
-      {activeTab === "history" && <SettlementHistoryPage />}
-      {activeTab === "policy" && (
-        <div className="flex items-center justify-center h-screen">
-          Policy Tab Content
-        </div>
-      )}
+
+      {/* Mobile/Tablet Dropdown Layout */}
+      <div className="sm:hidden mb-6">
+        <select
+          value={activeTab}
+          onChange={(e) => setActiveTab(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded-md text-sm"
+        >
+          {tabs.map((tab) => (
+            <option key={tab.key} value={tab.key}>
+              {tab.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Tab Content */}
+      <div>
+        {activeTab === "upcoming" && <UpcomingPage />}
+        {activeTab === "requests" && <SettlementRequestsPage />}
+        {activeTab === "history" && <SettlementHistoryPage />}
+        {activeTab === "policy" && (
+          <div className="flex items-center justify-center h-screen">
+            Policy Tab Content
+          </div>
+        )}
+      </div>
     </div>
   );
 }

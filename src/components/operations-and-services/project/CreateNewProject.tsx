@@ -7,7 +7,7 @@ import { getCompanyId } from "@/lib/auth/getUser";
 import { createClient } from "@/lib/supabase/client";
 import { milestoneSchema, projectSchema } from "@/lib/types";
 import { PencilSimple, TrashSimple, Info } from "@phosphor-icons/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { set, z } from "zod";
 
 type ProjectDetails = z.infer<typeof projectSchema>;
@@ -268,6 +268,77 @@ export default function CreateNewProjectPage() {
     }
   }, [projectDetails]);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const filteredEmployees = employees.filter(
+    (emp) =>
+      emp.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !projectAssignees.includes(emp.id) &&
+      emp.id !== projectDetails.project_lead_id
+  );
+
+  const handleAddAssignee = (id: string) => {
+    setProjectAssignees((prev) => [...prev, id]);
+    setSearchTerm("");
+    setDropdownOpen(false);
+    inputRef.current?.focus();
+  };
+
+  const handleRemoveAssignee = (id: string) => {
+    setProjectAssignees((prev) => prev.filter((a) => a !== id));
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const [milestoneSearchTerm, setMilestoneSearchTerm] = useState("");
+  const [isMilestoneDropdownOpen, setIsMilestoneDropdownOpen] = useState(false);
+  const milestoneInputRef = useRef<HTMLInputElement>(null);
+  const milestoneDropdownRef = useRef<HTMLDivElement>(null);
+
+  const filteredMilestoneEmployees = employees.filter(
+    (emp) =>
+      !milestoneAssignees.includes(emp.id) &&
+      emp.name.toLowerCase().includes(milestoneSearchTerm.toLowerCase())
+  );
+
+  const handleAddMilestoneAssignee = (id: string) => {
+    setMilestoneAssignees((prev) => [...prev, id]);
+    setMilestoneSearchTerm("");
+    setIsMilestoneDropdownOpen(false);
+    milestoneInputRef.current?.focus();
+  };
+
+  const handleRemoveMilestoneAssignee = (id: string) => {
+    setMilestoneAssignees((prev) => prev.filter((a) => a !== id));
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        milestoneDropdownRef.current &&
+        !milestoneDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsMilestoneDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6">
       <form onSubmit={updateProject} className="space-y-6">
@@ -411,59 +482,65 @@ export default function CreateNewProjectPage() {
           )}
         </div>
         <div>
-          <label className="block text-lg font-bold text-blue-700">
+          <label className="block text-lg font-bold text-blue-700 mb-1">
             Assignees
           </label>
-          <div className="relative">
-            <select
-              onChange={(e) =>
-                setProjectAssignees((prev) => [...prev, e.target.value])
-              }
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select assignees</option>
-              {employees.length > 0 &&
-                employees
-                  .filter(
-                    (emp) =>
-                      !projectAssignees.includes(emp.id) &&
-                      emp.id !== projectDetails.project_lead_id
-                  )
-                  .map((employee) => (
-                    <option key={employee.id} value={employee.id}>
-                      {employee.name}
-                    </option>
-                  ))}
-            </select>
 
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          <div className="relative" ref={dropdownRef}>
+            <input
+              type="text"
+              ref={inputRef}
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setDropdownOpen(true);
+              }}
+              onFocus={() => setDropdownOpen(true)}
+              placeholder="Select assignees"
+              className="w-full bg-blue-100 rounded p-3 appearance-none"
+            />
+            <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
               <svg className="fill-yellow-400" width="10" height="10">
                 <polygon points="0,0 10,0 5,6" />
               </svg>
             </div>
+
+            {dropdownOpen && filteredEmployees.length > 0 && (
+              <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
+                {filteredEmployees.map((emp) => (
+                  <li
+                    key={emp.id}
+                    onClick={() => handleAddAssignee(emp.id)}
+                    className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
+                  >
+                    {emp.name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          <div className="flex gap-2 mt-2">
-            {projectAssignees.map((assignee) => (
-              <span
-                key={assignee}
-                className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm"
-              >
-                {employees.find((e) => e.id === assignee)?.name}
-                <button
-                  type="button"
-                  className="ml-2 text-red-500"
-                  onClick={() =>
-                    setProjectAssignees((prev) =>
-                      prev.filter((a) => a !== assignee)
-                    )
-                  }
+
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {projectAssignees.map((assignee) => {
+              const emp = employees.find((e) => e.id === assignee);
+              return (
+                <span
+                  key={assignee}
+                  className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
                 >
-                  &times;
-                </button>
-              </span>
-            ))}
+                  {emp?.name}
+                  <button
+                    type="button"
+                    className="ml-2 text-red-500"
+                    onClick={() => handleRemoveAssignee(assignee)}
+                  >
+                    &times;
+                  </button>
+                </span>
+              );
+            })}
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-8">
             <h2 className="text-xl font-bold text-blue-900">Milestones</h2>
             {milestones.reduce((acc, m) => acc + m.weightage, 0) < 100 && (
               <button
@@ -609,53 +686,64 @@ export default function CreateNewProjectPage() {
               )}
             </div>
             <div>
-              <label className="block text-lg font-bold text-blue-700">
+              <label className="block text-lg font-bold text-blue-700 mb-1">
                 Assignees
               </label>
-              <div className="relative">
-                <select
-                  onChange={(e) =>
-                    setMilestoneAssignees((prev) => [...prev, e.target.value])
-                  }
-                  className="w-full bg-blue-100 rounded p-3 appearance-none"
-                >
-                  <option value={""}>Select assignee</option>
-                  {employees.length > 0 &&
-                    employees
-                      .filter((emp) => !milestoneAssignees.includes(emp.id))
-                      .map((employee) => (
-                        <option key={employee.id} value={employee.id}>
-                          {employee.name}
-                        </option>
-                      ))}
-                </select>
 
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <div className="relative" ref={milestoneDropdownRef}>
+                <input
+                  type="text"
+                  ref={milestoneInputRef}
+                  value={milestoneSearchTerm}
+                  onChange={(e) => {
+                    setMilestoneSearchTerm(e.target.value);
+                    setIsMilestoneDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsMilestoneDropdownOpen(true)}
+                  placeholder="Select assignee"
+                  className="w-full bg-blue-100 rounded p-3 appearance-none"
+                />
+                <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
                   <svg className="fill-yellow-400" width="10" height="10">
                     <polygon points="0,0 10,0 5,6" />
                   </svg>
                 </div>
+
+                {isMilestoneDropdownOpen &&
+                  filteredMilestoneEmployees.length > 0 && (
+                    <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
+                      {filteredMilestoneEmployees.map((emp) => (
+                        <li
+                          key={emp.id}
+                          onClick={() => handleAddMilestoneAssignee(emp.id)}
+                          className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
+                        >
+                          {emp.name}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
               </div>
-              <div className="flex gap-2 mt-2">
-                {milestoneAssignees.map((assignee) => (
-                  <span
-                    key={assignee}
-                    className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm"
-                  >
-                    {employees.find((e) => e.id === assignee)?.name}
-                    <button
-                      type="button"
-                      className="ml-2 text-red-500"
-                      onClick={() =>
-                        setMilestoneAssignees((prev) =>
-                          prev.filter((a) => a !== assignee)
-                        )
-                      }
+
+              <div className="flex gap-2 mt-2 flex-wrap">
+                {milestoneAssignees.map((assignee) => {
+                  const emp = employees.find((e) => e.id === assignee);
+                  return (
+                    <span
+                      key={assignee}
+                      className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
                     >
-                      &times;
-                    </button>
-                  </span>
-                ))}
+                      {emp?.name}
+                      <button
+                        type="button"
+                        className="ml-2 text-red-500"
+                        onClick={() => handleRemoveMilestoneAssignee(assignee)}
+                      >
+                        &times;
+                      </button>
+                    </span>
+                  );
+                })}
               </div>
             </div>
             <div>
@@ -806,53 +894,64 @@ export default function CreateNewProjectPage() {
               )}
             </div>
             <div>
-              <label className="block text-lg font-bold text-blue-700">
+              <label className="block text-lg font-bold text-blue-700 mb-1">
                 Assignees
               </label>
-              <div className="relative">
-                <select
-                  onChange={(e) =>
-                    setMilestoneAssignees((prev) => [...prev, e.target.value])
-                  }
-                  className="w-full bg-blue-100 rounded p-3 appearance-none"
-                >
-                  <option value={""}>Select assignee</option>
-                  {employees.length > 0 &&
-                    employees
-                      .filter((emp) => !milestoneAssignees.includes(emp.id))
-                      .map((employee) => (
-                        <option key={employee.id} value={employee.id}>
-                          {employee.name}
-                        </option>
-                      ))}
-                </select>
 
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <div className="relative" ref={milestoneDropdownRef}>
+                <input
+                  type="text"
+                  ref={milestoneInputRef}
+                  value={milestoneSearchTerm}
+                  onChange={(e) => {
+                    setMilestoneSearchTerm(e.target.value);
+                    setIsMilestoneDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsMilestoneDropdownOpen(true)}
+                  placeholder="Select assignee"
+                  className="w-full bg-blue-100 rounded p-3 appearance-none"
+                />
+                <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
                   <svg className="fill-yellow-400" width="10" height="10">
                     <polygon points="0,0 10,0 5,6" />
                   </svg>
                 </div>
+
+                {isMilestoneDropdownOpen &&
+                  filteredMilestoneEmployees.length > 0 && (
+                    <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
+                      {filteredMilestoneEmployees.map((emp) => (
+                        <li
+                          key={emp.id}
+                          onClick={() => handleAddMilestoneAssignee(emp.id)}
+                          className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
+                        >
+                          {emp.name}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
               </div>
-              <div className="flex gap-2 mt-2">
-                {milestoneAssignees.map((assignee) => (
-                  <span
-                    key={assignee}
-                    className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm"
-                  >
-                    {employees.find((e) => e.id === assignee)?.name}
-                    <button
-                      type="button"
-                      className="ml-2 text-red-500"
-                      onClick={() =>
-                        setMilestoneAssignees((prev) =>
-                          prev.filter((a) => a !== assignee)
-                        )
-                      }
+
+              <div className="flex gap-2 mt-2 flex-wrap">
+                {milestoneAssignees.map((assignee) => {
+                  const emp = employees.find((e) => e.id === assignee);
+                  return (
+                    <span
+                      key={assignee}
+                      className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
                     >
-                      &times;
-                    </button>
-                  </span>
-                ))}
+                      {emp?.name}
+                      <button
+                        type="button"
+                        className="ml-2 text-red-500"
+                        onClick={() => handleRemoveMilestoneAssignee(assignee)}
+                      >
+                        &times;
+                      </button>
+                    </span>
+                  );
+                })}
               </div>
             </div>
             <div>
@@ -1042,6 +1141,41 @@ export function UpdateProjectPage({
       setProjectAssignees(initialData.assignees || []);
     }
   }, [initialData]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const filteredEmployees = employees.filter(
+    (emp) =>
+      emp.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !projectAssignees.includes(emp.id) &&
+      emp.id !== projectDetails.project_lead_id
+  );
+
+  const handleAddAssignee = (id: string) => {
+    setProjectAssignees((prev) => [...prev, id]);
+    setSearchTerm("");
+    setDropdownOpen(false);
+    inputRef.current?.focus();
+  };
+
+  const handleRemoveAssignee = (id: string) => {
+    setProjectAssignees((prev) => prev.filter((a) => a !== id));
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6">
@@ -1186,57 +1320,63 @@ export function UpdateProjectPage({
           )}
         </div>
         <div>
-          <label className="block text-lg font-bold text-blue-700">
+          <label className="block text-lg font-bold text-blue-700 mb-1">
             Assignees
           </label>
-          <div className="relative">
-            <select
-              onChange={(e) =>
-                setProjectAssignees((prev) => [...prev, e.target.value])
-              }
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select assignees</option>
-              {employees.length > 0 &&
-                employees
-                  .filter(
-                    (emp) =>
-                      !projectAssignees.includes(emp.id) &&
-                      emp.id !== projectDetails.project_lead_id
-                  )
-                  .map((employee) => (
-                    <option key={employee.id} value={employee.id}>
-                      {employee.name}
-                    </option>
-                  ))}
-            </select>
 
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          <div className="relative" ref={dropdownRef}>
+            <input
+              type="text"
+              ref={inputRef}
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setDropdownOpen(true);
+              }}
+              onFocus={() => setDropdownOpen(true)}
+              placeholder="Select assignees"
+              className="w-full bg-blue-100 rounded p-3 appearance-none"
+            />
+            <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
               <svg className="fill-yellow-400" width="10" height="10">
                 <polygon points="0,0 10,0 5,6" />
               </svg>
             </div>
+
+            {dropdownOpen && filteredEmployees.length > 0 && (
+              <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
+                {filteredEmployees.map((emp) => (
+                  <li
+                    key={emp.id}
+                    onClick={() => handleAddAssignee(emp.id)}
+                    className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
+                  >
+                    {emp.name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          <div className="flex gap-2 mt-2">
-            {projectAssignees.map((assignee) => (
-              <span
-                key={assignee}
-                className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm"
-              >
-                {employees.find((e) => e.id === assignee)?.name}
-                <button
-                  type="button"
-                  className="ml-2 text-red-500"
-                  onClick={() =>
-                    setProjectAssignees((prev) =>
-                      prev.filter((a) => a !== assignee)
-                    )
-                  }
+
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {projectAssignees.map((assignee) => {
+              const emp = employees.find((e) => e.id === assignee);
+              return (
+                <span
+                  key={assignee}
+                  className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
                 >
-                  &times;
-                </button>
-              </span>
-            ))}
+                  {emp?.name}
+                  <button
+                    type="button"
+                    className="ml-2 text-red-500"
+                    onClick={() => handleRemoveAssignee(assignee)}
+                  >
+                    &times;
+                  </button>
+                </span>
+              );
+            })}
           </div>
           <div className="flex justify-end gap-4">
             <button

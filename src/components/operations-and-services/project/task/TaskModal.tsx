@@ -3,7 +3,7 @@
 import { Task } from "@/hooks/useTasks";
 import { useEmployees } from "@/hooks/useEmployees";
 import { taskSchema } from "@/lib/types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getCompanyId } from "@/lib/auth/getUser";
 
 interface TaskCreateModalProps {
@@ -120,9 +120,40 @@ export default function TaskCreateModal({
     }));
   }, [projectId, milestoneId]);
 
+  const [taskSearchTerm, setTaskSearchTerm] = useState("");
+  const [isTaskDropdownOpen, setIsTaskDropdownOpen] = useState(false);
+  const taskInputRef = useRef<HTMLInputElement>(null);
+  const taskDropdownRef = useRef<HTMLDivElement>(null);
+
+  const filteredTaskEmployees = employees.filter(
+    (emp) =>
+      !taskAssignees.includes(emp.id) &&
+      emp.name.toLowerCase().includes(taskSearchTerm.toLowerCase())
+  );
+
+  const handleAddTaskAssignee = (id: string) => {
+    setTaskAssignees((prev) => [...prev, id]);
+    setTaskSearchTerm("");
+    setIsTaskDropdownOpen(false);
+    taskInputRef.current?.focus();
+  };
+
+  const handleRemoveTaskAssignee = (id: string) => {
+    setTaskAssignees((prev) => prev.filter((a) => a !== id));
+  };
+
   useEffect(() => {
-    console.log("Task:",task)
-  }, [task]);
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        taskDropdownRef.current &&
+        !taskDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsTaskDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
@@ -195,53 +226,63 @@ export default function TaskCreateModal({
           )}
         </div>
         <div>
-          <label className="block text-lg font-bold text-blue-700">
+          <label className="block text-lg font-bold text-blue-700 mb-1">
             Assignees
           </label>
-          <div className="relative">
-            <select
-              onChange={(e) =>
-                setTaskAssignees((prev) => [...prev, e.target.value])
-              }
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select assignee</option>
-              {employees.length > 0 &&
-                employees
-                  .filter((emp) => !taskAssignees.includes(emp.id))
-                  .map((employee) => (
-                    <option key={employee.id} value={employee.id}>
-                      {employee.name}
-                    </option>
-                  ))}
-            </select>
 
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          <div className="relative" ref={taskDropdownRef}>
+            <input
+              type="text"
+              ref={taskInputRef}
+              value={taskSearchTerm}
+              onChange={(e) => {
+                setTaskSearchTerm(e.target.value);
+                setIsTaskDropdownOpen(true);
+              }}
+              onFocus={() => setIsTaskDropdownOpen(true)}
+              placeholder="Select assignee"
+              className="w-full bg-blue-100 rounded p-3 appearance-none"
+            />
+            <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
               <svg className="fill-yellow-400" width="10" height="10">
                 <polygon points="0,0 10,0 5,6" />
               </svg>
             </div>
+
+            {isTaskDropdownOpen && filteredTaskEmployees.length > 0 && (
+              <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
+                {filteredTaskEmployees.map((emp) => (
+                  <li
+                    key={emp.id}
+                    onClick={() => handleAddTaskAssignee(emp.id)}
+                    className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
+                  >
+                    {emp.name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          <div className="flex gap-2 mt-2">
-            {taskAssignees.map((assignee) => (
-              <span
-                key={assignee}
-                className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm"
-              >
-                {employees.find((e) => e.id === assignee)?.name}
-                <button
-                  type="button"
-                  className="ml-2 text-red-500"
-                  onClick={() =>
-                    setTaskAssignees((prev) =>
-                      prev.filter((a) => a !== assignee)
-                    )
-                  }
+
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {taskAssignees.map((assignee) => {
+              const emp = employees.find((e) => e.id === assignee);
+              return (
+                <span
+                  key={assignee}
+                  className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
                 >
-                  &times;
-                </button>
-              </span>
-            ))}
+                  {emp?.name}
+                  <button
+                    type="button"
+                    className="ml-2 text-red-500"
+                    onClick={() => handleRemoveTaskAssignee(assignee)}
+                  >
+                    &times;
+                  </button>
+                </span>
+              );
+            })}
           </div>
         </div>
         <div>
@@ -377,6 +418,41 @@ export function TaskUpdateModal({
     }));
   }, [taskAssignees]);
 
+  const [taskSearchTerm, setTaskSearchTerm] = useState("");
+  const [isTaskDropdownOpen, setIsTaskDropdownOpen] = useState(false);
+  const taskInputRef = useRef<HTMLInputElement>(null);
+  const taskDropdownRef = useRef<HTMLDivElement>(null);
+
+  const filteredTaskEmployees = employees.filter(
+    (emp) =>
+      !taskAssignees.includes(emp.id) &&
+      emp.name.toLowerCase().includes(taskSearchTerm.toLowerCase())
+  );
+
+  const handleAddTaskAssignee = (id: string) => {
+    setTaskAssignees((prev) => [...prev, id]);
+    setTaskSearchTerm("");
+    setIsTaskDropdownOpen(false);
+    taskInputRef.current?.focus();
+  };
+
+  const handleRemoveTaskAssignee = (id: string) => {
+    setTaskAssignees((prev) => prev.filter((a) => a !== id));
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        taskDropdownRef.current &&
+        !taskDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsTaskDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
       <form
@@ -448,53 +524,63 @@ export function TaskUpdateModal({
           )}
         </div>
         <div>
-          <label className="block text-lg font-bold text-blue-700">
+          <label className="block text-lg font-bold text-blue-700 mb-1">
             Assignees
           </label>
-          <div className="relative">
-            <select
-              onChange={(e) =>
-                setTaskAssignees((prev) => [...prev, e.target.value])
-              }
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select assignee</option>
-              {employees.length > 0 &&
-                employees
-                  .filter((emp) => !taskAssignees.includes(emp.id))
-                  .map((employee) => (
-                    <option key={employee.id} value={employee.id}>
-                      {employee.name}
-                    </option>
-                  ))}
-            </select>
 
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          <div className="relative" ref={taskDropdownRef}>
+            <input
+              type="text"
+              ref={taskInputRef}
+              value={taskSearchTerm}
+              onChange={(e) => {
+                setTaskSearchTerm(e.target.value);
+                setIsTaskDropdownOpen(true);
+              }}
+              onFocus={() => setIsTaskDropdownOpen(true)}
+              placeholder="Select assignee"
+              className="w-full bg-blue-100 rounded p-3 appearance-none"
+            />
+            <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
               <svg className="fill-yellow-400" width="10" height="10">
                 <polygon points="0,0 10,0 5,6" />
               </svg>
             </div>
+
+            {isTaskDropdownOpen && filteredTaskEmployees.length > 0 && (
+              <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
+                {filteredTaskEmployees.map((emp) => (
+                  <li
+                    key={emp.id}
+                    onClick={() => handleAddTaskAssignee(emp.id)}
+                    className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
+                  >
+                    {emp.name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          <div className="flex gap-2 mt-2">
-            {taskAssignees.map((assignee) => (
-              <span
-                key={assignee}
-                className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm"
-              >
-                {employees.find((e) => e.id === assignee)?.name}
-                <button
-                  type="button"
-                  className="ml-2 text-red-500"
-                  onClick={() =>
-                    setTaskAssignees((prev) =>
-                      prev.filter((a) => a !== assignee)
-                    )
-                  }
+
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {taskAssignees.map((assignee) => {
+              const emp = employees.find((e) => e.id === assignee);
+              return (
+                <span
+                  key={assignee}
+                  className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
                 >
-                  &times;
-                </button>
-              </span>
-            ))}
+                  {emp?.name}
+                  <button
+                    type="button"
+                    className="ml-2 text-red-500"
+                    onClick={() => handleRemoveTaskAssignee(assignee)}
+                  >
+                    &times;
+                  </button>
+                </span>
+              );
+            })}
           </div>
         </div>
         <div>

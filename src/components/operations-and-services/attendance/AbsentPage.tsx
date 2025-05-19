@@ -105,11 +105,11 @@ export default function AttendanceAbsentPage() {
                       }
                       {sites.length === 0 && "Loading..."}
                     </td>
-                    <td className="py-2 px-4">
-                      {formatTimeFromISO(entry.check_in_time)}
+                     <td className="py-2 px-4">
+                      {entry.check_in_time && formatTimeFromISO(entry.check_in_time)}
                     </td>
                     <td className="py-2 px-4">
-                      {formatTimeFromISO(entry.check_out_time)}
+                      {entry.check_out_time? formatTimeFromISO(entry.check_out_time): "N/A"}
                     </td>
                     <td className="py-2 px-4">
                       <span>Absent</span>

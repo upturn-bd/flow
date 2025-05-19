@@ -13,7 +13,7 @@ const TABS = [
   { key: "archived", label: "Archived" },
 ];
 
-export default function ProfilePage() {
+export default function ProjectPage() {
   const [activeTab, setActiveTab] = useState("ongoing");
   const [user, setUser] = useState<
     { id: string; name: string; role: string } | undefined
@@ -49,7 +49,8 @@ export default function ProfilePage() {
   if (!loading) {
     return (
       <div className="max-w-6xl mx-auto p-6 bg-white">
-        <div className="flex items-center justify-center gap-2 bg-white/80 rounded-xl shadow-sm mb-10 p-1 border border-gray-100">
+        {/* Desktop/Laptop Tab Layout */}
+        <div className="hidden sm:flex flex-wrap justify-center gap-2 bg-white/80 rounded-xl shadow-sm mb-10 p-1 border border-gray-100 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.key}
@@ -69,14 +70,33 @@ export default function ProfilePage() {
             </button>
           ))}
         </div>
-        {activeTab === "create-new" && <CreateNewProjectPage />}
-        {activeTab === "ongoing" && <ProjectsList />}
-        {activeTab === "completed" && <CompletedProjectsList />}
-        {activeTab === "archived" && (
-          <div className="flex items-center justify-center h-screen">
-            Archived Tab Content
-          </div>
-        )}
+
+        {/* Mobile/Tablet Dropdown Layout */}
+        <div className="sm:hidden mb-6">
+          <select
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md text-sm"
+          >
+            {tabs.map((tab) => (
+              <option key={tab.key} value={tab.key}>
+                {tab.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Tab Content */}
+        <div>
+          {activeTab === "create-new" && <CreateNewProjectPage />}
+          {activeTab === "ongoing" && <ProjectsList />}
+          {activeTab === "completed" && <CompletedProjectsList />}
+          {activeTab === "archived" && (
+            <div className="flex items-center justify-center h-screen">
+              Archived Tab Content
+            </div>
+          )}
+        </div>
       </div>
     );
   }
