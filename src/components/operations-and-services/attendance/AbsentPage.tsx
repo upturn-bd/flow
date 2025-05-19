@@ -20,7 +20,7 @@ export default function AttendanceAbsentPage() {
     try {
       const { data, error } = await supabase
         .from("attendance_records")
-        .select("check_in_time, check_out_time, site_id, attendance_date")
+        .select("id, check_in_time, check_out_time, site_id, attendance_date, tag, employee_id")
         .eq("employee_id", user.id)
         .eq("company_id", user.company_id)
         .eq("tag", "Absent")
@@ -28,7 +28,7 @@ export default function AttendanceAbsentPage() {
 
       if (error) throw error;
 
-      setAttendanceData(data);
+      setAttendanceData(data ?? []);
     } catch (error) {
       console.error("Error fetching attendance data:", error);
     } finally {

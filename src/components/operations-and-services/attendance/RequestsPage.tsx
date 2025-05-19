@@ -30,16 +30,16 @@ export default function AttendanceRequestsPage() {
       const { data, error } = await supabase
         .from("attendance_records")
         .select(
-          "id, check_in_time, check_out_time, site_id, attendance_date, employee_id, check_out_coordinates, check_in_coordinates"
+          "id, check_in_time, check_out_time, site_id, attendance_date, employee_id, check_out_coordinates, check_in_coordinates, tag"
         )
-        .eq("supervisor_id", user.id)
+        // .eq("supervisor_id", user.id)
         .eq("company_id", user.company_id)
         .eq("tag", "Pending")
         .order("attendance_date", { ascending: false });
 
       if (error) throw error;
 
-      setAttendanceData(data);
+      setAttendanceData(data ?? []);
     } catch (error) {
       console.error("Error fetching attendance data:", error);
     } finally {
@@ -129,7 +129,9 @@ export default function AttendanceRequestsPage() {
                       </p>
                       <p>
                         <span className="font-bold">Check-in:</span>{" "}
-                        {formatTimeFromISO(entry.check_in_time)}
+                        {entry.check_in_time
+                          ? formatTimeFromISO(entry.check_in_time)
+                          : "N/A"}
                       </p>
                       <p>
                         <span className="font-bold">Check-out:</span>{" "}
@@ -143,8 +145,8 @@ export default function AttendanceRequestsPage() {
                           className="text-blue-500 underlined"
                           target="_blank"
                           href={`https://www.openstreetmap.org/?mlat=${getLatitude(
-                            entry.check_in_coordinates
-                          )}&mlon=${getLongitude(entry.check_in_coordinates)}`}
+                            entry.check_in_coordinates as unknown as string
+                          )}&mlon=${getLongitude(entry.check_in_coordinates as unknown as string)}`}
                         >
                           URL
                         </a>
@@ -156,9 +158,9 @@ export default function AttendanceRequestsPage() {
                             className="text-blue-500 underlined"
                             target="_blank"
                             href={`https://www.openstreetmap.org/?mlat=${getLatitude(
-                              entry.check_out_coordinates
+                              entry.check_out_coordinates as unknown as string
                             )}&mlon=${getLongitude(
-                              entry.check_out_coordinates
+                              entry.check_out_coordinates as unknown as string
                             )}`}
                           >
                             URL

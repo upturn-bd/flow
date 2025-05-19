@@ -69,9 +69,7 @@ export default function AttendanceLatePage() {
     try {
       const { data, error } = await supabase
         .from("attendance_records")
-        .select(
-          "id, check_in_time, check_out_time, site_id, attendance_date, tag"
-        )
+        .select("id, check_in_time, check_out_time, site_id, attendance_date, tag, employee_id")
         .eq("employee_id", user.id)
         .eq("company_id", user.company_id)
         .or("tag.eq.Late, tag.eq.Wrong_Location")
@@ -79,7 +77,7 @@ export default function AttendanceLatePage() {
 
       if (error) throw error;
 
-      setAttendanceData(data);
+      setAttendanceData(data ?? []);
     } catch (error) {
       console.error("Error fetching attendance data:", error);
     } finally {
@@ -188,7 +186,7 @@ export default function AttendanceLatePage() {
                     <td className="flex py-2 px-4 justify-between items-center">
                       <ClickableStatusCell
                         tag={entry.tag}
-                        handleRequest={() => handleRequest(entry.id)}
+                        handleRequest={() => handleRequest(entry.id!)}
                       />
                     </td>
                   </tr>

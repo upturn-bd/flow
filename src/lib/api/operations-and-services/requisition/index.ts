@@ -1,7 +1,7 @@
 "use server";
 
 import { getUserInfo } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/client";
 import { generateRandomId } from "@/lib/utils";
 
 export async function uploadManyFiles(files: File[], bucketName: string) {

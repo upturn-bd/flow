@@ -290,7 +290,7 @@ export const attendanceSchema = z.object({
     .string()
     .min(1, { message: "Please select an attendance date" }),
   tag: z.string().min(1, { message: "Please select an attendance tag" }),
-  company_id: z.number().min(1, { message: "Please select a company" }),
+  company_id: z.number().optional(),
   site_id: z.number().min(1, { message: "Please select a site" }),
   check_in_time: z.string().optional(),
   check_in_coordinates: z

@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/client";
 import { getEmployeeId, getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { schoolingSchema, experienceSchema } from "@/lib/types";
 
