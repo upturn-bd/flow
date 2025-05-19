@@ -2,14 +2,13 @@
 
 import { useAttendanceStatus } from "@/hooks/useAttendance";
 import { useSites } from "@/hooks/useAttendanceManagement";
-import { useNewsAndNoticesTypes } from "@/hooks/useNewsAndNotices";
 import { useNotices } from "@/hooks/useNotice";
 import { useTasks } from "@/hooks/useTasks";
-import { getUserInfo } from "@/lib/auth/getUser";
 import { createClient } from "@/lib/supabase/client";
 import { formatDateToDayMonth } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FiRefreshCcw, FiAlertCircle, FiChevronDown } from "react-icons/fi";
+import { AuthContext } from "@/lib/auth/auth-provider";
 
 const initialAttendanceRecord = {
   tag: "Present",
@@ -74,7 +73,7 @@ export default function HomePage() {
   }
   const handleCheckIn = async () => {
     const supabase = createClient();
-    const user = await getUserInfo();
+    const { employee } = useContext(AuthContext)!;
     const coordinates = await getCurrentCoordinates();
     if (!coordinates) return; // Exit if permission denied
 
@@ -86,9 +85,9 @@ export default function HomePage() {
         ...attendanceRecord,
         attendance_date: now.split("T")[0], // Just the date part (YYYY-MM-DD)
         check_in_time: now, // Full ISO timestamp
-        employee_id: user.id,
-        company_id: user.company_id,
-        supervisor_id: user.supervisor_id,
+        employee_id: employee!.id,
+        company_id: employee!.company_id,
+        supervisor_id: employee!.supervisor_id,
         check_in_coordinates: coordinates,
       });
 
@@ -107,7 +106,7 @@ export default function HomePage() {
 
   const handleCheckOut = async () => {
     const supabase = createClient();
-    const user = await getUserInfo();
+    const { employee } = useContext(AuthContext)!;
     const coordinates = await getCurrentCoordinates();
     if (!coordinates) return; // Exit if permission denied
 
@@ -121,9 +120,9 @@ export default function HomePage() {
           check_out_time: now,
           check_out_coordinates: coordinates,
         })
-        .eq("employee_id", user.id)
-        .eq("company_id", user.company_id)
-        .eq("id", attendanceDetails.id)
+        .eq("employee_id", employee!.id)
+        .eq("company_id", employee!.company_id)
+        .eq("id", attendanceDetails?.id)
         .eq("attendance_date", now.split("T")[0]);
 
       if (error) {

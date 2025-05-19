@@ -1,8 +1,8 @@
 "use client";
 
-import { getCompanyId } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
 import { useState, useCallback } from "react";
+import { getEmployees as getEmployeesApi } from "@/lib/api/company-info/employees";
+import { getUserInfo } from "@/lib/api/company-info/employees"
 import { z } from "zod";
 
 const employeeSchema = z.object({
@@ -19,19 +19,10 @@ export function useEmployees() {
 
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
-    const client = createClient();
-    const company_id = await getCompanyId();
     try {
-      const res = await client
-        .from("employees")
-        .select("id, first_name, last_name, role")
-        .eq("company_id", company_id);
-      const formattedData = res.data?.map((employee) => ({
-        id: employee.id,
-        name: `${employee.first_name} ${employee.last_name}`,
-        role: employee.role,
-      })) || [];
-      setEmployees(formattedData);
+      const user = await getUserInfo();
+      const data = await getEmployeesApi(user.id);
+      setEmployees(data);
     } catch (error) {
       console.error(error);
     } finally {

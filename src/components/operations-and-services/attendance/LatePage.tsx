@@ -1,12 +1,12 @@
 "use client";
 
 import { Attendance } from "@/hooks/useAttendance";
-import { getUserInfo } from "@/lib/auth/getUser";
 import { createClient } from "@/lib/supabase/client";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { FaChevronDown, FaEllipsisV } from "react-icons/fa";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
+import { AuthContext } from "@/lib/auth/auth-provider";
 
 const ClickableStatusCell = ({
   tag,
@@ -17,7 +17,7 @@ const ClickableStatusCell = ({
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
+  const { employee } = useContext(AuthContext)!;
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -61,17 +61,16 @@ export default function AttendanceLatePage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(false);
   const { sites, fetchSites } = useSites();
-
+  const { employee } = useContext(AuthContext)!;
   async function fetchAttendanceData() {
     setLoading(true);
     const supabase = createClient();
-    const user = await getUserInfo();
     try {
       const { data, error } = await supabase
         .from("attendance_records")
         .select("id, check_in_time, check_out_time, site_id, attendance_date, tag, employee_id")
-        .eq("employee_id", user.id)
-        .eq("company_id", user.company_id)
+        .eq("employee_id", employee!.id)
+        .eq("company_id", employee!.company_id)
         .or("tag.eq.Late, tag.eq.Wrong_Location")
         .order("attendance_date", { ascending: false });
 
@@ -87,15 +86,13 @@ export default function AttendanceLatePage() {
 
   async function handleRequest(id: number) {
     const supabase = createClient();
-    const user = await getUserInfo();
-    console.log("user", user);
     console.log("id", id);
     try {
       const { error } = await supabase
         .from("attendance_records")
         .update({ tag: "Pending" })
-        .eq("employee_id", user.id)
-        .eq("company_id", user.company_id)
+        .eq("employee_id", employee!.id)
+        .eq("company_id", employee!.company_id)
         .eq("id", id);
 
       if (error) throw error;

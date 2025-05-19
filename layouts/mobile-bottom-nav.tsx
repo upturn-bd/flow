@@ -1,9 +1,8 @@
 "use client";
 
-import { ArrowFatRight as ArrowFatRightIcon } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
-import { navItems } from "./nav-items";
-import { getUserInfo } from "@/lib/auth/getUser";
+import { navItems } from "../src/app/(home)/nav-items";
+import { getUserInfo } from "@/lib/api/company-info/employees";
 import { useEffect, useState } from "react";
 
 export default function MobileBottomNav() {

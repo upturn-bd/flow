@@ -1,6 +1,12 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import {
+  getGrades,
+  createGrade,
+  deleteGrade,
+} from "@/lib/api/company-info/grades";
+import { getUserInfo } from "@/lib/api/company-info/employees"
 
 export type Grade = {
   id: number;
@@ -15,9 +21,9 @@ export function useGrades() {
   const fetchGrades = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/company-info/grades");
-      const data = await res.json();
-      setGrades(data.grades || []);
+      const user = await getUserInfo();
+      const data = await getGrades(user.id);
+      setGrades(data || []);
     } catch (error) {
       console.error(error);
     } finally {
@@ -25,27 +31,20 @@ export function useGrades() {
     }
   }, []);
 
-  const createGrade = async (grade: Omit<Grade, "id">) => {
-    const res = await fetch("/api/company-info/grades", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(grade),
-    });
-    return await res.json();
+  const createGradeHandler = async (grade: Omit<Grade, "id">) => {
+    const user = await getUserInfo();
+    return await createGrade(user.id, grade);
   };
 
-  const deleteGrade = async (id: number) => {
-    const res = await fetch(`/api/company-info/grades?id=${id}`, {
-      method: "DELETE",
-    });
-    return await res.json();
+  const deleteGradeHandler = async (id: number) => {
+    return await deleteGrade(id);
   };
 
   return {
     grades,
     loading,
     fetchGrades,
-    createGrade,
-    deleteGrade,
+    createGrade: createGradeHandler,
+    deleteGrade: deleteGradeHandler,
   };
 }

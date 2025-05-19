@@ -2,7 +2,7 @@
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Project } from "@/hooks/useProjects";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getCompanyId, getUserInfo } from "@/lib/api/company-info/employees"
 import { createClient } from "@/lib/supabase/client";
 import {
   PencilSimple,

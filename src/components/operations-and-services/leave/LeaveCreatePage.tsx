@@ -1,7 +1,7 @@
 "use client";
 
 import { useLeaveTypes } from "@/hooks/useLeaveManagement";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getCompanyId, getUserInfo } from "@/lib/api/company-info/employees"
 import { createClient } from "@/lib/supabase/client";
 import { leaveSchema } from "@/lib/types";
 import React, { useEffect, useState } from "react";

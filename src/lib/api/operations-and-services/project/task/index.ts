@@ -1,14 +1,16 @@
-"use server";
+"use client";
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getCompanyId } from "@/lib/api/company-info/employees"
 import { taskSchema } from "@/lib/types";
+import { useContext } from "react";
+import { AuthContext } from "@/lib/auth/auth-provider";
 
 export async function getTasks() {
   const client = createClient();
   const company_id = await getCompanyId();
-  const user = await getUserInfo();
+  const { employee } = useContext(AuthContext)!;
 
   const { data, error } = await client
     .from("task_records")
@@ -16,7 +18,7 @@ export async function getTasks() {
     .eq("company_id", company_id)
     .eq("status", false)
     .or(
-      `assignees.cs.{${user.id}},created_by.eq.${user.id}, department_id.eq.${user.department_id}`
+      `assignees.cs.{${employee!.id}},created_by.eq.${employee!.id}, department_id.eq.${employee!.department_id}`
     );
 
   if (error) throw error;

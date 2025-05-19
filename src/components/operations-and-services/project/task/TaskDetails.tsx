@@ -2,7 +2,7 @@
 
 import { useEmployees } from "@/hooks/useEmployees";
 import { Task } from "@/hooks/useTasks";
-import { getCompanyId } from "@/lib/auth/getUser";
+import { getCompanyId } from "@/lib/api/company-info/employees"
 import { createClient } from "@/lib/supabase/client";
 import { CalendarBlank } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";

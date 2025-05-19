@@ -1,12 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
 import Link from "next/link";
-
-import { signup } from "../auth-actions";
+import { AuthContext } from "@/lib/auth/auth-provider";
 
 interface FormData {
   email: string;
@@ -26,6 +25,9 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [generalError, setGeneralError] = useState<string | null>(null);
+  const authContext = useContext(AuthContext);
+  const loading = authContext?.loading;
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -36,14 +38,20 @@ const Signup = () => {
   };
 
   const handleSignup = async (values: FormData) => {
+    setGeneralError(null);
     if (!isChecked) {
       alert("You must agree to the terms and conditions.");
       return;
     }
-    await signup({
-      email: values.email,
-      password: values.password,
-    });
+    try {
+      // Supabase sign up with email and password
+      const { error } = await authContext?.signInUser(values.email, values.password);
+      if (error) {
+        setGeneralError("Sign up failed. " + error.message);
+      }
+    } catch (error: any) {
+      setGeneralError("Sign up failed. " + (error?.message || ""));
+    }
   };
 
   return (
@@ -67,7 +75,7 @@ const Signup = () => {
                   placeholder="Email"
                   autoComplete="email"
                   {...register("email", { required: "Email is required" })}
-                  disabled={false}
+                  disabled={loading}
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
@@ -83,7 +91,7 @@ const Signup = () => {
                   {...register("firstName", {
                     required: "First Name is required",
                   })}
-                  disabled={false}
+                  disabled={loading}
                 />
                 {errors.firstName && (
                   <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
@@ -97,7 +105,7 @@ const Signup = () => {
                   placeholder="Last Name"
                   autoComplete="family-name"
                   {...register("lastName", { required: "Last Name is required" })}
-                  disabled={false}
+                  disabled={loading}
                 />
                 {errors.lastName && (
                   <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
@@ -126,7 +134,7 @@ const Signup = () => {
                         "Password must include uppercase, lowercase, number, and special character",
                     },
                   })}
-                  disabled={false}
+                  disabled={loading}
                 />
                 <button
                   type="button"
@@ -157,7 +165,7 @@ const Signup = () => {
                       value === getValues("password") ||
                       "Passwords do not match",
                   })}
-                  disabled={false}
+                  disabled={loading}
                 />
                 <button
                   type="button"
@@ -193,11 +201,14 @@ const Signup = () => {
                 className={`px-8 py-3 mt-4 rounded-full bg-amber-400 text-black font-semibold shadow-xl cursor-pointer transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 ${
                   !isChecked ? "opacity-50 cursor-not-allowed" : ""
                 }`}
-                disabled={!isChecked}
+                disabled={!isChecked || loading}
               >
-                Create Account
+                {loading ? "Creating Account..." : "Create Account"}
               </button>
             </form>
+            {generalError && (
+              <p className="text-red-500 text-center mt-4">{generalError}</p>
+            )}
             <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-2 text-sm">
               <span className="text-[#002568]">Already have an account?</span>
               <Link href="/signin" className="text-[#FFAB2C] font-semibold hover:underline">

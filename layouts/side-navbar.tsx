@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowFatRight as ArrowFatRightIcon } from "@phosphor-icons/react";
-import { navItems } from "./nav-items";
+import { navItems } from "../src/app/(home)/nav-items";
 import { useEffect, useState } from "react";
-import { getUserInfo } from "@/lib/auth/getUser";
+import { getUserInfo } from "@/lib/api/company-info/employees";
 import Image from "next/image";
 
 export default function Sidebar() {

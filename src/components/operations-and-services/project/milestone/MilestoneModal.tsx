@@ -4,7 +4,7 @@ import { Milestone } from "@/hooks/useMilestones";
 import { useEmployees } from "@/hooks/useEmployees";
 import { milestoneSchema } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
-import { getCompanyId } from "@/lib/auth/getUser";
+import { getCompanyId } from "@/lib/api/company-info/employees"
 
 interface MilestoneCreateModalProps {
   currentTotalWeightage: number;

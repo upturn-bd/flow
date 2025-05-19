@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useContext } from "react";
+import {
+  getDepartments,
+  createDepartment,
+  updateDepartment,
+  deleteDepartment,
+} from "@/lib/api/company-info/departments";
+import { AuthContext } from "@/lib/auth/auth-provider";
 
 export type Department = {
   id: number;
@@ -17,9 +24,11 @@ export function useDepartments() {
   const fetchDepartments = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/company-info/departments");
-      const data = await res.json();
-      setDepartments(data.departments || []);
+      const { employee } = useContext(AuthContext)!;
+      console.log("user", employee);
+      const data = await getDepartments(employee!.id);
+      console.log("data", data);
+      setDepartments(data || []);
     } catch (error) {
       console.error(error);
     } finally {
@@ -27,37 +36,25 @@ export function useDepartments() {
     }
   }, []);
 
-  const createDepartment = async (department: Omit<Department, "id">) => {
-    const res = await fetch("/api/company-info/departments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(department),
-    });
-    return await res.json();
+  const createDepartmentHandler = async (department: Omit<Department, "id">) => {
+    const { employee } = useContext(AuthContext)!;
+    return await createDepartment(employee!.id, department);
   };
 
-  const updateDepartment = async (department: Department) => {
-    const res = await fetch("/api/company-info/departments", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(department),
-    });
-    return await res.json();
+  const updateDepartmentHandler = async (department: Department) => {
+    return await updateDepartment(department.id, department);
   };
 
-  const deleteDepartment = async (id: number) => {
-    const res = await fetch(`/api/company-info/departments?id=${id}`, {
-      method: "DELETE",
-    });
-    return await res.json();
+  const deleteDepartmentHandler = async (id: number) => {
+    return await deleteDepartment(id);
   };
 
   return {
     departments,
     loading,
     fetchDepartments,
-    createDepartment,
-    updateDepartment,
-    deleteDepartment,
+    createDepartment: createDepartmentHandler,
+    updateDepartment: updateDepartmentHandler,
+    deleteDepartment: deleteDepartmentHandler,
   };
 }

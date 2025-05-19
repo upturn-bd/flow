@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { useDepartments } from "@/hooks/useDepartments";
 import {
@@ -9,6 +9,8 @@ import {
   JOB_STATUS_OPTIONS,
 } from "./basicInfo.constants";
 import { BasicInfoField } from "./BasicInfoField";
+import { getBasicInfo } from "@/lib/api/basic-info";
+import { AuthContext } from "@/lib/auth/auth-provider";
 
 const initialFormState: BasicInfoFormData = {
   first_name: "",
@@ -138,11 +140,11 @@ export default function BasicInfoTab() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/basic-info");
-        if (res.ok) {
-          const { data } = await res.json();
-          setInitialData(data);
-          setFormValues(data);
+        const { employee } = useContext(AuthContext)!;
+        const res = await getBasicInfo(employee!.id);
+        if (res) {
+          setInitialData(res);
+          setFormValues(res);
         }
       } catch (error) {
         setSubmitError("Failed to fetch basic info. Please try again later.");

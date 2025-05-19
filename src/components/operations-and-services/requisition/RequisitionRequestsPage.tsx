@@ -2,7 +2,7 @@
 
 import { useRequisitionInventories } from "@/hooks/useInventory";
 import { useRequisitionTypes } from "@/hooks/useRequisitionTypes";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getCompanyId, getUserInfo } from "@/lib/api/company-info/employees"
 import { createClient } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
 import { FaFilePdf } from "react-icons/fa";

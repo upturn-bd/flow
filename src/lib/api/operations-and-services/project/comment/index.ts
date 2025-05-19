@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { getCompanyId } from "@/lib/auth/getUser";
+import { getCompanyId } from "@/lib/api/company-info/employees"
 import { commentSchema } from "@/lib/types";
 
 export async function getComments() {

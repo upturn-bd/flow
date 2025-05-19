@@ -1,28 +1,28 @@
 "use client";
 
 import { Attendance } from "@/hooks/useAttendance";
-import { getUserInfo } from "@/lib/auth/getUser";
 import { createClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
+import { AuthContext } from "@/lib/auth/auth-provider";
 
 export default function AttendanceAbsentPage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(false);
   const { sites, fetchSites } = useSites();
+  const { employee } = useContext(AuthContext)!;
 
   async function fetchAttendanceData() {
     setLoading(true);
     const supabase = createClient();
-    const user = await getUserInfo();
     try {
       const { data, error } = await supabase
         .from("attendance_records")
         .select("id, check_in_time, check_out_time, site_id, attendance_date, tag, employee_id")
-        .eq("employee_id", user.id)
-        .eq("company_id", user.company_id)
+        .eq("employee_id", employee!.id)
+        .eq("company_id", employee!.company_id)
         .eq("tag", "Absent")
         .order("attendance_date", { ascending: false });
 

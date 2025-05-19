@@ -1,19 +1,20 @@
-"use server";
+"use client";
 
-import { getUserInfo } from "@/lib/auth/getUser";
 import { createClient } from "@/lib/supabase/client";
 import { generateRandomId } from "@/lib/utils";
+import { AuthContext } from "@/lib/auth/auth-provider";
+import { useContext } from "react";
 
 export async function uploadManyFiles(files: File[], bucketName: string) {
   const supabase = await createClient();
-  const user = await getUserInfo();
+  const { employee } = useContext(AuthContext)!;
 
   const uploadedFilePaths = [];
   try {
     for (const file of files) {
       // Generate a unique filename to avoid collisions
       const uniqueFilename = `${generateRandomId()}-${file.name}`;
-      const filePath = `${user.id}/${uniqueFilename}`;
+      const filePath = `${employee!.id}/${uniqueFilename}`;
 
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(bucketName)

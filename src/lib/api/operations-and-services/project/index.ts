@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getCompanyId, getUserInfo } from "@/lib/api/company-info/employees"
 import { projectSchema } from "@/lib/types";
 
 export async function getProjects() {

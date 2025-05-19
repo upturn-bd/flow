@@ -186,7 +186,7 @@ export default function EducationExperienceTab() {
                     <td className="px-4 py-2 border">{edu.to_date}</td>
                     <td className="px-4 py-2 border">{edu.result}</td>
                     <td className="px-4 py-2 border space-y-2">
-                      {edu.attachments?.length > 0 ? (
+                      {edu.attachments && edu.attachments.length > 0 ? (
                         edu.attachments.map((attachment) => (
                           <div
                             key={attachment}

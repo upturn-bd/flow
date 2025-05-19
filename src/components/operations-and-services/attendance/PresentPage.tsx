@@ -1,12 +1,12 @@
 "use client";
 
 import { Attendance } from "@/hooks/useAttendance";
-import { getUserInfo } from "@/lib/auth/getUser";
 import { createClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
+import { AuthContext } from "@/lib/auth/auth-provider";
 
 export default function AttendancePresentPage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
@@ -16,13 +16,13 @@ export default function AttendancePresentPage() {
   async function fetchAttendanceData() {
     setLoading(true);
     const supabase = createClient();
-    const user = await getUserInfo();
+    const { employee } = useContext(AuthContext)!;
     try {
       const { data, error } = await supabase
         .from("attendance_records")
         .select("id, check_in_time, check_out_time, site_id, attendance_date, tag, employee_id")
-        .eq("employee_id", user.id)
-        .eq("company_id", user.company_id)
+        .eq("employee_id", employee!.id)
+        .eq("company_id", employee!.company_id)
         .eq("tag", "Present")
         .order("attendance_date", { ascending: false });
 

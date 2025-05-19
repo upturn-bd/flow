@@ -3,7 +3,7 @@
 import { useEmployees } from "@/hooks/useEmployees";
 import { Milestone } from "@/hooks/useMilestones";
 import { Task, useTasks } from "@/hooks/useTasks";
-import { getCompanyId } from "@/lib/auth/getUser";
+import { getCompanyId } from "@/lib/api/company-info/employees"
 import { createClient } from "@/lib/supabase/client";
 import {
   ArrowSquareOut,

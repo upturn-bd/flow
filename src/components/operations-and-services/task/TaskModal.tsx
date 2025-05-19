@@ -5,7 +5,7 @@ import { taskSchema } from "@/lib/types";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
 import { z } from "zod";
-import { getUserInfo } from "@/lib/auth/getUser";
+import { getUserInfo } from "@/lib/api/company-info/employees"
 import { useTasks } from "@/hooks/useTasks";
 
 type Task = z.infer<typeof taskSchema>;

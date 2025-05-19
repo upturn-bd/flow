@@ -7,7 +7,7 @@ import { IoMdCalendar } from "react-icons/io";
 import { any, z } from "zod";
 import { complaintRecordSchema } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getCompanyId, getUserInfo } from "@/lib/api/company-info/employees"
 import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
 import { useComplaintTypes } from "@/hooks/useComplaints";
 import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";

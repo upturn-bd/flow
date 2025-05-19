@@ -7,7 +7,7 @@ import { ArrowSquareOut, TrashSimple } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import ProjectDetails from "./ProjectDetails";
 import { createClient } from "@/lib/supabase/client";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getCompanyId, getUserInfo } from "@/lib/api/company-info/employees"
 
 function ProjectCard({
   project,

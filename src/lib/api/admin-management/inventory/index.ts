@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { getCompanyId } from "@/lib/auth/getUser";
 import { requisitionInventorySchema, requisitionTypeSchema } from "@/lib/types";
+import { getCompanyId } from "../../company-info/employees";
 
 export async function getRequisitionTypes() {
   const client = await createClient();

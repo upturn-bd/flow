@@ -1,9 +1,8 @@
 "use client";
 
 import { Attendance } from "@/hooks/useAttendance";
-import { getUserInfo } from "@/lib/auth/getUser";
 import { createClient } from "@/lib/supabase/client";
-import { use, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import {
   formatTimeFromISO,
@@ -13,6 +12,7 @@ import {
 } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import { useEmployees } from "@/hooks/useEmployees";
+import { AuthContext } from "@/lib/auth/auth-provider";
 
 export default function AttendanceRequestsPage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
@@ -25,7 +25,7 @@ export default function AttendanceRequestsPage() {
   async function fetchAttendanceData() {
     setLoading(true);
     const supabase = createClient();
-    const user = await getUserInfo();
+    const { employee } = useContext(AuthContext)!;
     try {
       const { data, error } = await supabase
         .from("attendance_records")
@@ -33,7 +33,7 @@ export default function AttendanceRequestsPage() {
           "id, check_in_time, check_out_time, site_id, attendance_date, employee_id, check_out_coordinates, check_in_coordinates, tag"
         )
         // .eq("supervisor_id", user.id)
-        .eq("company_id", user.company_id)
+        .eq("company_id", employee!.company_id)
         .eq("tag", "Pending")
         .order("attendance_date", { ascending: false });
 
@@ -50,12 +50,12 @@ export default function AttendanceRequestsPage() {
   async function handleRequest(e: React.FormEvent) {
     e.preventDefault();
     const supabase = createClient();
-    const user = await getUserInfo();
+    const { employee } = useContext(AuthContext)!;
     try {
       const { error } = await supabase
         .from("attendance_records")
         .update({ tag: updateTag })
-        .eq("company_id", user.company_id)
+        .eq("company_id", employee!.company_id)
         .eq("id", selectedRecord?.id);
 
       if (error) throw error;

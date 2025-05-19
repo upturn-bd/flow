@@ -3,7 +3,7 @@
 import { useDepartments } from "@/hooks/useDepartments";
 import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
 import { updateProject } from "@/lib/api/operations-and-services/project";
-import { getCompanyId } from "@/lib/auth/getUser";
+import { getCompanyId } from "@/lib/api/company-info/employees"
 import { createClient } from "@/lib/supabase/client";
 import { milestoneSchema, projectSchema } from "@/lib/types";
 import { PencilSimple, TrashSimple, Info } from "@phosphor-icons/react";

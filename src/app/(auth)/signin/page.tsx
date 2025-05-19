@@ -1,13 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
-
-import { googleSignIn, login } from "../auth-actions";
+import { AuthContext } from "@/lib/auth/auth-provider";
 
 interface SignInFormData {
   email: string;
@@ -22,7 +21,8 @@ const SignIn = () => {
   } = useForm<SignInFormData>();
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const authContext = useContext(AuthContext);
+  const loading = authContext?.loading;
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -30,26 +30,19 @@ const SignIn = () => {
 
   const handleSignIn = async (data: SignInFormData) => {
     setGeneralError(null);
-    setLoading(true);
-    const { error } = await login({ email: data.email, password: data.password });
-    if (error) {
-      setGeneralError("Login failed. " + error.message);
+    try {
+      await authContext?.signInUser(data.email, data.password);
+    } catch (error: any) {
+      setGeneralError("Login failed. " + (error?.message || ""));
     }
-    setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
     setGeneralError(null);
-    setLoading(true);
     try {
-      await googleSignIn();
-    } catch (err) {
-      if (err instanceof Error) {
-        console.error("Google Sign-In Error:", err.message);
-        setGeneralError("Google sign-in failed. Please try again.");
-      }
-    } finally {
-      setLoading(false);
+      await authContext?.signInWithGoogle();
+    } catch (err: any) {
+      setGeneralError("Google sign-in failed. Please try again.");
     }
   };
 

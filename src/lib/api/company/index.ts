@@ -1,8 +1,7 @@
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 
 export async function getCompanyId(uid: string): Promise<number> {
-  const client = await createClient();
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("employees")
     .select("company_id")
     .eq("id", uid)
@@ -14,9 +13,8 @@ export async function getCompanyId(uid: string): Promise<number> {
 }
 
 export async function getDesignations(uid: string) {
-  const client = await createClient();
   const company_id = await getCompanyId(uid);
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("designations")
     .select(
       `
@@ -34,9 +32,8 @@ export async function getDesignations(uid: string) {
 }
 
 export async function getDepartments(uid: string) {
-  const client = await createClient();
   const company_id = await getCompanyId(uid);
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("depts")
     .select(
       `
@@ -55,10 +52,9 @@ export async function validateCompanyCode(
   name: string,
   code: string
 ): Promise<{ isValid: boolean; id: number | null }> {
-  const client = await createClient();
   const id: number | null = null;
   const isValid: boolean = false;
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("companies")
     .select("id, name")
     .eq("code", code)

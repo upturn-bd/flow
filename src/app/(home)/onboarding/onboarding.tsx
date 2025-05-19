@@ -3,13 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
-import { ArrowFatRight as ArrowFatRightIcon } from "@phosphor-icons/react";
-import { validateCompanyCode } from "@/lib/api/company-ss";
+import { validateCompanyCode } from "@/lib/api/company";
 import {
   getDepartmentsByCompanyId,
   getEmployeesByCompanyId,
   getUser,
-} from "@/lib/auth/getUser";
+} from "@/lib/api/company-info/employees"
 
 const jobStatuses = [
   "Active",
@@ -223,22 +222,7 @@ export default function EmployeeOnboarding() {
   );
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col lg:flex-row">
-      <div
-        className="relative w-[100px] md:flex flex-col items-center justify-center hidden"
-        style={{
-          background:
-            "linear-gradient(135.32deg, #001731 24.86%, #002363 100%)",
-        }}
-      >
-        <div className="absolute top-10 right-0 translate-x-1/3 p-5 rounded-full bg-[#001731] flex items-center justify-center">
-          <ArrowFatRightIcon
-            size={70}
-            className="-rotate-45 text-yellow-500"
-            weight="fill"
-          />
-        </div>
-      </div>
+    <div className="w-full min-h-screen bg-white">
       <main className="w-full p-6 lg:py-12 lg:px-20">
         <h1 className="text-3xl font-semibold text-blue-700 mb-6">
           Employee Onboarding

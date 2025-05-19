@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useContext } from "react";
+import {
+  getDivisions,
+  createDivision,
+  updateDivision,
+  deleteDivision,
+} from "@/lib/api/company-info/divisions";
+import { AuthContext } from "@/lib/auth/auth-provider";
 
 export type Division = {
   id: number;
@@ -15,9 +22,9 @@ export function useDivisions() {
   const fetchDivisions = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/company-info/divisions");
-      const data = await res.json();
-      setDivisions(data.divisions || []);
+      const { employee } = useContext(AuthContext)!;
+      const data = await getDivisions(employee!.id);
+      setDivisions(data || []);
     } catch (error) {
       console.error(error);
     } finally {
@@ -25,37 +32,25 @@ export function useDivisions() {
     }
   }, []);
 
-  const createDivision = async (division: Omit<Division, "id">) => {
-    const res = await fetch("/api/company-info/divisions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(division),
-    });
-    return await res.json();
+  const createDivisionHandler = async (division: Omit<Division, "id">) => {
+    const { employee } = useContext(AuthContext)!;
+    return await createDivision(employee!.id, division);
   };
 
-  const updateDivision = async (division: Division) => {
-    const res = await fetch("/api/company-info/divisions", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(division),
-    });
-    return await res.json();
+  const updateDivisionHandler = async (division: Division) => {
+    return await updateDivision(division.id, division);
   };
 
-  const deleteDivision = async (id: number) => {
-    const res = await fetch(`/api/company-info/divisions?id=${id}`, {
-      method: "DELETE",
-    });
-    return await res.json();
+  const deleteDivisionHandler = async (id: number) => {
+    return await deleteDivision(id);
   };
 
   return {
     divisions,
     loading,
     fetchDivisions,
-    createDivision,
-    updateDivision,
-    deleteDivision,
+    createDivision: createDivisionHandler,
+    updateDivision: updateDivisionHandler,
+    deleteDivision: deleteDivisionHandler,
   };
 }

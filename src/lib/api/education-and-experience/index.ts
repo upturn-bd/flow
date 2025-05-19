@@ -1,20 +1,22 @@
-"use server";
+"use client";
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { getEmployeeId, getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeId, getCompanyId } from "@/lib/api/company-info/employees";
 import { schoolingSchema, experienceSchema } from "@/lib/types";
+import { AuthContext } from "@/lib/auth/auth-provider";
+import { useContext } from "react";
 
 export async function getSchoolings() {
   const client = await createClient();
-  const user = await getUserInfo();
+  const { employee } = useContext(AuthContext)! ;
   const company_id = await getCompanyId();
 
   const { data, error } = await client
     .from("schoolings")
     .select("*")
     .eq("company_id", company_id)
-    .eq("employee_id", user.id);
+    .eq("employee_id", employee!.id);
 
   if (error) throw error;
   return data;
@@ -103,13 +105,13 @@ export async function deleteSchooling(id: number) {
 export async function getExperiences() {
   const client = await createClient();
   const company_id = await getCompanyId();
-  const user = await getUserInfo();
+  const { employee } = useContext(AuthContext)!;
 
   const { data, error } = await client
     .from("experiences")
     .select("*")
     .eq("company_id", company_id)
-    .eq("employee_id", user.id);
+    .eq("employee_id", employee!.id);
 
   if (error) throw error;
   return data;

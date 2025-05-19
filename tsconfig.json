@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "layouts/mobile-bottom-nav.tsx", "layouts/side-navbar.tsx", "src/nothing.ts"],
   "exclude": ["node_modules"]
 }

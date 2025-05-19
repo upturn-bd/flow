@@ -3,6 +3,8 @@ import { Geist } from "next/font/google";
 
 import "./globals.css";
 import 'leaflet/dist/leaflet.css';
+import AuthProvider from "@/lib/auth/auth-provider";
+import Picker from "../../layouts/Picker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,7 +36,11 @@ export default function RootLayout({
           }
         />
       </head>
-      <body className={`${geistSans.className} antialiased`}>{children}</body>
+      <body className={`${geistSans.className} antialiased`}>
+        <AuthProvider>
+          <Picker>{children}</Picker>
+        </AuthProvider>
+      </body>
     </html>
   );
 }
