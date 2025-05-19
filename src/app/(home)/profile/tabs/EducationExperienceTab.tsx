@@ -5,11 +5,22 @@ import { useEducation } from "@/hooks/useEducation";
 import { useExperience } from "@/hooks/useExperience";
 import EducationModal from "@/components/education-and-experience/EducationModal";
 import ExperienceModal from "@/components/education-and-experience/ExperienceModal";
-import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  GraduationCap, 
+  Briefcase, 
+  Plus, 
+  Pencil, 
+  Trash, 
+  FileText, 
+  BookOpen,
+  Building,
+  Calendar 
+} from "lucide-react";
 import { Education } from "@/hooks/useEducation";
 import { Experience } from "@/hooks/useExperience";
-import { FaFilePdf } from "react-icons/fa";
 import { extractFilenameFromUrl } from "@/lib/utils";
+import { FilePdf } from "@phosphor-icons/react";
 
 export default function EducationExperienceTab() {
   const {
@@ -67,12 +78,12 @@ export default function EducationExperienceTab() {
       async () => {
         await createEducation(values);
         fetchEducation();
-        alert("Education created!");
+        showNotification('Education created successfully', 'success');
         setIsCreatingEducation(false);
       },
       setIsEducationActionLoading,
       undefined,
-      () => alert("Error creating education.")
+      () => showNotification('Error creating education', 'error')
     );
 
   const handleUpdateEducation = (values: Education) =>
@@ -80,12 +91,12 @@ export default function EducationExperienceTab() {
       async () => {
         await updateEducation(values);
         fetchEducation();
-        alert("Education updated!");
+        showNotification('Education updated successfully', 'success');
         setEditEducation(null);
       },
       setIsEducationActionLoading,
       undefined,
-      () => alert("Error updating education.")
+      () => showNotification('Error updating education', 'error')
     );
 
   const handleDeleteEducation = (id: number) => {
@@ -97,11 +108,11 @@ export default function EducationExperienceTab() {
       async () => {
         await deleteEducation(id);
         fetchEducation();
-        alert("Education deleted!");
+        showNotification('Education deleted successfully', 'success');
       },
       setIsEducationActionLoading,
       undefined,
-      () => alert("Error deleting education.")
+      () => showNotification('Error deleting education', 'error')
     );
   };
 
@@ -110,12 +121,12 @@ export default function EducationExperienceTab() {
       async () => {
         await createExperience(values);
         fetchExperience();
-        alert("Experience created!");
+        showNotification('Experience created successfully', 'success');
         setIsCreatingExperience(false);
       },
       setIsExperienceActionLoading,
       undefined,
-      () => alert("Error creating experience.")
+      () => showNotification('Error creating experience', 'error')
     );
 
   const handleUpdateExperience = (values: Experience) =>
@@ -123,12 +134,12 @@ export default function EducationExperienceTab() {
       async () => {
         await updateExperience(values);
         fetchExperience();
-        alert("Experience updated!");
+        showNotification('Experience updated successfully', 'success');
         setEditExperience(null);
       },
       setIsExperienceActionLoading,
       undefined,
-      () => alert("Error updating experience.")
+      () => showNotification('Error updating experience', 'error')
     );
 
   const handleDeleteExperience = (id: number) => {
@@ -140,12 +151,28 @@ export default function EducationExperienceTab() {
       async () => {
         await deleteExperience(id);
         fetchExperience();
-        alert("Experience deleted!");
+        showNotification('Experience deleted successfully', 'success');
       },
       setIsExperienceActionLoading,
       undefined,
-      () => alert("Error deleting experience.")
+      () => showNotification('Error deleting experience', 'error')
     );
+  };
+
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in-up ${
+      type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+    }`;
+    notification.innerHTML = message;
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+      notification.classList.add('animate-fade-out');
+      setTimeout(() => document.body.removeChild(notification), 500);
+    }, 3000);
   };
 
   const selectedEducationEdit = useMemo(
@@ -157,198 +184,310 @@ export default function EducationExperienceTab() {
     [experience, editExperience]
   );
 
+  const getFileIcon = (filename: string) => {
+    const extension = filename.split('.').pop()?.toLowerCase() || '';
+    if (['pdf'].includes(extension)) {
+      return <FilePdf className="text-red-600 h-5 w-5" />;
+    }
+    return <FileText className="text-blue-600 h-5 w-5" />;
+  };
+
+  const contentVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { 
+        type: "spring",
+        stiffness: 260,
+        damping: 20 
+      } 
+    }
+  };
+
   return (
-    <>
-      <h2 className="text-2xl font-bold text-blue-700">Education</h2>
-      <div className="overflow-x-auto border rounded-md mb-6">
-        {educationLoading ? (
-          <div className="p-4 text-center">Loading...</div>
-        ) : (
-          <table className="w-full text-sm text-left">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 border">Degree</th>
-                <th className="px-4 py-2 border">Institution</th>
-                <th className="px-4 py-2 border">From</th>
-                <th className="px-4 py-2 border">To</th>
-                <th className="px-4 py-2 border">CGPA</th>
-                <th className="px-4 py-2 border">Attachments</th>
-                <th className="px-4 py-2 border">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+    <motion.div 
+      initial="hidden"
+      animate="visible"
+      variants={contentVariants}
+      className="space-y-8"
+    >
+      {/* Education Section */}
+      <motion.div variants={itemVariants}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-800 flex items-center">
+            <GraduationCap className="mr-2 h-6 w-6 text-emerald-600" />
+            Education
+          </h2>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsCreatingEducation(true)}
+            className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2 text-sm shadow-sm"
+            disabled={isEducationActionLoading}
+          >
+            <Plus className="h-4 w-4" /> Add Education
+          </motion.button>
+        </div>
+        
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+          {educationLoading ? (
+            <div className="flex justify-center items-center p-8">
+              <div className="relative h-12 w-12">
+                <div className="absolute top-0 left-0 h-full w-full rounded-full border-t-2 border-b-2 border-emerald-500 animate-spin"></div>
+                <BookOpen className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-emerald-500 opacity-50" />
+              </div>
+              <p className="ml-4 text-gray-500 font-medium">Loading education records...</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
               {education.length > 0 ? (
-                education.map((edu) => (
-                  <tr key={edu.id ?? edu.name} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 border">{edu.name}</td>
-                    <td className="px-4 py-2 border">{edu.institute}</td>
-                    <td className="px-4 py-2 border">{edu.from_date}</td>
-                    <td className="px-4 py-2 border">{edu.to_date}</td>
-                    <td className="px-4 py-2 border">{edu.result}</td>
-                    <td className="px-4 py-2 border space-y-2">
-                      {edu.attachments?.length > 0 ? (
-                        edu.attachments.map((attachment) => (
-                          <div
-                            key={attachment}
-                            onClick={() => {
-                              window.open(attachment, "_blank");
-                            }}
-                            className="flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 gap-3 max-w-full cursor-pointer hover:bg-gray-50 transition duration-200"
-                          >
-                            <FaFilePdf className="text-red-600 text-xl" />
-                            <div className="text-sm">
-                              <p className="truncate whitespace-nowrap overflow-hidden max-w-[200px]">
-                                {extractFilenameFromUrl(attachment)}
-                              </p>
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Degree</th>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Institution</th>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">To</th>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result</th>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attachments</th>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    <AnimatePresence>
+                      {education.map((edu) => (
+                        <motion.tr 
+                          key={edu.id ?? edu.name} 
+                          className="hover:bg-gray-50"
+                          variants={itemVariants}
+                          exit={{ opacity: 0, height: 0 }}
+                          layout
+                        >
+                          <td className="px-4 py-3 text-sm text-gray-900">{edu.name}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900">{edu.institute}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{edu.from_date}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{edu.to_date}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900">{edu.result}</td>
+                          <td className="px-4 py-3 text-sm">
+                            <div className="flex flex-col gap-2">
+                              {edu.attachments && edu.attachments.length > 0 ? (
+                                edu.attachments.map((attachment) => (
+                                  <motion.div
+                                    key={attachment}
+                                    whileHover={{ scale: 1.03 }}
+                                    onClick={() => {
+                                      window.open(attachment, "_blank");
+                                    }}
+                                    className="flex items-center gap-2 p-1.5 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
+                                  >
+                                    {getFileIcon(extractFilenameFromUrl(attachment))}
+                                    <span className="truncate max-w-[150px]">
+                                      {extractFilenameFromUrl(attachment)}
+                                    </span>
+                                  </motion.div>
+                                ))
+                              ) : (
+                                <span className="text-gray-500 text-sm">No attachments</span>
+                              )}
                             </div>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-gray-500">No attachments</p>
-                      )}
-                    </td>
-                    <td className="px-4 py-2 flex gap-2">
-                      <button
-                        onClick={() => setEditEducation(edu.id ?? 0)}
-                        className="p-2"
-                        aria-label="Edit education"
-                        disabled={isEducationActionLoading}
-                      >
-                        <PencilSimple size={24} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteEducation(edu.id ?? 0)}
-                        className="p-2"
-                        aria-label="Delete education"
-                        disabled={isEducationActionLoading}
-                      >
-                        <TrashSimple className="text-red-600" size={24} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            <div className="flex items-center gap-2">
+                              <motion.button
+                                whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.1)" }}
+                                onClick={() => setEditEducation(edu.id ?? 0)}
+                                className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
+                                aria-label="Edit education"
+                                disabled={isEducationActionLoading}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </motion.button>
+                              <motion.button
+                                whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
+                                onClick={() => handleDeleteEducation(edu.id ?? 0)}
+                                className="p-1.5 text-red-600 hover:bg-red-100 rounded-full transition-colors"
+                                aria-label="Delete education"
+                                disabled={isEducationActionLoading}
+                              >
+                                <Trash className="h-4 w-4" />
+                              </motion.button>
+                            </div>
+                          </td>
+                        </motion.tr>
+                      ))}
+                    </AnimatePresence>
+                  </tbody>
+                </table>
               ) : (
-                <tr className="hover:bg-gray-50">
-                  <td
-                    className="px-4 py-2 border text-center font-medium text-lg"
-                    colSpan={6}
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                  className="text-center p-12 text-gray-500 flex flex-col items-center"
+                >
+                  <GraduationCap className="h-12 w-12 text-emerald-200 mb-3" />
+                  <p className="mb-4">No education records found.</p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsCreatingEducation(true)}
+                    className="px-4 py-2 text-emerald-600 border border-emerald-200 rounded-lg hover:bg-emerald-50 transition-colors flex items-center gap-2"
                   >
-                    No education records found.
-                  </td>
-                </tr>
+                    <Plus className="h-4 w-4" /> Add Education Record
+                  </motion.button>
+                </motion.div>
               )}
-            </tbody>
-          </table>
-        )}
-      </div>
-      <button
-        onClick={() => setIsCreatingEducation(true)}
-        type="button"
-        className="text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
-        aria-label="Add education"
-        disabled={isEducationActionLoading}
-      >
-        +
-      </button>
-      <h2 className="text-2xl font-bold text-blue-700 mb-6 mt-12">
-        Experience
-      </h2>
-      <div className="overflow-x-auto border rounded-md">
-        {experienceLoading ? (
-          <div className="p-4 text-center">Loading...</div>
-        ) : (
-          <table className="w-full text-sm text-left">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 border">Company Name</th>
-                <th className="px-4 py-2 border">Position</th>
-                <th className="px-4 py-2 border">From</th>
-                <th className="px-4 py-2 border">To</th>
-                <th className="px-4 py-2 border">Description</th>
-                <th className="px-4 py-2 border">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+            </div>
+          )}
+        </div>
+      </motion.div>
+
+      {/* Experience Section */}
+      <motion.div variants={itemVariants}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-800 flex items-center">
+            <Briefcase className="mr-2 h-6 w-6 text-blue-600" />
+            Experience
+          </h2>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsCreatingExperience(true)}
+            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm shadow-sm"
+            disabled={isExperienceActionLoading}
+          >
+            <Plus className="h-4 w-4" /> Add Experience
+          </motion.button>
+        </div>
+        
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+          {experienceLoading ? (
+            <div className="flex justify-center items-center p-8">
+              <div className="relative h-12 w-12">
+                <div className="absolute top-0 left-0 h-full w-full rounded-full border-t-2 border-b-2 border-blue-500 animate-spin"></div>
+                <Briefcase className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-blue-500 opacity-50" />
+              </div>
+              <p className="ml-4 text-gray-500 font-medium">Loading experience records...</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
               {experience.length > 0 ? (
-                experience.map((exp) => (
-                  <tr
-                    key={exp.id ?? exp.company_name}
-                    className="hover:bg-gray-50"
-                  >
-                    <td className="px-4 py-2 border">{exp.company_name}</td>
-                    <td className="px-4 py-2 border">{exp.designation}</td>
-                    <td className="px-4 py-2 border">{exp.from_date}</td>
-                    <td className="px-4 py-2 border">{exp.to_date}</td>
-                    <td className="px-4 py-2 border">{exp.description}</td>
-                    <td className="px-4 py-2 border flex gap-2">
-                      <button
-                        onClick={() => setEditExperience(exp.id ?? 0)}
-                        className="p-2"
-                        aria-label="Edit experience"
-                        disabled={isExperienceActionLoading}
-                      >
-                        <PencilSimple size={24} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteExperience(exp.id ?? 0)}
-                        className="p-2"
-                        aria-label="Delete experience"
-                        disabled={isExperienceActionLoading}
-                      >
-                        <TrashSimple className="text-red-600" size={24} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Designation</th>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">To</th>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    <AnimatePresence>
+                      {experience.map((exp) => (
+                        <motion.tr 
+                          key={exp.id ?? exp.company_name} 
+                          className="hover:bg-gray-50"
+                          variants={itemVariants}
+                          exit={{ opacity: 0, height: 0 }}
+                          layout
+                        >
+                          <td className="px-4 py-3 text-sm text-gray-900">{exp.company_name}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900">{exp.designation}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{exp.from_date}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{exp.to_date}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900 max-w-md">
+                            <div className="line-clamp-2">{exp.description}</div>
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            <div className="flex items-center gap-2">
+                              <motion.button
+                                whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.1)" }}
+                                onClick={() => setEditExperience(exp.id ?? 0)}
+                                className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
+                                aria-label="Edit experience"
+                                disabled={isExperienceActionLoading}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </motion.button>
+                              <motion.button
+                                whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
+                                onClick={() => handleDeleteExperience(exp.id ?? 0)}
+                                className="p-1.5 text-red-600 hover:bg-red-100 rounded-full transition-colors"
+                                aria-label="Delete experience"
+                                disabled={isExperienceActionLoading}
+                              >
+                                <Trash className="h-4 w-4" />
+                              </motion.button>
+                            </div>
+                          </td>
+                        </motion.tr>
+                      ))}
+                    </AnimatePresence>
+                  </tbody>
+                </table>
               ) : (
-                <tr className="hover:bg-gray-50">
-                  <td
-                    className="px-4 py-2 border text-center font-medium text-lg"
-                    colSpan={6}
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                  className="text-center p-12 text-gray-500 flex flex-col items-center"
+                >
+                  <Building className="h-12 w-12 text-blue-200 mb-3" />
+                  <p className="mb-4">No experience records found.</p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsCreatingExperience(true)}
+                    className="px-4 py-2 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors flex items-center gap-2"
                   >
-                    No experience records found.
-                  </td>
-                </tr>
+                    <Plus className="h-4 w-4" /> Add Experience Record
+                  </motion.button>
+                </motion.div>
               )}
-            </tbody>
-          </table>
+            </div>
+          )}
+        </div>
+      </motion.div>
+
+      {/* Modals */}
+      <AnimatePresence>
+        {/* Education Modal */}
+        {(isCreatingEducation || editEducation !== null) && (
+          <EducationModal
+            initialData={selectedEducationEdit}
+            onSubmit={selectedEducationEdit ? handleUpdateEducation : handleCreateEducation}
+            onClose={() => {
+              setIsCreatingEducation(false);
+              setEditEducation(null);
+            }}
+          />
         )}
-      </div>
-      <button
-        onClick={() => setIsCreatingExperience(true)}
-        type="button"
-        className="mt-6 text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
-        aria-label="Add experience"
-        disabled={isExperienceActionLoading}
-      >
-        +
-      </button>
-      {isCreatingEducation && (
-        <EducationModal
-          onSubmit={handleCreateEducation}
-          onClose={() => setIsCreatingEducation(false)}
-        />
-      )}
-      {selectedEducationEdit && (
-        <EducationModal
-          initialData={selectedEducationEdit}
-          onSubmit={handleUpdateEducation}
-          onClose={() => setEditEducation(null)}
-        />
-      )}
-      {isCreatingExperience && (
-        <ExperienceModal
-          onSubmit={handleCreateExperience}
-          onClose={() => setIsCreatingExperience(false)}
-        />
-      )}
-      {selectedExperienceEdit && (
-        <ExperienceModal
-          initialData={selectedExperienceEdit}
-          onSubmit={handleUpdateExperience}
-          onClose={() => setEditExperience(null)}
-        />
-      )}
-    </>
+
+        {/* Experience Modal */}
+        {(isCreatingExperience || editExperience !== null) && (
+          <ExperienceModal
+            initialData={selectedExperienceEdit}
+            onSubmit={selectedExperienceEdit ? handleUpdateExperience : handleCreateExperience}
+            onClose={() => {
+              setIsCreatingExperience(false);
+              setEditExperience(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

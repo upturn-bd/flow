@@ -4,14 +4,6 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { Project } from "@/hooks/useProjects";
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { createClient } from "@/lib/supabase/client";
-import {
-  PencilSimple,
-  TrashSimple,
-  Plus,
-  CalendarBlank,
-  ArrowSquareOut,
-  User,
-} from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { Milestone } from "./CreateNewProject";
 import { useMilestones } from "@/hooks/useMilestones";
@@ -22,6 +14,25 @@ import { Comment, useComments } from "@/hooks/useComments";
 import MilestoneDetails from "./milestone/MilestoneDetails";
 import { formatDate } from "@/lib/utils";
 import { projectSchema } from "@/lib/types";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Pencil, 
+  Trash2, 
+  Plus, 
+  Calendar, 
+  ExternalLink, 
+  Users,
+  MessageSquare,
+  ClipboardList,
+  Building2,
+  Loader2,
+  UserCircle,
+  Clock,
+  CheckCircle,
+  Send,
+  X
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface ProjectDetailsProps {
   id: number;
@@ -141,32 +152,32 @@ export default function ProjectDetails({
   const handleCreateMilestone = async (values: any) => {
     try {
       await createMilestone(values);
-      alert("Milestone created!");
+      toast.success("Milestone created!");
       setIsCreatingMilestone(false);
       fetchMilestonesByProjectId(projectId);
     } catch {
-      alert("Error creating Milestone.");
+      toast.error("Error creating Milestone.");
     }
   };
 
   const handleUpdateMilestone = async (values: any) => {
     try {
       await updateMilestone(values);
-      alert("Milestone updated!");
+      toast.success("Milestone updated!");
       setSelectedMilestone(null);
       fetchMilestonesByProjectId(projectId);
     } catch {
-      alert("Error updating Milestone.");
+      toast.error("Error updating Milestone.");
     }
   };
 
   const handleDeleteMilestone = async (id: number) => {
     try {
       await deleteMilestone(id);
-      alert("Milestone deleted!");
+      toast.success("Milestone deleted!");
       fetchMilestonesByProjectId(projectId);
     } catch {
-      alert("Error deleting Milestone.");
+      toast.error("Error deleting Milestone.");
     }
   };
 
@@ -196,21 +207,21 @@ export default function ProjectDetails({
         commenter_id: user.id,
       };
       await createComment(formatData);
-      alert("Comment created!");
+      toast.success("Comment created!");
       setIsCreatingComment(false);
       setComment("");
       fetchCommentsByProjectId(projectId);
     } catch {
-      alert("Error creating Comment.");
+      toast.error("Error creating Comment.");
     }
   };
   const handleDeleteComment = async (id: number) => {
     try {
       await deleteComment(id);
-      alert("Comment deleted!");
+      toast.success("Comment deleted!");
       fetchCommentsByProjectId(projectId);
     } catch {
-      alert("Error deleting Comment.");
+      toast.error("Error deleting Comment.");
     }
   };
 
@@ -379,7 +390,7 @@ export default function ProjectDetails({
             <div className="flex gap-2 items-start">
               <span className="font-bold">Assignee</span>:
               <div className="flex flex-wrap gap-2">
-                {projectDetails?.assignees?.length > 0 &&
+                {projectDetails?.assignees && projectDetails?.assignees.length > 0 &&
                   projectDetails?.assignees.map((assignee, i) => (
                     <span
                       key={i}
@@ -397,14 +408,14 @@ export default function ProjectDetails({
           {/* Dates */}
           <div className="flex gap-6 mt-6 text-sm">
             <div className="flex items-center gap-2">
-              <CalendarBlank size={16} className="text-gray-500" />
+              <Calendar size={16} className="text-gray-500" />
               <span>
                 <span className="font-semibold">Start:</span>{" "}
                 {formatDate(projectDetails?.start_date || "")}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <CalendarBlank size={16} className="text-gray-500" />
+              <Calendar size={16} className="text-gray-500" />
               <span>
                 <span className="font-semibold">End:</span>{" "}
                 {formatDate(projectDetails?.end_date || "")}
@@ -452,8 +463,8 @@ export default function ProjectDetails({
                       <div className="font-bold text-lg text-blue-900">
                         Milestone {i + 1}
                       </div>
-                      <ArrowSquareOut
-                        onClick={() => setMilestoneDetailsId(m.id)}
+                      <ExternalLink
+                        onClick={() => m.id !== undefined && setMilestoneDetailsId(m.id)}
                         size={18}
                         className="text-slate-800 hover:text-blue-800 cursor-pointer ml-4 md:ml-8"
                       />
@@ -469,13 +480,13 @@ export default function ProjectDetails({
                       Weightage: {m.weightage}
                     </p>
                     <div className="flex justify-end gap-2">
-                      <PencilSimple
+                      <Pencil
                         size={16}
-                        onClick={() => handleDisplayUpdateMilestoneModal(m.id)}
+                        onClick={() => m.id !== undefined && handleDisplayUpdateMilestoneModal(m.id)}
                         className="text-gray-600 cursor-pointer"
                       />
-                      <TrashSimple
-                        onClick={() => handleDeleteMilestone(m.id)}
+                      <Trash2
+                        onClick={() => m.id !== undefined && handleDeleteMilestone(m.id)}
                         size={16}
                         className="text-red-600 cursor-pointer"
                       />
@@ -513,7 +524,11 @@ export default function ProjectDetails({
               {!loadingComments &&
                 [...comments]
                   .sort(
-                    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+                    (a, b) => {
+                      const dateA = b.created_at ? new Date(b.created_at).getTime() : 0;
+                      const dateB = a.created_at ? new Date(a.created_at).getTime() : 0;
+                      return dateA - dateB;
+                    }
                   )
                   .map((c, i) => (
                     <div key={i} className={"bg-white p-3 rounded-md mb-3 "}>
@@ -529,15 +544,15 @@ export default function ProjectDetails({
                           <p className="text-sm">{c.comment}</p>
                         </div>
                         {c.commenter_id === user.id && (
-                          <TrashSimple
-                            onClick={() => handleDeleteComment(c.id)}
+                          <Trash2
+                            onClick={() => c.id !== undefined && handleDeleteComment(c.id)}
                             size={16}
                             className="text-red-600 cursor-pointer w-7 h-7 md:w-4 md:h-4"
                           />
                         )}
                       </div>
                       <p className="text-xs text-right text-gray-500 mt-1">
-                        {formatTime(c.created_at)}
+                        {formatTime(c.created_at!)}
                       </p>
                     </div>
                   ))}

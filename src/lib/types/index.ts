@@ -189,6 +189,8 @@ export const commentSchema = z.object({
   commenter_id: z.string(),
   project_id: z.number(),
   company_id: z.number().optional(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const taskSchema = z.object({

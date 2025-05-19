@@ -104,7 +104,7 @@ export default function ComplaintCreatePage() {
       setIsValid(false);
       const newErrors: Partial<ComplaintState> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof ComplaintState] = err.message as unknown as undefined;
       });
       setErrors(newErrors);
     }
@@ -118,7 +118,7 @@ export default function ComplaintCreatePage() {
     const fetchEmployees = async () => {
       try {
         const response = await getEmployeesInfo();
-        setEmployees(response.data);
+        setEmployees(response?.data || []);
       } catch (error) {
         setEmployees([]);
         console.error("Error fetching asset owners:", error);

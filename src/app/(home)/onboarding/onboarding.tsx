@@ -3,13 +3,32 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
-import { ArrowFatRight as ArrowFatRightIcon } from "@phosphor-icons/react";
 import {
   getDepartmentsByCompanyId,
   getEmployeesByCompanyId,
   getUser,
 } from "@/lib/auth/getUser";
 import { validateCompanyCode } from "@/lib/api/company";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Calendar, 
+  Building2, 
+  User, 
+  Mail, 
+  Phone, 
+  Briefcase, 
+  Users, 
+  CircleCheck, 
+  CircleAlert, 
+  AlertCircle, 
+  ChevronDown, 
+  Loader2, 
+  CheckCircle2, 
+  Clock, 
+  XCircle, 
+  BadgeCheck, 
+  Send
+} from "lucide-react";
 
 const jobStatuses = [
   "Active",
@@ -37,6 +56,25 @@ const formSchema = z.object({
   supervisor_id: z.string().optional(),
 });
 
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.4 }
+  }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
 export default function EmployeeOnboarding() {
   const [formData, setFormData] = useState({
     first_name: "",
@@ -53,6 +91,7 @@ export default function EmployeeOnboarding() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [verifyLoading, setVerifyLoading] = useState(false);
   const [dirty, setDirty] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -67,6 +106,7 @@ export default function EmployeeOnboarding() {
     { id: string; name: string; role: string }[]
   >([]);
   const [userId, setUserId] = useState<string>("");
+  const [activeSection, setActiveSection] = useState("company");
 
   useEffect(() => {
     const fetchRejectedData = async () => {
@@ -86,6 +126,7 @@ export default function EmployeeOnboarding() {
               setCompanyCode(data.companyData.code);
               setIsCompanyCodeValid(true);
               setFormData(formatted);
+              setActiveSection("personal");
             }
           }
         } catch (e) {
@@ -107,29 +148,46 @@ export default function EmployeeOnboarding() {
       [name]: name === "department_id" ? parseInt(value) : value,
     }));
     setDirty(true);
+    
+    // Clear error for the field being changed
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = {...prev};
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const parsed = formSchema.parse(formData);
+      const result = formSchema.safeParse(formData);
+      if (!result.success) {
+        const errorMap: Record<string, string> = {};
+        result.error.errors.forEach((e) => (errorMap[e.path[0]] = e.message));
+        setErrors(errorMap);
+        return;
+      }
+      
       setErrors({});
       setLoading(true);
       const res = await fetch("/api/onboarding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(parsed),
+        body: JSON.stringify(result.data),
       });
-      const result = await res.json();
-      if (!res.ok) return alert(result.error || "Something went wrong");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
       router.push("/onboarding?status=pending");
     } catch (err: any) {
-      const errorMap: Record<string, string> = {};
+      console.error("Submission error:", err);
       if (err?.errors) {
+        const errorMap: Record<string, string> = {};
         err.errors.forEach((e: any) => (errorMap[e.path[0]] = e.message));
         setErrors(errorMap);
       } else {
-        alert("Something went wrong. Please try again later.");
+        setErrors({ submit: err.message || "Something went wrong. Please try again later." });
       }
     } finally {
       setLoading(false);
@@ -138,7 +196,7 @@ export default function EmployeeOnboarding() {
 
   const handleValidateCompanyCode = async () => {
     try {
-      setLoading(true);
+      setVerifyLoading(true);
       const { isValid, id } = await validateCompanyCode(
         formData.company_name,
         companyCode
@@ -146,14 +204,19 @@ export default function EmployeeOnboarding() {
       if (isValid && id) {
         setFormData((prev) => ({ ...prev, company_id: id }));
         setIsCompanyCodeValid(isValid);
+        setActiveSection("personal");
       } else {
-        alert("Invalid company code or name. Please check and try again.");
+        setErrors({ 
+          company_code: "Invalid company code or name. Please check and try again." 
+        });
       }
     } catch (error) {
       console.error("Error verifying company code:", error);
-      alert("Failed to verify company code. Please try again.");
+      setErrors({ 
+        company_code: "Failed to verify company code. Please try again." 
+      });
     } finally {
-      setLoading(false);
+      setVerifyLoading(false);
     }
   };
 
@@ -172,7 +235,7 @@ export default function EmployeeOnboarding() {
         const res = await getEmployeesByCompanyId(companyId);
         setEmployees(res ?? []);
       } catch (error) {
-        console.error("Error fetching departments:", error);
+        console.error("Error fetching employees:", error);
       }
     };
 
@@ -194,240 +257,490 @@ export default function EmployeeOnboarding() {
     }
   }, [formData.company_id, isCompanyCodeValid]);
 
-  const renderInput = (
+  if (status === "pending") {
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="w-full min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-6"
+      >
+        <motion.div 
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="max-w-lg w-full bg-white rounded-xl shadow-lg overflow-hidden"
+        >
+          <div className="bg-blue-600 py-4 px-6">
+            <h2 className="text-xl font-semibold text-white flex items-center">
+              <Clock className="mr-2 h-5 w-5" />
+              Application Pending
+            </h2>
+          </div>
+          
+          <div className="p-6">
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center">
+                <Clock className="h-12 w-12 text-blue-600" />
+              </div>
+            </div>
+            
+            <h3 className="text-xl font-semibold text-center mb-4">Your information is being reviewed</h3>
+            
+            <p className="text-gray-600 text-center mb-6">
+              Thank you for submitting your details. Your application is currently under review by the administrative team.
+              You will be notified once the review process is complete.
+            </p>
+            
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6">
+              <p className="text-sm text-blue-700 flex items-start">
+                <AlertCircle size={16} className="mr-2 mt-0.5 flex-shrink-0" />
+                If you have any questions about your application status, please contact your supervisor or the HR department.
+              </p>
+            </div>
+            
+            <div className="flex justify-center">
+              <button
+                onClick={() => router.push("/home")}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Return to Dashboard
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
+  const renderInputField = (
     name: keyof typeof formData,
     label: string,
+    icon: React.ReactNode,
     type = "text",
     readOnly = false
-  ) => (
-    <div className="flex items-center space-x-4">
-      <label className="w-32 text-md font-semibold text-gray-800">
-        {label}
-      </label>
-      <input
-        name={name}
-        value={formData[name]}
-        onChange={handleChange}
-        type={type}
-        readOnly={readOnly}
-        className={`w-full lg:w-[20rem] xl:w-[25rem] rounded-md border px-4 py-2 text-sm ${
-          readOnly
-            ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-            : "bg-blue-50 border-gray-200 text-gray-900"
-        } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-      />
-      {errors[name] && (
-        <p className="mt-1 text-sm text-red-600 ml-36">{errors[name]}</p>
-      )}
-    </div>
-  );
+  ) => {
+    const hasError = !!errors[name];
+    
+    return (
+      <motion.div 
+        variants={fadeInUp}
+        className="mb-4"
+      >
+        <label 
+          htmlFor={name} 
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          {label}
+        </label>
+        <div className="relative">
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+            {icon}
+          </div>
+          <input
+            id={name}
+            name={name}
+            value={formData[name as keyof typeof formData] as string}
+            onChange={handleChange}
+            type={type}
+            readOnly={readOnly}
+            className={`w-full pl-10 pr-4 py-2.5 text-gray-900 rounded-lg ${
+              hasError 
+                ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50" 
+                : "border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-[#EAF4FF]"
+            } ${readOnly ? "bg-gray-100 cursor-not-allowed" : ""}`}
+          />
+          {hasError && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500">
+              <AlertCircle size={16} />
+            </div>
+          )}
+        </div>
+        {hasError && (
+          <p className="mt-1 text-sm text-red-600">{errors[name]}</p>
+        )}
+      </motion.div>
+    );
+  };
+
+  const renderSelectField = (
+    name: keyof typeof formData,
+    label: string,
+    icon: React.ReactNode,
+    options: Array<{ value: string | number; label: string }>,
+    placeholder: string
+  ) => {
+    const hasError = !!errors[name];
+    
+    return (
+      <motion.div 
+        variants={fadeInUp}
+        className="mb-4"
+      >
+        <label 
+          htmlFor={name} 
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          {label}
+        </label>
+        <div className="relative">
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+            {icon}
+          </div>
+          <select
+            id={name}
+            name={name}
+            value={formData[name] as string}
+            onChange={handleChange}
+            className={`w-full pl-10 pr-10 py-2.5 text-gray-900 rounded-lg appearance-none ${
+              hasError 
+                ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50" 
+                : "border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-[#EAF4FF]"
+            }`}
+          >
+            <option value="">{placeholder}</option>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+            <ChevronDown size={16} />
+          </div>
+          {hasError && (
+            <div className="absolute right-8 top-1/2 transform -translate-y-1/2 text-red-500">
+              <AlertCircle size={16} />
+            </div>
+          )}
+        </div>
+        {hasError && (
+          <p className="mt-1 text-sm text-red-600">{errors[name]}</p>
+        )}
+      </motion.div>
+    );
+  };
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col lg:flex-row">
-      <main className="w-full p-6 lg:py-12 lg:px-20">
-        <h1 className="text-3xl font-semibold text-blue-700 mb-6">
-          Employee Onboarding
-        </h1>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="w-full min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-10 px-4 sm:px-6"
+    >
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <motion.div 
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8 text-center"
+        >
+          <h1 className="text-3xl font-bold text-blue-800 mb-2">Employee Onboarding</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Complete your employee profile information to get started with our system.
+          </p>
+        </motion.div>
 
-        {status === "pending" ? (
-          <div className="mt-20 lg:w-4/5 mb-6 p-4 rounded-lg bg-[#FFC700] border border-yellow-300">
-            <h2 className="text-xl font-bold">Data sent for review.</h2>
-            <p className="mt-2 text-gray-800">
-              Please wait while your data is being reviewed by the admins.
-              Contact your supervisor if needed.
-            </p>
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="w-full flex flex-col lg:flex-row lg:justify-between gap-6 mt-12"
-          >
-            <div className="space-y-6 lg:max-w-5xl">
-              <div className="bg-white p-4 space-y-4">
-                <h2 className="text-xl font-bold text-blue-700">
-                  Company Information
-                </h2>
-                <div className="grid grid-cols-1 gap-4">
-                  {renderInput("company_name", "Company Name")}
-                  <div className="flex items-center space-x-4">
-                    <label className="w-32 text-md font-semibold text-gray-800">
-                      Company Code
-                    </label>
-                    <input
-                      name="companyCode"
-                      value={companyCode}
-                      onChange={(e) => setCompanyCode(e.target.value)}
-                      type="text"
-                      required
-                      className={
-                        "w-full lg:w-[20rem] xl:w-[25rem] rounded-md border px-4 py-2 text-sm bg-blue-50 border-gray-200 text-gray-900$ focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      }
-                    />
-                  </div>
-                  {(isCompanyCodeValid || status === "rejected") && (
-                    <button
-                      disabled
-                      className="md:w-1/3 bg-[#192D46] text-white px-6 py-2 rounded-md hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Verified
-                    </button>
-                  )}
+        {/* Progress Steps */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: { delay: 0.2 } }}
+          className="mb-10 hidden sm:block"
+        >
+          <div className="flex items-center justify-center">
+            <div className="relative">
+              <div className="flex items-center">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  activeSection === "company" ? "bg-blue-600" : isCompanyCodeValid ? "bg-green-600" : "bg-gray-300"
+                } text-white font-medium`}>
+                  {isCompanyCodeValid ? <CheckCircle2 size={18} /> : 1}
+                </div>
+                <div className={`h-1 w-20 sm:w-32 ${isCompanyCodeValid ? "bg-green-600" : "bg-gray-300"}`}></div>
+              </div>
+              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-sm font-medium">
+                Company
+              </div>
+            </div>
 
-                  {!isCompanyCodeValid && status !== "rejected" && (
-                    <button
-                      onClick={handleValidateCompanyCode}
-                      type="button"
-                      disabled={!formData.company_name || !companyCode}
-                      className="md:w-1/3 bg-[#192D46] text-white px-6 py-2 rounded-md hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Verify
-                    </button>
-                  )}
+            <div className="relative">
+              <div className="flex items-center">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  activeSection === "personal" ? "bg-blue-600" : "bg-gray-300"
+                } text-white font-medium`}>
+                  2
+                </div>
+                <div className="h-1 w-20 sm:w-32 bg-gray-300"></div>
+              </div>
+              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-sm font-medium">
+                Personal
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="flex items-center">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-300 text-white font-medium">
+                  3
                 </div>
               </div>
-
-              {isCompanyCodeValid && (
-                <div className="bg-white p-4 space-y-4">
-                  <h2 className="text-xl font-bold text-blue-700">
-                    Basic Information
-                  </h2>
-                  <div className="grid grid-cols-1 gap-4">
-                    {renderInput("first_name", "First Name")}
-                    {renderInput("last_name", "Last Name")}
-                    {renderInput("email", "Email")}
-                    {renderInput("phone_number", "Phone Number")}
-                    <div className="flex items-center space-x-4">
-                      <label className="w-32 text-md font-semibold text-gray-800">
-                        Department
-                      </label>
-                      <select
-                        name="department_id"
-                        value={formData.department_id}
-                        onChange={(e) => handleChange(e)}
-                        className="w-full lg:w-[20rem] xl:w-[25rem] rounded-md border px-4 py-2 text-sm bg-blue-50 border-gray-200 text-gray-900$ focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="">Select Department</option>
-                        {departments.map((department) => (
-                          <option key={department.id} value={department.id}>
-                            {department.name}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.department_id && (
-                        <p className="text-red-500 text-sm">
-                          {errors.department_id}
-                        </p>
-                      )}
-                    </div>
-                    {renderInput("designation", "Designation")}
-                    <div className="flex items-center space-x-4">
-                      <label className="w-32 text-md font-semibold text-gray-800">
-                        Job Status
-                      </label>
-                      <select
-                        name="job_status"
-                        value={formData.job_status}
-                        onChange={(e) => handleChange(e)}
-                        className="w-full lg:w-[20rem] xl:w-[25rem] rounded-md border px-4 py-2 text-sm bg-blue-50 border-gray-200 text-gray-900$ focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="">Select Job Status</option>
-                        {jobStatuses.map((status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.department_id && (
-                        <p className="text-red-500 text-sm">
-                          {errors.department_id}
-                        </p>
-                      )}
-                    </div>
-                    {renderInput("hire_date", "Joining Date", "date")}
-                    <div className="flex items-center space-x-4">
-                      <label className="w-32 text-md font-semibold text-gray-800">
-                        Supervisor
-                      </label>
-                      <select
-                        value={formData.supervisor_id}
-                        name="supervisor_id"
-                        onChange={handleChange}
-                        className="w-full lg:w-[20rem] xl:w-[25rem] rounded-md border px-4 py-2 text-sm bg-blue-50 border-gray-200 text-gray-900$ focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="">Not Applicable</option>
-                        {status !== "rejected" &&
-                          employees.map((employee) => (
-                            <option key={employee.id} value={employee.id}>
-                              {employee.name}
-                            </option>
-                          ))}
-                        {status === "rejected" &&
-                          employees
-                            .filter((employee) => employee.id !== userId)
-                            .map((employee) => (
-                              <option key={employee.id} value={employee.id}>
-                                {employee.name}
-                              </option>
-                            ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-sm font-medium">
+                Submit
+              </div>
             </div>
+          </div>
+        </motion.div>
 
-            <div>
-              {status === "rejected" && (
-                <div className="mb-4 p-4 rounded-md bg-[#FF4646] text-white border border-red-300">
-                  <h2 className="text-xl font-bold">Reason for rejection:</h2>
-                  <p className="mt-2">{reason || "Reason unavailable"}</p>
-                </div>
-              )}
-              {!status || status === "rejected" ? (
-                <button
-                  type="submit"
-                  disabled={
-                    loading ||
-                    (status === "rejected" && !dirty) ||
-                    !formSchema.safeParse(formData).success
-                  }
-                  className="bg-[#192D46] text-white px-6 py-2 rounded-md hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center">
-                      <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
-                      </svg>
-                      Loading...
-                    </span>
-                  ) : status === "rejected" ? (
-                    "Resubmit"
-                  ) : (
-                    "Send for review"
-                  )}
-                </button>
-              ) : null}
+        {/* Rejected Notice */}
+        {status === "rejected" && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-8 bg-red-50 border-l-4 border-red-400 p-4 rounded-md shadow-sm"
+          >
+            <div className="flex items-start">
+              <XCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5" />
+              <div>
+                <h3 className="text-lg font-medium text-red-800">Application Rejected</h3>
+                <p className="mt-1 text-red-700">
+                  Your application was rejected for the following reason:
+                </p>
+                <p className="mt-2 text-red-600 bg-red-100 p-2 rounded font-medium">
+                  {reason || "No specific reason provided. Please reach out to HR for more details."}
+                </p>
+                <p className="mt-3 text-sm text-red-600">
+                  Please update your information and resubmit your application.
+                </p>
+              </div>
             </div>
-          </form>
+          </motion.div>
         )}
-      </main>
-    </div>
+
+        {/* Form Container */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+          <form onSubmit={handleSubmit}>
+            <AnimatePresence mode="wait">
+              {/* Company Information Section */}
+              {activeSection === "company" && (
+                <motion.div
+                  key="company"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="p-6"
+                >
+                  <div className="flex items-center mb-6">
+                    <Building2 className="h-6 w-6 text-blue-600 mr-2" />
+                    <h2 className="text-xl font-semibold text-gray-800">Company Information</h2>
+                  </div>
+                  
+                  <motion.div 
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate="visible"
+                    className="space-y-2"
+                  >
+                    {renderInputField(
+                      "company_name",
+                      "Company Name",
+                      <Building2 size={18} />,
+                      "text",
+                      !!status
+                    )}
+                    
+                    <motion.div 
+                      variants={fadeInUp}
+                      className="mb-4"
+                    >
+                      <label 
+                        htmlFor="companyCode" 
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Company Code
+                      </label>
+                      <div className="relative">
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                          <BadgeCheck size={18} />
+                        </div>
+                        <input
+                          id="companyCode"
+                          name="companyCode"
+                          value={companyCode}
+                          onChange={(e) => setCompanyCode(e.target.value)}
+                          type="text"
+                          readOnly={!!status || isCompanyCodeValid}
+                          className={`w-full pl-10 pr-4 py-2.5 text-gray-900 rounded-lg ${
+                            errors.company_code
+                              ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50" 
+                              : "border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-[#EAF4FF]"
+                          } ${(!!status || isCompanyCodeValid) ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                        />
+                        {errors.company_code && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500">
+                            <AlertCircle size={16} />
+                          </div>
+                        )}
+                      </div>
+                      {errors.company_code && (
+                        <p className="mt-1 text-sm text-red-600">{errors.company_code}</p>
+                      )}
+                    </motion.div>
+                    
+                    <motion.div 
+                      variants={fadeInUp}
+                      className="flex justify-center mt-8"
+                    >
+                      {isCompanyCodeValid ? (
+                        <button
+                          type="button"
+                          className="flex items-center justify-center w-full sm:w-auto px-6 py-2 rounded-lg bg-green-100 text-green-700 cursor-default"
+                        >
+                          <CircleCheck className="mr-2 h-5 w-5" />
+                          Verified Successfully
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={!formData.company_name || !companyCode || verifyLoading}
+                          onClick={handleValidateCompanyCode}
+                          className="flex items-center justify-center w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {verifyLoading ? (
+                            <>
+                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                              Verifying...
+                            </>
+                          ) : (
+                            <>
+                              <BadgeCheck className="mr-2 h-5 w-5" />
+                              Verify Company Code
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              )}
+
+              {/* Personal Information Section */}
+              {activeSection === "personal" && (
+                <motion.div
+                  key="personal"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="p-6"
+                >
+                  <div className="flex items-center mb-6">
+                    <User className="h-6 w-6 text-blue-600 mr-2" />
+                    <h2 className="text-xl font-semibold text-gray-800">Personal Information</h2>
+                  </div>
+                  
+                  <motion.div 
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                      {renderInputField("first_name", "First Name", <User size={18} />)}
+                      {renderInputField("last_name", "Last Name", <User size={18} />)}
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                      {renderInputField("email", "Email Address", <Mail size={18} />, "email")}
+                      {renderInputField("phone_number", "Phone Number", <Phone size={18} />)}
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                      {renderSelectField(
+                        "department_id",
+                        "Department",
+                        <Building2 size={18} />,
+                        departments.map(dept => ({ value: dept.id, label: dept.name })),
+                        "Select Department"
+                      )}
+                      
+                      {renderInputField("designation", "Designation", <Briefcase size={18} />)}
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                      {renderSelectField(
+                        "job_status",
+                        "Job Status",
+                        <Briefcase size={18} />,
+                        jobStatuses.map(status => ({ value: status, label: status })),
+                        "Select Job Status"
+                      )}
+                      
+                      {renderInputField("hire_date", "Joining Date", <Calendar size={18} />, "date")}
+                    </div>
+                    
+                    {renderSelectField(
+                      "supervisor_id",
+                      "Supervisor",
+                      <Users size={18} />,
+                      (status !== "rejected"
+                        ? employees
+                        : employees.filter(employee => employee.id !== userId)
+                      ).map(emp => ({ value: emp.id, label: emp.name })),
+                      "Not Applicable"
+                    )}
+                    
+                    <motion.div 
+                      variants={fadeInUp}
+                      className="flex justify-between mt-8"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setActiveSection("company")}
+                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        Back to Company
+                      </button>
+                      
+                      <button
+                        type="submit"
+                        disabled={loading || (status === "rejected" && !dirty)}
+                        className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            Processing...
+                          </>
+                        ) : status === "rejected" ? (
+                          <>
+                            <Send className="mr-2 h-5 w-5" />
+                            Resubmit Application
+                          </>
+                        ) : (
+                          <>
+                            <Send className="mr-2 h-5 w-5" />
+                            Submit Application
+                          </>
+                        )}
+                      </button>
+                    </motion.div>
+                    
+                    {errors.submit && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm"
+                      >
+                        <div className="flex items-start">
+                          <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                          <span>{errors.submit}</span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </form>
+        </div>
+      </div>
+    </motion.div>
   );
 }

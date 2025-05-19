@@ -7,6 +7,21 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { z } from "zod";
 import { getUserInfo } from "@/lib/auth/getUser";
 import { useTasks } from "@/hooks/useTasks";
+import { motion } from "framer-motion";
+import { 
+  Calendar, 
+  Clock, 
+  Users, 
+  Building2, 
+  ChevronDown, 
+  AlertCircle, 
+  Check,
+  X,
+  Plus,
+  Search,
+  Loader2
+} from "lucide-react";
+import { toast } from "sonner";
 
 type Task = z.infer<typeof taskSchema>;
 
@@ -68,7 +83,10 @@ export default function TaskCreateModal() {
       setIsValid(false);
       const newErrors: Partial<Task> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        const path = err.path[0] as keyof Task;
+        if (path) {
+          newErrors[path as keyof Task] = err.message as unknown as undefined;
+        }
       });
       setErrors(newErrors);
     }
@@ -83,7 +101,10 @@ export default function TaskCreateModal() {
     if (!result.success) {
       const fieldErrors: Partial<Task> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof Task] = issue.message;
+        const path = issue.path[0] as keyof Task;
+        if (path) {
+          fieldErrors[path as keyof Task] = issue.message as unknown as undefined; 
+        }
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -149,234 +170,276 @@ export default function TaskCreateModal() {
 
   return (
     <div className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Task Name
-          </label>
-          <input
-            name="task_title"
-            type="text"
-            onChange={handleChange}
-            value={task.task_title}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.task_title && (
-            <p className="text-red-500 text-sm">{errors.task_title}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Description
-          </label>
-          <textarea
-            name="task_description"
-            onChange={handleChange}
-            value={task.task_description}
-            className="w-full h-32 bg-blue-100 rounded p-3"
-          />
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Department
-          </label>
-          <div className="relative">
-            <select
-              name="department_id"
-              onChange={handleChange}
-              value={task.department_id ?? ""}
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select Department</option>
-              {departments.length > 0 &&
-                departments.map((department) => (
-                  <option key={department.id} value={department.id}>
-                    {department.name}
-                  </option>
-                ))}
-            </select>
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
-            {errors.department_id && (
-              <p className="text-red-500 text-sm">{errors.department_id}</p>
-            )}
-          </div>
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Status
-          </label>
-          <div className="relative">
-            <select
-              name="status"
-              onChange={(e) =>
-                setTask((prev) => ({
-                  ...prev,
-                  status: e.target.value === "Completed" ? true : false,
-                }))
-              }
-              value={task.status ? "Completed" : "Ongoing"}
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select status</option>
-              {["Ongoing", "Completed"].map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
-          </div>
-          {errors.status && (
-            <p className="text-red-500 text-sm">{errors.status}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Priority
-          </label>
-          <div className="relative">
-            <select
-              name="priority"
-              onChange={handleChange}
-              value={task.priority}
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select priority</option>
-              {["High", "Medium", "Low"].map((priority) => (
-                <option key={priority} value={priority}>
-                  {priority}
-                </option>
-              ))}
-            </select>
-
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
-          </div>
-          {errors.priority && (
-            <p className="text-red-500 text-sm">{errors.priority}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Start Date
-          </label>
-          <input
-            onChange={handleChange}
-            name="start_date"
-            type="date"
-            value={task.start_date}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.start_date && (
-            <p className="text-red-500 text-sm">{errors.start_date}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            End Date
-          </label>
-          <input
-            name="end_date"
-            type="date"
-            onChange={handleChange}
-            value={task.end_date}
-            min={
-              task.start_date
-                ? new Date(new Date(task.start_date).getTime() + 86400000)
-                    .toISOString()
-                    .split("T")[0]
-                : ""
-            }
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.end_date && (
-            <p className="text-red-500 text-sm">{errors.end_date}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700 mb-1">
-            Assignees
-          </label>
-
-          <div className="relative" ref={taskDropdownRef}>
+      <motion.form 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        onSubmit={handleSubmit} 
+        className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200"
+      >
+        <h2 className="text-xl font-bold text-blue-700 mb-6">Create New Task</h2>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Task Name
+            </label>
             <input
+              name="task_title"
               type="text"
-              ref={taskInputRef}
-              value={taskSearchTerm}
-              onChange={(e) => {
-                setTaskSearchTerm(e.target.value);
-                setIsTaskDropdownOpen(true);
-              }}
-              onFocus={() => setIsTaskDropdownOpen(true)}
-              placeholder="Select assignee"
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
+              onChange={handleChange}
+              value={task.task_title}
+              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
-            <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
-
-            {isTaskDropdownOpen && filteredTaskEmployees.length > 0 && (
-              <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
-                {filteredTaskEmployees.map((emp) => (
-                  <li
-                    key={emp.id}
-                    onClick={() => handleAddTaskAssignee(emp.id)}
-                    className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
-                  >
-                    {emp.name}
-                  </li>
-                ))}
-              </ul>
+            {errors.task_title && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.task_title}
+              </p>
             )}
           </div>
-
-          <div className="flex gap-2 mt-2 flex-wrap">
-            {taskAssignees.map((assignee) => {
-              const emp = employees.find((e) => e.id === assignee);
-              return (
-                <span
-                  key={assignee}
-                  className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              name="task_description"
+              onChange={handleChange}
+              value={task.task_description}
+              className="w-full h-32 rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <Building2 size={16} className="mr-2" />
+                Department
+              </label>
+              <div className="relative">
+                <select
+                  name="department_id"
+                  onChange={handleChange}
+                  value={task.department_id ?? ""}
+                  className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
                 >
-                  {emp?.name}
-                  <button
-                    type="button"
-                    className="ml-2 text-red-500"
-                    onClick={() => handleRemoveTaskAssignee(assignee)}
+                  <option value={""}>Select Department</option>
+                  {departments.length > 0 &&
+                    departments.map((department) => (
+                      <option key={department.id} value={department.id}>
+                        {department.name}
+                      </option>
+                    ))}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                {errors.department_id && (
+                  <p className="mt-1 text-red-500 text-sm flex items-center">
+                    <AlertCircle size={14} className="mr-1" />
+                    {errors.department_id}
+                  </p>
+                )}
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <Clock size={16} className="mr-2" />
+                Status
+              </label>
+              <div className="relative">
+                <select
+                  name="status"
+                  onChange={(e) =>
+                    setTask((prev) => ({
+                      ...prev,
+                      status: e.target.value === "Completed" ? true : false,
+                    }))
+                  }
+                  value={task.status ? "Completed" : "Ongoing"}
+                  className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                >
+                  <option value={""}>Select status</option>
+                  {["Ongoing", "Completed"].map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Priority
+            </label>
+            <div className="flex gap-4">
+              {["High", "Medium", "Low"].map((priority) => (
+                <label 
+                  key={priority} 
+                  className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition ${
+                    task.priority === priority 
+                      ? 'bg-blue-50 border border-blue-200' 
+                      : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="priority"
+                    value={priority}
+                    checked={task.priority === priority}
+                    onChange={handleChange}
+                    className="sr-only"
+                  />
+                  <span className={`w-3 h-3 rounded-full ${
+                    priority === 'High' ? 'bg-red-500' : 
+                    priority === 'Medium' ? 'bg-yellow-500' : 'bg-green-500'
+                  }`}></span>
+                  <span>{priority}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <Calendar size={16} className="mr-2" />
+                Start Date
+              </label>
+              <input
+                onChange={handleChange}
+                name="start_date"
+                type="date"
+                value={task.start_date}
+                className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              />
+              {errors.start_date && (
+                <p className="mt-1 text-red-500 text-sm flex items-center">
+                  <AlertCircle size={14} className="mr-1" />
+                  {errors.start_date}
+                </p>
+              )}
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <Calendar size={16} className="mr-2" />
+                End Date
+              </label>
+              <input
+                name="end_date"
+                type="date"
+                onChange={handleChange}
+                value={task.end_date}
+                min={
+                  task.start_date
+                    ? new Date(new Date(task.start_date).getTime() + 86400000)
+                        .toISOString()
+                        .split("T")[0]
+                    : ""
+                }
+                className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              />
+              {errors.end_date && (
+                <p className="mt-1 text-red-500 text-sm flex items-center">
+                  <AlertCircle size={14} className="mr-1" />
+                  {errors.end_date}
+                </p>
+              )}
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+              <Users size={16} className="mr-2" />
+              Assignees
+            </label>
+
+            <div className="relative" ref={taskDropdownRef}>
+              <div className="flex items-center border border-gray-300 bg-gray-50 rounded-md focus-within:ring focus-within:ring-blue-200 transition-shadow">
+                <Search size={16} className="ml-3 text-gray-400" />
+                <input
+                  type="text"
+                  ref={taskInputRef}
+                  value={taskSearchTerm}
+                  onChange={(e) => {
+                    setTaskSearchTerm(e.target.value);
+                    setIsTaskDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsTaskDropdownOpen(true)}
+                  placeholder="Search for employees..."
+                  className="w-full p-2 bg-transparent border-none focus:outline-none"
+                />
+              </div>
+
+              {isTaskDropdownOpen && filteredTaskEmployees.length > 0 && (
+                <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  {filteredTaskEmployees.map((emp) => (
+                    <motion.li
+                      key={emp.id}
+                      onClick={() => handleAddTaskAssignee(emp.id)}
+                      className="cursor-pointer px-4 py-2 hover:bg-blue-50 text-sm flex items-center gap-2"
+                      whileHover={{ x: 5 }}
+                    >
+                      <Plus size={14} className="text-blue-500" />
+                      {emp.name}
+                    </motion.li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="flex gap-2 mt-2 flex-wrap">
+              {taskAssignees.map((assignee) => {
+                const emp = employees.find((e) => e.id === assignee);
+                return (
+                  <motion.span
+                    key={assignee}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center"
                   >
-                    &times;
-                  </button>
-                </span>
-              );
-            })}
+                    {emp?.name}
+                    <motion.button
+                      whileHover={{ scale: 1.2 }}
+                      type="button"
+                      className="ml-2 text-blue-700 hover:text-red-500 transition-colors"
+                      onClick={() => handleRemoveTaskAssignee(assignee)}
+                    >
+                      <X size={14} />
+                    </motion.button>
+                  </motion.span>
+                );
+              })}
+            </div>
           </div>
         </div>
-        <div className="flex justify-end gap-4">
-          <button
+        
+        <div className="pt-4 flex justify-end">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={!isValid || isSubmitting}
-            className={
-              "bg-[#192D46] text-white px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-            }
+            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </button>
+            {isSubmitting ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                <span>Creating...</span>
+              </>
+            ) : (
+              <>
+                <Check size={18} />
+                <span>Create Task</span>
+              </>
+            )}
+          </motion.button>
         </div>
-      </form>
+      </motion.form>
     </div>
   );
 }
@@ -424,7 +487,10 @@ export function TaskUpdateModal({
       setIsValid(false);
       const newErrors: Partial<Task> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        const path = err.path[0] as keyof Task;
+        if (path) {
+          newErrors[path as keyof Task] = err.message as unknown as undefined;
+        }
       });
       setErrors(newErrors);
     }
@@ -438,7 +504,10 @@ export function TaskUpdateModal({
     if (!result.success) {
       const fieldErrors: Partial<Task> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof Task] = issue.message;
+        const path = issue.path[0] as keyof Task;
+        if (path) {
+          fieldErrors[path as keyof Task] = issue.message as unknown as undefined;
+        }
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -462,7 +531,11 @@ export function TaskUpdateModal({
     if (initialData) {
       const { project_id, milestone_id, ...rest } = initialData;
       setTask(rest);
-      setTaskAssignees(rest.assignees);
+      if (rest.assignees) {
+        setTaskAssignees(rest.assignees);
+      } else {
+        setTaskAssignees([]);
+      }
     }
   }, [initialData]);
 
@@ -507,242 +580,286 @@ export function TaskUpdateModal({
 
   return (
     <div className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Task Name
-          </label>
-          <input
-            name="task_title"
-            type="text"
-            onChange={handleChange}
-            value={task.task_title}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.task_title && (
-            <p className="text-red-500 text-sm">{errors.task_title}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Description
-          </label>
-          <textarea
-            name="task_description"
-            onChange={handleChange}
-            value={task.task_description}
-            className="w-full h-32 bg-blue-100 rounded p-3"
-          />
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Department
-          </label>
-          <div className="relative">
-            <select
-              name="department_id"
-              onChange={handleChange}
-              value={task.department_id ?? ""}
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select Department</option>
-              {departments.length > 0 &&
-                departments.map((department) => (
-                  <option key={department.id} value={department.id}>
-                    {department.name}
-                  </option>
-                ))}
-            </select>
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
-            {errors.department_id && (
-              <p className="text-red-500 text-sm">{errors.department_id}</p>
-            )}
-          </div>
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Priority
-          </label>
-          <div className="relative">
-            <select
-              name="priority"
-              onChange={handleChange}
-              value={task.priority}
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select priority</option>
-              {["High", "Medium", "Low"].map((priority) => (
-                <option key={priority} value={priority}>
-                  {priority}
-                </option>
-              ))}
-            </select>
-
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
-          </div>
-          {errors.priority && (
-            <p className="text-red-500 text-sm">{errors.priority}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Status
-          </label>
-          <div className="relative">
-            <select
-              name="status"
-              onChange={(e) =>
-                setTask((prev) => ({
-                  ...prev,
-                  status: e.target.value === "Completed" ? true : false,
-                }))
-              }
-              value={task.status ? "Completed" : "Ongoing"}
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select status</option>
-              {["Ongoing", "Completed"].map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
-          </div>
-          {errors.status && (
-            <p className="text-red-500 text-sm">{errors.status}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Start Date
-          </label>
-          <input
-            onChange={handleChange}
-            name="start_date"
-            type="date"
-            value={task.start_date}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.start_date && (
-            <p className="text-red-500 text-sm">{errors.start_date}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            End Date
-          </label>
-          <input
-            name="end_date"
-            type="date"
-            onChange={handleChange}
-            value={task.end_date}
-            min={
-              task.start_date
-                ? new Date(new Date(task.start_date).getTime() + 86400000)
-                    .toISOString()
-                    .split("T")[0]
-                : ""
-            }
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.end_date && (
-            <p className="text-red-500 text-sm">{errors.end_date}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700 mb-1">
-            Assignees
-          </label>
-
-          <div className="relative" ref={taskDropdownRef}>
+      <motion.form 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        onSubmit={handleSubmit} 
+        className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200"
+      >
+        <h2 className="text-xl font-bold text-blue-700 mb-6">Update Task</h2>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Task Name
+            </label>
             <input
+              name="task_title"
               type="text"
-              ref={taskInputRef}
-              value={taskSearchTerm}
-              onChange={(e) => {
-                setTaskSearchTerm(e.target.value);
-                setIsTaskDropdownOpen(true);
-              }}
-              onFocus={() => setIsTaskDropdownOpen(true)}
-              placeholder="Select assignee"
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
+              onChange={handleChange}
+              value={task.task_title}
+              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
-            <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
-
-            {isTaskDropdownOpen && filteredTaskEmployees.length > 0 && (
-              <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
-                {filteredTaskEmployees.map((emp) => (
-                  <li
-                    key={emp.id}
-                    onClick={() => handleAddTaskAssignee(emp.id)}
-                    className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
-                  >
-                    {emp.name}
-                  </li>
-                ))}
-              </ul>
+            {errors.task_title && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.task_title}
+              </p>
             )}
           </div>
-
-          <div className="flex gap-2 mt-2 flex-wrap">
-            {taskAssignees.map((assignee) => {
-              const emp = employees.find((e) => e.id === assignee);
-              return (
-                <span
-                  key={assignee}
-                  className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              name="task_description"
+              onChange={handleChange}
+              value={task.task_description}
+              className="w-full h-32 rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <Building2 size={16} className="mr-2" />
+                Department
+              </label>
+              <div className="relative">
+                <select
+                  name="department_id"
+                  onChange={handleChange}
+                  value={task.department_id ?? ""}
+                  className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
                 >
-                  {emp?.name}
-                  <button
-                    type="button"
-                    className="ml-2 text-red-500"
-                    onClick={() => handleRemoveTaskAssignee(assignee)}
+                  <option value={""}>Select Department</option>
+                  {departments.length > 0 &&
+                    departments.map((department) => (
+                      <option key={department.id} value={department.id}>
+                        {department.name}
+                      </option>
+                    ))}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                {errors.department_id && (
+                  <p className="mt-1 text-red-500 text-sm flex items-center">
+                    <AlertCircle size={14} className="mr-1" />
+                    {errors.department_id}
+                  </p>
+                )}
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <Clock size={16} className="mr-2" />
+                Status
+              </label>
+              <div className="relative">
+                <select
+                  name="status"
+                  onChange={(e) =>
+                    setTask((prev) => ({
+                      ...prev,
+                      status: e.target.value === "Completed" ? true : false,
+                    }))
+                  }
+                  value={task.status ? "Completed" : "Ongoing"}
+                  className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                >
+                  <option value={""}>Select status</option>
+                  {["Ongoing", "Completed"].map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Priority
+            </label>
+            <div className="flex gap-4">
+              {["High", "Medium", "Low"].map((priority) => (
+                <label 
+                  key={priority} 
+                  className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition ${
+                    task.priority === priority 
+                      ? 'bg-blue-50 border border-blue-200' 
+                      : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="priority"
+                    value={priority}
+                    checked={task.priority === priority}
+                    onChange={handleChange}
+                    className="sr-only"
+                  />
+                  <span className={`w-3 h-3 rounded-full ${
+                    priority === 'High' ? 'bg-red-500' : 
+                    priority === 'Medium' ? 'bg-yellow-500' : 'bg-green-500'
+                  }`}></span>
+                  <span>{priority}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <Calendar size={16} className="mr-2" />
+                Start Date
+              </label>
+              <input
+                onChange={handleChange}
+                name="start_date"
+                type="date"
+                value={task.start_date}
+                className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              />
+              {errors.start_date && (
+                <p className="mt-1 text-red-500 text-sm flex items-center">
+                  <AlertCircle size={14} className="mr-1" />
+                  {errors.start_date}
+                </p>
+              )}
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <Calendar size={16} className="mr-2" />
+                End Date
+              </label>
+              <input
+                name="end_date"
+                type="date"
+                onChange={handleChange}
+                value={task.end_date}
+                min={
+                  task.start_date
+                    ? new Date(new Date(task.start_date).getTime() + 86400000)
+                        .toISOString()
+                        .split("T")[0]
+                    : ""
+                }
+                className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              />
+              {errors.end_date && (
+                <p className="mt-1 text-red-500 text-sm flex items-center">
+                  <AlertCircle size={14} className="mr-1" />
+                  {errors.end_date}
+                </p>
+              )}
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+              <Users size={16} className="mr-2" />
+              Assignees
+            </label>
+
+            <div className="relative" ref={taskDropdownRef}>
+              <div className="flex items-center border border-gray-300 bg-gray-50 rounded-md focus-within:ring focus-within:ring-blue-200 transition-shadow">
+                <Search size={16} className="ml-3 text-gray-400" />
+                <input
+                  type="text"
+                  ref={taskInputRef}
+                  value={taskSearchTerm}
+                  onChange={(e) => {
+                    setTaskSearchTerm(e.target.value);
+                    setIsTaskDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsTaskDropdownOpen(true)}
+                  placeholder="Search for employees..."
+                  className="w-full p-2 bg-transparent border-none focus:outline-none"
+                />
+              </div>
+
+              {isTaskDropdownOpen && filteredTaskEmployees.length > 0 && (
+                <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  {filteredTaskEmployees.map((emp) => (
+                    <motion.li
+                      key={emp.id}
+                      onClick={() => handleAddTaskAssignee(emp.id)}
+                      className="cursor-pointer px-4 py-2 hover:bg-blue-50 text-sm flex items-center gap-2"
+                      whileHover={{ x: 5 }}
+                    >
+                      <Plus size={14} className="text-blue-500" />
+                      {emp.name}
+                    </motion.li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="flex gap-2 mt-2 flex-wrap">
+              {taskAssignees.map((assignee) => {
+                const emp = employees.find((e) => e.id === assignee);
+                return (
+                  <motion.span
+                    key={assignee}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center"
                   >
-                    &times;
-                  </button>
-                </span>
-              );
-            })}
+                    {emp?.name}
+                    <motion.button
+                      whileHover={{ scale: 1.2 }}
+                      type="button"
+                      className="ml-2 text-blue-700 hover:text-red-500 transition-colors"
+                      onClick={() => handleRemoveTaskAssignee(assignee)}
+                    >
+                      <X size={14} />
+                    </motion.button>
+                  </motion.span>
+                );
+              })}
+            </div>
           </div>
         </div>
-        <div className="flex justify-end gap-4">
-          <button
+        
+        <div className="pt-4 flex justify-end">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             type="button"
             disabled={isSubmitting}
             onClick={onClose}
-            className="bg-yellow-500 px-4 py-2 rounded-md"
+            className="flex items-center gap-2 bg-yellow-500 text-white px-6 py-2 rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Back
-          </button>
-          <button
+            <span>Back</span>
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={!isValid || isSubmitting}
-            className={
-              "bg-[#192D46] text-white px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-            }
+            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Updating..." : "Update"}
-          </button>
+            {isSubmitting ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                <span>Updating...</span>
+              </>
+            ) : (
+              <>
+                <Check size={18} />
+                <span>Update Task</span>
+              </>
+            )}
+          </motion.button>
         </div>
-      </form>
+      </motion.form>
     </div>
   );
 }

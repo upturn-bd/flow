@@ -5,6 +5,20 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { taskSchema } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
 import { getCompanyId } from "@/lib/auth/getUser";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Calendar, 
+  Clock, 
+  Users, 
+  FileText, 
+  AlertCircle, 
+  X, 
+  Check,
+  ChevronDown,
+  AlertOctagon,
+  User
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface TaskCreateModalProps {
   milestoneId: number;
@@ -39,7 +53,7 @@ export default function TaskCreateModal({
   const { employees, fetchEmployees } = useEmployees();
   const [task, setTask] = useState<Task>(initialTask);
   const [taskAssignees, setTaskAssignees] = useState<string[]>([]);
-  const [errors, setErrors] = useState<Partial<Task>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isTaskValid, setIsTaskValid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -49,9 +63,10 @@ export default function TaskCreateModal({
     const result = taskSchema.safeParse(task);
 
     if (!result.success) {
-      const fieldErrors: Partial<Task> = {};
+      const fieldErrors: Record<string, string> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof Task] = issue.message;
+        const path = issue.path[0].toString();
+        fieldErrors[path] = issue.message;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -60,14 +75,21 @@ export default function TaskCreateModal({
 
     setErrors({});
     const company_id = await getCompanyId();
-    const formattedData = {
-      ...result.data,
-      company_id,
-    };
-    onSubmit(formattedData);
-    setTask(initialTask);
-    setTaskAssignees([]);
-    setIsSubmitting(false);
+    try {
+      const formattedData = {
+        ...result.data,
+        company_id,
+      };
+      onSubmit(formattedData);
+      toast.success("Task created successfully");
+      setTask(initialTask);
+      setTaskAssignees([]);
+    } catch (error) {
+      toast.error("Failed to create task");
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -97,9 +119,10 @@ export default function TaskCreateModal({
       setErrors({});
     } else {
       setIsTaskValid(false);
-      const newErrors: Partial<Task> = {};
+      const newErrors: Record<string, string> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        const path = err.path[0].toString();
+        newErrors[path] = err.message;
       });
       setErrors(newErrors);
     }
@@ -157,180 +180,232 @@ export default function TaskCreateModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
-      <form
-        onSubmit={handleSubmit}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
         className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto"
       >
-        <h2 className="text-xl font-semibold">Add task</h2>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Task Title
-          </label>
-          <input
-            name="task_title"
-            type="text"
-            onChange={handleChange}
-            value={task.task_title}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.task_title && (
-            <p className="text-red-500 text-sm">{errors.task_title}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Description
-          </label>
-          <textarea
-            name="task_description"
-            onChange={handleChange}
-            value={task.task_description}
-            className="w-full h-32 bg-blue-100 rounded p-3"
-          />
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Start Date
-          </label>
-          <input
-            onChange={handleChange}
-            name="start_date"
-            type="date"
-            value={task.start_date}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.start_date && (
-            <p className="text-red-500 text-sm">{errors.start_date}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            End Date
-          </label>
-          <input
-            name="end_date"
-            type="date"
-            onChange={handleChange}
-            value={task.end_date}
-            min={
-              task.start_date
-                ? new Date(new Date(task.start_date).getTime() + 86400000)
-                    .toISOString()
-                    .split("T")[0]
-                : ""
-            }
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.end_date && (
-            <p className="text-red-500 text-sm">{errors.end_date}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700 mb-1">
-            Assignees
-          </label>
-
-          <div className="relative" ref={taskDropdownRef}>
+        <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+          <FileText size={20} className="mr-2 text-blue-600" />
+          Add Task
+        </h2>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Task Title
+            </label>
             <input
+              name="task_title"
               type="text"
-              ref={taskInputRef}
-              value={taskSearchTerm}
-              onChange={(e) => {
-                setTaskSearchTerm(e.target.value);
-                setIsTaskDropdownOpen(true);
-              }}
-              onFocus={() => setIsTaskDropdownOpen(true)}
-              placeholder="Select assignee"
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
+              onChange={handleChange}
+              value={task.task_title}
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
-            <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
-
-            {isTaskDropdownOpen && filteredTaskEmployees.length > 0 && (
-              <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
-                {filteredTaskEmployees.map((emp) => (
-                  <li
-                    key={emp.id}
-                    onClick={() => handleAddTaskAssignee(emp.id)}
-                    className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
-                  >
-                    {emp.name}
-                  </li>
-                ))}
-              </ul>
+            {errors.task_title && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.task_title}
+              </p>
             )}
           </div>
-
-          <div className="flex gap-2 mt-2 flex-wrap">
-            {taskAssignees.map((assignee) => {
-              const emp = employees.find((e) => e.id === assignee);
-              return (
-                <span
-                  key={assignee}
-                  className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
-                >
-                  {emp?.name}
-                  <button
-                    type="button"
-                    className="ml-2 text-red-500"
-                    onClick={() => handleRemoveTaskAssignee(assignee)}
-                  >
-                    &times;
-                  </button>
-                </span>
-              );
-            })}
-          </div>
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Priority
-          </label>
-          <div className="relative">
-            <select
-              name="priority"
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              name="task_description"
               onChange={handleChange}
-              value={task.priority}
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select priority</option>
-              {["High", "Medium", "Low"].map((priority) => (
-                <option key={priority} value={priority}>
-                  {priority}
-                </option>
-              ))}
-            </select>
+              value={task.task_description}
+              className="w-full h-32 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center">
+                <Calendar size={16} className="mr-2" />
+                Start Date
+              </div>
+            </label>
+            <input
+              onChange={handleChange}
+              name="start_date"
+              type="date"
+              value={task.start_date}
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+            {errors.start_date && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.start_date}
+              </p>
+            )}
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center">
+                <Calendar size={16} className="mr-2" />
+                End Date
+              </div>
+            </label>
+            <input
+              name="end_date"
+              type="date"
+              onChange={handleChange}
+              value={task.end_date}
+              min={
+                task.start_date
+                  ? new Date(new Date(task.start_date).getTime() + 86400000)
+                      .toISOString()
+                      .split("T")[0]
+                  : ""
+              }
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+            {errors.end_date && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.end_date}
+              </p>
+            )}
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center">
+                <Users size={16} className="mr-2" />
+                Assignees
+              </div>
+            </label>
 
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
+            <div className="relative" ref={taskDropdownRef}>
+              <input
+                type="text"
+                ref={taskInputRef}
+                value={taskSearchTerm}
+                onChange={(e) => {
+                  setTaskSearchTerm(e.target.value);
+                  setIsTaskDropdownOpen(true);
+                }}
+                onFocus={() => setIsTaskDropdownOpen(true)}
+                placeholder="Search for employees..."
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 pr-10"
+              />
+              <User 
+                size={16} 
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+              />
+
+              <AnimatePresence>
+                {isTaskDropdownOpen && filteredTaskEmployees.length > 0 && (
+                  <motion.ul
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                  >
+                    {filteredTaskEmployees.map((emp) => (
+                      <motion.li
+                        key={emp.id}
+                        onClick={() => handleAddTaskAssignee(emp.id)}
+                        whileHover={{ backgroundColor: "#f3f4f6" }}
+                        className="cursor-pointer px-4 py-2 hover:bg-gray-100 text-sm"
+                      >
+                        {emp.name}
+                      </motion.li>
+                    ))}
+                  </motion.ul>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <div className="flex gap-2 mt-2 flex-wrap">
+              <AnimatePresence>
+                {taskAssignees.map((assignee) => {
+                  const emp = employees.find((e) => e.id === assignee);
+                  return (
+                    <motion.span
+                      key={assignee}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-sm flex items-center"
+                    >
+                      {emp?.name}
+                      <button
+                        type="button"
+                        className="ml-2 text-blue-500 hover:text-blue-700"
+                        onClick={() => handleRemoveTaskAssignee(assignee)}
+                      >
+                        <X size={14} />
+                      </button>
+                    </motion.span>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           </div>
-          {errors.priority && (
-            <p className="text-red-500 text-sm">{errors.priority}</p>
-          )}
-        </div>
-        <div className="mt-8 flex justify-end space-x-4">
-          <button
-            type="button"
-            className="px-4 py-2 bg-[#FFC700] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onClick={onClose}
-          >
-            Back
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!isTaskValid || isSubmitting}
-          >
-            Save
-          </button>
-        </div>
-      </form>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center">
+                <AlertOctagon size={16} className="mr-2" />
+                Priority
+              </div>
+            </label>
+            <div className="relative">
+              <select
+                name="priority"
+                onChange={handleChange}
+                value={task.priority}
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 appearance-none pr-10"
+              >
+                <option value={""}>Select priority</option>
+                {["High", "Medium", "Low"].map((priority) => (
+                  <option key={priority} value={priority}>
+                    {priority}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+            </div>
+            {errors.priority && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.priority}
+              </p>
+            )}
+          </div>
+          
+          <div className="mt-8 flex justify-end space-x-4">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="button"
+              className="flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors"
+              onClick={onClose}
+            >
+              <X size={16} className="mr-2" />
+              Cancel
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              className="flex items-center px-4 py-2 bg-blue-600 rounded-md text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!isTaskValid || isSubmitting}
+            >
+              <Check size={16} className="mr-2" />
+              {isSubmitting ? "Creating..." : "Create Task"}
+            </motion.button>
+          </div>
+        </form>
+      </motion.div>
     </div>
   );
 }
@@ -343,10 +418,9 @@ export function TaskUpdateModal({
   const { employees, fetchEmployees } = useEmployees();
   const [task, setTask] = useState<Task>(initialTask);
   const [taskAssignees, setTaskAssignees] = useState<string[]>([]);
-  const [errors, setErrors] = useState<Partial<Task>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isTaskValid, setIsTaskValid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -354,9 +428,10 @@ export function TaskUpdateModal({
     const result = taskSchema.safeParse(task);
 
     if (!result.success) {
-      const fieldErrors: Partial<Task> = {};
+      const fieldErrors: Record<string, string> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof Task] = issue.message;
+        const path = issue.path[0].toString();
+        fieldErrors[path] = issue.message;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -364,8 +439,15 @@ export function TaskUpdateModal({
     }
 
     setErrors({});
-    onSubmit(result.data);
-    setIsSubmitting(false);
+    try {
+      onSubmit(result.data);
+      toast.success("Task updated successfully");
+    } catch (error) {
+      toast.error("Failed to update task");
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -395,17 +477,15 @@ export function TaskUpdateModal({
       setErrors({});
     } else {
       setIsTaskValid(false);
-      const newErrors: Partial<Task> = {};
+      const newErrors: Record<string, string> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        const path = err.path[0].toString();
+        newErrors[path] = err.message;
       });
       setErrors(newErrors);
     }
   }, [task]);
 
-  useEffect(() => {
-    console.log("Errors: ", errors);
-  }, [errors]);
   useEffect(() => {
     setTask(initialData);
     setTaskAssignees(initialData.assignees || []);
@@ -455,180 +535,232 @@ export function TaskUpdateModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
-      <form
-        onSubmit={handleSubmit}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
         className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto"
       >
-        <h2 className="text-xl font-semibold">Add task</h2>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Task Title
-          </label>
-          <input
-            name="task_title"
-            type="text"
-            onChange={handleChange}
-            value={task.task_title}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.task_title && (
-            <p className="text-red-500 text-sm">{errors.task_title}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Description
-          </label>
-          <textarea
-            name="task_description"
-            onChange={handleChange}
-            value={task.task_description}
-            className="w-full h-32 bg-blue-100 rounded p-3"
-          />
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Start Date
-          </label>
-          <input
-            onChange={handleChange}
-            name="start_date"
-            type="date"
-            value={task.start_date}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.start_date && (
-            <p className="text-red-500 text-sm">{errors.start_date}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            End Date
-          </label>
-          <input
-            name="end_date"
-            type="date"
-            onChange={handleChange}
-            value={task.end_date}
-            min={
-              task.start_date
-                ? new Date(new Date(task.start_date).getTime() + 86400000)
-                    .toISOString()
-                    .split("T")[0]
-                : ""
-            }
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.end_date && (
-            <p className="text-red-500 text-sm">{errors.end_date}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700 mb-1">
-            Assignees
-          </label>
-
-          <div className="relative" ref={taskDropdownRef}>
+        <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+          <FileText size={20} className="mr-2 text-blue-600" />
+          Update Task
+        </h2>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Task Title
+            </label>
             <input
+              name="task_title"
               type="text"
-              ref={taskInputRef}
-              value={taskSearchTerm}
-              onChange={(e) => {
-                setTaskSearchTerm(e.target.value);
-                setIsTaskDropdownOpen(true);
-              }}
-              onFocus={() => setIsTaskDropdownOpen(true)}
-              placeholder="Select assignee"
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
+              onChange={handleChange}
+              value={task.task_title}
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
-            <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
-
-            {isTaskDropdownOpen && filteredTaskEmployees.length > 0 && (
-              <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
-                {filteredTaskEmployees.map((emp) => (
-                  <li
-                    key={emp.id}
-                    onClick={() => handleAddTaskAssignee(emp.id)}
-                    className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
-                  >
-                    {emp.name}
-                  </li>
-                ))}
-              </ul>
+            {errors.task_title && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.task_title}
+              </p>
             )}
           </div>
-
-          <div className="flex gap-2 mt-2 flex-wrap">
-            {taskAssignees.map((assignee) => {
-              const emp = employees.find((e) => e.id === assignee);
-              return (
-                <span
-                  key={assignee}
-                  className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
-                >
-                  {emp?.name}
-                  <button
-                    type="button"
-                    className="ml-2 text-red-500"
-                    onClick={() => handleRemoveTaskAssignee(assignee)}
-                  >
-                    &times;
-                  </button>
-                </span>
-              );
-            })}
-          </div>
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Priority
-          </label>
-          <div className="relative">
-            <select
-              name="priority"
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              name="task_description"
               onChange={handleChange}
-              value={task.priority}
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select priority</option>
-              {["High", "Medium", "Low"].map((priority) => (
-                <option key={priority} value={priority}>
-                  {priority}
-                </option>
-              ))}
-            </select>
+              value={task.task_description}
+              className="w-full h-32 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center">
+                <Calendar size={16} className="mr-2" />
+                Start Date
+              </div>
+            </label>
+            <input
+              onChange={handleChange}
+              name="start_date"
+              type="date"
+              value={task.start_date}
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+            {errors.start_date && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.start_date}
+              </p>
+            )}
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center">
+                <Calendar size={16} className="mr-2" />
+                End Date
+              </div>
+            </label>
+            <input
+              name="end_date"
+              type="date"
+              onChange={handleChange}
+              value={task.end_date}
+              min={
+                task.start_date
+                  ? new Date(new Date(task.start_date).getTime() + 86400000)
+                      .toISOString()
+                      .split("T")[0]
+                  : ""
+              }
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+            {errors.end_date && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.end_date}
+              </p>
+            )}
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center">
+                <Users size={16} className="mr-2" />
+                Assignees
+              </div>
+            </label>
 
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
+            <div className="relative" ref={taskDropdownRef}>
+              <input
+                type="text"
+                ref={taskInputRef}
+                value={taskSearchTerm}
+                onChange={(e) => {
+                  setTaskSearchTerm(e.target.value);
+                  setIsTaskDropdownOpen(true);
+                }}
+                onFocus={() => setIsTaskDropdownOpen(true)}
+                placeholder="Search for employees..."
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 pr-10"
+              />
+              <User 
+                size={16} 
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+              />
+
+              <AnimatePresence>
+                {isTaskDropdownOpen && filteredTaskEmployees.length > 0 && (
+                  <motion.ul
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                  >
+                    {filteredTaskEmployees.map((emp) => (
+                      <motion.li
+                        key={emp.id}
+                        onClick={() => handleAddTaskAssignee(emp.id)}
+                        whileHover={{ backgroundColor: "#f3f4f6" }}
+                        className="cursor-pointer px-4 py-2 hover:bg-gray-100 text-sm"
+                      >
+                        {emp.name}
+                      </motion.li>
+                    ))}
+                  </motion.ul>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <div className="flex gap-2 mt-2 flex-wrap">
+              <AnimatePresence>
+                {taskAssignees.map((assignee) => {
+                  const emp = employees.find((e) => e.id === assignee);
+                  return (
+                    <motion.span
+                      key={assignee}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-sm flex items-center"
+                    >
+                      {emp?.name}
+                      <button
+                        type="button"
+                        className="ml-2 text-blue-500 hover:text-blue-700"
+                        onClick={() => handleRemoveTaskAssignee(assignee)}
+                      >
+                        <X size={14} />
+                      </button>
+                    </motion.span>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           </div>
-          {errors.priority && (
-            <p className="text-red-500 text-sm">{errors.priority}</p>
-          )}
-        </div>
-        <div className="mt-8 flex justify-end space-x-4">
-          <button
-            type="button"
-            className="px-4 py-2 bg-[#FFC700] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onClick={onClose}
-          >
-            Back
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!isTaskValid || isSubmitting}
-          >
-            Update
-          </button>
-        </div>
-      </form>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center">
+                <AlertOctagon size={16} className="mr-2" />
+                Priority
+              </div>
+            </label>
+            <div className="relative">
+              <select
+                name="priority"
+                onChange={handleChange}
+                value={task.priority}
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 appearance-none pr-10"
+              >
+                <option value={""}>Select priority</option>
+                {["High", "Medium", "Low"].map((priority) => (
+                  <option key={priority} value={priority}>
+                    {priority}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+            </div>
+            {errors.priority && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.priority}
+              </p>
+            )}
+          </div>
+          
+          <div className="mt-8 flex justify-end space-x-4">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="button"
+              className="flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors"
+              onClick={onClose}
+            >
+              <X size={16} className="mr-2" />
+              Cancel
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              className="flex items-center px-4 py-2 bg-blue-600 rounded-md text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!isTaskValid || isSubmitting}
+            >
+              <Check size={16} className="mr-2" />
+              {isSubmitting ? "Updating..." : "Update Task"}
+            </motion.button>
+          </div>
+        </form>
+      </motion.div>
     </div>
   );
 }
