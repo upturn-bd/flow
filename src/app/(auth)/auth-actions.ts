@@ -69,20 +69,32 @@ function getSiteUrl(){
 
 export async function googleSignIn(){
   const supabase = await createClient();
+  const redirectUrl = `${getSiteUrl()}/auth/callback`;
 
-  const response = await supabase.auth.signInWithOAuth({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options:{
-      redirectTo: getSiteUrl() + "/auth/callback",
+      redirectTo: redirectUrl,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
     }
   });
-
-  const error = response.error;
 
   if (error) {
     throw error;
   }
 
+  // This will be the full URL with the OAuth provider's auth URL
+  return redirect(data.url);
+}
+
+export async function signOut() {
+  const supabase = await createClient();
+  
+  await supabase.auth.signOut();
+  
   revalidatePath("/", "layout");
-  redirect(response.data.url);
+  redirect("/signin");
 }

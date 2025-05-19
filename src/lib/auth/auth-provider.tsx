@@ -48,8 +48,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       
       // Fetch employee data when user changes
       if (currentUser) {
+        
         setEmployeeLoading(true);
         try {
+          console.log("currentUser", currentUser);
           const info = await getUserInfo();
           if (isMounted && info) {
             // Map getUserInfo result to EmployeeInfo
@@ -84,41 +86,40 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       }
     });
 
-    // // Get initial session
-    // supabase.auth.getUser().then(({ data }) => {
-    //   const currentUser = data.user ?? null;
-    //   setUser(currentUser);
-    //   setLoading(false);
+    // Get initial session
+    supabase.auth.getUser().then(({ data }) => {
+      const currentUser = data.user ?? null;
+      setUser(currentUser);
+      setLoading(false);
       
-    //   // Fetch employee data for initial user
-    //   if (currentUser && isMounted) {
-    //     setEmployeeLoading(true);
-    //     getUserInfo()
-    //       .then(info => {
-    //         if (isMounted && info) {
-    //           setEmployee({
-    //             has_approval: info.has_approval ?? '',
-    //             role: info.role,
-    //             rejection_reason: info.rejection_reason ?? null,
-    //             id: info.id,
-    //             name: info.name,
-    //             company_id: info.company_id,
-    //             supervisor_id: info.supervisor_id,
-    //             department_id: info.department_id,
-    //           });
-    //         }
-    //       })
-    //       .catch(() => {
-    //         if (isMounted) setEmployee(null);
-    //       })
-    //       .finally(() => {
-    //         if (isMounted) setEmployeeLoading(false);
-    //       });
-    //   } else {
-    //     if (isMounted) setEmployee(null);
-    //     // log out the user 
-    //   }
-    // });
+      // Fetch employee data for initial user
+      if (currentUser && isMounted) {
+        setEmployeeLoading(true);
+        getUserInfo()
+          .then(info => {
+            if (isMounted && info) {
+              setEmployee({
+                has_approval: info.has_approval ?? '',
+                role: info.role,
+                rejection_reason: info.rejection_reason ?? null,
+                id: info.id,
+                name: info.name,
+                company_id: info.company_id,
+                supervisor_id: info.supervisor_id,
+                department_id: info.department_id,
+              });
+            }
+          })
+          .catch(() => {
+            if (isMounted) setEmployee(null);
+          })
+          .finally(() => {
+            if (isMounted) setEmployeeLoading(false);
+          });
+      } else {
+        if (isMounted) setEmployee(null);
+      }
+    });
 
     return () => {
       isMounted = false;
@@ -212,52 +213,45 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     return data;
   }, []);
 
-  /**
- * Get the current user's employee info (id, name, role, company_id, supervisor_id, department_id).
- */
-async function getUserInfo(): Promise<{
-  id: string;
-  name: string;
-  role: string;
-  company_id: number;
-  supervisor_id: string | null;
-  department_id: number | null;
-  has_approval: string;
-  rejection_reason: string | null;
-} | null> {
-  try{
-    console.log("getting user");
+  const getUserInfo = async (): Promise<{
+    id: string;
+    name: string;
+    role: string;
+    company_id: number;
+    supervisor_id: string | null;
+    department_id: number | null;
+    has_approval: string;
+    rejection_reason: string | null;
+  } | null> => {
     try{
-      const session = await supabase.auth.getSession();
-      console.log("session", session);
-    }catch (err){
-      console.error("Error getting user", err);
+      console.log("Getting user info...");
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      console.log("Auth user:", user);
+      if (!user) throw new Error("User not found");
+      const { data, error } = await supabase
+        .from("employees")
+        .select("id, first_name, last_name, role, company_id, supervisor_id, department_id, has_approval, rejection_reason")
+        .eq("id", user?.id)
+        .single();
+      console.log("Employee data:", data);
+      if (error) throw error;
+      return {
+        id: data.id,
+        name: `${data.first_name} ${data.last_name}`,
+        role: data.role,
+        company_id: data.company_id,
+        supervisor_id: data.supervisor_id,
+        department_id: data.department_id,
+        has_approval: data.has_approval,
+        rejection_reason: data.rejection_reason,
+      };
+    }catch(error){
+      console.error("Error getting user info", error);
+      return null;
     }
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error("User not found");
-    const { data, error } = await supabase
-      .from("employees")
-      .select("id, first_name, last_name, role, company_id, supervisor_id, department_id, has_approval, rejection_reason")
-      .eq("id", user?.id)
-      .single();
-    if (error) throw error;
-    return {
-      id: data.id,
-      name: `${data.first_name} ${data.last_name}`,
-      role: data.role,
-      company_id: data.company_id,
-      supervisor_id: data.supervisor_id,
-      department_id: data.department_id,
-      has_approval: data.has_approval,
-      rejection_reason: data.rejection_reason,
-    };
-  }catch(error){
-    console.error("Error getting user info", error);
-    return null;
   }
-}
 
   const signOutUser = useCallback(async () => {
     setLoading(true);
