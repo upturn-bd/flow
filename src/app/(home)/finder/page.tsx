@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import FormInputField from "@/components/ui/FormInputField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
-import { useEmployees } from "@/hooks/useEmployees";
+import { Employee, useEmployees } from "@/hooks/useEmployees";
 import { supabase } from "@/lib/supabase/client";
 
 // Define the type for employee details from the database
@@ -34,21 +34,6 @@ type EmployeeDetail = {
   avatar_url?: string;
 };
 
-// Extended employee type with additional fields from supabase
-type ExtendedEmployee = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  position: string;
-  department: string;
-  grade: string;
-  location: string;
-  joinDate: string;
-  avatar: string | null;
-  role: string;
-};
-
 // Filter options
 type FilterOptions = {
   department: string;
@@ -59,8 +44,8 @@ type FilterOptions = {
 
 export default function FinderPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [extendedEmployees, setExtendedEmployees] = useState<ExtendedEmployee[]>([]);
-  const [filteredEmployees, setFilteredEmployees] = useState<ExtendedEmployee[]>([]);
+  const [extendedEmployees, setExtendedEmployees] = useState<Employee[]>([]);
+  const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
     department: "",
@@ -77,51 +62,10 @@ export default function FinderPage() {
     fetchEmployees();
   }, [fetchEmployees]);
 
-  // Fetch extended employee details once we have basic employee data
   useEffect(() => {
-    const fetchExtendedEmployeeData = async () => {
-      if (!employees.length) return;
-      
-      try {
-        
-        const employeeIds = employees.map(emp => emp.id);
-        
-        // Get employee details from employee_details table
-        const { data: employeeDetails } = await supabase
-          .from('employee_details')
-          .select('employee_id, email, phone, position, department, grade, location, join_date, avatar_url')
-          .in('employee_id', employeeIds);
-          
-        // Map the basic employees with their extended details
-        const extended = employees.map(emp => {
-          // Find the matching details or use an empty object with the correct type
-          const details: EmployeeDetail = employeeDetails?.find(
-            (detail: EmployeeDetail) => detail.employee_id === emp.id
-          ) || { employee_id: emp.id };
-          
-          return {
-            id: emp.id,
-            name: emp.name,
-            role: emp.role,
-            email: details.email || `${emp.name.toLowerCase().replace(/\s+/g, '.')}@company.com`,
-            phone: details.phone || "+1 234 567 8900",
-            position: details.position || emp.role,
-            department: details.department || "Unassigned",
-            grade: details.grade || "N/A",
-            location: details.location || "N/A",
-            joinDate: details.join_date || new Date().toISOString().split('T')[0],
-            avatar: details.avatar_url || null
-          };
-        });
-        
-        setExtendedEmployees(extended);
-        setFilteredEmployees(extended);
-      } catch (error) {
-        console.error("Error fetching extended employee data:", error);
-      }
-    };
-
-    fetchExtendedEmployeeData();
+    if (employees.length > 0) {
+      setExtendedEmployees(employees);
+    }
   }, [employees]);
 
   // Filter employees when search query or filters change
@@ -133,18 +77,17 @@ export default function FinderPage() {
       const matchesSearch = searchQuery === "" || 
         employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         employee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        employee.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        employee.department.toLowerCase().includes(searchQuery.toLowerCase());
+        employee.designation.toLowerCase().includes(searchQuery.toLowerCase());
       
       if (!matchesSearch) return false;
       
-      // Then check filters
-      const matchesDepartment = filters.department === "" || employee.department === filters.department;
-      const matchesPosition = filters.position === "" || employee.position === filters.position;
-      const matchesGrade = filters.grade === "" || employee.grade === filters.grade;
-      const matchesLocation = filters.location === "" || employee.location === filters.location;
+      // // Then check filters
+      // const matchesDepartment = filters.department === "" || employee.department === filters.department;
+      // const matchesPosition = filters.position === "" || employee.position === filters.position;
+      // const matchesGrade = filters.grade === "" || employee.grade === filters.grade;
+      // const matchesLocation = filters.location === "" || employee.location === filters.location;
       
-      return matchesDepartment && matchesPosition && matchesGrade && matchesLocation;
+      return true;
     });
     
     setFilteredEmployees(filtered);
@@ -353,19 +296,11 @@ export default function FinderPage() {
                   <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-4">
                     <div className="flex items-center">
                       <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-indigo-600 mr-4">
-                        {employee.avatar ? (
-                          <img 
-                            src={employee.avatar} 
-                            alt={employee.name} 
-                            className="w-full h-full rounded-full object-cover"
-                          />
-                        ) : (
-                          <User size={28} />
-                        )}
+                        <User size={28} />
                       </div>
                       <div>
                         <h3 className="font-bold text-lg">{employee.name}</h3>
-                        <p className="text-indigo-100 text-sm">{employee.position}</p>
+                        <p className="text-indigo-100 text-sm">{employee.designation}</p>
                       </div>
                     </div>
                   </div>
@@ -382,14 +317,6 @@ export default function FinderPage() {
                     <div className="flex">
                       <Building className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
                       <span className="text-gray-600 text-sm">{employee.department}</span>
-                    </div>
-                    <div className="flex">
-                      <GraduationCap className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
-                      <span className="text-gray-600 text-sm">Grade: {employee.grade}</span>
-                    </div>
-                    <div className="flex">
-                      <MapPin className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
-                      <span className="text-gray-600 text-sm">{employee.location}</span>
                     </div>
                     <div className="flex">
                       <Calendar className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
