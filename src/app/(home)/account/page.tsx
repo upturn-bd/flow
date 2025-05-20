@@ -247,15 +247,15 @@ export default function AccountPage() {
         </Link>
         
         <Link 
-          href="/home/hris" 
+          href="/hris" 
           className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:border-indigo-200 hover:shadow transition-all"
         >
           <div className="flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-3">
-              <Briefcase className="w-6 h-6" />
+              <User className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-gray-800 mb-1">HR Information</h3>
-            <p className="text-sm text-gray-500">View your HR information and documents</p>
+            <h3 className="font-semibold text-gray-800 mb-1">My Profile</h3>
+            <p className="text-sm text-gray-500">View and edit your personal information</p>
           </div>
         </Link>
         
