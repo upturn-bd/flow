@@ -5,7 +5,7 @@ import {
   deleteExperience as dExperience,
   getExperiences,
   updateExperience as uExperience,
-} from "@/lib/api/education-and-experience";
+} from "@/lib/api/hris";
 import { experienceSchema } from "@/lib/types";
 import { useState, useCallback } from "react";
 import { z } from "zod";

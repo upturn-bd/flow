@@ -4,12 +4,11 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { Bell, User, Search, Menu, LogOut, Settings, UserCircle } from "lucide-react";
 import { getUserInfo } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
 export default function TopBar() {
   const [user, setUser] = useState<{ id: string; name: string; role: string } | undefined>();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -42,7 +41,6 @@ export default function TopBar() {
   
   const handleLogout = async () => {
     try {
-      const supabase = createClient();
       await supabase.auth.signOut();
       router.push("/auth/login");
     } catch (error) {

@@ -10,15 +10,16 @@ import {
   MaritalStatus,
 } from "./personalInfo.constants";
 import { PersonalInfoField } from "./PersonalInfoField";
-import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, User, Heart, Users, PhoneCall, MapPin, Save, CheckCircle, AlertCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import { Calendar, User, Heart, Users, PhoneCall, MapPin, Save, X, CheckCircle, AlertCircle } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { fadeIn } from "@/components/ui/animations";
 import { 
   fetchCurrentUserPersonalInfo, 
   fetchUserPersonalInfo, 
   updatePersonalInfo,
-  isCurrentUserProfile 
-} from "@/lib/api/profile";
+  isCurrentUserProfile
+} from "@/lib/api/hris";
 
 interface PersonalInfoTabProps {
   uid?: string | null;
@@ -122,6 +123,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
     try {
       await updatePersonalInfo(formValues);
       setSubmitSuccess(true);
+      setTimeout(() => setSubmitSuccess(false), 3000);
       setIsEditMode(false);
     } catch (error) {
       setSubmitError(
@@ -205,9 +207,9 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
+      initial="hidden"
+      animate="visible"
+      variants={fadeIn}
       className="max-w-6xl mx-auto"
     >
       <div className="flex items-center justify-between mb-6">
@@ -239,66 +241,89 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
       </div>
 
       {submitError && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm"
+        >
           <div className="flex items-start">
             <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
             <p className="text-sm font-medium text-red-700">{submitError}</p>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {submitSuccess && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg shadow-sm">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg shadow-sm"
+        >
           <div className="flex items-start">
             <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
             <p className="text-sm font-medium text-green-700">Personal information updated successfully!</p>
           </div>
-        </div>
+        </motion.div>
       )}
 
       <form onSubmit={handleSubmit}>
         {personalInfoFields.map((section, sectionIndex) => (
-          <div key={section.title} className={sectionIndex > 0 ? "mt-8" : ""}>
+          <motion.div 
+            key={section.title} 
+            className={sectionIndex > 0 ? "mt-8" : ""}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: sectionIndex * 0.1 }}
+          >
             <div className="flex items-center mb-4">
               <div className="mr-3">{section.icon}</div>
               <h3 className="font-medium text-lg text-gray-800">{section.title}</h3>
             </div>
             
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <table className="min-w-full divide-y divide-gray-200">
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {section.fields.map((field) => (
-                    <tr key={field.name} className={isEditMode ? "hover:bg-blue-50" : ""}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-gray-50 w-1/3">
+                  {section.fields.map((field, fieldIndex) => (
+                    <motion.tr 
+                      key={field.name} 
+                      className={isEditMode ? "hover:bg-blue-50 transition-colors" : ""}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: fieldIndex * 0.05 + sectionIndex * 0.1 }}
+                    >
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal sm:whitespace-nowrap text-sm font-medium text-gray-800 bg-gray-50 w-1/3">
                         {field.label}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal text-sm text-gray-600">
                         {isEditMode && isCurrentUser ? (
-                          <PersonalInfoField
-                            name={field.name as keyof PersonalFormData}
-                            type={field.type}
-                            value={formValues[field.name as keyof PersonalFormData] || ""}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={formErrors[field.name as keyof PersonalFormData]}
-                            touched={!!touched[field.name as keyof PersonalFormData]}
-                            options={field.type === "select" ? field.options : undefined}
-                            label=""
-                          />
+                          <div className="max-w-full overflow-hidden">
+                            <PersonalInfoField
+                              name={field.name as keyof PersonalFormData}
+                              type={field.type}
+                              value={formValues[field.name as keyof PersonalFormData] || ""}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              error={formErrors[field.name as keyof PersonalFormData]}
+                              touched={!!touched[field.name as keyof PersonalFormData]}
+                              options={field.type === "select" ? field.options : undefined}
+                              label=""
+                            />
+                          </div>
                         ) : (
-                          <div className="py-1">
+                          <div className="py-1 break-words">
                             {field.name === "date_of_birth" && formValues[field.name]
                               ? new Date(formValues[field.name] as string).toLocaleDateString()
                               : formValues[field.name as keyof PersonalFormData] || "—"}
                           </div>
                         )}
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </div>
+          </motion.div>
         ))}
 
         {isEditMode && isCurrentUser && (
@@ -311,14 +336,15 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
             <button
               type="button"
               onClick={() => setIsEditMode(false)}
-              className="px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 text-sm font-medium shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+              className="px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 text-sm font-medium shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
             >
+              <X className="h-4 w-4 inline mr-2" />
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !isDirty || !isValid}
-              className={`px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 flex items-center ${
+              className={`px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 flex items-center transition-colors ${
                 isSubmitting || !isDirty || !isValid
                   ? "opacity-60 cursor-not-allowed"
                   : "hover:bg-blue-700"

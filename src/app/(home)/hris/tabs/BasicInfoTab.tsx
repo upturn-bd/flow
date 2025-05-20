@@ -9,15 +9,11 @@ import {
   JOB_STATUS_OPTIONS,
 } from "./basicInfo.constants";
 import { BasicInfoField } from "./BasicInfoField";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { User, Briefcase, Calendar, Save, X, CheckCircle, AlertCircle } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { 
-  fetchCurrentUserBasicInfo, 
-  fetchUserBasicInfo, 
-  updateBasicInfo,
-  isCurrentUserProfile 
-} from "@/lib/api/profile";
+import { fadeIn } from "@/components/ui/animations";
+import { fetchCurrentUserBasicInfo, fetchUserBasicInfo, isCurrentUserProfile, updateBasicInfo } from "@/lib/api/hris";
 
 const initialFormState: BasicInfoFormData = {
   first_name: "",
@@ -128,6 +124,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
         const response = await updateBasicInfo(result.data);
         setInitialData(response.data);
         setSubmitSuccess(true);
+        setTimeout(() => setSubmitSuccess(false), 3000);
         setIsEditMode(false);
       } catch (error) {
         setSubmitError(error instanceof Error ? error.message : "Unknown error");
@@ -194,11 +191,6 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
     [departments]
   );
 
-  const fadeIn = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.4 } }
-  };
-
   if (loading)
     return (
       <LoadingSpinner 
@@ -243,77 +235,95 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
       </div>
 
       {submitError && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm"
+        >
           <div className="flex items-start">
-            <svg className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
+            <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
             <p className="text-sm font-medium text-red-700">{submitError}</p>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {submitSuccess && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg shadow-sm">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg shadow-sm"
+        >
           <div className="flex items-start">
-            <svg className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
+            <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
             <p className="text-sm font-medium text-green-700">Basic information updated successfully!</p>
           </div>
-        </div>
+        </motion.div>
       )}
       
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <form onSubmit={handleSubmit}>
           {fieldGroups.map((group, groupIndex) => (
-            <div key={group.title} className={groupIndex > 0 ? "mt-8" : ""}>
+            <motion.div 
+              key={group.title} 
+              className={groupIndex > 0 ? "mt-8" : ""}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: groupIndex * 0.1 }}
+            >
               <div className="flex items-center mb-4">
                 <div className="mr-3">{group.icon}</div>
                 <h3 className="font-medium text-lg text-gray-800">{group.title}</h3>
               </div>
               
-              <div className="overflow-hidden border border-gray-200 rounded-lg">
+              <div className="overflow-hidden border border-gray-200 rounded-lg shadow-sm">
                 <table className="min-w-full divide-y divide-gray-200">
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {group.fields.map((field) => (
-                      <tr key={field.name} className={isEditMode ? "hover:bg-blue-50" : ""}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-gray-50 w-1/3">
+                    {group.fields.map((field, fieldIndex) => (
+                      <motion.tr 
+                        key={field.name} 
+                        className={isEditMode ? "hover:bg-blue-50 transition-colors" : ""}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: fieldIndex * 0.05 + groupIndex * 0.1 }}
+                      >
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal sm:whitespace-nowrap text-sm font-medium text-gray-800 bg-gray-50 w-1/3">
                           {field.label}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal text-sm text-gray-600">
                           {isEditMode && isCurrentUser ? (
-                            <BasicInfoField
-                              name={field.name as keyof BasicInfoFormData}
-                              label=""
-                              type={field.type}
-                              value={
-                                field.name === "department_id"
-                                  ? formValues[field.name]?.toString() || ""
-                                  : formValues[field.name as keyof BasicInfoFormData] || ""
-                              }
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              error={errors[field.name as keyof BasicInfoFormData]}
-                              touched={!!touched[field.name as keyof BasicInfoFormData]}
-                              options={
-                                field.name === "department_id"
-                                  ? departments.map((dep) => ({
-                                      value: dep.id.toString(),
-                                      label: dep.name,
-                                    }))
-                                  : field.name === "job_status"
-                                  ? JOB_STATUS_OPTIONS.map(status => ({
-                                      value: status,
-                                      label: status
-                                    }))
-                                  : undefined
-                              }
-                              disabled={!isEditMode || !isCurrentUser}
-                              loading={field.name === "department_id" ? loadingDepartments : false}
-                            />
+                            <div className="max-w-full overflow-hidden">
+                              <BasicInfoField
+                                name={field.name as keyof BasicInfoFormData}
+                                label=""
+                                type={field.type}
+                                value={
+                                  field.name === "department_id"
+                                    ? formValues[field.name]?.toString() || ""
+                                    : formValues[field.name as keyof BasicInfoFormData] || ""
+                                }
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                error={errors[field.name as keyof BasicInfoFormData]}
+                                touched={!!touched[field.name as keyof BasicInfoFormData]}
+                                options={
+                                  field.name === "department_id"
+                                    ? departments.map((dep) => ({
+                                        value: dep.id.toString(),
+                                        label: dep.name,
+                                      }))
+                                    : field.name === "job_status"
+                                    ? JOB_STATUS_OPTIONS.map(status => ({
+                                        value: status,
+                                        label: status
+                                      }))
+                                    : undefined
+                                }
+                                disabled={!isEditMode || !isCurrentUser}
+                                loading={field.name === "department_id" ? loadingDepartments : false}
+                              />
+                            </div>
                           ) : (
-                            <div className="py-1">
+                            <div className="py-1 break-words">
                               {field.name === "department_id" 
                                 ? departmentName(Number(formValues[field.name])) 
                                 : field.name === "hire_date" && formValues[field.name]
@@ -322,12 +332,12 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                             </div>
                           )}
                         </td>
-                      </tr>
+                      </motion.tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </div>
+            </motion.div>
           ))}
           
           {isEditMode && isCurrentUser && (
@@ -340,7 +350,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
               <button
                 type="button"
                 onClick={handleEditToggle}
-                className="px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 text-sm font-medium shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                className="px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 text-sm font-medium shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
               >
                 <X className="h-4 w-4 inline mr-1 -mt-px" />
                 Cancel
@@ -348,7 +358,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
               <button
                 type="submit"
                 disabled={isSubmitting || !isDirty || !isValid}
-                className={`px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
+                className={`px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors ${
                   isSubmitting || !isDirty || !isValid
                     ? "opacity-60 cursor-not-allowed"
                     : "hover:bg-blue-700"
@@ -369,7 +379,6 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
             </motion.div>
           )}
         </form>
-      </div>
     </motion.div>
   );
 }

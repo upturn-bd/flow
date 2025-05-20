@@ -1,13 +1,12 @@
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/auth/getUser";
 import { claimTypeSchema } from "@/lib/types";
 
 export async function getClaimTypes() {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("settlement_types")
     .select("*")
     .eq("company_id", company_id);
@@ -19,7 +18,6 @@ export async function getClaimTypes() {
 export async function createClaimType(
   payload: z.infer<typeof claimTypeSchema>
 ) {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
   const validated = claimTypeSchema.safeParse(payload);
@@ -27,7 +25,7 @@ export async function createClaimType(
 
   const { id, ...rest } = payload;
 
-  const { data, error } = await client.from("settlement_types").insert({
+  const { data, error } = await supabase.from("settlement_types").insert({
     ...rest,
     company_id,
   });
@@ -39,13 +37,12 @@ export async function createClaimType(
 export async function updateClaimType(
   payload: z.infer<typeof claimTypeSchema>
 ) {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
   const validated = claimTypeSchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("settlement_types")
     .update(payload)
     .eq("id", payload.id)
@@ -56,10 +53,9 @@ export async function updateClaimType(
 }
 
 export async function deleteClaimType(id: number) {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
-  const { error } = await client
+  const { error } = await supabase
     .from("settlement_types")
     .delete()
     .eq("id", id)

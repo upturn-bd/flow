@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { PersonalFormData } from "@/app/(home)/hris/tabs/personalInfo.constants";
 
 /**
@@ -6,15 +6,45 @@ import { PersonalFormData } from "@/app/(home)/hris/tabs/personalInfo.constants"
  * @returns Promise with personal info data or null if not found
  */
 export async function fetchCurrentUserPersonalInfo(): Promise<PersonalFormData | null> {
-  const res = await fetch("/api/personal-info");
-  if (res.status === 204) {
-    return null;
+  try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      throw new Error("Not authenticated");
+    }
+    
+    const { data, error } = await supabase
+      .from("personal_infos")
+      .select(`
+        date_of_birth,
+        gender,
+        blood_group,
+        marital_status,
+        nid_no,
+        religion,
+        father_name,
+        mother_name,
+        spouse_name,
+        emergency_contact_name,
+        emergency_contact_phone,
+        emergency_contact_relation,
+        permanent_address
+      `)
+      .eq("id", user.id)
+      .single();
+      
+    if (error) {
+      if (error.code === "PGRST116") { // Record not found
+        return null;
+      }
+      throw new Error(error.message);
+    }
+    
+    return data;
+  } catch (error) {
+    console.error("Error fetching personal info:", error);
+    throw error;
   }
-  if (!res.ok) {
-    throw new Error("Failed to fetch personal info");
-  }
-  const { data } = await res.json();
-  return data || null;
 }
 
 /**
@@ -23,7 +53,6 @@ export async function fetchCurrentUserPersonalInfo(): Promise<PersonalFormData |
  * @returns Promise with personal info data or null if not found
  */
 export async function fetchUserPersonalInfo(uid: string): Promise<PersonalFormData | null> {
-  const supabase = createClient();
   const { data, error } = await supabase
     .from("personal_infos")
     .select("*")
@@ -41,25 +70,111 @@ export async function fetchUserPersonalInfo(uid: string): Promise<PersonalFormDa
 }
 
 /**
- * Update personal information for the current user
- * @param personalInfo Updated personal info data
- * @returns Promise that resolves when update is successful
+ * Updates or creates personal information for the current user
+ * @param personalInfoData Personal information to update
+ * @returns Promise with updated personal info data
  */
-export async function updatePersonalInfo(personalInfo: PersonalFormData): Promise<void> {
-  const response = await fetch("/api/personal-info", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      ...personalInfo,
-      date_of_birth: personalInfo.date_of_birth ? new Date(personalInfo.date_of_birth).toISOString() : undefined,
-      blood_group: personalInfo.blood_group || undefined,
-      marital_status: personalInfo.marital_status || undefined,
-      gender: personalInfo.gender || undefined,
-    }),
-  });
-  
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData?.message || `Error: ${response.status}`);
+export async function updatePersonalInfo(personalInfoData: PersonalFormData): Promise<PersonalFormData> {
+  try {
+    // First get the user to ensure authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      throw new Error("Not authenticated");
+    }
+    
+    // Get company_id from the employees table
+    const { data: employeeData, error: employeeError } = await supabase
+      .from("employees")
+      .select("company_id")
+      .eq("id", user.id)
+      .single();
+      
+    if (employeeError) {
+      throw new Error("Failed to fetch employee data");
+    }
+    
+    // Prepare data for upsert
+    const formattedData = {
+      id: user.id,
+      company_id: employeeData.company_id,
+      ...personalInfoData,
+      date_of_birth: personalInfoData.date_of_birth ? new Date(personalInfoData.date_of_birth).toISOString() : undefined,
+      blood_group: personalInfoData.blood_group || undefined,
+      marital_status: personalInfoData.marital_status || undefined,
+      gender: personalInfoData.gender || undefined,
+    };
+    
+    // Upsert the personal info
+    const { data, error } = await supabase
+      .from("personal_infos")
+      .upsert(formattedData)
+      .select();
+      
+    if (error) {
+      throw error;
+    }
+    
+    return data[0];
+  } catch (error) {
+    console.error("Error updating personal info:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches personal information for a user
+ * If no userId is provided, fetches for the current user
+ * This provides the same functionality as fetchCurrentUserPersonalInfo and fetchUserPersonalInfo combined
+ */
+export async function getPersonalInfo(userId?: string): Promise<PersonalFormData | null> {
+  try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      throw new Error("Not authenticated");
+    }
+    
+    // Determine which user to fetch data for
+    const targetUserId = userId || user.id;
+    
+    // If trying to access someone else's data, log for auditing purposes
+    if (userId && user.id !== userId) {
+      console.log(`User ${user.id} is accessing personal info for ${userId}`);
+    }
+    
+    // Fetch personal info
+    const { data, error } = await supabase
+      .from("personal_infos")
+      .select(`
+        date_of_birth,
+        gender,
+        blood_group,
+        marital_status,
+        nid_no,
+        religion,
+        father_name,
+        mother_name,
+        spouse_name,
+        emergency_contact_name,
+        emergency_contact_phone,
+        emergency_contact_relation,
+        permanent_address
+      `)
+      .eq("id", targetUserId)
+      .single();
+      
+    if (error) {
+      // If no record exists yet, return null
+      if (error.code === "PGRST116") {
+        return null;
+      }
+      throw error;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error("Error fetching personal info:", error);
+    throw error;
   }
 } 

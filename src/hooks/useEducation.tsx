@@ -5,7 +5,7 @@ import {
   deleteSchooling,
   getSchoolings,
   updateSchooling,
-} from "@/lib/api/education-and-experience";
+} from "@/lib/api/hris";
 import { schoolingSchema } from "@/lib/types";
 import { useState, useCallback } from "react";
 import { z } from "zod";

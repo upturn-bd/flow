@@ -79,14 +79,14 @@ export default function Sidebar() {
       initial="hidden"
       animate="visible"
       variants={sidebarVariants}
-      className="w-20 fixed left-0 top-0 h-screen md:flex flex-col hidden shadow-xl z-10"
+      className="w-20 fixed left-0 top-0 h-screen md:flex flex-col hidden shadow-xl z-50"
       style={{
         background: "linear-gradient(135.32deg, #001731 24.86%, #002363 100%)",
       }}
     >
       <motion.div 
         variants={logoVariants}
-        className="absolute top-8 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full bg-[#001731] flex items-center justify-center shadow-lg"
+        className="absolute top-8 left-1/3 -translate-x-1/2 w-20 h-20 rounded-full bg-[#001731] flex items-center justify-center shadow-lg"
       >
         <Link href="/home" className="p-6">
           <Image 

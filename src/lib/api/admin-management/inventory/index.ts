@@ -1,13 +1,12 @@
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/auth/getUser";
 import { requisitionInventorySchema, requisitionTypeSchema } from "@/lib/types";
 
 export async function getRequisitionTypes() {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("requisition_types")
     .select("*")
     .eq("company_id", company_id);
@@ -19,13 +18,12 @@ export async function getRequisitionTypes() {
 export async function createRequisitionType(
   payload: z.infer<typeof requisitionTypeSchema>
 ) {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
   const validated = requisitionTypeSchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { data, error } = await client.from("requisition_types").insert({
+  const { data, error } = await supabase.from("requisition_types").insert({
     payload,
     company_id,
   });
@@ -35,10 +33,9 @@ export async function createRequisitionType(
 }
 
 export async function deleteRequisitionType(id: number) {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
-  const { error } = await client
+  const { error } = await supabase
     .from("requisition_types")
     .delete()
     .eq("id", id)
@@ -48,10 +45,9 @@ export async function deleteRequisitionType(id: number) {
 }
 
 export async function getRequisitionInventories() {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("requisition_inventories")
     .select("*")
     .eq("company_id", company_id);
@@ -63,13 +59,12 @@ export async function getRequisitionInventories() {
 export async function createRequisitionInventory(
   payload: z.infer<typeof requisitionInventorySchema>
 ) {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
   const validated = requisitionInventorySchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { data, error } = await client.from("requisition_inventories").insert({
+  const { data, error } = await supabase.from("requisition_inventories").insert({
     ...payload,
     company_id,
   });
@@ -81,13 +76,12 @@ export async function createRequisitionInventory(
 export async function updateRequisitionInventory(
   payload: z.infer<typeof requisitionInventorySchema>
 ) {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
   const validated = requisitionInventorySchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("requisition_inventories")
     .update(payload)
     .eq("id", payload.id)
@@ -98,10 +92,9 @@ export async function updateRequisitionInventory(
 }
 
 export async function deleteRequisitionInventory(id: number) {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
-  const { error } = await client
+  const { error } = await supabase
     .from("requisition_inventories")
     .delete()
     .eq("id", id)
@@ -111,10 +104,9 @@ export async function deleteRequisitionInventory(id: number) {
 }
 
 export async function getEmployeesInfo() {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("employees")
     .select("id, first_name, last_name")
     .eq("company_id", company_id);

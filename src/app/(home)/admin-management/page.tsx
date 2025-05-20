@@ -10,6 +10,7 @@ import { Building, Code, Briefcase, Globe, ChevronRight, LoaderCircle } from "lu
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
+import { getCompanyInfo, FormattedEmployee } from "@/lib/api/company/companyInfo";
 
 const companyBasicsSchema = z.object({
   company_name: z.string().min(1, "Company Name is required"),
@@ -23,7 +24,7 @@ type CompanyBasicsFormData = z.infer<typeof companyBasicsSchema>;
 export default function CompanyBasicsForm() {
   const [countries, setCountries] = useState<{ id: number; name: string }[]>([]);
   const [industries, setIndustries] = useState<{ id: number; name: string }[]>([]);
-  const [employees, setEmployees] = useState<{ id: number; name: string }[]>([]);
+  const [employees, setEmployees] = useState<FormattedEmployee[]>([]);
   const [loading, setLoading] = useState(true);
   const {
     control,
@@ -43,15 +44,15 @@ export default function CompanyBasicsForm() {
   useEffect(() => {
     const fetchCompanyInfo = async () => {
       try {
-        const res = await fetch("/api/company-info");
-        const { company, countries, industries, formattedEmployees } = await res.json();
+        // Use client-side function instead of API
+        const { company, countries, industries, formattedEmployees } = await getCompanyInfo();
 
         if (company) {
           reset({
             company_name: company.name,
             company_id: company.code,
-            industry_id: company.industry_id,
-            country_id: company.country_id,
+            industry_id: company.industry_id.toString(),
+            country_id: company.country_id.toString(),
           });
         }
         setCountries(countries);
@@ -163,7 +164,7 @@ export default function CompanyBasicsForm() {
                       label="Industry"
                       icon={<Briefcase size={18} />}
                       options={industries.map(industry => ({
-                        value: industry.id,
+                        value: industry.id.toString(),
                         label: industry.name
                       }))}
                       placeholder="Select Industry"
@@ -183,7 +184,7 @@ export default function CompanyBasicsForm() {
                       label="Country"
                       icon={<Globe size={18} />}
                       options={countries.map(country => ({
-                        value: country.id,
+                        value: country.id.toString(),
                         label: country.name
                       }))}
                       placeholder="Select Country"

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { Education } from "@/hooks/useEducation";
 import { Experience } from "@/hooks/useExperience";
 
@@ -8,7 +8,6 @@ import { Experience } from "@/hooks/useExperience";
  * @returns Promise with array of education records
  */
 export async function fetchUserEducation(uid: string): Promise<Education[]> {
-  const supabase = createClient();
   const { data, error } = await supabase
     .from("schoolings")
     .select("*")
@@ -27,7 +26,6 @@ export async function fetchUserEducation(uid: string): Promise<Education[]> {
  * @returns Promise with array of experience records
  */
 export async function fetchUserExperience(uid: string): Promise<Experience[]> {
-  const supabase = createClient();
   const { data, error } = await supabase
     .from("experiences")
     .select("*")

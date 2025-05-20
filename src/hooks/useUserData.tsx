@@ -1,8 +1,9 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { fetchCurrentUserBasicInfo } from "@/lib/api/profile/basicInfo";
 
 export type UserProfileData = {
   id: string;
@@ -31,18 +32,30 @@ export function useUserData() {
         setLoading(true);
         setError(null);
         
-        // Fetch basic user info from API
-        const response = await fetch("/api/basic-info");
-        if (!response.ok) {
-          throw new Error("Failed to fetch user data");
+        // Fetch basic user info using client-side function instead of API
+        const data = await fetchCurrentUserBasicInfo();
+        
+        // Get the user auth data for the ID
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          throw new Error("User not authenticated");
         }
         
-        const { data } = await response.json();
+        // Fetch additional user data including role
+        const { data: employeeData, error: employeeError } = await supabase
+          .from("employees")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+          
+        if (employeeError) {
+          throw new Error("Failed to fetch employee role");
+        }
         
         // If we have a department ID, fetch the department name
         let departmentName = undefined;
         if (data.department_id) {
-          const supabase = createClient();
           const { data: deptData, error: deptError } = await supabase
             .from("departments")
             .select("name")
@@ -54,13 +67,10 @@ export function useUserData() {
           }
         }
         
-        // Get the user auth data for the ID
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        
         setUserData({
           ...data,
-          id: user?.id || "",
+          id: user.id,
+          role: employeeData.role,
           department_name: departmentName
         });
       } catch (error) {
@@ -77,7 +87,6 @@ export function useUserData() {
   const logout = useCallback(async () => {
     try {
       setLoading(true);
-      const supabase = createClient();
       await supabase.auth.signOut();
       router.push("/auth/login");
     } catch (error) {
@@ -93,17 +102,30 @@ export function useUserData() {
       setLoading(true);
       setError(null);
       
-      const response = await fetch("/api/basic-info");
-      if (!response.ok) {
-        throw new Error("Failed to refresh user data");
+      // Use client-side function instead of API
+      const data = await fetchCurrentUserBasicInfo();
+      
+      // Get the user auth data for the ID
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("User not authenticated");
       }
       
-      const { data } = await response.json();
+      // Fetch additional user data including role
+      const { data: employeeData, error: employeeError } = await supabase
+        .from("employees")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+        
+      if (employeeError) {
+        throw new Error("Failed to fetch employee role");
+      }
       
       // If we have a department ID, fetch the department name
       let departmentName = undefined;
       if (data.department_id) {
-        const supabase = createClient();
         const { data: deptData } = await supabase
           .from("departments")
           .select("name")
@@ -115,13 +137,10 @@ export function useUserData() {
         }
       }
       
-      // Get the user auth data for the ID
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      
       setUserData({
         ...data,
-        id: user?.id || "",
+        id: user.id,
+        role: employeeData.role,
         department_name: departmentName
       });
     } catch (error) {

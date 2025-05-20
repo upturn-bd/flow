@@ -25,8 +25,8 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { 
   fetchUserEducation,
   fetchUserExperience,
-  isCurrentUserProfile 
-} from "@/lib/api/profile";
+  isCurrentUserProfile
+} from "@/lib/api/hris";
 
 interface EducationExperienceTabProps {
   uid?: string | null;

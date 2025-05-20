@@ -1,11 +1,8 @@
-"use server";
-
 import { getUserInfo } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { generateRandomId } from "@/lib/utils";
 
 export async function uploadManyFiles(files: File[], bucketName: string) {
-  const supabase = await createClient();
   const user = await getUserInfo();
 
   const uploadedFilePaths = [];

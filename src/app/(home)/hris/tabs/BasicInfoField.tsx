@@ -1,5 +1,12 @@
 import React from "react";
+import { motion } from "framer-motion";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { JOB_STATUS_OPTIONS } from "./basicInfo.constants";
+
+interface Option {
+  value: string;
+  label: string;
+}
 
 interface BasicInfoFieldProps {
   id?: string;
@@ -14,7 +21,7 @@ interface BasicInfoFieldProps {
   loadingDepartments?: boolean;
   readOnly?: boolean;
   disabled?: boolean;
-  options?: Array<{ value: string; label: string }>;
+  options?: Option[];
   loading?: boolean;
   onBlur?: (e: React.FocusEvent<any>) => void;
 }
@@ -42,110 +49,209 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
   const fieldId = id || `field-${name}`;
   const showError = error && touched;
   
-  if (name === "job_status") {
+  const inputClasses = `
+    w-full rounded-md border 
+    ${
+      error && touched
+        ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+        : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+    }
+    px-3 py-2 text-sm
+    shadow-sm focus:outline-none focus:ring-1
+    disabled:bg-gray-100 disabled:cursor-not-allowed
+    transition-colors
+    placeholder:text-gray-400
+    max-w-full
+  `;
+
+  const renderField = () => {
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center py-2">
+          <LoadingSpinner className="h-5 w-5 text-blue-500" />
+          <span className="ml-2 text-sm text-gray-500">Loading...</span>
+        </div>
+      );
+    }
+
+    if (name === "job_status") {
+      return (
+        <div>
+          <select
+            id={fieldId}
+            name={name}
+            value={value}
+            onChange={onChange}
+            className={inputClass}
+            aria-invalid={!!showError}
+            aria-describedby={showError ? `${fieldId}-error` : undefined}
+            onBlur={onBlur}
+            disabled={disabled}
+          >
+            <option value="">Select Job Status</option>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+          {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-600" aria-live="polite">{error}</p>}
+        </div>
+      );
+    }
+    if (name === "department_id") {
+      return (
+        <div>
+          <select
+            id={fieldId}
+            name={name}
+            value={value}
+            onChange={onChange}
+            className={inputClass}
+            aria-invalid={!!showError}
+            aria-describedby={showError ? `${fieldId}-error` : undefined}
+            disabled={loading || loadingDepartments || disabled}
+            onBlur={onBlur}
+          >
+            <option value="">{loading || loadingDepartments ? "Loading..." : "Select Department"}</option>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+          {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-600" aria-live="polite">{error}</p>}
+        </div>
+      );
+    }
+    if (type === "select") {
+      return (
+        <div className="mb-0">
+          {label && (
+            <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1">
+              {label}
+            </label>
+          )}
+          <select
+            id={fieldId}
+            name={name}
+            value={value}
+            onChange={onChange}
+            className={inputClass}
+            aria-invalid={showError ? "true" : "false"}
+            aria-describedby={showError ? `${fieldId}-error` : undefined}
+            onBlur={onBlur}
+            disabled={disabled}
+          >
+            <option value="">Select {label}</option>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          {showError && (
+            <motion.p
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              id={`${fieldId}-error`}
+              className="mt-1 text-xs text-red-600"
+              aria-live="polite"
+            >
+              {error}
+            </motion.p>
+          )}
+        </div>
+      );
+    }
+    if (name === "id_input") {
+      return (
+        <div>
+          <input
+            id={fieldId}
+            type={type}
+            name={name}
+            value={value}
+            readOnly
+            className={inputClass}
+            aria-invalid={!!showError}
+            aria-describedby={showError ? `${fieldId}-error` : undefined}
+            onBlur={onBlur}
+            disabled={disabled}
+          />
+          {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-600" aria-live="polite">{error}</p>}
+        </div>
+      );
+    }
+    if (type === "textarea") {
+      return (
+        <div className="mb-0">
+          {label && (
+            <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1">
+              {label}
+            </label>
+          )}
+          <textarea
+            id={fieldId}
+            name={name}
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+            disabled={disabled}
+            rows={3}
+            className={inputClass}
+            aria-invalid={showError ? "true" : "false"}
+            aria-describedby={showError ? `${fieldId}-error` : undefined}
+          />
+          {showError && (
+            <motion.p
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              id={`${fieldId}-error`}
+              className="mt-1 text-xs text-red-600"
+              aria-live="polite"
+            >
+              {error}
+            </motion.p>
+          )}
+        </div>
+      );
+    }
     return (
-      <div>
-        <select
-          id={fieldId}
-          name={name}
-          value={value}
-          onChange={onChange}
-          className={inputClass}
-          aria-invalid={!!showError}
-          aria-describedby={showError ? `${fieldId}-error` : undefined}
-          onBlur={onBlur}
-          disabled={disabled}
-        >
-          <option value="">Select Job Status</option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>{option.label}</option>
-          ))}
-        </select>
-        {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-600" aria-live="polite">{error}</p>}
-      </div>
-    );
-  }
-  if (name === "department_id") {
-    return (
-      <div>
-        <select
-          id={fieldId}
-          name={name}
-          value={value}
-          onChange={onChange}
-          className={inputClass}
-          aria-invalid={!!showError}
-          aria-describedby={showError ? `${fieldId}-error` : undefined}
-          disabled={loading || loadingDepartments || disabled}
-          onBlur={onBlur}
-        >
-          <option value="">{loading || loadingDepartments ? "Loading..." : "Select Department"}</option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>{option.label}</option>
-          ))}
-        </select>
-        {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-600" aria-live="polite">{error}</p>}
-      </div>
-    );
-  }
-  if (type === "select") {
-    return (
-      <div>
-        <select
-          id={fieldId}
-          name={name}
-          value={value}
-          onChange={onChange}
-          className={inputClass}
-          aria-invalid={!!showError}
-          aria-describedby={showError ? `${fieldId}-error` : undefined}
-          disabled={disabled}
-          onBlur={onBlur}
-        >
-          <option value="">Select {label}</option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>{option.label}</option>
-          ))}
-        </select>
-        {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-600" aria-live="polite">{error}</p>}
-      </div>
-    );
-  }
-  if (name === "id_input") {
-    return (
-      <div>
+      <div className="mb-0">
+        {label && (
+          <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1">
+            {label}
+          </label>
+        )}
         <input
           id={fieldId}
-          type={type}
+          type={type === "date" ? "date" : type}
           name={name}
           value={value}
-          readOnly
+          onChange={onChange}
+          readOnly={readOnly}
           className={inputClass}
-          aria-invalid={!!showError}
+          aria-invalid={showError ? "true" : "false"}
           aria-describedby={showError ? `${fieldId}-error` : undefined}
           onBlur={onBlur}
           disabled={disabled}
+          max={type === "date" ? "9999-12-31" : undefined}
         />
-        {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-600" aria-live="polite">{error}</p>}
+        {showError && (
+          <motion.p
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            id={`${fieldId}-error`}
+            className="mt-1 text-xs text-red-600"
+            aria-live="polite"
+          >
+            {error}
+          </motion.p>
+        )}
       </div>
     );
-  }
+  };
+
   return (
-    <div>
-      <input
-        id={fieldId}
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        readOnly={readOnly}
-        className={inputClass}
-        aria-invalid={!!showError}
-        aria-describedby={showError ? `${fieldId}-error` : undefined}
-        onBlur={onBlur}
-        disabled={disabled}
-      />
-      {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-600" aria-live="polite">{error}</p>}
+    <div className="mb-0">
+      {renderField()}
     </div>
   );
 }; 

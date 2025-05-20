@@ -1,13 +1,22 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import {
+  getDepartments as fetchDepartmentsApi,
+  createDepartment as createDepartmentApi,
+  updateDepartment as updateDepartmentApi,
+  deleteDepartment as deleteDepartmentApi
+} from "@/lib/api/company/departments";
 
+// Define Department type that matches both API and UI needs
 export type Department = {
   id: number;
   name: string;
-  head_id: string;
-  description: string;
-  division_id: number;
+  head_id?: string;
+  description?: string;
+  division_id?: number;
+  company_id?: string | number;
+  created_at?: string;
 };
 
 export function useDepartments() {
@@ -17,9 +26,8 @@ export function useDepartments() {
   const fetchDepartments = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/company-info/departments");
-      const data = await res.json();
-      setDepartments(data.departments || []);
+      const data = await fetchDepartmentsApi();
+      setDepartments(data as Department[]);
     } catch (error) {
       console.error(error);
     } finally {
@@ -27,29 +35,37 @@ export function useDepartments() {
     }
   }, []);
 
-  const createDepartment = async (department: Omit<Department, "id">) => {
-    const res = await fetch("/api/company-info/departments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(department),
-    });
-    return await res.json();
+  const createDepartment = async (department: Omit<Department, "id" | "company_id" | "created_at">) => {
+    try {
+      const data = await createDepartmentApi(department);
+      await fetchDepartments(); // Refresh list after creating
+      return { success: true, data };
+    } catch (error) {
+      console.error(error);
+      return { success: false, error };
+    }
   };
 
   const updateDepartment = async (department: Department) => {
-    const res = await fetch("/api/company-info/departments", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(department),
-    });
-    return await res.json();
+    try {
+      await updateDepartmentApi(department);
+      await fetchDepartments(); // Refresh list after updating
+      return { success: true };
+    } catch (error) {
+      console.error(error);
+      return { success: false, error };
+    }
   };
 
   const deleteDepartment = async (id: number) => {
-    const res = await fetch(`/api/company-info/departments?id=${id}`, {
-      method: "DELETE",
-    });
-    return await res.json();
+    try {
+      await deleteDepartmentApi(id);
+      await fetchDepartments(); // Refresh list after deleting
+      return { success: true, message: "Department deleted successfully." };
+    } catch (error) {
+      console.error(error);
+      return { success: false, error };
+    }
   };
 
   return {

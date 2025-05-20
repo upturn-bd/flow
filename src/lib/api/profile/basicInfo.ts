@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { BasicInfoFormData } from "@/app/(home)/hris/tabs/basicInfo.constants";
 
 /**
@@ -6,12 +6,29 @@ import { BasicInfoFormData } from "@/app/(home)/hris/tabs/basicInfo.constants";
  * @returns Promise with basic info data
  */
 export async function fetchCurrentUserBasicInfo(): Promise<BasicInfoFormData> {
-  const res = await fetch("/api/basic-info");
-  if (!res.ok) {
-    throw new Error("Failed to fetch basic info");
+  // Using direct Supabase client access instead of API route
+  try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      throw new Error("Not authenticated");
+    }
+    
+    const { data, error } = await supabase
+      .from("employees")
+      .select("first_name, last_name, email, phone_number, department_id, designation, job_status, hire_date, id_input")
+      .eq("id", user.id)
+      .single();
+      
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    return data;
+  } catch (error) {
+    console.error("Error fetching basic info:", error);
+    throw error;
   }
-  const { data } = await res.json();
-  return data;
 }
 
 /**
@@ -20,7 +37,6 @@ export async function fetchCurrentUserBasicInfo(): Promise<BasicInfoFormData> {
  * @returns Promise with basic info data
  */
 export async function fetchUserBasicInfo(uid: string): Promise<BasicInfoFormData> {
-  const supabase = createClient();
   const { data, error } = await supabase
     .from("employees")
     .select("first_name, last_name, email, phone_number, department_id, designation, job_status, hire_date, id_input")
@@ -40,21 +56,32 @@ export async function fetchUserBasicInfo(uid: string): Promise<BasicInfoFormData
  * @returns Promise with updated data
  */
 export async function updateBasicInfo(basicInfo: BasicInfoFormData): Promise<{ data: BasicInfoFormData }> {
-  const response = await fetch("/api/basic-info", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      ...basicInfo,
-      department_id: Number(basicInfo.department_id),
-    }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData?.message || `Error: ${response.status}`);
+  try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      throw new Error("Not authenticated");
+    }
+    
+    const { data, error } = await supabase
+      .from("employees")
+      .update({
+        ...basicInfo,
+        department_id: Number(basicInfo.department_id),
+      })
+      .eq("id", user.id)
+      .select()
+      .single();
+      
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    return { data };
+  } catch (error) {
+    console.error("Error updating basic info:", error);
+    throw error;
   }
-
-  return await response.json();
 }
 
 /**
@@ -66,7 +93,6 @@ export async function isCurrentUserProfile(uid?: string | null): Promise<boolean
   if (!uid) return true;
   
   try {
-    const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     return user?.id === uid;
   } catch (error) {

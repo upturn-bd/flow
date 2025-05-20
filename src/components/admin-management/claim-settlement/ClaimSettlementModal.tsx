@@ -54,7 +54,7 @@ export function ClaimTypeCreateModal({
       setIsValid(false);
       const newErrors: Partial<ClaimTypeFormValues> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof ClaimTypeFormValues] = err.message as unknown as undefined;
       });
       setErrors(newErrors);
     }
@@ -87,7 +87,7 @@ export function ClaimTypeCreateModal({
     if (!result.success) {
       const fieldErrors: Partial<ClaimTypeFormValues> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof ClaimTypeFormValues] = issue.message;
+        fieldErrors[issue.path[0] as keyof ClaimTypeFormValues] = issue.message as unknown as undefined; 
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -102,9 +102,10 @@ export function ClaimTypeCreateModal({
   useEffect(() => {
     async function fetchPositions() {
       try {
-        const res = await fetch("/api/company-info/positions");
-        const data = await res.json();
-        setAllPositions(data.positions);
+        const positions = await import("@/lib/api/company").then(
+          (module) => module.getPositions()
+        );
+        setAllPositions(positions);
       } catch (error) {
         console.error(error);
       }
@@ -117,7 +118,7 @@ export function ClaimTypeCreateModal({
     const fetchAllSettlers = async () => {
       try {
         const response = await getEmployeesInfo();
-        setAllSettlers(response.data);
+        setAllSettlers(response.data || []);
       } catch (error) {
         setAllSettlers([]);
         console.error("Error fetching asset owners:", error);
@@ -269,7 +270,7 @@ export function ClaimTypeUpdateModal({
       setIsValid(false);
       const newErrors: Partial<ClaimTypeFormValues> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof ClaimTypeFormValues] = err.message as unknown as undefined;
       });
       setErrors(newErrors);
     }
@@ -302,7 +303,7 @@ export function ClaimTypeUpdateModal({
     if (!result.success) {
       const fieldErrors: Partial<ClaimTypeFormValues> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof ClaimTypeFormValues] = issue.message;
+        fieldErrors[issue.path[0] as keyof ClaimTypeFormValues] = issue.message as unknown as undefined;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -317,9 +318,10 @@ export function ClaimTypeUpdateModal({
   useEffect(() => {
     async function fetchPositions() {
       try {
-        const res = await fetch("/api/company-info/positions");
-        const data = await res.json();
-        setAllPositions(data.positions);
+        const positions = await import("@/lib/api/company").then(
+          (module) => module.getPositions()
+        );
+        setAllPositions(positions);
       } catch (error) {
         console.error(error);
       }
@@ -332,7 +334,7 @@ export function ClaimTypeUpdateModal({
     const fetchAllSettlers = async () => {
       try {
         const response = await getEmployeesInfo();
-        setAllSettlers(response.data);
+        setAllSettlers(response.data || []);
       } catch (error) {
         setAllSettlers([]);
         console.error("Error fetching asset owners:", error);

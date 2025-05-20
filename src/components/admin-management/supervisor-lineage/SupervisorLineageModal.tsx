@@ -37,9 +37,10 @@ export default function LineageCreateModal({
   useEffect(() => {
     async function fetchPositions() {
       try {
-        const res = await fetch("/api/company-info/positions");
-        const data = await res.json();
-        setAllPositions(data.positions);
+        const positions = await import("@/lib/api/company").then(
+          (module) => module.getPositions()
+        );
+        setAllPositions(positions);
       } catch (error) {
         console.error(error);
       }
@@ -295,9 +296,10 @@ export function LineageUpdateModal({
   useEffect(() => {
     async function fetchPositions() {
       try {
-        const res = await fetch("/api/company-info/positions");
-        const data = await res.json();
-        setAllPositions(data.positions);
+        const positions = await import("@/lib/api/company").then(
+          (module) => module.getPositions()
+        );
+        setAllPositions(positions);
       } catch (error) {
         console.error(error);
       }

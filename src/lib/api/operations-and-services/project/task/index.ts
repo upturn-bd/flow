@@ -1,16 +1,13 @@
-"use server";
-
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { taskSchema } from "@/lib/types";
 
 export async function getTasks() {
-  const client = createClient();
   const company_id = await getCompanyId();
   const user = await getUserInfo();
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("task_records")
     .select("*")
     .eq("company_id", company_id)
@@ -24,13 +21,12 @@ export async function getTasks() {
 }
 
 export async function createTask(payload: z.infer<typeof taskSchema>) {
-  const client = createClient();
   const company_id = await getCompanyId();
 
   const validated = taskSchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { data, error } = await client.from("task_records").insert({
+  const { data, error } = await supabase.from("task_records").insert({
     ...payload,
     company_id,
   });
@@ -40,13 +36,12 @@ export async function createTask(payload: z.infer<typeof taskSchema>) {
 }
 
 export async function updateTask(payload: z.infer<typeof taskSchema>) {
-  const client = createClient();
   const company_id = await getCompanyId();
 
   const validated = taskSchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("task_records")
     .update(payload)
     .eq("id", payload.id)
@@ -57,10 +52,9 @@ export async function updateTask(payload: z.infer<typeof taskSchema>) {
 }
 
 export async function deleteTask(id: number) {
-  const client = createClient();
-  const company_id = await getCompanyId();
+    const company_id = await getCompanyId();
 
-  const { error } = await client
+  const { error } = await supabase
     .from("task_records")
     .delete()
     .eq("id", id)

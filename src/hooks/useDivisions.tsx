@@ -1,11 +1,21 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import {
+  getDivisions as fetchDivisionsApi,
+  createDivision as createDivisionApi,
+  updateDivision as updateDivisionApi,
+  deleteDivision as deleteDivisionApi
+} from "@/lib/api/company/divisions";
 
+// Define Division type that matches both API and UI needs
 export type Division = {
   id: number;
   name: string;
-  head_id: string;
+  head_id?: string;
+  description?: string;
+  company_id?: string | number;
+  created_at?: string;
 };
 
 export function useDivisions() {
@@ -15,9 +25,8 @@ export function useDivisions() {
   const fetchDivisions = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/company-info/divisions");
-      const data = await res.json();
-      setDivisions(data.divisions || []);
+      const data = await fetchDivisionsApi();
+      setDivisions(data as Division[]);
     } catch (error) {
       console.error(error);
     } finally {
@@ -25,29 +34,37 @@ export function useDivisions() {
     }
   }, []);
 
-  const createDivision = async (division: Omit<Division, "id">) => {
-    const res = await fetch("/api/company-info/divisions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(division),
-    });
-    return await res.json();
+  const createDivision = async (division: Omit<Division, "id" | "company_id" | "created_at">) => {
+    try {
+      const data = await createDivisionApi(division);
+      await fetchDivisions(); // Refresh list after creating
+      return { success: true, data };
+    } catch (error) {
+      console.error(error);
+      return { success: false, error };
+    }
   };
 
   const updateDivision = async (division: Division) => {
-    const res = await fetch("/api/company-info/divisions", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(division),
-    });
-    return await res.json();
+    try {
+      await updateDivisionApi(division);
+      await fetchDivisions(); // Refresh list after updating
+      return { success: true };
+    } catch (error) {
+      console.error(error);
+      return { success: false, error };
+    }
   };
 
   const deleteDivision = async (id: number) => {
-    const res = await fetch(`/api/company-info/divisions?id=${id}`, {
-      method: "DELETE",
-    });
-    return await res.json();
+    try {
+      await deleteDivisionApi(id);
+      await fetchDivisions(); // Refresh list after deleting
+      return { success: true, message: "Division deleted successfully." };
+    } catch (error) {
+      console.error(error);
+      return { success: false, error };
+    }
   };
 
   return {

@@ -1,13 +1,12 @@
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/auth/getUser";
 import { newsAndNoticeTypeSchema } from "@/lib/types";
 
 export async function getNewsAndNoticeTypes() {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("notice_types")
     .select("*")
     .eq("company_id", company_id);
@@ -19,7 +18,6 @@ export async function getNewsAndNoticeTypes() {
 export async function createNewsAndNoticeType(
   payload: z.infer<typeof newsAndNoticeTypeSchema>
 ) {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
   const validated = newsAndNoticeTypeSchema.safeParse(payload);
@@ -27,7 +25,7 @@ export async function createNewsAndNoticeType(
 
   const { id, ...rest } = payload;
 
-  const { data, error } = await client.from("notice_types").insert({
+  const { data, error } = await supabase.from("notice_types").insert({
     ...rest,
     company_id,
   });
@@ -37,10 +35,9 @@ export async function createNewsAndNoticeType(
 }
 
 export async function deleteNewsAndNoticeType(id: number) {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
-  const { error } = await client
+  const { error } = await supabase
     .from("notice_types")
     .delete()
     .eq("id", id)

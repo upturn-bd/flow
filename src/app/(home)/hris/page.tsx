@@ -16,7 +16,9 @@ import {
   Loader2,
 } from "lucide-react";
 import TabView, { TabItem } from "@/components/ui/TabView";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
+import Link from "next/link";
+import { isCurrentUserProfile } from "@/lib/api/hris";
 
 // Client component that uses useSearchParams
 function ProfileContent() {
@@ -36,13 +38,8 @@ function ProfileContent() {
       try {
         setLoading(true);
         // Check if we are looking at another user
-        const supabase = createClient();
-
-        const {
-          data: { user: currentUser },
-        } = await supabase.auth.getUser();
-        const isCurrentUser = currentUser?.id === uid;
-        setIsCurrentUser(isCurrentUser);
+        const currentUserCheck = await isCurrentUserProfile(uid);
+        setIsCurrentUser(currentUserCheck);
 
         // Get the user's name for display
         const { data, error } = await supabase
@@ -190,13 +187,13 @@ function ProfileContent() {
           transition={{ duration: 0.3 }}
           className="mb-6"
         >
-          <a
-            href="/home/finder"
+          <Link
+            href="/finder"
             className="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back to Employee Finder
-          </a>
+          </Link>
         </motion.div>
       )}
 

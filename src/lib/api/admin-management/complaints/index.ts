@@ -1,13 +1,12 @@
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/auth/getUser";
 import { complaintsTypeSchema } from "@/lib/types";
 
 export async function getComplaintTypes() {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("complaint_types")
     .select("*")
     .eq("company_id", company_id);
@@ -19,7 +18,6 @@ export async function getComplaintTypes() {
 export async function createComplaintType(
   payload: z.infer<typeof complaintsTypeSchema>
 ) {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
   const validated = complaintsTypeSchema.safeParse(payload);
@@ -27,7 +25,7 @@ export async function createComplaintType(
 
   const { id, ...rest } = payload;
 
-  const { data, error } = await client.from("complaint_types").insert({
+  const { data, error } = await supabase.from("complaint_types").insert({
     ...rest,
     company_id,
   });
@@ -37,10 +35,9 @@ export async function createComplaintType(
 }
 
 export async function deleteComplaintType(id: number) {
-  const client = await createClient();
   const company_id = await getCompanyId();
 
-  const { error } = await client
+  const { error } = await supabase
     .from("complaint_types")
     .delete()
     .eq("id", id)
