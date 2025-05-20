@@ -2,7 +2,9 @@
 
 import { Department } from "@/hooks/useDepartments";
 import { Division } from "@/hooks/useDivisions";
+import { useEmployees } from "@/hooks/useEmployees";
 import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
+import { useEffect } from "react";
 
 interface DepartmentDetailsModalProps {
   department: Department;
@@ -10,7 +12,6 @@ interface DepartmentDetailsModalProps {
   onClose: () => void;
   editDepartment: () => void;
   deleteDepartment: () => void;
-  employees: { id: number; name: string }[];
 }
 
 export default function DepartmentDetailsModal({
@@ -18,9 +19,12 @@ export default function DepartmentDetailsModal({
   onClose,
   editDepartment,
   deleteDepartment,
-  employees,
   divisions,
 }: DepartmentDetailsModalProps) {
+  const { employees, fetchEmployees } = useEmployees();
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg w-full max-w-md">
@@ -32,11 +36,11 @@ export default function DepartmentDetailsModal({
           </p>
           <p>
             <strong>Head:</strong>{" "}
-            {
-              employees?.filter(
-                (employee) => employee.id == department.head_id
-              )[0]?.name
-            }
+            {department?.head_id == null
+              ? "No head assigned"
+              : employees?.filter(
+                  (employee) => employee.id == department.head_id
+                )[0]?.name}
           </p>
           <p>
             <strong>Division ID:</strong>{" "}

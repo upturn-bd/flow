@@ -1,23 +1,27 @@
 "use client";
 
 import { Division } from "@/hooks/useDivisions";
+import { useEmployees } from "@/hooks/useEmployees";
 import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
+import { useEffect } from "react";
 
 interface DivisionDetailsModalProps {
   division: Division;
   onClose: () => void;
   editDivision: () => void;
   deleteDivision: () => void;
-  employees: { id: number; name: string }[];
 }
 
 export default function DivisionDetailsModal({
   division,
   onClose,
-  employees,
   editDivision,
   deleteDivision,
 }: DivisionDetailsModalProps) {
+  const { employees, fetchEmployees } = useEmployees();
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg w-full max-w-md">
@@ -29,11 +33,11 @@ export default function DivisionDetailsModal({
           </p>
           <p>
             <strong>Head:</strong>
-            {
-              employees?.filter(
-                (employee) => employee.id == division.head_id
-              )[0]?.name
-            }
+            {division?.head_id == null
+              ? "No head assigned"
+              : employees?.filter(
+                  (employee) => employee.id == division.head_id
+                )[0]?.name}
           </p>
         </div>
         <div className="flex justify-end pt-4">
@@ -43,17 +47,11 @@ export default function DivisionDetailsModal({
           >
             Close
           </button>
-          <button
-            onClick={editDivision}
-            className="p-2"
-          >
+          <button onClick={editDivision} className="p-2">
             <PencilSimple size={24} />
           </button>
-          <button
-            onClick={deleteDivision}
-            className="p-2"
-          >
-           <TrashSimple className="text-red-600" size={24} />
+          <button onClick={deleteDivision} className="p-2">
+            <TrashSimple className="text-red-600" size={24} />
           </button>
         </div>
       </div>
