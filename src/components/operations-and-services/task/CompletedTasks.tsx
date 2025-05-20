@@ -41,12 +41,12 @@ function TaskCard({
     fetchEmployees();
     fetchDepartments();
   }, [fetchEmployees, fetchDepartments]);
-  
+
   const { id, task_title, department_id, task_description } = task;
 
   const handleDelete = async () => {
     if (!id) return;
-    
+
     try {
       setIsDeleting(true);
       await deleteTask(id);
@@ -67,9 +67,9 @@ function TaskCard({
       </div>
     );
   }
-  
+
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -78,8 +78,13 @@ function TaskCard({
     >
       <div className="flex justify-between items-start">
         <div className="flex items-start gap-2">
-          <CheckCircle size={18} className="text-green-500 mt-1 flex-shrink-0" />
-          <h2 className="text-md md:text-lg font-semibold text-gray-800">{task_title}</h2>
+          <CheckCircle
+            size={18}
+            className="text-green-500 mt-1 flex-shrink-0"
+          />
+          <h2 className="text-md md:text-lg font-semibold text-gray-800">
+            {task_title}
+          </h2>
         </div>
         <div className="flex gap-x-2">
           <motion.button
@@ -105,18 +110,20 @@ function TaskCard({
           </motion.button>
         </div>
       </div>
-      
+
       <div className="mt-2 text-sm text-gray-600">
         <p>{task_description}</p>
       </div>
-      
-      {department_id && departments.find(dept => dept.id === department_id) && (
-        <div className="mt-1">
-          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-            {departments.find(dept => dept.id === department_id)?.name || 'Unknown department'}
-          </span>
-        </div>
-      )}
+
+      {department_id &&
+        departments.find((dept) => dept.id === department_id) && (
+          <div className="mt-1">
+            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+              {departments.find((dept) => dept.id === department_id)?.name ||
+                "Unknown department"}
+            </span>
+          </div>
+        )}
     </motion.div>
   );
 }
@@ -130,12 +137,12 @@ function CompletedTasksList() {
 
   async function fetchTasks() {
     setLoading(true);
-    const client = createClient();
+
     const company_id = await getCompanyId();
     const user = await getUserInfo();
 
     try {
-      const { data, error } = await client
+      const { data, error } = await supabase
         .from("task_records")
         .select("*")
         .eq("company_id", company_id)
@@ -188,16 +195,18 @@ function CompletedTasksList() {
             <p className="text-gray-500">Loading completed tasks...</p>
           </motion.div>
         )}
-        
+
         {!selectedTask && !taskDetailsId && !loading && (
-          <motion.div 
+          <motion.div
             key="content"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="px-2 py-4 md:p-6 max-w-5xl mx-auto"
           >
-            <h1 className="text-xl font-bold text-blue-700 mb-6">Completed Tasks</h1>
+            <h1 className="text-xl font-bold text-blue-700 mb-6">
+              Completed Tasks
+            </h1>
 
             <div className="space-y-4">
               <AnimatePresence>
@@ -221,15 +230,19 @@ function CompletedTasksList() {
                     <div className="bg-gray-100 rounded-full p-4 mb-4">
                       <CheckCircle className="h-12 w-12 text-gray-400" />
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900">No completed tasks</h3>
-                    <p className="mt-1 text-gray-500">Tasks will appear here once they're marked as complete</p>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      No completed tasks
+                    </h3>
+                    <p className="mt-1 text-gray-500">
+                      Tasks will appear here once they're marked as complete
+                    </p>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
           </motion.div>
         )}
-        
+
         {taskDetailsId && (
           <TaskDetails
             onClose={() => setTaskDetailsId(null)}

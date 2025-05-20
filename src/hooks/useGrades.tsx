@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   getGrades as fetchGradesApi,
   createGrade as createGradeApi,
@@ -11,9 +11,6 @@ export type Grade = {
   id: number;
   name: string;
   company_id: number;
-  level?: number;
-  description?: string;
-  created_at?: string;
 };
 
 export function useGrades() {

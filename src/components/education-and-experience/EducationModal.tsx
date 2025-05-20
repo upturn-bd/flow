@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 import { dirtyValuesChecker, extractFilenameFromUrl } from "@/lib/utils";
 import { Education } from "@/hooks/useEducation";
 import { schoolingSchema, schoolingTypes } from "@/lib/types";
-import { uploadFile } from "@/lib/api/education-and-experience";
 import { FiUploadCloud } from "react-icons/fi";
-import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
+import { useFileUpload } from "@/hooks/useFileUpload";
 
 interface EducationModalProps {
   initialData?: Education | null;
@@ -31,6 +30,8 @@ export default function EducationModal({
     employee_id: "",
     company_id: 0,
   });
+  
+  const { uploading, uploadFiles } = useFileUpload();
 
   useEffect(() => {
     if (initialData) {
@@ -86,23 +87,26 @@ export default function EducationModal({
       return;
     }
 
-    if (attachments.length > 0) {
-      const { uploadedFilePaths, error: uploadError } = await uploadManyFiles(
-        attachments,
-        "education-certificates"
-      );
-
-      if (uploadError) throw uploadError;
-
-      onSubmit({
-        ...result.data,
-        attachments: [...existingAttachments, ...(uploadedFilePaths || [])],
-      });
+    try {
+      if (attachments.length > 0) {
+        const uploadResult = await uploadFiles(attachments, "education-certificates");
+  
+        if (!uploadResult.success) {
+          throw new Error("Failed to upload files");
+        }
+  
+        onSubmit({
+          ...result.data,
+          attachments: [...existingAttachments, ...(uploadResult.fileUrls || [])],
+        });
+      } else {
+        onSubmit(result.data);
+      }
+      
       setErrors({});
-      setIsSubmitting(false);
-    } else {
-      onSubmit(result.data);
-      setErrors({});
+    } catch (error) {
+      console.error("Error during form submission:", error);
+    } finally {
       setIsSubmitting(false);
     }
   };

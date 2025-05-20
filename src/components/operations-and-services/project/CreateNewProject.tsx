@@ -1,8 +1,8 @@
 "use client";
 
 import { useDepartments } from "@/hooks/useDepartments";
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
-import { updateProject } from "@/lib/api/operations-and-services/project";
+import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
+import { useProjects } from "@/hooks/useProjects";
 import { getCompanyId } from "@/lib/auth/getUser";
 import { supabase } from "@/lib/supabase/client";
 import { milestoneSchema, projectSchema } from "@/lib/types";
@@ -68,7 +68,8 @@ export default function CreateNewProjectPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const { departments, fetchDepartments } = useDepartments();
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const { employees, fetchEmployeeInfo } = useEmployeeInfo();
+  const { createProject } = useProjects();
   const [milestone, setMilestone] = useState<Milestone>(initialMilestone);
   const [milestoneAssignees, setMilestoneAssignees] = useState<string[]>([]);
   const [milestones, setMilestones] = useState<Milestone[] | []>([]);
@@ -81,40 +82,38 @@ export default function CreateNewProjectPage() {
   const [isCreatingMilestone, setIsCreatingMilestone] = useState(false);
   const [isMilestoneValid, setIsMilestoneValid] = useState(false);
 
-  async function updateProject(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const client = createClient();
-    const company_id = await getCompanyId();
     setIsSubmitting(true);
+    
     try {
-      const validated = projectSchema.safeParse(projectDetails);
-      if (!validated.success) throw validated.error;
-      const { data, error } = await client
-        .from("project_records")
-        .insert({
-          ...projectDetails,
-          company_id,
-          assignees: projectAssignees,
-        })
-        .select("id")
-        .single();
-
-      if (error) throw error;
-
+      const company_id = await getCompanyId();
+      const projectData = {
+        ...projectDetails,
+        assignees: projectAssignees
+      };
+      
+      const result = await createProject(projectData);
+      
+      if (!result.success) {
+        throw new Error("Failed to create project");
+      }
+      
       if (milestones.length > 0) {
         const formatMilestones = milestones.map((m) => ({
           ...m,
-          project_id: data.id,
+          project_id: result.data?.id,
           assignees: m.assignees || [],
           company_id,
         }));
 
-        const { error: milestoneError } = await client
+        const { error: milestoneError } = await supabase
           .from("milestone_records")
           .insert(formatMilestones);
 
         if (milestoneError) console.error(milestoneError);
       }
+      
       setProjectDetails(initialProjectDetails);
       setProjectAssignees([]);
       setMilestones([]);
@@ -259,33 +258,8 @@ export default function CreateNewProjectPage() {
   }, [fetchDepartments]);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setEmployees(response.data || []);
-      } catch (error) {
-        setEmployees([]);
-        console.error("Error fetching asset owners:", error);
-      }
-    };
-
-    fetchEmployees();
-  }, []);
-
-  useEffect(() => {
-    const result = projectSchema.safeParse(projectDetails);
-    if (result.success) {
-      setIsValid(true);
-      setErrors({});
-    } else {
-      setIsValid(false);
-      const newErrors: Partial<ProjectDetails> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof ProjectDetails] = err.message as any;
-      });
-      setErrors(newErrors);
-    }
-  }, [projectDetails]);
+    fetchEmployeeInfo();
+  }, [fetchEmployeeInfo]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -372,7 +346,7 @@ export default function CreateNewProjectPage() {
         Create New Project
       </motion.h1>
       
-      <form onSubmit={updateProject} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <motion.div 
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -1298,26 +1272,23 @@ export function UpdateProjectPage({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const { departments, fetchDepartments } = useDepartments();
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const { employees, fetchEmployeeInfo } = useEmployeeInfo();
+  const { updateProject } = useProjects();
 
-  async function updateProject(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setIsSubmitting(true);
     try {
-      const validated = projectSchema.safeParse(projectDetails);
-      if (!validated.success) throw validated.error;
-      onSubmit({
-        ...projectDetails,
-        assignees: projectAssignees,
-      });
-      setProjectDetails(initialProjectDetails);
-      setProjectAssignees([]);
-      toast.success("Project updated successfully!");
+      const result = await updateProject(projectDetails);
+      if (result.success) {
+        onSubmit(projectDetails);
+        onClose();
+        toast.success("Project updated successfully!");
+      } else {
+        throw new Error("Failed to update project");
+      }
     } catch (error) {
       console.error("Error updating project:", error);
       toast.error("Error updating project. Please try again.");
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
@@ -1355,18 +1326,8 @@ export function UpdateProjectPage({
   }, [projectDetails]);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setEmployees(response.data || []);
-      } catch (error) {
-        setEmployees([]);
-        console.error("Error fetching asset owners:", error);
-      }
-    };
-
-    fetchEmployees();
-  }, []);
+    fetchEmployeeInfo();
+  }, [fetchEmployeeInfo]);
 
   useEffect(() => {
     fetchDepartments();
@@ -1429,7 +1390,7 @@ export function UpdateProjectPage({
         Update Project
       </motion.h1>
       
-      <form onSubmit={updateProject} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Project Name

@@ -13,7 +13,7 @@ export type Position = {
   name: string;
   description?: string;
   department_id?: number;
-  grade_id?: number;
+  grade?: number;
   company_id?: string | number;
   created_at?: string;
 };

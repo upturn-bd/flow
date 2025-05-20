@@ -4,18 +4,23 @@ import { z } from "zod";
 import { useEffect, useState } from "react";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
+import { Division } from "@/hooks/useDivisions";
 
+// Define the schema using Zod
 const schema = z.object({
   id: z.number().optional(),
   name: z.string().min(1).max(50),
   head_id: z.string().min(1),
+  description: z.string().optional(),
+  company_id: z.union([z.string(), z.number()]).optional(),
+  created_at: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
 
 interface DivisionModalProps {
-  initialData?: { id: number; name: string; head_id: string } | null;
-  onSubmit: (values: FormValues) => void;
+  initialData?: Division | null;
+  onSubmit: (values: Division) => void;
   onClose: () => void;
 }
 
@@ -24,15 +29,14 @@ export default function DivisionModal({
   onSubmit,
   onClose,
 }: DivisionModalProps) {
-  const [formValues, setFormValues] = useState<FormValues>({
+  const [formValues, setFormValues] = useState<Division>({
     id: initialData?.id ?? 0,
     name: initialData?.name ?? "",
     head_id: initialData?.head_id ?? "",
+    description: initialData?.description ?? "",
   });
 
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof FormValues, string>>
-  >({});
+  const [errors, setErrors] = useState<Partial<Division>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
@@ -41,9 +45,9 @@ export default function DivisionModal({
   useEffect(() => {
     const result = schema.safeParse(formValues);
     if (!result.success) {
-      const fieldErrors: Partial<Record<keyof FormValues, string>> = {};
+      const fieldErrors: Partial<Division> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] = issue.message;
+        fieldErrors[issue.path[0] as keyof Division] = issue.message as any;
       }
       setErrors(fieldErrors);
     } else {
@@ -55,11 +59,14 @@ export default function DivisionModal({
   useEffect(() => {
     if (initialData) {
       setIsDirty(dirtyValuesChecker(initialData, formValues));
+    } else {
+      const dirty = Object.values(formValues).some((v) => v !== "");
+      setIsDirty(dirty);
     }
   }, [initialData, formValues]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormValues((prev) => ({
@@ -75,9 +82,9 @@ export default function DivisionModal({
     const result = schema.safeParse(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<Record<keyof FormValues, string>> = {};
+      const fieldErrors: Partial<Division> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] = issue.message;
+        fieldErrors[issue.path[0] as keyof Division] = issue.message as any;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -85,7 +92,7 @@ export default function DivisionModal({
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(formValues);
     setIsSubmitting(false);
   };
 
@@ -136,6 +143,23 @@ export default function DivisionModal({
           </select>
           {errors.head_id && (
             <p className="text-red-500 text-sm">{errors.head_id}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block font-semibold text-blue-800 mb-1">
+            Division Description
+          </label>
+          <textarea
+            name="description"
+            value={formValues.description || ""}
+            onChange={handleChange}
+            className="w-full rounded-md bg-blue-50 p-2"
+            placeholder="Add Division Description"
+            rows={4}
+          />
+          {errors.description && (
+            <p className="text-red-500 text-sm">{errors.description}</p>
           )}
         </div>
 

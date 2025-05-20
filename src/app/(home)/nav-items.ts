@@ -36,9 +36,4 @@ export const navItems = [
       href: "/admin-management",
       icon: UserGearIcon,
     },
-    {
-      label: "Account",
-      href: "/account",
-      icon: UserIcon,
-    },
   ];

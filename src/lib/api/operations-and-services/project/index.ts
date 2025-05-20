@@ -42,7 +42,7 @@ export async function getProjects() {
   return formatData;
 }
 
-export async function createProject(payload: z.infer<typeof projectSchema>) {
+export async function createProject(payload: z.infer<typeof projectSchema>): Promise<{ id: number }> {
   const company_id = await getCompanyId();
 
   const validated = projectSchema.safeParse(payload);
@@ -51,7 +51,7 @@ export async function createProject(payload: z.infer<typeof projectSchema>) {
   const { data, error } = await supabase.from("project_records").insert({
     ...payload,
     company_id,
-  });
+  }).select("id").single();
 
   if (error) throw error;
   return data;

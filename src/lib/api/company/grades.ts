@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
+import { getCompanyId } from "./companyInfo";
 
 interface Grade {
   id: number;
@@ -15,30 +16,18 @@ interface Grade {
 export async function getGrades(): Promise<Grade[]> {
   try {
     
-    // First get the user to ensure authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      throw new Error("Not authenticated");
-    }
-    
-    // Get company_id from the employees table
-    const { data: employee, error: employeeError } = await supabase
-      .from("employees")
-      .select("company_id")
-      .eq("id", user.id)
-      .single();
+    const {company_id, error: companyError} = await getCompanyId();
       
-    if (employeeError) {
-      throw new Error(employeeError.message);
+    if (companyError) {
+      throw new Error(companyError.message);
     }
     
     // Fetch grades using the company_id
     const { data: grades, error } = await supabase
       .from("grades")
       .select("*")
-      .eq("company_id", employee.company_id);
-      
+      .eq("company_id", company_id);
+
     if (error) {
       throw error;
     }

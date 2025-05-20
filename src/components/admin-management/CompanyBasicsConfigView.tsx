@@ -25,7 +25,7 @@ import {
   X, 
   Info 
 } from "lucide-react";
-import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
+import { fadeInUp, staggerContainer } from "@/components/ui/animations";
 
 // Add prop type
 type CompanyBasicsConfigViewProps = {

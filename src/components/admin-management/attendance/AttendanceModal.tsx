@@ -7,6 +7,11 @@ import { z } from "zod";
 import { Site } from "@/hooks/useAttendanceManagement";
 import { dirtyValuesChecker } from "@/lib/utils";
 
+type Coordinates = {
+  lat: number;
+  lng: number;
+};
+
 type FormValues = z.infer<typeof siteSchema>;
 
 interface AttendanceCreateModalProps {
@@ -48,7 +53,7 @@ export default function AttendanceCreateModal({
       setIsValid(false);
       const newErrors: Partial<FormValues> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof FormVaues] = err.message;
+        newErrors[err.path[0] as keyof FormValues] = err.message as any;
       });
       setErrors(newErrors);
     }
@@ -72,7 +77,7 @@ export default function AttendanceCreateModal({
     if (!result.success) {
       const fieldErrors: Partial<FormValues> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] = issue.message;
+        fieldErrors[issue.path[0] as keyof FormValues] = issue.message as any;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -102,10 +107,6 @@ export default function AttendanceCreateModal({
       }));
     }
   }, [coordinates, map]);
-
-  useEffect(() => {
-    console.log("Form Values:", formValues);
-  }, [formValues]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
@@ -158,7 +159,7 @@ export default function AttendanceCreateModal({
 
         <ClientMap
           type="create"
-          value={coordinates}
+          value={coordinates!}
           onChange={(coords) =>
             setFormValues({
               ...formValues,
@@ -221,7 +222,7 @@ export function AttendanceUpdateModal({
       setIsValid(false);
       const newErrors: Partial<FormValues> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof FormValues] = err.message as any;
       });
       setErrors(newErrors);
     }
@@ -245,7 +246,7 @@ export function AttendanceUpdateModal({
     if (!result.success) {
       const fieldErrors: Partial<FormValues> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] = issue.message;
+        fieldErrors[issue.path[0] as keyof FormValues] = issue.message as any;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -331,7 +332,7 @@ export function AttendanceUpdateModal({
 
         <ClientMap
           type="update"
-          value={coordinates}
+          value={coordinates!}
           onChange={(coords) =>
             setFormValues({
               ...formValues,

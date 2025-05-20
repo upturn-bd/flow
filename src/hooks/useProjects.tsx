@@ -1,13 +1,13 @@
 "use client";
 
-import {
-  createProject as cProject,
-  deleteProject as dProject,
-  getProjects,
-  updateProject as uProject,
+import { useState, useCallback } from "react";
+import { 
+  getProjects as fetchProjectsApi, 
+  createProject as createProjectApi, 
+  updateProject as updateProjectApi, 
+  deleteProject as deleteProjectApi 
 } from "@/lib/api/operations-and-services/project";
 import { projectSchema } from "@/lib/types";
-import { useState, useCallback } from "react";
 import { z } from "zod";
 
 export type Project = z.infer<typeof projectSchema>;
@@ -15,40 +15,62 @@ export type Project = z.infer<typeof projectSchema>;
 export function useProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      const data = await getProjects();
-      setProjects(data);
-    } catch (error) {
-      console.error(error);
+      const data = await fetchProjectsApi();
+      setProjects(data as Project[]);
+    } catch (err) {
+      console.error("Error fetching projects:", err);
+      setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
       setLoading(false);
     }
   }, []);
 
   const createProject = async (project: Project) => {
-    const data = await cProject(project);
-    return { success: true, status: 200, data };
+    try {
+      const data = await createProjectApi(project);
+      await fetchProjects(); // Refresh list after creating
+      return { success: true, data };
+    } catch (err) {
+      console.error("Error creating project:", err);
+      return { success: false, error: err };
+    }
   };
 
   const updateProject = async (project: Project) => {
-    const data = await uProject(project);
-    return { success: true, status: 200, data };
+    try {
+      await updateProjectApi(project);
+      await fetchProjects(); // Refresh list after updating
+      return { success: true };
+    } catch (err) {
+      console.error("Error updating project:", err);
+      return { success: false, error: err };
+    }
   };
 
   const deleteProject = async (id: number) => {
-    const data = await dProject(id);
-    return { success: true, status: 200, data };
+    try {
+      await deleteProjectApi(id);
+      await fetchProjects(); // Refresh list after deleting
+      return { success: true };
+    } catch (err) {
+      console.error("Error deleting project:", err);
+      return { success: false, error: err };
+    }
   };
 
   return {
     projects,
     loading,
+    error,
     fetchProjects,
     createProject,
     updateProject,
-    deleteProject,
+    deleteProject
   };
 }

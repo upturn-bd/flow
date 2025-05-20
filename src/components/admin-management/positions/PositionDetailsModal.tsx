@@ -32,14 +32,14 @@ export default function PositionDetailsModal({
             <strong>Name:</strong> {position?.name}
           </p>
           <p>
-            <strong>Department:</strong>
+            <strong>Department: </strong>
             {
               departments?.filter((dep) => dep.id == position.department_id)[0]
                 ?.name
             }
           </p>
           <p>
-            <strong>Grade:</strong>
+            <strong>Grade: </strong>
             {grades?.filter((grade) => grade.id == position.grade)[0]?.name}
           </p>
           <p>

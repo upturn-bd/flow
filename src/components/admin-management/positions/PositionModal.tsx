@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import { dirtyValuesChecker } from "@/lib/utils";
+import { Position } from "@/hooks/usePositions";
 
 // Define the schema using Zod
 const schema = z.object({
@@ -11,13 +12,13 @@ const schema = z.object({
   description: z.string().optional(),
   department_id: z.number().min(1),
   grade: z.number().min(1),
+  company_id: z.union([z.string(), z.number()]).optional(),
+  created_at: z.string().optional(),
 });
 
-type FormValues = z.infer<typeof schema>;
-
 interface PositionModalProps {
-  initialData?: FormValues | null;
-  onSubmit: (values: FormValues) => void;
+  initialData?: Position | null;
+  onSubmit: (values: Position) => void;
   onClose: () => void;
   departments: { id: number; name: string }[];
   grades: { id: number; name: string }[];
@@ -31,7 +32,7 @@ export default function PositionModal({
   onClose,
 }: PositionModalProps) {
   const [isDirty, setIsDirty] = useState(false);
-  const [formValues, setFormValues] = useState<FormValues>({
+  const [formValues, setFormValues] = useState<Position>({
     id: 0,
     name: "",
     description: "",
@@ -39,7 +40,7 @@ export default function PositionModal({
     grade: 0,
   });
 
-  const [errors, setErrors] = useState<Partial<FormValues>>({});
+  const [errors, setErrors] = useState<Partial<Position>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
@@ -54,7 +55,11 @@ export default function PositionModal({
   useEffect(() => {
     if (initialData) {
       const dirty = dirtyValuesChecker(initialData, formValues);
-      setIsDirty(dirty);
+      if (initialData.grade !== formValues.grade) {
+        setIsDirty(true);
+      } else {
+        setIsDirty(dirty);
+      }
     } else {
       const dirty = Object.values(formValues).some((v) => v !== "");
       setIsDirty(dirty);
@@ -69,9 +74,9 @@ export default function PositionModal({
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<FormValues> = {};
+      const newErrors: Partial<Position> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof Position] = err.message as any;
       });
       setErrors(newErrors);
     }
@@ -80,7 +85,7 @@ export default function PositionModal({
   }, [formValues]);
 
   const handleChange =
-    (field: keyof FormValues) =>
+    (field: keyof Position) =>
     (
       event: React.ChangeEvent<
         HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -134,7 +139,7 @@ export default function PositionModal({
             Department
           </label>
           <select
-            value={formValues.department_id}
+            value={formValues.department_id || ""}
             onChange={handleChange("department_id")}
             className="w-full rounded-md bg-blue-50 p-2"
           >
@@ -155,7 +160,7 @@ export default function PositionModal({
             Grade
           </label>
           <select
-            value={formValues.grade}
+            value={formValues.grade || ""}
             onChange={handleChange("grade")}
             className="w-full rounded-md bg-blue-50 p-2"
           >

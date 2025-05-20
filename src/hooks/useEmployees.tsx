@@ -19,10 +19,9 @@ export function useEmployees() {
 
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
-    const client = createClient();
     const company_id = await getCompanyId();
     try {
-      const res = await client
+      const res = await supabase
         .from("employees")
         .select("id, first_name, last_name, role, email, phone_number")
         .eq("company_id", company_id);
