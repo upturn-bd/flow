@@ -3,7 +3,7 @@
 import React, { useEffect, useState, ChangeEvent } from "react";
 import { z } from "zod";
 import { settlementRecordSchema } from "@/lib/types";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
 import { useClaimTypes } from "@/hooks/useClaimAndSettlement";

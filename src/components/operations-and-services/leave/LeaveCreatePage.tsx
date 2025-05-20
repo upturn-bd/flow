@@ -2,7 +2,7 @@
 
 import { useLeaveTypes } from "@/hooks/useLeaveManagement";
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { leaveSchema } from "@/lib/types";
 import React, { useEffect, useState } from "react";
 import { Calendar, CheckCircle, Clock, Info } from "lucide-react";

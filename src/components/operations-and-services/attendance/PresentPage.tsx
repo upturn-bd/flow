@@ -2,7 +2,7 @@
 
 import { Attendance } from "@/hooks/useAttendance";
 import { getUserInfo } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { FaChevronDown, FaCalendarAlt, FaSearch } from "react-icons/fa";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
@@ -15,7 +15,7 @@ export default function AttendancePresentPage() {
 
   async function fetchAttendanceData() {
     setLoading(true);
-    const supabase = createClient();
+    
     const user = await getUserInfo();
     try {
       const { data, error } = await supabase

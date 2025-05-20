@@ -1,7 +1,7 @@
 "use client";
 
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
 import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
 import { ComplaintState } from "./ComplaintCreatePage";
@@ -19,7 +19,7 @@ export default function ComplaintHistoryPage() {
 
   async function fetchComplaintRequests() {
     setLoading(true);
-    const supabase = createClient();
+    
     const user = await getUserInfo();
     const company_id = await getCompanyId();
     try {

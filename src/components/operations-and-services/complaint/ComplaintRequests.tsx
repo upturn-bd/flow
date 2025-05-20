@@ -1,7 +1,7 @@
 "use client";
 
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
 import { FaFilePdf } from "react-icons/fa";
 import { extractFilenameFromUrl } from "@/lib/utils";
@@ -21,7 +21,7 @@ export default function ComplaintRequestsPage() {
 
   async function fetchComplaintRequests() {
     setLoading(true);
-    const supabase = createClient();
+    
     const user = await getUserInfo();
     const company_id = await getCompanyId();
     try {
@@ -46,7 +46,7 @@ export default function ComplaintRequestsPage() {
   }
 
   async function updateSettlementRequest(action: string, id: number) {
-    const supabase = createClient();
+    
     const user = await getUserInfo();
     const company_id = await getCompanyId();
     try {

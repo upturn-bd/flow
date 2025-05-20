@@ -5,7 +5,7 @@ import { useSites } from "@/hooks/useAttendanceManagement";
 import { useNotices } from "@/hooks/useNotice";
 import { useTasks } from "@/hooks/useTasks";
 import { getUserInfo } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { formatDateToDayMonth } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -90,7 +90,7 @@ export default function HomePage() {
   }
   
   const handleCheckIn = async () => {
-    const supabase = createClient();
+    
     const user = await getUserInfo();
     const coordinates = await getCurrentCoordinates();
     if (!coordinates) return; // Exit if permission denied
@@ -139,7 +139,7 @@ export default function HomePage() {
   };
 
   const handleCheckOut = async () => {
-    const supabase = createClient();
+    
     const user = await getUserInfo();
     const coordinates = await getCurrentCoordinates();
     if (!coordinates) return; // Exit if permission denied

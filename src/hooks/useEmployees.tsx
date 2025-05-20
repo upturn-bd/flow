@@ -1,7 +1,7 @@
 "use client";
 
 import { getCompanyId } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useState, useCallback } from "react";
 import { z } from "zod";
 

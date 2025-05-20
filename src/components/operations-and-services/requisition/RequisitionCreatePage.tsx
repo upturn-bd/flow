@@ -8,7 +8,7 @@ import { useRequisitionInventories } from "@/hooks/useInventory";
 import { useRequisitionTypes } from "@/hooks/useRequisitionTypes";
 import { z } from "zod";
 import { requisitionSchema } from "@/lib/types";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
 import { motion, AnimatePresence } from "framer-motion";

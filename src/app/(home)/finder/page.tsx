@@ -19,7 +19,7 @@ import {
 import FormInputField from "@/components/ui/FormInputField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { useEmployees } from "@/hooks/useEmployees";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 
 // Define the type for employee details from the database
 type EmployeeDetail = {
@@ -83,7 +83,7 @@ export default function FinderPage() {
       if (!employees.length) return;
       
       try {
-        const supabase = createClient();
+        
         const employeeIds = employees.map(emp => emp.id);
         
         // Get employee details from employee_details table

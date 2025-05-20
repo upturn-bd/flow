@@ -10,7 +10,7 @@ import { attendanceSchema } from "@/lib/types";
 import { useState, useCallback, useEffect } from "react";
 import { z } from "zod";
 import { getUserInfo } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 
 export type Attendance = z.infer<typeof attendanceSchema>;
 
@@ -70,7 +70,7 @@ export function useAttendanceStatus() {
   );
   const [loading, setLoading] = useState(true);
   const checkAttendanceStatus = async () => {
-    const supabase = createClient();
+    
     const user = await getUserInfo();
     try {
       setLoading(true);

@@ -21,7 +21,6 @@ export function useSites() {
     try {
       const data = await getSites();
       setSites(data);
-      console.log("data", data);
     } catch (error) {
       console.error(error);
     } finally {

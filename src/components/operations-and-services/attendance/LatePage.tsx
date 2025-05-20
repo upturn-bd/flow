@@ -2,7 +2,7 @@
 
 import { Attendance } from "@/hooks/useAttendance";
 import { getUserInfo } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown, FaCalendarAlt, FaSearch, FaEllipsisV } from "react-icons/fa";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
@@ -73,7 +73,7 @@ export default function AttendanceLatePage() {
 
   async function fetchAttendanceData() {
     setLoading(true);
-    const supabase = createClient();
+    
     const user = await getUserInfo();
     try {
       const { data, error } = await supabase
@@ -95,7 +95,7 @@ export default function AttendanceLatePage() {
   }
 
   async function handleRequest(id: number) {
-    const supabase = createClient();
+    
     const user = await getUserInfo();
     try {
       const { error } = await supabase

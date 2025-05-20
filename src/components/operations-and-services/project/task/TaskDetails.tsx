@@ -3,7 +3,7 @@
 import { useEmployees } from "@/hooks/useEmployees";
 import { Task } from "@/hooks/useTasks";
 import { getCompanyId } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar, ChevronLeft, Loader2, User, CheckCircle, XCircle, Clock } from "lucide-react";

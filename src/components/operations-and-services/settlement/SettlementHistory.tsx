@@ -1,7 +1,7 @@
 "use client";
 
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
 import { SettlementState } from "./SettlementCreatePage";
 import { extractFilenameFromUrl } from "@/lib/utils";
@@ -23,7 +23,7 @@ export default function SettlementHistoryPage() {
 
   async function fetchSettlementRequests() {
     setLoading(true);
-    const supabase = createClient();
+    
     const user = await getUserInfo();
     const company_id = await getCompanyId();
     try {

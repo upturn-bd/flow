@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 
 interface FormData {
     email: string;
@@ -15,7 +15,6 @@ const Page: React.FC = () => {
 
     const onSubmit = async (data: FormData) => {
         try {
-            const supabase = createClient();
             const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
                 redirectTo: `${window.location.origin}/change-pass`,
             });

@@ -36,26 +36,14 @@ export interface CompanyInfoResponse {
  */
 export async function getCompanyInfo(): Promise<CompanyInfoResponse> {
   try {
-    // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      throw new Error("Not authenticated");
+    const { company_id, error: companyIdError } = await getCompanyId();
+
+    if (companyIdError) {
+      throw new Error(companyIdError.message);
     }
-    
-    // Get user's company ID
-    const { data: employee, error: employeeError } = await supabase
-      .from("employees")
-      .select("company_id")
-      .eq("id", user.id)
-      .single();
-      
-    if (employeeError) {
-      throw new Error(employeeError.message);
-    }
-    
-    const companyId = employee.company_id;
-    
+
+    const companyId = company_id;
+
     // Fetch company data
     const { data: company, error: companyError } = await supabase
       .from("companies")
@@ -68,45 +56,45 @@ export async function getCompanyInfo(): Promise<CompanyInfoResponse> {
       `)
       .eq("id", companyId)
       .single();
-      
+
     if (companyError) {
       throw new Error(companyError.message);
     }
-    
+
     // Fetch countries
     const { data: countries, error: countriesError } = await supabase
       .from("countries")
       .select("id, name");
-      
+
     if (countriesError) {
       throw new Error(countriesError.message);
     }
-    
+
     // Fetch industries
     const { data: industries, error: industriesError } = await supabase
       .from("industries")
       .select("id, name");
-      
+
     if (industriesError) {
       throw new Error(industriesError.message);
     }
-    
+
     // Fetch employees from the company
     const { data: employees, error: employeesError } = await supabase
       .from("employees")
       .select("id, first_name, last_name")
       .eq("company_id", companyId);
-      
+
     if (employeesError) {
       throw new Error(employeesError.message);
     }
-    
+
     // Format employees for dropdown display
     const formattedEmployees = employees.map(emp => ({
       id: emp.id,
       name: `${emp.first_name} ${emp.last_name}`
     }));
-    
+
     return {
       company,
       countries,
@@ -117,4 +105,41 @@ export async function getCompanyInfo(): Promise<CompanyInfoResponse> {
     console.error("Error fetching company info:", error);
     throw error;
   }
-} 
+}
+
+export async function getCompanyId(): Promise<{ company_id: number | null, error: Error | null }> {
+
+  // Check localStorage for company_id
+  const localStorageCompanyId = localStorage.getItem("company_id");
+  if (localStorageCompanyId) {
+    return {
+      company_id: parseInt(localStorageCompanyId),
+      error: null
+    };
+  }
+  // Get current user
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error("Not authenticated");
+  }
+
+  // Get user's company ID
+  const { data: employee, error: employeeError } = await supabase
+    .from("employees")
+    .select("company_id")
+    .eq("id", user.id)
+    .single();
+
+  if (employeeError) {
+    console.error("Error fetching company ID:", employeeError);
+  }
+
+  // Save company_id to localStorage
+  localStorage.setItem("company_id", employee?.company_id.toString() || "0");
+
+  return {
+    company_id: employee?.company_id || null,
+    error: employeeError || null
+  };
+}
