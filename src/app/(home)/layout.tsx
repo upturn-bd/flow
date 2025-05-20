@@ -1,7 +1,10 @@
+"use client";
+
 import MobileBottomNav from "./mobile-bottom-nav";
 import Sidebar from "./side-navbar";
+import TopBar from "./top-bar";
 
-export default async function HomeLayout({
+export default function HomeLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -9,9 +12,12 @@ export default async function HomeLayout({
   return (
     <div className="flex h-dvh">
       <Sidebar />
-      <main className="flex-1 md:ml-[100px] pb-36 md:pb-0 overflow-y-auto">
-        {children}
-      </main>
+      <div className="flex-1 md:ml-[80px] flex flex-col h-full">
+        <TopBar />
+        <main className="flex-1 overflow-y-auto pb-36 md:pb-0">
+          {children}
+        </main>
+      </div>
       <MobileBottomNav />
     </div>
   );

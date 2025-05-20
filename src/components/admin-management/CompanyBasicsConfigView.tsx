@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useDepartments } from "@/hooks/useDepartments";
 import DepartmentModal from "./departments/DepartmentModal";
 import DepartmentDetailsModal from "./departments/DepartmentDetailsModal";
@@ -13,6 +14,18 @@ import { usePositions } from "@/hooks/usePositions";
 import PositionDetailsModal from "./positions/PositionDetailsModal";
 import PositionModal from "./positions/PositionModal";
 import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
+import { 
+  Building, 
+  Users, 
+  Layers, 
+  GraduationCap, 
+  BriefcaseBusiness, 
+  Plus, 
+  Eye, 
+  X, 
+  Info 
+} from "lucide-react";
+import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 
 // Add prop type
 type CompanyBasicsConfigViewProps = {
@@ -38,32 +51,32 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
   const handleCreateDivision = async (values: any) => {
     try {
       await createDivision(values);
-      alert("Division created!");
       setIsCreatingDivision(false);
       fetchDivisions();
+      showNotification("Division created successfully");
     } catch {
-      alert("Error creating Division.");
+      showNotification("Error creating Division", true);
     }
   };
 
   const handleUpdateDivision = async (values: any) => {
     try {
       await updateDivision(values);
-      alert("Division updated!");
       setEditDivision(null);
       fetchDivisions();
+      showNotification("Division updated successfully");
     } catch {
-      alert("Error updating Division.");
+      showNotification("Error updating Division", true);
     }
   };
 
   const handleDeleteDivision = async (id: number) => {
     try {
       await deleteDivision(id);
-      alert("Division deleted!");
+      showNotification("Division deleted successfully");
       fetchDivisions();
     } catch {
-      alert("Error deleting Division.");
+      showNotification("Error deleting Division", true);
     }
   };
 
@@ -89,32 +102,32 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
   const handleCreateDepartment = async (values: any) => {
     try {
       await createDepartment(values);
-      alert("Department created!");
       setIsCreatingDepartment(false);
       fetchDepartments();
+      showNotification("Department created successfully");
     } catch {
-      alert("Error creating department.");
+      showNotification("Error creating department", true);
     }
   };
 
   const handleUpdateDepartment = async (values: any) => {
     try {
       await updateDepartment(values);
-      alert("Department updated!");
       setEditDepartment(null);
       fetchDepartments();
+      showNotification("Department updated successfully");
     } catch {
-      alert("Error updating department.");
+      showNotification("Error updating department", true);
     }
   };
 
   const handleDeleteDepartment = async (id: number) => {
     try {
       await deleteDepartment(id);
-      alert("Department deleted!");
+      showNotification("Department deleted successfully");
       fetchDepartments();
     } catch {
-      alert("Error deleting department.");
+      showNotification("Error deleting department", true);
     }
   };
 
@@ -136,25 +149,25 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
   const handleCreateGrade = async (values: any) => {
     try {
       await createGrade(values);
-      alert("Grade created!");
       setIsCreatingGrade(false);
       fetchGrades();
+      showNotification("Grade created successfully");
     } catch {
-      alert("Error creating Grade.");
+      showNotification("Error creating Grade", true);
     }
   };
 
   const handleDeleteGrade = async (id: number) => {
     try {
       await deleteGrade(id);
-      alert("Grade deleted!");
+      showNotification("Grade deleted successfully");
       fetchGrades();
     } catch {
-      alert("Error deleting Grade.");
+      showNotification("Error deleting Grade", true);
     }
   };
 
-  //Department states and functions
+  //Position states and functions
   const {
     positions,
     fetchPositions,
@@ -173,245 +186,384 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
   const handleCreatePosition = async (values: any) => {
     try {
       await createPosition(values);
-      alert("Position created!");
       setIsCreatingPosition(false);
       fetchPositions();
+      showNotification("Position created successfully");
     } catch {
-      alert("Error creating Position.");
+      showNotification("Error creating Position", true);
     }
   };
 
   const handleUpdatePosition = async (values: any) => {
     try {
       await updatePosition(values);
-      alert("Position updated!");
       setEditPosition(null);
       fetchPositions();
+      showNotification("Position updated successfully");
     } catch {
-      alert("Error updating Position.");
+      showNotification("Error updating Position", true);
     }
   };
 
   const handleDeletePosition = async (id: number) => {
     try {
       await deletePosition(id);
-      alert("Position deleted!");
+      showNotification("Position deleted successfully");
       fetchPositions();
     } catch {
-      alert("Error deleting Position.");
+      showNotification("Error deleting Position", true);
     }
   };
 
   const selectedPositionView = positions.find((d) => d.id === viewPosition);
   const selectedPositionEdit = positions.find((d) => d.id === editPosition);
 
+  // Notification state
+  const [notification, setNotification] = useState<{ message: string; isError: boolean; visible: boolean }>({
+    message: '',
+    isError: false,
+    visible: false
+  });
+
+  const showNotification = (message: string, isError = false) => {
+    setNotification({ message, isError, visible: true });
+    setTimeout(() => {
+      setNotification(prev => ({ ...prev, visible: false }));
+    }, 3000);
+  };
+
   return (
-    <div>
-      <div className="space-y-2">
-        <div className="flex flex-col">
-          <label className="block font-bold text-blue-800">Division</label>
+    <motion.div 
+      initial="hidden"
+      animate="visible"
+      variants={staggerContainer}
+    >
+      {/* Notification */}
+      <AnimatePresence>
+        {notification.visible && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center gap-2 ${
+              notification.isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+            }`}
+          >
+            {notification.isError ? <X className="h-5 w-5" /> : <Info className="h-5 w-5" />}
+            <span>{notification.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Divisions Section */}
+      <motion.section 
+        variants={fadeInUp}
+        className="mb-8"
+      >
+        <div className="border-b border-gray-200 pb-4 mb-4">
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+            <Layers className="w-5 h-5 mr-2 text-blue-600" />
+            Divisions
+          </h3>
+          <p className="text-sm text-gray-600">Manage organization divisions</p>
         </div>
 
-        <div className="grid grid-cols-1">
-          {divisions.map((div) => (
-            <div key={div.id} className="py-2 flex items-center gap-x-6">
-              <div className="w-1/2 md:w-1/3 px-3 py-1 rounded-md bg-gray-300">
-                {div.name}
-              </div>
-
-              <button
-                onClick={() => setViewDivision(div.id)}
-                className="w-1/2 md:w-1/3 px-3 py-1 rounded-md bg-gray-300 text-left"
-              >
-                View Details
-              </button>
+        <div className="space-y-3">
+          {divisions.length === 0 ? (
+            <div className="p-6 bg-gray-50 rounded-lg text-center text-gray-500">
+              No divisions added yet. Click the plus button to add one.
             </div>
-          ))}
+          ) : (
+            divisions.map((div) => (
+              <motion.div 
+                key={div.id} 
+                className="bg-white rounded-lg border border-gray-200 p-3 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
+                whileHover={{ scale: 1.01 }}
+              >
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mr-3">
+                    <Layers size={16} />
+                  </div>
+                  <span className="font-medium text-gray-800">{div.name}</span>
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setViewDivision(div.id)}
+                  className="px-3 py-1.5 rounded-md bg-blue-50 text-blue-600 text-sm flex items-center gap-1 hover:bg-blue-100 transition-colors"
+                >
+                  <Eye size={14} />
+                  Details
+                </motion.button>
+              </motion.div>
+            ))
+          )}
         </div>
-        <button
+        
+        <motion.button
+          whileHover={{ scale: 1.1, rotate: 90 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setIsCreatingDivision(true)}
-          type="button"
-          className="text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
+          className="mt-4 flex items-center justify-center text-white bg-blue-600 rounded-full w-8 h-8 shadow-sm hover:bg-blue-700 transition-colors"
         >
-          +
-        </button>
+          <Plus size={18} />
+        </motion.button>
 
-        {isCreatingDivision && (
-          <DivisionModal
-            employees={employees}
-            onSubmit={handleCreateDivision}
-            onClose={() => setIsCreatingDivision(false)}
-          />
-        )}
-        {selectedDivisionView && (
-          <DivisionDetailsModal
-            editDivision={() => setEditDivision(selectedDivisionView.id)}
-            deleteDivision={() => handleDeleteDivision(selectedDivisionView.id)}
-            employees={employees}
-            division={selectedDivisionView}
-            onClose={() => setViewDivision(null)}
-          />
-        )}
-        {selectedDivisionEdit && (
-          <DivisionModal
-            employees={employees}
-            initialData={selectedDivisionEdit}
-            onSubmit={handleUpdateDivision}
-            onClose={() => setEditDivision(null)}
-          />
-        )}
-      </div>
-      <div className="space-y-2 mt-8">
-        <div className="flex flex-col">
-          <label className="block font-bold text-blue-800 mb-2">
-            Department
-          </label>
+        <AnimatePresence>
+          {isCreatingDivision && (
+            <DivisionModal
+              onSubmit={handleCreateDivision}
+              onClose={() => setIsCreatingDivision(false)}
+            />
+          )}
+          {selectedDivisionView && (
+            <DivisionDetailsModal
+              editDivision={() => setEditDivision(selectedDivisionView.id)}
+              deleteDivision={() => handleDeleteDivision(selectedDivisionView.id)}
+              employees={employees}
+              division={selectedDivisionView}
+              onClose={() => setViewDivision(null)}
+            />
+          )}
+          {selectedDivisionEdit && (
+            <DivisionModal
+              initialData={selectedDivisionEdit}
+              onSubmit={handleUpdateDivision}
+              onClose={() => setEditDivision(null)}
+            />
+          )}
+        </AnimatePresence>
+      </motion.section>
+
+      {/* Departments Section */}
+      <motion.section 
+        variants={fadeInUp}
+        className="mb-8"
+      >
+        <div className="border-b border-gray-200 pb-4 mb-4">
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+            <Building className="w-5 h-5 mr-2 text-indigo-600" />
+            Departments
+          </h3>
+          <p className="text-sm text-gray-600">Manage organization departments</p>
         </div>
 
-        <div className="grid grid-cols-1">
-          {departments.map((dept) => (
-            <div key={dept.id} className="py-2 flex items-center gap-x-6">
-              <div className="w-1/2  md:w-1/3 px-3 py-1 rounded-md bg-gray-300">
-                {dept.name}
-              </div>
-
-              <button
-                onClick={() => setViewDepartment(dept.id)}
-                className="w-1/2 md:w-1/3 px-3 py-1 rounded-md bg-gray-300 text-left"
-              >
-                View Details
-              </button>
+        <div className="space-y-3">
+          {departments.length === 0 ? (
+            <div className="p-6 bg-gray-50 rounded-lg text-center text-gray-500">
+              No departments added yet. Click the plus button to add one.
             </div>
-          ))}
+          ) : (
+            departments.map((dept) => (
+              <motion.div 
+                key={dept.id} 
+                className="bg-white rounded-lg border border-gray-200 p-3 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
+                whileHover={{ scale: 1.01 }}
+              >
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mr-3">
+                    <Building size={16} />
+                  </div>
+                  <span className="font-medium text-gray-800">{dept.name}</span>
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setViewDepartment(dept.id)}
+                  className="px-3 py-1.5 rounded-md bg-indigo-50 text-indigo-600 text-sm flex items-center gap-1 hover:bg-indigo-100 transition-colors"
+                >
+                  <Eye size={14} />
+                  Details
+                </motion.button>
+              </motion.div>
+            ))
+          )}
         </div>
-        <button
+        
+        <motion.button
+          whileHover={{ scale: 1.1, rotate: 90 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setIsCreatingDepartment(true)}
-          type="button"
-          className="text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
+          className="mt-4 flex items-center justify-center text-white bg-indigo-600 rounded-full w-8 h-8 shadow-sm hover:bg-indigo-700 transition-colors"
         >
-          +
-        </button>
+          <Plus size={18} />
+        </motion.button>
 
-        {isCreatingDepartment && (
-          <DepartmentModal
-            employees={employees}
-            divisions={divisions}
-            onSubmit={handleCreateDepartment}
-            onClose={() => setIsCreatingDepartment(false)}
-          />
-        )}
-        {selectedDepartmentView && (
-          <DepartmentDetailsModal
-            divisions={divisions}
-            editDepartment={() => setEditDepartment(selectedDepartmentView.id)}
-            deleteDepartment={() =>
-              handleDeleteDepartment(selectedDepartmentView.id)
-            }
-            employees={employees}
-            department={selectedDepartmentView}
-            onClose={() => setViewDepartment(null)}
-          />
-        )}
-        {selectedDepartmentEdit && (
-          <DepartmentModal
-            employees={employees}
-            divisions={divisions}
-            initialData={selectedDepartmentEdit}
-            onSubmit={handleUpdateDepartment}
-            onClose={() => setEditDepartment(null)}
-          />
-        )}
-      </div>
-      <div className="space-y-2 mt-8">
-        <label className="block font-bold text-blue-800 mb-2">Grade</label>
+        <AnimatePresence>
+          {isCreatingDepartment && (
+            <DepartmentModal
+              divisions={divisions}
+              onSubmit={handleCreateDepartment}
+              onClose={() => setIsCreatingDepartment(false)}
+            />
+          )}
+          {selectedDepartmentView && (
+            <DepartmentDetailsModal
+              divisions={divisions}
+              editDepartment={() => setEditDepartment(selectedDepartmentView.id)}
+              deleteDepartment={() => handleDeleteDepartment(selectedDepartmentView.id)}
+              employees={employees}
+              department={selectedDepartmentView}
+              onClose={() => setViewDepartment(null)}
+            />
+          )}
+          {selectedDepartmentEdit && (
+            <DepartmentModal
+              divisions={divisions}
+              initialData={selectedDepartmentEdit}
+              onSubmit={handleUpdateDepartment}
+              onClose={() => setEditDepartment(null)}
+            />
+          )}
+        </AnimatePresence>
+      </motion.section>
+
+      {/* Grades Section */}
+      <motion.section 
+        variants={fadeInUp}
+        className="mb-8"
+      >
+        <div className="border-b border-gray-200 pb-4 mb-4">
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+            <GraduationCap className="w-5 h-5 mr-2 text-green-600" />
+            Grades
+          </h3>
+          <p className="text-sm text-gray-600">Manage employee grades and levels</p>
+        </div>
+
         <div className="flex flex-wrap gap-2">
-          {grades.map((grade, idx) => (
-            <div
-              key={idx}
-              className="flex items-center bg-blue-50 rounded-md px-3 py-1"
-            >
-              {grade.name}
-              <button
-                type="button"
-                className="ml-2 text-blue-700"
-                onClick={() => handleDeleteGrade(grade.id)}
-              >
-                ✕
-              </button>
+          {grades.length === 0 ? (
+            <div className="p-6 bg-gray-50 rounded-lg text-center text-gray-500 w-full">
+              No grades added yet. Click the plus button to add one.
             </div>
-          ))}
+          ) : (
+            grades.map((grade) => (
+              <motion.div
+                key={grade.id}
+                className="flex items-center bg-green-50 border border-green-100 rounded-md px-3 py-2 shadow-sm"
+                whileHover={{ scale: 1.05 }}
+              >
+                <GraduationCap className="h-4 w-4 text-green-600 mr-2" />
+                <span className="text-gray-800">{grade.name}</span>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="ml-2 text-green-600 hover:text-green-800 transition-colors"
+                  onClick={() => handleDeleteGrade(grade.id)}
+                >
+                  <X size={14} />
+                </motion.button>
+              </motion.div>
+            ))
+          )}
         </div>
-        <button
-          type="button"
+        
+        <motion.button
+          whileHover={{ scale: 1.1, rotate: 90 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setIsCreatingGrade(true)}
-          className="mt-2 text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
+          className="mt-4 flex items-center justify-center text-white bg-green-600 rounded-full w-8 h-8 shadow-sm hover:bg-green-700 transition-colors"
         >
-          +
-        </button>
-        {isCreatingGrade && (
-          <GradeModal
-            onSubmit={handleCreateGrade}
-            onClose={() => setIsCreatingGrade(false)}
-          />
-        )}
-      </div>
-      <div className="space-y-2 mt-8">
-        <div className="flex flex-col">
-          <label className="block font-bold text-blue-800 mb-2">Position</label>
+          <Plus size={18} />
+        </motion.button>
+
+        <AnimatePresence>
+          {isCreatingGrade && (
+            <GradeModal
+              onSubmit={handleCreateGrade}
+              onClose={() => setIsCreatingGrade(false)}
+            />
+          )}
+        </AnimatePresence>
+      </motion.section>
+
+      {/* Positions Section */}
+      <motion.section 
+        variants={fadeInUp}
+        className="mb-8"
+      >
+        <div className="border-b border-gray-200 pb-4 mb-4">
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+            <BriefcaseBusiness className="w-5 h-5 mr-2 text-purple-600" />
+            Positions
+          </h3>
+          <p className="text-sm text-gray-600">Manage job positions and roles</p>
         </div>
 
-        <div className="grid grid-cols-1">
-          {positions.map((position) => (
-            <div key={position.id} className="py-2 flex items-center gap-x-6">
-              <div className="w-1/2  md:w-1/3 px-3 py-1 rounded-md bg-gray-300">
-                {position.name}
-              </div>
-
-              <button
-                onClick={() => setViewPosition(position.id)}
-                className="w-1/2 md:w-1/3 px-3 py-1 rounded-md bg-gray-300 text-left"
-              >
-                View Details
-              </button>
+        <div className="space-y-3">
+          {positions.length === 0 ? (
+            <div className="p-6 bg-gray-50 rounded-lg text-center text-gray-500">
+              No positions added yet. Click the plus button to add one.
             </div>
-          ))}
-        </div>
-        <button
-          onClick={() => setIsCreatingPosition(true)}
-          type="button"
-          className="text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
-        >
-          +
-        </button>
+          ) : (
+            positions.map((position) => (
+              <motion.div 
+                key={position.id} 
+                className="bg-white rounded-lg border border-gray-200 p-3 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
+                whileHover={{ scale: 1.01 }}
+              >
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3">
+                    <BriefcaseBusiness size={16} />
+                  </div>
+                  <span className="font-medium text-gray-800">{position.name}</span>
+                </div>
 
-        {isCreatingPosition && (
-          <PositionModal
-            departments={departments}
-            grades={grades}
-            onSubmit={handleCreatePosition}
-            onClose={() => setIsCreatingPosition(false)}
-          />
-        )}
-        {selectedPositionView && (
-          <PositionDetailsModal
-            editPosition={() => setEditPosition(selectedPositionView.id)}
-            deletePosition={() => handleDeletePosition(selectedPositionView.id)}
-            position={selectedPositionView}
-            onClose={() => setViewPosition(null)}
-            departments={departments}
-            grades={grades}
-          />
-        )}
-        {selectedPositionEdit && (
-          <PositionModal
-            departments={departments}
-            grades={grades}
-            initialData={selectedPositionEdit}
-            onSubmit={handleUpdatePosition}
-            onClose={() => setEditPosition(null)}
-          />
-        )}
-      </div>
-    </div>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setViewPosition(position.id)}
+                  className="px-3 py-1.5 rounded-md bg-purple-50 text-purple-600 text-sm flex items-center gap-1 hover:bg-purple-100 transition-colors"
+                >
+                  <Eye size={14} />
+                  Details
+                </motion.button>
+              </motion.div>
+            ))
+          )}
+        </div>
+        
+        <motion.button
+          whileHover={{ scale: 1.1, rotate: 90 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsCreatingPosition(true)}
+          className="mt-4 flex items-center justify-center text-white bg-purple-600 rounded-full w-8 h-8 shadow-sm hover:bg-purple-700 transition-colors"
+        >
+          <Plus size={18} />
+        </motion.button>
+
+        <AnimatePresence>
+          {isCreatingPosition && (
+            <PositionModal
+              departments={departments}
+              grades={grades}
+              onSubmit={handleCreatePosition}
+              onClose={() => setIsCreatingPosition(false)}
+            />
+          )}
+          {selectedPositionView && (
+            <PositionDetailsModal
+              editPosition={() => setEditPosition(selectedPositionView.id)}
+              deletePosition={() => handleDeletePosition(selectedPositionView.id)}
+              position={selectedPositionView}
+              onClose={() => setViewPosition(null)}
+              departments={departments}
+              grades={grades}
+            />
+          )}
+          {selectedPositionEdit && (
+            <PositionModal
+              departments={departments}
+              grades={grades}
+              initialData={selectedPositionEdit}
+              onSubmit={handleUpdatePosition}
+              onClose={() => setEditPosition(null)}
+            />
+          )}
+        </AnimatePresence>
+      </motion.section>
+    </motion.div>
   );
 }

@@ -25,6 +25,7 @@ import {
   MapPin,
   Tag 
 } from "lucide-react";
+import { calculateDistance } from "@/lib/utils/location-utils";
 
 const initialAttendanceRecord = {
   tag: "Present",
@@ -98,6 +99,22 @@ export default function HomePage() {
     const now = new Date().toISOString();
 
     try {
+      // Calculate tag based on site and location data
+      const selectedSite = sites.find(site => site.id === attendanceRecord.site_id);
+      // Present if on time and within 100m of the site
+      const isOnTime = new Date(now) < new Date(selectedSite?.check_in!);
+      const isWithin100m = calculateDistance(coordinates, selectedSite?.location) <= 100;
+      
+      // Determine attendance status
+      let attendanceStatus = 'Absent';
+      if (isOnTime && isWithin100m) {
+        attendanceStatus = 'Present';
+      } else if (!isOnTime && isWithin100m) {
+        attendanceStatus = 'Late';
+      } else if (!isWithin100m) {
+        attendanceStatus = 'Wrong_Location';
+      }
+      attendanceRecord.tag = attendanceStatus;
       const { data, error } = await supabase.from("attendance_records").insert({
         ...attendanceRecord,
         attendance_date: now.split("T")[0], // Just the date part (YYYY-MM-DD)
@@ -306,7 +323,7 @@ export default function HomePage() {
                         }
                         className="border border-gray-300 rounded-lg px-4 py-2.5 bg-[#EAF4FF] focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64"
                       >
-                        <option value="">Select site</option>
+                        <option value="">{sitesLoading ? "Loading..." : "Select site"}</option>
                         {sites.map((site) => (
                           <option key={site.id} value={site.id}>
                             {site.name}
@@ -315,7 +332,7 @@ export default function HomePage() {
                       </select>
                     </div>
                     
-                    <div className="flex flex-col gap-2">
+                    {/* <div className="flex flex-col gap-2">
                       <label className="flex items-center text-gray-700 font-medium">
                         <Tag className="w-4 h-4 mr-2 text-blue-600" />
                         Attendance Status
@@ -339,7 +356,7 @@ export default function HomePage() {
                           )
                         )}
                       </select>
-                    </div>
+                    </div> */}
                   </div>
                 )}
               </div>

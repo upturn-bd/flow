@@ -10,17 +10,17 @@ import {
 
 export const navItems = [
     {
-      label: "profile",
-      href: "/profile",
+      label: "HRIS",
+      href: "/hris",
       icon: UserCircleIcon,
     },
     {
-      label: "operations-and-services",
+      label: "Operations and Services",
       href: "/operations-and-services",
       icon: EnvelopeIcon,
     },
     {
-      label: "admin-management",
+      label: "Admin Management",
       href: "/admin-management",
       icon: UserGearIcon,
     },
