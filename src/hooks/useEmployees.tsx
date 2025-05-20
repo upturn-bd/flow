@@ -24,12 +24,14 @@ export function useEmployees() {
     try {
       const res = await client
         .from("employees")
-        .select("id, first_name, last_name, role")
+        .select("id, first_name, last_name, role, email, phone_number")
         .eq("company_id", company_id);
       const formattedData = res.data?.map((employee) => ({
         id: employee.id,
         name: `${employee.first_name} ${employee.last_name}`,
         role: employee.role,
+        email: employee.email,
+        phone: employee.phone_number,
       })) || [];
       setEmployees(formattedData);
     } catch (error) {

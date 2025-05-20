@@ -321,7 +321,6 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
             <DivisionDetailsModal
               editDivision={() => setEditDivision(selectedDivisionView.id)}
               deleteDivision={() => handleDeleteDivision(selectedDivisionView.id)}
-              employees={employees}
               division={selectedDivisionView}
               onClose={() => setViewDivision(null)}
             />
@@ -404,7 +403,6 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
               divisions={divisions}
               editDepartment={() => setEditDepartment(selectedDepartmentView.id)}
               deleteDepartment={() => handleDeleteDepartment(selectedDepartmentView.id)}
-              employees={employees}
               department={selectedDepartmentView}
               onClose={() => setViewDepartment(null)}
             />

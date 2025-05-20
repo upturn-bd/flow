@@ -6,9 +6,16 @@ import {
     Envelope as EnvelopeIcon,
     Scroll as ScrollIcon,
     UserGear as UserGearIcon,
+    MagnifyingGlass as MagnifyingGlassIcon,
+    User as UserIcon,
   } from "@phosphor-icons/react/dist/ssr";
 
 export const navItems = [
+    {
+      label: "Home",
+      href: "/home",
+      icon: GridFourIcon, 
+    },
     {
       label: "HRIS",
       href: "/hris",
@@ -20,8 +27,18 @@ export const navItems = [
       icon: EnvelopeIcon,
     },
     {
+      label: "Finder",
+      href: "/finder",
+      icon: MagnifyingGlassIcon,
+    },
+    {
       label: "Admin Management",
       href: "/admin-management",
       icon: UserGearIcon,
+    },
+    {
+      label: "Account",
+      href: "/account",
+      icon: UserIcon,
     },
   ];

@@ -20,10 +20,19 @@ import {
 import { Education } from "@/hooks/useEducation";
 import { Experience } from "@/hooks/useExperience";
 import { extractFilenameFromUrl } from "@/lib/utils";
-import { FilePdf } from "@phosphor-icons/react";
+import { FilePdf, MapPin } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { 
+  fetchUserEducation,
+  fetchUserExperience,
+  isCurrentUserProfile 
+} from "@/lib/api/profile";
 
-export default function EducationExperienceTab() {
+interface EducationExperienceTabProps {
+  uid?: string | null;
+}
+
+export default function EducationExperienceTab({ uid }: EducationExperienceTabProps) {
   const {
     education,
     loading: educationLoading,
@@ -34,8 +43,11 @@ export default function EducationExperienceTab() {
   } = useEducation();
   const [editEducation, setEditEducation] = useState<number | null>(null);
   const [isCreatingEducation, setIsCreatingEducation] = useState(false);
-  const [isEducationActionLoading, setIsEducationActionLoading] =
-    useState(false);
+  const [isEducationActionLoading, setIsEducationActionLoading] = useState(false);
+  const [userEducations, setUserEducations] = useState<Education[]>([]);
+  const [userExperiences, setUserExperiences] = useState<Experience[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [isCurrentUser, setIsCurrentUser] = useState(true);
 
   const {
     experience,
@@ -47,14 +59,46 @@ export default function EducationExperienceTab() {
   } = useExperience();
   const [editExperience, setEditExperience] = useState<number | null>(null);
   const [isCreatingExperience, setIsCreatingExperience] = useState(false);
-  const [isExperienceActionLoading, setIsExperienceActionLoading] =
-    useState(false);
+  const [isExperienceActionLoading, setIsExperienceActionLoading] = useState(false);
+
+  // Check if current user
+  useEffect(() => {
+    const checkCurrentUser = async () => {
+      const result = await isCurrentUserProfile(uid);
+      setIsCurrentUser(result);
+    };
+    
+    checkCurrentUser();
+  }, [uid]);
 
   useEffect(() => {
-    fetchEducation();
-    fetchExperience();
-    // eslint-disable-next-line
-  }, []);
+    const fetchUserData = async () => {
+      if (uid) {
+        // Fetch specific user's data
+        setLoading(true);
+        try {
+          // Fetch education and experience records in parallel
+          const [educationData, experienceData] = await Promise.all([
+            fetchUserEducation(uid),
+            fetchUserExperience(uid)
+          ]);
+          
+          setUserEducations(educationData);
+          setUserExperiences(experienceData);
+        } catch (error) {
+          console.error("Error in data fetching:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        // Fetch current user's data using the hooks
+        fetchEducation();
+        fetchExperience();
+      }
+    };
+    
+    fetchUserData();
+  }, [uid, fetchEducation, fetchExperience]);
 
   // Utility for async actions with loading and error handling
   const handleAsyncAction = async (
@@ -185,6 +229,11 @@ export default function EducationExperienceTab() {
     [experience, editExperience]
   );
 
+  // Determine which data set to use
+  const educationToShow = uid ? userEducations : education;
+  const experienceToShow = uid ? userExperiences : experience;
+  const isDataLoading = uid ? loading : (educationLoading || experienceLoading);
+
   const getFileIcon = (filename: string) => {
     const extension = filename.split('.').pop()?.toLowerCase() || '';
     if (['pdf'].includes(extension)) {
@@ -230,125 +279,100 @@ export default function EducationExperienceTab() {
             <GraduationCap className="mr-2 h-6 w-6 text-emerald-600" />
             Education
           </h2>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsCreatingEducation(true)}
-            className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2 text-sm shadow-sm"
-            disabled={isEducationActionLoading}
-          >
-            <Plus className="h-4 w-4" /> Add Education
-          </motion.button>
+          {isCurrentUser && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsCreatingEducation(true)}
+              className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2 text-sm shadow-sm"
+              disabled={isEducationActionLoading}
+            >
+              <Plus className="h-4 w-4" /> Add Education
+            </motion.button>
+          )}
         </div>
         
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-          {educationLoading ? (
+          {isDataLoading ? (
             <LoadingSpinner 
               color="emerald"
               height="h-40"
               horizontal={true}
               text="Loading education records..."
-              icon={GraduationCap}
             />
-          ) : (
-            <div className="overflow-x-auto">
-              {education.length > 0 ? (
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Degree</th>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Institution</th>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">To</th>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result</th>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attachments</th>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    <AnimatePresence>
-                      {education.map((edu) => (
-                        <motion.tr 
-                          key={edu.id ?? edu.name} 
-                          className="hover:bg-gray-50"
-                          variants={itemVariants}
-                          exit={{ opacity: 0, height: 0 }}
-                          layout
-                        >
-                          <td className="px-4 py-3 text-sm text-gray-900">{edu.name}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{edu.institute}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{edu.from_date}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{edu.to_date}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{edu.result}</td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="flex flex-col gap-2">
-                              {edu.attachments && edu.attachments.length > 0 ? (
-                                edu.attachments.map((attachment) => (
-                                  <motion.div
-                                    key={attachment}
-                                    whileHover={{ scale: 1.03 }}
-                                    onClick={() => {
-                                      window.open(attachment, "_blank");
-                                    }}
-                                    className="flex items-center gap-2 p-1.5 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
-                                  >
-                                    {getFileIcon(extractFilenameFromUrl(attachment))}
-                                    <span className="truncate max-w-[150px]">
-                                      {extractFilenameFromUrl(attachment)}
-                                    </span>
-                                  </motion.div>
-                                ))
-                              ) : (
-                                <span className="text-gray-500 text-sm">No attachments</span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="flex items-center gap-2">
-                              <motion.button
-                                whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.1)" }}
-                                onClick={() => setEditEducation(edu.id ?? 0)}
-                                className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
-                                aria-label="Edit education"
-                                disabled={isEducationActionLoading}
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </motion.button>
-                              <motion.button
-                                whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
-                                onClick={() => handleDeleteEducation(edu.id ?? 0)}
-                                className="p-1.5 text-red-600 hover:bg-red-100 rounded-full transition-colors"
-                                aria-label="Delete education"
-                                disabled={isEducationActionLoading}
-                              >
-                                <Trash className="h-4 w-4" />
-                              </motion.button>
-                            </div>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </AnimatePresence>
-                  </tbody>
-                </table>
-              ) : (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4 }}
-                  className="text-center p-12 text-gray-500 flex flex-col items-center"
+          ) : educationToShow.length === 0 ? (
+            <div className="px-6 py-12 text-center border-t">
+              <BookOpen className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+              <h3 className="text-lg font-medium text-gray-800 mb-1">No Education Records</h3>
+              <p className="text-gray-500">
+                {isCurrentUser 
+                  ? "Add your academic qualifications to showcase your educational background."
+                  : "No education records found for this user."}
+              </p>
+              {isCurrentUser && (
+                <button 
+                  className="mt-4 inline-flex items-center gap-1 text-emerald-600 font-medium hover:text-emerald-700"
+                  onClick={() => setIsCreatingEducation(true)}
                 >
-                  <GraduationCap className="h-12 w-12 text-emerald-200 mb-3" />
-                  <p className="mb-4">No education records found.</p>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setIsCreatingEducation(true)}
-                    className="px-4 py-2 text-emerald-600 border border-emerald-200 rounded-lg hover:bg-emerald-50 transition-colors flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" /> Add Education Record
-                  </motion.button>
-                </motion.div>
+                  <Plus className="h-4 w-4" /> Add Education
+                </button>
               )}
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {educationToShow.map((edu) => (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  key={edu.id}
+                  className="p-6 hover:bg-gray-50 flex flex-col md:flex-row md:items-start gap-4"
+                >
+                  <div className="flex-grow">
+                    <h3 className="font-semibold text-gray-900 mb-1">{edu.institute}</h3>
+                    <p className="text-gray-800">{edu.type}</p>
+                    <div className="flex items-center text-gray-500 text-sm mt-1">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      <span>{new Date(edu.from_date).toLocaleDateString()} - {edu.to_date ? new Date(edu.to_date).toLocaleDateString() : 'Present'}</span>
+                    </div>
+                    {edu.result && (
+                      <p className="mt-2 text-gray-600 text-sm">{edu.result}</p>
+                    )}
+                    {edu.attachments && edu.attachments.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {edu.attachments.map((attachment, index) => (
+                          <a 
+                            key={index}
+                            href={attachment} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100 transition-colors"
+                          >
+                            {getFileIcon(extractFilenameFromUrl(attachment))}
+                            <span className="ml-1 truncate max-w-[150px]">{extractFilenameFromUrl(attachment)}</span>
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {isCurrentUser && (
+                    <div className="flex items-center space-x-2 mt-2 md:mt-0">
+                      <button
+                        onClick={() => setEditEducation(edu.id ?? null)}
+                        className="p-1.5 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-full transition-colors"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteEducation(edu.id ?? 0)}
+                        className="p-1.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                        disabled={isEducationActionLoading}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
             </div>
           )}
         </div>
@@ -359,105 +383,94 @@ export default function EducationExperienceTab() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-800 flex items-center">
             <Briefcase className="mr-2 h-6 w-6 text-blue-600" />
-            Experience
+            Work Experience
           </h2>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsCreatingExperience(true)}
-            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm shadow-sm"
-            disabled={isExperienceActionLoading}
-          >
-            <Plus className="h-4 w-4" /> Add Experience
-          </motion.button>
+          {isCurrentUser && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsCreatingExperience(true)}
+              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm shadow-sm"
+              disabled={isExperienceActionLoading}
+            >
+              <Plus className="h-4 w-4" /> Add Experience
+            </motion.button>
+          )}
         </div>
         
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-          {experienceLoading ? (
+          {isDataLoading ? (
             <LoadingSpinner 
               color="blue"
               height="h-40"
               horizontal={true}
-              text="Loading experience records..."
-              icon={Briefcase}
+              text="Loading work experience records..."
             />
-          ) : (
-            <div className="overflow-x-auto">
-              {experience.length > 0 ? (
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Designation</th>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">To</th>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    <AnimatePresence>
-                      {experience.map((exp) => (
-                        <motion.tr 
-                          key={exp.id ?? exp.company_name} 
-                          className="hover:bg-gray-50"
-                          variants={itemVariants}
-                          exit={{ opacity: 0, height: 0 }}
-                          layout
-                        >
-                          <td className="px-4 py-3 text-sm text-gray-900">{exp.company_name}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{exp.designation}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{exp.from_date}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{exp.to_date}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900 max-w-md">
-                            <div className="line-clamp-2">{exp.description}</div>
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="flex items-center gap-2">
-                              <motion.button
-                                whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.1)" }}
-                                onClick={() => setEditExperience(exp.id ?? 0)}
-                                className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
-                                aria-label="Edit experience"
-                                disabled={isExperienceActionLoading}
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </motion.button>
-                              <motion.button
-                                whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
-                                onClick={() => handleDeleteExperience(exp.id ?? 0)}
-                                className="p-1.5 text-red-600 hover:bg-red-100 rounded-full transition-colors"
-                                aria-label="Delete experience"
-                                disabled={isExperienceActionLoading}
-                              >
-                                <Trash className="h-4 w-4" />
-                              </motion.button>
-                            </div>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </AnimatePresence>
-                  </tbody>
-                </table>
-              ) : (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4 }}
-                  className="text-center p-12 text-gray-500 flex flex-col items-center"
+          ) : experienceToShow.length === 0 ? (
+            <div className="px-6 py-12 text-center border-t">
+              <Building className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+              <h3 className="text-lg font-medium text-gray-800 mb-1">No Work Experience</h3>
+              <p className="text-gray-500">
+                {isCurrentUser
+                  ? "Add your professional experience to showcase your career journey."
+                  : "No work experience records found for this user."}
+              </p>
+              {isCurrentUser && (
+                <button 
+                  className="mt-4 inline-flex items-center gap-1 text-blue-600 font-medium hover:text-blue-700"
+                  onClick={() => setIsCreatingExperience(true)}
                 >
-                  <Building className="h-12 w-12 text-blue-200 mb-3" />
-                  <p className="mb-4">No experience records found.</p>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setIsCreatingExperience(true)}
-                    className="px-4 py-2 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" /> Add Experience Record
-                  </motion.button>
-                </motion.div>
+                  <Plus className="h-4 w-4" /> Add Experience
+                </button>
               )}
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {experienceToShow.map((exp) => (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  key={exp.id}
+                  className="p-6 hover:bg-gray-50 flex flex-col md:flex-row md:items-start gap-4"
+                >
+                  <div className="flex-grow">
+                    <h3 className="font-semibold text-gray-900 mb-1">{exp.company_name}</h3>
+                    <p className="text-gray-800">{exp.designation}</p>
+                    <div className="flex flex-wrap items-center gap-x-4 text-gray-500 text-sm mt-1">
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        <span>{new Date(exp.from_date).toLocaleDateString()} - {exp.to_date ? new Date(exp.to_date).toLocaleDateString() : 'Present'}</span>
+                      </div>
+                      {/* {exp.location && (
+                        <div className="flex items-center mt-1 md:mt-0">
+                          <MapPin className="h-4 w-4 mr-1" />
+                          <span>{exp.location}</span>
+                        </div>
+                      )} */}
+                    </div>
+                    {exp.description && (
+                      <p className="mt-2 text-gray-600 text-sm">{exp.description}</p>
+                    )}
+                  </div>
+                  {isCurrentUser && (
+                    <div className="flex items-center space-x-2 mt-2 md:mt-0">
+                      <button
+                        onClick={() => setEditExperience(exp.id ?? null)}
+                        className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteExperience(exp.id ?? 0)}
+                        className="p-1.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                        disabled={isExperienceActionLoading}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
             </div>
           )}
         </div>

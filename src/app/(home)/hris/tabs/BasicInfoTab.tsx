@@ -12,6 +12,12 @@ import { BasicInfoField } from "./BasicInfoField";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Briefcase, Calendar, Save, X, CheckCircle, AlertCircle } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { 
+  fetchCurrentUserBasicInfo, 
+  fetchUserBasicInfo, 
+  updateBasicInfo,
+  isCurrentUserProfile 
+} from "@/lib/api/profile";
 
 const initialFormState: BasicInfoFormData = {
   first_name: "",
@@ -49,7 +55,11 @@ const fieldGroups = [
   },
 ];
 
-export default function BasicInfoTab() {
+interface BasicInfoTabProps {
+  uid?: string | null;
+}
+
+export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
   const [formValues, setFormValues] = useState<BasicInfoFormData>(initialFormState);
   const [initialData, setInitialData] = useState<BasicInfoFormData | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof BasicInfoFormData, string>>>({});
@@ -61,6 +71,7 @@ export default function BasicInfoTab() {
   const [loading, setLoading] = useState(true);
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
+  const [isCurrentUser, setIsCurrentUser] = useState(true);
   const { departments, fetchDepartments } = useDepartments();
   const [loadingDepartments, setLoadingDepartments] = useState(true);
 
@@ -68,6 +79,15 @@ export default function BasicInfoTab() {
     setLoadingDepartments(true);
     fetchDepartments().finally(() => setLoadingDepartments(false));
   }, [fetchDepartments]);
+
+  useEffect(() => {
+    const checkCurrentUser = async () => {
+      const result = await isCurrentUserProfile(uid);
+      setIsCurrentUser(result);
+    };
+    
+    checkCurrentUser();
+  }, [uid]);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<any>) => {
@@ -105,24 +125,8 @@ export default function BasicInfoTab() {
       }
 
       try {
-        const response = await fetch("/api/basic-info", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...result.data,
-            department_id: Number(result.data.department_id),
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          setSubmitError(errorData?.message || `Error: ${response.status}`);
-          setIsSubmitting(false);
-          return;
-        }
-
-        const json = await response.json();
-        setInitialData(json.data);
+        const response = await updateBasicInfo(result.data);
+        setInitialData(response.data);
         setSubmitSuccess(true);
         setIsEditMode(false);
       } catch (error) {
@@ -143,20 +147,26 @@ export default function BasicInfoTab() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/basic-info");
-        if (res.ok) {
-          const { data } = await res.json();
-          setInitialData(data);
-          setFormValues(data);
+        let data;
+        if (uid) {
+          // Fetch specific user's basic info
+          data = await fetchUserBasicInfo(uid);
+        } else {
+          // Fetch current user's basic info
+          data = await fetchCurrentUserBasicInfo();
         }
+        
+        setInitialData(data);
+        setFormValues(data);
       } catch (error) {
         setSubmitError("Failed to fetch basic info. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
+    
     fetchData();
-  }, []);
+  }, [uid]);
 
   useEffect(() => {
     if (initialData) {
@@ -209,25 +219,27 @@ export default function BasicInfoTab() {
           <Calendar className="mr-2 h-6 w-6 text-blue-600" />
           Basic Information
         </h2>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleEditToggle}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
-              isEditMode ? 'bg-blue-600' : 'bg-gray-200'
-            }`}
-            role="switch"
-            aria-checked={isEditMode}
-          >
-            <span
-              className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
-                isEditMode ? 'translate-x-6' : 'translate-x-1'
+        {isCurrentUser && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleEditToggle}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
+                isEditMode ? 'bg-blue-600' : 'bg-gray-200'
               }`}
-            />
-          </button>
-          <span className="text-sm font-medium text-gray-700">
-            {isEditMode ? 'Edit Mode On' : 'Edit Mode Off'}
-          </span>
-        </div>
+              role="switch"
+              aria-checked={isEditMode}
+            >
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                  isEditMode ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+            <span className="text-sm font-medium text-gray-700">
+              {isEditMode ? 'Edit Mode On' : 'Edit Mode Off'}
+            </span>
+          </div>
+        )}
       </div>
 
       {submitError && (
@@ -251,105 +263,113 @@ export default function BasicInfoTab() {
           </div>
         </div>
       )}
-
-      {isEditMode ? (
-        <form onSubmit={handleSubmit} autoComplete="off" aria-label="Basic Information Form">
-          <div className="space-y-6">
-            {fieldGroups.map((group) => (
-              <fieldset key={group.title} className="border border-gray-200 rounded-lg p-5 bg-white shadow-sm">
-                <legend className="px-2 text-lg font-semibold text-gray-800 flex items-center gap-2 bg-white">
-                  {group.icon}
-                  {group.title}
-                </legend>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                  {group.fields.map((field) => (
-                    <BasicInfoField
-                      key={field.name}
-                      id={`basic-info-${field.name}`}
-                      name={field.name}
-                      label={field.label}
-                      type={field.type}
-                      value={formValues[field.name as keyof BasicInfoFormData]}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched[field.name as keyof BasicInfoFormData] ? errors[field.name as keyof BasicInfoFormData] : undefined}
-                      departments={departments}
-                      loadingDepartments={loadingDepartments}
-                      readOnly={field.name === "id_input"}
-                    />
-                  ))}
-                </div>
-              </fieldset>
-            ))}
-          </div>
-          <div className="flex justify-end mt-8 space-x-4">
-            <button
-              type="button"
-              className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-              onClick={handleEditToggle}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isSubmitting || !isDirty || !isValid}
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                  <span>Saving...</span>
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4" />
-                  <span>Save Changes</span>
-                </>
-              )}
-            </button>
-          </div>
-        </form>
-      ) : (
-        <div className="space-y-6">
-          {fieldGroups.map((group) => (
-            <div key={group.title} className="border border-gray-100 rounded-lg p-5 bg-white shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
-                {group.icon}
-                {group.title}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
-                {group.fields.map((field) => {
-                  const value = formValues[field.name as keyof BasicInfoFormData];
-                  return (
-                    <div key={field.name} className="flex flex-col sm:flex-row sm:items-baseline">
-                      <span className="text-sm font-medium text-gray-500 w-32 mb-1 sm:mb-0">
-                        {field.label}:
-                      </span>
-                      <span className="text-gray-800 flex-1">
-                        {field.name !== "department_id"
-                          ? value || <span className="text-gray-400 italic">Not provided</span>
-                          : departmentName(Number(value))}
-                      </span>
-                    </div>
-                  );
-                })}
+      
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <form onSubmit={handleSubmit}>
+          {fieldGroups.map((group, groupIndex) => (
+            <div key={group.title} className={groupIndex > 0 ? "mt-8" : ""}>
+              <div className="flex items-center mb-4">
+                <div className="mr-3">{group.icon}</div>
+                <h3 className="font-medium text-lg text-gray-800">{group.title}</h3>
+              </div>
+              
+              <div className="overflow-hidden border border-gray-200 rounded-lg">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {group.fields.map((field) => (
+                      <tr key={field.name} className={isEditMode ? "hover:bg-blue-50" : ""}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-gray-50 w-1/3">
+                          {field.label}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {isEditMode && isCurrentUser ? (
+                            <BasicInfoField
+                              name={field.name as keyof BasicInfoFormData}
+                              label=""
+                              type={field.type}
+                              value={
+                                field.name === "department_id"
+                                  ? formValues[field.name]?.toString() || ""
+                                  : formValues[field.name as keyof BasicInfoFormData] || ""
+                              }
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              error={errors[field.name as keyof BasicInfoFormData]}
+                              touched={!!touched[field.name as keyof BasicInfoFormData]}
+                              options={
+                                field.name === "department_id"
+                                  ? departments.map((dep) => ({
+                                      value: dep.id.toString(),
+                                      label: dep.name,
+                                    }))
+                                  : field.name === "job_status"
+                                  ? JOB_STATUS_OPTIONS.map(status => ({
+                                      value: status,
+                                      label: status
+                                    }))
+                                  : undefined
+                              }
+                              disabled={!isEditMode || !isCurrentUser}
+                              loading={field.name === "department_id" ? loadingDepartments : false}
+                            />
+                          ) : (
+                            <div className="py-1">
+                              {field.name === "department_id" 
+                                ? departmentName(Number(formValues[field.name])) 
+                                : field.name === "hire_date" && formValues[field.name]
+                                ? new Date(formValues[field.name]).toLocaleDateString()
+                                : formValues[field.name as keyof BasicInfoFormData] || "—"}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           ))}
           
-          <div className="flex justify-end mt-6">
-            <button
-              onClick={handleEditToggle}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition-colors"
+          {isEditMode && isCurrentUser && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mt-8 flex justify-end gap-3"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-              Edit Information
-            </button>
-          </div>
-        </div>
-      )}
+              <button
+                type="button"
+                onClick={handleEditToggle}
+                className="px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 text-sm font-medium shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+              >
+                <X className="h-4 w-4 inline mr-1 -mt-px" />
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting || !isDirty || !isValid}
+                className={`px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
+                  isSubmitting || !isDirty || !isValid
+                    ? "opacity-60 cursor-not-allowed"
+                    : "hover:bg-blue-700"
+                }`}
+              >
+                {isSubmitting ? (
+                  <>
+                    <LoadingSpinner className="h-4 w-4 inline mr-1 -mt-px" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 inline mr-1 -mt-px" />
+                    Save Changes
+                  </>
+                )}
+              </button>
+            </motion.div>
+          )}
+        </form>
+      </div>
     </motion.div>
   );
 }

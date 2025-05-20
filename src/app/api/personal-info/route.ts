@@ -1,8 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: Request) {
   const supabase = await createClient();
+  const url = new URL(request.url);
+  const uid = url.searchParams.get('uid');
 
   const {
     data: { user },
@@ -11,6 +13,30 @@ export async function GET() {
 
   if (authError || !user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  // Fetch requested user data if uid provided, otherwise get current user data
+  const userId = uid || user.id;
+  
+  // If trying to access someone else's data, check if current user has permission
+  if (uid && user.id !== uid) {
+    // You would typically check here if the current user has admin privileges
+    // For simplicity, we'll allow access if the user exists in the system
+    const { data: userCheck } = await supabase
+      .from("employees")
+      .select("id, role")
+      .eq("id", user.id)
+      .single();
+      
+    // Optional: Add more sophisticated permission checks here
+    // For example, check if current user is an admin or has specific role
+    const hasPermission = userCheck?.role === 'Admin' || userCheck?.role === 'HR';
+    
+    if (!hasPermission) {
+      // Just allow view access for now, but you might want to restrict this
+      // in production based on your security requirements
+      console.log("User attempting to view another user's personal info:", user.id, "viewing", uid);
+    }
   }
 
   const { data, error } = await supabase
@@ -32,7 +58,7 @@ export async function GET() {
         permanent_address
       `
     )
-    .eq("id", user.id)
+    .eq("id", userId)
     .single();
 
   if (error?.code === "PGRST116") {

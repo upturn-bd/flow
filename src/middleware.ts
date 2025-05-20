@@ -52,10 +52,10 @@ export async function middleware(request: NextRequest) {
   );
 
   // Handle auth routes redirections
-  if (!supabaseUser && !isAuthRoute && 
-      !excludePaths.some(path => 
-        currentPath === path || currentPath.startsWith(`${path}/`)
-      )) {
+  if (!supabaseUser && !isAuthRoute &&
+    !excludePaths.some(path =>
+      currentPath === path || currentPath.startsWith(`${path}/`)
+    )) {
     // No user, redirect to login page
     url.pathname = "/login";
     return NextResponse.redirect(url);
@@ -80,9 +80,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect "/" to "/hris"
+  // Redirect "/" to "/home"
   if (currentPath === "/") {
-    url.pathname = "/hris";
+    url.pathname = "/home";
     return NextResponse.redirect(url);
   }
 
@@ -166,8 +166,8 @@ export async function middleware(request: NextRequest) {
 
   // Role-based access control
   const rolePermissions: Record<Role, string[]> = {
-    Employee: ["/home", "/hris", "/operations-and-services", "/notifications", "/account", "/profile"],
-    Manager: ["/home", "/hris", "/operations-and-services", "/notifications", "/account", "/profile"],
+    Employee: ["/home", "/hris", "/operations-and-services", "/notifications", "/account", "/profile",],
+    Manager: ["/home", "/hris", "/operations-and-services", "/notifications", "/account", "/profile", "/finder",],
     Admin: [
       "/hris",
       "/operations-and-services",
@@ -176,10 +176,11 @@ export async function middleware(request: NextRequest) {
       "/notifications",
       "/account",
       "/profile",
+      "/finder",
     ],
   };
 
-  const isAllowed = rolePermissions[role]?.some((allowedPath) => 
+  const isAllowed = rolePermissions[role]?.some((allowedPath) =>
     currentPath === allowedPath || currentPath.startsWith(`${allowedPath}/`)
   );
 
