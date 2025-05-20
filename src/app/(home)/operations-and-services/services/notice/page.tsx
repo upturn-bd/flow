@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Pencil, Trash2, Plus, Clock, CalendarDays, Info, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function NoticePage() {
   const {
@@ -111,48 +112,13 @@ export default function NoticePage() {
 
   if (loading) {
     return (
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="flex justify-center items-center min-h-[70vh]"
-      >
-        <div className="flex flex-col items-center">
-          <div className="relative h-14 w-14">
-            <motion.div 
-              animate={{ 
-                rotate: 360,
-              }}
-              transition={{ 
-                duration: 1.5, 
-                repeat: Infinity, 
-                ease: "linear" 
-              }}
-              className="absolute inset-0 rounded-full border-2 border-amber-500 border-opacity-20"
-            />
-            <motion.div 
-              animate={{ 
-                rotate: 360,
-              }}
-              transition={{ 
-                duration: 3, 
-                repeat: Infinity, 
-                ease: "linear" 
-              }}
-              className="absolute inset-1 rounded-full border-t-2 border-r-2 border-amber-500"
-            />
-            <Bell className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-amber-500" />
-          </div>
-          <motion.p 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mt-4 text-gray-600 font-medium"
-          >
-            Loading notices...
-          </motion.p>
-        </div>
-      </motion.div>
+      <div className="max-w-6xl mx-auto p-4 sm:p-6 min-h-[70vh] flex items-center justify-center">
+        <LoadingSpinner 
+          text="Loading notices..." 
+          icon={Bell} 
+          color="amber"
+        />
+      </div>
     );
   }
 
@@ -174,10 +140,15 @@ export default function NoticePage() {
               transition={{ duration: 0.3 }}
               className="flex items-center justify-between mb-8"
             >
-              <h1 className="text-2xl font-bold text-gray-800 flex items-center">
-                <Bell className="mr-2 h-6 w-6 text-amber-500" />
-                Notices & Announcements
-              </h1>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-2">
+                  <Bell className="mr-2 h-6 w-6 text-amber-500" />
+                  Notices & Announcements
+                </h1>
+                <p className="text-gray-600 max-w-3xl">
+                  View and manage company-wide notices and important announcements.
+                </p>
+              </div>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -251,7 +222,7 @@ export default function NoticePage() {
                           <motion.button
                             whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={() => handleDeleteNotice(notice.id ?? 0)}
+                            onClick={() => handleDeleteNotice(notice.id!)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
                             aria-label="Delete notice"
                           >
@@ -259,40 +230,19 @@ export default function NoticePage() {
                           </motion.button>
                         </div>
                       </div>
-                      
-                      <p className="text-gray-600 whitespace-pre-line mb-4">{notice.description}</p>
-                      
-                      <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-4">
-                        {notice.valid_from && (
-                          <div className="flex items-center text-sm text-gray-500">
-                            <CalendarDays className="h-4 w-4 mr-2 text-amber-400" />
-                            <span>From: {new Date(notice.valid_from).toLocaleDateString('en-US', { 
-                              year: 'numeric', 
-                              month: 'short', 
-                              day: 'numeric' 
-                            })}</span>
-                          </div>
-                        )}
-                        
+                      <p className="text-gray-700 mb-4">{notice.description}</p>
+                      <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                        <div className="flex items-center text-sm text-gray-500">
+                          <Clock className="h-4 w-4 mr-1.5" />
+                          <span>
+                            Posted on {new Date(notice.valid_from).toLocaleDateString()}
+                          </span>
+                        </div>
                         {notice.valid_till && (
-                          <div className="flex items-center text-sm text-gray-500">
-                            <CalendarDays className="h-4 w-4 mr-2 text-amber-400" />
-                            <span>Till: {new Date(notice.valid_till).toLocaleDateString('en-US', { 
-                              year: 'numeric', 
-                              month: 'short', 
-                              day: 'numeric' 
-                            })}</span>
-                          </div>
-                        )}
-                        
-                        {notice.urgency && (
-                          <div className="flex items-center text-sm">
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium
-                              ${notice.urgency === 'High' ? 'bg-red-100 text-red-700' : 
-                                notice.urgency === 'Medium' ? 'bg-amber-100 text-amber-700' : 
-                                'bg-green-100 text-green-700'}`}
-                            >
-                              {notice.urgency}
+                          <div className="flex items-center text-sm text-amber-600">
+                            <CalendarDays className="h-4 w-4 mr-1.5" />
+                            <span>
+                              Expires on {new Date(notice.valid_till).toLocaleDateString()}
                             </span>
                           </div>
                         )}
@@ -304,19 +254,19 @@ export default function NoticePage() {
             )}
           </motion.div>
         )}
-        
+
         {isCreatingNotice && (
-          <NoticeCreateModal
-            onSubmit={handleCreateNotice}
+          <NoticeCreateModal 
             onClose={() => setIsCreatingNotice(false)}
+            onSubmit={handleCreateNotice} 
           />
         )}
-        
+
         {editNotice && (
-          <NoticeUpdateModal
-            onSubmit={handleUpdateNotice}
-            onClose={() => setEditNotice(null)}
+          <NoticeUpdateModal 
             initialData={editNotice}
+            onClose={() => setEditNotice(null)}
+            onSubmit={handleUpdateNotice}
           />
         )}
       </AnimatePresence>
