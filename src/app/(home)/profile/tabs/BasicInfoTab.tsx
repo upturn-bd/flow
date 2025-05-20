@@ -11,6 +11,7 @@ import {
 import { BasicInfoField } from "./BasicInfoField";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Briefcase, Calendar, Save, X, CheckCircle, AlertCircle } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const initialFormState: BasicInfoFormData = {
   first_name: "",
@@ -190,15 +191,10 @@ export default function BasicInfoTab() {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-60">
-        <div className="flex flex-col items-center">
-          <div className="relative h-12 w-12">
-            <div className="absolute top-0 left-0 h-full w-full rounded-full border-t-2 border-b-2 border-blue-500 animate-spin"></div>
-            <Calendar className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-blue-500 opacity-50" />
-          </div>
-          <p className="mt-4 text-gray-500 font-medium">Loading basic information...</p>
-        </div>
-      </div>
+      <LoadingSpinner 
+        icon={Calendar}
+        text="Loading basic information..."
+      />
     );
 
   return (

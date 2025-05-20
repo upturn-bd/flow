@@ -102,7 +102,7 @@ const page = () => {
                             <button className="text-[#002568]">
                                 Don’t have an account?
                             </button>
-                            <a href="/signin" className="text-[#FFAB2C]">Sign In</a>
+                            <a href="/login" className="text-[#FFAB2C]">Sign In</a>
                         </div>
                     </div>
                 </div>

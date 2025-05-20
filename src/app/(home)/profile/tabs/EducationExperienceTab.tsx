@@ -21,6 +21,7 @@ import { Education } from "@/hooks/useEducation";
 import { Experience } from "@/hooks/useExperience";
 import { extractFilenameFromUrl } from "@/lib/utils";
 import { FilePdf } from "@phosphor-icons/react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function EducationExperienceTab() {
   const {
@@ -242,13 +243,13 @@ export default function EducationExperienceTab() {
         
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
           {educationLoading ? (
-            <div className="flex justify-center items-center p-8">
-              <div className="relative h-12 w-12">
-                <div className="absolute top-0 left-0 h-full w-full rounded-full border-t-2 border-b-2 border-emerald-500 animate-spin"></div>
-                <BookOpen className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-emerald-500 opacity-50" />
-              </div>
-              <p className="ml-4 text-gray-500 font-medium">Loading education records...</p>
-            </div>
+            <LoadingSpinner 
+              color="emerald"
+              height="h-40"
+              horizontal={true}
+              text="Loading education records..."
+              icon={GraduationCap}
+            />
           ) : (
             <div className="overflow-x-auto">
               {education.length > 0 ? (
@@ -373,13 +374,13 @@ export default function EducationExperienceTab() {
         
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
           {experienceLoading ? (
-            <div className="flex justify-center items-center p-8">
-              <div className="relative h-12 w-12">
-                <div className="absolute top-0 left-0 h-full w-full rounded-full border-t-2 border-b-2 border-blue-500 animate-spin"></div>
-                <Briefcase className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-blue-500 opacity-50" />
-              </div>
-              <p className="ml-4 text-gray-500 font-medium">Loading experience records...</p>
-            </div>
+            <LoadingSpinner 
+              color="blue"
+              height="h-40"
+              horizontal={true}
+              text="Loading experience records..."
+              icon={Briefcase}
+            />
           ) : (
             <div className="overflow-x-auto">
               {experience.length > 0 ? (

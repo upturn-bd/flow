@@ -200,7 +200,7 @@ const Signup = () => {
             </form>
             <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-2 text-sm">
               <span className="text-[#002568]">Already have an account?</span>
-              <Link href="/signin" className="text-[#FFAB2C] font-semibold hover:underline">
+              <Link href="/login" className="text-[#FFAB2C] font-semibold hover:underline">
                 Sign In
               </Link>
             </div>

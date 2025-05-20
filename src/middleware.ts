@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const currentPath = url.pathname;
 
-  const excludePaths = ["/signin", "/signup", "/auth", "/unauthorized", "/api"];
+  const excludePaths = ["/login", "/signup", "/auth", "/unauthorized", "/api"];
 
   if (
     excludePaths.some(
@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
 
   const { user } = await getUser();
   if (!user) {
-    url.pathname = "/signin";
+    url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 

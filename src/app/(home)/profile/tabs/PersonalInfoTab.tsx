@@ -12,6 +12,7 @@ import {
 import { PersonalInfoField } from "./PersonalInfoField";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, User, Heart, Users, PhoneCall, MapPin, Save, CheckCircle, AlertCircle } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const defaultPersonalFormValues: PersonalFormData = {
   gender: "",
@@ -151,15 +152,11 @@ export default function PersonalInfoTab() {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-60">
-        <div className="flex flex-col items-center">
-          <div className="relative h-12 w-12">
-            <div className="absolute top-0 left-0 h-full w-full rounded-full border-t-2 border-b-2 border-purple-500 animate-spin"></div>
-            <Heart className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-purple-500 opacity-50" />
-          </div>
-          <p className="mt-4 text-gray-500 font-medium">Loading personal information...</p>
-        </div>
-      </div>
+      <LoadingSpinner 
+        color="purple"
+        text="Loading personal information..."
+        icon={Heart}
+      />
     );
 
   // Field groups for better UX

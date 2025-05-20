@@ -27,8 +27,13 @@ import {
   Clock, 
   XCircle, 
   BadgeCheck, 
-  Send
+  Send,
+  LogOut
 } from "lucide-react";
+import { logout } from "@/app/(auth)/auth-actions";
+import FormInputField from "@/components/ui/FormInputField";
+import FormSelectField from "@/components/ui/FormSelectField";
+import { fadeIn, fadeInUp, scaleIn, staggerContainer } from "@/components/ui/animations";
 
 const jobStatuses = [
   "Active",
@@ -55,25 +60,6 @@ const formSchema = z.object({
   company_id: z.number().min(1, "Company ID is required"),
   supervisor_id: z.string().optional(),
 });
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.4 }
-  }
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
 
 export default function EmployeeOnboarding() {
   const [formData, setFormData] = useState({
@@ -300,10 +286,11 @@ export default function EmployeeOnboarding() {
             
             <div className="flex justify-center">
               <button
-                onClick={() => router.push("/home")}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                onClick={logout}
+                className="flex items-center px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                Return to Dashboard
+                <LogOut className="mr-2 h-5 w-5" />
+                Logout
               </button>
             </div>
           </div>
@@ -311,114 +298,6 @@ export default function EmployeeOnboarding() {
       </motion.div>
     );
   }
-
-  const renderInputField = (
-    name: keyof typeof formData,
-    label: string,
-    icon: React.ReactNode,
-    type = "text",
-    readOnly = false
-  ) => {
-    const hasError = !!errors[name];
-    
-    return (
-      <motion.div 
-        variants={fadeInUp}
-        className="mb-4"
-      >
-        <label 
-          htmlFor={name} 
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          {label}
-        </label>
-        <div className="relative">
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-            {icon}
-          </div>
-          <input
-            id={name}
-            name={name}
-            value={formData[name as keyof typeof formData] as string}
-            onChange={handleChange}
-            type={type}
-            readOnly={readOnly}
-            className={`w-full pl-10 pr-4 py-2.5 text-gray-900 rounded-lg ${
-              hasError 
-                ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50" 
-                : "border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-[#EAF4FF]"
-            } ${readOnly ? "bg-gray-100 cursor-not-allowed" : ""}`}
-          />
-          {hasError && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500">
-              <AlertCircle size={16} />
-            </div>
-          )}
-        </div>
-        {hasError && (
-          <p className="mt-1 text-sm text-red-600">{errors[name]}</p>
-        )}
-      </motion.div>
-    );
-  };
-
-  const renderSelectField = (
-    name: keyof typeof formData,
-    label: string,
-    icon: React.ReactNode,
-    options: Array<{ value: string | number; label: string }>,
-    placeholder: string
-  ) => {
-    const hasError = !!errors[name];
-    
-    return (
-      <motion.div 
-        variants={fadeInUp}
-        className="mb-4"
-      >
-        <label 
-          htmlFor={name} 
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          {label}
-        </label>
-        <div className="relative">
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-            {icon}
-          </div>
-          <select
-            id={name}
-            name={name}
-            value={formData[name] as string}
-            onChange={handleChange}
-            className={`w-full pl-10 pr-10 py-2.5 text-gray-900 rounded-lg appearance-none ${
-              hasError 
-                ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50" 
-                : "border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-[#EAF4FF]"
-            }`}
-          >
-            <option value="">{placeholder}</option>
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
-            <ChevronDown size={16} />
-          </div>
-          {hasError && (
-            <div className="absolute right-8 top-1/2 transform -translate-y-1/2 text-red-500">
-              <AlertCircle size={16} />
-            </div>
-          )}
-        </div>
-        {hasError && (
-          <p className="mt-1 text-sm text-red-600">{errors[name]}</p>
-        )}
-      </motion.div>
-    );
-  };
 
   return (
     <motion.div 
@@ -456,7 +335,7 @@ export default function EmployeeOnboarding() {
                 </div>
                 <div className={`h-1 w-20 sm:w-32 ${isCompanyCodeValid ? "bg-green-600" : "bg-gray-300"}`}></div>
               </div>
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-sm font-medium">
+              <div className="absolute -bottom-6 left-5 transform -translate-x-1/2 text-sm font-medium">
                 Company
               </div>
             </div>
@@ -470,7 +349,7 @@ export default function EmployeeOnboarding() {
                 </div>
                 <div className="h-1 w-20 sm:w-32 bg-gray-300"></div>
               </div>
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-sm font-medium">
+              <div className="absolute -bottom-6 left-5 transform -translate-x-1/2 text-sm font-medium">
                 Personal
               </div>
             </div>
@@ -481,7 +360,7 @@ export default function EmployeeOnboarding() {
                   3
                 </div>
               </div>
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-sm font-medium">
+              <div className="absolute -bottom-6 left-5 transform -translate-x-1/2 text-sm font-medium">
                 Submit
               </div>
             </div>
@@ -513,6 +392,21 @@ export default function EmployeeOnboarding() {
           </motion.div>
         )}
 
+        {/* Logout Button */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-4 flex justify-end"
+        >
+          <button
+            onClick={logout}
+            className="flex items-center px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </button>
+        </motion.div>
+
         {/* Form Container */}
         <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
           <form onSubmit={handleSubmit}>
@@ -538,51 +432,25 @@ export default function EmployeeOnboarding() {
                     animate="visible"
                     className="space-y-2"
                   >
-                    {renderInputField(
-                      "company_name",
-                      "Company Name",
-                      <Building2 size={18} />,
-                      "text",
-                      !!status
-                    )}
+                    <FormInputField
+                      name="company_name"
+                      label="Company Name"
+                      icon={<Building2 size={18} />}
+                      value={formData.company_name}
+                      onChange={handleChange}
+                      readOnly={!!status}
+                      error={errors.company_name}
+                    />
                     
-                    <motion.div 
-                      variants={fadeInUp}
-                      className="mb-4"
-                    >
-                      <label 
-                        htmlFor="companyCode" 
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Company Code
-                      </label>
-                      <div className="relative">
-                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                          <BadgeCheck size={18} />
-                        </div>
-                        <input
-                          id="companyCode"
-                          name="companyCode"
-                          value={companyCode}
-                          onChange={(e) => setCompanyCode(e.target.value)}
-                          type="text"
-                          readOnly={!!status || isCompanyCodeValid}
-                          className={`w-full pl-10 pr-4 py-2.5 text-gray-900 rounded-lg ${
-                            errors.company_code
-                              ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50" 
-                              : "border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-[#EAF4FF]"
-                          } ${(!!status || isCompanyCodeValid) ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                        />
-                        {errors.company_code && (
-                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500">
-                            <AlertCircle size={16} />
-                          </div>
-                        )}
-                      </div>
-                      {errors.company_code && (
-                        <p className="mt-1 text-sm text-red-600">{errors.company_code}</p>
-                      )}
-                    </motion.div>
+                    <FormInputField
+                      name="companyCode"
+                      label="Company Code"
+                      icon={<BadgeCheck size={18} />}
+                      value={companyCode}
+                      onChange={(e) => setCompanyCode(e.target.value)}
+                      readOnly={!!status || isCompanyCodeValid}
+                      error={errors.company_code}
+                    />
                     
                     <motion.div 
                       variants={fadeInUp}
@@ -642,49 +510,102 @@ export default function EmployeeOnboarding() {
                     animate="visible"
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                      {renderInputField("first_name", "First Name", <User size={18} />)}
-                      {renderInputField("last_name", "Last Name", <User size={18} />)}
+                      <FormInputField
+                        name="first_name"
+                        label="First Name"
+                        icon={<User size={18} />}
+                        value={formData.first_name}
+                        onChange={handleChange}
+                        error={errors.first_name}
+                      />
+                      <FormInputField
+                        name="last_name"
+                        label="Last Name"
+                        icon={<User size={18} />}
+                        value={formData.last_name}
+                        onChange={handleChange}
+                        error={errors.last_name}
+                      />
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                      {renderInputField("email", "Email Address", <Mail size={18} />, "email")}
-                      {renderInputField("phone_number", "Phone Number", <Phone size={18} />)}
+                      <FormInputField
+                        name="email"
+                        label="Email Address"
+                        icon={<Mail size={18} />}
+                        value={formData.email}
+                        onChange={handleChange}
+                        type="email"
+                        error={errors.email}
+                      />
+                      <FormInputField
+                        name="phone_number"
+                        label="Phone Number"
+                        icon={<Phone size={18} />}
+                        value={formData.phone_number}
+                        onChange={handleChange}
+                        error={errors.phone_number}
+                      />
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                      {renderSelectField(
-                        "department_id",
-                        "Department",
-                        <Building2 size={18} />,
-                        departments.map(dept => ({ value: dept.id, label: dept.name })),
-                        "Select Department"
-                      )}
+                      <FormSelectField
+                        name="department_id"
+                        label="Department"
+                        icon={<Building2 size={18} />}
+                        options={departments.map(dept => ({ value: dept.id, label: dept.name }))}
+                        placeholder="Select Department"
+                        value={formData.department_id}
+                        onChange={handleChange}
+                        error={errors.department_id}
+                      />
                       
-                      {renderInputField("designation", "Designation", <Briefcase size={18} />)}
+                      <FormInputField
+                        name="designation"
+                        label="Designation"
+                        icon={<Briefcase size={18} />}
+                        value={formData.designation}
+                        onChange={handleChange}
+                        error={errors.designation}
+                      />
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                      {renderSelectField(
-                        "job_status",
-                        "Job Status",
-                        <Briefcase size={18} />,
-                        jobStatuses.map(status => ({ value: status, label: status })),
-                        "Select Job Status"
-                      )}
+                      <FormSelectField
+                        name="job_status"
+                        label="Job Status"
+                        icon={<Briefcase size={18} />}
+                        options={jobStatuses.map(status => ({ value: status, label: status }))}
+                        placeholder="Select Job Status"
+                        value={formData.job_status}
+                        onChange={handleChange}
+                        error={errors.job_status}
+                      />
                       
-                      {renderInputField("hire_date", "Joining Date", <Calendar size={18} />, "date")}
+                      <FormInputField
+                        name="hire_date"
+                        label="Joining Date"
+                        icon={<Calendar size={18} />}
+                        value={formData.hire_date}
+                        onChange={handleChange}
+                        type="date"
+                        error={errors.hire_date}
+                      />
                     </div>
                     
-                    {renderSelectField(
-                      "supervisor_id",
-                      "Supervisor",
-                      <Users size={18} />,
-                      (status !== "rejected"
+                    <FormSelectField
+                      name="supervisor_id"
+                      label="Supervisor"
+                      icon={<Users size={18} />}
+                      options={(status !== "rejected"
                         ? employees
                         : employees.filter(employee => employee.id !== userId)
-                      ).map(emp => ({ value: emp.id, label: emp.name })),
-                      "Not Applicable"
-                    )}
+                      ).map(emp => ({ value: emp.id, label: emp.name }))}
+                      placeholder="Not Applicable"
+                      value={formData.supervisor_id || ""}
+                      onChange={handleChange}
+                      error={errors.supervisor_id}
+                    />
                     
                     <motion.div 
                       variants={fadeInUp}
