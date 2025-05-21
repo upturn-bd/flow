@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import TaskCreateModal, { TaskUpdateModal } from "../task/TaskModal";
 import TaskDetails from "../task/TaskDetails";
+import { createClient } from '@/lib/supabase/client';
 
 interface MilestoneDetailsProps {
   id: number;
@@ -217,8 +218,8 @@ export default function MilestoneDetails({
             <div className="flex gap-2 items-start">
               <span className="font-bold">Assignee</span>:
               <div className="flex flex-wrap gap-2">
-                {milestoneDetails?.assignees?.length > 0 &&
-                  milestoneDetails?.assignees.map((assignee, i) => (
+                {(milestoneDetails?.assignees && milestoneDetails.assignees.length > 0) &&
+                  milestoneDetails.assignees.map((assignee, i) => (
                     <span
                       key={i}
                       className="bg-[#E6F0FF] text-[#0074FF] text-xs px-2 py-1 rounded"
@@ -281,16 +282,16 @@ export default function MilestoneDetails({
                     <div className="flex justify-end gap-2">
                       <PencilSimple
                         size={16}
-                        onClick={() => handleDisplayUpdateTaskeModal(task.id)}
+                        onClick={() => task.id && handleDisplayUpdateTaskeModal(task.id)}
                         className="text-gray-600 cursor-pointer"
                       />
                       <TrashSimple
-                        onClick={() => handleDeleteTask(task.id)}
+                        onClick={() => task.id && handleDeleteTask(task.id)}
                         size={16}
                         className="text-red-600 cursor-pointer"
                       />
                       <ArrowSquareOut
-                        onClick={() => setTaskDetailsId(task.id)}
+                        onClick={() => task.id && setTaskDetailsId(task.id)}
                         size={18}
                         className="text-slate-800 hover:text-blue-800 cursor-pointer ml-4 md:ml-8"
                       />
@@ -311,7 +312,7 @@ export default function MilestoneDetails({
           </div>
           {isCreatingTask && (
             <TaskCreateModal
-              projectId={milestoneDetails?.project_id}
+              projectId={milestoneDetails?.project_id ?? 0}
               milestoneId={milestoneId}
               onClose={() => setIsCreatingTask(false)}
               onSubmit={handleCreateTask}

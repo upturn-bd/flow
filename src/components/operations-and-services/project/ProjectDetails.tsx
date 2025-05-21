@@ -1,9 +1,7 @@
 "use client";
-import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Project } from "@/hooks/useProjects";
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
-import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { Milestone } from "./CreateNewProject";
 import { useMilestones } from "@/hooks/useMilestones";
@@ -14,25 +12,14 @@ import { Comment, useComments } from "@/hooks/useComments";
 import MilestoneDetails from "./milestone/MilestoneDetails";
 import { formatDate } from "@/lib/utils";
 import { projectSchema } from "@/lib/types";
-import { motion, AnimatePresence } from "framer-motion";
 import { 
   Pencil, 
   Trash2, 
-  Plus, 
   Calendar, 
   ExternalLink, 
-  Users,
-  MessageSquare,
-  ClipboardList,
-  Building2,
-  Loader2,
-  UserCircle,
-  Clock,
-  CheckCircle,
-  Send,
-  X
 } from "lucide-react";
 import { toast } from "sonner";
+import { createClient } from '@/lib/supabase/client';
 
 interface ProjectDetailsProps {
   id: number;
@@ -111,12 +98,29 @@ export default function ProjectDetails({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { employees, fetchEmployees } = useEmployees();
-  const { departments, fetchDepartments } = useDepartments();
   const [user, setUser] = useState<any>(null);
   const [remark, setRemark] = useState<string>("");
   const [displaySubmissionModal, setDisplaySubmissionModal] =
     useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [loadingTasks, setLoadingTasks] = useState(false);
+
+  const calculateProgress = (milestones: Milestone[]) => {
+    if (!projectDetails || !milestones.length) return;
+    
+    const completedWeightage = milestones
+      .filter(m => m.status === 'Completed')
+      .reduce((acc, m) => acc + (m.weightage || 0), 0);
+    
+    // Progress is a number in the schema
+    if (projectDetails) {
+      setProjectDetails({
+        ...projectDetails,
+        progress: completedWeightage
+      });
+    }
+  };
 
   const submitProject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -238,14 +242,14 @@ export default function ProjectDetails({
         .eq("company_id", company_id);
 
       if (error) {
-        setError("Error fetching project details");
+        setError("Error fetching Project details");
         console.error(error);
         return;
       }
 
       setProjectDetails(data[0]);
     } catch (error) {
-      setError("Error fetching project details");
+      setError("Error fetching Project details");
       console.error(error);
     } finally {
       setLoading(false);
@@ -270,19 +274,48 @@ export default function ProjectDetails({
         return;
       }
 
-      const formatData = data?.map((item) => {
-        const { created_at, updated_at, ...rest } = item;
+      const formatData = data?.map((item: any) => {
+        const { created_at, updated_at, department_id, ...rest } = item;
         return {
           ...rest,
         };
       });
 
-      setMilestones(formatData);
+      setMilestones(formatData || []);
+      calculateProgress(formatData || []);
     } catch (error) {
       setError("Error fetching milestones");
       console.error(error);
     } finally {
       setLoadingMilestones(false);
+    }
+  }
+
+  async function fetchTasksByProjectId(id: number) {
+    setLoadingTasks(true);
+    const client = createClient();
+    const company_id = await getCompanyId();
+
+    try {
+      const { data, error } = await client
+        .from("task_records")
+        .select("*")
+        .eq("project_id", id)
+        .eq("company_id", company_id)
+        .is("milestone_id", null);
+
+      if (error) {
+        setError("Error fetching tasks");
+        console.error(error);
+        return;
+      }
+
+      setTasks(data || []);
+    } catch (error) {
+      setError("Error fetching tasks");
+      console.error(error);
+    } finally {
+      setLoadingTasks(false);
     }
   }
 
@@ -317,6 +350,7 @@ export default function ProjectDetails({
     if (id) {
       fetchProjectDetails(id);
       fetchMilestonesByProjectId(id);
+      fetchTasksByProjectId(id);
       fetchCommentsByProjectId(id);
       setProjectId(id);
     }
@@ -324,8 +358,7 @@ export default function ProjectDetails({
 
   useEffect(() => {
     fetchEmployees();
-    fetchDepartments();
-  }, [fetchDepartments, fetchEmployees]);
+  }, [fetchEmployees]);
 
   useEffect(() => {
     const fetchUser = async () => {

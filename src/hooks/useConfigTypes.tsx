@@ -220,7 +220,7 @@ export function useClaimTypes() {
     createItem: createClaimType,
     updateItem: updateClaimType,
     deleteItem: deleteClaimType
-  } = useConfigTypes<ClaimType>('claim_types');
+  } = useConfigTypes<ClaimType>('settlement_types');
   
   return {
     claimTypes,

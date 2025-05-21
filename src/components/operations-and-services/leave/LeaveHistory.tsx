@@ -4,7 +4,6 @@ import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
 import { LeaveState } from "./LeaveCreatePage";
-import { fetchLeaveHistory } from "@/lib/api/operations-and-services/attendance/leave";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";

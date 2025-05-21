@@ -10,6 +10,7 @@ import ProjectDetails from "./ProjectDetails";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExternalLink, Trash2, Clock, Calendar, Building2, User, Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { createClient } from '@/lib/supabase/client';
 
 function ProjectCard({
   project,
@@ -161,51 +162,37 @@ function CompletedProjectsList() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  async function fetchProjects() {
+  async function fetchCompletedProjects() {
     setLoading(true);
     const client = createClient();
     const company_id = await getCompanyId();
-    const user = await getUserInfo();
 
     try {
-      if (user.role === "Admin") {
-        const { data, error } = await client
-          .from("project_records")
-          .select("*")
-          .eq("status", "Completed")
-          .eq("company_id", company_id);
-
-        if (error) throw error;
-        const formatData = data?.map((item) => {
-          const { created_at, updated_at, ...rest } = item;
-          return {
-            ...rest,
-          };
-        });
-        setProjects(formatData);
-        return;
-      }
       const { data, error } = await client
         .from("project_records")
         .select("*")
         .eq("company_id", company_id)
-        .eq("status", "Completed")
-        .or(
-          `assignees.cs.{${user.id}}, department_id.eq.${user.department_id}, project_lead_id.eq.${user.id}`
-        );
+        .eq("status", "Completed");
 
-      if (error) throw error;
-      const formatData = data?.map((item) => {
+      if (error) {
+        setError("Error fetching Projects");
+        console.error(error);
+        return;
+      }
+
+      // Format project data
+      const formatData = data?.map((item: any) => {
         const { created_at, updated_at, ...rest } = item;
         return {
           ...rest,
         };
       });
-      setProjects(formatData);
-      return;
+
+      setProjects(formatData || []);
     } catch (error) {
-      toast.error("Failed to fetch projects");
+      setError("Error fetching Projects");
       console.error(error);
     } finally {
       setLoading(false);
@@ -213,14 +200,14 @@ function CompletedProjectsList() {
   }
 
   useEffect(() => {
-    fetchProjects();
+    fetchCompletedProjects();
   }, []);
 
   const handleDeleteProject = async (id: number) => {
     try {
       await deleteProject(id);
       toast.success("Project deleted successfully");
-      fetchProjects();
+      fetchCompletedProjects();
     } catch (error) {
       toast.error("Error deleting project");
       console.error(error);
@@ -232,7 +219,7 @@ function CompletedProjectsList() {
       await updateProject(values);
       toast.success("Project updated successfully");
       setSelectedProject(null);
-      fetchProjects();
+      fetchCompletedProjects();
     } catch (error) {
       toast.error("Error updating project");
       console.error(error);

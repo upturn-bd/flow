@@ -13,22 +13,6 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 
-// Define the settlement schema
-const settlementSchema = z.object({
-  id: z.number().optional(),
-  settlement_type_id: z.number().min(1, { message: "Settlement type is required" }),
-  description: z.string().optional(),
-  event_date: z.string().min(1, { message: "Event date is required" }),
-  amount: z.number().min(0.01, { message: "Amount must be greater than 0" }),
-  comment: z.string().optional(),
-  status: z.string().min(1, { message: "Status is required" }),
-  approved_by_id: z.string().optional(),
-  claimant_id: z.string().optional(),
-  requested_to: z.string().optional(),
-  in_advance: z.boolean().optional(),
-  attachments: z.array(z.string()).optional(),
-});
-
 // Define the settlement state type
 interface SettlementState {
   id: number;

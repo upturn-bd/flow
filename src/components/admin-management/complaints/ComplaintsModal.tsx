@@ -21,7 +21,7 @@ export default function ComplaintTypeCreateModal({
     company_id: 0,
   });
 
-  const [errors, setErrors] = useState<Partial<FormValues>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
@@ -32,9 +32,10 @@ export default function ComplaintTypeCreateModal({
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<FormValues> = {};
+      const newErrors: Record<string, string> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        const path = String(err.path[0]);
+        newErrors[path] = err.message;
       });
       setErrors(newErrors);
     }
@@ -58,9 +59,10 @@ export default function ComplaintTypeCreateModal({
     const result = complaintsTypeSchema.safeParse(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<FormValues> = {};
+      const fieldErrors: Record<string, string> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] = issue.message;
+        const path = String(issue.path[0]);
+        fieldErrors[path] = issue.message;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);

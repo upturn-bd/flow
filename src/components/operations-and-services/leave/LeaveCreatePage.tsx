@@ -1,5 +1,6 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { supabase } from "@/lib/supabase/client";

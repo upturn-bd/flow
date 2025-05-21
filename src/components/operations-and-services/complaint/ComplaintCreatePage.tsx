@@ -9,7 +9,6 @@ import { supabase } from "@/lib/supabase/client";
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
 import { useEmployees } from "@/hooks/useEmployees";
-import { createComplaint } from "@/lib/api/operations-and-services/complaint/complaintApi";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 
 const initialComplaintRecord = {

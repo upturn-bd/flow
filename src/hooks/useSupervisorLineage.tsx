@@ -28,12 +28,12 @@ export function useLineage() {
     }
   }, []);
 
-  const createLineage = async (lineage: Omit<Lineage, "id">[]) => {
+  const createLineage = async (lineage: z.infer<typeof lineageSchema>[]) => {
     const data = await cLineage(lineage);
     return { success: true, status: 200, data };
   };
 
-  const updateLineage = async (lineage: Omit<Lineage, "id">[]) => {
+  const updateLineage = async (lineage: z.infer<typeof lineageSchema>[]) => {
     const data = await uLineage(lineage);
     return { success: true, status: 200, data };
   };

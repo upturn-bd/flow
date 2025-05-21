@@ -7,6 +7,8 @@ import LineageCreateModal, {
   LineageUpdateModal,
 } from "./SupervisorLineageModal";
 import { TrashSimple } from "@phosphor-icons/react";
+import { lineageSchema } from "@/lib/types";
+import { z } from "zod";
 
 const groupLineageData = (lineages: any[]) => {
   return lineages.reduce((acc, lineage) => {
@@ -33,7 +35,7 @@ export default function SupervisorLineageView() {
     { name: string; details: any }[] | []
   >([]);
 
-  const handleCreateLineage = async (values: any) => {
+  const handleCreateLineage = async (values: z.infer<typeof lineageSchema>[]) => {
     try {
       await createLineage(values);
       alert("Lineage created!");
@@ -44,7 +46,7 @@ export default function SupervisorLineageView() {
     }
   };
 
-  const handleUpdateLineage = async (values: any) => {
+  const handleUpdateLineage = async (values: z.infer<typeof lineageSchema>[]) => {
     try {
       await updateLineage(values);
       alert("Lineage updated!");

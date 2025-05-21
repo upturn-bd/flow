@@ -4,9 +4,6 @@ import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
 import ComplaintTypeCreateModal from "./ComplaintsModal";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
-import ComplaintsTable from "./ComplaintsTable";
-import ComplaintsModal from "./ComplaintsModal";
-import { Button } from "@/components/ui/button";
 
 export default function ComplaintsView() {
   const {
@@ -58,7 +55,7 @@ export default function ComplaintsView() {
                 <button
                   type="button"
                   className="ml-2 text-gray-600"
-                  onClick={() => handleDeleteComplaintType(type.id)}
+                  onClick={() => type.id !== undefined && handleDeleteComplaintType(type.id)}
                 >
                   ✕
                 </button>

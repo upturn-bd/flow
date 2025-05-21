@@ -40,7 +40,7 @@ export default function MilestoneCreateModal({
   const { employees, fetchEmployees } = useEmployees();
   const [milestone, setMilestone] = useState<Milestone>(initialMilestone);
   const [milestoneAssignees, setMilestoneAssignees] = useState<string[]>([]);
-  const [errors, setErrors] = useState<Partial<Milestone>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isMilestoneValid, setIsMilestoneValid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -50,9 +50,10 @@ export default function MilestoneCreateModal({
     const result = milestoneSchema.safeParse(milestone);
 
     if (!result.success) {
-      const fieldErrors: Partial<Milestone> = {};
+      const fieldErrors: Record<string, string> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof Milestone] = issue.message;
+        const path = String(issue.path[0]);
+        fieldErrors[path] = issue.message;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -102,9 +103,10 @@ export default function MilestoneCreateModal({
       setErrors({});
     } else {
       setIsMilestoneValid(false);
-      const newErrors: Partial<Milestone> = {};
+      const newErrors: Record<string, string> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        const path = String(err.path[0]);
+        newErrors[path] = err.message;
       });
       setErrors(newErrors);
     }
@@ -366,7 +368,7 @@ export function MilestoneUpdateModal({
   const { employees, fetchEmployees } = useEmployees();
   const [milestone, setMilestone] = useState<Milestone>(initialMilestone);
   const [milestoneAssignees, setMilestoneAssignees] = useState<string[]>([]);
-  const [errors, setErrors] = useState<Partial<Milestone>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isMilestoneValid, setIsMilestoneValid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -377,9 +379,10 @@ export function MilestoneUpdateModal({
     const result = milestoneSchema.safeParse(milestone);
 
     if (!result.success) {
-      const fieldErrors: Partial<Milestone> = {};
+      const fieldErrors: Record<string, string> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof Milestone] = issue.message;
+        const path = String(issue.path[0]);
+        fieldErrors[path] = issue.message;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -423,9 +426,10 @@ export function MilestoneUpdateModal({
       setErrors({});
     } else {
       setIsMilestoneValid(false);
-      const newErrors: Partial<Milestone> = {};
+      const newErrors: Record<string, string> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        const path = String(err.path[0]);
+        newErrors[path] = err.message;
       });
       setErrors(newErrors);
     }

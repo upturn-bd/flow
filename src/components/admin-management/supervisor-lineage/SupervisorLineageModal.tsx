@@ -5,11 +5,10 @@ import { lineageSchema } from "@/lib/types";
 import { z } from "zod";
 import { Trash } from "@phosphor-icons/react";
 
-type FormValues = z.infer<typeof lineageSchema>;
 
 interface LineageModalProps {
   initialData?: Lineage[] | null;
-  onSubmit: (values: FormValues) => void;
+  onSubmit: (values: z.infer<typeof lineageSchema>[]) => void;
   onClose: () => void;
 }
 
@@ -119,13 +118,15 @@ export default function LineageCreateModal({
     const lineageData = hierarchy
       .filter((level) => level.position_id !== null)
       .map((level) => ({
-        position_id: level.position_id,
+        position_id: level.position_id as number,
         hierarchical_level: level.level,
         name: name,
         company_id: 0,
       }));
 
-    onSubmit(lineageData);
+    if (lineageData.length > 0) {
+      onSubmit(lineageData);
+    }
   };
 
   useEffect(() => {
@@ -143,10 +144,6 @@ export default function LineageCreateModal({
       setRemainingPositions(availablePositions);
     }
   }, [lineages, allPositions]);
-
-  useEffect(() => {
-    console.log("Hierarchy updated:", hierarchy);
-  }, [hierarchy]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -377,13 +374,15 @@ export function LineageUpdateModal({
     const lineageData = hierarchy
       .filter((level) => level.position_id !== null)
       .map((level) => ({
-        position_id: level.position_id,
+        position_id: level.position_id as number,
         hierarchical_level: level.level,
         name: name,
         company_id: 0,
       }));
 
-    onSubmit(lineageData);
+    if (lineageData.length > 0) {
+      onSubmit(lineageData);
+    }
   };
 
   useEffect(() => {
@@ -403,7 +402,7 @@ export function LineageUpdateModal({
   }, [hierarchy, allPositions]);
 
   useEffect(() => {
-    if (initialData) {
+    if (initialData && initialData.length > 0) {
       setName(initialData[0].name);
       setHierarchy(
         initialData.map((level) => {
@@ -415,10 +414,6 @@ export function LineageUpdateModal({
       );
     }
   }, [initialData]);
-
-  useEffect(() => {
-    console.log("Hierarchy updated:", hierarchy);
-  }, [hierarchy]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -524,8 +519,7 @@ export function LineageUpdateModal({
                     level.position_id === null ||
                     Number.isNaN(level.position_id)
                 ) ||
-                (name === initialData[0].name &&
-                  compareLineages(initialData, hierarchy))
+                !!(initialData && initialData.length > 0 && name === initialData[0].name && compareLineages(initialData, hierarchy))
               }
               className="bg-[#FFC700] hover:bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >

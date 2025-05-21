@@ -44,6 +44,16 @@ const markerIcon = new L.Icon({
   iconAnchor: [12, 41],
 });
 
+const MapController = ({ setMap }: { setMap: (map: L.Map) => void }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    setMap(map);
+  }, [map, setMap]);
+  
+  return null;
+};
+
 const MapUpdater = ({ coordinates }: { coordinates: Coordinates }) => {
   const map = useMap();
   useEffect(() => {
@@ -205,9 +215,9 @@ export default function ClientMap({ value, onChange, type }: ClientMapProps) {
         center={coordinates ?? DEFAULT_POSITION}
         zoom={13}
         scrollWheelZoom={true}
-        whenCreated={(mapInstance) => setMap(mapInstance)}
-        className="h-80 rounded-lg z-0"
+        className="h-[60vh] w-full rounded-lg shadow-md"
       >
+        <MapController setMap={setMap} />
         <TileLayer
           attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

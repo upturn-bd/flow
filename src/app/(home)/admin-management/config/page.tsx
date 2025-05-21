@@ -1,7 +1,7 @@
 "use client";
 
 import AttendanceManagementView from "@/components/admin-management/attendance/AttendanceManagementView";
-import ClaimSettlementView from "@/components/admin-management/claim-settlement/ClaimSettlementView";
+import ClaimSettlementView from "@/components/admin-management/settlement/SettlementView";
 import ComplaintsView from "@/components/admin-management/complaints/ComplaintsManagementView";
 import InventoryManagementView from "@/components/admin-management/inventory/InventoryManagementView";
 import LeaveManagementView from "@/components/admin-management/leave/LeaveManagementView";

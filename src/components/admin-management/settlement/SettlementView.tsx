@@ -7,10 +7,9 @@ import { useClaimTypes } from "@/hooks/useConfigTypes";
 import {
   ClaimTypeCreateModal,
   ClaimTypeUpdateModal,
-} from "./ClaimSettlementModal";
+} from "./SettlementModal";
 import { claimTypeSchema } from "@/lib/types";
 import { z } from "zod";
-import ClaimSettlementTable from "./ClaimSettlementTable";
 
 type SettlementType = z.infer<typeof claimTypeSchema>;
 

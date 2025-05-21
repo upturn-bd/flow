@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar, ChevronLeft, Loader2, User, CheckCircle, XCircle, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { createClient } from '@/lib/supabase/client';
 
 interface TaskDetailsProps {
   id: number;
