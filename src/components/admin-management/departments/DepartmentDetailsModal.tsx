@@ -12,6 +12,7 @@ interface DepartmentDetailsModalProps {
   onClose: () => void;
   editDepartment: () => void;
   deleteDepartment: () => void;
+  employees: { id: string; name: string }[];
 }
 
 export default function DepartmentDetailsModal({
@@ -20,11 +21,8 @@ export default function DepartmentDetailsModal({
   editDepartment,
   deleteDepartment,
   divisions,
+  employees,
 }: DepartmentDetailsModalProps) {
-  const { employees, fetchEmployees } = useEmployees();
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg w-full max-w-md">
@@ -32,10 +30,10 @@ export default function DepartmentDetailsModal({
 
         <div className="space-y-2">
           <p>
-            <strong>Name:</strong> {department?.name}
+            <strong>Name: </strong> {department?.name}
           </p>
           <p>
-            <strong>Head:</strong>{" "}
+            <strong>Head: </strong>
             {department?.head_id == null
               ? "No head assigned"
               : employees?.filter(
@@ -43,7 +41,7 @@ export default function DepartmentDetailsModal({
                 )[0]?.name}
           </p>
           <p>
-            <strong>Division ID:</strong>{" "}
+            <strong>Division: </strong>
             {
               divisions?.filter(
                 (division) => division.id == department.division_id
@@ -51,7 +49,7 @@ export default function DepartmentDetailsModal({
             }
           </p>
           <p>
-            <strong>Description:</strong> {department?.description}
+            <strong>Description: </strong> {department?.description}
           </p>
         </div>
 

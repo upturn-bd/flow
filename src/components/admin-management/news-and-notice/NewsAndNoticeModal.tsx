@@ -32,9 +32,9 @@ export default function NewsAndNoticesCreateModal({
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<FormValues> = {};
+      const newErrors: Record<string, string> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof FormValues] = err.message;
       });
       setErrors(newErrors);
     }
@@ -60,7 +60,7 @@ export default function NewsAndNoticesCreateModal({
     if (!result.success) {
       const fieldErrors: Partial<FormValues> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] = issue.message;
+        fieldErrors[issue.path[0] as keyof FormValues] = issue.message as any;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);

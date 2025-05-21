@@ -9,8 +9,8 @@ import LeaveTypeCreateModal, {
 } from "./LeaveModal";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { TrashSimple } from "@phosphor-icons/react";
-import LeaveTable from "./LeaveTable";
-import { holidayConfig } from "@/lib/types/leave";
+import { useHolidayConfigs } from "@/hooks/useLeaveManagement";
+import { HolidayConfig, LeaveType } from "@/hooks/useLeaveManagement";
 
 export default function LeaveManagementView() {
   const {

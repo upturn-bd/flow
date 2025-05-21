@@ -15,7 +15,6 @@ import PositionDetailsModal from "./positions/PositionDetailsModal";
 import PositionModal from "./positions/PositionModal";
 import { 
   Building, 
-  Users, 
   Layers, 
   GraduationCap, 
   BriefcaseBusiness, 
@@ -25,11 +24,10 @@ import {
   Info 
 } from "lucide-react";
 import { fadeInUp, staggerContainer } from "@/components/ui/animations";
-import { useEmployees } from "@/hooks/useEmployees";
 
 // Add prop type
 type CompanyBasicsConfigViewProps = {
-  employees: { id: number; name: string }[];
+  employees: { id: string; name: string }[];
 };
 
 export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConfigViewProps) {
@@ -313,6 +311,7 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
         <AnimatePresence>
           {isCreatingDivision && (
             <DivisionModal
+              employees={employees}
               onSubmit={handleCreateDivision}
               onClose={() => setIsCreatingDivision(false)}
             />
@@ -323,10 +322,12 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
               deleteDivision={() => handleDeleteDivision(selectedDivisionView.id)}
               division={selectedDivisionView}
               onClose={() => setViewDivision(null)}
+              employees={employees}
             />
           )}
           {selectedDivisionEdit && (
             <DivisionModal
+              employees={employees}
               initialData={selectedDivisionEdit}
               onSubmit={handleUpdateDivision}
               onClose={() => setEditDivision(null)}
@@ -393,6 +394,7 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
         <AnimatePresence>
           {isCreatingDepartment && (
             <DepartmentModal
+              employees={employees}
               divisions={divisions}
               onSubmit={handleCreateDepartment}
               onClose={() => setIsCreatingDepartment(false)}
@@ -400,6 +402,7 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
           )}
           {selectedDepartmentView && (
             <DepartmentDetailsModal
+              employees={employees}
               divisions={divisions}
               editDepartment={() => setEditDepartment(selectedDepartmentView.id)}
               deleteDepartment={() => handleDeleteDepartment(selectedDepartmentView.id)}
@@ -409,6 +412,7 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
           )}
           {selectedDepartmentEdit && (
             <DepartmentModal
+              employees={employees}
               divisions={divisions}
               initialData={selectedDepartmentEdit}
               onSubmit={handleUpdateDepartment}

@@ -6,7 +6,7 @@ import RequisitionTypeCreateModal, {
   RequisitionInventoryCreateModal,
   RequisitionInventoryUpdateModal,
 } from "./InventoryModal";
-import { useRequisitionTypes } from "@/hooks/useConfigTypes";
+import { RequisitionInventory, useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { TrashSimple } from "@phosphor-icons/react";
 

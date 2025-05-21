@@ -57,7 +57,7 @@ export default function NewsAndNoticeView() {
                 <button
                   type="button"
                   className="ml-2 text-gray-600"
-                  onClick={() => handleDeleteNewsAndNoticeType(type.id)}
+                  onClick={() => handleDeleteNewsAndNoticeType(type.id!)}
                 >
                   ✕
                 </button>

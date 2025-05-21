@@ -16,18 +16,19 @@ const schema = z.object({
   created_at: z.string().optional(),
 });
 
-type FormValues = z.infer<typeof schema>;
 
 interface DivisionModalProps {
   initialData?: Division | null;
   onSubmit: (values: Division) => void;
   onClose: () => void;
+  employees: { id: string; name: string }[];
 }
 
 export default function DivisionModal({
   initialData,
   onSubmit,
   onClose,
+  employees,
 }: DivisionModalProps) {
   const [formValues, setFormValues] = useState<Division>({
     id: initialData?.id ?? 0,
@@ -40,7 +41,6 @@ export default function DivisionModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
-  const { employees, fetchEmployees } = useEmployees();
 
   useEffect(() => {
     const result = schema.safeParse(formValues);
@@ -95,10 +95,6 @@ export default function DivisionModal({
     onSubmit(formValues);
     setIsSubmitting(false);
   };
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">

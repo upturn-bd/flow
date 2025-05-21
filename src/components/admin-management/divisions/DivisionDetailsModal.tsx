@@ -1,15 +1,14 @@
 "use client";
 
 import { Division } from "@/hooks/useDivisions";
-import { useEmployees } from "@/hooks/useEmployees";
 import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
-import { useEffect } from "react";
 
 interface DivisionDetailsModalProps {
   division: Division;
   onClose: () => void;
   editDivision: () => void;
   deleteDivision: () => void;
+  employees: { id: string; name: string }[];
 }
 
 export default function DivisionDetailsModal({
@@ -17,11 +16,8 @@ export default function DivisionDetailsModal({
   onClose,
   editDivision,
   deleteDivision,
+  employees,
 }: DivisionDetailsModalProps) {
-  const { employees, fetchEmployees } = useEmployees();
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg w-full max-w-md">
@@ -29,10 +25,10 @@ export default function DivisionDetailsModal({
 
         <div className="space-y-2">
           <p>
-            <strong>Name:</strong> {division?.name}
+            <strong>Name: </strong> {division?.name}
           </p>
           <p>
-            <strong>Head:</strong>
+            <strong>Head: </strong>
             {division?.head_id == null
               ? "No head assigned"
               : employees?.filter(

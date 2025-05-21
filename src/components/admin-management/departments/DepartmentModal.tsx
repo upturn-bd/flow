@@ -4,14 +4,13 @@ import { useEffect, useState } from "react";
 import { Department } from "@/hooks/useDepartments";
 import { z } from "zod";
 import { dirtyValuesChecker } from "@/lib/utils";
-import { useEmployees } from "@/hooks/useEmployees";
 
 const schema = z.object({
-  id: z.number().optional(),
+  id: z.number(),
   name: z.string().min(1, "Name is required").max(50),
   head_id: z.string().min(1, "Please select a department head"),
   description: z.string().optional(),
-  division_id: z.number().min(1, "Please select a division"), // kept as string for form compatibility
+  division_id: z.number().min(1, "Please select a division"),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -21,6 +20,7 @@ interface DepartmentModalProps {
   onSubmit: (values: FormValues) => void;
   onClose: () => void;
   divisions: { id: number; name: string }[];
+  employees: { id: string; name: string }[];
 }
 
 export default function DepartmentModal({
@@ -28,6 +28,7 @@ export default function DepartmentModal({
   onSubmit,
   divisions,
   onClose,
+  employees,
 }: DepartmentModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
     id: 0,
@@ -37,19 +38,19 @@ export default function DepartmentModal({
     division_id: 0,
   });
 
-  const { employees, fetchEmployees } = useEmployees();
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
-
   useEffect(() => {
     if (initialData) {
-      setFormValues(initialData);
+      setFormValues({
+        id: initialData.id,
+        name: initialData.name,
+        head_id: initialData.head_id || "",
+        description: initialData.description || "",
+        division_id: initialData.division_id || 0,
+      });
     }
   }, [initialData]);
 
-  const [errors, setErrors] = useState<Partial<FormValues>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
@@ -61,9 +62,10 @@ export default function DepartmentModal({
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<FormValues> = {};
+      const newErrors: Record<string, string> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        const path = String(err.path[0]);
+        newErrors[path] = err.message;
       });
       setErrors(newErrors);
     }
@@ -76,7 +78,7 @@ export default function DepartmentModal({
   ) => {
     const { name, value } = e.target;
     if (name === "division_id") {
-      setFormValues((prev) => ({ ...prev, [name]: parseInt(value) }));
+      setFormValues((prev) => ({ ...prev, [name]: parseInt(value) || 0 }));
     } else {
       setFormValues((prev) => ({ ...prev, [name]: value }));
     }
@@ -88,9 +90,9 @@ export default function DepartmentModal({
     const result = schema.safeParse(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<FormValues> = {};
+      const fieldErrors: Record<string, string> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] = issue.message;
+        fieldErrors[String(issue.path[0])] = issue.message;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -105,7 +107,14 @@ export default function DepartmentModal({
   // Check if form values are dirty
   useEffect(() => {
     if (initialData) {
-      setIsDirty(dirtyValuesChecker(initialData, formValues));
+      const initialDataForComparison: FormValues = {
+        id: initialData.id,
+        name: initialData.name,
+        head_id: initialData.head_id || "",
+        description: initialData.description || "",
+        division_id: initialData.division_id || 0,
+      };
+      setIsDirty(dirtyValuesChecker(initialDataForComparison, formValues));
     }
   }, [initialData, formValues]);
 
@@ -161,7 +170,7 @@ export default function DepartmentModal({
           </label>
           <select
             name="division_id"
-            value={formValues.division_id}
+            value={formValues.division_id || ""}
             onChange={handleChange}
             className="w-full rounded-md bg-blue-50 p-2"
           >
