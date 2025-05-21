@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { getUser } from "./lib/auth/getUser";
+import { getUserFromServer } from "./lib/auth/getUser";
 import { createClient } from "./lib/supabase/server";
 
 type Role = "Employee" | "Manager" | "Admin";
@@ -74,7 +74,7 @@ export async function middleware(request: NextRequest) {
 
   // Standard middleware checks from here
   // Get user data from context
-  const { user } = await getUser();
+  const { user } = await getUserFromServer();
   if (!user) {
     url.pathname = "/login";
     return NextResponse.redirect(url);

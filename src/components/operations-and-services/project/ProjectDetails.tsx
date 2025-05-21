@@ -1,7 +1,8 @@
 "use client";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Project } from "@/hooks/useProjects";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { useEffect, useState } from "react";
 import { Milestone } from "./CreateNewProject";
 import { useMilestones } from "@/hooks/useMilestones";
@@ -202,7 +203,7 @@ export default function ProjectDetails({
   const handleCreateComment = async (e: React.FormEvent) => {
     e.preventDefault();
     const company_id = await getCompanyId();
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     try {
       const formatData = {
         comment: comment,
@@ -362,7 +363,7 @@ export default function ProjectDetails({
 
   useEffect(() => {
     const fetchUser = async () => {
-      const user = await getUserInfo();
+      const user = await getEmployeeInfo();
       setUser(user);
     };
     fetchUser();

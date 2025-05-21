@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 
 // A generic hook for managing different request types
 export function useRequests<T extends { id: number }>(
@@ -19,7 +20,7 @@ export function useRequests<T extends { id: number }>(
     setLoading(true);
     
     try {
-      const user = await getUserInfo();
+      const user = await getEmployeeInfo();
       const company_id = await getCompanyId();
       
       const { data, error } = await supabase
@@ -53,7 +54,7 @@ export function useRequests<T extends { id: number }>(
     setProcessingId(id);
     
     try {
-      const user = await getUserInfo();
+      const user = await getEmployeeInfo();
       const company_id = await getCompanyId();
       
       // Build update object based on field names

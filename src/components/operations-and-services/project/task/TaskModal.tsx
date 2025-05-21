@@ -4,7 +4,7 @@ import { Task } from "@/hooks/useTasks";
 import { useEmployees } from "@/hooks/useEmployees";
 import { taskSchema } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
-import { getCompanyId } from "@/lib/auth/getUser";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Calendar, 

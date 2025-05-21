@@ -4,7 +4,7 @@ import { cn } from "@/components/ui/class";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { navItems } from "./nav-items";
-import { getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
@@ -17,7 +17,7 @@ export default function MobileBottomNav() {
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const user = await getUserInfo();
+        const user = await getEmployeeInfo();
         setUser(user);
       } catch (error) {
         console.error("Failed to fetch user data:", error);

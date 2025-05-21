@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
-import { getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
 import { z } from "zod";
 
 /**
@@ -7,7 +7,7 @@ import { z } from "zod";
  */
 export async function getSupervisor() {
   try {
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     
     if (!user || !user.supervisor_id) {
       return null;
@@ -32,7 +32,7 @@ export async function getSupervisor() {
  */
 export async function fetchLeaveHistory() {
   try {
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     
     if (!user) {
       throw new Error("User not authenticated");

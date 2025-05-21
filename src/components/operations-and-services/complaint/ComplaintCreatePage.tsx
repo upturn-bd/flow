@@ -6,7 +6,8 @@ import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { z } from "zod";
 import { complaintRecordSchema } from "@/lib/types";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
@@ -52,7 +53,7 @@ export default function ComplaintCreatePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const company_id = await getCompanyId();
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     setIsSubmitting(true);
     try {
       const { uploadedFilePaths, error: uploadError } = await uploadManyFiles(

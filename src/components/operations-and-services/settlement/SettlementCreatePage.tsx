@@ -4,7 +4,8 @@ import React, { useEffect, useState, ChangeEvent } from "react";
 import { FiUploadCloud } from "react-icons/fi";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { z } from "zod";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
 import { motion } from "framer-motion";
 import { CheckCircle, Calendar, DollarSign } from "lucide-react";
@@ -92,7 +93,7 @@ export default function SettlementCreatePage() {
     setIsSubmitting(true);
     try {
       const company_id = await getCompanyId();
-      const user = await getUserInfo();
+      const user = await getEmployeeInfo();
 
       const { uploadedFilePaths, error: uploadError } = await uploadManyFiles(
         attachments,

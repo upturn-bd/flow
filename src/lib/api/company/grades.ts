@@ -16,12 +16,8 @@ interface Grade {
 export async function getGrades(): Promise<Grade[]> {
   try {
     
-    const {company_id, error: companyError} = await getCompanyId();
+    const company_id = await getCompanyId();
       
-    if (companyError) {
-      throw new Error(companyError.message);
-    }
-    
     // Fetch grades using the company_id
     const { data: grades, error } = await supabase
       .from("grades")

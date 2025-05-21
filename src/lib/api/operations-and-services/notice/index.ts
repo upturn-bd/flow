@@ -1,11 +1,12 @@
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { supabase } from "@/lib/supabase/client";
 import { noticeSchema } from "@/lib/types";
 import { z } from "zod";
 
 export async function getNotices() {
   const company_id = await getCompanyId();
-  const user = await getUserInfo();
+  const user = await getEmployeeInfo();
   const currentDate = new Date().toISOString();
 
   const { data, error } = await supabase

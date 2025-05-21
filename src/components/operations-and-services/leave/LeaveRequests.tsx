@@ -1,6 +1,7 @@
 "use client";
 
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
 import { LeaveState } from "./LeaveCreatePage";

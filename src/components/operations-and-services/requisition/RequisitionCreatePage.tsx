@@ -8,7 +8,8 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { z } from "zod";
 import { requisitionSchema } from "@/lib/types";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -148,7 +149,7 @@ export default function RequisitionCreatePage({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const company_id = await getCompanyId();
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     setIsSubmitting(true);
     try {
       const { uploadedFilePaths, error: uploadError } = await uploadManyFiles(
@@ -598,7 +599,7 @@ export function RequisitionDraftPage({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const company_id = await getCompanyId();
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     setIsSubmitting(true);
     try {
       const { uploadedFilePaths, error: uploadError } = await uploadManyFiles(

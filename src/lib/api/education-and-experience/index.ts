@@ -1,16 +1,17 @@
-"use server";
+"use client";
 
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
-import { getEmployeeId, getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { supabase } from "@/lib/supabase/client";
+import { getEmployeeInfo } from "@/lib/api/employee";
 import { schoolingSchema, experienceSchema } from "@/lib/types";
+import { getCompanyId } from "../company/companyInfo";
+import { getEmployeeId } from "../employee";
 
 export async function getSchoolings() {
-  const client = await createClient();
-  const user = await getUserInfo();
+  const user = await getEmployeeInfo();
   const company_id = await getCompanyId();
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("schoolings")
     .select("*")
     .eq("company_id", company_id)
@@ -23,14 +24,13 @@ export async function getSchoolings() {
 export async function createSchooling(
   payload: z.infer<typeof schoolingSchema>
 ) {
-  const client = await createClient();
   const company_id = await getCompanyId();
   const uid = await getEmployeeId();
 
   const validated = schoolingSchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { data, error } = await client.from("schoolings").insert({
+  const { data, error } = await supabase.from("schoolings").insert({
     ...validated.data,
     company_id,
     employee_id: uid,
@@ -45,7 +45,6 @@ export async function uploadFile(
 ): Promise<{ success?: boolean; error?: string }> {
   if (file) {
     try {
-      const supabase = await createClient();
       const uid = await getEmployeeId();
       const { data, error } = await supabase.storage
         .from("education-certificates")
@@ -66,14 +65,13 @@ export async function uploadFile(
 export async function updateSchooling(
   payload: z.infer<typeof schoolingSchema>
 ) {
-  const client = await createClient();
   const company_id = await getCompanyId();
   const uid = await getEmployeeId();
 
   const validated = schoolingSchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("schoolings")
     .update({ ...validated.data })
     .eq("id", payload.id)
@@ -85,11 +83,10 @@ export async function updateSchooling(
 }
 
 export async function deleteSchooling(id: number) {
-  const client = await createClient();
   const company_id = await getCompanyId();
   const uid = await getEmployeeId();
 
-  const { error } = await client
+  const { error } = await supabase
     .from("schoolings")
     .delete()
     .eq("id", id)
@@ -101,11 +98,10 @@ export async function deleteSchooling(id: number) {
 }
 
 export async function getExperiences() {
-  const client = await createClient();
   const company_id = await getCompanyId();
-  const user = await getUserInfo();
+  const user = await getEmployeeInfo();
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("experiences")
     .select("*")
     .eq("company_id", company_id)
@@ -118,14 +114,13 @@ export async function getExperiences() {
 export async function createExperience(
   payload: z.infer<typeof experienceSchema>
 ) {
-  const client = await createClient();
   const company_id = await getCompanyId();
   const uid = await getEmployeeId();
 
   const validated = experienceSchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { data, error } = await client.from("experiences").insert({
+  const { data, error } = await supabase.from("experiences").insert({
     ...validated.data,
     company_id,
     employee_id: uid,
@@ -138,14 +133,13 @@ export async function createExperience(
 export async function updateExperience(
   payload: z.infer<typeof experienceSchema>
 ) {
-  const client = await createClient();
   const company_id = await getCompanyId();
   const uid = await getEmployeeId();
 
   const validated = experienceSchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("experiences")
     .update({ ...validated.data })
     .eq("employee_id", uid)
@@ -156,11 +150,10 @@ export async function updateExperience(
 }
 
 export async function deleteExperience(id: number) {
-  const client = await createClient();
   const company_id = await getCompanyId();
   const uid = await getEmployeeId();
 
-  const { error } = await client
+  const { error } = await supabase
     .from("experiences")
     .delete()
     .eq("id", id)

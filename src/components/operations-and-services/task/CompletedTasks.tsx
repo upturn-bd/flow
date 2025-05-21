@@ -5,7 +5,8 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { useTasks } from "@/hooks/useTasks";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { z } from "zod";
 import { taskSchema } from "@/lib/types";
 import TaskDetails from "../project/task/TaskDetails";
@@ -139,7 +140,7 @@ function CompletedTasksList() {
     setLoading(true);
 
     const company_id = await getCompanyId();
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
 
     try {
       const { data, error } = await supabase

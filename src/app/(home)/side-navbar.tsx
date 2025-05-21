@@ -4,7 +4,7 @@ import { cn } from "@/components/ui/class";
 import Link from "next/link";
 import { navItems } from "./nav-items";
 import { useEffect, useState } from "react";
-import { getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -18,7 +18,7 @@ export default function Sidebar() {
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const user = await getUserInfo();
+        const user = await getEmployeeInfo();
         setUser(user);
       } catch (error) {
         console.error("Failed to fetch user data:", error);

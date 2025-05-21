@@ -1,7 +1,7 @@
 "use client";
 
 import { Attendance } from "@/hooks/useAttendance";
-import { getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { FaChevronDown, FaCalendarAlt, FaSearch, FaMapMarkerAlt, FaUser, FaBuilding, FaClock, FaCalendarDay } from "react-icons/fa";
@@ -25,7 +25,7 @@ export default function AttendanceRequestsPage() {
   async function fetchAttendanceData() {
     setLoading(true);
     
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     try {
       const { data, error } = await supabase
         .from("attendance_records")
@@ -50,7 +50,7 @@ export default function AttendanceRequestsPage() {
   async function handleRequest(e: React.FormEvent) {
     e.preventDefault();
     
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     try {
       const { error } = await supabase
         .from("attendance_records")

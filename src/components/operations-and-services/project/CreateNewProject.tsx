@@ -3,7 +3,7 @@
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { useProjects } from "@/hooks/useProjects";
-import { getCompanyId } from "@/lib/auth/getUser";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { supabase } from "@/lib/supabase/client";
 import { milestoneSchema, projectSchema } from "@/lib/types";
 import React, { useEffect, useRef, useState } from "react";

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { Bell, User, Search, Menu, LogOut, Settings, UserCircle } from "lucide-react";
-import { getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -16,7 +16,7 @@ export default function TopBar() {
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const userData = await getUserInfo();
+        const userData = await getEmployeeInfo();
         setUser(userData);
       } catch (error) {
         console.error("Failed to fetch user data:", error);

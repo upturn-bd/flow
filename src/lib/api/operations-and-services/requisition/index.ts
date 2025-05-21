@@ -1,9 +1,9 @@
-import { getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
 import { supabase } from "@/lib/supabase/client";
 import { generateRandomId } from "@/lib/utils";
 
 export async function uploadManyFiles(files: File[], bucketName: string) {
-  const user = await getUserInfo();
+  const user = await getEmployeeInfo();
 
   const uploadedFilePaths = [];
   try {

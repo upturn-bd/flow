@@ -3,11 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
-import {
-  getDepartmentsByCompanyId,
-  getEmployeesByCompanyId,
-  getUser,
-} from "@/lib/auth/getUser";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Calendar, 
@@ -18,9 +13,7 @@ import {
   Briefcase, 
   Users, 
   CircleCheck, 
-  CircleAlert, 
   AlertCircle, 
-  ChevronDown, 
   Loader2, 
   CheckCircle2, 
   Clock, 
@@ -32,9 +25,11 @@ import {
 import { logout } from "@/app/(auth)/auth-actions";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
-import { fadeIn, fadeInUp, scaleIn, staggerContainer } from "@/components/ui/animations";
+import { fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { useCompanyValidation } from "@/hooks/useCompanyValidation";
 import { useEmployees } from "@/hooks/useEmployees";
+import { getEmployeeId, getUser } from "@/lib/api/employee";
+import { getDepartments } from "@/lib/api/company";
 
 const jobStatuses = [
   "Active",
@@ -224,7 +219,7 @@ export default function EmployeeOnboarding() {
   
   const fetchDepartmentsData = async (companyId: number) => {
     try {
-      const res = await getDepartmentsByCompanyId(companyId);
+      const res = await getDepartments(await getEmployeeId());
       setDepartments(res);
     } catch (error) {
       console.error("Error fetching departments:", error);

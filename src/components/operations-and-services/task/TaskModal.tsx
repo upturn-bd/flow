@@ -5,7 +5,7 @@ import { taskSchema } from "@/lib/types";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
 import { z } from "zod";
-import { getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
 import { useTasks } from "@/hooks/useTasks";
 import { motion } from "framer-motion";
 import { 
@@ -96,7 +96,7 @@ export default function TaskCreateModal() {
     e.preventDefault();
     setIsSubmitting(true);
     const result = taskSchema.safeParse(task);
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
 
     if (!result.success) {
       const fieldErrors: Partial<Task> = {};

@@ -36,13 +36,7 @@ export interface CompanyInfoResponse {
  */
 export async function getCompanyInfo(): Promise<CompanyInfoResponse> {
   try {
-    const { company_id, error: companyIdError } = await getCompanyId();
-
-    if (companyIdError) {
-      throw new Error(companyIdError.message);
-    }
-
-    const companyId = company_id;
+    const companyId = await getCompanyId();
 
     // Fetch company data
     const { data: company, error: companyError } = await supabase
@@ -107,15 +101,12 @@ export async function getCompanyInfo(): Promise<CompanyInfoResponse> {
   }
 }
 
-export async function getCompanyId(): Promise<{ company_id: number | null, error: Error | null }> {
+export async function getCompanyId(): Promise<number> {
 
   // Check localStorage for company_id
   const localStorageCompanyId = localStorage.getItem("company_id");
   if (localStorageCompanyId) {
-    return {
-      company_id: parseInt(localStorageCompanyId),
-      error: null
-    };
+    return parseInt(localStorageCompanyId);
   }
   // Get current user
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -138,8 +129,5 @@ export async function getCompanyId(): Promise<{ company_id: number | null, error
   // Save company_id to localStorage
   localStorage.setItem("company_id", employee?.company_id.toString() || "0");
 
-  return {
-    company_id: employee?.company_id || null,
-    error: employeeError || null
-  };
+  return employee?.company_id || 0;
 }

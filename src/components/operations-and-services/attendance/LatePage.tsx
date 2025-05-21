@@ -1,7 +1,7 @@
 "use client";
 
 import { Attendance } from "@/hooks/useAttendance";
-import { getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown, FaCalendarAlt, FaSearch, FaEllipsisV } from "react-icons/fa";
@@ -74,7 +74,7 @@ export default function AttendanceLatePage() {
   async function fetchAttendanceData() {
     setLoading(true);
     
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     try {
       const { data, error } = await supabase
         .from("attendance_records")
@@ -96,7 +96,7 @@ export default function AttendanceLatePage() {
 
   async function handleRequest(id: number) {
     
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     try {
       const { error } = await supabase
         .from("attendance_records")

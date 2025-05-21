@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId } from "@/lib/auth/getUser";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { requisitionInventorySchema, requisitionTypeSchema } from "@/lib/types";
 
 export async function getRequisitionTypes() {

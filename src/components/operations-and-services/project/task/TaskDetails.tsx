@@ -2,7 +2,7 @@
 
 import { useEmployees } from "@/hooks/useEmployees";
 import { Task } from "@/hooks/useTasks";
-import { getCompanyId } from "@/lib/auth/getUser";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";

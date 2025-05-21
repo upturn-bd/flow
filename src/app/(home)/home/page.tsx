@@ -4,7 +4,7 @@ import { useAttendanceStatus } from "@/hooks/useAttendance";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import { useNotices } from "@/hooks/useNotice";
 import { useTasks } from "@/hooks/useTasks";
-import { getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
 import { supabase } from "@/lib/supabase/client";
 import { formatDateToDayMonth } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -91,7 +91,7 @@ export default function HomePage() {
   
   const handleCheckIn = async () => {
     
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     const coordinates = await getCurrentCoordinates();
     if (!coordinates) return; // Exit if permission denied
 
@@ -140,7 +140,7 @@ export default function HomePage() {
 
   const handleCheckOut = async () => {
     
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     const coordinates = await getCurrentCoordinates();
     if (!coordinates) return; // Exit if permission denied
 

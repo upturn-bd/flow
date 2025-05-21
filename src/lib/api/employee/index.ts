@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
+import { User } from "@supabase/supabase-js";
 
 export interface EmployeeData {
     first_name: string;
@@ -157,3 +158,47 @@ export async function submitEmployeeOnboarding(employeeData: EmployeeData): Prom
 
     return { message: "Employee inserted successfully." };
 } 
+
+export async function getEmployeeId() {
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        throw new Error("Not authenticated");
+    }
+
+    return user.id;
+}
+
+export async function getUser(): Promise<{ user: User | null }> {
+    const { data, error } = await supabase.auth.getUser();
+  
+    if (data.user) {
+      return { user: data.user };
+    }
+    if (error) console.error(error);
+    return { user: null };
+  }
+
+  export async function getEmployeeInfo() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const { data, error } = await supabase
+      .from("employees")
+      .select("id, first_name, last_name, role, company_id, supervisor_id, department_id")
+      .eq("id", user?.id)
+      .single();
+  
+    if (error) throw error;
+    return {
+      id: data.id,
+      name: `${data.first_name} ${data.last_name}`,
+      role: data.role,
+      company_id: data.company_id,
+      supervisor_id: data.supervisor_id,
+      department_id: data.department_id,
+    };
+  }

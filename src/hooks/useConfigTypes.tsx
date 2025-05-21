@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId } from "@/lib/auth/getUser";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 
 // A generic hook for managing configuration types
 export function useConfigTypes<T extends { id?: number, company_id?: number | null }>(

@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { SettlementState } from "@/components/operations-and-services/settlement/SettlementCreatePage";
 
 export function useSettlementRequests() {
@@ -15,7 +16,7 @@ export function useSettlementRequests() {
     setLoading(true);
     
     try {
-      const user = await getUserInfo();
+      const user = await getEmployeeInfo();
       const company_id = await getCompanyId();
       
       const { data, error } = await supabase
@@ -49,7 +50,7 @@ export function useSettlementRequests() {
     setProcessingId(id);
     
     try {
-      const user = await getUserInfo();
+      const user = await getEmployeeInfo();
       const company_id = await getCompanyId();
       
       const { data, error } = await supabase

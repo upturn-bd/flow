@@ -15,7 +15,8 @@ import { leaveTypeSchema, holidayConfigSchema } from "@/lib/types";
 import { useState, useCallback } from "react";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { LeaveState } from "@/components/operations-and-services/leave/LeaveCreatePage";
 
 export type LeaveType = z.infer<typeof leaveTypeSchema>;
@@ -138,7 +139,7 @@ export function useLeaveRequests() {
     setLoading(true);
     
     try {
-      const user = await getUserInfo();
+      const user = await getEmployeeInfo();
       const company_id = await getCompanyId();
       
       const { data, error } = await supabase
@@ -172,7 +173,7 @@ export function useLeaveRequests() {
     setProcessingId(id);
     
     try {
-      const user = await getUserInfo();
+      const user = await getEmployeeInfo();
       const company_id = await getCompanyId();
       
       const { data, error } = await supabase

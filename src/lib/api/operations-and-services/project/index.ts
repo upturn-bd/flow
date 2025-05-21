@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { projectSchema } from "@/lib/types";
 
 export async function getProjects() {
   const company_id = await getCompanyId();
-  const user = await getUserInfo();
+  const user = await getEmployeeInfo();
 
   if (user.role === "Admin") {
     const { data, error } = await supabase

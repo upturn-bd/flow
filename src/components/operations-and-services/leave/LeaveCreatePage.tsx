@@ -2,7 +2,8 @@
 
 import { createClient } from '@/lib/supabase/client';
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { supabase } from "@/lib/supabase/client";
 import { leaveSchema } from "@/lib/types";
 import React, { useEffect, useState } from "react";
@@ -53,7 +54,7 @@ export default function LeaveCreatePage() {
     e.preventDefault();
     const client = createClient();
     const company_id = await getCompanyId();
-    const user = await getUserInfo();
+    const user = await getEmployeeInfo();
     setIsSubmitting(true);
     
     try {

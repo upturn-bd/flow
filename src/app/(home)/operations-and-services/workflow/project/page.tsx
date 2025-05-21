@@ -3,7 +3,7 @@
 import CompletedProjectsList from "@/components/operations-and-services/project/CompletedProjectsList";
 import CreateNewProjectPage from "@/components/operations-and-services/project/CreateNewProject";
 import ProjectsList from "@/components/operations-and-services/project/OngoingProjectsView";
-import { getUserInfo } from "@/lib/auth/getUser";
+import { getEmployeeInfo } from "@/lib/api/employee";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -85,7 +85,7 @@ export default function ProjectPage() {
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const user = await getUserInfo();
+        const user = await getEmployeeInfo();
         setUser(user);
         if (user.role === "Admin") {
           setTabs(TABS);
