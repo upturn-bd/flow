@@ -45,22 +45,6 @@ export async function getDesignations(uid: string) {
   return data;
 }
 
-export async function getDepartments(uid: string) {
-  const company_id = await getCompanyId(uid);
-  const { data, error } = await supabase
-    .from("depts")
-    .select(
-      `
-    id,
-    name
-    `
-    )
-    .eq("company_id", company_id.toString());
-  if (error) {
-    throw error;
-  }
-  return data;
-}
 
 export async function validateCompanyCode(
   name: string,

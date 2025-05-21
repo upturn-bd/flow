@@ -28,8 +28,8 @@ import FormSelectField from "@/components/ui/FormSelectField";
 import { fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { useCompanyValidation } from "@/hooks/useCompanyValidation";
 import { useEmployees } from "@/hooks/useEmployees";
-import { getEmployeeId, getUser } from "@/lib/api/employee";
-import { getDepartments } from "@/lib/api/company";
+import { useDepartments } from "@/hooks/useDepartments";
+import { getUser } from "@/lib/api/employee";
 
 const jobStatuses = [
   "Active",
@@ -81,22 +81,23 @@ export default function EmployeeOnboarding() {
   const reason = searchParams.get("reason");
   const [isCompanyCodeValid, setIsCompanyCodeValid] = useState(false);
   const [companyCode, setCompanyCode] = useState("");
-  const [departments, setDepartments] = useState<
-    { id: number; name: string }[]
-  >([]);
-  const [employees, setEmployees] = useState<
-    { id: string; name: string; role: string }[]
-  >([]);
   const [userId, setUserId] = useState<string>("");
   const [activeSection, setActiveSection] = useState("company");
 
   const { 
     validateCompanyCode, 
-    loading: validationLoading, 
-    error: validationError 
   } = useCompanyValidation();
   
   const { employees: hookEmployees, fetchEmployees } = useEmployees();
+  const { departments, fetchDepartments } = useDepartments();
+
+  const fetchDepartmentsData = async () => {
+    try {
+      await fetchDepartments();
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchRejectedData = async () => {
@@ -117,6 +118,10 @@ export default function EmployeeOnboarding() {
               setIsCompanyCodeValid(true);
               setFormData(formatted);
               setActiveSection("personal");
+              
+              // Fetch departments when application is rejected
+              await fetchDepartmentsData();
+              await fetchEmployees();
             }
           }
         } catch (e) {
@@ -127,7 +132,7 @@ export default function EmployeeOnboarding() {
       }
     };
     fetchRejectedData();
-  }, [status]);
+  }, [status, fetchDepartmentsData, fetchEmployees, formData]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -197,8 +202,9 @@ export default function EmployeeOnboarding() {
         
         // Fetch departments and employees for the validated company
         if (result.id) {
-          await fetchDepartmentsData(result.id);
+          await fetchDepartmentsData();
           await fetchEmployees();
+          setVerifyLoading(false);
         }
       } else {
         setIsCompanyCodeValid(false);
@@ -217,15 +223,6 @@ export default function EmployeeOnboarding() {
     }
   };
   
-  const fetchDepartmentsData = async (companyId: number) => {
-    try {
-      const res = await getDepartments(await getEmployeeId());
-      setDepartments(res);
-    } catch (error) {
-      console.error("Error fetching departments:", error);
-    }
-  };
-
   useEffect(() => {
     const getUserId = async () => {
       try {
@@ -239,10 +236,10 @@ export default function EmployeeOnboarding() {
     };
 
     if (isCompanyCodeValid && formData.company_id) {
-      fetchDepartmentsData(formData.company_id);
+      fetchDepartmentsData();
       getUserId();
     }
-  }, [formData.company_id, isCompanyCodeValid]);
+  }, [formData.company_id, isCompanyCodeValid, fetchDepartmentsData]);
 
   if (status === "pending") {
     return (
