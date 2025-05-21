@@ -18,7 +18,7 @@ import {
 import TabView, { TabItem } from "@/components/ui/TabView";
 import { supabase } from "@/lib/supabase/client";
 import Link from "next/link";
-import { isCurrentUserProfile } from "@/lib/api/hris";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 // Client component that uses useSearchParams
 function ProfileContent() {
@@ -26,7 +26,12 @@ function ProfileContent() {
   const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [isCurrentUser, setIsCurrentUser] = useState(true);
+  const { 
+    isCurrentUser, 
+    loading: profileLoading, 
+    checkIsCurrentUser, 
+    fetchUserName 
+  } = useUserProfile();
 
   const searchParams = useSearchParams();
   const uid = searchParams.get("uid");
@@ -38,20 +43,14 @@ function ProfileContent() {
       try {
         setLoading(true);
         // Check if we are looking at another user
-        const currentUserCheck = await isCurrentUserProfile(uid);
-        setIsCurrentUser(currentUserCheck);
-
-        // Get the user's name for display
-        const { data, error } = await supabase
-          .from("employees")
-          .select("first_name, last_name")
-          .eq("id", uid)
-          .single();
-
-        if (error) {
+        await checkIsCurrentUser(uid);
+        
+        // Get user name
+        const userInfo = await fetchUserName(uid);
+        if (userInfo) {
+          setUserName(userInfo.name || "");
+        } else {
           setError("Could not find employee record");
-        } else if (data) {
-          setUserName(`${data.first_name} ${data.last_name}`);
         }
       } catch (err) {
         setError("Error loading user information");
@@ -61,7 +60,7 @@ function ProfileContent() {
     };
 
     fetchUserInfo();
-  }, [uid]);
+  }, [uid, checkIsCurrentUser, fetchUserName]);
 
   const pageVariants = {
     hidden: { opacity: 0 },

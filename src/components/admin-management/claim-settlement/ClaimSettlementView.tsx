@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
 import { TrashSimple } from "@phosphor-icons/react";
-import { useClaimTypes } from "@/hooks/useClaimAndSettlement";
+import { useClaimTypes } from "@/hooks/useConfigTypes";
 import {
   ClaimTypeCreateModal,
   ClaimTypeUpdateModal,
 } from "./ClaimSettlementModal";
 import { claimTypeSchema } from "@/lib/types";
 import { z } from "zod";
+import ClaimSettlementTable from "./ClaimSettlementTable";
 
 type SettlementType = z.infer<typeof claimTypeSchema>;
 

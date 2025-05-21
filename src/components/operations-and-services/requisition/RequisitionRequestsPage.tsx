@@ -1,13 +1,10 @@
 "use client";
 
-import { useRequisitionInventories } from "@/hooks/useInventory";
-import { useRequisitionTypes } from "@/hooks/useRequisitionTypes";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
-import { supabase } from "@/lib/supabase/client";
+import { useRequisitionInventories } from "@/hooks/useConfigTypes";
+import { useRequisitionTypes } from "@/hooks/useConfigTypes";
 import React, { useEffect, useState } from "react";
-import { RequisitionState } from "./RequisitionCreatePage";
 import { extractFilenameFromUrl } from "@/lib/utils";
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
+import { useEmployees } from "@/hooks/useEmployees";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Loader2, 
@@ -23,102 +20,42 @@ import {
   X
 } from "lucide-react";
 import { toast } from "sonner";
+import { useRequisitionRequests } from "@/hooks/useRequests";
 
 export default function RequisitionRequestsPage() {
-  const [requisitionRequests, setRequisitionRequests] = useState<
-    RequisitionState[]
-  >([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
-  const { requisitionInventories, fetchRequisitionInventories } =
-    useRequisitionInventories();
   const [comment, setComment] = useState<string>("");
-  const [employees, setEmployees] = useState<any[]>([]);
-  const [processingId, setProcessingId] = useState<number | null>(null);
-
-  async function fetchRequisitionRequests() {
-    setLoading(true);
-    
-    const user = await getUserInfo();
-    const company_id = await getCompanyId();
-    try {
-      const { data, error } = await supabase
-        .from("requisition_records")
-        .select("*")
-        .eq("company_id", company_id)
-        .eq("asset_owner", user.id)
-        .eq("status", "Pending");
-
-      if (error) {
-        setError("Failed to fetch requisition requests");
-        toast.error("Failed to fetch requisition requests");
-        throw error;
-      }
-
-      setRequisitionRequests(data);
-    } catch (error) {
-      setError("Failed to fetch requisition requests");
-      toast.error("Failed to fetch requisition requests");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function updateRequisitionRequest(action: string, id: number) {
-    setProcessingId(id);
-    
-    const user = await getUserInfo();
-    const company_id = await getCompanyId();
-    try {
-      const { data, error } = await supabase
-        .from("requisition_records")
-        .update({
-          status: action,
-          approved_by_id: user.id,
-          comment: comment,
-        })
-        .eq("company_id", company_id)
-        .eq("id", id);
-      if (error) {
-        toast.error("Failed to update requisition request");
-        throw error;
-      }
-      toast.success(`Request ${action.toLowerCase()} successfully`);
-      setComment("");
-      fetchRequisitionRequests();
-    } catch (error) {
-      toast.error("Failed to update requisition request");
-      console.error(error);
-    } finally {
-      setProcessingId(null);
-    }
-  }
+  const { employees, fetchEmployees } = useEmployees();
+  const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
+  const { requisitionInventories, fetchRequisitionInventories } = useRequisitionInventories();
+  const { 
+    requisitionRequests, 
+    loading, 
+    error, 
+    processingId, 
+    fetchRequisitionRequests, 
+    updateRequisitionRequest 
+  } = useRequisitionRequests();
 
   useEffect(() => {
-    fetchRequisitionRequests();
-  }, []);
+    fetchRequisitionRequests("Pending");
+  }, [fetchRequisitionRequests]);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setEmployees(response.data || []);
-      } catch (error) {
-        setEmployees([]);
-        console.error("Error fetching asset owners:", error);
-        toast.error("Error fetching employees");
-      }
-    };
-
     fetchEmployees();
-  }, []);
+  }, [fetchEmployees]);
 
   useEffect(() => {
     fetchRequisitionTypes();
     fetchRequisitionInventories();
   }, [fetchRequisitionTypes, fetchRequisitionInventories]);
+
+  const handleUpdateRequest = async (action: string, id: number) => {
+    const success = await updateRequisitionRequest(action, id, comment);
+    if (success) {
+      toast.success(`Request ${action.toLowerCase()} successfully`);
+      setComment("");
+    }
+  };
 
   return (
     <AnimatePresence mode="wait">
@@ -268,7 +205,7 @@ export default function RequisitionRequestsPage() {
                       <motion.button 
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => req.id !== undefined && updateRequisitionRequest("Rejected", req.id)}
+                        onClick={() => req.id !== undefined && handleUpdateRequest("Rejected", req.id)}
                         disabled={processingId === req.id}
                         className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                       >
@@ -282,7 +219,7 @@ export default function RequisitionRequestsPage() {
                       <motion.button 
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => req.id !== undefined && updateRequisitionRequest("Approved", req.id)}
+                        onClick={() => req.id !== undefined && handleUpdateRequest("Approved", req.id)}
                         disabled={processingId === req.id}
                         className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                       >

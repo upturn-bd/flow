@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { leaveTypeSchema, holidayConfigSchema } from "@/lib/types";
+import { updateLeaveTypes } from "@/lib/api/admin-management/leave/index";
+import { leaveTypeSchema, holidaySchema } from "@/lib/types";
 import { z } from "zod";
-import { LeaveType, holidayConfig } from "@/hooks/useLeaveManagement";
+import { LeaveType } from "@/hooks/useConfigTypes";
+import { holidayConfig } from "@/lib/types/leave";
 import { dirtyValuesChecker } from "@/lib/utils";
 
 type FormValues = z.infer<typeof leaveTypeSchema>;
@@ -283,7 +285,7 @@ export function LeaveTypeUpdateModal({
   );
 }
 
-type HolidayFormValues = z.infer<typeof holidayConfigSchema>;
+type HolidayFormValues = z.infer<typeof holidaySchema>;
 
 interface LeaveHolidayCreateModalProps {
   onSubmit: (values: HolidayFormValues) => void;
@@ -313,7 +315,7 @@ export function LeaveHolidayCreateModal({
   const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
-    const result = holidayConfigSchema.safeParse(formValues);
+    const result = holidaySchema.safeParse(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
@@ -342,7 +344,7 @@ export function LeaveHolidayCreateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = holidayConfigSchema.safeParse(formValues);
+    const result = holidaySchema.safeParse(formValues);
 
     if (!result.success) {
       const fieldErrors: Partial<HolidayFormValues> = {};
@@ -452,7 +454,7 @@ export function LeaveHolidayUpdateModal({
   const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
-    const result = holidayConfigSchema.safeParse(formValues);
+    const result = holidaySchema.safeParse(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
@@ -481,7 +483,7 @@ export function LeaveHolidayUpdateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = holidayConfigSchema.safeParse(formValues);
+    const result = holidaySchema.safeParse(formValues);
 
     if (!result.success) {
       const fieldErrors: Partial<HolidayFormValues> = {};

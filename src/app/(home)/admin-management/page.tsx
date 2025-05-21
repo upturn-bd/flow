@@ -10,7 +10,7 @@ import { Building, Code, Briefcase, Globe, ChevronRight, LoaderCircle } from "lu
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
-import { getCompanyInfo, FormattedEmployee } from "@/lib/api/company/companyInfo";
+import { useCompanyInfo } from "@/hooks/useCompanyInfo";
 
 const companyBasicsSchema = z.object({
   company_name: z.string().min(1, "Company Name is required"),
@@ -22,15 +22,24 @@ const companyBasicsSchema = z.object({
 type CompanyBasicsFormData = z.infer<typeof companyBasicsSchema>;
 
 export default function CompanyBasicsForm() {
-  const [countries, setCountries] = useState<{ id: number; name: string }[]>([]);
-  const [industries, setIndustries] = useState<{ id: number; name: string }[]>([]);
-  const [employees, setEmployees] = useState<FormattedEmployee[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  
+  const { 
+    companyInfo,
+    countries,
+    industries,
+    employees,
+    loading: companyInfoLoading,
+    error,
+    fetchCompanyInfo 
+  } = useCompanyInfo();
+  
   const {
     control,
     reset,
     handleSubmit,
-    formState: { errors },
+    formState: { errors: formErrors },
   } = useForm<CompanyBasicsFormData>({
     resolver: zodResolver(companyBasicsSchema),
     defaultValues: {
@@ -42,31 +51,27 @@ export default function CompanyBasicsForm() {
   });
 
   useEffect(() => {
-    const fetchCompanyInfo = async () => {
+    const loadCompanyInfo = async () => {
       try {
-        // Use client-side function instead of API
-        const { company, countries, industries, formattedEmployees } = await getCompanyInfo();
-
-        if (company) {
+        await fetchCompanyInfo();
+        
+        if (companyInfo) {
           reset({
-            company_name: company.name,
-            company_id: company.code,
-            industry_id: company.industry_id.toString(),
-            country_id: company.country_id.toString(),
+            company_name: companyInfo.name,
+            company_id: companyInfo.code,
+            industry_id: companyInfo.industry_id.toString(),
+            country_id: companyInfo.country_id.toString(),
           });
         }
-        setCountries(countries);
-        setIndustries(industries);
-        setEmployees(formattedEmployees);
-      } catch (error) {
-        console.error("Failed to load company info", error);
+      } catch (err) {
+        console.error("Failed to load company info", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCompanyInfo();
-  }, [reset]);
+    loadCompanyInfo();
+  }, [reset, fetchCompanyInfo, companyInfo]);
 
   const onSubmit = (data: CompanyBasicsFormData) => {
     console.log(data);
@@ -134,7 +139,7 @@ export default function CompanyBasicsForm() {
                       value={field.value}
                       onChange={field.onChange}
                       readOnly={true}
-                      error={errors.company_name?.message}
+                      error={formErrors.company_name?.message}
                     />
                   )}
                 />
@@ -150,7 +155,7 @@ export default function CompanyBasicsForm() {
                       value={field.value}
                       onChange={field.onChange}
                       readOnly={true}
-                      error={errors.company_id?.message}
+                      error={formErrors.company_id?.message}
                     />
                   )}
                 />
@@ -170,7 +175,7 @@ export default function CompanyBasicsForm() {
                       placeholder="Select Industry"
                       value={field.value}
                       onChange={field.onChange}
-                      error={errors.industry_id?.message}
+                      error={formErrors.industry_id?.message}
                     />
                   )}
                 />
@@ -190,7 +195,7 @@ export default function CompanyBasicsForm() {
                       placeholder="Select Country"
                       value={field.value}
                       onChange={field.onChange}
-                      error={errors.country_id?.message}
+                      error={formErrors.country_id?.message}
                     />
                   )}
                 />

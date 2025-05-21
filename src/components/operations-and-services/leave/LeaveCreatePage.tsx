@@ -1,6 +1,6 @@
 "use client";
 
-import { useLeaveTypes } from "@/hooks/useLeaveManagement";
+import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { supabase } from "@/lib/supabase/client";
 import { leaveSchema } from "@/lib/types";
@@ -9,6 +9,7 @@ import { Calendar, CheckCircle, Clock, Info } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
 import { motion } from "framer-motion";
+import { getSupervisor } from "@/lib/api/operations-and-services/attendance/leave";
 
 const initialLeaveRecord = {
   type_id: 0,

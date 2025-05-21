@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import RequisitionCreatePage, { RequisitionDraftPage } from "./RequisitionCreatePage";
-import { useRequisitionTypes } from "@/hooks/useRequisitionTypes";
+import { useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { Clock, FileEdit, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 

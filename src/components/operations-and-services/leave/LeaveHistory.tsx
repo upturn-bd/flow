@@ -3,9 +3,11 @@
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
 import { LeaveState } from "./LeaveCreatePage";
-import { useLeaveTypes } from "@/hooks/useLeaveManagement";
+import { fetchLeaveHistory } from "@/lib/api/operations-and-services/attendance/leave";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEmployees } from "@/hooks/useEmployees";
+import { useLeaveTypes } from "@/hooks/useConfigTypes";
 
 export default function LeaveHistoryPage() {
   const [leaveRequests, setLeaveRequests] = useState<LeaveState[]>([]);
@@ -13,7 +15,7 @@ export default function LeaveHistoryPage() {
   const [error, setError] = useState<string | null>(null);
   const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
   const [comment, setComment] = useState<string>("");
-  const [employees, setEmployees] = useState<any[]>([]);
+  const { employees, fetchEmployees } = useEmployees();
 
   async function fetchComplaintRequests() {
     setLoading(true);
@@ -46,18 +48,8 @@ export default function LeaveHistoryPage() {
   }, []);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setEmployees(response.data);
-      } catch (error) {
-        setEmployees([]);
-        console.error("Error fetching employees:", error);
-      }
-    };
-
     fetchEmployees();
-  }, []);
+  }, [fetchEmployees]);
 
   useEffect(() => {
     fetchLeaveTypes();

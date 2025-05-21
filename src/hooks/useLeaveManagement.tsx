@@ -14,29 +14,55 @@ import {
 import { leaveTypeSchema, holidayConfigSchema } from "@/lib/types";
 import { useState, useCallback } from "react";
 import { z } from "zod";
+import { supabase } from "@/lib/supabase/client";
+import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
+import { LeaveState } from "@/components/operations-and-services/leave/LeaveCreatePage";
 
 export type LeaveType = z.infer<typeof leaveTypeSchema>;
 
 export function useLeaveTypes() {
   const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchLeaveTypes = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getLeaveTypes();
-      setLeaveTypes(data);
+      const company_id = await getCompanyId();
+      const { data, error } = await supabase
+        .from("leave_types")
+        .select("*")
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      setLeaveTypes(data || []);
+      return data;
     } catch (error) {
+      setError("Failed to fetch leave types");
       console.error(error);
+      return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const createLeaveType = async (leaveType: LeaveType) => {
-    const data = await cLeaveType(leaveType);
-    return { success: true, status: 200, data };
-  };
+  const createLeaveType = useCallback(async (values: LeaveType) => {
+    try {
+      const company_id = await getCompanyId();
+      const { data, error } = await supabase
+        .from("leave_types")
+        .insert({
+          ...values,
+          company_id,
+        });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
 
   const updateLeaveType = async (leaveType: LeaveType) => {
     const data = await uLeaveType(leaveType);
@@ -51,6 +77,7 @@ export function useLeaveTypes() {
   return {
     leaveTypes,
     loading,
+    error,
     fetchLeaveTypes,
     createLeaveType,
     updateLeaveType,
@@ -98,5 +125,90 @@ export function useHolidayConfigs() {
     createHolidayConfig,
     updateHolidayConfig,
     deleteHolidayConfig,
+  };
+}
+
+export function useLeaveRequests() {
+  const [leaveRequests, setLeaveRequests] = useState<LeaveState[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [processingId, setProcessingId] = useState<number | null>(null);
+
+  const fetchLeaveRequests = useCallback(async (status: string = "Pending") => {
+    setLoading(true);
+    
+    try {
+      const user = await getUserInfo();
+      const company_id = await getCompanyId();
+      
+      const { data, error } = await supabase
+        .from("leave_records")
+        .select("*")
+        .eq("company_id", company_id)
+        .eq("requested_to", user.id)
+        .eq("status", status);
+
+      if (error) {
+        setError("Failed to fetch leave requests");
+        throw error;
+      }
+
+      setLeaveRequests(data || []);
+      return data;
+    } catch (error) {
+      setError("Failed to fetch leave requests");
+      console.error(error);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchLeaveHistory = useCallback(async () => {
+    return fetchLeaveRequests("Pending");
+  }, [fetchLeaveRequests]);
+
+  const updateLeaveRequest = useCallback(async (action: string, id: number, comment: string) => {
+    setProcessingId(id);
+    
+    try {
+      const user = await getUserInfo();
+      const company_id = await getCompanyId();
+      
+      const { data, error } = await supabase
+        .from("leave_records")
+        .update({
+          status: action,
+          approved_by_id: user.id,
+          remarks: comment,
+        })
+        .eq("company_id", company_id)
+        .eq("id", id);
+      
+      if (error) {
+        setError("Failed to update leave request");
+        throw error;
+      }
+      
+      // Refresh the requests
+      await fetchLeaveRequests();
+      return true;
+    } catch (error) {
+      setError("Failed to update leave request");
+      console.error(error);
+      return false;
+    } finally {
+      setProcessingId(null);
+    }
+  }, [fetchLeaveRequests]);
+
+  return {
+    leaveRequests,
+    loading,
+    error,
+    processingId,
+    fetchLeaveRequests,
+    fetchLeaveHistory,
+    updateLeaveRequest
   };
 }

@@ -22,11 +22,7 @@ import { Experience } from "@/hooks/useExperience";
 import { extractFilenameFromUrl } from "@/lib/utils";
 import { FilePdf, MapPin } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { 
-  fetchUserEducation,
-  fetchUserExperience,
-  isCurrentUserProfile
-} from "@/lib/api/hris";
+import { useProfile } from "@/hooks/useProfile";
 
 interface EducationExperienceTabProps {
   uid?: string | null;
@@ -44,10 +40,6 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
   const [editEducation, setEditEducation] = useState<number | null>(null);
   const [isCreatingEducation, setIsCreatingEducation] = useState(false);
   const [isEducationActionLoading, setIsEducationActionLoading] = useState(false);
-  const [userEducations, setUserEducations] = useState<Education[]>([]);
-  const [userExperiences, setUserExperiences] = useState<Experience[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [isCurrentUser, setIsCurrentUser] = useState(true);
 
   const {
     experience,
@@ -61,35 +53,21 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
   const [isCreatingExperience, setIsCreatingExperience] = useState(false);
   const [isExperienceActionLoading, setIsExperienceActionLoading] = useState(false);
 
-  // Check if current user
-  useEffect(() => {
-    const checkCurrentUser = async () => {
-      const result = await isCurrentUserProfile(uid);
-      setIsCurrentUser(result);
-    };
-    
-    checkCurrentUser();
-  }, [uid]);
+  const {
+    educations: userEducations,
+    experiences: userExperiences,
+    loading,
+    fetchUserEducation,
+    fetchUserExperience,
+    isCurrentUser
+  } = useProfile();
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const loadData = async () => {
       if (uid) {
         // Fetch specific user's data
-        setLoading(true);
-        try {
-          // Fetch education and experience records in parallel
-          const [educationData, experienceData] = await Promise.all([
-            fetchUserEducation(uid),
-            fetchUserExperience(uid)
-          ]);
-          
-          setUserEducations(educationData);
-          setUserExperiences(experienceData);
-        } catch (error) {
-          console.error("Error in data fetching:", error);
-        } finally {
-          setLoading(false);
-        }
+        await fetchUserEducation(uid);
+        await fetchUserExperience(uid);
       } else {
         // Fetch current user's data using the hooks
         fetchEducation();
@@ -97,8 +75,8 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
       }
     };
     
-    fetchUserData();
-  }, [uid, fetchEducation, fetchExperience]);
+    loadData();
+  }, [uid, fetchEducation, fetchExperience, fetchUserEducation, fetchUserExperience]);
 
   // Utility for async actions with loading and error handling
   const handleAsyncAction = async (

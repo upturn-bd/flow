@@ -3,14 +3,14 @@
 import React, { useEffect, useState, ChangeEvent } from "react";
 import { FiUploadCloud } from "react-icons/fi";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
-import { IoMdCalendar } from "react-icons/io";
-import { any, z } from "zod";
+import { z } from "zod";
 import { complaintRecordSchema } from "@/lib/types";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
-import { useComplaintTypes } from "@/hooks/useComplaints";
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
+import { useEmployees } from "@/hooks/useEmployees";
+import { createComplaint } from "@/lib/api/operations-and-services/complaint/complaintApi";
+import { useComplaintTypes } from "@/hooks/useConfigTypes";
 
 const initialComplaintRecord = {
   complaint_type_id: 0,
@@ -27,18 +27,18 @@ export type ComplaintState = z.infer<typeof complaintRecordSchema>;
 
 export default function ComplaintCreatePage() {
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [complaintState, setComplaintState] = useState(initialComplaintRecord);
+  const [complaintState, setComplaintState] = useState<ComplaintState>(initialComplaintRecord);
   const [attachments, setAttachments] = useState<File[]>([]);
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
+  const { employees, fetchEmployees } = useEmployees();
   const [errors, setErrors] = useState<Partial<ComplaintState>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
-  const [employees, setEmployees] = useState<any[]>([]);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target as HTMLInputElement;
+    const { name, value } = e.target;
     if (name === "complaint_type_id") {
       setComplaintState((prev) => ({ ...prev, [name]: Number(value) }));
     } else {
@@ -52,7 +52,6 @@ export default function ComplaintCreatePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const client = createClient();
     const company_id = await getCompanyId();
     const user = await getUserInfo();
     setIsSubmitting(true);
@@ -64,7 +63,7 @@ export default function ComplaintCreatePage() {
 
       if (uploadError) throw uploadError;
 
-      const formattedSettlementState = {
+      const formattedComplaintState = {
         ...complaintState,
         attachments: uploadedFilePaths,
         anonymous: isAnonymous,
@@ -72,11 +71,13 @@ export default function ComplaintCreatePage() {
         company_id,
         requested_to: user.supervisor_id,
       };
-      const { data, error } = await client
+      
+      const { data, error } = await supabase
         .from("complaint_records")
-        .insert(formattedSettlementState);
-      console.log("Error:", error);
+        .insert(formattedComplaintState);
+        
       if (error) throw error;
+      
       alert("Complaint created successfully!");
       setComplaintState(initialComplaintRecord);
       setAttachments([]);
@@ -112,21 +113,8 @@ export default function ComplaintCreatePage() {
 
   useEffect(() => {
     fetchComplaintTypes();
-  }, [fetchComplaintTypes]);
-
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setEmployees(response?.data || []);
-      } catch (error) {
-        setEmployees([]);
-        console.error("Error fetching asset owners:", error);
-      }
-    };
-
     fetchEmployees();
-  }, []);
+  }, [fetchComplaintTypes, fetchEmployees]);
 
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto lg:mx-20">

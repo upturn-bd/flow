@@ -1,5 +1,5 @@
 "use client";
-import { useClaimTypes } from "@/hooks/useClaimAndSettlement";
+import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEffect, useState } from "react";
 import SettlementCreatePage, {
   SettlementDraftPage,

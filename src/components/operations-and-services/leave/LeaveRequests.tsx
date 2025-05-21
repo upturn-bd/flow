@@ -3,91 +3,42 @@
 import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
 import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
 import { LeaveState } from "./LeaveCreatePage";
-import { useLeaveTypes } from "@/hooks/useLeaveManagement";
+import { useEmployees } from "@/hooks/useEmployees";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
+import { useLeaveTypes } from "@/hooks/useConfigTypes";
+import { useLeaveRequests } from "@/hooks/useRequests";
 
 export default function LeaveRequestsPage() {
-  const [leaveRequests, setLeaveRequests] = useState<LeaveState[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
   const [comment, setComment] = useState<string>("");
-  const [employees, setEmployees] = useState<any[]>([]);
-
-  async function fetchComplaintRequests() {
-    setLoading(true);
-    
-    const user = await getUserInfo();
-    const company_id = await getCompanyId();
-    try {
-      const { data, error } = await supabase
-        .from("leave_records")
-        .select("*")
-        .eq("company_id", company_id)
-        .eq("requested_to", user.id)
-        .eq("status", "Pending");
-
-      if (error) {
-        setError("Failed to fetch leave requests");
-        throw error;
-      }
-
-      setLeaveRequests(data);
-    } catch (error) {
-      setError("Failed to fetch leave requests");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function updateSettlementRequest(action: string, id: number) {
-    
-    const user = await getUserInfo();
-    const company_id = await getCompanyId();
-    try {
-      const { data, error } = await supabase
-        .from("leave_records")
-        .update({
-          status: action,
-          approved_by_id: user.id,
-          remarks: comment,
-        })
-        .eq("company_id", company_id)
-        .eq("id", id);
-      if (error) {
-        setError("Failed to fetch leave requests");
-        throw error;
-      }
-      alert("leave request updated successfully");
-      setComment("");
-      fetchComplaintRequests();
-    } catch {
-      setError("Failed to fetch leave requests");
-    }
-  }
+  const { employees, fetchEmployees } = useEmployees();
+  const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
+  const { 
+    leaveRequests, 
+    loading, 
+    error, 
+    processingId, 
+    fetchLeaveRequests, 
+    updateLeaveRequest 
+  } = useLeaveRequests();
 
   useEffect(() => {
-    fetchComplaintRequests();
-  }, []);
+    fetchLeaveRequests("Pending");
+  }, [fetchLeaveRequests]);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setEmployees(response.data);
-      } catch (error) {
-        setEmployees([]);
-        console.error("Error fetching employees:", error);
-      }
-    };
-
     fetchEmployees();
-  }, []);
+  }, [fetchEmployees]);
 
   useEffect(() => {
     fetchLeaveTypes();
   }, [fetchLeaveTypes]);
+
+  const handleUpdateRequest = async (action: string, id: number) => {
+    await updateLeaveRequest(action, id, comment);
+    setComment("");
+  };
 
   if (loading) {
     return (
@@ -158,16 +109,18 @@ export default function LeaveRequestsPage() {
             {/* Action Buttons */}
             <div className="flex justify-end gap-4 pt-2">
               <button
-                onClick={() => updateSettlementRequest("Rejected", req.id)}
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full"
+                onClick={() => handleUpdateRequest("Rejected", req.id || 0)}
+                disabled={processingId === req.id}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full disabled:opacity-50"
               >
-                Reject
+                {processingId === req.id ? "Processing..." : "Reject"}
               </button>
               <button
-                onClick={() => updateSettlementRequest("Accepted", req.id)}
-                className="bg-[#001F4D] hover:bg-[#002a66] text-white px-6 py-2 rounded-full"
+                onClick={() => handleUpdateRequest("Accepted", req.id || 0)}
+                disabled={processingId === req.id}
+                className="bg-[#001F4D] hover:bg-[#002a66] text-white px-6 py-2 rounded-full disabled:opacity-50"
               >
-                Accept
+                {processingId === req.id ? "Processing..." : "Accept"}
               </button>
             </div>
           </div>

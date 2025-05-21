@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
 import { User, Briefcase, Calendar, Save, X, CheckCircle, AlertCircle } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { fadeIn } from "@/components/ui/animations";
-import { fetchCurrentUserBasicInfo, fetchUserBasicInfo, isCurrentUserProfile, updateBasicInfo } from "@/lib/api/hris";
+import { useProfile } from "@/hooks/useProfile";
 
 const initialFormState: BasicInfoFormData = {
   first_name: "",
@@ -64,26 +64,24 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
-  const [isCurrentUser, setIsCurrentUser] = useState(true);
   const { departments, fetchDepartments } = useDepartments();
   const [loadingDepartments, setLoadingDepartments] = useState(true);
+  
+  const {
+    loading,
+    isCurrentUser,
+    basicInfo,
+    fetchCurrentUserBasicInfo,
+    fetchUserBasicInfo,
+    updateBasicInfo: updateBasicInfoApi,
+  } = useProfile();
 
   useEffect(() => {
     setLoadingDepartments(true);
     fetchDepartments().finally(() => setLoadingDepartments(false));
   }, [fetchDepartments]);
-
-  useEffect(() => {
-    const checkCurrentUser = async () => {
-      const result = await isCurrentUserProfile(uid);
-      setIsCurrentUser(result);
-    };
-    
-    checkCurrentUser();
-  }, [uid]);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<any>) => {
@@ -121,7 +119,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
       }
 
       try {
-        const response = await updateBasicInfo(result.data);
+        const response = await updateBasicInfoApi(result.data);
         setInitialData(response.data);
         setSubmitSuccess(true);
         setTimeout(() => setSubmitSuccess(false), 3000);
@@ -132,7 +130,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
         setIsSubmitting(false);
       }
     },
-    [formValues]
+    [formValues, updateBasicInfoApi]
   );
 
   const handleEditToggle = useCallback(() => {
@@ -157,13 +155,11 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
         setFormValues(data);
       } catch (error) {
         setSubmitError("Failed to fetch basic info. Please try again later.");
-      } finally {
-        setLoading(false);
       }
     };
     
     fetchData();
-  }, [uid]);
+  }, [uid, fetchUserBasicInfo, fetchCurrentUserBasicInfo]);
 
   useEffect(() => {
     if (initialData) {

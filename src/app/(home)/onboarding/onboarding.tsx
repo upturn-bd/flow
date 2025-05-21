@@ -8,7 +8,6 @@ import {
   getEmployeesByCompanyId,
   getUser,
 } from "@/lib/auth/getUser";
-import { validateCompanyCode } from "@/lib/api/company";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Calendar, 
@@ -34,6 +33,8 @@ import { logout } from "@/app/(auth)/auth-actions";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { fadeIn, fadeInUp, scaleIn, staggerContainer } from "@/components/ui/animations";
+import { useCompanyValidation } from "@/hooks/useCompanyValidation";
+import { useEmployees } from "@/hooks/useEmployees";
 
 const jobStatuses = [
   "Active",
@@ -93,6 +94,14 @@ export default function EmployeeOnboarding() {
   >([]);
   const [userId, setUserId] = useState<string>("");
   const [activeSection, setActiveSection] = useState("company");
+
+  const { 
+    validateCompanyCode, 
+    loading: validationLoading, 
+    error: validationError 
+  } = useCompanyValidation();
+  
+  const { employees: hookEmployees, fetchEmployees } = useEmployees();
 
   useEffect(() => {
     const fetchRejectedData = async () => {
@@ -183,48 +192,46 @@ export default function EmployeeOnboarding() {
   const handleValidateCompanyCode = async () => {
     try {
       setVerifyLoading(true);
-      const { isValid, id } = await validateCompanyCode(
-        formData.company_name,
-        companyCode
-      );
-      if (isValid && id) {
-        setFormData((prev) => ({ ...prev, company_id: id }));
-        setIsCompanyCodeValid(isValid);
+      
+      const result = await validateCompanyCode(formData.company_name, companyCode);
+      
+      if (result.isValid && result.id !== null) {
+        setIsCompanyCodeValid(true);
+        setFormData((prev) => ({ ...prev, company_id: result.id || 0 }));
         setActiveSection("personal");
+        
+        // Fetch departments and employees for the validated company
+        if (result.id) {
+          await fetchDepartmentsData(result.id);
+          await fetchEmployees();
+        }
       } else {
+        setIsCompanyCodeValid(false);
+        setVerifyLoading(false);
         setErrors({ 
-          company_code: "Invalid company code or name. Please check and try again." 
+          company_code: result.error || "Invalid company code or name. Please check and try again." 
         });
       }
     } catch (error) {
       console.error("Error verifying company code:", error);
+      setIsCompanyCodeValid(false);
+      setVerifyLoading(false);
       setErrors({ 
         company_code: "Failed to verify company code. Please try again." 
       });
-    } finally {
-      setVerifyLoading(false);
+    }
+  };
+  
+  const fetchDepartmentsData = async (companyId: number) => {
+    try {
+      const res = await getDepartmentsByCompanyId(companyId);
+      setDepartments(res);
+    } catch (error) {
+      console.error("Error fetching departments:", error);
     }
   };
 
   useEffect(() => {
-    const fetchDepartments = async (companyId: number) => {
-      try {
-        const res = await getDepartmentsByCompanyId(companyId);
-        setDepartments(res);
-      } catch (error) {
-        console.error("Error fetching departments:", error);
-      }
-    };
-
-    const fetchEmployees = async (companyId: number) => {
-      try {
-        const res = await getEmployeesByCompanyId(companyId);
-        setEmployees(res ?? []);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      }
-    };
-
     const getUserId = async () => {
       try {
         const { user } = await getUser();
@@ -237,8 +244,7 @@ export default function EmployeeOnboarding() {
     };
 
     if (isCompanyCodeValid && formData.company_id) {
-      fetchDepartments(formData.company_id);
-      fetchEmployees(formData.company_id);
+      fetchDepartmentsData(formData.company_id);
       getUserId();
     }
   }, [formData.company_id, isCompanyCodeValid]);
@@ -598,8 +604,8 @@ export default function EmployeeOnboarding() {
                       label="Supervisor"
                       icon={<Users size={18} />}
                       options={(status !== "rejected"
-                        ? employees
-                        : employees.filter(employee => employee.id !== userId)
+                        ? hookEmployees
+                        : hookEmployees.filter(employee => employee.id !== userId)
                       ).map(emp => ({ value: emp.id, label: emp.name }))}
                       placeholder="Not Applicable"
                       value={formData.supervisor_id || ""}

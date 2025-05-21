@@ -14,12 +14,8 @@ import { motion } from "framer-motion";
 import { Calendar, User, Heart, Users, PhoneCall, MapPin, Save, X, CheckCircle, AlertCircle } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { fadeIn } from "@/components/ui/animations";
-import { 
-  fetchCurrentUserPersonalInfo, 
-  fetchUserPersonalInfo, 
-  updatePersonalInfo,
-  isCurrentUserProfile
-} from "@/lib/api/hris";
+import { useProfile } from "@/hooks/useProfile";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 interface PersonalInfoTabProps {
   uid?: string | null;
@@ -49,21 +45,19 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const [initialData, setInitialData] = useState<PersonalFormData | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
-  const [isCurrentUser, setIsCurrentUser] = useState(true);
-
-  useEffect(() => {
-    const checkCurrentUser = async () => {
-      const result = await isCurrentUserProfile(uid);
-      setIsCurrentUser(result);
-    };
-    
-    checkCurrentUser();
-  }, [uid]);
-
+  
+  const { 
+    loading, 
+    personalInfo,
+    fetchCurrentUserPersonalInfo, 
+    fetchUserPersonalInfo, 
+    updatePersonalInfo: updatePersonalInfoApi,
+    isCurrentUser
+  } = useProfile();
+  
   useEffect(() => {
     const fetchPersonalInfo = async () => {
       try {
@@ -84,12 +78,10 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
         }
       } catch (error) {
         setSubmitError("Failed to fetch personal info. Please try again later.");
-      } finally {
-        setLoading(false);
       }
     };
     fetchPersonalInfo();
-  }, [uid]);
+  }, [uid, fetchUserPersonalInfo, fetchCurrentUserPersonalInfo]);
 
   const handleChange = useCallback((e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
@@ -121,7 +113,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
     }
 
     try {
-      await updatePersonalInfo(formValues);
+      await updatePersonalInfoApi(formValues);
       setSubmitSuccess(true);
       setTimeout(() => setSubmitSuccess(false), 3000);
       setIsEditMode(false);

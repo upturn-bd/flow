@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { claimTypeSchema } from "@/lib/types";
-import { ClaimType } from "@/hooks/useClaimAndSettlement";
-import { dirtyValuesChecker } from "@/lib/utils";
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
 import { z } from "zod";
+import { ClaimType } from "@/hooks/useConfigTypes";
+import { dirtyValuesChecker } from "@/lib/utils";
+import { useEmployees } from "@/hooks/useEmployees";
 
 type ClaimTypeFormValues = z.infer<typeof claimTypeSchema>;
 
@@ -40,10 +40,8 @@ export function ClaimTypeCreateModal({
   const [errors, setErrors] = useState<Partial<ClaimTypeFormValues>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
-  const [allSettlers, setAllSettlers] = useState<
-    { id: string; name: string }[]
-  >([]);
   const [allPositions, setAllPositions] = useState<Position[]>([]);
+  const { employees: allSettlers, loading: loadingEmployees, fetchEmployees } = useEmployees();
 
   useEffect(() => {
     const result = claimTypeSchema.safeParse(formValues);
@@ -115,18 +113,8 @@ export function ClaimTypeCreateModal({
   }, []);
 
   useEffect(() => {
-    const fetchAllSettlers = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setAllSettlers(response.data || []);
-      } catch (error) {
-        setAllSettlers([]);
-        console.error("Error fetching asset owners:", error);
-      }
-    };
-
-    fetchAllSettlers();
-  }, []);
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
@@ -255,10 +243,8 @@ export function ClaimTypeUpdateModal({
   const [errors, setErrors] = useState<Partial<ClaimTypeFormValues>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
-  const [allSettlers, setAllSettlers] = useState<
-    { id: string; name: string }[]
-  >([]);
   const [allPositions, setAllPositions] = useState<Position[]>([]);
+  const { employees: allSettlers, loading: loadingEmployees, fetchEmployees } = useEmployees();
   const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
@@ -331,18 +317,8 @@ export function ClaimTypeUpdateModal({
   }, []);
 
   useEffect(() => {
-    const fetchAllSettlers = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setAllSettlers(response.data || []);
-      } catch (error) {
-        setAllSettlers([]);
-        console.error("Error fetching asset owners:", error);
-      }
-    };
-
-    fetchAllSettlers();
-  }, []);
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   useEffect(() => {
     setFormValues(initialData);

@@ -6,11 +6,8 @@ import RequisitionTypeCreateModal, {
   RequisitionInventoryCreateModal,
   RequisitionInventoryUpdateModal,
 } from "./InventoryModal";
-import { useRequisitionTypes } from "@/hooks/useRequisitionTypes";
-import {
-  RequisitionInventory,
-  useRequisitionInventories,
-} from "@/hooks/useInventory";
+import { useRequisitionTypes } from "@/hooks/useConfigTypes";
+import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { TrashSimple } from "@phosphor-icons/react";
 
 export default function InventoryManagementView() {

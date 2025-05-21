@@ -1,12 +1,6 @@
 "use client";
 
-import { useRequisitionInventories } from "@/hooks/useInventory";
-import { useRequisitionTypes } from "@/hooks/useRequisitionTypes";
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
-import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
-import { RequisitionState } from "./RequisitionCreatePage";
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Loader2, 
@@ -21,66 +15,28 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { extractFilenameFromUrl } from "@/lib/utils";
+import { useEmployees } from "@/hooks/useEmployees";
+import { useRequisitionInventories } from "@/hooks/useConfigTypes";
+import { useRequisitionTypes } from "@/hooks/useConfigTypes";
+import { fetchRequisitionHistory } from "@/lib/api/operations-and-services/requisition";
 
 export default function RequisitionHistoryPage() {
-  const [requisitionRequests, setRequisitionRequests] = useState<
-    RequisitionState[]
-  >([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { employees, fetchEmployees } = useEmployees();
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
-  const { requisitionInventories, fetchRequisitionInventories } =
-    useRequisitionInventories();
-  const [comment, setComment] = useState<string>("");
-  const [employees, setEmployees] = useState<any[]>([]);
-
-  async function fetchRequisitionRequests() {
-    setLoading(true);
-    
-    const user = await getUserInfo();
-    const company_id = await getCompanyId();
-    try {
-      const { data, error } = await supabase
-        .from("requisition_records")
-        .select("*")
-        .eq("company_id", company_id)
-        .eq("asset_owner", user.id)
-        .neq("status", "Pending");
-
-      if (error) {
-        setError("Failed to fetch requisition requests");
-        toast.error("Failed to fetch requisition requests");
-        throw error;
-      }
-
-      setRequisitionRequests(data);
-    } catch (error) {
-      setError("Failed to fetch requisition requests");
-      toast.error("Failed to fetch requisition requests");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { requisitionInventories, fetchRequisitionInventories } = useRequisitionInventories();
 
   useEffect(() => {
-    fetchRequisitionRequests();
+    // For history, we fetch with any status that is not Pending
+    fetchRequisitionHistory("Approved").then(() => {
+      // This is a hacky approach since we want both approved and rejected
+      // A better solution would be to modify the hook to accept an array of statuses
+      fetchRequisitionHistory("Rejected");
+    });
   }, []);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setEmployees(response.data || []);
-      } catch (error) {
-        setEmployees([]);
-        console.error("Error fetching asset owners:", error);
-        toast.error("Error fetching employees");
-      }
-    };
-
     fetchEmployees();
-  }, []);
+  }, [fetchEmployees]);
 
   useEffect(() => {
     fetchRequisitionTypes();

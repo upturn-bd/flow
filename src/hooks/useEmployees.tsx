@@ -1,53 +1,35 @@
 "use client";
 
-import { getCompanyId } from "@/lib/auth/getUser";
-import { supabase } from "@/lib/supabase/client";
 import { useState, useCallback } from "react";
-import { unknown, z } from "zod";
+import { supabase } from "@/lib/supabase/client";
+import { getEmployeesInfo as getEmployeesInfoApi } from "@/lib/api/admin-management/inventory";
 
-const employeeSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  role: z.string(),
-  email: z.string(),
-  phone: z.string(),
-  designation: z.string(),
-  joinDate: z.string(),
-});
-
-export type Employee = z.infer<typeof employeeSchema>;
+interface Employee {
+  id: string;
+  name: string;
+  role?: string;
+}
 
 export function useEmployees() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
-    const company_id = await getCompanyId();
+    setError(null);
     try {
-      const res = await supabase
-        .from("employees")
-        .select(
-          `id, first_name, last_name, role, email, phone_number, designation, hire_date, department_id(name)`
-        )
-        .eq("company_id", company_id);
-      const formattedData =
-        res.data?.map((employee) => {
-          const department = (employee.department_id as unknown as {name:string})?.name;
-          return {
-            id: employee.id,
-            name: `${employee.first_name} ${employee.last_name}`,
-            role: employee.role,
-            email: employee.email,
-            phone: employee.phone_number,
-            designation: employee.designation,
-            joinDate: employee.hire_date,
-            department: department,
-          };
-        }) || [];
-      setEmployees(formattedData);
-    } catch (error) {
-      console.error(error);
+      const response = await getEmployeesInfoApi();
+      if (response?.data) {
+        setEmployees(response.data);
+        return response.data;
+      }
+      return [];
+    } catch (err) {
+      const errorObj = err instanceof Error ? err : new Error(String(err));
+      setError(errorObj);
+      console.error("Error fetching employees:", errorObj);
+      return [];
     } finally {
       setLoading(false);
     }
@@ -56,6 +38,7 @@ export function useEmployees() {
   return {
     employees,
     loading,
-    fetchEmployees,
+    error,
+    fetchEmployees
   };
 }

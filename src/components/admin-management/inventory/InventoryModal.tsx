@@ -1,8 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { requisitionTypeSchema } from "@/lib/types";
+import { requisitionInventorySchema, requisitionTypeSchema } from "@/lib/types";
 import { z } from "zod";
+import { RequisitionInventory, RequisitionType } from "@/hooks/useConfigTypes";
+import { dirtyValuesChecker } from "@/lib/utils";
+import { useDepartments } from "@/hooks/useDepartments";
+import { useEmployees } from "@/hooks/useEmployees";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import Button from "@/components/ui/Button";
 
 type FormValues = z.infer<typeof requisitionTypeSchema>;
 
@@ -33,7 +40,7 @@ export default function RequisitionTypeCreateModal({
       setIsValid(false);
       const newErrors: Partial<FormValues> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof FormValues] = err.message as unknown as undefined;
       });
       setErrors(newErrors);
     }
@@ -59,7 +66,7 @@ export default function RequisitionTypeCreateModal({
     if (!result.success) {
       const fieldErrors: Partial<FormValues> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] = issue.message;
+        fieldErrors[issue.path[0] as keyof FormValues] = issue.message as unknown as undefined;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -115,12 +122,6 @@ export default function RequisitionTypeCreateModal({
     </div>
   );
 }
-import { requisitionInventorySchema } from "@/lib/types";
-import { RequisitionInventory } from "@/hooks/useInventory";
-import { dirtyValuesChecker } from "@/lib/utils";
-import { RequisitionType } from "@/hooks/useRequisitionTypes";
-import { useDepartments } from "@/hooks/useDepartments";
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
 
 type RequisitionInventoryFormValues = z.infer<
   typeof requisitionInventorySchema
@@ -159,9 +160,7 @@ export function RequisitionInventoryCreateModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const { departments, fetchDepartments } = useDepartments();
-  const [assetOwners, setAssetOwners] = useState<
-    { id: string; name: string }[]
-  >([]);
+  const { employees: assetOwners, loading: loadingEmployees, fetchEmployees } = useEmployees();
 
   useEffect(() => {
     const result = requisitionInventorySchema.safeParse(formValues);
@@ -172,7 +171,7 @@ export function RequisitionInventoryCreateModal({
       setIsValid(false);
       const newErrors: Partial<RequisitionInventoryFormValues> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof RequisitionInventoryFormValues] = err.message as unknown as undefined ;
       });
       setErrors(newErrors);
     }
@@ -209,8 +208,8 @@ export function RequisitionInventoryCreateModal({
     if (!result.success) {
       const fieldErrors: Partial<FormValues> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof RequisitionInventoryFormValues] =
-          issue.message;
+        fieldErrors[issue.path[0] as keyof FormValues] =
+          issue.message as unknown as undefined;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -231,18 +230,8 @@ export function RequisitionInventoryCreateModal({
   }, [fetchDepartments]);
 
   useEffect(() => {
-    const fetchAssetOwners = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setAssetOwners(response.data);
-      } catch (error) {
-        setAssetOwners([]);
-        console.error("Error fetching asset owners:", error);
-      }
-    };
-
-    fetchAssetOwners();
-  }, []);
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
@@ -412,9 +401,7 @@ export function RequisitionInventoryUpdateModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const { departments, fetchDepartments } = useDepartments();
-  const [assetOwners, setAssetOwners] = useState<
-    { id: string; name: string }[]
-  >([]);
+  const { employees: assetOwners, loading: loadingEmployees, fetchEmployees } = useEmployees();
   const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
@@ -426,7 +413,7 @@ export function RequisitionInventoryUpdateModal({
       setIsValid(false);
       const newErrors: Partial<RequisitionInventoryFormValues> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0]] = err.message;
+        newErrors[err.path[0] as keyof RequisitionInventoryFormValues] = err.message as unknown as undefined;
       });
       setErrors(newErrors);
     }
@@ -463,8 +450,8 @@ export function RequisitionInventoryUpdateModal({
     if (!result.success) {
       const fieldErrors: Partial<FormValues> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof RequisitionInventoryFormValues] =
-          issue.message;
+        fieldErrors[issue.path[0] as keyof FormValues] =
+          issue.message as unknown as undefined;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -481,18 +468,8 @@ export function RequisitionInventoryUpdateModal({
   }, [fetchDepartments]);
 
   useEffect(() => {
-    const fetchAssetOwners = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setAssetOwners(response.data);
-      } catch (error) {
-        setAssetOwners([]);
-        console.error("Error fetching asset owners:", error);
-      }
-    };
-
-    fetchAssetOwners();
-  }, []);
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   useEffect(() => {
     setFormValues(initialData);

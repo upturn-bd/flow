@@ -1,12 +1,12 @@
 // app/(dashboard)/onboarding/page.tsx
 "use client";
 
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
 import { UserPlus, Loader2, Check, X, AlertTriangle, Users, User } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useEmployees } from "@/hooks/useEmployees";
 
 interface PendingEmployee {
   id: string;
@@ -52,7 +52,7 @@ export default function OnboardingApprovalPage() {
     Record<string, string>
   >({});
   const [loading, setLoading] = useState(true);
-  const [employees, setEmployees] = useState<{ id: string; name: string }[]>([]);
+  const { employees, fetchEmployees } = useEmployees();
 
   useEffect(() => {
     fetch("/api/onboarding/pending")
@@ -61,19 +61,9 @@ export default function OnboardingApprovalPage() {
         if (data?.data) setRequests(data.data);
       })
       .finally(() => setLoading(false));
-    const fetchEmployees = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        if (response?.data) {
-          setEmployees(response.data);
-        }
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-        toast.error("Failed to load supervisors");
-      }
-    };
+    
     fetchEmployees();
-  }, []);
+  }, [fetchEmployees]);
 
   const handleInputChange = (id: string, value: string) => {
     setRejectionReasons((prev) => ({ ...prev, [id]: value }));

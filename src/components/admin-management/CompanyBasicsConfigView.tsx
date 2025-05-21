@@ -13,7 +13,6 @@ import GradeModal from "./grades/GradeModal";
 import { usePositions } from "@/hooks/usePositions";
 import PositionDetailsModal from "./positions/PositionDetailsModal";
 import PositionModal from "./positions/PositionModal";
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
 import { 
   Building, 
   Users, 
@@ -26,6 +25,7 @@ import {
   Info 
 } from "lucide-react";
 import { fadeInUp, staggerContainer } from "@/components/ui/animations";
+import { useEmployees } from "@/hooks/useEmployees";
 
 // Add prop type
 type CompanyBasicsConfigViewProps = {

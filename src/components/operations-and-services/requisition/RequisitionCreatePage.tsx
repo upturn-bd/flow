@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, ChangeEvent, use } from "react";
+import React, { useEffect, useState, ChangeEvent } from "react";
 import { FiUploadCloud } from "react-icons/fi";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { IoMdCalendar } from "react-icons/io";
-import { useRequisitionInventories } from "@/hooks/useInventory";
-import { useRequisitionTypes } from "@/hooks/useRequisitionTypes";
+import { useEmployees } from "@/hooks/useEmployees";
 import { z } from "zod";
 import { requisitionSchema } from "@/lib/types";
 import { supabase } from "@/lib/supabase/client";
@@ -27,18 +26,43 @@ import {
   FileText
 } from "lucide-react";
 import { toast } from "sonner";
+import { useForm, Controller } from "react-hook-form";
+import { createRequisition } from "@/lib/api/operations-and-services/requisition";
+import { useRequisitionInventories } from "@/hooks/useConfigTypes";
+import { useRequisitionTypes } from "@/hooks/useConfigTypes";
 
-const initialRequisitionState = {
+// Define a proper interface that mirrors the requisition schema
+interface RequisitionFormState {
+  requisition_category_id: number;
+  employee_id: string;
+  item_id: number;
+  quantity: number;
+  status: "Pending" | "Approved" | "Rejected"; // Using the exact enum values
+  is_one_off: boolean;
+  from_time: string;
+  to_time: string;
+  date: string;
+  attachments: string[];
+  description: string;
+  id?: number;
+  company_id?: number;
+  asset_owner?: string;
+  approved_by_id?: string;
+  comment?: string;
+  remark?: string;
+}
+
+const initialRequisitionState: RequisitionFormState = {
   requisition_category_id: 0,
   employee_id: "",
   item_id: 0,
   quantity: 0,
-  status: "Pending",
+  status: "Pending", // Using valid enum value
   is_one_off: false,
   from_time: "",
   to_time: "",
   date: "",
-  attachments: [] as File[],
+  attachments: [],
   description: "",
 };
 
@@ -53,24 +77,35 @@ interface RequisitionDraftPageProps {
 
 export type RequisitionState = z.infer<typeof requisitionSchema>;
 
-function saveDraftToLocalStorage(draftId: number, requisitionState: RequisitionState) {
+// Define a type to handle draft with ID
+interface RequisitionDraft extends Omit<RequisitionFormState, 'attachments'> {
+  draft_id: number;
+  attachments: string[];
+}
+
+function saveDraftToLocalStorage(draftId: number, requisitionState: RequisitionFormState) {
   // Check if drafts exist in localStorage
   const drafts = localStorage.getItem("requisition-drafts");
   const parsedDrafts = drafts ? JSON.parse(drafts) : [];
+  
+  // Create a draft object with draft_id
+  const draftToSave: RequisitionDraft = {
+    ...requisitionState,
+    draft_id: draftId,
+    attachments: [], // We can't store File objects in localStorage
+  };
+  
   // Check if a draft with this ID already exists
   const existingDraftIndex = parsedDrafts.findIndex(
-    (draft: RequisitionState) => draft.id === draftId
+    (draft: RequisitionDraft) => draft.draft_id === draftId
   );
 
   if (existingDraftIndex !== -1) {
     // Replace existing draft
-    parsedDrafts[existingDraftIndex] = {
-      draft_id: draftId,
-      ...requisitionState,
-    };
+    parsedDrafts[existingDraftIndex] = draftToSave;
   } else {
     // Add new draft
-    parsedDrafts.push({ draft_id: draftId, ...requisitionState });
+    parsedDrafts.push(draftToSave);
   }
 
   // Save back to localStorage
@@ -81,21 +116,22 @@ export default function RequisitionCreatePage({
   onClose,
 }: RequisitionCreatePageProps) {
   const [isOneOff, setIsOneOff] = useState(false);
-  const [requisitionState, setRequisitionState] = useState(
+  const [requisitionState, setRequisitionState] = useState<RequisitionFormState>(
     initialRequisitionState
   );
   const [attachments, setAttachments] = useState<File[]>([]);
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } =
     useRequisitionInventories();
-  const [errors, setErrors] = useState<Partial<RequisitionState>>({});
+  const { employees, fetchEmployees } = useEmployees();
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target as HTMLInputElement;
+    const { name, value } = e.target;
     if (
       name === "quantity" ||
       name === "requisition_category_id" ||
@@ -113,7 +149,6 @@ export default function RequisitionCreatePage({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const client = createClient();
     const company_id = await getCompanyId();
     const user = await getUserInfo();
     setIsSubmitting(true);
@@ -134,17 +169,17 @@ export default function RequisitionCreatePage({
           (inv) => inv.id === requisitionState.item_id
         )[0]?.asset_owner,
       };
-      const { data, error } = await client
+      const { data, error } = await supabase
         .from("requisition_records")
         .insert(formattedRequisitionState);
-      console.log("Error:", error);
+
       if (error) throw error;
-      alert("Requisition created successfully!");
+      toast.success("Requisition created successfully!");
       setRequisitionState(initialRequisitionState);
       setAttachments([]);
     } catch (error) {
       console.error("Error creating Requisition:", error);
-      alert("Error creating Requisition. Please try again.");
+      toast.error("Error creating Requisition. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -153,11 +188,9 @@ export default function RequisitionCreatePage({
   function handleSaveDraft() {
     const drafts = localStorage.getItem("requisition-drafts");
     const draftId = drafts ? JSON.parse(drafts).length + 1 : 1;
-    saveDraftToLocalStorage(draftId, {
-      ...requisitionState,
-      attachments: attachments,
-    });
-    alert("Draft saved successfully!");
+    
+    saveDraftToLocalStorage(draftId, requisitionState);
+    toast.success("Draft saved successfully!");
     setRequisitionState(initialRequisitionState);
     setAttachments([]);
     onClose();
@@ -171,24 +204,53 @@ export default function RequisitionCreatePage({
   }, [isOneOff]);
 
   useEffect(() => {
-    const result = requisitionSchema.safeParse(requisitionState);
-    if (result.success) {
-      setIsValid(true);
-      setErrors({});
-    } else {
-      setIsValid(false);
-      const newErrors: Partial<RequisitionState> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof RequisitionState] = err.message as unknown as undefined;
-      });
-      setErrors(newErrors);
+    // Perform our own validation instead of using the schema directly
+    const newErrors: Record<string, string> = {};
+    let valid = true;
+
+    // Basic validation of required fields
+    if (!requisitionState.requisition_category_id) {
+      newErrors.requisition_category_id = "Please select a category";
+      valid = false;
     }
-  }, [requisitionState]);
+
+    if (!requisitionState.item_id) {
+      newErrors.item_id = "Please select an item";
+      valid = false;
+    }
+
+    if (!requisitionState.quantity || requisitionState.quantity <= 0) {
+      newErrors.quantity = "Please enter a valid quantity";
+      valid = false;
+    }
+
+    if (!requisitionState.date) {
+      newErrors.date = "Please select a date";
+      valid = false;
+    }
+
+    // Time validation for non-one-off requisitions
+    if (!isOneOff) {
+      if (!requisitionState.from_time) {
+        newErrors.from_time = "Please specify the start time";
+        valid = false;
+      }
+      
+      if (!requisitionState.to_time) {
+        newErrors.to_time = "Please specify the end time";
+        valid = false;
+      }
+    }
+
+    setErrors(newErrors as Record<string, string>);
+    setIsValid(valid);
+  }, [requisitionState, isOneOff]);
 
   useEffect(() => {
     fetchRequisitionTypes();
     fetchRequisitionInventories();
-  }, [fetchRequisitionTypes, fetchRequisitionInventories]);
+    fetchEmployees();
+  }, [fetchRequisitionTypes, fetchRequisitionInventories, fetchEmployees]);
 
   return (
     <motion.div 
@@ -503,21 +565,23 @@ export function RequisitionDraftPage({
   onClose,
 }: RequisitionDraftPageProps) {
   const [isOneOff, setIsOneOff] = useState(false);
-  const [requisitionState, setRequisitionState] = useState(
-    initialRequisitionState
-  );
+  const [requisitionState, setRequisitionState] = useState<RequisitionFormState & { draft_id?: number }>({
+    ...initialRequisitionState,
+    draft_id: undefined
+  });
   const [attachments, setAttachments] = useState<File[]>([]);
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } =
     useRequisitionInventories();
-  const [errors, setErrors] = useState<Partial<RequisitionState>>({});
+  const { employees, fetchEmployees } = useEmployees();
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target as HTMLInputElement;
+    const { name, value } = e.target;
     if (
       name === "quantity" ||
       name === "requisition_category_id" ||
@@ -535,7 +599,6 @@ export function RequisitionDraftPage({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const client = createClient();
     const company_id = await getCompanyId();
     const user = await getUserInfo();
     setIsSubmitting(true);
@@ -547,10 +610,11 @@ export function RequisitionDraftPage({
 
       if (uploadError) throw uploadError;
 
-      const { draft_id, ...rest } = requisitionState;
+      // Remove draft_id before submitting to database
+      const { draft_id, ...requisitionData } = requisitionState;
 
       const formattedRequisitionState = {
-        ...rest,
+        ...requisitionData,
         attachments: uploadedFilePaths,
         employee_id: user.id,
         company_id,
@@ -558,47 +622,69 @@ export function RequisitionDraftPage({
           (inv) => inv.id === requisitionState.item_id
         )[0]?.asset_owner,
       };
-      const { data, error } = await client
+      
+      const { data, error } = await supabase
         .from("requisition_records")
         .insert(formattedRequisitionState);
+        
       if (error) throw error;
-      alert("Requisition created successfully!");
+      
+      toast.success("Requisition created successfully!");
       setRequisitionState(initialRequisitionState);
       setAttachments([]);
+      
+      // Remove the draft from localStorage
       const drafts = localStorage.getItem("requisition-drafts");
-      const updatedDrafts = JSON.parse(drafts!).filter(
-        (draft: { draft_id: number }) => draft.draft_id !== draft_id
-      );
-      localStorage.setItem("requisition-drafts", JSON.stringify(updatedDrafts));
+      if (drafts) {
+        const updatedDrafts = JSON.parse(drafts).filter(
+          (draft: RequisitionDraft) => draft.draft_id !== draft_id
+        );
+        localStorage.setItem("requisition-drafts", JSON.stringify(updatedDrafts));
+      }
+      
+      onClose();
     } catch (error) {
       console.error("Error creating Requisition:", error);
-      alert("Error creating Requisition. Please try again.");
+      toast.error("Error creating Requisition. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   }
 
   function handleSaveDraft() {
-    const drafts = localStorage.getItem("requisition-drafts");
-    const updatedDrafts = JSON.parse(drafts!)
-      .filter((draft: { draft_id: number }) => draft.draft_id !== requisitionState.draft_id)
-      .concat(requisitionState);
-    localStorage.setItem("requisition-drafts", JSON.stringify(updatedDrafts));
-    alert("Draft saved successfully!");
-    setRequisitionState(initialRequisitionState);
-    setAttachments([]);
-    onClose();
+    if (requisitionState.draft_id) {
+      const drafts = localStorage.getItem("requisition-drafts");
+      if (drafts) {
+        const parsedDrafts = JSON.parse(drafts);
+        const updatedDrafts = parsedDrafts
+          .filter((draft: RequisitionDraft) => draft.draft_id !== requisitionState.draft_id)
+          .concat({
+            ...requisitionState,
+            attachments: [] // We can't store File objects
+          });
+          
+        localStorage.setItem("requisition-drafts", JSON.stringify(updatedDrafts));
+        toast.success("Draft updated successfully!");
+        setRequisitionState(initialRequisitionState);
+        setAttachments([]);
+        onClose();
+      }
+    }
   }
 
   useEffect(() => {
     const drafts = localStorage.getItem("requisition-drafts");
     if (drafts) {
       const parsedDrafts = JSON.parse(drafts);
-      const draft = parsedDrafts.find((draft: { draft_id: number }) => draft.draft_id === draftId);
+      const draft = parsedDrafts.find((draft: RequisitionDraft) => draft.draft_id === draftId);
       if (draft) {
-        setRequisitionState(draft);
-        setAttachments(draft.attachments);
+        setRequisitionState({
+          ...draft,
+          // Keep the draft_id so we can reference it later
+          draft_id: draft.draft_id
+        });
         setIsOneOff(draft.is_one_off);
+        // Note: attachments won't be restored from localStorage
       }
     }
   }, [draftId]);
@@ -611,29 +697,53 @@ export function RequisitionDraftPage({
   }, [isOneOff]);
 
   useEffect(() => {
-    const result = requisitionSchema.safeParse(requisitionState);
-    setErrors({});
-    if (result.success) {
-      setIsValid(true);
-      setErrors({});
-    } else {
-      setIsValid(false);
-      const newErrors: Partial<RequisitionState> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof RequisitionState] = err.message as unknown as undefined;
-      });
-      setErrors(newErrors);
-    }
-  }, [requisitionState]);
+    // Perform our own validation instead of using the schema directly
+    const newErrors: Record<string, string> = {};
+    let valid = true;
 
-  useEffect(() => {
-    console.log("Errors:", errors);
-  }, [errors]);
+    // Basic validation of required fields
+    if (!requisitionState.requisition_category_id) {
+      newErrors.requisition_category_id = "Please select a category";
+      valid = false;
+    }
+
+    if (!requisitionState.item_id) {
+      newErrors.item_id = "Please select an item";
+      valid = false;
+    }
+
+    if (!requisitionState.quantity || requisitionState.quantity <= 0) {
+      newErrors.quantity = "Please enter a valid quantity";
+      valid = false;
+    }
+
+    if (!requisitionState.date) {
+      newErrors.date = "Please select a date";
+      valid = false;
+    }
+
+    // Time validation for non-one-off requisitions
+    if (!isOneOff) {
+      if (!requisitionState.from_time) {
+        newErrors.from_time = "Please specify the start time";
+        valid = false;
+      }
+      
+      if (!requisitionState.to_time) {
+        newErrors.to_time = "Please specify the end time";
+        valid = false;
+      }
+    }
+
+    setErrors(newErrors as Record<string, string>);
+    setIsValid(valid);
+  }, [requisitionState, isOneOff]);
 
   useEffect(() => {
     fetchRequisitionTypes();
     fetchRequisitionInventories();
-  }, [fetchRequisitionTypes, fetchRequisitionInventories]);
+    fetchEmployees();
+  }, [fetchRequisitionTypes, fetchRequisitionInventories, fetchEmployees]);
 
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto lg:mx-20">

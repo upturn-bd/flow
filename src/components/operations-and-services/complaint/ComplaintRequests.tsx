@@ -1,97 +1,41 @@
 "use client";
 
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
-import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
 import { FaFilePdf } from "react-icons/fa";
 import { extractFilenameFromUrl } from "@/lib/utils";
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
-import { ComplaintState } from "./ComplaintCreatePage";
-import { useComplaintTypes } from "@/hooks/useComplaints";
+import { useEmployees } from "@/hooks/useEmployees";
+import { useComplaints } from "@/hooks/useRequests";
+import { useComplaintTypes } from "@/hooks/useConfigTypes";
 
 export default function ComplaintRequestsPage() {
-  const [complaintRequests, setComplaintRequests] = useState<ComplaintState[]>(
-    []
-  );
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
   const [comment, setComment] = useState<string>("");
-  const [employees, setEmployees] = useState<any[]>([]);
-
-  async function fetchComplaintRequests() {
-    setLoading(true);
-    
-    const user = await getUserInfo();
-    const company_id = await getCompanyId();
-    try {
-      const { data, error } = await supabase
-        .from("complaint_records")
-        .select("*")
-        .eq("company_id", company_id)
-        .eq("requested_to", user.id)
-        .eq("status", "Submitted");
-
-      if (error) {
-        setError("Failed to fetch complaint requests");
-        throw error;
-      }
-
-      setComplaintRequests(data);
-    } catch (error) {
-      setError("Failed to fetch complaint requests");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function updateSettlementRequest(action: string, id: number) {
-    
-    const user = await getUserInfo();
-    const company_id = await getCompanyId();
-    try {
-      const { data, error } = await supabase
-        .from("complaint_records")
-        .update({
-          status: action,
-          resolved_by_id: user.id,
-          comment: comment,
-        })
-        .eq("company_id", company_id)
-        .eq("id", id);
-      if (error) {
-        setError("Failed to fetch complaint requests");
-        throw error;
-      }
-      alert("complaint request updated successfully");
-      setComment("");
-      fetchComplaintRequests();
-    } catch {
-      setError("Failed to fetch complaint requests");
-    }
-  }
+  const { employees, fetchEmployees } = useEmployees();
+  const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
+  const { 
+    complaints, 
+    loading, 
+    error, 
+    processingId, 
+    fetchComplaints, 
+    updateComplaint 
+  } = useComplaints();
 
   useEffect(() => {
-    fetchComplaintRequests();
-  }, []);
+    fetchComplaints("Pending");
+  }, [fetchComplaints]);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setEmployees(response.data);
-      } catch (error) {
-        setEmployees([]);
-        console.error("Error fetching employees:", error);
-      }
-    };
-
     fetchEmployees();
-  }, []);
+  }, [fetchEmployees]);
 
   useEffect(() => {
     fetchComplaintTypes();
   }, [fetchComplaintTypes]);
+
+  const handleUpdateRequest = async (action: string, id: number) => {
+    await updateComplaint(action, id, comment);
+    setComment("");
+  };
 
   if (loading) {
     return (
@@ -109,8 +53,8 @@ export default function ComplaintRequestsPage() {
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <h1 className="text-xl font-bold text-[#003366]">Complaint Requests</h1>
 
-      {complaintRequests.length > 0 &&
-        complaintRequests.map((req) => (
+      {complaints.length > 0 &&
+        complaints.map((req) => (
           <div
             key={req.id}
             className="bg-gray-100 rounded-xl p-6 space-y-4 shadow-sm"
@@ -119,14 +63,19 @@ export default function ComplaintRequestsPage() {
               <div className="flex-1 space-y-2 text-sm text-gray-800">
                 <p>
                   <span className="font-bold">Category:</span>{" "}
+                  {complaintTypes.find((type) => type.id === req.complaint_type_id)?.name}
+                </p>
+                <p>
+                  <span className="font-bold">Requested By:</span>{" "}
                   {
-                    complaintTypes.find(
-                      (type) => type.id === req.complaint_type_id
+                    req.anonymous ? "Anonymous" :
+                    employees.find(
+                      (employee) => employee.id === req.complainer_id
                     )?.name
                   }
                 </p>
                 <p>
-                  <span className="font-bold">Complaint Against:</span>{" "}
+                  <span className="font-bold">Against:</span>{" "}
                   {
                     employees.find(
                       (employee) => employee.id === req.against_whom
@@ -134,24 +83,34 @@ export default function ComplaintRequestsPage() {
                   }
                 </p>
                 <p>
-                  <span className="font-bold">Complaint By:</span>{" "}
-                  {req.anonymous
-                    ? "Anonymous"
-                    : employees.find(
-                        (employee) => employee.id === req.complainer_id
-                      )?.name}
-                </p>
-                <p>
                   <span className="font-bold">Description:</span>{" "}
                   {req.description}
                 </p>
+                {req.attachments && req.attachments.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {req.attachments.map((url, idx) => (
+                      <a
+                        key={idx}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                      >
+                        <FaFilePdf className="text-red-500" />
+                        <span className="text-xs">
+                          {extractFilenameFromUrl(url)}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 space-y-4">
                 {/* Comment */}
                 <div>
                   <label className="block font-semibold text-gray-800 mb-1">
-                    Comment
+                    Remarks
                   </label>
                   <input
                     type="text"
@@ -162,50 +121,29 @@ export default function ComplaintRequestsPage() {
                     className="w-full bg-white px-4 py-2 rounded-md border border-gray-300"
                   />
                 </div>
-
-                {/* Attachment */}
-                {req.attachments?.length > 0 && (
-                  <div className="space-y-2">
-                    <label className="block font-semibold text-gray-800 mb-1">
-                      Attachment
-                    </label>
-                    {req.attachments.map((attachment) => (
-                      <div
-                        key={attachment}
-                        onClick={() => {
-                          window.open(attachment, "_blank");
-                        }}
-                        className="flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 gap-3 max-w-xs cursor-pointer hover:bg-gray-50 transition duration-200"
-                      >
-                        <FaFilePdf className="text-red-600 text-xl" />
-                        <div className="text-sm">
-                          <p>{extractFilenameFromUrl(attachment)}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-4 pt-2">
               <button
-                onClick={() => updateSettlementRequest("Resolved", req.id)}
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full"
+                onClick={() => handleUpdateRequest("Rejected", req.id || 0)}
+                disabled={processingId === req.id}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full disabled:opacity-50"
               >
-                Reject
+                {processingId === req.id ? "Processing..." : "Reject"}
               </button>
               <button
-                onClick={() => updateSettlementRequest("Resolved", req.id)}
-                className="bg-[#001F4D] hover:bg-[#002a66] text-white px-6 py-2 rounded-full"
+                onClick={() => handleUpdateRequest("Accepted", req.id || 0)}
+                disabled={processingId === req.id}
+                className="bg-[#001F4D] hover:bg-[#002a66] text-white px-6 py-2 rounded-full disabled:opacity-50"
               >
-                Accept
+                {processingId === req.id ? "Processing..." : "Accept"}
               </button>
             </div>
           </div>
         ))}
-      {complaintRequests.length === 0 && (
+      {complaints.length === 0 && (
         <div className="flex items-center justify-center h-screen">
           No complaint requests available.
         </div>

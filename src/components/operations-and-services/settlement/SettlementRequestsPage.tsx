@@ -1,12 +1,10 @@
 "use client";
 
-import { getCompanyId, getUserInfo } from "@/lib/auth/getUser";
-import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
-import { SettlementState } from "./SettlementCreatePage";
 import { extractFilenameFromUrl } from "@/lib/utils";
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
-import { useClaimTypes } from "@/hooks/useClaimAndSettlement";
+import { useClaimTypes } from "@/hooks/useConfigTypes";
+import { useEmployees } from "@/hooks/useEmployees";
+import { useSettlementRequests } from "@/hooks/useRequests";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   FileText, 
@@ -23,97 +21,37 @@ import {
 import { toast } from "sonner";
 
 export default function SettlementRequestsPage() {
-  const [settlementRequests, setSettlementRequests] = useState<
-    SettlementState[]
-  >([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { claimTypes, fetchClaimTypes } = useClaimTypes();
   const [comment, setComment] = useState<string>("");
-  const [employees, setEmployees] = useState<any[]>([]);
-  const [processingId, setProcessingId] = useState<number | null>(null);
-
-  async function fetchSettlementRequests() {
-    setLoading(true);
-    
-    const user = await getUserInfo();
-    const company_id = await getCompanyId();
-    try {
-      const { data, error } = await supabase
-        .from("settlement_records")
-        .select("*")
-        .eq("company_id", company_id)
-        .eq("requested_to", user.id)
-        .eq("status", "Pending");
-
-      if (error) {
-        setError("Failed to fetch settlement requests");
-        toast.error("Failed to fetch settlement requests");
-        throw error;
-      }
-
-      setSettlementRequests(data);
-    } catch (error) {
-      setError("Failed to fetch settlement requests");
-      toast.error("Failed to fetch settlement requests");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function updateSettlementRequest(action: string, id: number) {
-    setProcessingId(id);
-    
-    const user = await getUserInfo();
-    const company_id = await getCompanyId();
-    try {
-      const { data, error } = await supabase
-        .from("settlement_records")
-        .update({
-          status: action,
-          approved_by_id: user.id,
-          comment: comment,
-        })
-        .eq("company_id", company_id)
-        .eq("id", id);
-      if (error) {
-        toast.error("Failed to update settlement request");
-        throw error;
-      }
-      toast.success(`Settlement request ${action.toLowerCase()} successfully`);
-      setComment("");
-      fetchSettlementRequests();
-    } catch (error) {
-      toast.error("Failed to update settlement request");
-      console.error(error);
-    } finally {
-      setProcessingId(null);
-    }
-  }
+  const { employees, fetchEmployees } = useEmployees();
+  const { claimTypes, fetchClaimTypes } = useClaimTypes();
+  const { 
+    settlementRequests, 
+    loading, 
+    error, 
+    processingId, 
+    fetchSettlementRequests, 
+    updateSettlementRequest 
+  } = useSettlementRequests();
 
   useEffect(() => {
-    fetchSettlementRequests();
-  }, []);
+    fetchSettlementRequests("Pending");
+  }, [fetchSettlementRequests]);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await getEmployeesInfo();
-        setEmployees(response.data || []);
-      } catch (error) {
-        setEmployees([]);
-        console.error("Error fetching employees:", error);
-        toast.error("Error fetching employees");
-      }
-    };
-
     fetchEmployees();
-  }, []);
+  }, [fetchEmployees]);
 
   useEffect(() => {
     fetchClaimTypes();
   }, [fetchClaimTypes]);
+
+  const handleUpdateRequest = async (action: string, id: number) => {
+    const success = await updateSettlementRequest(action, id, comment);
+    if (success) {
+      toast.success(`Settlement request ${action.toLowerCase()} successfully`);
+      setComment("");
+    }
+  };
 
   return (
     <AnimatePresence mode="wait">
@@ -258,7 +196,7 @@ export default function SettlementRequestsPage() {
                       <motion.button 
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => req.id !== undefined && updateSettlementRequest("Rejected", req.id)}
+                        onClick={() => req.id !== undefined && handleUpdateRequest("Rejected", req.id)}
                         disabled={processingId === req.id}
                         className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                       >
@@ -272,7 +210,7 @@ export default function SettlementRequestsPage() {
                       <motion.button 
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => req.id !== undefined && updateSettlementRequest("Approved", req.id)}
+                        onClick={() => req.id !== undefined && handleUpdateRequest("Approved", req.id)}
                         disabled={processingId === req.id}
                         className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                       >
