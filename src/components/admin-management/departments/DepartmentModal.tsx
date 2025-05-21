@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { Department } from "@/hooks/useDepartments";
 import { z } from "zod";
 import { dirtyValuesChecker } from "@/lib/utils";
+import { Building, User, FileText, StackSimple } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
 const schema = z.object({
   id: z.number(),
@@ -21,6 +25,7 @@ interface DepartmentModalProps {
   onClose: () => void;
   divisions: { id: number; name: string }[];
   employees: { id: string; name: string }[];
+  isLoading?: boolean;
 }
 
 export default function DepartmentModal({
@@ -29,6 +34,7 @@ export default function DepartmentModal({
   divisions,
   onClose,
   employees,
+  isLoading = false
 }: DepartmentModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
     id: 0,
@@ -118,113 +124,163 @@ export default function DepartmentModal({
     }
   }, [initialData, formValues]);
 
+  // Animation variants
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: {
+        duration: 0.3,
+        when: "beforeChildren",
+        staggerChildren: 0.1
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0.95,
+      transition: { duration: 0.2 } 
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <form
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+      <motion.form
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        variants={modalVariants}
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full max-w-md space-y-4"
+        className="bg-white p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-gray-200"
       >
-        <h2 className="text-xl font-semibold">
-          {initialData ? "Edit Department" : "Create Department"}
-        </h2>
+        <motion.div variants={fadeInUp} className="flex items-center gap-3">
+          <Building size={24} weight="duotone" className="text-gray-600" />
+          <h2 className="text-xl font-semibold text-gray-800">
+            {initialData ? "Edit Department" : "Create Department"}
+          </h2>
+        </motion.div>
 
-        <div>
-          <label className="block font-semibold text-blue-800 mb-1">
-            Department Name
-          </label>
-          <input
-            name="name"
-            value={formValues.name}
-            onChange={handleChange}
-            className="w-full rounded-md bg-blue-50 p-2"
-            placeholder="Enter Name"
-          />
-          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-        </div>
+        <motion.div variants={fadeInUp} className="space-y-4">
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Department Name
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Building size={18} weight="duotone" className="text-gray-500" />
+              </div>
+              <input
+                name="name"
+                value={formValues.name}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all"
+                placeholder="Enter Department Name"
+              />
+            </div>
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
+          </div>
 
-        <div>
-          <label className="block font-semibold text-blue-800 mb-1">
-            Department Head
-          </label>
-          <select
-            name="head_id"
-            value={formValues.head_id}
-            onChange={handleChange}
-            className="w-full rounded-md bg-blue-50 p-2"
-          >
-            <option value="">Select Employee</option>
-            {employees.map((employee) => (
-              <option key={employee.id} value={employee.id}>
-                {employee.name}
-              </option>
-            ))}
-          </select>
-          {errors.head_id && (
-            <p className="text-red-500 text-sm">{errors.head_id}</p>
-          )}
-        </div>
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Department Head
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User size={18} weight="duotone" className="text-gray-500" />
+              </div>
+              <select
+                name="head_id"
+                value={formValues.head_id}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all appearance-none"
+              >
+                <option value="">Select Employee</option>
+                {employees.map((employee) => (
+                  <option key={employee.id} value={employee.id}>
+                    {employee.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors.head_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.head_id}</p>
+            )}
+          </div>
 
-        <div>
-          <label className="block font-semibold text-blue-800 mb-1">
-            Division
-          </label>
-          <select
-            name="division_id"
-            value={formValues.division_id || ""}
-            onChange={handleChange}
-            className="w-full rounded-md bg-blue-50 p-2"
-          >
-            <option value="">Select Division</option>
-            {divisions.map((division) => (
-              <option key={division.id} value={division.id}>
-                {division.name}
-              </option>
-            ))}
-          </select>
-          {errors.division_id && (
-            <p className="text-red-500 text-sm">{errors.division_id}</p>
-          )}
-        </div>
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Division
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <StackSimple size={18} weight="duotone" className="text-gray-500" />
+              </div>
+              <select
+                name="division_id"
+                value={formValues.division_id || ""}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all appearance-none"
+              >
+                <option value="">Select Division</option>
+                {divisions.map((division) => (
+                  <option key={division.id} value={division.id}>
+                    {division.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors.division_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.division_id}</p>
+            )}
+          </div>
 
-        <div>
-          <label className="block font-semibold text-blue-800 mb-1">
-            Department Description
-          </label>
-          <textarea
-            name="description"
-            value={formValues.description || ""}
-            onChange={handleChange}
-            className="w-full rounded-md bg-blue-50 p-2"
-            placeholder="Add Departmental Description"
-            rows={4}
-          />
-          {errors.description && (
-            <p className="text-red-500 text-sm">{errors.description}</p>
-          )}
-        </div>
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Department Description
+            </label>
+            <div className="relative">
+              <div className="absolute top-3 left-3 flex items-start pointer-events-none">
+                <FileText size={18} weight="duotone" className="text-gray-500" />
+              </div>
+              <textarea
+                name="description"
+                value={formValues.description || ""}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all"
+                placeholder="Add Department Description"
+                rows={4}
+              />
+            </div>
+          </div>
+        </motion.div>
 
-        <div className="mt-8 flex justify-end space-x-4">
-          <button
+        <motion.div variants={fadeIn} className="flex justify-end gap-4 pt-4">
+          <Button
             type="button"
-            className="px-4 py-2 bg-[#FFC700] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            variant="outline"
             onClick={onClose}
+            className="border border-gray-200 text-gray-700 hover:bg-gray-50"
           >
-            Back
-          </button>
-          <button
+            Cancel
+          </Button>
+          <Button
             type="submit"
-            className="px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="primary"
+            isLoading={!!(isLoading || isSubmitting)}
             disabled={
+              isLoading ||
               isSubmitting ||
-              (initialData ? !isDirty : false) ||
               !isValid ||
-              Object.keys(errors).length > 0
+              (initialData! && !isDirty)
             }
+            className="bg-gray-800 hover:bg-gray-700 text-white"
           >
-            {isSubmitting ? "Saving..." : "Submit"}
-          </button>
-        </div>
-      </form>
+            {initialData ? "Update" : "Create"}
+          </Button>
+        </motion.div>
+      </motion.form>
     </div>
   );
 }

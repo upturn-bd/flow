@@ -6,6 +6,10 @@ import { z } from "zod";
 import { ClaimType } from "@/hooks/useConfigTypes";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
+import { Receipt, X, Money, Buildings, UserPlus } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
+import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
 type ClaimTypeFormValues = z.infer<typeof claimTypeSchema>;
 
@@ -17,17 +21,20 @@ interface Position {
 interface ClaimTypeCreateModalProps {
   onSubmit: (values: ClaimTypeFormValues) => void;
   onClose: () => void;
+  isLoading?: boolean;
 }
 
 interface ClaimTypeUpdateModalProps {
   initialData: ClaimType;
   onSubmit: (values: ClaimTypeFormValues) => void;
   onClose: () => void;
+  isLoading?: boolean;
 }
 
 export function ClaimTypeCreateModal({
   onSubmit,
   onClose,
+  isLoading = false,
 }: ClaimTypeCreateModalProps) {
   const [formValues, setFormValues] = useState<ClaimTypeFormValues>({
     id: 1,
@@ -116,114 +123,176 @@ export function ClaimTypeCreateModal({
     fetchEmployees();
   }, [fetchEmployees]);
 
+  // Animation variants
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: {
+        duration: 0.3,
+        when: "beforeChildren",
+        staggerChildren: 0.1
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0.95,
+      transition: { duration: 0.2 } 
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
-      <form
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-8 backdrop-blur-sm">
+      <motion.form
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        variants={modalVariants}
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto"
+        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-200"
       >
-        <h2 className="text-xl font-semibold">Add Settlement Type</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Receipt size={24} weight="duotone" className="text-gray-600" />
+            <h2 className="text-xl font-semibold text-gray-800">Add Settlement Type</h2>
+          </div>
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500"
+          >
+            <X size={20} weight="bold" />
+          </Button>
+        </motion.div>
+
+        <motion.div variants={fadeInUp} className="space-y-4">
           <div>
-            <label className="block font-semibold text-blue-800 mb-1">
+            <label className="block font-semibold text-gray-700 mb-2">
               Item Name
             </label>
-            <input
-              name="settlement_item"
-              value={formValues.settlement_item}
-              onChange={handleChange}
-              className="w-full rounded-md bg-blue-50 p-2"
-              placeholder="Enter Name"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Receipt size={18} weight="duotone" className="text-gray-500" />
+              </div>
+              <input
+                name="settlement_item"
+                value={formValues.settlement_item}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                placeholder="Enter Item Name"
+              />
+            </div>
             {errors.settlement_item && (
-              <p className="text-red-500 text-sm">{errors.settlement_item}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.settlement_item}</p>
             )}
           </div>
+
           <div>
-            <label className="block font-semibold text-blue-800 mb-1">
+            <label className="block font-semibold text-gray-700 mb-2">
               Claim Level
             </label>
-            <select
-              name="settlement_level_id"
-              value={formValues.settlement_level_id}
-              onChange={handleChange}
-              className="w-full rounded-md bg-blue-50 p-2"
-            >
-              <option value="">Select Claim Level</option>
-              {allPositions.map((position) => (
-                <option key={position.id} value={position.id}>
-                  {position.name}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Buildings size={18} weight="duotone" className="text-gray-500" />
+              </div>
+              <select
+                name="settlement_level_id"
+                value={formValues.settlement_level_id}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
+              >
+                <option value="">Select Claim Level</option>
+                {allPositions.map((position) => (
+                  <option key={position.id} value={position.id}>
+                    {position.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             {errors.settlement_level_id && (
-              <p className="text-red-500 text-sm">
+              <p className="text-red-500 text-sm mt-1">
                 {errors.settlement_level_id}
               </p>
             )}
           </div>
+
           <div>
-            <label className="block font-semibold text-blue-800 mb-1">
+            <label className="block font-semibold text-gray-700 mb-2">
               Allowance
             </label>
-            <input
-              name="allowance"
-              type="number"
-              min={1}
-              value={formValues.allowance}
-              onChange={handleChange}
-              className="w-full rounded-md bg-blue-50 p-2"
-              placeholder="Enter Allowance"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Money size={18} weight="duotone" className="text-gray-500" />
+              </div>
+              <input
+                name="allowance"
+                type="number"
+                min={1}
+                value={formValues.allowance}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                placeholder="Enter Allowance"
+              />
+            </div>
             {errors.allowance && (
-              <p className="text-red-500 text-sm">{errors.allowance}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.allowance}</p>
             )}
           </div>
+
           <div>
-            <label className="block font-semibold text-blue-800 mb-1">
-              Setller
+            <label className="block font-semibold text-gray-700 mb-2">
+              Settler
             </label>
-            <select
-              name="settler_id"
-              value={formValues.settler_id}
-              onChange={handleChange}
-              className="w-full rounded-md bg-blue-50 p-2"
-            >
-              <option value="">Select Settler</option>
-              {allSettlers.length > 0 ? (
-                allSettlers.map((settler) => (
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <UserPlus size={18} weight="duotone" className="text-gray-500" />
+              </div>
+              <select
+                name="settler_id"
+                value={formValues.settler_id}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
+              >
+                <option value="">Select Settler</option>
+                {!loadingEmployees && allSettlers.map((settler) => (
                   <option key={settler.id} value={settler.id}>
                     {settler.name}
                   </option>
-                ))
-              ) : (
-                <option value={""}>loading....</option>
-              )}
-            </select>
+                ))}
+              </select>
+            </div>
             {errors.settler_id && (
-              <p className="text-red-500 text-sm">{errors.settler_id}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.settler_id}</p>
             )}
           </div>
-        </div>
-        <div className="mt-8 flex justify-end space-x-4">
-          <button
+        </motion.div>
+
+        <motion.div variants={fadeIn} className="flex justify-end mt-8 gap-4">
+          <Button
             type="button"
-            className="px-4 py-2 bg-[#FFC700] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            variant="outline"
             onClick={onClose}
+            className="border border-gray-300 text-gray-700 hover:bg-gray-50"
           >
-            Back
-          </button>
-          <button
+            Cancel
+          </Button>
+          <Button
             type="submit"
-            className="px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="primary"
+            isLoading={!!(isLoading || isSubmitting)}
             disabled={
-              isSubmitting || !isValid || Object.keys(errors).length > 0
+              isLoading ||
+              isSubmitting ||
+              !isValid ||
+              Object.keys(errors).length > 0
             }
+            className="bg-gray-800 hover:bg-gray-900 text-white"
           >
-            {isSubmitting ? "Saving..." : "Submit"}
-          </button>
-        </div>
-      </form>
+            Create Settlement Type
+          </Button>
+        </motion.div>
+      </motion.form>
     </div>
   );
 }
@@ -232,8 +301,10 @@ export function ClaimTypeUpdateModal({
   initialData,
   onSubmit,
   onClose,
+  isLoading = false,
 }: ClaimTypeUpdateModalProps) {
   const [formValues, setFormValues] = useState<ClaimTypeFormValues>({
+    id: 1,
     settlement_item: "",
     allowance: 0,
     settler_id: "",
@@ -243,9 +314,13 @@ export function ClaimTypeUpdateModal({
   const [errors, setErrors] = useState<Partial<ClaimTypeFormValues>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
   const [allPositions, setAllPositions] = useState<Position[]>([]);
   const { employees: allSettlers, loading: loadingEmployees, fetchEmployees } = useEmployees();
-  const [isDirty, setIsDirty] = useState(false);
+
+  useEffect(() => {
+    setFormValues(initialData);
+  }, [initialData]);
 
   useEffect(() => {
     const result = claimTypeSchema.safeParse(formValues);
@@ -261,6 +336,10 @@ export function ClaimTypeUpdateModal({
       setErrors(newErrors);
     }
   }, [formValues]);
+
+  useEffect(() => {
+    setIsDirty(dirtyValuesChecker(initialData, formValues));
+  }, [initialData, formValues]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -289,7 +368,7 @@ export function ClaimTypeUpdateModal({
     if (!result.success) {
       const fieldErrors: Partial<ClaimTypeFormValues> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof ClaimTypeFormValues] = issue.message as unknown as undefined;
+        fieldErrors[issue.path[0] as keyof ClaimTypeFormValues] = issue.message as unknown as undefined; 
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -320,125 +399,177 @@ export function ClaimTypeUpdateModal({
     fetchEmployees();
   }, [fetchEmployees]);
 
-  useEffect(() => {
-    setFormValues(initialData);
-  }, [initialData]);
-
-  useEffect(() => {
-    setIsDirty(dirtyValuesChecker(initialData, formValues));
-  }, [formValues, initialData]);
+  // Animation variants
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: {
+        duration: 0.3,
+        when: "beforeChildren",
+        staggerChildren: 0.1
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0.95,
+      transition: { duration: 0.2 } 
+    }
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
-      <form
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-8 backdrop-blur-sm">
+      <motion.form
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        variants={modalVariants}
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto"
+        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-200"
       >
-        <h2 className="text-xl font-semibold">Inventory/Equipment/Supplies</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Receipt size={24} weight="duotone" className="text-gray-600" />
+            <h2 className="text-xl font-semibold text-gray-800">Update Settlement Type</h2>
+          </div>
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500"
+          >
+            <X size={20} weight="bold" />
+          </Button>
+        </motion.div>
+
+        <motion.div variants={fadeInUp} className="space-y-4">
           <div>
-            <label className="block font-semibold text-blue-800 mb-1">
+            <label className="block font-semibold text-gray-700 mb-2">
               Item Name
             </label>
-            <input
-              name="settlement_item"
-              value={formValues.settlement_item}
-              onChange={handleChange}
-              className="w-full rounded-md bg-blue-50 p-2"
-              placeholder="Enter Name"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Receipt size={18} weight="duotone" className="text-gray-500" />
+              </div>
+              <input
+                name="settlement_item"
+                value={formValues.settlement_item}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                placeholder="Enter Item Name"
+              />
+            </div>
             {errors.settlement_item && (
-              <p className="text-red-500 text-sm">{errors.settlement_item}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.settlement_item}</p>
             )}
           </div>
+
           <div>
-            <label className="block font-semibold text-blue-800 mb-1">
+            <label className="block font-semibold text-gray-700 mb-2">
               Claim Level
             </label>
-            <select
-              name="settlement_level_id"
-              value={formValues.settlement_level_id}
-              onChange={handleChange}
-              className="w-full rounded-md bg-blue-50 p-2"
-            >
-              <option value="">Select Claim Level</option>
-              {allPositions.map((position) => (
-                <option key={position.id} value={position.id}>
-                  {position.name}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Buildings size={18} weight="duotone" className="text-gray-500" />
+              </div>
+              <select
+                name="settlement_level_id"
+                value={formValues.settlement_level_id}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
+              >
+                <option value="">Select Claim Level</option>
+                {allPositions.map((position) => (
+                  <option key={position.id} value={position.id}>
+                    {position.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             {errors.settlement_level_id && (
-              <p className="text-red-500 text-sm">
+              <p className="text-red-500 text-sm mt-1">
                 {errors.settlement_level_id}
               </p>
             )}
           </div>
+
           <div>
-            <label className="block font-semibold text-blue-800 mb-1">
+            <label className="block font-semibold text-gray-700 mb-2">
               Allowance
             </label>
-            <input
-              name="allowance"
-              type="number"
-              min={1}
-              value={formValues.allowance}
-              onChange={handleChange}
-              className="w-full rounded-md bg-blue-50 p-2"
-              placeholder="Enter Allowance"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Money size={18} weight="duotone" className="text-gray-500" />
+              </div>
+              <input
+                name="allowance"
+                type="number"
+                min={1}
+                value={formValues.allowance}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                placeholder="Enter Allowance"
+              />
+            </div>
             {errors.allowance && (
-              <p className="text-red-500 text-sm">{errors.allowance}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.allowance}</p>
             )}
           </div>
+
           <div>
-            <label className="block font-semibold text-blue-800 mb-1">
-              Setller
+            <label className="block font-semibold text-gray-700 mb-2">
+              Settler
             </label>
-            <select
-              name="settler_id"
-              value={formValues.settler_id}
-              onChange={handleChange}
-              className="w-full rounded-md bg-blue-50 p-2"
-            >
-              <option value="">Select Settler</option>
-              {allSettlers.length > 0 ? (
-                allSettlers.map((settler) => (
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <UserPlus size={18} weight="duotone" className="text-gray-500" />
+              </div>
+              <select
+                name="settler_id"
+                value={formValues.settler_id}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
+              >
+                <option value="">Select Settler</option>
+                {!loadingEmployees && allSettlers.map((settler) => (
                   <option key={settler.id} value={settler.id}>
                     {settler.name}
                   </option>
-                ))
-              ) : (
-                <option value={""}>loading....</option>
-              )}
-            </select>
+                ))}
+              </select>
+            </div>
             {errors.settler_id && (
-              <p className="text-red-500 text-sm">{errors.settler_id}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.settler_id}</p>
             )}
           </div>
-        </div>
-        <div className="mt-8 flex justify-end space-x-4">
-          <button
+        </motion.div>
+
+        <motion.div variants={fadeIn} className="flex justify-end mt-8 gap-4">
+          <Button
             type="button"
-            className="px-4 py-2 bg-[#FFC700] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            variant="outline"
             onClick={onClose}
+            className="border border-gray-300 text-gray-700 hover:bg-gray-50"
           >
-            Back
-          </button>
-          <button
+            Cancel
+          </Button>
+          <Button
             type="submit"
-            className="px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="primary"
+            isLoading={!!(isLoading || isSubmitting)}
             disabled={
+              isLoading ||
               isSubmitting ||
               !isValid ||
               Object.keys(errors).length > 0 ||
               !isDirty
             }
+            className="bg-gray-800 hover:bg-gray-900 text-white"
           >
-            {isSubmitting ? "Saving..." : "Submit"}
-          </button>
-        </div>
-      </form>
+            Update Settlement Type
+          </Button>
+        </motion.div>
+      </motion.form>
     </div>
   );
 }

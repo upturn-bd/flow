@@ -15,6 +15,8 @@ export type Lineage = z.infer<typeof lineageSchema>;
 export function useLineage() {
   const [lineages, setLineages] = useState<Lineage[]>([]);
   const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   const fetchLineages = useCallback(async () => {
     setLoading(true);
@@ -29,23 +31,46 @@ export function useLineage() {
   }, []);
 
   const createLineage = async (lineage: z.infer<typeof lineageSchema>[]) => {
-    const data = await cLineage(lineage);
-    return { success: true, status: 200, data };
+    setCreating(true);
+    try {
+      const data = await cLineage(lineage);
+      return { success: true, status: 200, data };
+    } catch (error) {
+      console.error("Error creating lineage:", error);
+      throw error;
+    } finally {
+      setCreating(false);
+    }
   };
 
   const updateLineage = async (lineage: z.infer<typeof lineageSchema>[]) => {
-    const data = await uLineage(lineage);
-    return { success: true, status: 200, data };
+    setUpdating(true);
+    try {
+      const data = await uLineage(lineage);
+      return { success: true, status: 200, data };
+    } catch (error) {
+      console.error("Error updating lineage:", error);
+      throw error;
+    } finally {
+      setUpdating(false);
+    }
   };
 
   const deleteLineage = async (name: string) => {
-    const data = await dLineage(name);
-    return { success: true, status: 200, data };
+    try {
+      const data = await dLineage(name);
+      return { success: true, status: 200, data };
+    } catch (error) {
+      console.error("Error deleting lineage:", error);
+      throw error;
+    }
   };
 
   return {
     lineages,
     loading,
+    creating,
+    updating,
     fetchLineages,
     createLineage,
     deleteLineage,

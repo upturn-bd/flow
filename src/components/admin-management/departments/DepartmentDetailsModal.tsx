@@ -2,9 +2,10 @@
 
 import { Department } from "@/hooks/useDepartments";
 import { Division } from "@/hooks/useDivisions";
-import { useEmployees } from "@/hooks/useEmployees";
-import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
-import { useEffect } from "react";
+import { PencilSimple, TrashSimple, Building, User, StackSimple, FileText, X } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
 interface DepartmentDetailsModalProps {
   department: Department;
@@ -23,51 +24,108 @@ export default function DepartmentDetailsModal({
   divisions,
   employees,
 }: DepartmentDetailsModalProps) {
+  // Animation variants
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: {
+        duration: 0.3,
+        when: "beforeChildren",
+        staggerChildren: 0.1
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0.95,
+      transition: { duration: 0.2 } 
+    }
+  };
+
+  const departmentHead = employees?.find((employee) => employee.id === department.head_id);
+  const divisionName = divisions?.find((division) => division.id === department.division_id)?.name;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg w-full max-w-md">
-        <h2 className="text-xl font-bold mb-4">Department Details</h2>
-
-        <div className="space-y-2">
-          <p>
-            <strong>Name: </strong> {department?.name}
-          </p>
-          <p>
-            <strong>Head: </strong>
-            {department?.head_id == null
-              ? "No head assigned"
-              : employees?.filter(
-                  (employee) => employee.id == department.head_id
-                )[0]?.name}
-          </p>
-          <p>
-            <strong>Division: </strong>
-            {
-              divisions?.filter(
-                (division) => division.id == department.division_id
-              )[0]?.name
-            }
-          </p>
-          <p>
-            <strong>Description: </strong> {department?.description}
-          </p>
-        </div>
-
-        <div className="flex justify-end pt-4">
-          <button
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        variants={modalVariants}
+        className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl border border-gray-200"
+      >
+        <motion.div variants={fadeInUp} className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Building size={24} weight="duotone" className="text-gray-600" />
+            <h2 className="text-xl font-semibold text-gray-800">Department Details</h2>
+          </div>
+          <Button
+            variant="ghost"
             onClick={onClose}
-            className="bg-[#FFC700] hover:bg-yellow-500 text-black px-4 py-2 rounded mr-4"
+            className="p-1 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500"
           >
-            Close
-          </button>
-          <button onClick={editDepartment} className="p-2">
-            <PencilSimple size={24} />
-          </button>
-          <button onClick={deleteDepartment} className="p-2">
-            <TrashSimple className="text-red-600" size={24} />
-          </button>
-        </div>
-      </div>
+            <X size={20} weight="bold" />
+          </Button>
+        </motion.div>
+
+        <motion.div variants={fadeInUp} className="mt-6 space-y-4">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <Building size={20} weight="duotone" className="text-gray-600 flex-shrink-0" />
+            <div>
+              <div className="text-sm text-gray-600 font-medium">Department Name</div>
+              <div className="font-medium text-gray-800">{department?.name}</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <User size={20} weight="duotone" className="text-gray-600 flex-shrink-0" />
+            <div>
+              <div className="text-sm text-gray-600 font-medium">Department Head</div>
+              <div className="font-medium text-gray-800">
+                {departmentHead ? departmentHead.name : "No head assigned"}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <StackSimple size={20} weight="duotone" className="text-gray-600 flex-shrink-0" />
+            <div>
+              <div className="text-sm text-gray-600 font-medium">Division</div>
+              <div className="font-medium text-gray-800">{divisionName || "None"}</div>
+            </div>
+          </div>
+
+          {department?.description && (
+            <div className="flex gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
+              <FileText size={20} weight="duotone" className="text-gray-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <div className="text-sm text-gray-600 font-medium">Description</div>
+                <div className="text-gray-800">{department.description}</div>
+              </div>
+            </div>
+          )}
+        </motion.div>
+
+        <motion.div variants={fadeIn} className="flex justify-end pt-6 gap-2">
+          <Button
+            variant="outline"
+            onClick={editDepartment}
+            className="flex items-center gap-2 border border-gray-200 text-gray-700 hover:bg-gray-50"
+          >
+            <PencilSimple size={18} weight="bold" />
+            Edit
+          </Button>
+          <Button
+            variant="danger"
+            onClick={deleteDepartment}
+            className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 hover:border-red-300"
+          >
+            <TrashSimple size={18} weight="bold" />
+            Delete
+          </Button>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

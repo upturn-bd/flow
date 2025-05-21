@@ -93,7 +93,7 @@ export default function CompanyBasicsForm() {
           initial={{ scale: 0.9, opacity: 0.5 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="p-2 rounded-lg bg-blue-100 text-blue-700 mr-3"
+          className="p-2 rounded-lg bg-gray-100 text-gray-700 mr-3"
         >
           <Building size={24} />
         </motion.div>
@@ -111,7 +111,7 @@ export default function CompanyBasicsForm() {
             exit={{ opacity: 0 }}
             className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm p-6"
           >
-            <LoaderCircle className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+            <LoaderCircle className="w-12 h-12 text-gray-500 animate-spin mb-4" />
             <p className="text-gray-600">Loading company information...</p>
           </motion.div>
         ) : (
@@ -120,8 +120,8 @@ export default function CompanyBasicsForm() {
             className="bg-white rounded-xl shadow-sm mb-8"
           >
             <div className="border-b border-gray-200 px-6 py-4">
-              <h2 className="text-lg font-semibold text-blue-700 flex items-center">
-                <Building className="w-5 h-5 mr-2" />
+              <h2 className="text-lg font-semibold text-gray-700 flex items-center">
+                <Building className="w-5 h-5 mr-2 text-gray-600" />
                 Company Basics
               </h2>
             </div>
@@ -220,7 +220,7 @@ export default function CompanyBasicsForm() {
           href="/admin-management/config"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all duration-200"
+          className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white px-6 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all duration-200"
         >
           <span className="font-medium">Continue to Configuration</span>
           <ChevronRight size={18} />

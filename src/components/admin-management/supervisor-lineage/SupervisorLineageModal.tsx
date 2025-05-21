@@ -3,13 +3,16 @@ import { Lineage, useLineage } from "@/hooks/useSupervisorLineage";
 import { useEffect, useState } from "react";
 import { lineageSchema } from "@/lib/types";
 import { z } from "zod";
-import { Trash } from "@phosphor-icons/react";
-
+import { Trash, Plus, Buildings } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
 interface LineageModalProps {
   initialData?: Lineage[] | null;
   onSubmit: (values: z.infer<typeof lineageSchema>[]) => void;
   onClose: () => void;
+  isLoading?: boolean;
 }
 
 interface HierarchyLevel {
@@ -25,6 +28,7 @@ interface Position {
 export default function LineageCreateModal({
   onSubmit,
   onClose,
+  isLoading = false
 }: LineageModalProps) {
   const { lineages, fetchLineages } = useLineage();
   const [name, setName] = useState<string>("");
@@ -114,6 +118,7 @@ export default function LineageCreateModal({
       return prev;
     });
   };
+  
   const handleSave = () => {
     const lineageData = hierarchy
       .filter((level) => level.position_id !== null)
@@ -145,12 +150,40 @@ export default function LineageCreateModal({
     }
   }, [lineages, allPositions]);
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg w-full max-w-md space-y-4">
-        <h2 className="text-xl font-semibold">Create Lineage</h2>
+  // Animation variants
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: {
+        duration: 0.3,
+        when: "beforeChildren",
+        staggerChildren: 0.1
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0.95,
+      transition: { duration: 0.2 } 
+    }
+  };
 
-        <div className="mb-4">
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        variants={modalVariants}
+        className="bg-white p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-blue-100"
+      >
+        <motion.div variants={fadeInUp} className="flex items-center gap-3">
+          <Buildings size={24} weight="duotone" className="text-blue-600" />
+          <h2 className="text-xl font-semibold text-blue-800">Create Lineage</h2>
+        </motion.div>
+
+        <motion.div variants={fadeInUp} className="mb-4">
           <label className="block font-semibold text-blue-800 mb-2">
             Lineage Name
           </label>
@@ -158,103 +191,110 @@ export default function LineageCreateModal({
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-md bg-blue-50 p-2"
+            className="w-full rounded-md bg-blue-50 p-2 border border-blue-200 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 outline-none transition-all"
             placeholder="Enter Lineage Name"
           />
-        </div>
+        </motion.div>
 
-        <div className="bg-white py-6 w-full max-w-4xl mx-auto">
-          <h2 className="text-xl font-bold text-blue-700 mb-6">
-            Lineage Details
-          </h2>
+        <motion.div variants={fadeInUp} className="bg-white py-4 w-full max-w-4xl mx-auto">
+          <h3 className="text-md font-semibold text-blue-700 mb-4">
+            Set Hierarchy
+          </h3>
 
           <div className="flex flex-col items-center justify-center w-full">
-            <h3 className="text-md font-semibold text-blue-900 mb-4 self-start">
-              Set Hierarchy
-            </h3>
-
             <div className="flex flex-col w-full max-w-md pr-6">
-              {/* Single position case */}
-              {/* {allPositions.length === 1 && (
-                <div className="rounded-md bg-blue-100 px-4 py-2 border border-transparent">
-                  {allPositions[0].name}
-                </div>
-              )} */}
-
-              {/* Multiple positions case */}
               {allPositions.length > 0 &&
                 hierarchy.map((level, index) => {
                   const availablePositions = getAvailablePositions(index);
                   return (
-                    <div key={index} className="relative">
-                      <select
-                        value={level.position_id || ""}
-                        onChange={(e) =>
-                          handlePositionChange(index, parseInt(e.target.value))
-                        }
-                        className="w-full rounded-md bg-blue-100 px-4 py-2 border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      >
-                        <option>Select position for Level {level.level}</option>
-                        {availablePositions.map((position) => (
-                          <option key={position.id} value={position.id}>
-                            {position.name}
-                          </option>
-                        ))}
-                      </select>
-                      {index > 0 && (
-                        <button
-                          onClick={() => removeLevel(index)}
-                          className="absolute right-[-2rem] top-1/2 -translate-y-1/2 text-red-600"
-                          aria-label="Remove level"
+                    <motion.div 
+                      key={index} 
+                      className="relative mb-4"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      {/* <div className="mb-1 text-sm text-blue-600 font-medium">
+                        Level {level.level}
+                      </div> */}
+                      <div className="flex gap-2">
+                        <select
+                          value={level.position_id || ""}
+                          onChange={(e) =>
+                            handlePositionChange(index, parseInt(e.target.value))
+                          }
+                          className="w-full rounded-md bg-blue-50 px-4 py-2 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                         >
-                          <Trash size={18} />
-                        </button>
-                      )}
+                          <option>Select position for Level {level.level}</option>
+                          {availablePositions.map((position) => (
+                            <option key={position.id} value={position.id}>
+                              {position.name}
+                            </option>
+                          ))}
+                        </select>
+                        {index > 0 && (
+                          <Button
+                            onClick={() => removeLevel(index)}
+                            variant="danger"
+                            size="sm"
+                            className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200"
+                          >
+                            <Trash size={16} weight="duotone" />
+                          </Button>
+                        )}
+                      </div>
                       {index < hierarchy.length - 1 && (
                         <div className="flex justify-center">
-                          <div className="h-6 w-1 bg-blue-700 mx-auto"></div>
+                          <div className="h-6 w-0.5 bg-blue-300 absolute left-1/2 transform -translate-x-1/2"></div>
                         </div>
                       )}
-                    </div>
+                    </motion.div>
                   );
                 })}
               {showAddButton && (
-                <button
+                <Button
                   type="button"
+                  variant="primary"
+                  size="sm"
                   onClick={addNewLevel}
-                  className="mt-2 text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
+                  className="mt-2 flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  +
-                </button>
+                  <Plus size={16} weight="bold" />
+                  Add Level
+                </Button>
               )}
             </div>
           </div>
 
-          <div className="flex justify-end mt-8 gap-4">
-            <button
+          <motion.div variants={fadeIn} className="flex justify-end mt-8 gap-4">
+            <Button
+              variant="outline"
               onClick={onClose}
-              className="bg-blue-900 text-white font-semibold px-6 py-2 rounded-full shadow-md transition-all"
+              className="border border-blue-200 text-blue-700 hover:bg-blue-50"
             >
-              Back
-            </button>
-            <button
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
               onClick={handleSave}
+              isLoading={isLoading}
               disabled={
                 hierarchy.length === 0 ||
                 !name ||
+                isLoading ||
                 hierarchy.some(
                   (level) =>
                     level.position_id === null ||
                     Number.isNaN(level.position_id)
                 )
               }
-              className="bg-[#FFC700] hover:bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Save
-            </button>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </motion.div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
@@ -282,6 +322,7 @@ export function LineageUpdateModal({
   initialData,
   onSubmit,
   onClose,
+  isLoading = false
 }: LineageModalProps) {
   const { lineages, fetchLineages } = useLineage();
   const [name, setName] = useState<string>("");
@@ -370,6 +411,7 @@ export function LineageUpdateModal({
       return prev;
     });
   };
+  
   const handleSave = () => {
     const lineageData = hierarchy
       .filter((level) => level.position_id !== null)
@@ -416,13 +458,19 @@ export function LineageUpdateModal({
   }, [initialData]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg w-full max-w-md space-y-4">
-        <h2 className="text-xl font-semibold">
-          {initialData ? "Edit Lineage" : "Create Lineage"}
-        </h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        className="bg-white p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-blue-100"
+      >
+        <motion.div variants={fadeInUp} className="flex items-center gap-3">
+          <Buildings size={24} weight="duotone" className="text-blue-600" />
+          <h2 className="text-xl font-semibold text-blue-800">Edit Lineage</h2>
+        </motion.div>
 
-        <div className="mb-4">
+        <motion.div variants={fadeInUp} className="mb-4">
           <label className="block font-semibold text-blue-800 mb-2">
             Lineage Name
           </label>
@@ -430,90 +478,97 @@ export function LineageUpdateModal({
             type="text"
             value={name}
             readOnly
-            className="w-full rounded-md bg-blue-50 p-2"
+            className="w-full rounded-md bg-blue-50 p-2 border border-blue-200 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 outline-none transition-all cursor-not-allowed"
             placeholder="Enter Lineage Name"
           />
-        </div>
+        </motion.div>
 
-        <div className="bg-white py-6 w-full max-w-4xl mx-auto">
-          <h2 className="text-xl font-bold text-blue-700 mb-6">
-            Lineage Details
-          </h2>
+        <motion.div variants={fadeInUp} className="bg-white py-4 w-full max-w-4xl mx-auto">
+          <h3 className="text-md font-semibold text-blue-700 mb-4">
+            Update Hierarchy
+          </h3>
 
           <div className="flex flex-col items-center justify-center w-full">
-            <h3 className="text-md font-semibold text-blue-900 mb-4 self-start">
-              Set Hierarchy
-            </h3>
-
             <div className="flex flex-col w-full max-w-md pr-6">
-              {/* Single position case */}
-              {/* {allPositions.length === 1 && (
-                <div className="rounded-md bg-blue-100 px-4 py-2 border border-transparent">
-                  {allPositions[0].name}
-                </div>
-              )} */}
-
-              {/* Multiple positions case */}
               {allPositions.length > 0 &&
                 hierarchy.map((level, index) => {
                   const availablePositions = getAvailablePositions(index);
                   return (
-                    <div key={index} className="relative">
-                      <select
-                        value={level.position_id || ""}
-                        onChange={(e) =>
-                          handlePositionChange(index, parseInt(e.target.value))
-                        }
-                        className="w-full rounded-md bg-blue-100 px-4 py-2 border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      >
-                        <option>Select position for Level {level.level}</option>
-                        {availablePositions.map((position) => (
-                          <option key={position.id} value={position.id}>
-                            {position.name}
-                          </option>
-                        ))}
-                      </select>
-                      {index > 0 && (
-                        <button
-                          onClick={() => removeLevel(index)}
-                          className="absolute right-[-2rem] top-1/2 -translate-y-1/2 text-red-600"
-                          aria-label="Remove level"
+                    <motion.div 
+                      key={index} 
+                      className="relative mb-4"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      {/* <div className="mb-1 text-sm text-blue-600 font-medium">
+                        Level {level.level}
+                      </div> */}
+                      <div className="flex gap-2">
+                        <select
+                          value={level.position_id || ""}
+                          onChange={(e) =>
+                            handlePositionChange(index, parseInt(e.target.value))
+                          }
+                          className="w-full rounded-md bg-blue-50 px-4 py-2 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                         >
-                          <Trash size={18} />
-                        </button>
-                      )}
+                          <option>Select position for Level {level.level}</option>
+                          {availablePositions.map((position) => (
+                            <option key={position.id} value={position.id}>
+                              {position.name}
+                            </option>
+                          ))}
+                        </select>
+                        {index > 0 && (
+                          <Button
+                            onClick={() => removeLevel(index)}
+                            variant="danger"
+                            size="sm"
+                            className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200"
+                          >
+                            <Trash size={16} weight="duotone" />
+                          </Button>
+                        )}
+                      </div>
                       {index < hierarchy.length - 1 && (
                         <div className="flex justify-center">
-                          <div className="h-6 w-1 bg-blue-700 mx-auto"></div>
+                          <div className="h-6 w-0.5 bg-blue-300 absolute left-1/2 transform -translate-x-1/2"></div>
                         </div>
                       )}
-                    </div>
+                    </motion.div>
                   );
                 })}
               {showAddButton && (
-                <button
+                <Button
                   type="button"
+                  variant="primary"
+                  size="sm"
                   onClick={addNewLevel}
-                  className="mt-2 text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
+                  className="mt-2 flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  +
-                </button>
+                  <Plus size={16} weight="bold" />
+                  Add Level
+                </Button>
               )}
             </div>
           </div>
 
-          <div className="flex justify-end mt-8 gap-4">
-            <button
+          <motion.div variants={fadeIn} className="flex justify-end mt-8 gap-4">
+            <Button
+              variant="outline"
               onClick={onClose}
-              className="bg-blue-900 text-white font-semibold px-6 py-2 rounded-full shadow-md transition-all"
+              className="border border-blue-200 text-blue-700 hover:bg-blue-50"
             >
-              Back
-            </button>
-            <button
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
               onClick={handleSave}
+              isLoading={isLoading}
               disabled={
                 hierarchy.length === 0 ||
                 !name ||
+                isLoading ||
                 hierarchy.some(
                   (level) =>
                     level.position_id === null ||
@@ -521,13 +576,13 @@ export function LineageUpdateModal({
                 ) ||
                 !!(initialData && initialData.length > 0 && name === initialData[0].name && compareLineages(initialData, hierarchy))
               }
-              className="bg-[#FFC700] hover:bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Save
-            </button>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </motion.div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

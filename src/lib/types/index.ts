@@ -92,11 +92,8 @@ export const leaveTypeSchema = z.object({
 export const holidayConfigSchema = z.object({
   id: z.number().optional(),
   name: z.string().min(1).max(50),
-  start_day: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Invalid from_date",
-  }),
-  end_day: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Invalid from_date",
+  date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date",
   }),
   company_id: z.number().optional(),
 });
