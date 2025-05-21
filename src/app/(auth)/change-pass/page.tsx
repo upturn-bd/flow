@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
+import Link from "next/link";
 
 interface FormData {
     code:number;
@@ -102,7 +103,7 @@ const page = () => {
                             <button className="text-[#002568]">
                                 Don’t have an account?
                             </button>
-                            <a href="/login" className="text-[#FFAB2C]">Sign In</a>
+                            <Link href="/login" className="text-[#FFAB2C]">Sign In</Link>
                         </div>
                     </div>
                 </div>

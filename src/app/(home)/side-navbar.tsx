@@ -2,30 +2,16 @@
 
 import { cn } from "@/components/ui/class";
 import Link from "next/link";
-import { navItems } from "./nav-items";
 import { useEffect, useState } from "react";
-import { getEmployeeInfo } from "@/lib/api/employee";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export default function Sidebar() {
-  const [user, setUser] = useState<
-    { id: string; name: string; role: string } | undefined
-  >();
+  const { employeeInfo, isApproved, getAuthorizedNavItems } = useAuth();
   const pathname = usePathname();
-
-  useEffect(() => {
-    async function fetchUserData() {
-      try {
-        const user = await getEmployeeInfo();
-        setUser(user);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      }
-    }
-    fetchUserData();
-  }, []);
+  const navItems = getAuthorizedNavItems();
 
   // Animation variants
   const sidebarVariants = {
@@ -67,12 +53,10 @@ export default function Sidebar() {
     }
   };
 
-  const filteredNavItems = [
-    ...navItems.filter(item => item.label !== "admin-management"),
-    ...(user?.role === "Admin" 
-      ? navItems.filter(item => item.label === "admin-management") 
-      : [])
-  ];
+  // Hide the sidebar for unapproved users
+  if (!isApproved) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -103,7 +87,7 @@ export default function Sidebar() {
         variants={sidebarVariants} 
         className="flex flex-col items-center w-full mt-32 space-y-8"
       >
-        {filteredNavItems.map((item) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href);
           

@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
+import { getCompanyId } from "./companyInfo";
 
 interface Department {
   id: number;
@@ -11,36 +12,31 @@ interface Department {
 /**
  * Fetches all departments for the current user's company
  */
-export async function getDepartments(): Promise<Department[]> {
+export async function getDepartments(company_id?: number): Promise<Department[]> {
   try {
-    // First get the user to ensure authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      throw new Error("Not authenticated");
+    let companyId = company_id;
+    if (!companyId) {
+      // First get the user to ensure authentication
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        throw new Error("Not authenticated");
+      }
+
+      // Get company_id from the employees table
+      companyId = await getCompanyId();
     }
-    
-    // Get company_id from the employees table
-    const { data: employee, error: employeeError } = await supabase
-      .from("employees")
-      .select("company_id")
-      .eq("id", user.id)
-      .single();
-      
-    if (employeeError) {
-      throw new Error(employeeError.message);
-    }
-    
+
     // Fetch departments using the company_id
     const { data: departments, error } = await supabase
       .from("departments")
       .select("*")
-      .eq("company_id", employee.company_id);
-      
+      .eq("company_id", companyId);
+
     if (error) {
       throw error;
     }
-    
+
     return departments || [];
   } catch (error) {
     console.error("Error fetching departments:", error);
@@ -55,39 +51,39 @@ export async function createDepartment(departmentData: Omit<Department, 'id' | '
   try {
     // First get the user to ensure authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+
     if (authError || !user) {
       throw new Error("Not authenticated");
     }
-    
+
     // Get company_id from the employees table
     const { data: employee, error: employeeError } = await supabase
       .from("employees")
       .select("company_id")
       .eq("id", user.id)
       .single();
-      
+
     if (employeeError) {
       throw new Error(employeeError.message);
     }
-    
+
     // Create formatted data with company_id
     const formattedData = {
       ...departmentData,
       company_id: employee.company_id,
     };
-    
+
     // Insert the new department
     const { data, error } = await supabase
       .from("departments")
       .insert(formattedData)
       .select()
       .single();
-      
+
     if (error) {
       throw error;
     }
-    
+
     return data;
   } catch (error) {
     console.error("Error creating department:", error);
@@ -103,16 +99,16 @@ export async function updateDepartment(departmentData: Partial<Department> & { i
     if (!departmentData.id) {
       throw new Error("Department ID is required for update");
     }
-    
+
     // Extract id and update data
     const { id, ...updateData } = departmentData;
-    
+
     // Update the department
     const { error } = await supabase
       .from("departments")
       .update(updateData)
       .eq("id", id);
-      
+
     if (error) {
       throw error;
     }
@@ -130,13 +126,13 @@ export async function deleteDepartment(id: number): Promise<void> {
     if (!id) {
       throw new Error("Department ID is required for deletion");
     }
-    
+
     // Delete the department
     const { error } = await supabase
       .from("departments")
       .delete()
       .eq("id", id);
-      
+
     if (error) {
       throw error;
     }

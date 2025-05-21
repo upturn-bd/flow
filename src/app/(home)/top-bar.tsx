@@ -1,30 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
-import { Bell, User, Search, Menu, LogOut, Settings, UserCircle } from "lucide-react";
-import { getEmployeeInfo } from "@/lib/api/employee";
+import { useState, useRef, useEffect } from "react";
+import { Bell, User, Search, LogOut, Settings, UserCircle, ShieldAlert } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export default function TopBar() {
-  const [user, setUser] = useState<{ id: string; name: string; role: string } | undefined>();
+  const { employeeInfo, isApproved } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
-  useEffect(() => {
-    async function fetchUserData() {
-      try {
-        const userData = await getEmployeeInfo();
-        setUser(userData);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      }
-    }
-    fetchUserData();
-  }, []);
-  
   // Close the user menu when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -42,46 +31,55 @@ export default function TopBar() {
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      router.push("/auth/login");
+      router.push("/login");
     } catch (error) {
       console.error("Failed to log out:", error);
     }
   };
 
+  // Check if current path is authorized based on approval status
+  const basePath = `/${pathname.split('/')[1]}`;
+  const isAuthorized = isApproved || basePath === "/account";
+
+  // If the user isn't approved, show a special header for account pages only
+  if (!isApproved && basePath !== "/account") {
+    return null;
+  }
+
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-5 h-16">
-      <div className="px-4 md:px-6 h-full flex items-center justify-end">
+      <div className="px-4 md:px-6 h-full flex items-center justify-between">
         {/* Left side */}
-        {/* <div className="flex items-center">
-          <button 
-            className="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 mr-2"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <Menu size={24} />
-          </button>
-          
-          <div className="hidden md:flex items-center">
-            <span className="font-medium text-gray-800">Flow</span>
-          </div>
-        </div> */}
+        <div className="flex items-center">
+          {!isAuthorized && (
+            <div className="flex items-center text-amber-600">
+              <ShieldAlert className="h-5 w-5 mr-2" />
+              <span className="text-sm font-medium hidden md:inline">Restricted access</span>
+            </div>
+          )}
+        </div>
 
         {/* Right side */}
         <div className="flex items-center space-x-1 md:space-x-3">
-          <div className="relative">
-            <button className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
-              <Search className="h-5 w-5" />
-            </button>
-          </div>
-          
-          <Link 
-            href="/notifications"
-            className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors relative"
-          >
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              3
-            </span>
-          </Link>
+          {isApproved && (
+            <>
+              <div className="relative">
+                <button className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+                  <Search className="h-5 w-5" />
+                </button>
+              </div>
+              
+              <Link 
+                href="/notifications"
+                className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors relative"
+              >
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                  3
+                </span>
+              </Link>
+            </>
+          )}
 
           <div className="relative" ref={userMenuRef}>
             <button 
@@ -92,7 +90,7 @@ export default function TopBar() {
                 <User className="h-5 w-5 text-blue-600" />
               </div>
               <span className="ml-2 text-sm font-medium text-gray-700 hidden md:inline-block">
-                {user?.name || 'Profile'}
+                {employeeInfo?.name || 'Profile'}
               </span>
             </button>
             
@@ -100,8 +98,11 @@ export default function TopBar() {
             {userMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 border border-gray-200">
                 <div className="px-4 py-2 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900">{user?.name || 'User'}</p>
-                  <p className="text-xs text-gray-500">{user?.role || 'Role'}</p>
+                  <p className="text-sm font-medium text-gray-900">{employeeInfo?.name || 'User'}</p>
+                  <p className="text-xs text-gray-500">{employeeInfo?.role || 'Role'}</p>
+                  {!isApproved && (
+                    <p className="text-xs mt-1 text-amber-500">Pending approval</p>
+                  )}
                 </div>
                 
                 <Link 

@@ -3,29 +3,13 @@
 import { cn } from "@/components/ui/class";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { navItems } from "./nav-items";
-import { getEmployeeInfo } from "@/lib/api/employee";
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export default function MobileBottomNav() {
-  const [user, setUser] = useState<
-    { id: string; name: string; role: string } | undefined
-  >();
+  const { isApproved, getAuthorizedNavItems } = useAuth();
   const pathname = usePathname();
   
-  useEffect(() => {
-    async function fetchUserData() {
-      try {
-        const user = await getEmployeeInfo();
-        setUser(user);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      }
-    }
-    fetchUserData();
-  }, []);
-
   // Animation variants
   const navVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -44,15 +28,16 @@ export default function MobileBottomNav() {
     visible: { opacity: 1, y: 0 }
   };
 
-  const filteredNavItems = [
-    ...navItems.filter(item => item.label !== "admin-management"),
-    ...(user?.role === "Admin" 
-      ? navItems.filter(item => item.label === "admin-management") 
-      : [])
-  ];
+  // Get authorized nav items from auth context
+  const navItems = getAuthorizedNavItems();
 
   // Limit to maximum 5 items on mobile
-  const displayItems = filteredNavItems.slice(0, 5);
+  const displayItems = navItems.slice(0, 5);
+
+  // Hide the nav bar for unapproved users
+  if (!isApproved || displayItems.length === 0) {
+    return null;
+  }
 
   return (
     <motion.div

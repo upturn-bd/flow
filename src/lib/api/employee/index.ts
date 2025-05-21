@@ -188,7 +188,7 @@ export async function getUser(): Promise<{ user: User | null }> {
     } = await supabase.auth.getUser();
     const { data, error } = await supabase
       .from("employees")
-      .select("id, first_name, last_name, role, company_id, supervisor_id, department_id")
+      .select("id, first_name, last_name, role, company_id, supervisor_id, department_id, has_approval, email, phone_number, designation")
       .eq("id", user?.id)
       .single();
   
@@ -200,5 +200,9 @@ export async function getUser(): Promise<{ user: User | null }> {
       company_id: data.company_id,
       supervisor_id: data.supervisor_id,
       department_id: data.department_id,
+      has_approval: data.has_approval,
+      email: data.email,
+      phone_number: data.phone_number,
+      designation: data.designation,
     };
   }

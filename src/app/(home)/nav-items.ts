@@ -8,32 +8,58 @@ import {
     UserGear as UserGearIcon,
     MagnifyingGlass as MagnifyingGlassIcon,
     User as UserIcon,
+    Bell as BellIcon,
   } from "@phosphor-icons/react/dist/ssr";
+import { adminRoutes, employeeRoutes, managerRoutes } from "@/lib/utils/path-utils";
 
-export const navItems = [
+export type NavItem = {
+  label: string;
+  href: string;
+  icon: any;
+  roles?: string[];  // Which roles can access this item
+};
+
+export const navItems: NavItem[] = [
     {
-      label: "Home",
+      label: "home",
       href: "/home",
       icon: GridFourIcon, 
+      roles: ["Employee", "Manager", "Admin"],
     },
     {
-      label: "HRIS",
+      label: "hris",
       href: "/hris",
       icon: UserCircleIcon,
+      roles: ["Manager", "Admin"],
     },
     {
-      label: "Operations and Services",
+      label: "operations-and-services",
       href: "/operations-and-services",
       icon: EnvelopeIcon,
+      roles: ["Employee", "Manager", "Admin"],
     },
     {
-      label: "Finder",
+      label: "notifications",
+      href: "/notifications",
+      icon: BellIcon,
+      roles: ["Employee", "Manager", "Admin"],
+    },
+    {
+      label: "finder",
       href: "/finder",
       icon: MagnifyingGlassIcon,
+      roles: ["Manager", "Admin"],
     },
     {
-      label: "Admin Management",
+      label: "admin-management",
       href: "/admin-management",
       icon: UserGearIcon,
+      roles: ["Admin"],
+    },
+    {
+      label: "account",
+      href: "/account",
+      icon: UserIcon,
+      roles: ["Employee", "Manager", "Admin"],
     },
   ];

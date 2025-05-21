@@ -29,7 +29,7 @@ import { fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { useCompanyValidation } from "@/hooks/useCompanyValidation";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useDepartments } from "@/hooks/useDepartments";
-import { getUser } from "@/lib/api/employee";
+import { getEmployeeId, getUser } from "@/lib/api/employee";
 
 const jobStatuses = [
   "Active",
@@ -86,14 +86,15 @@ export default function EmployeeOnboarding() {
 
   const { 
     validateCompanyCode, 
+    companyId,
   } = useCompanyValidation();
   
-  const { employees: hookEmployees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployees } = useEmployees();
   const { departments, fetchDepartments } = useDepartments();
 
   const fetchDepartmentsData = async () => {
     try {
-      await fetchDepartments();
+      await fetchDepartments(companyId ?? undefined);
     } catch (error) {
       console.error("Error fetching departments:", error);
     }
@@ -129,10 +130,26 @@ export default function EmployeeOnboarding() {
         } finally {
           setLoading(false);
         }
+      } else{
+        const user = await getUser();
+        if (user) {
+          setFormData((prev) => ({
+            ...prev,
+            email: user.user?.email ?? "",
+            phone_number: user.user?.phone ?? "",
+          }));
+        }
       }
     };
     fetchRejectedData();
-  }, [status, fetchDepartmentsData, fetchEmployees, formData]);
+  }, []);
+
+  useEffect(() => {
+    if (isCompanyCodeValid && formData.company_id) {
+      fetchDepartmentsData();
+      getEmployeeId().then(id => setUserId(id));
+    }
+  }, [isCompanyCodeValid]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -222,24 +239,6 @@ export default function EmployeeOnboarding() {
       });
     }
   };
-  
-  useEffect(() => {
-    const getUserId = async () => {
-      try {
-        const { user } = await getUser();
-        if (user) {
-          setUserId(user.id);
-        }
-      } catch (error) {
-        console.error("Error fetching user ID:", error);
-      }
-    };
-
-    if (isCompanyCodeValid && formData.company_id) {
-      fetchDepartmentsData();
-      getUserId();
-    }
-  }, [formData.company_id, isCompanyCodeValid, fetchDepartmentsData]);
 
   if (status === "pending") {
     return (
@@ -596,8 +595,8 @@ export default function EmployeeOnboarding() {
                       label="Supervisor"
                       icon={<Users size={18} />}
                       options={(status !== "rejected"
-                        ? hookEmployees
-                        : hookEmployees.filter(employee => employee.id !== userId)
+                        ? employees
+                        : employees.filter(employee => employee.id !== userId)
                       ).map(emp => ({ value: emp.id, label: emp.name }))}
                       placeholder="Not Applicable"
                       value={formData.supervisor_id || ""}
@@ -607,16 +606,8 @@ export default function EmployeeOnboarding() {
                     
                     <motion.div 
                       variants={fadeInUp}
-                      className="flex justify-between mt-8"
-                    >
-                      <button
-                        type="button"
-                        onClick={() => setActiveSection("company")}
-                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        Back to Company
-                      </button>
-                      
+                      className="flex justify-end mt-8"
+                    >                      
                       <button
                         type="submit"
                         disabled={loading || (status === "rejected" && !dirty)}

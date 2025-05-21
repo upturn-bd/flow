@@ -23,10 +23,10 @@ export function useDepartments() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchDepartments = useCallback(async () => {
+  const fetchDepartments = useCallback(async (company_id?: number) => {
     setLoading(true);
     try {
-      const data = await fetchDepartmentsApi();
+      const data = await fetchDepartmentsApi(company_id);
       setDepartments(data as Department[]);
     } catch (error) {
       console.error(error);

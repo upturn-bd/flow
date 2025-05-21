@@ -88,7 +88,7 @@ export function useUserData() {
     try {
       setLoading(true);
       await supabase.auth.signOut();
-      router.push("/auth/login");
+      router.push("/login");
     } catch (error) {
       console.error("Failed to log out:", error);
       setError(error instanceof Error ? error.message : "Failed to log out");

@@ -2,12 +2,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getUserFromServer } from "./lib/auth/getUser";
 import { createClient } from "./lib/supabase/server";
+import { authRoutes, excludePaths, employeeRoutes, managerRoutes, adminRoutes } from "./lib/utils/path-utils";
 
 type Role = "Employee" | "Manager" | "Admin";
 
-// Auth routes that don't require authentication
-const authRoutes = ["/signup", "/login", "/auth", "/forgot-password"];
-const excludePaths = ["/signup", "/login", "/auth", "/forgot-password", "/unauthorized", "/api"];
+
 
 export async function middleware(request: NextRequest) {
   // Initialize Supabase client for session management
@@ -51,11 +50,13 @@ export async function middleware(request: NextRequest) {
     currentPath.startsWith(route)
   );
 
+  // Check if path is excluded from auth checks
+  const isExcludedPath = excludePaths.some(path =>
+    currentPath === path || currentPath.startsWith(`${path}/`)
+  );
+
   // Handle auth routes redirections
-  if (!supabaseUser && !isAuthRoute &&
-    !excludePaths.some(path =>
-      currentPath === path || currentPath.startsWith(`${path}/`)
-    )) {
+  if (!supabaseUser && !isAuthRoute && !isExcludedPath) {
     // No user, redirect to login page
     url.pathname = "/login";
     return NextResponse.redirect(url);
@@ -66,9 +67,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // If path is excluded or auth route, return early
-  if (excludePaths.some(
-    (path) => currentPath === path || currentPath.startsWith(`${path}/`)
-  )) {
+  if (isExcludedPath) {
     return response;
   }
 
@@ -166,18 +165,9 @@ export async function middleware(request: NextRequest) {
 
   // Role-based access control
   const rolePermissions: Record<Role, string[]> = {
-    Employee: ["/home", "/hris", "/operations-and-services", "/notifications", "/account", "/profile",],
-    Manager: ["/home", "/hris", "/operations-and-services", "/notifications", "/account", "/profile", "/finder",],
-    Admin: [
-      "/hris",
-      "/operations-and-services",
-      "/admin-management",
-      "/home",
-      "/notifications",
-      "/account",
-      "/profile",
-      "/finder",
-    ],
+    Employee: employeeRoutes,
+    Manager: managerRoutes,
+    Admin: adminRoutes,
   };
 
   const isAllowed = rolePermissions[role]?.some((allowedPath) =>

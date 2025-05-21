@@ -59,7 +59,7 @@ export default function FormSelectField({
               : "border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-[#EAF4FF]"
           }`}
         >
-          <option value="">{placeholder}</option>
+          <option value={0}>{placeholder}</option>
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
