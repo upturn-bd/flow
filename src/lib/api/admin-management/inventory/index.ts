@@ -119,3 +119,25 @@ export async function getEmployeesInfo() {
   if (error) throw error;
   return { data: employees, error: null };
 }
+
+export async function getExtendedEmployeesInfo() {
+  const company_id = await getCompanyId();
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select("id, first_name, last_name, email, phone_number, department_id(name), designation, hire_date")
+    .eq("company_id", company_id);
+
+  const employees = data?.map((employee) => ({
+    id: employee.id,
+    name: `${employee.first_name} ${employee.last_name}`,
+    email: employee.email,
+    phone: employee.phone_number,
+    department: (employee.department_id as unknown as { name: string }).name,
+    designation: employee.designation,
+    joinDate: employee.hire_date
+  }));
+
+  if (error) throw error;
+  return { data: employees, error: null };
+}

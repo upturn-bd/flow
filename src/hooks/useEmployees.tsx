@@ -1,17 +1,25 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { supabase } from "@/lib/supabase/client";
-import { getEmployeesInfo as getEmployeesInfoApi } from "@/lib/api/admin-management/inventory";
+import { getEmployeesInfo, getExtendedEmployeesInfo } from "@/lib/api/admin-management/inventory";
 
-interface Employee {
+export interface Employee {
   id: string;
   name: string;
   role?: string;
 }
 
+export interface ExtendedEmployee extends Employee {
+  email?: string;
+  phone?: string;
+  department?: string;
+  designation?: string;
+  joinDate?: string;
+}
+
 export function useEmployees() {
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [extendedEmployees, setExtendedEmployees] = useState<ExtendedEmployee[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -19,7 +27,7 @@ export function useEmployees() {
     setLoading(true);
     setError(null);
     try {
-      const response = await getEmployeesInfoApi();
+      const response = await getEmployeesInfo();
       if (response?.data) {
         setEmployees(response.data);
         return response.data;
@@ -35,10 +43,32 @@ export function useEmployees() {
     }
   }, []);
 
+  const fetchExtendedEmployees = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getExtendedEmployeesInfo();
+      if (response?.data) {
+        setExtendedEmployees(response.data);
+        return response.data;
+      }
+      return [];
+    } catch (err) {
+      const errorObj = err instanceof Error ? err : new Error(String(err));
+      setError(errorObj);
+      console.error("Error fetching employees:", errorObj);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     employees,
+    extendedEmployees,
     loading,
     error,
-    fetchEmployees
+    fetchEmployees,
+    fetchExtendedEmployees
   };
 }

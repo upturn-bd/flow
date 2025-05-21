@@ -18,55 +18,30 @@ import {
 } from "lucide-react";
 import FormInputField from "@/components/ui/FormInputField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
-import { Employee, useEmployees } from "@/hooks/useEmployees";
-import { supabase } from "@/lib/supabase/client";
-
-// Define the type for employee details from the database
-type EmployeeDetail = {
-  employee_id: string;
-  email?: string;
-  phone?: string;
-  position?: string;
-  department?: string;
-  grade?: string;
-  location?: string;
-  join_date?: string;
-  avatar_url?: string;
-};
+import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
 
 // Filter options
 type FilterOptions = {
   department: string;
-  position: string;
-  grade: string;
-  location: string;
+  designation: string;
 };
 
 export default function FinderPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [extendedEmployees, setExtendedEmployees] = useState<Employee[]>([]);
-  const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
+  const [filteredEmployees, setFilteredEmployees] = useState<ExtendedEmployee[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
     department: "",
-    position: "",
-    grade: "",
-    location: "",
+    designation: "",
   });
 
   // Use the useEmployees hook
-  const { employees, loading, fetchEmployees } = useEmployees();
+  const { extendedEmployees, loading, fetchExtendedEmployees } = useEmployees();
 
   // Fetch basic employee data on mount
   useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
-
-  useEffect(() => {
-    if (employees.length > 0) {
-      setExtendedEmployees(employees);
-    }
-  }, [employees]);
+    fetchExtendedEmployees();
+  }, [fetchExtendedEmployees]);
 
   // Filter employees when search query or filters change
   useEffect(() => {
@@ -76,8 +51,8 @@ export default function FinderPage() {
       // First check search query (case insensitive)
       const matchesSearch = searchQuery === "" || 
         employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        employee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        employee.designation.toLowerCase().includes(searchQuery.toLowerCase());
+        employee.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        employee.designation?.toLowerCase().includes(searchQuery.toLowerCase());
       
       if (!matchesSearch) return false;
       
@@ -95,9 +70,7 @@ export default function FinderPage() {
 
   // Get unique values for filter dropdowns
   const departments = [...new Set(extendedEmployees.map(e => e.department))];
-  const positions = [...new Set(extendedEmployees.map(e => e.position))];
-  const grades = [...new Set(extendedEmployees.map(e => e.grade))];
-  const locations = [...new Set(extendedEmployees.map(e => e.location))];
+  const positions = [...new Set(extendedEmployees.map(e => e.designation))];
 
   // Format date to be more readable
   const formatDate = (dateString: string) => {
@@ -194,39 +167,13 @@ export default function FinderPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
                     <select
-                      value={filters.position}
-                      onChange={(e) => setFilters({...filters, position: e.target.value})}
+                      value={filters.designation}
+                      onChange={(e) => setFilters({...filters, designation: e.target.value})}
                       className="w-full rounded-lg border border-gray-300 bg-[#EAF4FF] px-3 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     >
                       <option value="">All Positions</option>
                       {positions.map(position => (
                         <option key={position} value={position}>{position}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Grade</label>
-                    <select
-                      value={filters.grade}
-                      onChange={(e) => setFilters({...filters, grade: e.target.value})}
-                      className="w-full rounded-lg border border-gray-300 bg-[#EAF4FF] px-3 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                    >
-                      <option value="">All Grades</option>
-                      {grades.map(grade => (
-                        <option key={grade} value={grade}>{grade}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                    <select
-                      value={filters.location}
-                      onChange={(e) => setFilters({...filters, location: e.target.value})}
-                      className="w-full rounded-lg border border-gray-300 bg-[#EAF4FF] px-3 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                    >
-                      <option value="">All Locations</option>
-                      {locations.map(location => (
-                        <option key={location} value={location}>{location}</option>
                       ))}
                     </select>
                   </div>
@@ -237,9 +184,7 @@ export default function FinderPage() {
                     whileTap={{ scale: 0.97 }}
                     onClick={() => setFilters({
                       department: "",
-                      position: "",
-                      grade: "",
-                      location: ""
+                      designation: "",
                     })}
                     className="px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
                   >
@@ -320,7 +265,7 @@ export default function FinderPage() {
                     </div>
                     <div className="flex">
                       <Calendar className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
-                      <span className="text-gray-600 text-sm">Joined: {formatDate(employee.joinDate)}</span>
+                      <span className="text-gray-600 text-sm">Joined: {employee.joinDate ? formatDate(employee.joinDate) : "N/A"}</span>
                     </div>
                   </div>
                   
