@@ -36,7 +36,7 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      className="space-y-8"
+      className="space-y-8 w-full"
     >
       {/* Notification */}
       <AnimatePresence>
@@ -45,37 +45,53 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center gap-2 ${
+            className={`fixed top-4 right-4 z-50 p-3 sm:p-4 rounded-lg shadow-lg flex items-center gap-2 max-w-[90vw] sm:max-w-md ${
               notification.isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
             }`}
           >
-            {notification.isError ? <X className="h-5 w-5" /> : <Info className="h-5 w-5" />}
-            <span>{notification.message}</span>
+            {notification.isError ? <X className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> : <Info className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />}
+            <span className="text-sm sm:text-base line-clamp-2">{notification.message}</span>
+            <button 
+              onClick={() => setNotification(prev => ({ ...prev, visible: false }))}
+              className="ml-auto flex-shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Divisions Section */}
-      <DivisionsSection 
-        employees={employees} 
-        showNotification={showNotification} 
-      />
+      <div className="px-2 sm:px-0">
+        {/* Divisions Section */}
+        <div className="mb-8">
+          <DivisionsSection 
+            employees={employees} 
+            showNotification={showNotification} 
+          />
+        </div>
 
-      {/* Departments Section */}
-      <DepartmentsSection 
-        employees={employees} 
-        showNotification={showNotification} 
-      />
+        {/* Departments Section */}
+        <div className="mb-8">
+          <DepartmentsSection 
+            employees={employees} 
+            showNotification={showNotification} 
+          />
+        </div>
 
-      {/* Grades Section */}
-      <GradesSection 
-        showNotification={showNotification} 
-      />
+        {/* Grades Section */}
+        <div className="mb-8">
+          <GradesSection 
+            showNotification={showNotification} 
+          />
+        </div>
 
-      {/* Positions Section */}
-      <PositionsSection 
-        showNotification={showNotification} 
-      />
+        {/* Positions Section */}
+        <div className="mb-8">
+          <PositionsSection 
+            showNotification={showNotification} 
+          />
+        </div>
+      </div>
     </motion.div>
   );
 }

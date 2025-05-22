@@ -14,7 +14,7 @@ const schema = z.object({
   name: z.string().min(1, "Name is required").max(50),
   head_id: z.string().min(1, "Please select a department head"),
   description: z.string().optional(),
-  division_id: z.number().min(1, "Please select a division"),
+  division_id: z.number().min(0, "Please select a division"),
 });
 
 type FormValues = z.infer<typeof schema>;

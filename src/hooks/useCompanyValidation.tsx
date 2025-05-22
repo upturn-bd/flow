@@ -23,6 +23,7 @@ export function useCompanyValidation() {
       const result = await validateCompanyCodeApi(companyName, companyCode);
       setIsValid(result.isValid);
       setCompanyId(result.id);
+      localStorage.setItem("company_id", result.id?.toString() ?? "0");
       return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to validate company code";

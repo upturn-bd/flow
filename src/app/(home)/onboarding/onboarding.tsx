@@ -44,7 +44,10 @@ const formSchema = z.object({
   last_name: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   phone_number: z.string().min(1, "Phone number is required"),
-  department_id: z.number().min(1, "Department is required"),
+  department_id: z.union([
+    z.number().min(0, "Department is required"),
+    z.string().refine(val => !isNaN(Number(val)), "Department is required")
+  ]).transform(val => typeof val === 'string' ? Number(val) : val),
   designation: z.string().min(1, "Designation is required"),
   job_status: z.enum(jobStatuses, {
     errorMap: () => ({ message: "Job status is required" }),
@@ -53,7 +56,7 @@ const formSchema = z.object({
     message: "Please enter a valid date",
   }),
   company_name: z.string().min(1, "Company name is required"),
-  company_id: z.number().min(1, "Company ID is required"),
+  company_id: z.number().min(0, "Company ID is required"),
   supervisor_id: z.string().optional(),
 });
 
@@ -63,7 +66,7 @@ export default function EmployeeOnboarding() {
     last_name: "",
     email: "",
     phone_number: "",
-    department_id: 0,
+    department_id: null,
     designation: "",
     job_status: "",
     hire_date: "",
@@ -147,9 +150,11 @@ export default function EmployeeOnboarding() {
   useEffect(() => {
     if (isCompanyCodeValid && formData.company_id) {
       fetchDepartmentsData();
+      fetchEmployees();
+
       getEmployeeId().then(id => setUserId(id));
     }
-  }, [isCompanyCodeValid]);
+  }, [companyId]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -219,8 +224,8 @@ export default function EmployeeOnboarding() {
         
         // Fetch departments and employees for the validated company
         if (result.id) {
-          await fetchDepartmentsData();
-          await fetchEmployees();
+          // await fetchDepartmentsData();
+          // await fetchEmployees();
           setVerifyLoading(false);
         }
       } else {

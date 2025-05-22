@@ -16,7 +16,7 @@ type FormSelectFieldProps = {
   icon: React.ReactNode;
   options: SelectOption[];
   placeholder: string;
-  value: string | number;
+  value: string | number | null;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   error?: string;
 };
@@ -32,6 +32,8 @@ export default function FormSelectField({
   error,
 }: FormSelectFieldProps) {
   const hasError = !!error;
+
+  console.log(options);
   
   return (
     <motion.div 
@@ -51,7 +53,7 @@ export default function FormSelectField({
         <select
           id={name}
           name={name}
-          value={value}
+          value={value === null ? "null" : value}
           onChange={onChange}
           className={`w-full pl-10 pr-10 py-2.5 text-gray-900 rounded-lg appearance-none ${
             hasError 
@@ -59,7 +61,7 @@ export default function FormSelectField({
               : "border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-[#EAF4FF]"
           }`}
         >
-          <option value={0}>{placeholder}</option>
+          <option value={"null"}>{placeholder}</option>
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

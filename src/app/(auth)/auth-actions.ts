@@ -59,8 +59,6 @@ export async function signup({
 }
 
 function getSiteUrl(){
-  console.log(process.env.NODE_ENV);
-  
   if (process.env.NODE_ENV === "production") {
     return "https://flow.upturn.com.bd";
   }

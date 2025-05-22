@@ -111,8 +111,6 @@ export function formatDateToDayMonth(dateStr: string): string {
 export function getLongitude(pointString: string | null): number | null {
   if (!pointString) return null;
 
-  console.log("pointString", pointString);
-
   try {
     // Remove parentheses and split by comma
     const cleaned = pointString.replace(/[()]/g, "");

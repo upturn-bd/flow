@@ -39,12 +39,6 @@ export const navItems: NavItem[] = [
       roles: ["Employee", "Manager", "Admin"],
     },
     {
-      label: "notifications",
-      href: "/notifications",
-      icon: BellIcon,
-      roles: ["Employee", "Manager", "Admin"],
-    },
-    {
       label: "finder",
       href: "/finder",
       icon: MagnifyingGlassIcon,
@@ -55,11 +49,5 @@ export const navItems: NavItem[] = [
       href: "/admin-management",
       icon: UserGearIcon,
       roles: ["Admin"],
-    },
-    {
-      label: "account",
-      href: "/account",
-      icon: UserIcon,
-      roles: ["Employee", "Manager", "Admin"],
     },
   ];

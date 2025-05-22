@@ -14,8 +14,8 @@ const schema = z.object({
   id: z.number().optional(),
   name: z.string().min(1, "Name is required").max(50),
   description: z.string().optional(),
-  department_id: z.number().min(1, "Please select a department"),
-  grade: z.number().min(1, "Please select a grade"),
+  department_id: z.number().min(0, "Please select a department"),
+  grade: z.number().min(0, "Please select a grade"),
   company_id: z.union([z.string(), z.number()]).optional(),
   created_at: z.string().optional(),
 });

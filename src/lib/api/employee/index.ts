@@ -13,18 +13,18 @@ export interface EmployeeData {
     company_id: number;
     supervisor_id?: string;
     role?: string;
-  }
-  
-  export interface CompanyData {
+}
+
+export interface CompanyData {
     name: string;
     code: string;
-  }
-  
-  export interface EmployeeOnboardingData {
+}
+
+export interface EmployeeOnboardingData {
     userData: EmployeeData | null;
     companyData: CompanyData | null;
-  }
-  
+}
+
 
 /**
  * Client-side wrapper for fetching onboarding data
@@ -157,7 +157,7 @@ export async function submitEmployeeOnboarding(employeeData: EmployeeData): Prom
     }
 
     return { message: "Employee inserted successfully." };
-} 
+}
 
 export async function getEmployeeId() {
     const {
@@ -174,35 +174,93 @@ export async function getEmployeeId() {
 
 export async function getUser(): Promise<{ user: User | null }> {
     const { data, error } = await supabase.auth.getUser();
-  
+
     if (data.user) {
-      return { user: data.user };
+        return { user: data.user };
     }
     if (error) console.error(error);
     return { user: null };
-  }
+}
 
-  export async function getEmployeeInfo() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const { data, error } = await supabase
-      .from("employees")
-      .select("id, first_name, last_name, role, company_id, supervisor_id, department_id, has_approval, email, phone_number, designation")
-      .eq("id", user?.id)
-      .single();
-  
-    if (error) throw error;
+function getFormattedEmployeeData(data: any) {
     return {
-      id: data.id,
-      name: `${data.first_name} ${data.last_name}`,
-      role: data.role,
-      company_id: data.company_id,
-      supervisor_id: data.supervisor_id,
-      department_id: data.department_id,
-      has_approval: data.has_approval,
-      email: data.email,
-      phone_number: data.phone_number,
-      designation: data.designation,
+        id: data.id,
+        name: `${data.first_name} ${data.last_name}`,
+        role: data.role,
+        company_id: data.company_id,
+        supervisor_id: data.supervisor_id,
+        department_id: data.department_id,
+        has_approval: data.has_approval,
+        email: data.email,
+        phone_number: data.phone_number,
+        designation: data.designation,
     };
-  }
+}
+export async function getEmployeeInfo() {
+    // Check if we have cached data in localStorage
+    const cachedData = localStorage.getItem('employeeInfo');
+    const now = new Date();
+
+    let cachedUserInfo = null;
+    let cachedUpdatedAt = null;
+
+    if (cachedData) {
+        const { data, updated_at } = JSON.parse(cachedData);
+        cachedUserInfo = data;
+        cachedUpdatedAt = updated_at;
+    }
+
+    // If no valid cache, fetch from API
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+        throw new Error("Not authenticated");
+    }
+
+
+    // If we have valid cached data, only check for updates
+    if (cachedUserInfo && cachedUpdatedAt) {
+        const { data, error } = await supabase
+            .from("employees")
+            .select("id, first_name, last_name, role, company_id, supervisor_id, department_id, has_approval, email, phone_number, designation")
+            .eq("id", user.id)
+            .gt("updated_at", cachedUpdatedAt)
+            .single();
+
+        if (error?.code === "PGRST116") {
+            console.log("No updated data found");
+            return cachedUserInfo;
+        }
+
+        if (error) {
+            console.error("Fetch error:", error);
+            throw new Error(`Failed to fetch employee data: ${error.message}`);
+        }
+
+        return getFormattedEmployeeData(data);
+    }
+
+    // If no cache exists, fetch all employee data
+    const { data, error } = await supabase
+        .from("employees")
+        .select("id, first_name, last_name, role, company_id, supervisor_id, department_id, has_approval, email, phone_number, designation")
+        .eq("id", user.id)
+        .single();
+
+    if (error) {
+        console.error("Fetch error:", error);
+        throw new Error(`Failed to fetch employee data: ${error.message}`);
+    }
+
+    const employeeData = getFormattedEmployeeData(data);
+
+    // Cache the data with timestamp
+    localStorage.setItem('employeeInfo', JSON.stringify({
+        data: employeeData,
+        updated_at: now.toISOString()
+    }));
+
+    return employeeData;
+}

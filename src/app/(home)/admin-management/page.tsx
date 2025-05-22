@@ -22,7 +22,6 @@ const companyBasicsSchema = z.object({
 type CompanyBasicsFormData = z.infer<typeof companyBasicsSchema>;
 
 export default function CompanyBasicsForm() {
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   
   const { 
@@ -30,8 +29,6 @@ export default function CompanyBasicsForm() {
     countries,
     industries,
     employees,
-    loading: companyInfoLoading,
-    error,
     fetchCompanyInfo 
   } = useCompanyInfo();
   
@@ -54,15 +51,6 @@ export default function CompanyBasicsForm() {
     const loadCompanyInfo = async () => {
       try {
         await fetchCompanyInfo();
-        
-        if (companyInfo) {
-          reset({
-            company_name: companyInfo.name,
-            company_id: companyInfo.code,
-            industry_id: companyInfo.industry_id.toString(),
-            country_id: companyInfo.country_id.toString(),
-          });
-        }
       } catch (err) {
         console.error("Failed to load company info", err);
       } finally {
@@ -71,11 +59,23 @@ export default function CompanyBasicsForm() {
     };
 
     loadCompanyInfo();
-  }, [reset, fetchCompanyInfo, companyInfo]);
+  }, [reset, fetchCompanyInfo]);
+
+  useEffect(() => {
+    if (companyInfo) {
+      reset({
+        company_name: companyInfo.name,
+        company_id: companyInfo.code,
+        industry_id: companyInfo.industry_id.toString(),
+        country_id: companyInfo.country_id.toString(),
+      });
+    }
+  }, [companyInfo, reset]);
 
   const onSubmit = (data: CompanyBasicsFormData) => {
     console.log(data);
     // Handle form submission here
+    // TODO: Update company info
   };
 
   return (
@@ -119,14 +119,14 @@ export default function CompanyBasicsForm() {
             variants={fadeIn}
             className="bg-white rounded-xl shadow-sm mb-8"
           >
-            <div className="border-b border-gray-200 px-6 py-4">
+            <div className="border-b border-gray-200 px-3 py-4">
               <h2 className="text-lg font-semibold text-gray-700 flex items-center">
                 <Building className="w-5 h-5 mr-2 text-gray-600" />
                 Company Basics
               </h2>
             </div>
             
-            <form onSubmit={handleSubmit(onSubmit)} className="p-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="p-3 sm:p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Controller
                   control={control}
@@ -207,7 +207,7 @@ export default function CompanyBasicsForm() {
 
       <motion.div
         variants={fadeInUp}
-        className="bg-white rounded-xl shadow-sm p-6"
+        className="bg-white rounded-xl shadow-sm p-2"
       >
         <CompanyBasicsConfigView employees={employees} />
       </motion.div>

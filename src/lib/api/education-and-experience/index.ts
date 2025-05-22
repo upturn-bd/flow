@@ -53,7 +53,6 @@ export async function uploadFile(
           upsert: false,
         });
 
-      console.log("File upload response:", data, error);
       return { success: true };
     } catch {
       return { error: "File upload failed" };

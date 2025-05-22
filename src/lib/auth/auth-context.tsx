@@ -79,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       try {
         setEmployeeDataLoading(true);
+        
         const data = await getEmployeeInfo();
         setEmployeeInfo(data);
       } catch (error) {

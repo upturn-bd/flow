@@ -350,7 +350,6 @@ export function AttendanceUpdateModal({
   }, [coordinates, map]);
 
   useEffect(() => {
-    console.log("Initial Data:", initialData);
     setFormValues(initialData);
     setCoordinates({
       lat: initialData.latitude,
