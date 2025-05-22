@@ -219,7 +219,7 @@ export default function LineageCreateModal({
                       </div> */}
                       <div className="flex gap-2">
                         <select
-                          value={level.position_id || ""}
+                          value={level.position_id === null ? "" : level.position_id}
                           onChange={(e) =>
                             handlePositionChange(index, parseInt(e.target.value))
                           }
@@ -506,7 +506,7 @@ export function LineageUpdateModal({
                       </div> */}
                       <div className="flex gap-2">
                         <select
-                          value={level.position_id || ""}
+                          value={level.position_id === null ? "" : level.position_id}
                           onChange={(e) =>
                             handlePositionChange(index, parseInt(e.target.value))
                           }

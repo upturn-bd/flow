@@ -14,7 +14,6 @@ const schema = z.object({
   id: z.number().optional(),
   name: z.string().min(1, "Name is required").max(50),
   head_id: z.string().min(1, "Please select a division head"),
-  description: z.string().optional(),
   company_id: z.union([z.string(), z.number()]).optional(),
   created_at: z.string().optional(),
 });
@@ -33,10 +32,9 @@ export default function DivisionModal({
   employees,
 }: DivisionModalProps) {
   const [formValues, setFormValues] = useState<Division>({
-    id: initialData?.id ?? 0,
+    id: initialData?.id,
     name: initialData?.name ?? "",
     head_id: initialData?.head_id ?? "",
-    description: initialData?.description ?? "",
   });
 
   const [errors, setErrors] = useState<Partial<Division>>({});
@@ -188,25 +186,6 @@ export default function DivisionModal({
               </select>
             </div>
             {errors.head_id && <p className="text-red-500 text-sm mt-1">{errors.head_id as string}</p>}
-          </div>
-
-          <div>
-            <label className="block font-semibold text-gray-700 mb-2">
-              Division Description
-            </label>
-            <div className="relative">
-              <div className="absolute top-3 left-3 flex items-start pointer-events-none">
-                <FileText className="h-5 w-5 text-gray-500" />
-              </div>
-              <textarea
-                name="description"
-                value={formValues.description || ""}
-                onChange={handleChange}
-                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all"
-                placeholder="Add Division Description"
-                rows={4}
-              />
-            </div>
           </div>
         </motion.div>
 

@@ -33,8 +33,6 @@ export default function FormSelectField({
 }: FormSelectFieldProps) {
   const hasError = !!error;
 
-  console.log(options);
-  
   return (
     <motion.div 
       variants={fadeInUp}

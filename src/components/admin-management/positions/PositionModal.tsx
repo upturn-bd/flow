@@ -37,11 +37,8 @@ export default function PositionModal({
 }: PositionModalProps) {
   const [isDirty, setIsDirty] = useState(false);
   const [formValues, setFormValues] = useState<Position>({
-    id: 0,
     name: "",
     description: "",
-    department_id: 0,
-    grade: 0,
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof Position, string>>>({});
@@ -185,7 +182,7 @@ export default function PositionModal({
                 <Building className="h-5 w-5 text-gray-500" />
               </div>
               <select
-                value={formValues.department_id || ""}
+                value={formValues.department_id === null ? "" : formValues.department_id}
                 onChange={handleChange("department_id")}
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all appearance-none"
               >

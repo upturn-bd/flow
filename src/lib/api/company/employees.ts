@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
+import { getCompanyId } from "./companyInfo";
 
 interface Employee {
   id: string;
@@ -14,29 +15,13 @@ interface Employee {
 export async function getEmployees(): Promise<Employee[]> {
   try {
     
-    // First get the user to ensure authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      throw new Error("Not authenticated");
-    }
-    
-    // Get company_id from the employees table
-    const { data: employee, error: employeeError } = await supabase
-      .from("employees")
-      .select("company_id")
-      .eq("id", user.id)
-      .single();
-      
-    if (employeeError) {
-      throw new Error(employeeError.message);
-    }
+    const company_id = await getCompanyId();
     
     // Fetch employees using the company_id
     const { data: employees, error } = await supabase
       .from("employees")
       .select("id, first_name, last_name")
-      .eq("company_id", employee.company_id);
+      .eq("company_id", company_id);
       
     if (error) {
       throw error;
@@ -95,29 +80,13 @@ export async function getEmployeeById(id: string): Promise<Employee | null> {
 export async function searchEmployees(query: string): Promise<Employee[]> {
   try {
     
-    // First get the user to ensure authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      throw new Error("Not authenticated");
-    }
-    
-    // Get company_id from the employees table
-    const { data: employee, error: employeeError } = await supabase
-      .from("employees")
-      .select("company_id")
-      .eq("id", user.id)
-      .single();
-      
-    if (employeeError) {
-      throw new Error(employeeError.message);
-    }
+    const company_id = await getCompanyId();
     
     // Search employees
     const { data: employees, error } = await supabase
       .from("employees")
       .select("id, first_name, last_name")
-      .eq("company_id", employee.company_id)
+      .eq("company_id", company_id)
       .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%`);
       
     if (error) {

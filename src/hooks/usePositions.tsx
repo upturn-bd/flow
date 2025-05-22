@@ -9,7 +9,7 @@ import {
 } from "@/lib/api/company";
 
 export type Position = {
-  id: number;
+  id?: number;
   name: string;
   description?: string;
   department_id?: number;
@@ -47,7 +47,7 @@ export function usePositions() {
 
   const updatePosition = async (position: Position) => {
     try {
-      await updatePositionApi(position);
+      await updatePositionApi({ id: position.id!, ...position });
       await fetchPositions(); // Refresh list after updating
       return { success: true };
     } catch (error) {

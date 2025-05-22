@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
-
+import { getCompanyId } from "./companyInfo";
 interface Position {
   id: number;
   name: string;
@@ -16,29 +16,14 @@ interface Position {
 export async function getPositions(): Promise<Position[]> {
   try {
     
-    // First get the user to ensure authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      throw new Error("Not authenticated");
-    }
-    
-    // Get company_id from the employees table
-    const { data: employee, error: employeeError } = await supabase
-      .from("employees")
-      .select("company_id")
-      .eq("id", user.id)
-      .single();
+    const company_id = await getCompanyId();
       
-    if (employeeError) {
-      throw new Error(employeeError.message);
-    }
     
     // Fetch positions using the company_id
     const { data: positions, error } = await supabase
       .from("positions")
       .select("*")
-      .eq("company_id", employee.company_id);
+      .eq("company_id", company_id);
       
     if (error) {
       throw error;
@@ -57,28 +42,13 @@ export async function getPositions(): Promise<Position[]> {
 export async function createPosition(positionData: Omit<Position, 'id' | 'company_id' | 'created_at'>): Promise<Position> {
   try {
     
-    // First get the user to ensure authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      throw new Error("Not authenticated");
-    }
-    
-    // Get company_id from the employees table
-    const { data: employee, error: employeeError } = await supabase
-      .from("employees")
-      .select("company_id")
-      .eq("id", user.id)
-      .single();
+    const company_id = await getCompanyId();
       
-    if (employeeError) {
-      throw new Error(employeeError.message);
-    }
     
     // Create formatted data with company_id
     const formattedData = {
       ...positionData,
-      company_id: employee.company_id,
+      company_id: company_id,
     };
     
     // Insert the new position

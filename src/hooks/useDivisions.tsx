@@ -10,10 +10,9 @@ import {
 
 // Define Division type that matches both API and UI needs
 export type Division = {
-  id: number;
+  id?: number;
   name: string;
   head_id?: string;
-  description?: string;
   company_id?: string | number;
   created_at?: string;
 };
@@ -47,7 +46,7 @@ export function useDivisions() {
 
   const updateDivision = async (division: Division) => {
     try {
-      await updateDivisionApi(division);
+      await updateDivisionApi({ id: division.id!, ...division });
       await fetchDivisions(); // Refresh list after updating
       return { success: true };
     } catch (error) {

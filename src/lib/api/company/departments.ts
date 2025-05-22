@@ -16,12 +16,6 @@ export async function getDepartments(company_id?: number): Promise<Department[]>
   try {
     let companyId = company_id;
     if (!companyId) {
-      // First get the user to ensure authentication
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-      if (authError || !user) {
-        throw new Error("Not authenticated");
-      }
 
       // Get company_id from the employees table
       companyId = await getCompanyId();
@@ -49,28 +43,13 @@ export async function getDepartments(company_id?: number): Promise<Department[]>
  */
 export async function createDepartment(departmentData: Omit<Department, 'id' | 'company_id' | 'created_at'>): Promise<Department> {
   try {
-    // First get the user to ensure authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user) {
-      throw new Error("Not authenticated");
-    }
-
-    // Get company_id from the employees table
-    const { data: employee, error: employeeError } = await supabase
-      .from("employees")
-      .select("company_id")
-      .eq("id", user.id)
-      .single();
-
-    if (employeeError) {
-      throw new Error(employeeError.message);
-    }
+    const company_id = await getCompanyId();
 
     // Create formatted data with company_id
     const formattedData = {
       ...departmentData,
-      company_id: employee.company_id,
+      company_id: company_id,
     };
 
     // Insert the new department

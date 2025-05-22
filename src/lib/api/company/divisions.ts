@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
+import { getCompanyId } from ".";
 
 interface Division {
   id: number;
@@ -20,23 +21,15 @@ export async function getDivisions(): Promise<Division[]> {
     if (authError || !user) {
       throw new Error("Not authenticated");
     }
-    
-    // Get company_id from the employees table
-    const { data: employee, error: employeeError } = await supabase
-      .from("employees")
-      .select("company_id")
-      .eq("id", user.id)
-      .single();
+
+    const company_id = await getCompanyId();
       
-    if (employeeError) {
-      throw new Error(employeeError.message);
-    }
     
     // Fetch divisions using the company_id
     const { data: divisions, error } = await supabase
       .from("divisions")
       .select("*")
-      .eq("company_id", employee.company_id);
+      .eq("company_id", company_id);
       
     if (error) {
       throw error;
@@ -62,21 +55,13 @@ export async function createDivision(divisionData: Omit<Division, 'id' | 'compan
       throw new Error("Not authenticated");
     }
     
-    // Get company_id from the employees table
-    const { data: employee, error: employeeError } = await supabase
-      .from("employees")
-      .select("company_id")
-      .eq("id", user.id)
-      .single();
-      
-    if (employeeError) {
-      throw new Error(employeeError.message);
-    }
+    const company_id = await getCompanyId();
+
     
     // Create formatted data with company_id
     const formattedData = {
       ...divisionData,
-      company_id: employee.company_id,
+      company_id: company_id,
     };
     
     // Insert the new division

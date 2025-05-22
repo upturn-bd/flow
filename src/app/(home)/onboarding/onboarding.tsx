@@ -604,7 +604,7 @@ export default function EmployeeOnboarding() {
                         : employees.filter(employee => employee.id !== userId)
                       ).map(emp => ({ value: emp.id, label: emp.name }))}
                       placeholder="Not Applicable"
-                      value={formData.supervisor_id || ""}
+                      value={formData.supervisor_id === null ? "" : formData.supervisor_id}
                       onChange={handleChange}
                       error={errors.supervisor_id}
                     />

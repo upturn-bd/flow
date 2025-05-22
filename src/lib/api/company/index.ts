@@ -5,6 +5,8 @@
  */
 
 import { supabase } from "@/lib/supabase/client";
+import { getCompanyId } from "./companyInfo";
+import { getEmployeeId } from "../employee";
 
 // Re-export company info functions
 export * from './companyInfo';
@@ -14,20 +16,8 @@ export * from './employees';
 export * from './grades';
 export * from './positions';
 
-export async function getCompanyId(uid: string): Promise<number> {
-  const { data, error } = await supabase
-    .from("employees")
-    .select("company_id")
-    .eq("id", uid)
-    .single();
-  if (!data) {
-    throw error;
-  }
-  return parseInt(data.company_id);
-}
-
-export async function getDesignations(uid: string) {
-  const company_id = await getCompanyId(uid);
+export async function getDesignations() {
+  const company_id = await getCompanyId();
   const { data, error } = await supabase
     .from("designations")
     .select(

@@ -41,28 +41,13 @@ export async function getGrades(): Promise<Grade[]> {
 export async function createGrade(gradeData: Omit<Grade, 'id' | 'company_id' | 'created_at'>): Promise<Grade> {
   try {
     
-    // First get the user to ensure authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      throw new Error("Not authenticated");
-    }
-    
-    // Get company_id from the employees table
-    const { data: employee, error: employeeError } = await supabase
-      .from("employees")
-      .select("company_id")
-      .eq("id", user.id)
-      .single();
+    const company_id = await getCompanyId();
       
-    if (employeeError) {
-      throw new Error(employeeError.message);
-    }
     
     // Create formatted data with company_id
     const formattedData = {
       ...gradeData,
-      company_id: employee.company_id,
+      company_id: company_id,
     };
     
     // Insert the new grade

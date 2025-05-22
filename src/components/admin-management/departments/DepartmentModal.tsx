@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
 const schema = z.object({
-  id: z.number(),
+  id: z.number().optional(),
   name: z.string().min(1, "Name is required").max(50),
   head_id: z.string().min(1, "Please select a department head"),
   description: z.string().optional(),
@@ -23,7 +23,7 @@ interface DepartmentModalProps {
   initialData?: Department | null;
   onSubmit: (values: FormValues) => void;
   onClose: () => void;
-  divisions: { id: number; name: string }[];
+  divisions: { id?: number; name: string }[];
   employees: { id: string; name: string }[];
   isLoading?: boolean;
 }
@@ -37,7 +37,7 @@ export default function DepartmentModal({
   isLoading = false
 }: DepartmentModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
-    id: 0,
+    id: undefined,
     name: "",
     head_id: "",
     description: "",
@@ -84,7 +84,10 @@ export default function DepartmentModal({
   ) => {
     const { name, value } = e.target;
     if (name === "division_id") {
-      setFormValues((prev) => ({ ...prev, [name]: parseInt(value) || 0 }));
+      console.log(value);
+      console.log(value === "0");
+      console.log(parseInt(value));
+      setFormValues((prev) => ({ ...prev, [name]: parseInt(value) }));
     } else {
       setFormValues((prev) => ({ ...prev, [name]: value }));
     }
@@ -219,7 +222,7 @@ export default function DepartmentModal({
               </div>
               <select
                 name="division_id"
-                value={formValues.division_id || ""}
+                value={formValues.division_id === null ? "" : formValues.division_idZ}
                 onChange={handleChange}
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all appearance-none"
               >
@@ -246,7 +249,7 @@ export default function DepartmentModal({
               </div>
               <textarea
                 name="description"
-                value={formValues.description || ""}
+                value={formValues.description === null ? "" : formValues.description}
                 onChange={handleChange}
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all"
                 placeholder="Add Department Description"

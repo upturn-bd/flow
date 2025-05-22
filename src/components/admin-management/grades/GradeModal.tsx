@@ -60,9 +60,7 @@ export default function GradeModal({
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: initialData || {
-      id: 0,
       name: "",
-      company_id: 0,
     },
   });
 

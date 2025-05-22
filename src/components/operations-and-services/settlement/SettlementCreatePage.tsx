@@ -16,7 +16,7 @@ import { toast } from "sonner";
 
 // Define the settlement state type
 interface SettlementState {
-  id: number;
+  id?: number;
   settlement_type_id: number;
   amount: number;
   event_date: string;
@@ -32,7 +32,6 @@ interface SettlementState {
 
 // Initial state
 const initialSettlementState: SettlementState = {
-  id: 0,
   settlement_type_id: 0,
   amount: 0,
   event_date: "",
@@ -208,7 +207,7 @@ export default function SettlementCreatePage() {
           <div className="relative">
             <select
               name="settlement_type_id"
-              value={settlementState.settlement_type_id || ""}
+              value={settlementState.settlement_type_id === null ? "" : settlementState.settlement_type_id}
               onChange={handleInputChange}
               className="w-full bg-blue-100 rounded p-3 appearance-none"
             >
