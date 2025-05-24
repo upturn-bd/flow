@@ -28,7 +28,7 @@ interface Position {
 export default function LineageCreateModal({
   onSubmit,
   onClose,
-  isLoading = false
+  isLoading = false,
 }: LineageModalProps) {
   const { lineages, fetchLineages } = useLineage();
   const [name, setName] = useState<string>("");
@@ -40,8 +40,8 @@ export default function LineageCreateModal({
   useEffect(() => {
     async function fetchPositions() {
       try {
-        const positions = await import("@/lib/api/company").then(
-          (module) => module.getPositions()
+        const positions = await import("@/lib/api/company").then((module) =>
+          module.getPositions()
         );
         setAllPositions(positions);
       } catch (error) {
@@ -105,20 +105,20 @@ export default function LineageCreateModal({
       const selectedPositionIds = prev
         .map((l) => l.position_id)
         .filter(Boolean) as number[];
-      const remainingPositions = allPositions.filter(
+      const remainingPositionsNow = remainingPositions.filter(
         (p) => !selectedPositionIds.includes(p.id)
       );
 
-      if (remainingPositions.length > 0) {
+      if (remainingPositionsNow.length > 0) {
         return [
           ...prev,
-          { level: prev.length + 1, position_id: remainingPositions[0].id },
+          { level: prev.length + 1, position_id: remainingPositionsNow[0].id },
         ];
       }
       return prev;
     });
   };
-  
+
   const handleSave = () => {
     const lineageData = hierarchy
       .filter((level) => level.position_id !== null)
@@ -126,7 +126,6 @@ export default function LineageCreateModal({
         position_id: level.position_id as number,
         hierarchical_level: level.level,
         name: name,
-        company_id: 0,
       }));
 
     if (lineageData.length > 0) {
@@ -135,8 +134,8 @@ export default function LineageCreateModal({
   };
 
   useEffect(() => {
-    setShowAddButton(hierarchy.length < allPositions.length);
-  }, [hierarchy, allPositions]);
+    setShowAddButton(remainingPositions.length > 0);
+  }, [remainingPositions]);
 
   useEffect(() => {
     if (allPositions.length > 0) {
@@ -147,27 +146,37 @@ export default function LineageCreateModal({
         (pos) => !usedPositionIds.has(pos.id)
       );
       setRemainingPositions(availablePositions);
+
+      // Initialize hierarchy with first available position if empty
+      if (hierarchy.length === 0 && availablePositions.length > 0) {
+        setHierarchy([{ level: 1, position_id: availablePositions[0].id }]);
+      }
     }
-  }, [lineages, allPositions]);
+  }, [lineages, allPositions, hierarchy]);
 
   // Animation variants
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
+        staggerChildren: 0.1,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.2 } 
-    }
+      transition: { duration: 0.2 },
+    },
   };
+
+  useEffect(() => {
+    console.log("Hierarchy: ", hierarchy);
+    console.log(remainingPositions);
+  }, [hierarchy, remainingPositions]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
@@ -180,7 +189,9 @@ export default function LineageCreateModal({
       >
         <motion.div variants={fadeInUp} className="flex items-center gap-3">
           <Buildings size={24} weight="duotone" className="text-blue-600" />
-          <h2 className="text-xl font-semibold text-blue-800">Create Lineage</h2>
+          <h2 className="text-xl font-semibold text-blue-800">
+            Create Lineage
+          </h2>
         </motion.div>
 
         <motion.div variants={fadeInUp} className="mb-4">
@@ -196,7 +207,10 @@ export default function LineageCreateModal({
           />
         </motion.div>
 
-        <motion.div variants={fadeInUp} className="bg-white py-4 w-full max-w-4xl mx-auto">
+        <motion.div
+          variants={fadeInUp}
+          className="bg-white py-4 w-full max-w-4xl mx-auto"
+        >
           <h3 className="text-md font-semibold text-blue-700 mb-4">
             Set Hierarchy
           </h3>
@@ -207,8 +221,8 @@ export default function LineageCreateModal({
                 hierarchy.map((level, index) => {
                   const availablePositions = getAvailablePositions(index);
                   return (
-                    <motion.div 
-                      key={index} 
+                    <motion.div
+                      key={index}
                       className="relative mb-4"
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -219,13 +233,20 @@ export default function LineageCreateModal({
                       </div> */}
                       <div className="flex gap-2">
                         <select
-                          value={level.position_id === null ? "" : level.position_id}
+                          value={
+                            level.position_id === null ? "" : level.position_id
+                          }
                           onChange={(e) =>
-                            handlePositionChange(index, parseInt(e.target.value))
+                            handlePositionChange(
+                              index,
+                              parseInt(e.target.value)
+                            )
                           }
                           className="w-full rounded-md bg-blue-50 px-4 py-2 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                         >
-                          <option>Select position for Level {level.level}</option>
+                          <option>
+                            Select position for Level {level.level}
+                          </option>
                           {availablePositions.map((position) => (
                             <option key={position.id} value={position.id}>
                               {position.name}
@@ -322,7 +343,7 @@ export function LineageUpdateModal({
   initialData,
   onSubmit,
   onClose,
-  isLoading = false
+  isLoading = false,
 }: LineageModalProps) {
   const { lineages, fetchLineages } = useLineage();
   const [name, setName] = useState<string>("");
@@ -334,8 +355,8 @@ export function LineageUpdateModal({
   useEffect(() => {
     async function fetchPositions() {
       try {
-        const positions = await import("@/lib/api/company").then(
-          (module) => module.getPositions()
+        const positions = await import("@/lib/api/company").then((module) =>
+          module.getPositions()
         );
         setAllPositions(positions);
       } catch (error) {
@@ -356,8 +377,12 @@ export function LineageUpdateModal({
       .map((item) => item.position_id)
       .filter(Boolean) as number[];
 
-    return allPositions.filter(
-      (position) => !selectedPositionIds.includes(position.id)
+    // Include currently selected position in available options
+    const currentPositionId = hierarchy[levelIndex]?.position_id;
+    return remainingPositions.filter(
+      (position) =>
+        !selectedPositionIds.includes(position.id) ||
+        position.id === currentPositionId
     );
   };
 
@@ -398,20 +423,19 @@ export function LineageUpdateModal({
       const selectedPositionIds = prev
         .map((l) => l.position_id)
         .filter(Boolean) as number[];
-      const remainingPositions = allPositions.filter(
+      const remainingPositionsNow = remainingPositions.filter(
         (p) => !selectedPositionIds.includes(p.id)
       );
 
-      if (remainingPositions.length > 0) {
+      if (remainingPositionsNow.length > 0) {
         return [
           ...prev,
-          { level: prev.length + 1, position_id: remainingPositions[0].id },
+          { level: prev.length + 1, position_id: remainingPositionsNow[0].id },
         ];
       }
       return prev;
     });
   };
-  
   const handleSave = () => {
     const lineageData = hierarchy
       .filter((level) => level.position_id !== null)
@@ -428,21 +452,25 @@ export function LineageUpdateModal({
   };
 
   useEffect(() => {
-    setShowAddButton(hierarchy.length < allPositions.length);
-  }, [hierarchy, allPositions]);
+    setShowAddButton(!(hierarchy.length === remainingPositions.length));
+  }, [hierarchy, remainingPositions]);
 
   useEffect(() => {
     if (allPositions.length > 0) {
       const usedPositionIds = new Set(
-        hierarchy.map((h: HierarchyLevel) => h.position_id)
+        lineages
+          .filter(
+            (l: Lineage) =>
+              !initialData?.some((i) => i.position_id === l.position_id)
+          )
+          .map((l: Lineage) => l.position_id)
       );
       const availablePositions = allPositions.filter(
         (pos) => !usedPositionIds.has(pos.id)
       );
       setRemainingPositions(availablePositions);
     }
-  }, [hierarchy, allPositions]);
-
+  }, [lineages, allPositions, initialData]);
   useEffect(() => {
     if (initialData && initialData.length > 0) {
       setName(initialData[0].name);
@@ -483,7 +511,10 @@ export function LineageUpdateModal({
           />
         </motion.div>
 
-        <motion.div variants={fadeInUp} className="bg-white py-4 w-full max-w-4xl mx-auto">
+        <motion.div
+          variants={fadeInUp}
+          className="bg-white py-4 w-full max-w-4xl mx-auto"
+        >
           <h3 className="text-md font-semibold text-blue-700 mb-4">
             Update Hierarchy
           </h3>
@@ -494,8 +525,8 @@ export function LineageUpdateModal({
                 hierarchy.map((level, index) => {
                   const availablePositions = getAvailablePositions(index);
                   return (
-                    <motion.div 
-                      key={index} 
+                    <motion.div
+                      key={index}
                       className="relative mb-4"
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -506,13 +537,20 @@ export function LineageUpdateModal({
                       </div> */}
                       <div className="flex gap-2">
                         <select
-                          value={level.position_id === null ? "" : level.position_id}
+                          value={
+                            level.position_id === null ? "" : level.position_id
+                          }
                           onChange={(e) =>
-                            handlePositionChange(index, parseInt(e.target.value))
+                            handlePositionChange(
+                              index,
+                              parseInt(e.target.value)
+                            )
                           }
                           className="w-full rounded-md bg-blue-50 px-4 py-2 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                         >
-                          <option>Select position for Level {level.level}</option>
+                          <option>
+                            Select position for Level {level.level}
+                          </option>
                           {availablePositions.map((position) => (
                             <option key={position.id} value={position.id}>
                               {position.name}
@@ -574,7 +612,12 @@ export function LineageUpdateModal({
                     level.position_id === null ||
                     Number.isNaN(level.position_id)
                 ) ||
-                !!(initialData && initialData.length > 0 && name === initialData[0].name && compareLineages(initialData, hierarchy))
+                !!(
+                  initialData &&
+                  initialData.length > 0 &&
+                  name === initialData[0].name &&
+                  compareLineages(initialData, hierarchy)
+                )
               }
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >

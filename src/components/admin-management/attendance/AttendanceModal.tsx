@@ -1,14 +1,14 @@
 "use client";
 import dynamic from "next/dynamic";
 const ClientMap = dynamic(() => import("./ClientMap"), { ssr: false });
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { siteSchema } from "@/lib/types";
 import { z } from "zod";
 import { Site } from "@/hooks/useAttendanceManagement";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { MapPin, Clock, ClockClockwise, Buildings, X } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
 type Coordinates = {
@@ -37,13 +37,11 @@ export default function AttendanceCreateModal({
   isLoading = false
 }: AttendanceCreateModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
-    id: 0,
     name: "",
     check_in: "",
     check_out: "",
     longitude: 23.8041,
     latitude: 90.4074,
-    company_id: 0,
     location: "https://www.openstreetmap.org/?mlat=23.80411&mlon=90.4074",
   });
 
@@ -279,13 +277,11 @@ export function AttendanceUpdateModal({
   isLoading = false
 }: AttendanceUpdateModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
-    id: 0,
     name: "",
     check_in: "",
     check_out: "",
     longitude: 23.8041,
     latitude: 90.4074,
-    company_id: 0,
     location: "https://www.openstreetmap.org/?mlat=23.80411&mlon=90.4074",
   });
 

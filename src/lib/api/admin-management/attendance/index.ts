@@ -21,10 +21,8 @@ export async function createSite(payload: z.infer<typeof siteSchema>) {
   const validated = siteSchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { id, ...rest } = payload;
-
   const { data, error } = await supabase.from("sites").insert({
-    ...rest,
+    ...payload,
     company_id,
   });
 

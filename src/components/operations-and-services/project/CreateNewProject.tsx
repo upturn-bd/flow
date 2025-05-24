@@ -9,32 +9,28 @@ import { milestoneSchema, projectSchema } from "@/lib/types";
 import React, { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Pencil, 
-  Trash2, 
-  Info, 
-  Plus, 
-  ChevronDown, 
-  Calendar, 
+import {
+  Pencil,
+  Trash2,
+  Info,
+  Plus,
+  ChevronDown,
+  Calendar,
   Users,
-  Building2, 
-  UserCircle, 
+  Building2,
+  UserCircle,
   Search,
   AlertCircle,
   X,
   Check,
   Milestone,
   ArrowRight,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 
 type ProjectDetails = z.infer<typeof projectSchema>;
 export type Milestone = z.infer<typeof milestoneSchema>;
-interface Employee {
-  id: string;
-  name: string;
-}
 
 const initialMilestone: Milestone = {
   milestone_title: "",
@@ -54,7 +50,7 @@ const initialProjectDetails: ProjectDetails = {
   goal: "",
   end_date: "",
   project_lead_id: "",
-  department_id: 0,
+  department_id: undefined,
   status: "Ongoing",
   assignees: [],
 };
@@ -85,20 +81,20 @@ export default function CreateNewProjectPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       const company_id = await getCompanyId();
       const projectData = {
         ...projectDetails,
-        assignees: projectAssignees
+        assignees: projectAssignees,
       };
-      
+
       const result = await createProject(projectData);
-      
+
       if (!result.success) {
         throw new Error("Failed to create project");
       }
-      
+
       if (milestones.length > 0) {
         const formatMilestones = milestones.map((m) => ({
           ...m,
@@ -113,7 +109,7 @@ export default function CreateNewProjectPage() {
 
         if (milestoneError) console.error(milestoneError);
       }
-      
+
       setProjectDetails(initialProjectDetails);
       setProjectAssignees([]);
       setMilestones([]);
@@ -333,21 +329,21 @@ export default function CreateNewProjectPage() {
   }, []);
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6"
     >
-      <motion.h1 
+      <motion.h1
         initial={{ y: -20 }}
         animate={{ y: 0 }}
         className="text-2xl font-bold text-blue-800 mb-8"
       >
         Create New Project
       </motion.h1>
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
@@ -369,7 +365,7 @@ export default function CreateNewProjectPage() {
             </p>
           )}
         </motion.div>
-        
+
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -420,7 +416,7 @@ export default function CreateNewProjectPage() {
                 value={projectDetails.department_id}
                 className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-[#EAF4FF] p-3 appearance-none"
               >
-                <option value={0}>Select Department</option>
+                <option value={undefined}>Select Department</option>
                 {departments.length > 0 &&
                   departments.map((department) => (
                     <option key={department.id} value={department.id}>
@@ -428,11 +424,20 @@ export default function CreateNewProjectPage() {
                     </option>
                   ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+              <ChevronDown
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                size={16}
+              />
               {errors.department_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
                   <AlertCircle size={14} className="mr-1" />
-                  {errors.department_id}
+                  Please select a department
+                </p>
+              )}
+              {projectDetails.department_id === undefined && (
+                <p className="mt-1 text-red-500 text-sm flex items-center">
+                  <AlertCircle size={14} className="mr-1" />
+                  Please select a department
                 </p>
               )}
             </div>
@@ -462,7 +467,10 @@ export default function CreateNewProjectPage() {
                     </option>
                   ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+              <ChevronDown
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                size={16}
+              />
               {errors.project_lead_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
                   <AlertCircle size={14} className="mr-1" />
@@ -472,7 +480,7 @@ export default function CreateNewProjectPage() {
             </div>
           </motion.div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -497,7 +505,7 @@ export default function CreateNewProjectPage() {
               </p>
             )}
           </motion.div>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -531,7 +539,7 @@ export default function CreateNewProjectPage() {
             )}
           </motion.div>
         </div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -555,9 +563,9 @@ export default function CreateNewProjectPage() {
               placeholder="Search for assignees..."
               className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-[#EAF4FF] p-3 pr-10"
             />
-            <Search 
-              size={16} 
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+            <Search
+              size={16}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
             />
 
             <AnimatePresence>
@@ -609,7 +617,7 @@ export default function CreateNewProjectPage() {
             </AnimatePresence>
           </div>
         </motion.div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -633,7 +641,7 @@ export default function CreateNewProjectPage() {
               </motion.button>
             )}
           </div>
-          
+
           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
             <AnimatePresence>
               {milestones.length > 0 &&
@@ -664,7 +672,7 @@ export default function CreateNewProjectPage() {
                       <span>Weightage: {m.weightage}%</span>
                     </div>
                     <div className="flex justify-end gap-2">
-                      <motion.button 
+                      <motion.button
                         type="button"
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
@@ -675,7 +683,7 @@ export default function CreateNewProjectPage() {
                       >
                         <Pencil size={16} />
                       </motion.button>
-                      <motion.button 
+                      <motion.button
                         type="button"
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
@@ -689,9 +697,9 @@ export default function CreateNewProjectPage() {
                 ))}
             </AnimatePresence>
           </div>
-          
+
           {milestones.length === 0 && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="rounded-lg p-10 text-center flex flex-col items-center"
@@ -711,8 +719,8 @@ export default function CreateNewProjectPage() {
             </motion.div>
           )}
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           className="flex justify-end pt-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -742,7 +750,7 @@ export default function CreateNewProjectPage() {
 
       {isCreatingMilestone && (
         // Modal for creating a new milestone
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -758,7 +766,7 @@ export default function CreateNewProjectPage() {
               <Milestone size={20} className="mr-2 text-blue-600" />
               Add Milestone
             </h2>
-            
+
             <form onSubmit={handleAddMilestone} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -778,7 +786,7 @@ export default function CreateNewProjectPage() {
                   </p>
                 )}
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description
@@ -790,7 +798,7 @@ export default function CreateNewProjectPage() {
                   className="w-full h-32 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-[#EAF4FF] p-3"
                 />
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
@@ -811,7 +819,7 @@ export default function CreateNewProjectPage() {
                     </p>
                   )}
                 </div>
-                
+
                 <div>
                   <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
                     <Calendar size={14} className="text-blue-500" />
@@ -841,7 +849,7 @@ export default function CreateNewProjectPage() {
                   )}
                 </div>
               </div>
-              
+
               <div>
                 <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
                   <Users size={14} className="text-blue-500" />
@@ -861,31 +869,32 @@ export default function CreateNewProjectPage() {
                     placeholder="Search for assignees..."
                     className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-[#EAF4FF] p-3 pr-10"
                   />
-                  <Search 
-                    size={16} 
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+                  <Search
+                    size={16}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                   />
 
                   <AnimatePresence>
-                    {isMilestoneDropdownOpen && filteredMilestoneEmployees.length > 0 && (
-                      <motion.ul
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
-                      >
-                        {filteredMilestoneEmployees.map((emp) => (
-                          <motion.li
-                            key={emp.id}
-                            onClick={() => handleAddMilestoneAssignee(emp.id)}
-                            whileHover={{ backgroundColor: "#f3f4f6" }}
-                            className="cursor-pointer px-4 py-2 hover:bg-gray-100 text-sm"
-                          >
-                            {emp.name}
-                          </motion.li>
-                        ))}
-                      </motion.ul>
-                    )}
+                    {isMilestoneDropdownOpen &&
+                      filteredMilestoneEmployees.length > 0 && (
+                        <motion.ul
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                        >
+                          {filteredMilestoneEmployees.map((emp) => (
+                            <motion.li
+                              key={emp.id}
+                              onClick={() => handleAddMilestoneAssignee(emp.id)}
+                              whileHover={{ backgroundColor: "#f3f4f6" }}
+                              className="cursor-pointer px-4 py-2 hover:bg-gray-100 text-sm"
+                            >
+                              {emp.name}
+                            </motion.li>
+                          ))}
+                        </motion.ul>
+                      )}
                   </AnimatePresence>
                 </div>
 
@@ -905,7 +914,9 @@ export default function CreateNewProjectPage() {
                           <button
                             type="button"
                             className="ml-2 text-blue-500 hover:text-blue-700"
-                            onClick={() => handleRemoveMilestoneAssignee(assignee)}
+                            onClick={() =>
+                              handleRemoveMilestoneAssignee(assignee)
+                            }
                           >
                             <X size={14} />
                           </button>
@@ -915,7 +926,7 @@ export default function CreateNewProjectPage() {
                   </AnimatePresence>
                 </div>
               </div>
-              
+
               <div>
                 <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
                   Status
@@ -934,7 +945,10 @@ export default function CreateNewProjectPage() {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                  <ChevronDown
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                    size={16}
+                  />
                   {milestoneErrors.status && (
                     <p className="mt-1 text-red-500 text-sm flex items-center">
                       <AlertCircle size={14} className="mr-1" />
@@ -943,7 +957,7 @@ export default function CreateNewProjectPage() {
                   )}
                 </div>
               </div>
-              
+
               <div>
                 <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
                   Weightage (%)
@@ -953,7 +967,9 @@ export default function CreateNewProjectPage() {
                   type="number"
                   onChange={handleMilestoneChange}
                   value={milestone.weightage}
-                  max={100 - milestones.reduce((acc, m) => acc + m.weightage, 0)}
+                  max={
+                    100 - milestones.reduce((acc, m) => acc + m.weightage, 0)
+                  }
                   min={1}
                   className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-[#EAF4FF] p-3"
                 />
@@ -964,7 +980,7 @@ export default function CreateNewProjectPage() {
                   </p>
                 )}
               </div>
-              
+
               <div className="mt-8 flex justify-end space-x-4">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -976,7 +992,7 @@ export default function CreateNewProjectPage() {
                   <X size={16} className="mr-2" />
                   Cancel
                 </motion.button>
-                
+
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -995,7 +1011,7 @@ export default function CreateNewProjectPage() {
 
       {selectedMilestone && (
         // Modal for updating an existing milestone
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -1011,7 +1027,7 @@ export default function CreateNewProjectPage() {
               <Pencil size={20} className="mr-2 text-blue-600" />
               Update Milestone
             </h2>
-            
+
             <form onSubmit={handleUpdateMilestone} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1031,7 +1047,7 @@ export default function CreateNewProjectPage() {
                   </p>
                 )}
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description
@@ -1043,7 +1059,7 @@ export default function CreateNewProjectPage() {
                   className="w-full h-32 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-[#EAF4FF] p-3"
                 />
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
@@ -1064,7 +1080,7 @@ export default function CreateNewProjectPage() {
                     </p>
                   )}
                 </div>
-                
+
                 <div>
                   <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
                     <Calendar size={14} className="text-blue-500" />
@@ -1094,7 +1110,7 @@ export default function CreateNewProjectPage() {
                   )}
                 </div>
               </div>
-              
+
               <div>
                 <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
                   <Users size={14} className="text-blue-500" />
@@ -1114,31 +1130,32 @@ export default function CreateNewProjectPage() {
                     placeholder="Search for assignees..."
                     className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-[#EAF4FF] p-3 pr-10"
                   />
-                  <Search 
-                    size={16} 
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+                  <Search
+                    size={16}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                   />
 
                   <AnimatePresence>
-                    {isMilestoneDropdownOpen && filteredMilestoneEmployees.length > 0 && (
-                      <motion.ul
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
-                      >
-                        {filteredMilestoneEmployees.map((emp) => (
-                          <motion.li
-                            key={emp.id}
-                            onClick={() => handleAddMilestoneAssignee(emp.id)}
-                            whileHover={{ backgroundColor: "#f3f4f6" }}
-                            className="cursor-pointer px-4 py-2 hover:bg-gray-100 text-sm"
-                          >
-                            {emp.name}
-                          </motion.li>
-                        ))}
-                      </motion.ul>
-                    )}
+                    {isMilestoneDropdownOpen &&
+                      filteredMilestoneEmployees.length > 0 && (
+                        <motion.ul
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                        >
+                          {filteredMilestoneEmployees.map((emp) => (
+                            <motion.li
+                              key={emp.id}
+                              onClick={() => handleAddMilestoneAssignee(emp.id)}
+                              whileHover={{ backgroundColor: "#f3f4f6" }}
+                              className="cursor-pointer px-4 py-2 hover:bg-gray-100 text-sm"
+                            >
+                              {emp.name}
+                            </motion.li>
+                          ))}
+                        </motion.ul>
+                      )}
                   </AnimatePresence>
                 </div>
 
@@ -1158,7 +1175,9 @@ export default function CreateNewProjectPage() {
                           <button
                             type="button"
                             className="ml-2 text-blue-500 hover:text-blue-700"
-                            onClick={() => handleRemoveMilestoneAssignee(assignee)}
+                            onClick={() =>
+                              handleRemoveMilestoneAssignee(assignee)
+                            }
                           >
                             <X size={14} />
                           </button>
@@ -1168,7 +1187,7 @@ export default function CreateNewProjectPage() {
                   </AnimatePresence>
                 </div>
               </div>
-              
+
               <div>
                 <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
                   Status
@@ -1187,7 +1206,10 @@ export default function CreateNewProjectPage() {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                  <ChevronDown
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                    size={16}
+                  />
                   {milestoneErrors.status && (
                     <p className="mt-1 text-red-500 text-sm flex items-center">
                       <AlertCircle size={14} className="mr-1" />
@@ -1196,7 +1218,7 @@ export default function CreateNewProjectPage() {
                   )}
                 </div>
               </div>
-              
+
               <div>
                 <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
                   Weightage (%)
@@ -1208,7 +1230,8 @@ export default function CreateNewProjectPage() {
                   value={milestone.weightage}
                   max={
                     milestones.length > 1
-                      ? 100 - milestones.reduce((acc, m) => acc + m.weightage, 0)
+                      ? 100 -
+                        milestones.reduce((acc, m) => acc + m.weightage, 0)
                       : 100
                   }
                   min={1}
@@ -1221,7 +1244,7 @@ export default function CreateNewProjectPage() {
                   </p>
                 )}
               </div>
-              
+
               <div className="mt-8 flex justify-end space-x-4">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -1233,7 +1256,7 @@ export default function CreateNewProjectPage() {
                   <X size={16} className="mr-2" />
                   Cancel
                 </motion.button>
-                
+
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -1339,7 +1362,7 @@ export function UpdateProjectPage({
       setProjectAssignees(initialData.assignees || []);
     }
   }, [initialData]);
-  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -1377,19 +1400,19 @@ export function UpdateProjectPage({
   }, []);
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6"
     >
-      <motion.h1 
+      <motion.h1
         initial={{ y: -20 }}
         animate={{ y: 0 }}
         className="text-2xl font-bold text-blue-800 mb-8"
       >
         Update Project
       </motion.h1>
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1409,7 +1432,7 @@ export function UpdateProjectPage({
             </p>
           )}
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Description
@@ -1448,7 +1471,7 @@ export function UpdateProjectPage({
                 value={projectDetails.department_id}
                 className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-[#EAF4FF] p-3 appearance-none"
               >
-                <option value={0}>Select Department</option>
+                <option value={undefined}>Select Department</option>
                 {departments.length > 0 &&
                   departments.map((department) => (
                     <option key={department.id} value={department.id}>
@@ -1456,11 +1479,20 @@ export function UpdateProjectPage({
                     </option>
                   ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+              <ChevronDown
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                size={16}
+              />
               {errors.department_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
                   <AlertCircle size={14} className="mr-1" />
-                  {errors.department_id}
+                  Please select a department
+                </p>
+              )}
+              {projectDetails.department_id === undefined && (
+                <p className="mt-1 text-red-500 text-sm flex items-center">
+                  <AlertCircle size={14} className="mr-1" />
+                  Please select a department
                 </p>
               )}
             </div>
@@ -1486,7 +1518,10 @@ export function UpdateProjectPage({
                     </option>
                   ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+              <ChevronDown
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                size={16}
+              />
               {errors.project_lead_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
                   <AlertCircle size={14} className="mr-1" />
@@ -1496,7 +1531,7 @@ export function UpdateProjectPage({
             </div>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
@@ -1517,7 +1552,7 @@ export function UpdateProjectPage({
               </p>
             )}
           </div>
-          
+
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
               <Calendar size={16} className="text-blue-500" />
@@ -1547,7 +1582,7 @@ export function UpdateProjectPage({
             )}
           </div>
         </div>
-        
+
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
             <Users size={16} className="text-blue-500" />
@@ -1567,9 +1602,9 @@ export function UpdateProjectPage({
               placeholder="Search for assignees..."
               className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-white p-3 pr-10"
             />
-            <Search 
-              size={16} 
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+            <Search
+              size={16}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
             />
 
             <AnimatePresence>
@@ -1620,7 +1655,7 @@ export function UpdateProjectPage({
               })}
             </AnimatePresence>
           </div>
-          
+
           <div className="flex justify-end gap-4 mt-8">
             <motion.button
               type="button"
@@ -1633,7 +1668,7 @@ export function UpdateProjectPage({
               <X size={16} className="mr-2" />
               Cancel
             </motion.button>
-            
+
             <motion.button
               type="submit"
               whileHover={isValid && !isSubmitting ? { scale: 1.03 } : {}}

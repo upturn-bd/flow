@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { optional, z } from "zod";
 
 export const schoolingTypes = [
   "High School",
@@ -30,7 +30,7 @@ export const schoolingSchema = z.object({
 
 export const leaveSchema = z.object({
   id: z.number().optional(),
-  type_id: z.number().min(0, { message: "Please select a leave type" }),
+  type_id: z.number().optional(),
   start_date: z.string().min(1, { message: "Please select a start date" }),
   end_date: z.string().min(1, { message: "Please select an end date" }),
   remarks: z
@@ -119,14 +119,12 @@ export const complaintsTypeSchema = z.object({
 export const requisitionInventorySchema = z.object({
   id: z.number().optional(),
   name: z.string().min(1, { message: "Please enter a valid name" }).max(50),
-  requisition_category_id: z
-    .number()
-    .min(1, { message: "Please select a category" }),
+  requisition_category_id: z.number().optional(),
   description: z.string().optional(),
   asset_owner: z.string().min(1, { message: "Please select an asset owner" }),
   quantity: z.number().min(1),
   company_id: z.number().optional(),
-  department_id: z.number().min(0, { message: "Please select a department" }),
+  department_id: z.number().optional(),
 });
 
 export const claimTypeSchema = z.object({
@@ -136,9 +134,7 @@ export const claimTypeSchema = z.object({
     .min(1, { message: "Please enter a valid name" })
     .max(25),
   allowance: z.number().min(1, { message: "Please enter a valid allowance" }),
-  settlement_level_id: z
-    .number()
-    .min(1, { message: "Please select a settlement level" }),
+  settlement_level_id: z.number().optional(),
   settler_id: z.string().min(1, { message: "Please select a settler" }),
   company_id: z.number().optional(),
 });
@@ -156,7 +152,7 @@ export const projectSchema = z.object({
     .string()
     .min(1, { message: "Please select a project lead" }),
   remark: z.string().optional(),
-  department_id: z.number().min(0, { message: "Please select a department" }),
+  department_id: z.number().optional(),
   goal: z.string().optional(),
   progress: z.number().nullable().optional(),
   status: z.string(),
@@ -175,7 +171,7 @@ export const milestoneSchema = z.object({
   end_date: z.string().min(1, { message: "Please select an end date" }),
   status: z.string().min(1, { message: "Please select a status" }),
   weightage: z.number().min(1, { message: "Please enter a valid weightage" }),
-  project_id: z.number().min(0, { message: "Please select a project" }),
+  project_id: z.number().optional(),
   company_id: z.number().optional(),
   assignees: z.array(z.string()).optional(),
 });
@@ -184,10 +180,8 @@ export const commentSchema = z.object({
   id: z.number().optional(),
   comment: z.string().min(1, { message: "Please enter a valid comment" }),
   commenter_id: z.string(),
-  project_id: z.number(),
+  project_id: z.number().optional(),
   company_id: z.number().optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
 });
 
 export const taskSchema = z.object({
@@ -202,20 +196,18 @@ export const taskSchema = z.object({
   status: z.boolean().default(false),
   milestone_id: z.number().optional(),
   project_id: z.number().optional(),
-  department_id: z.number().optional().nullable(),
+  department_id: z.number().optional(),
   company_id: z.number().optional(),
   assignees: z.array(z.string()).optional(),
   priority: z.string().min(1, { message: "Please select a priority" }),
-  created_by: z.string().optional().nullable(),
+  created_by: z.string().optional(),
 });
 
 export const requisitionSchema = z.object({
   id: z.number().optional(),
-  requisition_category_id: z
-    .number()
-    .min(1, { message: "Please select a category" }),
+  requisition_category_id: z.number().optional(),
   employee_id: z.string().optional(),
-  item_id: z.number().min(0, { message: "Please select an item" }),
+  item_id: z.number().optional(),
   asset_owner: z.string().optional(),
   description: z.string().optional(),
   quantity: z.number().min(1, { message: "Please enter a valid quantity" }),
@@ -235,9 +227,7 @@ export const requisitionSchema = z.object({
 
 export const settlementRecordSchema = z.object({
   id: z.number().optional(),
-  settlement_type_id: z
-    .number()
-    .min(1, { message: "Please select a settlement type" }),
+  settlement_type_id: z.number().optional(),
   description: z.string().optional(),
   event_date: z.string().min(1, { message: "Please select an event date" }),
   amount: z.number().min(0.01, { message: "Please enter a valid amount" }),
@@ -253,9 +243,7 @@ export const settlementRecordSchema = z.object({
 
 export const complaintRecordSchema = z.object({
   id: z.number().optional(),
-  complaint_type_id: z
-    .number()
-    .min(1, { message: "Please select a complaint type" }),
+  complaint_type_id: z.number().optional(),
   complainer_id: z.string(),
   resolved_by_id: z.string().optional(),
   requested_to: z.string().optional(),
@@ -270,7 +258,7 @@ export const complaintRecordSchema = z.object({
 
 export const noticeSchema = z.object({
   id: z.number().optional(),
-  notice_type_id: z.number().min(0, { message: "Please select a notice type" }),
+  notice_type_id: z.number().optional(),
   title: z
     .string()
     .min(1, { message: "Please enter a title" })
@@ -290,7 +278,7 @@ export const attendanceSchema = z.object({
     .min(1, { message: "Please select an attendance date" }),
   tag: z.string().min(1, { message: "Please select an attendance tag" }),
   company_id: z.number().optional(),
-  site_id: z.number().min(0, { message: "Please select a site" }),
+  site_id: z.number().optional(),
   check_in_time: z.string().optional(),
   check_in_coordinates: z
     .object({

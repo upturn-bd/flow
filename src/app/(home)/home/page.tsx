@@ -29,7 +29,7 @@ import { calculateDistance } from "@/lib/utils/location-utils";
 
 const initialAttendanceRecord = {
   tag: "Present",
-  site_id: 0,
+  site_id: undefined,
 };
 
 export default function HomePage() {

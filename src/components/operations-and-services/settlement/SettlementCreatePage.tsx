@@ -3,7 +3,6 @@
 import React, { useEffect, useState, ChangeEvent } from "react";
 import { FiUploadCloud } from "react-icons/fi";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
-import { z } from "zod";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
@@ -17,7 +16,7 @@ import { toast } from "sonner";
 // Define the settlement state type
 interface SettlementState {
   id?: number;
-  settlement_type_id: number;
+  settlement_type_id: number | undefined;
   amount: number;
   event_date: string;
   requested_to: string;
@@ -32,13 +31,13 @@ interface SettlementState {
 
 // Initial state
 const initialSettlementState: SettlementState = {
-  settlement_type_id: 0,
+  settlement_type_id: undefined,
   amount: 0,
   event_date: "",
   requested_to: "",
   description: "",
   comment: "",
-  status: "Submitted",
+  status: "Pending",
   in_advance: false,
   attachments: [],
   claimant_id: "",
@@ -48,7 +47,9 @@ export default function SettlementCreatePage() {
   const [isAdvance, setIsAdvance] = useState(false);
   const [selectedType, setSelectedType] = useState<number | null>(null);
   const [allowance, setAllowance] = useState<number | null>(null);
-  const [settlementState, setSettlementState] = useState<SettlementState>(initialSettlementState);
+  const [settlementState, setSettlementState] = useState<SettlementState>(
+    initialSettlementState
+  );
   const [attachments, setAttachments] = useState<File[]>([]);
   const { claimTypes, fetchClaimTypes } = useClaimTypes();
   const { employees, fetchEmployees } = useEmployees();
@@ -56,35 +57,35 @@ export default function SettlementCreatePage() {
   const [isValid, setIsValid] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    
+
     if (name === "settlement_type_id") {
       const typeId = Number(value);
       setSelectedType(typeId);
-      
-      const claimType = claimTypes.find(type => type.id === typeId);
+
+      const claimType = claimTypes.find((type) => type.id === typeId);
       setAllowance(claimType?.allowance || null);
-      
-      setSettlementState(prev => ({ 
-        ...prev, 
+
+      setSettlementState((prev) => ({
+        ...prev,
         [name]: typeId,
-        requested_to: claimType?.settler_id || prev.requested_to
+        requested_to: claimType?.settler_id || prev.requested_to,
       }));
-    }
-    else if (name === "amount") {
-      setSettlementState(prev => ({ ...prev, [name]: Number(value) }));
-    } 
-    else {
-      setSettlementState(prev => ({ 
-        ...prev, 
-        [name]: value 
+    } else if (name === "amount") {
+      setSettlementState((prev) => ({ ...prev, [name]: Number(value) }));
+    } else {
+      setSettlementState((prev) => ({
+        ...prev,
+        [name]: value,
       }));
     }
   };
 
   const removeFile = (name: string) => {
-    setAttachments(prev => prev.filter(file => file.name !== name));
+    setAttachments((prev) => prev.filter((file) => file.name !== name));
   };
 
   async function handleSubmit(e: React.FormEvent) {
@@ -122,14 +123,16 @@ export default function SettlementCreatePage() {
       setAllowance(null);
     } catch (error: any) {
       console.error("Error creating Settlement:", error);
-      toast.error(`Error creating Settlement: ${error.message || "Please try again"}`);
+      toast.error(
+        `Error creating Settlement: ${error.message || "Please try again"}`
+      );
     } finally {
       setIsSubmitting(false);
     }
   }
 
   useEffect(() => {
-    setSettlementState(prev => ({
+    setSettlementState((prev) => ({
       ...prev,
       in_advance: isAdvance,
     }));
@@ -207,11 +210,11 @@ export default function SettlementCreatePage() {
           <div className="relative">
             <select
               name="settlement_type_id"
-              value={settlementState.settlement_type_id === null ? "" : settlementState.settlement_type_id}
+              value={settlementState.settlement_type_id}
               onChange={handleInputChange}
               className="w-full bg-blue-100 rounded p-3 appearance-none"
             >
-              <option value="">Select Type</option>
+              <option value={undefined}>Select Type</option>
               {claimTypes.length > 0 &&
                 claimTypes.map((type) => (
                   <option key={type.id} value={type.id}>
@@ -231,7 +234,7 @@ export default function SettlementCreatePage() {
             </p>
           )}
 
-          {selectedType && allowance !== null && (
+          {selectedType !== undefined && allowance !== null && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -244,7 +247,9 @@ export default function SettlementCreatePage() {
         </div>
 
         <div>
-          <label className="block text-lg font-bold text-blue-700">Amount</label>
+          <label className="block text-lg font-bold text-blue-700">
+            Amount
+          </label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
               BDT
@@ -296,7 +301,9 @@ export default function SettlementCreatePage() {
               <p className="text-sm">
                 Your request will be forwarded to:{" "}
                 <span className="font-medium">
-                  {employees.find(emp => emp.id === settlementState.requested_to)?.name || "Unknown"}
+                  {employees.find(
+                    (emp) => emp.id === settlementState.requested_to
+                  )?.name || "Unknown"}
                 </span>
               </p>
             </div>
@@ -377,7 +384,7 @@ export default function SettlementCreatePage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={!isValid || isSubmitting}
+            disabled={!isValid || isSubmitting || settlementState.settlement_type_id === undefined}
             className="bg-blue-700 text-white px-6 py-2 rounded-full hover:bg-blue-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Submitting..." : "Submit Request"}

@@ -7,9 +7,18 @@ import { RequisitionInventory, RequisitionType } from "@/hooks/useConfigTypes";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
-import { Package, X, Buildings, UserPlus, TextAlignLeft, Plus, Minus, Tag } from "@phosphor-icons/react";
+import {
+  Package,
+  X,
+  Buildings,
+  UserPlus,
+  TextAlignLeft,
+  Plus,
+  Minus,
+  Tag,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
 type FormValues = z.infer<typeof requisitionTypeSchema>;
@@ -27,7 +36,6 @@ export default function RequisitionTypeCreateModal({
 }: RequisitionTypesModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
     name: "",
-    company_id: 0,
   });
 
   const [errors, setErrors] = useState<Partial<FormValues>>({});
@@ -43,7 +51,8 @@ export default function RequisitionTypeCreateModal({
       setIsValid(false);
       const newErrors: Partial<FormValues> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof FormValues] = err.message as unknown as undefined;
+        newErrors[err.path[0] as keyof FormValues] =
+          err.message as unknown as undefined;
       });
       setErrors(newErrors);
     }
@@ -69,7 +78,8 @@ export default function RequisitionTypeCreateModal({
     if (!result.success) {
       const fieldErrors: Partial<FormValues> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] = issue.message as unknown as undefined;
+        fieldErrors[issue.path[0] as keyof FormValues] =
+          issue.message as unknown as undefined;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -84,20 +94,20 @@ export default function RequisitionTypeCreateModal({
   // Animation variants
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
+        staggerChildren: 0.1,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.2 } 
-    }
+      transition: { duration: 0.2 },
+    },
   };
 
   return (
@@ -110,10 +120,15 @@ export default function RequisitionTypeCreateModal({
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-200"
       >
-        <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+        <motion.div
+          variants={fadeInUp}
+          className="flex items-center justify-between mb-6"
+        >
           <div className="flex items-center gap-3">
             <Tag size={24} weight="duotone" className="text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-800">Configure Category</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Configure Category
+            </h2>
           </div>
           <Button
             variant="ghost"
@@ -126,7 +141,9 @@ export default function RequisitionTypeCreateModal({
 
         <motion.div variants={fadeInUp}>
           <div className="mb-4">
-            <label className="block font-semibold text-gray-700 mb-2">Name</label>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Name
+            </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Tag size={18} weight="duotone" className="text-gray-500" />
@@ -139,7 +156,9 @@ export default function RequisitionTypeCreateModal({
                 placeholder="Enter Category Name"
               />
             </div>
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </div>
         </motion.div>
 
@@ -202,9 +221,8 @@ export function RequisitionInventoryCreateModal({
     description: "",
     quantity: 1,
     asset_owner: "",
-    requisition_category_id: 0,
-    department_id: 0,
-    company_id: 1,
+    requisition_category_id: undefined,
+    department_id: undefined,
   });
   const [errors, setErrors] = useState<Partial<RequisitionInventoryFormValues>>(
     {}
@@ -212,7 +230,11 @@ export function RequisitionInventoryCreateModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const { departments, fetchDepartments } = useDepartments();
-  const { employees: assetOwners, loading: loadingEmployees, fetchEmployees } = useEmployees();
+  const {
+    employees: assetOwners,
+    loading: loadingEmployees,
+    fetchEmployees,
+  } = useEmployees();
 
   useEffect(() => {
     fetchDepartments();
@@ -228,7 +250,8 @@ export function RequisitionInventoryCreateModal({
       setIsValid(false);
       const newErrors: Partial<RequisitionInventoryFormValues> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof RequisitionInventoryFormValues] = err.message as unknown as undefined ;
+        newErrors[err.path[0] as keyof RequisitionInventoryFormValues] =
+          err.message as unknown as undefined;
       });
       setErrors(newErrors);
     }
@@ -265,7 +288,8 @@ export function RequisitionInventoryCreateModal({
     if (!result.success) {
       const fieldErrors: Partial<RequisitionInventoryFormValues> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof RequisitionInventoryFormValues] = issue.message as unknown as undefined;
+        fieldErrors[issue.path[0] as keyof RequisitionInventoryFormValues] =
+          issue.message as unknown as undefined;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -280,34 +304,34 @@ export function RequisitionInventoryCreateModal({
   // Animation variants
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
+        staggerChildren: 0.1,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.2 } 
-    }
+      transition: { duration: 0.2 },
+    },
   };
 
   const handleIncrement = () => {
-    setFormValues(prev => ({
+    setFormValues((prev) => ({
       ...prev,
-      quantity: prev.quantity + 1
+      quantity: prev.quantity + 1,
     }));
   };
 
   const handleDecrement = () => {
     if (formValues.quantity > 1) {
-      setFormValues(prev => ({
+      setFormValues((prev) => ({
         ...prev,
-        quantity: prev.quantity - 1
+        quantity: prev.quantity - 1,
       }));
     }
   };
@@ -322,10 +346,15 @@ export function RequisitionInventoryCreateModal({
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-200"
       >
-        <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+        <motion.div
+          variants={fadeInUp}
+          className="flex items-center justify-between mb-6"
+        >
           <div className="flex items-center gap-3">
             <Package size={24} weight="duotone" className="text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-800">Configure Inventory Item</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Configure Inventory Item
+            </h2>
           </div>
           <Button
             variant="ghost"
@@ -353,7 +382,9 @@ export function RequisitionInventoryCreateModal({
                 placeholder="Enter Item Name"
               />
             </div>
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </div>
 
           <div>
@@ -362,7 +393,11 @@ export function RequisitionInventoryCreateModal({
             </label>
             <div className="relative">
               <div className="absolute top-3 left-3 pointer-events-none">
-                <TextAlignLeft size={18} weight="duotone" className="text-gray-500" />
+                <TextAlignLeft
+                  size={18}
+                  weight="duotone"
+                  className="text-gray-500"
+                />
               </div>
               <textarea
                 name="description"
@@ -373,7 +408,9 @@ export function RequisitionInventoryCreateModal({
                 rows={3}
               />
             </div>
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+            )}
           </div>
 
           <div>
@@ -404,7 +441,9 @@ export function RequisitionInventoryCreateModal({
                 <Plus size={16} weight="bold" />
               </Button>
             </div>
-            {errors.quantity && <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>}
+            {errors.quantity && (
+              <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>
+            )}
           </div>
 
           <div>
@@ -413,7 +452,11 @@ export function RequisitionInventoryCreateModal({
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <UserPlus size={18} weight="duotone" className="text-gray-500" />
+                <UserPlus
+                  size={18}
+                  weight="duotone"
+                  className="text-gray-500"
+                />
               </div>
               <select
                 name="asset_owner"
@@ -422,14 +465,17 @@ export function RequisitionInventoryCreateModal({
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
               >
                 <option value="">Select Asset Owner</option>
-                {!loadingEmployees && assetOwners.map((employee) => (
-                  <option key={employee.id} value={employee.id}>
-                    {employee.name}
-                  </option>
-                ))}
+                {!loadingEmployees &&
+                  assetOwners.map((employee) => (
+                    <option key={employee.id} value={employee.id}>
+                      {employee.name}
+                    </option>
+                  ))}
               </select>
             </div>
-            {errors.asset_owner && <p className="text-red-500 text-sm mt-1">{errors.asset_owner}</p>}
+            {errors.asset_owner && (
+              <p className="text-red-500 text-sm mt-1">{errors.asset_owner}</p>
+            )}
           </div>
 
           <div>
@@ -446,7 +492,7 @@ export function RequisitionInventoryCreateModal({
                 onChange={handleChange}
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
               >
-                <option value={0}>Select Category</option>
+                <option value={undefined}>Select Category</option>
                 {requisitionCategories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -454,7 +500,16 @@ export function RequisitionInventoryCreateModal({
                 ))}
               </select>
             </div>
-            {errors.requisition_category_id && <p className="text-red-500 text-sm mt-1">{errors.requisition_category_id}</p>}
+            {errors.requisition_category_id && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.requisition_category_id}
+              </p>
+            )}
+            {formValues.department_id === undefined && (
+              <p className="text-red-500 text-sm mt-1">
+                Please select a category.
+              </p>
+            )}
           </div>
 
           <div>
@@ -463,7 +518,11 @@ export function RequisitionInventoryCreateModal({
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Buildings size={18} weight="duotone" className="text-gray-500" />
+                <Buildings
+                  size={18}
+                  weight="duotone"
+                  className="text-gray-500"
+                />
               </div>
               <select
                 name="department_id"
@@ -471,7 +530,7 @@ export function RequisitionInventoryCreateModal({
                 onChange={handleChange}
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
               >
-                <option value={0}>Select Department</option>
+                <option value={undefined}>Select Department</option>
                 {departments.map((department) => (
                   <option key={department.id} value={department.id}>
                     {department.name}
@@ -479,7 +538,16 @@ export function RequisitionInventoryCreateModal({
                 ))}
               </select>
             </div>
-            {errors.department_id && <p className="text-red-500 text-sm mt-1">{errors.department_id}</p>}
+            {errors.department_id && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.department_id}
+              </p>
+            )}
+            {formValues.department_id === undefined && (
+              <p className="text-red-500 text-sm mt-1">
+                Please select a department
+              </p>
+            )}
           </div>
         </motion.div>
 
@@ -500,7 +568,9 @@ export function RequisitionInventoryCreateModal({
               isLoading ||
               isSubmitting ||
               !isValid ||
-              Object.keys(errors).length > 0
+              Object.keys(errors).length > 0 ||
+              formValues.department_id === undefined ||
+              formValues.requisition_category_id === undefined
             }
             className="bg-gray-800 hover:bg-gray-900 text-white"
           >
@@ -524,9 +594,8 @@ export function RequisitionInventoryUpdateModal({
     description: "",
     quantity: 1,
     asset_owner: "",
-    requisition_category_id: 0,
-    department_id: 0,
-    company_id: 1,
+    requisition_category_id: undefined,
+    department_id: undefined,
   });
   const [errors, setErrors] = useState<Partial<RequisitionInventoryFormValues>>(
     {}
@@ -534,7 +603,11 @@ export function RequisitionInventoryUpdateModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const { departments, fetchDepartments } = useDepartments();
-  const { employees: assetOwners, loading: loadingEmployees, fetchEmployees } = useEmployees();
+  const {
+    employees: assetOwners,
+    loading: loadingEmployees,
+    fetchEmployees,
+  } = useEmployees();
   const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
@@ -546,7 +619,8 @@ export function RequisitionInventoryUpdateModal({
       setIsValid(false);
       const newErrors: Partial<RequisitionInventoryFormValues> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof RequisitionInventoryFormValues] = err.message as unknown as undefined;
+        newErrors[err.path[0] as keyof RequisitionInventoryFormValues] =
+          err.message as unknown as undefined;
       });
       setErrors(newErrors);
     }
@@ -583,7 +657,8 @@ export function RequisitionInventoryUpdateModal({
     if (!result.success) {
       const fieldErrors: Partial<RequisitionInventoryFormValues> = {};
       for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof RequisitionInventoryFormValues] = issue.message as unknown as undefined;
+        fieldErrors[issue.path[0] as keyof RequisitionInventoryFormValues] =
+          issue.message as unknown as undefined;
       }
       setErrors(fieldErrors);
       setIsSubmitting(false);
@@ -658,7 +733,7 @@ export function RequisitionInventoryUpdateModal({
               onChange={handleChange}
               className="w-full rounded-md bg-blue-50 p-2"
             >
-              <option value="">Select Category</option>
+              <option value={undefined}>Select Category</option>
               {requisitionCategories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -668,6 +743,11 @@ export function RequisitionInventoryUpdateModal({
             {errors.requisition_category_id && (
               <p className="text-red-500 text-sm">
                 {errors.requisition_category_id}
+              </p>
+            )}
+            {formValues.requisition_category_id === undefined && (
+              <p className="text-red-500 text-sm mt-1">
+                Please select a category.
               </p>
             )}
           </div>
@@ -698,7 +778,7 @@ export function RequisitionInventoryUpdateModal({
               onChange={handleChange}
               className="w-full rounded-md bg-blue-50 p-2"
             >
-              <option value="">Select Department</option>
+              <option value={undefined}>Select Department</option>
               {departments.map((department) => (
                 <option key={department.id} value={department.id}>
                   {department.name}
@@ -707,6 +787,11 @@ export function RequisitionInventoryUpdateModal({
             </select>
             {errors.department_id && (
               <p className="text-red-500 text-sm">{errors.department_id}</p>
+            )}
+            {formValues.department_id === undefined && (
+              <p className="text-red-500 text-sm mt-1">
+                Please select a department
+              </p>
             )}
           </div>
           <div>
@@ -750,7 +835,8 @@ export function RequisitionInventoryUpdateModal({
               isLoading ||
               isSubmitting ||
               !isValid ||
-              Object.keys(errors).length > 0
+              Object.keys(errors).length > 0 ||
+              formValues.department_id === undefined
             }
           >
             {isLoading ? "Saving..." : "Submit"}

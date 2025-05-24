@@ -39,7 +39,7 @@ const initialTask: Task = {
   start_date: "",
   end_date: "",
   priority: "Medium",
-  project_id: 1,
+  project_id: undefined,
   assignees: [],
   status: false,
 };

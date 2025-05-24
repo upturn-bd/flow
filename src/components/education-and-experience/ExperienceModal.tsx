@@ -22,9 +22,7 @@ export default function ExperienceModal({
     from_date: "",
     to_date: "",
     description: "",
-    id: 0,
     employee_id: "",
-    company_id: 0,
   });
 
   useEffect(() => {

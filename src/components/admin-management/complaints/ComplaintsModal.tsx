@@ -22,9 +22,7 @@ export default function ComplaintTypeCreateModal({
   isLoading = false,
 }: ComplaintsModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
-    id: 0,
     name: "",
-    company_id: 0,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});

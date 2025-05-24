@@ -12,10 +12,10 @@ import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Upload, 
-  Calendar, 
-  Clock, 
+import {
+  Upload,
+  Calendar,
+  Clock,
   ChevronLeft,
   ChevronDown,
   PackageOpen,
@@ -24,7 +24,7 @@ import {
   Check,
   Loader2,
   X,
-  FileText
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
@@ -32,9 +32,9 @@ import { useRequisitionTypes } from "@/hooks/useConfigTypes";
 
 // Define a proper interface that mirrors the requisition schema
 interface RequisitionFormState {
-  requisition_category_id: number;
+  requisition_category_id: number | undefined;
   employee_id: string;
-  item_id: number;
+  item_id: number | undefined;
   quantity: number;
   status: "Pending" | "Approved" | "Rejected"; // Using the exact enum values
   is_one_off: boolean;
@@ -52,9 +52,9 @@ interface RequisitionFormState {
 }
 
 const initialRequisitionState: RequisitionFormState = {
-  requisition_category_id: 0,
+  requisition_category_id: undefined,
   employee_id: "",
-  item_id: 0,
+  item_id: undefined,
   quantity: 0,
   status: "Pending", // Using valid enum value
   is_one_off: false,
@@ -77,23 +77,26 @@ interface RequisitionDraftPageProps {
 export type RequisitionState = z.infer<typeof requisitionSchema>;
 
 // Define a type to handle draft with ID
-interface RequisitionDraft extends Omit<RequisitionFormState, 'attachments'> {
+interface RequisitionDraft extends Omit<RequisitionFormState, "attachments"> {
   draft_id: number;
   attachments: string[];
 }
 
-function saveDraftToLocalStorage(draftId: number, requisitionState: RequisitionFormState) {
+function saveDraftToLocalStorage(
+  draftId: number,
+  requisitionState: RequisitionFormState
+) {
   // Check if drafts exist in localStorage
   const drafts = localStorage.getItem("requisition-drafts");
   const parsedDrafts = drafts ? JSON.parse(drafts) : [];
-  
+
   // Create a draft object with draft_id
   const draftToSave: RequisitionDraft = {
     ...requisitionState,
     draft_id: draftId,
     attachments: [], // We can't store File objects in localStorage
   };
-  
+
   // Check if a draft with this ID already exists
   const existingDraftIndex = parsedDrafts.findIndex(
     (draft: RequisitionDraft) => draft.draft_id === draftId
@@ -115,9 +118,8 @@ export default function RequisitionCreatePage({
   onClose,
 }: RequisitionCreatePageProps) {
   const [isOneOff, setIsOneOff] = useState(false);
-  const [requisitionState, setRequisitionState] = useState<RequisitionFormState>(
-    initialRequisitionState
-  );
+  const [requisitionState, setRequisitionState] =
+    useState<RequisitionFormState>(initialRequisitionState);
   const [attachments, setAttachments] = useState<File[]>([]);
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } =
@@ -187,7 +189,7 @@ export default function RequisitionCreatePage({
   function handleSaveDraft() {
     const drafts = localStorage.getItem("requisition-drafts");
     const draftId = drafts ? JSON.parse(drafts).length + 1 : 1;
-    
+
     saveDraftToLocalStorage(draftId, requisitionState);
     toast.success("Draft saved successfully!");
     setRequisitionState(initialRequisitionState);
@@ -234,7 +236,7 @@ export default function RequisitionCreatePage({
         newErrors.from_time = "Please specify the start time";
         valid = false;
       }
-      
+
       if (!requisitionState.to_time) {
         newErrors.to_time = "Please specify the end time";
         valid = false;
@@ -252,7 +254,7 @@ export default function RequisitionCreatePage({
   }, [fetchRequisitionTypes, fetchRequisitionInventories, fetchEmployees]);
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -271,24 +273,33 @@ export default function RequisitionCreatePage({
           <span>Back</span>
         </motion.button>
       </div>
-      
+
       <div
         className="flex items-center cursor-pointer gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200"
         onClick={() => setIsOneOff(!isOneOff)}
       >
-        <div className={`w-12 h-6 rounded-full relative ${isOneOff ? 'bg-blue-500' : 'bg-gray-300'} transition-colors duration-300`}>
-          <motion.div 
+        <div
+          className={`w-12 h-6 rounded-full relative ${
+            isOneOff ? "bg-blue-500" : "bg-gray-300"
+          } transition-colors duration-300`}
+        >
+          <motion.div
             className="w-5 h-5 bg-white rounded-full absolute top-0.5"
-            animate={{ 
-              left: isOneOff ? 'calc(100% - 1.25rem - 0.125rem)' : '0.125rem' 
+            animate={{
+              left: isOneOff ? "calc(100% - 1.25rem - 0.125rem)" : "0.125rem",
             }}
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
           />
         </div>
-        <span className="text-sm font-medium text-gray-700">One-Off Request</span>
+        <span className="text-sm font-medium text-gray-700">
+          One-Off Request
+        </span>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200"
+      >
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
@@ -302,7 +313,7 @@ export default function RequisitionCreatePage({
                 onChange={handleInputChange}
                 className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
-                <option value={""}>Select category</option>
+                <option value={undefined}>Select category</option>
                 {requisitionTypes.length > 0 &&
                   requisitionTypes.map((type) => (
                     <option key={type.id} value={type.id}>
@@ -310,16 +321,19 @@ export default function RequisitionCreatePage({
                     </option>
                   ))}
               </select>
-              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+              <ChevronDown
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                size={16}
+              />
               {errors.requisition_category_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
                   <AlertCircle size={14} className="mr-1" />
-                  {errors.requisition_category_id}
+                  Please select a category
                 </p>
               )}
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Item
@@ -331,7 +345,7 @@ export default function RequisitionCreatePage({
                 onChange={handleInputChange}
                 className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
-                <option value={""}>Select item</option>
+                <option value={undefined}>Select item</option>
                 {requisitionInventories.length > 0 &&
                   requisitionInventories
                     .filter(
@@ -345,16 +359,19 @@ export default function RequisitionCreatePage({
                       </option>
                     ))}
               </select>
-              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+              <ChevronDown
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                size={16}
+              />
               {errors.item_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
                   <AlertCircle size={14} className="mr-1" />
-                  {errors.item_id}
+                  Please select an item
                 </p>
               )}
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Quantity
@@ -416,7 +433,7 @@ export default function RequisitionCreatePage({
                     />
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                     <Clock size={16} className="mr-2" />
@@ -459,7 +476,9 @@ export default function RequisitionCreatePage({
             </label>
             <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-6 text-center">
               <Upload className="mx-auto mb-4 text-gray-400 h-10 w-10" />
-              <p className="text-sm text-gray-500 mb-4">Drag and drop files here, or</p>
+              <p className="text-sm text-gray-500 mb-4">
+                Drag and drop files here, or
+              </p>
               <label
                 htmlFor="file_upload"
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg cursor-pointer hover:bg-blue-700 transition-colors"
@@ -484,10 +503,10 @@ export default function RequisitionCreatePage({
                   ]);
                 }}
               />
-              
+
               <AnimatePresence>
                 {attachments.length > 0 && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -533,7 +552,7 @@ export default function RequisitionCreatePage({
             <Save size={18} />
             <span>Save as Draft</span>
           </motion.button>
-          
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -564,9 +583,11 @@ export function RequisitionDraftPage({
   onClose,
 }: RequisitionDraftPageProps) {
   const [isOneOff, setIsOneOff] = useState(false);
-  const [requisitionState, setRequisitionState] = useState<RequisitionFormState & { draft_id?: number }>({
+  const [requisitionState, setRequisitionState] = useState<
+    RequisitionFormState & { draft_id?: number }
+  >({
     ...initialRequisitionState,
-    draft_id: undefined
+    draft_id: undefined,
   });
   const [attachments, setAttachments] = useState<File[]>([]);
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
@@ -621,26 +642,29 @@ export function RequisitionDraftPage({
           (inv) => inv.id === requisitionState.item_id
         )[0]?.asset_owner,
       };
-      
+
       const { data, error } = await supabase
         .from("requisition_records")
         .insert(formattedRequisitionState);
-        
+
       if (error) throw error;
-      
+
       toast.success("Requisition created successfully!");
       setRequisitionState(initialRequisitionState);
       setAttachments([]);
-      
+
       // Remove the draft from localStorage
       const drafts = localStorage.getItem("requisition-drafts");
       if (drafts) {
         const updatedDrafts = JSON.parse(drafts).filter(
           (draft: RequisitionDraft) => draft.draft_id !== draft_id
         );
-        localStorage.setItem("requisition-drafts", JSON.stringify(updatedDrafts));
+        localStorage.setItem(
+          "requisition-drafts",
+          JSON.stringify(updatedDrafts)
+        );
       }
-      
+
       onClose();
     } catch (error) {
       console.error("Error creating Requisition:", error);
@@ -656,13 +680,19 @@ export function RequisitionDraftPage({
       if (drafts) {
         const parsedDrafts = JSON.parse(drafts);
         const updatedDrafts = parsedDrafts
-          .filter((draft: RequisitionDraft) => draft.draft_id !== requisitionState.draft_id)
+          .filter(
+            (draft: RequisitionDraft) =>
+              draft.draft_id !== requisitionState.draft_id
+          )
           .concat({
             ...requisitionState,
-            attachments: [] // We can't store File objects
+            attachments: [], // We can't store File objects
           });
-          
-        localStorage.setItem("requisition-drafts", JSON.stringify(updatedDrafts));
+
+        localStorage.setItem(
+          "requisition-drafts",
+          JSON.stringify(updatedDrafts)
+        );
         toast.success("Draft updated successfully!");
         setRequisitionState(initialRequisitionState);
         setAttachments([]);
@@ -675,12 +705,14 @@ export function RequisitionDraftPage({
     const drafts = localStorage.getItem("requisition-drafts");
     if (drafts) {
       const parsedDrafts = JSON.parse(drafts);
-      const draft = parsedDrafts.find((draft: RequisitionDraft) => draft.draft_id === draftId);
+      const draft = parsedDrafts.find(
+        (draft: RequisitionDraft) => draft.draft_id === draftId
+      );
       if (draft) {
         setRequisitionState({
           ...draft,
           // Keep the draft_id so we can reference it later
-          draft_id: draft.draft_id
+          draft_id: draft.draft_id,
         });
         setIsOneOff(draft.is_one_off);
         // Note: attachments won't be restored from localStorage
@@ -727,7 +759,7 @@ export function RequisitionDraftPage({
         newErrors.from_time = "Please specify the start time";
         valid = false;
       }
-      
+
       if (!requisitionState.to_time) {
         newErrors.to_time = "Please specify the end time";
         valid = false;
@@ -781,7 +813,7 @@ export function RequisitionDraftPage({
               onChange={handleInputChange}
               className="w-full bg-blue-100 rounded p-3 appearance-none"
             >
-              <option value={""}>Select category</option>
+              <option value={undefined}>Select category</option>
               {requisitionTypes.length > 0 &&
                 requisitionTypes.map((type) => (
                   <option key={type.id} value={type.id}>
@@ -800,6 +832,12 @@ export function RequisitionDraftPage({
               {errors.requisition_category_id}
             </p>
           )}
+          {requisitionState.requisition_category_id === undefined && (
+            <p className="mt-1 text-red-500 text-sm flex items-center">
+              <AlertCircle size={14} className="mr-1" />
+              Please select a category
+            </p>
+          )}
         </div>
         <div>
           <label className="block text-lg font-bold text-blue-700">Item</label>
@@ -810,7 +848,7 @@ export function RequisitionDraftPage({
               onChange={handleInputChange}
               className="w-full bg-blue-100 rounded p-3 appearance-none"
             >
-              <option value={""}>Select item</option>
+              <option value={undefined}>Select item</option>
               {requisitionInventories.length > 0 &&
                 requisitionInventories
                   .filter(
@@ -832,6 +870,12 @@ export function RequisitionDraftPage({
           </div>
           {errors.item_id && (
             <p className="text-red-500 text-sm mt-1">{errors.item_id}</p>
+          )}
+          {requisitionState.item_id === undefined && (
+            <p className="mt-1 text-red-500 text-sm flex items-center">
+              <AlertCircle size={14} className="mr-1" />
+              Please select an item
+            </p>
           )}
         </div>
         <div>
@@ -971,7 +1015,12 @@ export function RequisitionDraftPage({
           </button>
           <button
             type="submit"
-            disabled={!isValid || isSubmitting}
+            disabled={
+              !isValid ||
+              isSubmitting ||
+              !requisitionState.requisition_category_id ||
+              !requisitionState.item_id
+            }
             className="bg-[#001F4D] text-white px-6 py-2 rounded-full hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Submitting..." : "Submit"}

@@ -23,10 +23,8 @@ export async function createNewsAndNoticeType(
   const validated = newsAndNoticeTypeSchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { id, ...rest } = payload;
-
   const { data, error } = await supabase.from("notice_types").insert({
-    ...rest,
+    ...payload,
     company_id,
   });
 

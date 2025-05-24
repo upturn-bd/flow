@@ -13,7 +13,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 
 const initialComplaintRecord = {
-  complaint_type_id: 0,
+  complaint_type_id: undefined,
   complainer_id: "",
   requested_to: "",
   description: "",
@@ -27,7 +27,9 @@ export type ComplaintState = z.infer<typeof complaintRecordSchema>;
 
 export default function ComplaintCreatePage() {
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [complaintState, setComplaintState] = useState<ComplaintState>(initialComplaintRecord);
+  const [complaintState, setComplaintState] = useState<ComplaintState>(
+    initialComplaintRecord
+  );
   const [attachments, setAttachments] = useState<File[]>([]);
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
   const { employees, fetchEmployees } = useEmployees();
@@ -52,7 +54,6 @@ export default function ComplaintCreatePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const company_id = await getCompanyId();
     const user = await getEmployeeInfo();
     setIsSubmitting(true);
     try {
@@ -68,16 +69,16 @@ export default function ComplaintCreatePage() {
         attachments: uploadedFilePaths,
         anonymous: isAnonymous,
         complainer_id: isAnonymous ? null : user.id,
-        company_id,
+        company_id: user.company_id,
         requested_to: user.supervisor_id,
       };
-      
+
       const { data, error } = await supabase
         .from("complaint_records")
         .insert(formattedComplaintState);
-        
+
       if (error) throw error;
-      
+
       alert("Complaint created successfully!");
       setComplaintState(initialComplaintRecord);
       setAttachments([]);
@@ -105,7 +106,8 @@ export default function ComplaintCreatePage() {
       setIsValid(false);
       const newErrors: Partial<ComplaintState> = {};
       result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof ComplaintState] = err.message as unknown as undefined;
+        newErrors[err.path[0] as keyof ComplaintState] =
+          err.message as unknown as undefined;
       });
       setErrors(newErrors);
     }
@@ -145,7 +147,7 @@ export default function ComplaintCreatePage() {
               onChange={handleInputChange}
               className="w-full bg-blue-100 rounded p-3 appearance-none"
             >
-              <option value={""}>Select category</option>
+              <option value={undefined}>Select category</option>
               {complaintTypes.length > 0 &&
                 complaintTypes.map((type) => (
                   <option key={type.id} value={type.id}>
@@ -161,7 +163,12 @@ export default function ComplaintCreatePage() {
           </div>
           {errors.complaint_type_id && (
             <p className="text-red-500 text-sm mt-1">
-              {errors.complaint_type_id}
+              Please select a category
+            </p>
+          )}
+          {complaintState.complaint_type_id === undefined && (
+            <p className="text-red-500 text-sm mt-1">
+              Please select a category
             </p>
           )}
         </div>
@@ -264,7 +271,11 @@ export default function ComplaintCreatePage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={!isValid || isSubmitting}
+            disabled={
+              !isValid ||
+              isSubmitting ||
+              complaintState.complaint_type_id === undefined
+            }
             className="bg-[#001F4D] text-white px-6 py-2 rounded-full hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Submitting..." : "Submit"}

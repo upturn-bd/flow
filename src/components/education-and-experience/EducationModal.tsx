@@ -26,9 +26,7 @@ export default function EducationModal({
     to_date: "",
     result: "",
     attachments: [],
-    id: 0,
     employee_id: "",
-    company_id: 0,
   });
   
   const { uploading, uploadFiles } = useFileUpload();

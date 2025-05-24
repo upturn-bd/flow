@@ -8,20 +8,19 @@ import { z } from "zod";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { useTasks } from "@/hooks/useTasks";
 import { motion } from "framer-motion";
-import { 
-  Calendar, 
-  Clock, 
-  Users, 
-  Building2, 
-  ChevronDown, 
-  AlertCircle, 
+import {
+  Calendar,
+  Clock,
+  Users,
+  Building2,
+  ChevronDown,
+  AlertCircle,
   Check,
   X,
   Plus,
   Search,
-  Loader2
+  Loader2,
 } from "lucide-react";
-import { toast } from "sonner";
 
 type Task = z.infer<typeof taskSchema>;
 
@@ -31,7 +30,7 @@ const initialTaskRecord = {
   start_date: "",
   end_date: "",
   status: false,
-  department_id: 0,
+  department_id: undefined,
   assignees: [],
   priority: "Medium",
   created_by: "",
@@ -67,7 +66,7 @@ export default function TaskCreateModal() {
     } else if (name === "department_id") {
       setTask((prev) => ({
         ...prev,
-        [name]: value === "" ? null : parseInt(value),
+        [name]: parseInt(value),
       }));
     } else {
       setTask((prev) => ({ ...prev, [name]: value }));
@@ -103,7 +102,8 @@ export default function TaskCreateModal() {
       for (const issue of result.error.issues) {
         const path = issue.path[0] as keyof Task;
         if (path) {
-          fieldErrors[path as keyof Task] = issue.message as unknown as undefined; 
+          fieldErrors[path as keyof Task] =
+            issue.message as unknown as undefined;
         }
       }
       setErrors(fieldErrors);
@@ -170,15 +170,17 @@ export default function TaskCreateModal() {
 
   return (
     <div className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6">
-      <motion.form 
+      <motion.form
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        onSubmit={handleSubmit} 
+        onSubmit={handleSubmit}
         className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200"
       >
-        <h2 className="text-xl font-bold text-blue-700 mb-6">Create New Task</h2>
-        
+        <h2 className="text-xl font-bold text-blue-700 mb-6">
+          Create New Task
+        </h2>
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -198,7 +200,7 @@ export default function TaskCreateModal() {
               </p>
             )}
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description
@@ -210,7 +212,7 @@ export default function TaskCreateModal() {
               className="w-full h-32 rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
@@ -221,10 +223,10 @@ export default function TaskCreateModal() {
                 <select
                   name="department_id"
                   onChange={handleChange}
-                  value={task.department_id ?? ""}
+                  value={task.department_id}
                   className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
                 >
-                  <option value={""}>Select Department</option>
+                  <option value={undefined}>Select Department</option>
                   {departments.length > 0 &&
                     departments.map((department) => (
                       <option key={department.id} value={department.id}>
@@ -232,16 +234,25 @@ export default function TaskCreateModal() {
                       </option>
                     ))}
                 </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                <ChevronDown
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                  size={16}
+                />
                 {errors.department_id && (
                   <p className="mt-1 text-red-500 text-sm flex items-center">
                     <AlertCircle size={14} className="mr-1" />
-                    {errors.department_id}
+                    Please select a department.
+                  </p>
+                )}
+                {task.department_id === undefined && (
+                  <p className="mt-1 text-red-500 text-sm flex items-center">
+                    <AlertCircle size={14} className="mr-1" />
+                    Please select a department.
                   </p>
                 )}
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                 <Clock size={16} className="mr-2" />
@@ -266,23 +277,26 @@ export default function TaskCreateModal() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                <ChevronDown
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                  size={16}
+                />
               </div>
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Priority
             </label>
             <div className="flex gap-4">
               {["High", "Medium", "Low"].map((priority) => (
-                <label 
-                  key={priority} 
+                <label
+                  key={priority}
                   className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition ${
-                    task.priority === priority 
-                      ? 'bg-blue-50 border border-blue-200' 
-                      : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
+                    task.priority === priority
+                      ? "bg-blue-50 border border-blue-200"
+                      : "bg-gray-50 border border-gray-200 hover:bg-gray-100"
                   }`}
                 >
                   <input
@@ -293,16 +307,21 @@ export default function TaskCreateModal() {
                     onChange={handleChange}
                     className="sr-only"
                   />
-                  <span className={`w-3 h-3 rounded-full ${
-                    priority === 'High' ? 'bg-red-500' : 
-                    priority === 'Medium' ? 'bg-yellow-500' : 'bg-green-500'
-                  }`}></span>
+                  <span
+                    className={`w-3 h-3 rounded-full ${
+                      priority === "High"
+                        ? "bg-red-500"
+                        : priority === "Medium"
+                        ? "bg-yellow-500"
+                        : "bg-green-500"
+                    }`}
+                  ></span>
                   <span>{priority}</span>
                 </label>
               ))}
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
@@ -323,7 +342,7 @@ export default function TaskCreateModal() {
                 </p>
               )}
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                 <Calendar size={16} className="mr-2" />
@@ -351,7 +370,7 @@ export default function TaskCreateModal() {
               )}
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
               <Users size={16} className="mr-2" />
@@ -417,13 +436,15 @@ export default function TaskCreateModal() {
             </div>
           </div>
         </div>
-        
+
         <div className="pt-4 flex justify-end">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            disabled={!isValid || isSubmitting}
+            disabled={
+              !isValid || isSubmitting || task.department_id === undefined
+            }
             className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
@@ -471,7 +492,7 @@ export function TaskUpdateModal({
     } else if (name === "department_id") {
       setTask((prev) => ({
         ...prev,
-        [name]: value === "" ? null : parseInt(value),
+        [name]: parseInt(value),
       }));
     } else {
       setTask((prev) => ({ ...prev, [name]: value }));
@@ -506,7 +527,8 @@ export function TaskUpdateModal({
       for (const issue of result.error.issues) {
         const path = issue.path[0] as keyof Task;
         if (path) {
-          fieldErrors[path as keyof Task] = issue.message as unknown as undefined;
+          fieldErrors[path as keyof Task] =
+            issue.message as unknown as undefined;
         }
       }
       setErrors(fieldErrors);
@@ -580,15 +602,15 @@ export function TaskUpdateModal({
 
   return (
     <div className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6">
-      <motion.form 
+      <motion.form
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        onSubmit={handleSubmit} 
+        onSubmit={handleSubmit}
         className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200"
       >
         <h2 className="text-xl font-bold text-blue-700 mb-6">Update Task</h2>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -608,7 +630,7 @@ export function TaskUpdateModal({
               </p>
             )}
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description
@@ -620,7 +642,7 @@ export function TaskUpdateModal({
               className="w-full h-32 rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
@@ -634,7 +656,7 @@ export function TaskUpdateModal({
                   value={task.department_id ?? ""}
                   className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
                 >
-                  <option value={""}>Select Department</option>
+                  <option value={undefined}>Select Department</option>
                   {departments.length > 0 &&
                     departments.map((department) => (
                       <option key={department.id} value={department.id}>
@@ -642,16 +664,25 @@ export function TaskUpdateModal({
                       </option>
                     ))}
                 </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                <ChevronDown
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                  size={16}
+                />
                 {errors.department_id && (
                   <p className="mt-1 text-red-500 text-sm flex items-center">
                     <AlertCircle size={14} className="mr-1" />
-                    {errors.department_id}
+                    Please select a department.
+                  </p>
+                )}
+                {task.department_id === undefined && (
+                  <p className="mt-1 text-red-500 text-sm flex items-center">
+                    <AlertCircle size={14} className="mr-1" />
+                    Please select a department.
                   </p>
                 )}
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                 <Clock size={16} className="mr-2" />
@@ -676,23 +707,26 @@ export function TaskUpdateModal({
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                <ChevronDown
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                  size={16}
+                />
               </div>
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Priority
             </label>
             <div className="flex gap-4">
               {["High", "Medium", "Low"].map((priority) => (
-                <label 
-                  key={priority} 
+                <label
+                  key={priority}
                   className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition ${
-                    task.priority === priority 
-                      ? 'bg-blue-50 border border-blue-200' 
-                      : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
+                    task.priority === priority
+                      ? "bg-blue-50 border border-blue-200"
+                      : "bg-gray-50 border border-gray-200 hover:bg-gray-100"
                   }`}
                 >
                   <input
@@ -703,16 +737,21 @@ export function TaskUpdateModal({
                     onChange={handleChange}
                     className="sr-only"
                   />
-                  <span className={`w-3 h-3 rounded-full ${
-                    priority === 'High' ? 'bg-red-500' : 
-                    priority === 'Medium' ? 'bg-yellow-500' : 'bg-green-500'
-                  }`}></span>
+                  <span
+                    className={`w-3 h-3 rounded-full ${
+                      priority === "High"
+                        ? "bg-red-500"
+                        : priority === "Medium"
+                        ? "bg-yellow-500"
+                        : "bg-green-500"
+                    }`}
+                  ></span>
                   <span>{priority}</span>
                 </label>
               ))}
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
@@ -733,7 +772,7 @@ export function TaskUpdateModal({
                 </p>
               )}
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                 <Calendar size={16} className="mr-2" />
@@ -761,7 +800,7 @@ export function TaskUpdateModal({
               )}
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
               <Users size={16} className="mr-2" />
@@ -827,7 +866,7 @@ export function TaskUpdateModal({
             </div>
           </div>
         </div>
-        
+
         <div className="pt-4 flex justify-end">
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -843,7 +882,9 @@ export function TaskUpdateModal({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            disabled={!isValid || isSubmitting}
+            disabled={
+              !isValid || isSubmitting || task.department_id === undefined
+            }
             className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (

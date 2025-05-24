@@ -5,7 +5,13 @@ import { z } from "zod";
 import { motion } from "framer-motion";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { Position } from "@/hooks/usePositions";
-import { BriefcaseBusiness, Building, GraduationCap, FileText, X } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  Building,
+  GraduationCap,
+  FileText,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
@@ -14,10 +20,9 @@ const schema = z.object({
   id: z.number().optional(),
   name: z.string().min(1, "Name is required").max(50),
   description: z.string().optional(),
-  department_id: z.number().min(0, "Please select a department"),
-  grade: z.number().min(0, "Please select a grade"),
-  company_id: z.union([z.string(), z.number()]).optional(),
-  created_at: z.string().optional(),
+  department_id: z.number().optional(),
+  grade: z.number().optional(),
+  company_id: z.number().optional(),
 });
 
 interface PositionModalProps {
@@ -39,29 +44,33 @@ export default function PositionModal({
   const [formValues, setFormValues] = useState<Position>({
     name: "",
     description: "",
+    department_id: undefined,
+    grade: undefined,
   });
 
-  const [errors, setErrors] = useState<Partial<Record<keyof Position, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof Position, string>>>(
+    {}
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
   // Animation variants
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
+        staggerChildren: 0.1,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.2 } 
-    }
+      transition: { duration: 0.2 },
+    },
   };
 
   // Reset form values when initialData changes
@@ -137,7 +146,10 @@ export default function PositionModal({
         onSubmit={submitHandler}
         className="bg-white p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-gray-200"
       >
-        <motion.div variants={fadeInUp} className="flex items-center justify-between">
+        <motion.div
+          variants={fadeInUp}
+          className="flex items-center justify-between"
+        >
           <div className="flex items-center gap-3">
             <BriefcaseBusiness className="w-6 h-6 text-gray-600" />
             <h2 className="text-xl font-semibold text-gray-800">
@@ -170,7 +182,9 @@ export default function PositionModal({
                 placeholder="Enter Position Name"
               />
             </div>
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </div>
 
           <div>
@@ -182,11 +196,11 @@ export default function PositionModal({
                 <Building className="h-5 w-5 text-gray-500" />
               </div>
               <select
-                value={formValues.department_id === null ? "" : formValues.department_id}
+                value={formValues.department_id}
                 onChange={handleChange("department_id")}
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all appearance-none"
               >
-                <option value="">Select Department</option>
+                <option value={undefined}>Select Department</option>
                 {departments.map((department) => (
                   <option key={department.id} value={department.id}>
                     {department.name}
@@ -195,7 +209,14 @@ export default function PositionModal({
               </select>
             </div>
             {errors.department_id && (
-              <p className="text-red-500 text-sm mt-1">{errors.department_id}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.department_id}
+              </p>
+            )}
+            {formValues.department_id === undefined && (
+              <p className="text-red-500 text-sm mt-1">
+                Please select a department
+              </p>
             )}
           </div>
 
@@ -208,11 +229,11 @@ export default function PositionModal({
                 <GraduationCap className="h-5 w-5 text-gray-500" />
               </div>
               <select
-                value={formValues.grade || ""}
+                value={formValues.grade}
                 onChange={handleChange("grade")}
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all appearance-none"
               >
-                <option value="">Select Grade</option>
+                <option value={undefined}>Select Grade</option>
                 {grades.map((grade) => (
                   <option key={grade.id} value={grade.id}>
                     {grade.name}
@@ -222,6 +243,9 @@ export default function PositionModal({
             </div>
             {errors.grade && (
               <p className="text-red-500 text-sm mt-1">{errors.grade}</p>
+            )}
+            {formValues.grade === undefined && (
+              <p className="text-red-500 text-sm mt-1">Please select a grade</p>
             )}
           </div>
 
@@ -260,7 +284,9 @@ export default function PositionModal({
               isSubmitting ||
               !isDirty ||
               !isValid ||
-              Object.keys(errors).length > 0
+              Object.keys(errors).length > 0 ||
+              formValues.department_id === undefined ||
+              formValues.grade === undefined
             }
             className="bg-gray-800 hover:bg-gray-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >

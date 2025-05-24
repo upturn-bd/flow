@@ -16,7 +16,10 @@ type DepartmentsSectionProps = {
   showNotification: (message: string, isError?: boolean) => void;
 };
 
-export default function DepartmentsSection({ employees, showNotification }: DepartmentsSectionProps) {
+export default function DepartmentsSection({
+  employees,
+  showNotification,
+}: DepartmentsSectionProps) {
   const { divisions, fetchDivisions } = useDivisions();
   const {
     departments,
@@ -29,7 +32,9 @@ export default function DepartmentsSection({ employees, showNotification }: Depa
   const [viewDepartment, setViewDepartment] = useState<number | null>(null);
   const [editDepartment, setEditDepartment] = useState<number | null>(null);
   const [isCreatingDepartment, setIsCreatingDepartment] = useState(false);
-  const [departmentDeleteLoading, setDepartmentDeleteLoading] = useState<number | null>(null);
+  const [departmentDeleteLoading, setDepartmentDeleteLoading] = useState<
+    number | null
+  >(null);
 
   useEffect(() => {
     fetchDepartments();
@@ -79,7 +84,7 @@ export default function DepartmentsSection({ employees, showNotification }: Depa
   );
 
   return (
-    <motion.section 
+    <motion.section
       variants={fadeInUp}
       className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm"
     >
@@ -106,8 +111,8 @@ export default function DepartmentsSection({ employees, showNotification }: Depa
             </div>
           ) : (
             departments.map((dept) => (
-              <motion.div 
-                key={dept.id} 
+              <motion.div
+                key={dept.id}
                 className="bg-white rounded-lg border border-gray-200 p-2 sm:p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
                 whileHover={{ scale: 1.01 }}
               >
@@ -115,7 +120,9 @@ export default function DepartmentsSection({ employees, showNotification }: Depa
                   <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 mr-2 sm:mr-3">
                     <Building size={16} />
                   </div>
-                  <span className="font-medium text-gray-800 text-sm sm:text-base">{dept.name}</span>
+                  <span className="font-medium text-gray-800 text-sm sm:text-base">
+                    {dept.name}
+                  </span>
                 </div>
 
                 <div className="flex gap-2 w-full sm:w-auto justify-end">
@@ -133,11 +140,17 @@ export default function DepartmentsSection({ employees, showNotification }: Depa
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleDeleteDepartment(dept.id)}
                     disabled={departmentDeleteLoading === dept.id}
-                    className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-red-50 text-red-600 text-xs sm:text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${departmentDeleteLoading === dept.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-red-50 text-red-600 text-xs sm:text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${
+                      departmentDeleteLoading === dept.id
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
                   >
                     <TrashSimple size={14} />
                     <span className="hidden xs:inline">
-                      {departmentDeleteLoading === dept.id ? 'Deleting...' : 'Delete'}
+                      {departmentDeleteLoading === dept.id
+                        ? "Deleting..."
+                        : "Delete"}
                     </span>
                   </motion.button>
                 </div>
@@ -146,7 +159,7 @@ export default function DepartmentsSection({ employees, showNotification }: Depa
           )}
         </div>
       )}
-      
+
       <div className="flex justify-center sm:justify-start mt-4">
         <motion.button
           whileHover={{ scale: 1.1, rotate: 90 }}
@@ -172,7 +185,9 @@ export default function DepartmentsSection({ employees, showNotification }: Depa
             employees={employees}
             divisions={divisions}
             editDepartment={() => setEditDepartment(selectedDepartmentView.id)}
-            deleteDepartment={() => handleDeleteDepartment(selectedDepartmentView.id)}
+            deleteDepartment={() =>
+              handleDeleteDepartment(selectedDepartmentView.id)
+            }
             department={selectedDepartmentView}
             onClose={() => setViewDepartment(null)}
           />
@@ -189,4 +204,4 @@ export default function DepartmentsSection({ employees, showNotification }: Depa
       </AnimatePresence>
     </motion.section>
   );
-} 
+}

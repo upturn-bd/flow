@@ -14,7 +14,7 @@ const schema = z.object({
   name: z.string().min(1, "Name is required").max(50),
   head_id: z.string().min(1, "Please select a department head"),
   description: z.string().optional(),
-  division_id: z.number().min(0, "Please select a division"),
+  division_id: z.number().optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -34,14 +34,13 @@ export default function DepartmentModal({
   divisions,
   onClose,
   employees,
-  isLoading = false
+  isLoading = false,
 }: DepartmentModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
-    id: undefined,
     name: "",
     head_id: "",
     description: "",
-    division_id: 0,
+    division_id: undefined,
   });
 
   useEffect(() => {
@@ -51,7 +50,7 @@ export default function DepartmentModal({
         name: initialData.name,
         head_id: initialData.head_id || "",
         description: initialData.description || "",
-        division_id: initialData.division_id || 0,
+        division_id: initialData.division_id || undefined,
       });
     }
   }, [initialData]);
@@ -84,9 +83,6 @@ export default function DepartmentModal({
   ) => {
     const { name, value } = e.target;
     if (name === "division_id") {
-      console.log(value);
-      console.log(value === "0");
-      console.log(parseInt(value));
       setFormValues((prev) => ({ ...prev, [name]: parseInt(value) }));
     } else {
       setFormValues((prev) => ({ ...prev, [name]: value }));
@@ -121,7 +117,7 @@ export default function DepartmentModal({
         name: initialData.name,
         head_id: initialData.head_id || "",
         description: initialData.description || "",
-        division_id: initialData.division_id || 0,
+        division_id: initialData.division_id || undefined,
       };
       setIsDirty(dirtyValuesChecker(initialDataForComparison, formValues));
     }
@@ -130,20 +126,20 @@ export default function DepartmentModal({
   // Animation variants
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
+        staggerChildren: 0.1,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.2 } 
-    }
+      transition: { duration: 0.2 },
+    },
   };
 
   return (
@@ -170,7 +166,11 @@ export default function DepartmentModal({
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Building size={18} weight="duotone" className="text-gray-500" />
+                <Building
+                  size={18}
+                  weight="duotone"
+                  className="text-gray-500"
+                />
               </div>
               <input
                 name="name"
@@ -218,15 +218,19 @@ export default function DepartmentModal({
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <StackSimple size={18} weight="duotone" className="text-gray-500" />
+                <StackSimple
+                  size={18}
+                  weight="duotone"
+                  className="text-gray-500"
+                />
               </div>
               <select
                 name="division_id"
-                value={formValues.division_id === null ? "" : formValues.division_idZ}
+                value={formValues.division_id}
                 onChange={handleChange}
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all appearance-none"
               >
-                <option value="">Select Division</option>
+                <option value={undefined}>Select Division</option>
                 {divisions.map((division) => (
                   <option key={division.id} value={division.id}>
                     {division.name}
@@ -237,6 +241,11 @@ export default function DepartmentModal({
             {errors.division_id && (
               <p className="text-red-500 text-sm mt-1">{errors.division_id}</p>
             )}
+            {formValues.division_id === undefined && (
+              <p className="text-red-500 text-sm mt-1">
+                Please select a division
+              </p>
+            )}
           </div>
 
           <div>
@@ -245,11 +254,17 @@ export default function DepartmentModal({
             </label>
             <div className="relative">
               <div className="absolute top-3 left-3 flex items-start pointer-events-none">
-                <FileText size={18} weight="duotone" className="text-gray-500" />
+                <FileText
+                  size={18}
+                  weight="duotone"
+                  className="text-gray-500"
+                />
               </div>
               <textarea
                 name="description"
-                value={formValues.description === null ? "" : formValues.description}
+                value={
+                  formValues.description === null ? "" : formValues.description
+                }
                 onChange={handleChange}
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all"
                 placeholder="Add Department Description"
@@ -276,7 +291,8 @@ export default function DepartmentModal({
               isLoading ||
               isSubmitting ||
               !isValid ||
-              (initialData! && !isDirty)
+              (initialData! && !isDirty) ||
+              formValues.division_id === undefined
             }
             className="bg-gray-800 hover:bg-gray-700 text-white"
           >

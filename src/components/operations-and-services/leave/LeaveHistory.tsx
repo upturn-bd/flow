@@ -19,7 +19,7 @@ export default function LeaveHistoryPage() {
 
   async function fetchComplaintRequests() {
     setLoading(true);
-    
+
     const user = await getEmployeeInfo();
     const company_id = await getCompanyId();
     try {
@@ -27,8 +27,7 @@ export default function LeaveHistoryPage() {
         .from("leave_records")
         .select("*")
         .eq("company_id", company_id)
-        .eq("requested_to", user.id)
-        .neq("status", "Pending");
+        .eq("employee_id", user.id);
 
       if (error) {
         setError("Failed to fetch leave requests");

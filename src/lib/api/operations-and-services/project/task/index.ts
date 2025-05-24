@@ -14,7 +14,7 @@ export async function getTasks() {
     .eq("company_id", company_id)
     .eq("status", false)
     .or(
-      `assignees.cs.{${user.id}},created_by.eq.${user.id}, department_id.eq.${user.department_id}`
+      `assignees.cs.{${user.id}}, created_by.eq.${user.id}, department_id.eq.${user.department_id}`
     );
 
   if (error) throw error;

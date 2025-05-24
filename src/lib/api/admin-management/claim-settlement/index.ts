@@ -23,10 +23,8 @@ export async function createClaimType(
   const validated = claimTypeSchema.safeParse(payload);
   if (!validated.success) throw validated.error;
 
-  const { id, ...rest } = payload;
-
   const { data, error } = await supabase.from("settlement_types").insert({
-    ...rest,
+    ...payload,
     company_id,
   });
 

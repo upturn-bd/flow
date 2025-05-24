@@ -7,7 +7,7 @@ import { useDepartments } from "@/hooks/useDepartments";
 import { useGrades } from "@/hooks/useGrades";
 import PositionDetailsModal from "./PositionDetailsModal";
 import PositionModal from "./PositionModal";
-import { BriefcaseBusiness, Plus, Eye, X } from "lucide-react";
+import { BriefcaseBusiness, Plus, Eye } from "lucide-react";
 import { fadeInUp } from "@/components/ui/animations";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { TrashSimple } from "@phosphor-icons/react";
@@ -16,7 +16,9 @@ type PositionsSectionProps = {
   showNotification: (message: string, isError?: boolean) => void;
 };
 
-export default function PositionsSection({ showNotification }: PositionsSectionProps) {
+export default function PositionsSection({
+  showNotification,
+}: PositionsSectionProps) {
   const { departments, fetchDepartments } = useDepartments();
   const { grades, fetchGrades } = useGrades();
   const {
@@ -27,11 +29,13 @@ export default function PositionsSection({ showNotification }: PositionsSectionP
     updatePosition,
     deletePosition,
   } = usePositions();
-  
+
   const [viewPosition, setViewPosition] = useState<number | null>(null);
   const [editPosition, setEditPosition] = useState<number | null>(null);
   const [isCreatingPosition, setIsCreatingPosition] = useState(false);
-  const [positionDeleteLoading, setPositionDeleteLoading] = useState<number | null>(null);
+  const [positionDeleteLoading, setPositionDeleteLoading] = useState<
+    number | null
+  >(null);
 
   useEffect(() => {
     fetchPositions();
@@ -78,7 +82,7 @@ export default function PositionsSection({ showNotification }: PositionsSectionP
   const selectedPositionEdit = positions.find((d) => d.id === editPosition);
 
   return (
-    <motion.section 
+    <motion.section
       variants={fadeInUp}
       className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm"
     >
@@ -105,8 +109,8 @@ export default function PositionsSection({ showNotification }: PositionsSectionP
             </div>
           ) : (
             positions.map((position) => (
-              <motion.div 
-                key={position.id} 
+              <motion.div
+                key={position.id}
                 className="bg-white rounded-lg border border-gray-200 p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
                 whileHover={{ scale: 1.01 }}
               >
@@ -114,7 +118,9 @@ export default function PositionsSection({ showNotification }: PositionsSectionP
                   <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 mr-3">
                     <BriefcaseBusiness size={16} />
                   </div>
-                  <span className="font-medium text-gray-800">{position.name}</span>
+                  <span className="font-medium text-gray-800">
+                    {position.name}
+                  </span>
                 </div>
 
                 <div className="flex gap-2 w-full sm:w-auto justify-end">
@@ -132,13 +138,18 @@ export default function PositionsSection({ showNotification }: PositionsSectionP
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleDeletePosition(position.id)}
                     disabled={positionDeleteLoading === position.id}
-                    className={`px-3 py-1.5 rounded-md bg-red-50 text-red-600 text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${positionDeleteLoading === position.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`px-3 py-1.5 rounded-md bg-red-50 text-red-600 text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${
+                      positionDeleteLoading === position.id
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
                   >
                     <TrashSimple size={14} />
-                    {positionDeleteLoading === position.id ? 
-                      <span className="hidden sm:inline">Deleting...</span> : 
+                    {positionDeleteLoading === position.id ? (
+                      <span className="hidden sm:inline">Deleting...</span>
+                    ) : (
                       <span className="hidden sm:inline">Delete</span>
-                    }
+                    )}
                   </motion.button>
                 </div>
               </motion.div>
@@ -146,7 +157,7 @@ export default function PositionsSection({ showNotification }: PositionsSectionP
           )}
         </div>
       )}
-      
+
       <div className="flex justify-center sm:justify-start mt-4">
         <motion.button
           whileHover={{ scale: 1.1, rotate: 90 }}
@@ -189,4 +200,4 @@ export default function PositionsSection({ showNotification }: PositionsSectionP
       </AnimatePresence>
     </motion.section>
   );
-} 
+}

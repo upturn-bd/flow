@@ -44,12 +44,10 @@ export function useComplaintTypes() {
   const createComplaintType = useCallback(async (values: ComplaintType) => {
     try {
       const company_id = await getCompanyId();
-      const { data, error } = await supabase
-        .from("complaint_types")
-        .insert({
-          ...values,
-          company_id,
-        });
+      const { data, error } = await supabase.from("complaint_types").insert({
+        ...values,
+        company_id,
+      });
 
       if (error) throw error;
       return data;
@@ -76,16 +74,19 @@ export function useComplaints() {
 
   const fetchComplaints = useCallback(async (status: string = "Pending") => {
     setLoading(true);
-    
+
     try {
       const user = await getEmployeeInfo();
       const company_id = await getCompanyId();
-      
+
+      const validField =
+        status === "Pending" ? "requested_to" : "complainer_id";
+
       const { data, error } = await supabase
         .from("complaint_records")
         .select("*")
         .eq("company_id", company_id)
-        .eq("requested_to", user.id)
+        .eq(validField, user.id)
         .eq("status", status);
 
       if (error) {
@@ -108,39 +109,42 @@ export function useComplaints() {
     return fetchComplaints("Pending");
   }, [fetchComplaints]);
 
-  const updateComplaint = useCallback(async (action: string, id: number, comment: string) => {
-    setProcessingId(id);
-    
-    try {
-      const user = await getEmployeeInfo();
-      const company_id = await getCompanyId();
-      
-      const { data, error } = await supabase
-        .from("complaint_records")
-        .update({
-          status: action,
-          approved_by_id: user.id,
-          comment: comment,
-        })
-        .eq("company_id", company_id)
-        .eq("id", id);
-      
-      if (error) {
+  const updateComplaint = useCallback(
+    async (action: string, id: number, comment: string) => {
+      setProcessingId(id);
+
+      try {
+        const user = await getEmployeeInfo();
+        const company_id = await getCompanyId();
+
+        const { data, error } = await supabase
+          .from("complaint_records")
+          .update({
+            status: action,
+            approved_by_id: user.id,
+            comment: comment,
+          })
+          .eq("company_id", company_id)
+          .eq("id", id);
+
+        if (error) {
+          setError("Failed to update complaint request");
+          throw error;
+        }
+
+        // Refresh the requests
+        await fetchComplaints();
+        return true;
+      } catch (error) {
         setError("Failed to update complaint request");
-        throw error;
+        console.error(error);
+        return false;
+      } finally {
+        setProcessingId(null);
       }
-      
-      // Refresh the requests
-      await fetchComplaints();
-      return true;
-    } catch (error) {
-      setError("Failed to update complaint request");
-      console.error(error);
-      return false;
-    } finally {
-      setProcessingId(null);
-    }
-  }, [fetchComplaints]);
+    },
+    [fetchComplaints]
+  );
 
   return {
     complaints,
@@ -149,6 +153,6 @@ export function useComplaints() {
     processingId,
     fetchComplaints,
     fetchComplaintHistory,
-    updateComplaint
+    updateComplaint,
   };
 }

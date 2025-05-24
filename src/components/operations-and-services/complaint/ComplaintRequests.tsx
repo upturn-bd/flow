@@ -24,17 +24,17 @@ export default function ComplaintRequestsPage() {
   const [comment, setComment] = useState<string>("");
   const { employees, fetchEmployees } = useEmployees();
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
-  const { 
-    complaints, 
-    loading, 
-    error, 
-    processingId, 
-    fetchComplaints, 
-    updateComplaint 
+  const {
+    complaints,
+    loading,
+    error,
+    processingId,
+    fetchComplaints,
+    updateComplaint,
   } = useComplaints();
 
   useEffect(() => {
-    fetchComplaints("Pending");
+    fetchComplaints("Submitted");
   }, [fetchComplaints]);
 
   useEffect(() => {
@@ -78,16 +78,19 @@ export default function ComplaintRequestsPage() {
                 <div className="flex-1 space-y-2 text-sm text-gray-800">
                   <p>
                     <span className="font-bold">Category:</span>{" "}
-                    {complaintTypes.find((type) => type.id === complaint.complaint_type_id)?.name}
+                    {
+                      complaintTypes.find(
+                        (type) => type.id === complaint.complaint_type_id
+                      )?.name
+                    }
                   </p>
                   <p>
                     <span className="font-bold">Requested By:</span>{" "}
-                    {
-                      complaint.anonymous ? "Anonymous" :
-                      employees.find(
-                        (employee) => employee.id === complaint.complainer_id
-                      )?.name
-                    }
+                    {complaint.anonymous
+                      ? "Anonymous"
+                      : employees.find(
+                          (employee) => employee.id === complaint.complainer_id
+                        )?.name}
                   </p>
                   <p>
                     <span className="font-bold">Against:</span>{" "}
@@ -101,24 +104,25 @@ export default function ComplaintRequestsPage() {
                     <span className="font-bold">Description:</span>{" "}
                     {complaint.description}
                   </p>
-                  {complaint.attachments && complaint.attachments.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {complaint.attachments.map((url, idx) => (
-                        <a
-                          key={idx}
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
-                        >
-                          <FaFilePdf className="text-red-500" />
-                          <span className="text-xs">
-                            {extractFilenameFromUrl(url)}
-                          </span>
-                        </a>
-                      ))}
-                    </div>
-                  )}
+                  {complaint.attachments &&
+                    complaint.attachments.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {complaint.attachments.map((url, idx) => (
+                          <a
+                            key={idx}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                          >
+                            <FaFilePdf className="text-red-500" />
+                            <span className="text-xs">
+                              {extractFilenameFromUrl(url)}
+                            </span>
+                          </a>
+                        ))}
+                      </div>
+                    )}
                 </div>
 
                 <div className="flex-1 space-y-4">
@@ -142,14 +146,18 @@ export default function ComplaintRequestsPage() {
               {/* Action Buttons */}
               <div className="flex justify-end gap-4 pt-2">
                 <button
-                  onClick={() => handleUpdateRequest("Rejected", complaint.id || 0)}
+                  onClick={() =>
+                    handleUpdateRequest("Rejected", complaint.id || 0)
+                  }
                   disabled={processingId === complaint.id}
                   className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full disabled:opacity-50"
                 >
                   {processingId === complaint.id ? "Processing..." : "Reject"}
                 </button>
                 <button
-                  onClick={() => handleUpdateRequest("Accepted", complaint.id || 0)}
+                  onClick={() =>
+                    handleUpdateRequest("Accepted", complaint.id || 0)
+                  }
                   disabled={processingId === complaint.id}
                   className="bg-[#001F4D] hover:bg-[#002a66] text-white px-6 py-2 rounded-full disabled:opacity-50"
                 >

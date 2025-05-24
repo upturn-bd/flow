@@ -6,7 +6,14 @@ import { z } from "zod";
 import { LeaveType } from "@/hooks/useConfigTypes";
 import { HolidayConfig } from "@/hooks/useLeaveManagement";
 import { dirtyValuesChecker } from "@/lib/utils";
-import { CalendarBlank, X, Clock, Clipboard, CalendarCheck, Tag } from "@phosphor-icons/react";
+import {
+  CalendarBlank,
+  X,
+  Clock,
+  Clipboard,
+  CalendarCheck,
+  Tag,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
@@ -32,10 +39,8 @@ export default function LeaveTypeCreateModal({
   isLoading = false,
 }: LeaveTypeCreateModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
-    id: 0,
     name: "",
     annual_quota: 0,
-    company_id: 0,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -94,20 +99,20 @@ export default function LeaveTypeCreateModal({
   // Animation variants
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
+        staggerChildren: 0.1,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.2 } 
-    }
+      transition: { duration: 0.2 },
+    },
   };
 
   return (
@@ -120,10 +125,15 @@ export default function LeaveTypeCreateModal({
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-200"
       >
-        <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+        <motion.div
+          variants={fadeInUp}
+          className="flex items-center justify-between mb-6"
+        >
           <div className="flex items-center gap-3">
             <Tag size={24} weight="duotone" className="text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-800">Configure Leave Type</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Configure Leave Type
+            </h2>
           </div>
           <Button
             variant="ghost"
@@ -151,7 +161,9 @@ export default function LeaveTypeCreateModal({
                 placeholder="Enter Leave Type Name"
               />
             </div>
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </div>
 
           <div>
@@ -160,7 +172,11 @@ export default function LeaveTypeCreateModal({
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <CalendarBlank size={18} weight="duotone" className="text-gray-500" />
+                <CalendarBlank
+                  size={18}
+                  weight="duotone"
+                  className="text-gray-500"
+                />
               </div>
               <input
                 name="annual_quota"
@@ -213,10 +229,8 @@ export function LeaveTypeUpdateModal({
   isLoading = false,
 }: LeaveTypeUpdateModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
-    id: 0,
     name: "",
     annual_quota: 0,
-    company_id: 0,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -284,20 +298,20 @@ export function LeaveTypeUpdateModal({
   // Animation variants
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
+        staggerChildren: 0.1,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.2 } 
-    }
+      transition: { duration: 0.2 },
+    },
   };
 
   return (
@@ -310,10 +324,15 @@ export function LeaveTypeUpdateModal({
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-200"
       >
-        <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+        <motion.div
+          variants={fadeInUp}
+          className="flex items-center justify-between mb-6"
+        >
           <div className="flex items-center gap-3">
             <Tag size={24} weight="duotone" className="text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-800">Update Leave Type</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Update Leave Type
+            </h2>
           </div>
           <Button
             variant="ghost"
@@ -341,7 +360,9 @@ export function LeaveTypeUpdateModal({
                 placeholder="Enter Leave Type Name"
               />
             </div>
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </div>
 
           <div>
@@ -350,7 +371,11 @@ export function LeaveTypeUpdateModal({
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <CalendarBlank size={18} weight="duotone" className="text-gray-500" />
+                <CalendarBlank
+                  size={18}
+                  weight="duotone"
+                  className="text-gray-500"
+                />
               </div>
               <input
                 name="annual_quota"
@@ -418,10 +443,8 @@ export function LeaveHolidayCreateModal({
   isLoading = false,
 }: LeaveHolidayCreateModalProps) {
   const [formValues, setFormValues] = useState<HolidayFormValues>({
-    id: 0,
     name: "",
     date: new Date().toISOString().split("T")[0],
-    company_id: 0,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -480,20 +503,20 @@ export function LeaveHolidayCreateModal({
   // Animation variants
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
+        staggerChildren: 0.1,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.2 } 
-    }
+      transition: { duration: 0.2 },
+    },
   };
 
   return (
@@ -506,10 +529,19 @@ export function LeaveHolidayCreateModal({
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-200"
       >
-        <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+        <motion.div
+          variants={fadeInUp}
+          className="flex items-center justify-between mb-6"
+        >
           <div className="flex items-center gap-3">
-            <CalendarCheck size={24} weight="duotone" className="text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-800">Configure Holiday</h2>
+            <CalendarCheck
+              size={24}
+              weight="duotone"
+              className="text-gray-600"
+            />
+            <h2 className="text-xl font-semibold text-gray-800">
+              Configure Holiday
+            </h2>
           </div>
           <Button
             variant="ghost"
@@ -527,7 +559,11 @@ export function LeaveHolidayCreateModal({
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Clipboard size={18} weight="duotone" className="text-gray-500" />
+                <Clipboard
+                  size={18}
+                  weight="duotone"
+                  className="text-gray-500"
+                />
               </div>
               <input
                 name="name"
@@ -537,7 +573,9 @@ export function LeaveHolidayCreateModal({
                 placeholder="Enter Holiday Name"
               />
             </div>
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </div>
 
           <div>
@@ -546,7 +584,11 @@ export function LeaveHolidayCreateModal({
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <CalendarBlank size={18} weight="duotone" className="text-gray-500" />
+                <CalendarBlank
+                  size={18}
+                  weight="duotone"
+                  className="text-gray-500"
+                />
               </div>
               <input
                 name="date"
@@ -556,7 +598,9 @@ export function LeaveHolidayCreateModal({
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
               />
             </div>
-            {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
+            {errors.date && (
+              <p className="text-red-500 text-sm mt-1">{errors.date}</p>
+            )}
           </div>
         </motion.div>
 
@@ -596,10 +640,8 @@ export function LeaveHolidayUpdateModal({
   isLoading = false,
 }: LeaveHolidayUpdateModalProps) {
   const [formValues, setFormValues] = useState<HolidayFormValues>({
-    id: 0,
     name: "",
     date: new Date().toISOString().split("T")[0],
-    company_id: 0,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -667,20 +709,20 @@ export function LeaveHolidayUpdateModal({
   // Animation variants
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
+        staggerChildren: 0.1,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.2 } 
-    }
+      transition: { duration: 0.2 },
+    },
   };
 
   return (
@@ -693,10 +735,19 @@ export function LeaveHolidayUpdateModal({
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-200"
       >
-        <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+        <motion.div
+          variants={fadeInUp}
+          className="flex items-center justify-between mb-6"
+        >
           <div className="flex items-center gap-3">
-            <CalendarCheck size={24} weight="duotone" className="text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-800">Update Holiday</h2>
+            <CalendarCheck
+              size={24}
+              weight="duotone"
+              className="text-gray-600"
+            />
+            <h2 className="text-xl font-semibold text-gray-800">
+              Update Holiday
+            </h2>
           </div>
           <Button
             variant="ghost"
@@ -714,7 +765,11 @@ export function LeaveHolidayUpdateModal({
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Clipboard size={18} weight="duotone" className="text-gray-500" />
+                <Clipboard
+                  size={18}
+                  weight="duotone"
+                  className="text-gray-500"
+                />
               </div>
               <input
                 name="name"
@@ -724,7 +779,9 @@ export function LeaveHolidayUpdateModal({
                 placeholder="Enter Holiday Name"
               />
             </div>
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </div>
 
           <div>
@@ -733,7 +790,11 @@ export function LeaveHolidayUpdateModal({
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <CalendarBlank size={18} weight="duotone" className="text-gray-500" />
+                <CalendarBlank
+                  size={18}
+                  weight="duotone"
+                  className="text-gray-500"
+                />
               </div>
               <input
                 name="date"
@@ -743,7 +804,9 @@ export function LeaveHolidayUpdateModal({
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
               />
             </div>
-            {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
+            {errors.date && (
+              <p className="text-red-500 text-sm mt-1">{errors.date}</p>
+            )}
           </div>
         </motion.div>
 

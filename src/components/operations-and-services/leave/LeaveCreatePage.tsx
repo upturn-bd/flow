@@ -1,20 +1,18 @@
 "use client";
 
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from "@/lib/supabase/client";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { supabase } from "@/lib/supabase/client";
 import { leaveSchema } from "@/lib/types";
 import React, { useEffect, useState } from "react";
 import { Calendar, CheckCircle, Clock, Info } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
 import { motion } from "framer-motion";
-import { getSupervisor } from "@/lib/api/operations-and-services/attendance/leave";
 
 const initialLeaveRecord = {
-  type_id: 0,
+  type_id: undefined,
   start_date: "",
   end_date: "",
   description: "",
@@ -24,16 +22,31 @@ const initialLeaveRecord = {
 export type LeaveState = z.infer<typeof leaveSchema>;
 
 const leaveBalanceData = [
-  { count: "15", type: "Annual Leave", color: "bg-green-100 border-green-300 text-green-800" },
-  { count: "09", type: "Casual Leave", color: "bg-blue-100 border-blue-300 text-blue-800" },
-  { count: "11", type: "Sick Leave", color: "bg-purple-100 border-purple-300 text-purple-800" },
+  {
+    count: "15",
+    type: "Annual Leave",
+    color: "bg-green-100 border-green-300 text-green-800",
+  },
+  {
+    count: "09",
+    type: "Casual Leave",
+    color: "bg-blue-100 border-blue-300 text-blue-800",
+  },
+  {
+    count: "11",
+    type: "Sick Leave",
+    color: "bg-purple-100 border-purple-300 text-purple-800",
+  },
 ];
 
 export default function LeaveCreatePage() {
-  const [leaveRecord, setLeaveRecord] = useState<LeaveState>(initialLeaveRecord);
-  const [errors, setErrors] = useState<Partial<Record<keyof LeaveState, string>>>({});
+  const [leaveRecord, setLeaveRecord] =
+    useState<LeaveState>(initialLeaveRecord);
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof LeaveState, string>>
+  >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { leaveTypes, fetchLeaveTypes, loading:isLoading } = useLeaveTypes();
+  const { leaveTypes, fetchLeaveTypes, loading: isLoading } = useLeaveTypes();
   const [isValid, setIsValid] = useState(false);
   const [daysCount, setDaysCount] = useState(0);
 
@@ -53,24 +66,23 @@ export default function LeaveCreatePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const client = createClient();
-    const company_id = await getCompanyId();
     const user = await getEmployeeInfo();
     setIsSubmitting(true);
-    
+
     try {
       const formattedSettlementState = {
         ...leaveRecord,
         employee_id: user.id,
-        company_id,
+        company_id: user.company_id,
         requested_to: user.supervisor_id,
       };
-      
+
       const { data, error } = await client
         .from("leave_records")
         .insert(formattedSettlementState);
-      
+
       if (error) throw error;
-      
+
       toast.success("Leave application submitted successfully!");
       setLeaveRecord(initialLeaveRecord);
     } catch (error) {
@@ -115,11 +127,11 @@ export default function LeaveCreatePage() {
 
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
   };
-  
+
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={fadeIn}
@@ -131,7 +143,7 @@ export default function LeaveCreatePage() {
           <Clock className="mr-2 h-5 w-5 text-blue-600" />
           Leave Balance
         </h1>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
           {leaveBalanceData.map(({ count, type, color }) => (
             <div
@@ -151,7 +163,7 @@ export default function LeaveCreatePage() {
           <Calendar className="mr-2 h-5 w-5 text-blue-600" />
           Leave Application
         </h2>
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Category */}
           <div className="space-y-2">
@@ -163,9 +175,11 @@ export default function LeaveCreatePage() {
                 name="type_id"
                 value={leaveRecord.type_id}
                 onChange={handleChange}
-                className={`w-full bg-gray-50 border ${errors.type_id ? 'border-red-300' : 'border-gray-300'} rounded-lg p-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
+                className={`w-full bg-gray-50 border ${
+                  errors.type_id ? "border-red-300" : "border-gray-300"
+                } rounded-lg p-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
               >
-                <option value="">Select leave type</option>
+                <option value={undefined}>Select leave type</option>
                 {isLoading ? (
                   <option disabled>Loading leave types...</option>
                 ) : (
@@ -183,7 +197,14 @@ export default function LeaveCreatePage() {
               </div>
             </div>
             {errors.type_id && (
-              <p className="text-red-500 text-sm mt-1">{errors.type_id}</p>
+              <p className="text-red-500 text-sm mt-1">
+                Please select a leave type
+              </p>
+            )}
+            {leaveRecord.type_id === undefined && (
+              <p className="text-red-500 text-sm mt-1">
+                Please select a leave type
+              </p>
             )}
           </div>
 
@@ -207,7 +228,7 @@ export default function LeaveCreatePage() {
                 <p className="text-red-500 text-sm">{errors.start_date}</p>
               )}
             </div>
-            
+
             <div className="space-y-2">
               <label className="block font-medium text-gray-700">To</label>
               <div className="relative bg-gray-50 border border-gray-300 rounded-lg overflow-hidden">
@@ -234,7 +255,11 @@ export default function LeaveCreatePage() {
             <div className="flex items-center p-3 bg-blue-50 rounded-md border border-blue-100">
               <Info className="h-5 w-5 text-blue-600 mr-2" />
               <span className="text-blue-800 text-sm">
-                You are requesting <strong>{daysCount} day{daysCount !== 1 ? 's' : ''}</strong> of leave
+                You are requesting{" "}
+                <strong>
+                  {daysCount} day{daysCount !== 1 ? "s" : ""}
+                </strong>{" "}
+                of leave
               </span>
             </div>
           )}
@@ -250,7 +275,9 @@ export default function LeaveCreatePage() {
               value={leaveRecord.description}
               onChange={handleChange}
               placeholder="Please provide details about your leave request..."
-              className={`w-full bg-gray-50 border ${errors.description ? 'border-red-300' : 'border-gray-300'} rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
+              className={`w-full bg-gray-50 border ${
+                errors.description ? "border-red-300" : "border-gray-300"
+              } rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
             />
             {errors.description && (
               <p className="text-red-500 text-sm">{errors.description}</p>
@@ -265,8 +292,12 @@ export default function LeaveCreatePage() {
             </div>
             <button
               type="submit"
-              disabled={!isValid || isSubmitting}
-              className={`flex items-center justify-center w-full sm:w-auto bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm disabled:opacity-60 disabled:cursor-not-allowed ${isSubmitting ? 'opacity-80' : ''}`}
+              disabled={
+                !isValid || isSubmitting || leaveRecord.type_id === undefined
+              }
+              className={`flex items-center justify-center w-full sm:w-auto bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm disabled:opacity-60 disabled:cursor-not-allowed ${
+                isSubmitting ? "opacity-80" : ""
+              }`}
             >
               {isSubmitting ? (
                 <>

@@ -8,7 +8,7 @@ import RequisitionTypeCreateModal, {
 } from "./InventoryModal";
 import { RequisitionInventory, useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
-import { TrashSimple, Package, Tag, Plus, ArrowsClockwise, Eye } from "@phosphor-icons/react";
+import { TrashSimple, Package, Tag, Plus, Eye } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";

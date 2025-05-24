@@ -37,12 +37,10 @@ export function ClaimTypeCreateModal({
   isLoading = false,
 }: ClaimTypeCreateModalProps) {
   const [formValues, setFormValues] = useState<ClaimTypeFormValues>({
-    id: 1,
     settlement_item: "",
     allowance: 0,
     settler_id: "",
-    settlement_level_id: 0,
-    company_id: 1,
+    settlement_level_id: undefined,
   });
   const [errors, setErrors] = useState<Partial<ClaimTypeFormValues>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -202,7 +200,7 @@ export function ClaimTypeCreateModal({
                 onChange={handleChange}
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
               >
-                <option value="">Select Claim Level</option>
+                <option value={undefined}>Select Claim Level</option>
                 {allPositions.map((position) => (
                   <option key={position.id} value={position.id}>
                     {position.name}
@@ -213,6 +211,12 @@ export function ClaimTypeCreateModal({
             {errors.settlement_level_id && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.settlement_level_id}
+              </p>
+            )}
+
+            {formValues.settlement_level_id === undefined && (
+              <p className="text-red-500 text-sm mt-1">
+                Please select a claim level.
               </p>
             )}
           </div>
@@ -304,12 +308,10 @@ export function ClaimTypeUpdateModal({
   isLoading = false,
 }: ClaimTypeUpdateModalProps) {
   const [formValues, setFormValues] = useState<ClaimTypeFormValues>({
-    id: 1,
     settlement_item: "",
     allowance: 0,
     settler_id: "",
-    settlement_level_id: 0,
-    company_id: 1,
+    settlement_level_id: undefined
   });
   const [errors, setErrors] = useState<Partial<ClaimTypeFormValues>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -478,7 +480,7 @@ export function ClaimTypeUpdateModal({
                 onChange={handleChange}
                 className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
               >
-                <option value="">Select Claim Level</option>
+                <option value={undefined}>Select Claim Level</option>
                 {allPositions.map((position) => (
                   <option key={position.id} value={position.id}>
                     {position.name}
@@ -489,6 +491,11 @@ export function ClaimTypeUpdateModal({
             {errors.settlement_level_id && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.settlement_level_id}
+              </p>
+            )}
+            {formValues.settlement_level_id === undefined && (
+              <p className="text-red-500 text-sm mt-1">
+                Please select a claim level.
               </p>
             )}
           </div>

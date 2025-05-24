@@ -18,21 +18,22 @@ import { extractFilenameFromUrl } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
-import { fetchRequisitionHistory } from "@/lib/api/operations-and-services/requisition";
+import { useRequisitionRequests } from "@/hooks/useRequests";
 
 export default function RequisitionHistoryPage() {
   const { employees, fetchEmployees } = useEmployees();
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } = useRequisitionInventories();
+  const {fetchRequisitionRequests} = useRequisitionRequests();
 
   useEffect(() => {
     // For history, we fetch with any status that is not Pending
-    fetchRequisitionHistory("Approved").then(() => {
+    fetchRequisitionRequests("Approved").then(() => {
       // This is a hacky approach since we want both approved and rejected
       // A better solution would be to modify the hook to accept an array of statuses
-      fetchRequisitionHistory("Rejected");
+      fetchRequisitionRequests("Rejected");
     });
-  }, []);
+  }, [fetchRequisitionRequests]);
 
   useEffect(() => {
     fetchEmployees();

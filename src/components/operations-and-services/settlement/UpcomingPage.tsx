@@ -1,9 +1,7 @@
 "use client";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEffect, useState } from "react";
-import SettlementCreatePage, {
-  SettlementDraftPage,
-} from "./SettlementCreatePage";
+import SettlementCreatePage from "./SettlementCreatePage";
 import { Receipt, FileEdit, Trash2, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 

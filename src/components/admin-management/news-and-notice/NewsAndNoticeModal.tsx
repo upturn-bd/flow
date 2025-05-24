@@ -22,9 +22,7 @@ export default function NewsAndNoticesCreateModal({
   isLoading = false,
 }: NewsAndNoticesModalProps) {
   const [formValues, setFormValues] = useState<FormValues>({
-    id: 0,
     name: "",
-    company_id: 0,
   });
 
   const [errors, setErrors] = useState<Partial<FormValues>>({});

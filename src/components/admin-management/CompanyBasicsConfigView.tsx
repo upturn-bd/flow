@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Info, X } from "lucide-react";
 import { useState } from "react";
-import { fadeInUp, staggerContainer } from "@/components/ui/animations";
+import { staggerContainer } from "@/components/ui/animations";
 
 // Import the section components directly
 import DivisionsSection from "@/components/admin-management/divisions/DivisionsSection";

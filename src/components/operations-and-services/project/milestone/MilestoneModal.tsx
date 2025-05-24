@@ -27,7 +27,7 @@ const initialMilestone: Milestone = {
   end_date: "",
   weightage: 0,
   status: "",
-  project_id: 1,
+  project_id: undefined,
   assignees: [],
 };
 

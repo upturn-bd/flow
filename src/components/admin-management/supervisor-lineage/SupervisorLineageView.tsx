@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
-import { Lineage, useLineage } from "@/hooks/useSupervisorLineage";
+import { useLineage } from "@/hooks/useSupervisorLineage";
 import LineageCreateModal, {
   LineageUpdateModal,
 } from "./SupervisorLineageModal";
-import { TrashSimple, Plus, Eye, Buildings, UsersThree } from "@phosphor-icons/react";
+import { TrashSimple, Plus, Eye, UsersThree } from "@phosphor-icons/react";
 import { lineageSchema } from "@/lib/types";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
