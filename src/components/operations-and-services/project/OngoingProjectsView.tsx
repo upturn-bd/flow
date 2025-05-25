@@ -7,185 +7,30 @@ import { useEffect, useState } from "react";
 import ProjectDetails from "./ProjectDetails";
 import { UpdateProjectPage } from "./CreateNewProject";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, Edit, Trash2, Clock, Calendar, Building2, User } from "lucide-react";
+import { ExternalLink, Edit, Trash2, Clock, Calendar, Building2, User, Plus } from "lucide-react";
 import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { Button } from "@/components/ui/button";
+import ProjectCard from "./ProjectCard";
+import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 
-function ProjectCard({
-  project,
-  setProjectDetailsId,
-  setSelectedProject,
-  deleteProject,
-}: {
-  project: Project;
-  setProjectDetailsId: (id: number) => void;
-  setSelectedProject: (project: Project) => void;
-  deleteProject: (id: number) => void;
-}) {
-  const {
-    employees,
-    loading: employeeLoading,
-    fetchEmployees,
-  } = useEmployees();
-  const {
-    departments,
-    loading: departmentsLoading,
-    fetchDepartments,
-  } = useDepartments();
-  const [isDeleting, setIsDeleting] = useState(false);
-  
-  useEffect(() => {
-    fetchEmployees();
-    fetchDepartments();
-  }, [fetchEmployees, fetchDepartments]);
-  
-  const {
-    id,
-    project_title,
-    project_lead_id,
-    department_id,
-    end_date,
-    progress,
-    description,
-    start_date,
-    assignees,
-    goal,
-    status,
-    company_id,
-  } = project;
-
-  const formatProject = {
-    id,
-    project_title,
-    project_lead_id,
-    department_id,
-    end_date,
-    description,
-    start_date,
-    assignees,
-    goal,
-    status,
-    company_id,
-    progress,
-  };
-  
-  const handleDelete = async () => {
-    if (!id) return;
-    setIsDeleting(true);
-    try {
-      await deleteProject(id);
-      toast.success("Project deleted successfully");
-    } catch (error) {
-      toast.error("Error deleting project");
-      console.error(error);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-  
-  if (employeeLoading || departmentsLoading) {
-    return (
-      <LoadingSpinner 
-        color="blue" 
-        text="Loading project info..." 
-        height="h-32" 
-        icon={Clock}
-      />
-    );
-  }
-  
-  if (!employeeLoading && !departmentsLoading) {
-    return (
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.2 }}
-        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-6 mb-6 w-full border border-gray-200"
-      >
-        <div className="flex justify-between">
-          <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-2">
-            {project_title}
-          </h2>
-          <div className="flex gap-x-2">
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setSelectedProject(formatProject)}
-              className="rounded-full p-2"
-            >
-              <Edit size={16} />
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={handleDelete}
-              isLoading={isDeleting}
-              className="rounded-full p-2"
-            >
-              <Trash2 size={16} />
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => id !== undefined && setProjectDetailsId(id)}
-              className="rounded-full p-2"
-            >
-              <ExternalLink size={16} />
-            </Button>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4 mt-4">
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Building2 size={14} className="flex-shrink-0" />
-            <span className="font-medium">Department:</span>
-            <span>
-              {departments.filter(
-                (department) => department.id === department_id
-              )[0]?.name || "N/A"}
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <User size={14} className="flex-shrink-0" />
-            <span className="font-medium">Lead:</span>
-            <span>
-              {employees.filter((employee) => employee.id === project_lead_id)[0]
-                ?.name || "N/A"}
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Clock size={14} className="flex-shrink-0" />
-            <span className="font-medium">Progress:</span>
-            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs">
-              {progress || "N/A"}
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Calendar size={14} className="flex-shrink-0" />
-            <span className="font-medium">Deadline:</span>
-            <span>{end_date}</span>
-          </div>
-        </div>
-        
-        <div className="mt-4 text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
-          <p>{description}</p>
-        </div>
-      </motion.div>
-    );
-  }
-  return null;
-}
+const emptyProject: Project = {
+  project_title: "",
+  start_date: "",
+  end_date: "",
+  project_lead_id: "",
+  status: "Ongoing",
+  description: "",
+  assignees: [],
+};
 
 function ProjectsList() {
   const { projects, loading, fetchProjects, updateProject, deleteProject } =
     useProjects();
   const [projectDetailsId, setProjectDetailsId] = useState<number | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const { employees } = useEmployees();
+  const { departments } = useDepartments();
 
   useEffect(() => {
     fetchProjects();
@@ -217,47 +62,86 @@ function ProjectsList() {
   return (
     <AnimatePresence mode="wait">
       {loading && (
-        <LoadingSpinner color="blue" text="Loading projects..." height="h-screen" />
+        <LoadingSpinner 
+          icon={Building2} 
+          text="Loading projects..." 
+          height="h-screen" 
+          color="gray" 
+        />
       )}
       
       {!selectedProject && !projectDetailsId && !loading && (
         <motion.div
           key="content"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="px-2 py-4 md:p-6"
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+          className="px-4 space-y-6 py-4"
         >
-          <h1 className="text-xl font-bold text-blue-700 mb-6">
-            Ongoing Projects
-          </h1>
+          <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-4">
+            <Building2 size={22} className="text-gray-600" strokeWidth={1.5} />
+            <h3 className="text-lg font-semibold text-gray-800">Ongoing Projects</h3>
+          </motion.div>
 
-          <div className="space-y-4">
+          <motion.div variants={fadeInUp}>
             <AnimatePresence>
-              {projects.length > 0 &&
-                projects.map((project, idx) => (
-                  <ProjectCard
-                    deleteProject={handleDeleteProject}
-                    setSelectedProject={setSelectedProject}
-                    key={project.id || idx}
-                    project={project}
-                    setProjectDetailsId={setProjectDetailsId}
-                  />
-                ))}
+              {projects.length > 0 ? (
+                <div className="space-y-4">
+                  {projects.map((project, idx) => (
+                    typeof project.id !== "undefined" ? (
+                      <ProjectCard
+                        key={project.id}
+                        project={project}
+                        onEdit={() => setSelectedProject(project)}
+                        onDelete={() => handleDeleteProject(project.id as number)}
+                        onDetails={() => setProjectDetailsId(project.id as number)}
+                        employees={employees}
+                        departments={departments}
+                        showEdit={true}
+                        showDelete={true}
+                        showDetails={true}
+                      />
+                    ) : null
+                  ))}
+                </div>
+              ) : (
+                <motion.div 
+                  variants={fadeIn}
+                  className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200"
+                >
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="flex justify-center mb-3"
+                  >
+                    <Building2 size={40} className="text-gray-400" strokeWidth={1.5} />
+                  </motion.div>
+                  <p className="text-gray-500 mb-1">No ongoing projects found</p>
+                  <p className="text-gray-400 text-sm mb-4">Create new projects to get started</p>
+                  <Button
+                    variant="primary"
+                    onClick={() => setSelectedProject(emptyProject)}
+                    className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"
+                  >
+                    <Plus size={16} strokeWidth={2} />
+                    Create Project
+                  </Button>
+                </motion.div>
+              )}
             </AnimatePresence>
-          </div>
-          
-          {projects.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center py-12 text-center"
-            >
-              <div className="bg-gray-100 rounded-full p-4 mb-4">
-                <Calendar className="h-12 w-12 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900">No ongoing projects</h3>
-              <p className="mt-1 text-gray-500">Create new projects to get started</p>
+          </motion.div>
+
+          {projects.length > 0 && (
+            <motion.div variants={fadeIn} className="flex justify-end mt-4">
+              <Button
+                variant="primary" 
+                onClick={() => setSelectedProject(emptyProject)}
+                className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"
+              >
+                <Plus size={16} strokeWidth={2} />
+                Add Project
+              </Button>
             </motion.div>
           )}
         </motion.div>

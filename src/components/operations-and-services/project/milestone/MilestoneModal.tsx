@@ -1,10 +1,18 @@
 "use client";
 
+import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { 
+  Target,
+  Search,
+  X,
+  Check,
+} from "lucide-react";
 import { Milestone } from "@/hooks/useMilestones";
 import { useEmployees } from "@/hooks/useEmployees";
 import { milestoneSchema } from "@/lib/types";
-import { useEffect, useRef, useState } from "react";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface MilestoneCreateModalProps {
   currentTotalWeightage: number;
@@ -162,199 +170,237 @@ export default function MilestoneCreateModal({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
-      <form
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto py-8">
+      <motion.form
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto"
+        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl"
       >
-        <h2 className="text-xl font-semibold">Add Milestone</h2>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Milestone Title
-          </label>
-          <input
-            name="milestone_title"
-            type="text"
-            onChange={handleChange}
-            value={milestone.milestone_title}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.milestone_title && (
-            <p className="text-red-500 text-sm">{errors.milestone_title}</p>
-          )}
+        <div className="flex items-center gap-3 mb-6">
+          <Target size={24} className="text-gray-600" strokeWidth={2} />
+          <h2 className="text-xl font-semibold text-gray-900">Add Milestone</h2>
         </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Description
-          </label>
-          <textarea
-            name="description"
-            onChange={handleChange}
-            value={milestone.description}
-            className="w-full h-32 bg-blue-100 rounded p-3"
-          />
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Start Date
-          </label>
-          <input
-            onChange={handleChange}
-            name="start_date"
-            type="date"
-            value={milestone.start_date}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.start_date && (
-            <p className="text-red-500 text-sm">{errors.start_date}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            End Date
-          </label>
-          <input
-            name="end_date"
-            type="date"
-            onChange={handleChange}
-            value={milestone.end_date}
-            min={
-              milestone.start_date
-                ? new Date(new Date(milestone.start_date).getTime() + 86400000)
-                    .toISOString()
-                    .split("T")[0]
-                : ""
-            }
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.end_date && (
-            <p className="text-red-500 text-sm">{errors.end_date}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700 mb-1">
-            Assignees
-          </label>
 
-          <div className="relative" ref={milestoneDropdownRef}>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Milestone Title
+            </label>
             <input
+              name="milestone_title"
               type="text"
-              ref={milestoneInputRef}
-              value={milestoneSearchTerm}
-              onChange={(e) => {
-                setMilestoneSearchTerm(e.target.value);
-                setIsMilestoneDropdownOpen(true);
-              }}
-              onFocus={() => setIsMilestoneDropdownOpen(true)}
-              placeholder="Select assignee"
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
+              onChange={handleChange}
+              value={milestone.milestone_title}
+              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
             />
-            <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
+            {errors.milestone_title && (
+              <p className="text-red-500 text-sm mt-1">{errors.milestone_title}</p>
+            )}
+          </div>
 
-            {isMilestoneDropdownOpen &&
-              filteredMilestoneEmployees.length > 0 && (
-                <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              name="description"
+              onChange={handleChange}
+              value={milestone.description}
+              className="w-full h-32 rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Start Date
+            </label>
+            <input
+              onChange={handleChange}
+              name="start_date"
+              type="date"
+              value={milestone.start_date}
+              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+            />
+            {errors.start_date && (
+              <p className="text-red-500 text-sm mt-1">{errors.start_date}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              End Date
+            </label>
+            <input
+              name="end_date"
+              type="date"
+              onChange={handleChange}
+              value={milestone.end_date}
+              min={
+                milestone.start_date
+                  ? new Date(new Date(milestone.start_date).getTime() + 86400000)
+                      .toISOString()
+                      .split("T")[0]
+                  : ""
+              }
+              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+            />
+            {errors.end_date && (
+              <p className="text-red-500 text-sm mt-1">{errors.end_date}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Assignees
+            </label>
+
+            <div className="relative" ref={milestoneDropdownRef}>
+              <input
+                type="text"
+                ref={milestoneInputRef}
+                value={milestoneSearchTerm}
+                onChange={(e) => {
+                  setMilestoneSearchTerm(e.target.value);
+                  setIsMilestoneDropdownOpen(true);
+                }}
+                onFocus={() => setIsMilestoneDropdownOpen(true)}
+                placeholder="Search for assignees..."
+                className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3 pr-10"
+              />
+              <Search 
+                size={16}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                strokeWidth={2}
+              />
+
+              {isMilestoneDropdownOpen && filteredMilestoneEmployees.length > 0 && (
+                <motion.ul
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                >
                   {filteredMilestoneEmployees.map((emp) => (
-                    <li
+                    <motion.li
                       key={emp.id}
                       onClick={() => handleAddMilestoneAssignee(emp.id)}
-                      className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
+                      whileHover={{ backgroundColor: "#f3f4f6" }}
+                      className="cursor-pointer px-4 py-2 hover:bg-gray-50 text-sm text-gray-700"
                     >
                       {emp.name}
-                    </li>
+                    </motion.li>
                   ))}
-                </ul>
+                </motion.ul>
               )}
-          </div>
+            </div>
 
-          <div className="flex gap-2 mt-2 flex-wrap">
-            {milestoneAssignees.map((assignee) => {
-              const emp = employees.find((e) => e.id === assignee);
-              return (
-                <span
-                  key={assignee}
-                  className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
-                >
-                  {emp?.name}
-                  <button
-                    type="button"
-                    className="ml-2 text-red-500"
-                    onClick={() => handleRemoveMilestoneAssignee(assignee)}
+            <div className="flex gap-2 mt-2 flex-wrap">
+              {milestoneAssignees.map((assignee) => {
+                const emp = employees.find((e) => e.id === assignee);
+                return (
+                  <motion.span
+                    key={assignee}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm flex items-center"
                   >
-                    &times;
-                  </button>
-                </span>
-              );
-            })}
-          </div>
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Status
-          </label>
-          <div className="relative">
-            <select
-              name="status"
-              onChange={handleChange}
-              value={milestone.status}
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select status</option>
-              {["Ongoing", "Completed", "Archived"].map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
+                    {emp?.name}
+                    <button
+                      type="button"
+                      className="ml-2 text-gray-500 hover:text-gray-700"
+                      onClick={() => handleRemoveMilestoneAssignee(assignee)}
+                    >
+                      <X size={14} strokeWidth={2} />
+                    </button>
+                  </motion.span>
+                );
+              })}
             </div>
           </div>
-          {errors.status && (
-            <p className="text-red-500 text-sm">{errors.status}</p>
-          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <div className="relative">
+              <select
+                name="status"
+                onChange={handleChange}
+                value={milestone.status}
+                className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3 appearance-none"
+              >
+                <option value="">Select status</option>
+                {["Ongoing", "Completed", "Archived"].map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg className="fill-gray-400" width="10" height="6">
+                  <path d="M0 0h10L5 6z" />
+                </svg>
+              </div>
+            </div>
+            {errors.status && (
+              <p className="text-red-500 text-sm mt-1">{errors.status}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Weightage
+            </label>
+            <input
+              name="weightage"
+              type="number"
+              onChange={handleChange}
+              value={milestone.weightage}
+              max={100 - currentTotalWeightage}
+              min={1}
+              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+            />
+            {errors.weightage && (
+              <p className="text-red-500 text-sm mt-1">{errors.weightage}</p>
+            )}
+          </div>
         </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Weightage
-          </label>
-          <input
-            name="weightage"
-            type="number"
-            onChange={handleChange}
-            value={milestone.weightage}
-            max={100 - currentTotalWeightage}
-            min={1}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.weightage && (
-            <p className="text-red-500 text-sm">{errors.weightage}</p>
-          )}
-        </div>
+
         <div className="mt-8 flex justify-end space-x-4">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             type="button"
-            className="px-4 py-2 bg-[#FFC700] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex items-center px-4 py-2 bg-gray-100 border border-gray-200 rounded-md text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm"
             onClick={onClose}
           >
+            <X size={16} className="mr-2" strokeWidth={2} />
             Back
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             type="submit"
-            className="px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center px-4 py-2 bg-gray-800 rounded-md text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!isMilestoneValid || isSubmitting}
           >
-            Save
-          </button>
+            {isSubmitting ? (
+              <>
+                <LoadingSpinner className="mr-2" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Check size={16} className="mr-2" strokeWidth={2} />
+                Save
+              </>
+            )}
+          </motion.button>
         </div>
-      </form>
+      </motion.form>
     </div>
   );
 }
@@ -413,6 +459,7 @@ export function MilestoneUpdateModal({
     } else {
       setMilestone((prev: Milestone) => ({ ...prev, [name]: value }));
     }
+    setIsDirty(true);
   };
 
   useEffect(() => {
@@ -435,9 +482,6 @@ export function MilestoneUpdateModal({
     }
   }, [milestone]);
 
-  useEffect(() => {
-    console.log("Errors: ", errors);
-  }, [errors]);
   useEffect(() => {
     setMilestone(initialData);
     setMilestoneAssignees(initialData.assignees || []);
@@ -486,199 +530,237 @@ export function MilestoneUpdateModal({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
-      <form
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto py-8">
+      <motion.form
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto"
+        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl"
       >
-        <h2 className="text-xl font-semibold">Add Milestone</h2>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Milestone Title
-          </label>
-          <input
-            name="milestone_title"
-            type="text"
-            onChange={handleChange}
-            value={milestone.milestone_title}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.milestone_title && (
-            <p className="text-red-500 text-sm">{errors.milestone_title}</p>
-          )}
+        <div className="flex items-center gap-3 mb-6">
+          <Target size={24} className="text-gray-600" strokeWidth={2} />
+          <h2 className="text-xl font-semibold text-gray-900">Update Milestone</h2>
         </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Description
-          </label>
-          <textarea
-            name="description"
-            onChange={handleChange}
-            value={milestone.description}
-            className="w-full h-32 bg-blue-100 rounded p-3"
-          />
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Start Date
-          </label>
-          <input
-            onChange={handleChange}
-            name="start_date"
-            type="date"
-            value={milestone.start_date}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.start_date && (
-            <p className="text-red-500 text-sm">{errors.start_date}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            End Date
-          </label>
-          <input
-            name="end_date"
-            type="date"
-            onChange={handleChange}
-            value={milestone.end_date}
-            min={
-              milestone.start_date
-                ? new Date(new Date(milestone.start_date).getTime() + 86400000)
-                    .toISOString()
-                    .split("T")[0]
-                : ""
-            }
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.end_date && (
-            <p className="text-red-500 text-sm">{errors.end_date}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700 mb-1">
-            Assignees
-          </label>
 
-          <div className="relative" ref={milestoneDropdownRef}>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Milestone Title
+            </label>
             <input
+              name="milestone_title"
               type="text"
-              ref={milestoneInputRef}
-              value={milestoneSearchTerm}
-              onChange={(e) => {
-                setMilestoneSearchTerm(e.target.value);
-                setIsMilestoneDropdownOpen(true);
-              }}
-              onFocus={() => setIsMilestoneDropdownOpen(true)}
-              placeholder="Select assignee"
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
+              onChange={handleChange}
+              value={milestone.milestone_title}
+              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
             />
-            <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
+            {errors.milestone_title && (
+              <p className="text-red-500 text-sm mt-1">{errors.milestone_title}</p>
+            )}
+          </div>
 
-            {isMilestoneDropdownOpen &&
-              filteredMilestoneEmployees.length > 0 && (
-                <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-60 overflow-y-auto">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              name="description"
+              onChange={handleChange}
+              value={milestone.description}
+              className="w-full h-32 rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Start Date
+            </label>
+            <input
+              onChange={handleChange}
+              name="start_date"
+              type="date"
+              value={milestone.start_date}
+              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+            />
+            {errors.start_date && (
+              <p className="text-red-500 text-sm mt-1">{errors.start_date}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              End Date
+            </label>
+            <input
+              name="end_date"
+              type="date"
+              onChange={handleChange}
+              value={milestone.end_date}
+              min={
+                milestone.start_date
+                  ? new Date(new Date(milestone.start_date).getTime() + 86400000)
+                      .toISOString()
+                      .split("T")[0]
+                  : ""
+              }
+              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+            />
+            {errors.end_date && (
+              <p className="text-red-500 text-sm mt-1">{errors.end_date}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Assignees
+            </label>
+
+            <div className="relative" ref={milestoneDropdownRef}>
+              <input
+                type="text"
+                ref={milestoneInputRef}
+                value={milestoneSearchTerm}
+                onChange={(e) => {
+                  setMilestoneSearchTerm(e.target.value);
+                  setIsMilestoneDropdownOpen(true);
+                }}
+                onFocus={() => setIsMilestoneDropdownOpen(true)}
+                placeholder="Search for assignees..."
+                className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3 pr-10"
+              />
+              <Search 
+                size={16}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                strokeWidth={2}
+              />
+
+              {isMilestoneDropdownOpen && filteredMilestoneEmployees.length > 0 && (
+                <motion.ul
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                >
                   {filteredMilestoneEmployees.map((emp) => (
-                    <li
+                    <motion.li
                       key={emp.id}
                       onClick={() => handleAddMilestoneAssignee(emp.id)}
-                      className="cursor-pointer px-4 py-2 hover:bg-blue-100 text-sm"
+                      whileHover={{ backgroundColor: "#f3f4f6" }}
+                      className="cursor-pointer px-4 py-2 hover:bg-gray-50 text-sm text-gray-700"
                     >
                       {emp.name}
-                    </li>
+                    </motion.li>
                   ))}
-                </ul>
+                </motion.ul>
               )}
-          </div>
+            </div>
 
-          <div className="flex gap-2 mt-2 flex-wrap">
-            {milestoneAssignees.map((assignee) => {
-              const emp = employees.find((e) => e.id === assignee);
-              return (
-                <span
-                  key={assignee}
-                  className="bg-gray-200 text-blue-800 px-2 py-1 rounded-sm text-sm flex items-center"
-                >
-                  {emp?.name}
-                  <button
-                    type="button"
-                    className="ml-2 text-red-500"
-                    onClick={() => handleRemoveMilestoneAssignee(assignee)}
+            <div className="flex gap-2 mt-2 flex-wrap">
+              {milestoneAssignees.map((assignee) => {
+                const emp = employees.find((e) => e.id === assignee);
+                return (
+                  <motion.span
+                    key={assignee}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm flex items-center"
                   >
-                    &times;
-                  </button>
-                </span>
-              );
-            })}
-          </div>
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Status
-          </label>
-          <div className="relative">
-            <select
-              name="status"
-              onChange={handleChange}
-              value={milestone.status}
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select status</option>
-              {["Ongoing", "Completed", "Archived"].map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
+                    {emp?.name}
+                    <button
+                      type="button"
+                      className="ml-2 text-gray-500 hover:text-gray-700"
+                      onClick={() => handleRemoveMilestoneAssignee(assignee)}
+                    >
+                      <X size={14} strokeWidth={2} />
+                    </button>
+                  </motion.span>
+                );
+              })}
             </div>
           </div>
-          {errors.status && (
-            <p className="text-red-500 text-sm">{errors.status}</p>
-          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <div className="relative">
+              <select
+                name="status"
+                onChange={handleChange}
+                value={milestone.status}
+                className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3 appearance-none"
+              >
+                <option value="">Select status</option>
+                {["Ongoing", "Completed", "Archived"].map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg className="fill-gray-400" width="10" height="6">
+                  <path d="M0 0h10L5 6z" />
+                </svg>
+              </div>
+            </div>
+            {errors.status && (
+              <p className="text-red-500 text-sm mt-1">{errors.status}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Weightage
+            </label>
+            <input
+              name="weightage"
+              type="number"
+              onChange={handleChange}
+              value={milestone.weightage}
+              max={100 - currentTotalWeightage + initialData.weightage}
+              min={1}
+              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+            />
+            {errors.weightage && (
+              <p className="text-red-500 text-sm mt-1">{errors.weightage}</p>
+            )}
+          </div>
         </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Weightage
-          </label>
-          <input
-            name="weightage"
-            type="number"
-            onChange={handleChange}
-            value={milestone.weightage}
-            max={100 - currentTotalWeightage + initialData.weightage}
-            min={1}
-            className="w-full bg-blue-100 rounded p-3"
-          />
-          {errors.weightage && (
-            <p className="text-red-500 text-sm">{errors.weightage}</p>
-          )}
-        </div>
+
         <div className="mt-8 flex justify-end space-x-4">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             type="button"
-            className="px-4 py-2 bg-[#FFC700] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex items-center px-4 py-2 bg-gray-100 border border-gray-200 rounded-md text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm"
             onClick={onClose}
           >
+            <X size={16} className="mr-2" strokeWidth={2} />
             Back
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             type="submit"
-            className="px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!isMilestoneValid || isSubmitting}
+            className="flex items-center px-4 py-2 bg-gray-800 rounded-md text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!isMilestoneValid || isSubmitting || !isDirty}
           >
-            Update
-          </button>
+            {isSubmitting ? (
+              <>
+                <LoadingSpinner className="mr-2" />
+                Updating...
+              </>
+            ) : (
+              <>
+                <Check size={16} className="mr-2" strokeWidth={2} />
+                Update
+              </>
+            )}
+          </motion.button>
         </div>
-      </form>
+      </motion.form>
     </div>
   );
 }

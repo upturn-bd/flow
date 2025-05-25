@@ -9,7 +9,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
-import { useLeaveRequests } from "@/hooks/useRequests";
+import { useLeaveRequests } from "@/hooks/useLeaveManagement";
 
 // Add this interface
 interface LeaveRequest {

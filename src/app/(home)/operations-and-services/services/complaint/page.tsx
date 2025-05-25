@@ -22,7 +22,7 @@ const tabs: TabItem[] = [
     label: "New Complaint",
     icon: <FilePlus className="h-5 w-5" />,
     color: "text-red-600",
-    content: <ComplaintCreatePage />
+    content: <ComplaintCreatePage onClose={() => {}} />
   },
   { 
     key: "requests", 

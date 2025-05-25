@@ -1,12 +1,12 @@
 "use client";
 import TaskCreateModal, {
   TaskUpdateModal,
-} from "@/components/operations-and-services/task/TaskModal";
+} from "./shared/TaskModal";
 import { useTasks } from "@/hooks/useTasks";
 import { taskSchema } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import TaskDetails from "../project/task/TaskDetails";
+import TaskDetails from "./shared/TaskDetails";
 import { motion, AnimatePresence } from "framer-motion";
 import { Edit, Trash2, ExternalLink, Loader2 } from "lucide-react";
 import { toast } from "sonner";

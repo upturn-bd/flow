@@ -14,144 +14,7 @@ import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { Button } from "@/components/ui/button";
-
-function ProjectCard({
-  project,
-  setProjectDetailsId,
-  deleteProject,
-}: {
-  project: Project;
-  setProjectDetailsId: (id: number) => void;
-  setSelectedProject: (project: Project) => void;
-  deleteProject: (id: number) => void;
-}) {
-  const {
-    employees,
-    loading: employeeLoading,
-    fetchEmployees,
-  } = useEmployees();
-  const {
-    departments,
-    loading: departmentsLoading,
-    fetchDepartments,
-  } = useDepartments();
-  const [isDeleting, setIsDeleting] = useState(false);
-  
-  useEffect(() => {
-    fetchEmployees();
-    fetchDepartments();
-  }, [fetchEmployees, fetchDepartments]);
-  
-  const {
-    id,
-    project_title,
-    project_lead_id,
-    department_id,
-    end_date,
-    progress,
-    description,
-  } = project;
-
-  const handleDelete = async () => {
-    if (!id) return;
-    setIsDeleting(true);
-    try {
-      await deleteProject(id);
-      toast.success("Project deleted successfully");
-    } catch (error) {
-      toast.error("Error deleting project");
-      console.error(error);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  if (employeeLoading || departmentsLoading) {
-    return (
-      <LoadingSpinner color="blue" text="Loading project info..." height="h-32" />
-    );
-  }
-  
-  if (!employeeLoading && !departmentsLoading) {
-    return (
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.2 }}
-        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-6 mb-6 w-full border border-gray-200"
-      >
-        <div className="flex justify-between">
-          <div className="flex items-start gap-2">
-            <CheckCircle size={18} className="text-green-500 mt-1 flex-shrink-0" />
-            <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-2">
-              {project_title}
-            </h2>
-          </div>
-          <div className="flex gap-x-2">
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={handleDelete}
-              isLoading={isDeleting}
-              className="rounded-full p-2"
-            >
-              <Trash2 size={16} />
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => id !== undefined && setProjectDetailsId(id)}
-              className="rounded-full p-2"
-            >
-              <ExternalLink size={16} />
-            </Button>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4 mt-4">
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Building2 size={14} className="flex-shrink-0" />
-            <span className="font-medium">Department:</span>
-            <span>
-              {departments.filter(
-                (department) => department.id === department_id
-              )[0]?.name || "N/A"}
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <User size={14} className="flex-shrink-0" />
-            <span className="font-medium">Lead:</span>
-            <span>
-              {employees.filter((employee) => employee.id === project_lead_id)[0]
-                ?.name || "N/A"}
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Clock size={14} className="flex-shrink-0" />
-            <span className="font-medium">Progress:</span>
-            <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs">
-              {progress || "N/A"}
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Calendar size={14} className="flex-shrink-0" />
-            <span className="font-medium">Deadline:</span>
-            <span>{end_date}</span>
-          </div>
-        </div>
-        
-        <div className="mt-4 text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
-          <p>{description}</p>
-        </div>
-      </motion.div>
-    );
-  }
-  return null;
-}
+import ProjectCard from "./ProjectCard";
 
 function CompletedProjectsList() {
   const { deleteProject, updateProject } = useProjects();
@@ -160,6 +23,8 @@ function CompletedProjectsList() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { employees } = useEmployees();
+  const { departments } = useDepartments();
 
   async function fetchCompletedProjects() {
     setLoading(true);
@@ -228,7 +93,6 @@ function CompletedProjectsList() {
       {loading && (
         <LoadingSpinner color="blue" text="Loading projects..." height="h-screen" />
       )}
-      
       {!selectedProject && !projectDetailsId && !loading && (
         <motion.div
           key="content"
@@ -240,22 +104,29 @@ function CompletedProjectsList() {
           <h1 className="text-xl font-bold text-blue-700 mb-6">
             Completed Projects
           </h1>
-
           <div className="space-y-4">
             <AnimatePresence>
               {projects.length > 0 &&
                 projects.map((project, idx) => (
-                  <ProjectCard
-                    deleteProject={handleDeleteProject}
-                    setSelectedProject={setSelectedProject}
-                    key={project.id || idx}
-                    project={project}
-                    setProjectDetailsId={setProjectDetailsId}
-                  />
+                  typeof project.id !== "undefined" ? (
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
+                      onEdit={undefined}
+                      onDelete={() => handleDeleteProject(project.id as number)}
+                      onDetails={() => setProjectDetailsId(project.id as number)}
+                      employees={employees}
+                      departments={departments}
+                      showEdit={false}
+                      showDelete={true}
+                      showDetails={true}
+                      statusIcon={<CheckCircle size={18} className="text-green-500 mt-1 flex-shrink-0" />}
+                      progressColor="bg-green-100 text-green-800"
+                    />
+                  ) : null
                 ))}
             </AnimatePresence>
           </div>
-          
           {projects.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -271,7 +142,6 @@ function CompletedProjectsList() {
           )}
         </motion.div>
       )}
-      
       {projectDetailsId && (
         <ProjectDetails
           id={projectDetailsId}

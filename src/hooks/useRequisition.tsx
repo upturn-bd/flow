@@ -4,12 +4,27 @@ import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { RequisitionState } from "@/components/operations-and-services/requisition/RequisitionCreatePage";
+
+export interface RequisitionState {
+  id: number;
+  requisition_category_id: number;
+  item_id: number;
+  quantity: number;
+  date: string;
+  from_time?: string;
+  to_time?: string;
+  description?: string;
+  attachments?: string[];
+  employee_id: number;
+  company_id: number;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  approved_by_id?: number;
+  comment?: string;
+  asset_owner: number;
+}
 
 export function useRequisitionRequests() {
-  const [requisitionRequests, setRequisitionRequests] = useState<
-    RequisitionState[]
-  >([]);
+  const [requisitionRequests, setRequisitionRequests] = useState<RequisitionState[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<number | null>(null);
@@ -17,13 +32,11 @@ export function useRequisitionRequests() {
   const fetchRequisitionRequests = useCallback(
     async (status: string = "Pending") => {
       setLoading(true);
+      setError(null);
 
       try {
         const user = await getEmployeeInfo();
         const company_id = await getCompanyId();
-
-        const validField =
-          status === "Pending" ? "requested_to" : "employee_id";
 
         const { data, error } = await supabase
           .from("requisition_records")
@@ -51,8 +64,35 @@ export function useRequisitionRequests() {
   );
 
   const fetchRequisitionHistory = useCallback(async () => {
-    return fetchRequisitionRequests("Pending");
-  }, [fetchRequisitionRequests]);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const user = await getEmployeeInfo();
+      const company_id = await getCompanyId();
+
+      // Fetch both approved and rejected requests
+      const { data, error } = await supabase
+        .from("requisition_records")
+        .select("*")
+        .eq("company_id", company_id);
+        // .eq("asset_owner", user.id);
+
+      if (error) {
+        setError("Failed to fetch requisition history");
+        throw error;
+      }
+
+      setRequisitionRequests(data || []);
+      return data;
+    } catch (error) {
+      setError("Failed to fetch requisition history");
+      console.error(error);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const updateRequisitionRequest = useCallback(
     async (action: string, id: number, comment: string) => {

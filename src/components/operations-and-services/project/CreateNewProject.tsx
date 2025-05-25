@@ -7,11 +7,13 @@ import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { useProjects } from "@/hooks/useProjects";
 import { useMilestones } from "@/hooks/useMilestones";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Building2, X } from "lucide-react";
 import ProjectForm, { type ProjectDetails } from "./ProjectForm";
 import MilestoneList from "./milestone/MilestoneList";
 import MilestoneForm, { type Milestone } from "./milestone/MilestoneForm";
 import { supabase } from "@/lib/supabase/client";
+import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
+import { Button } from "@/components/ui/button";
 
 const initialMilestone: Milestone = {
   milestone_title: "",
@@ -92,10 +94,10 @@ export default function CreateNewProjectPage() {
           const milestoneResult = await createMilestone(milestoneToCreate);
           if (!milestoneResult.success) {
             // Rollback project creation
-          await supabase
-          .from("project_records")
-          .delete()
-            .match({ id: projectId });
+            await supabase
+              .from("project_records")
+              .delete()
+              .match({ id: projectId });
             console.error("Failed to create milestones:", milestoneResult);
             throw new Error("Failed to create milestones");
           }
@@ -135,26 +137,25 @@ export default function CreateNewProjectPage() {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial="hidden"
+      animate="visible"
+      variants={staggerContainer}
       className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6"
     >
-      <motion.h1
-        initial={{ y: -20 }}
-        animate={{ y: 0 }}
-        className="text-2xl font-bold text-blue-800 mb-8"
-      >
-        Create New Project
-      </motion.h1>
+      <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Building2 size={24} className="text-gray-600" strokeWidth={1.5} />
+          <h2 className="text-xl font-semibold text-gray-800">Create New Project</h2>
+        </div>
+      </motion.div>
       
       {errors.submit && (
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          variants={fadeInUp}
           className="bg-red-50 border border-red-200 p-4 rounded-md mb-4"
         >
           <p className="text-red-700 flex items-center">
-            <AlertCircle size={16} className="mr-2" />
+            <AlertCircle size={16} className="mr-2" strokeWidth={2} />
             {errors.submit}
           </p>
         </motion.div>
@@ -162,66 +163,63 @@ export default function CreateNewProjectPage() {
 
       {errors.milestone_weightage && (
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          variants={fadeInUp}
           className="bg-red-50 border border-red-200 p-4 rounded-md mb-4"
         >
           <p className="text-red-700 flex items-center">
-            <AlertCircle size={16} className="mr-2" />
+            <AlertCircle size={16} className="mr-2" strokeWidth={2} />
             {errors.milestone_weightage}
           </p>
         </motion.div>
       )}
 
-      <ProjectForm
-        onSubmit={handleSubmit}
-        isSubmitting={isSubmitting}
-        departments={departments}
-        employees={employees}
-        mode="create"
-      />
+      <motion.div variants={fadeInUp}>
+        <ProjectForm
+          onSubmit={handleSubmit}
+          isSubmitting={isSubmitting}
+          departments={departments}
+          employees={employees}
+          mode="create"
+        />
+      </motion.div>
 
-      <MilestoneList
-        milestones={milestones}
-        onEdit={(id) => {
-          const milestoneToUpdate = milestones.find((m) => m.project_id === id);
-          if (milestoneToUpdate) {
-            setMilestone(milestoneToUpdate);
-            setSelectedMilestone(id);
-          }
-        }}
-        onDelete={handleDeleteMilestone}
-        onAdd={() => setIsCreatingMilestone(true)}
-        employees={employees}
-      />
+      <motion.div variants={fadeInUp}>
+        <MilestoneList
+          milestones={milestones}
+          onEdit={(id) => {
+            const milestoneToUpdate = milestones.find((m) => m.project_id === id);
+            if (milestoneToUpdate) {
+              setMilestone(milestoneToUpdate);
+              setSelectedMilestone(id);
+            }
+          }}
+          onDelete={handleDeleteMilestone}
+          onAdd={() => setIsCreatingMilestone(true)}
+          employees={employees}
+        />
+      </motion.div>
 
       {isCreatingMilestone && (
         <MilestoneForm
           milestone={milestone}
-          isSubmitting={isSubmitting}
           onSubmit={handleAddMilestone}
-          onCancel={() => {
-            setIsCreatingMilestone(false);
-            setMilestone(initialMilestone);
-          }}
+          onCancel={() => setIsCreatingMilestone(false)}
           employees={employees}
           currentMilestones={milestones}
           mode="create"
+          isSubmitting={isSubmitting}
         />
       )}
 
       {selectedMilestone && (
         <MilestoneForm
           milestone={milestone}
-          isSubmitting={isSubmitting}
           onSubmit={handleUpdateMilestone}
-          onCancel={() => {
-            setSelectedMilestone(null);
-            setMilestone(initialMilestone);
-          }}
+          onCancel={() => setSelectedMilestone(null)}
           employees={employees}
-          currentMilestones={milestones}
+          currentMilestones={milestones.filter((m) => m.project_id !== selectedMilestone)}
           mode="edit"
+          isSubmitting={isSubmitting}
         />
       )}
     </motion.div>
@@ -237,19 +235,18 @@ export function UpdateProjectPage({
   onSubmit: (data: ProjectDetails) => void;
   onClose: () => void;
 }) {
-  const { departments, fetchDepartments } = useDepartments();
-  const { employees, fetchEmployeeInfo } = useEmployeeInfo();
+  const { departments } = useDepartments();
+  const { employees } = useEmployeeInfo();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  React.useEffect(() => {
-    fetchDepartments();
-    fetchEmployeeInfo();
-  }, [fetchDepartments, fetchEmployeeInfo]);
 
   const handleSubmit = async (data: ProjectDetails) => {
     setIsSubmitting(true);
     try {
       await onSubmit(data);
+      onClose();
+    } catch (error) {
+      console.error("Error updating project:", error);
+      toast.error("Failed to update project");
     } finally {
       setIsSubmitting(false);
     }
@@ -257,27 +254,36 @@ export function UpdateProjectPage({
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial="hidden"
+      animate="visible"
+      variants={staggerContainer}
       className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6"
     >
-      <motion.h1
-        initial={{ y: -20 }}
-        animate={{ y: 0 }}
-        className="text-2xl font-bold text-blue-800 mb-8"
-      >
-        Update Project
-      </motion.h1>
+      <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Building2 size={24} className="text-gray-600" strokeWidth={1.5} />
+          <h2 className="text-xl font-semibold text-gray-800">Update Project</h2>
+        </div>
+        <Button
+          variant="ghost"
+          onClick={onClose}
+          className="p-1 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500"
+        >
+          <X size={20} strokeWidth={2} />
+        </Button>
+      </motion.div>
 
-      <ProjectForm
-        initialData={initialData}
-        onSubmit={handleSubmit}
-        onCancel={onClose}
-        isSubmitting={isSubmitting}
-        departments={departments}
-        employees={employees}
-        mode="edit"
-      />
+      <motion.div variants={fadeInUp}>
+        <ProjectForm
+          initialData={initialData}
+          onSubmit={handleSubmit}
+          onCancel={onClose}
+          isSubmitting={isSubmitting}
+          departments={departments}
+          employees={employees}
+          mode="edit"
+        />
+      </motion.div>
     </motion.div>
   );
 } 

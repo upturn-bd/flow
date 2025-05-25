@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { Button } from "@/components/ui/button";
+import { fadeInUp } from "@/components/ui/animations";
 
 const TABS = [
   {
@@ -95,28 +97,33 @@ export default function ProjectPage() {
   }
 
   return (
-    <motion.div
+    <motion.section
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="max-w-6xl mx-auto p-4 sm:p-6"
+      variants={fadeInUp}
+      className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm max-w-6xl mx-auto"
     >
-      <motion.div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-2">
+      <div className="border-b border-gray-200 pb-4 mb-4">
+        <h1 className="text-lg font-semibold text-gray-800 flex items-center mb-1">
           <Folder className="mr-2 h-6 w-6 text-blue-500" />
           Project Management
         </h1>
-        <p className="text-gray-600 max-w-3xl">
+        <p className="text-sm text-gray-600">
           Efficiently manage your projects from start to finish. Create, assign, and track progress to ensure successful completion of all project milestones.
         </p>
-      </motion.div>
-      {tabs.length > 0 && (
+      </div>
+      {tabs.length > 0 ? (
         <TabView
           tabs={tabs}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
+      ) : (
+        <div className="p-4 sm:p-6 bg-gray-50 rounded-lg text-center text-gray-500">
+          No projects found. Click the plus button to add one.
+        </div>
       )}
-    </motion.div>
+    </motion.section>
   );
 }

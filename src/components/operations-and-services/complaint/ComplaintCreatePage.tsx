@@ -1,8 +1,22 @@
 "use client";
 
 import React, { useEffect, useState, ChangeEvent } from "react";
-import { FiUploadCloud } from "react-icons/fi";
-import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Upload,
+  Calendar,
+  ChevronLeft,
+  ChevronDown,
+  AlertCircle,
+  Save,
+  Check,
+  Loader2,
+  X,
+  FileText,
+  MessageSquare,
+  User,
+  Flag
+} from "lucide-react";
 import { z } from "zod";
 import { complaintRecordSchema } from "@/lib/types";
 import { supabase } from "@/lib/supabase/client";
@@ -11,6 +25,7 @@ import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
+import { toast } from "sonner";
 
 const initialComplaintRecord = {
   complaint_type_id: undefined,
@@ -25,15 +40,17 @@ const initialComplaintRecord = {
 
 export type ComplaintState = z.infer<typeof complaintRecordSchema>;
 
-export default function ComplaintCreatePage() {
+interface ComplaintCreatePageProps {
+  onClose: () => void;
+}
+
+export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProps) {
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [complaintState, setComplaintState] = useState<ComplaintState>(
-    initialComplaintRecord
-  );
+  const [complaintState, setComplaintState] = useState<ComplaintState>(initialComplaintRecord);
   const [attachments, setAttachments] = useState<File[]>([]);
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
   const { employees, fetchEmployees } = useEmployees();
-  const [errors, setErrors] = useState<Partial<ComplaintState>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
@@ -42,7 +59,7 @@ export default function ComplaintCreatePage() {
   ) => {
     const { name, value } = e.target;
     if (name === "complaint_type_id") {
-      setComplaintState((prev) => ({ ...prev, [name]: Number(value) }));
+      setComplaintState((prev) => ({ ...prev, [name]: value ? Number(value) : undefined }));
     } else {
       setComplaintState((prev) => ({ ...prev, [name]: value }));
     }
@@ -73,18 +90,19 @@ export default function ComplaintCreatePage() {
         requested_to: user.supervisor_id,
       };
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("complaint_records")
         .insert(formattedComplaintState);
 
       if (error) throw error;
 
-      alert("Complaint created successfully!");
+      toast.success("Complaint created successfully!");
       setComplaintState(initialComplaintRecord);
       setAttachments([]);
-    } catch (error) {
+      onClose();
+    } catch (error: any) {
       console.error("Error creating Complaint:", error);
-      alert("Error creating Complaint. Please try again.");
+      toast.error(`Error creating Complaint: ${error.message || "Please try again"}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -98,19 +116,28 @@ export default function ComplaintCreatePage() {
   }, [isAnonymous]);
 
   useEffect(() => {
-    const result = complaintRecordSchema.safeParse(complaintState);
-    if (result.success) {
-      setIsValid(true);
-      setErrors({});
-    } else {
-      setIsValid(false);
-      const newErrors: Partial<ComplaintState> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof ComplaintState] =
-          err.message as unknown as undefined;
-      });
-      setErrors(newErrors);
+    // Validate form
+    const newErrors: Record<string, string> = {};
+    let valid = true;
+
+    console.log(complaintState.complaint_type_id);
+    if (!complaintState.complaint_type_id && complaintState.complaint_type_id !== 0) {
+      newErrors.complaint_type_id = "Please select a category";
+      valid = false;
     }
+
+    if (!complaintState.against_whom) {
+      newErrors.against_whom = "Please select a person";
+      valid = false;
+    }
+
+    if (!complaintState.description) {
+      newErrors.description = "Description is required";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    setIsValid(valid);
   }, [complaintState]);
 
   useEffect(() => {
@@ -119,169 +146,230 @@ export default function ComplaintCreatePage() {
   }, [fetchComplaintTypes, fetchEmployees]);
 
   return (
-    <div className="p-6 space-y-6 max-w-4xl mx-auto lg:mx-20">
-      <div>
-        <h1 className="text-xl font-bold text-blue-600">Complaints</h1>
-        <div
-          className="flex items-center cursor-pointer gap-2"
-          onClick={() => setIsAnonymous(!isAnonymous)}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="p-6 space-y-6 max-w-4xl mx-auto"
+    >
+      <div className="flex justify-between items-center">
+        <h1 className="text-xl font-bold text-blue-700">Create Complaint</h1>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onClose}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
         >
-          {isAnonymous ? (
-            <PiToggleRightFill size={36} className="text-blue-500" />
-          ) : (
-            <PiToggleLeftFill size={36} className="text-gray-400" />
-          )}
-          <span className="text-sm text-blue-600">Anonymous</span>
-        </div>
+          <ChevronLeft size={16} />
+          <span>Back</span>
+        </motion.button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Category
-          </label>
-          <div className="relative">
-            <select
-              name="complaint_type_id"
-              value={complaintState.complaint_type_id}
-              onChange={handleInputChange}
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={undefined}>Select category</option>
-              {complaintTypes.length > 0 &&
-                complaintTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-            </select>
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
-          </div>
-          {errors.complaint_type_id && (
-            <p className="text-red-500 text-sm mt-1">
-              Please select a category
-            </p>
-          )}
-          {complaintState.complaint_type_id === undefined && (
-            <p className="text-red-500 text-sm mt-1">
-              Please select a category
-            </p>
-          )}
-        </div>
-        <div>
-          <label className="block text-lg font-bold text-blue-700">
-            Complaint Against
-          </label>
-          <div className="relative">
-            <select
-              name="against_whom"
-              value={complaintState.against_whom}
-              onChange={handleInputChange}
-              className="w-full bg-blue-100 rounded p-3 appearance-none"
-            >
-              <option value={""}>Select a person</option>
-              {employees.length > 0 &&
-                employees.map((emp) => (
-                  <option key={emp.id} value={emp.id}>
-                    {emp.name}
-                  </option>
-                ))}
-            </select>
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="fill-yellow-400" width="10" height="10">
-                <polygon points="0,0 10,0 5,6" />
-              </svg>
-            </div>
-          </div>
-          {errors.against_whom && (
-            <p className="text-red-500 text-sm mt-1">{errors.against_whom}</p>
-          )}
-        </div>
-        <div>
-          <label className="block font-bold text-[#003366] mb-1">
-            Description
-          </label>
-          <textarea
-            name="description"
-            value={complaintState.description}
-            onChange={handleInputChange}
-            rows={4}
-            className="w-full bg-[#EAF4FF] px-4 py-2 rounded-md"
+      <div
+        className="flex items-center cursor-pointer gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200"
+        onClick={() => setIsAnonymous(!isAnonymous)}
+      >
+        <div
+          className={`w-12 h-6 rounded-full relative ${
+            isAnonymous ? "bg-blue-500" : "bg-gray-300"
+          } transition-colors duration-300`}
+        >
+          <motion.div
+            className="w-5 h-5 bg-white rounded-full absolute top-0.5"
+            animate={{
+              left: isAnonymous ? "calc(100% - 1.25rem - 0.125rem)" : "0.125rem",
+            }}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
           />
-          {errors.description && (
-            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
-          )}
         </div>
+        <span className="text-sm font-medium text-gray-700">
+          Anonymous Complaint
+        </span>
+      </div>
 
-        <div>
-          <label className="block font-bold text-[#003366] mb-1">
-            Attachment
-          </label>
-          <div className="bg-gray-100 rounded-md border border-gray-300 p-6 text-center text-sm text-gray-500">
-            <FiUploadCloud className="mx-auto mb-4 text-2xl" />
-            <label
-              htmlFor="file_upload"
-              className="px-4 py-2 bg-white border border-gray-400 text-sm rounded-md cursor-pointer hover:bg-gray-200 transition"
-            >
-              Browse File
+      <form onSubmit={handleSubmit} className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200">
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+              <Flag size={16} className="mr-2" />
+              Category
             </label>
-            <input
-              type="file"
-              id="file_upload"
-              name="attachments"
-              className="hidden"
-              accept=".pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt"
-              multiple
-              onChange={(e) => {
-                const files = Array.from(e.target.files || []);
-                setAttachments((prev) => [
-                  ...prev,
-                  ...files.filter(
-                    (file) => !prev.some((f) => f.name === file.name)
-                  ),
-                ]);
-              }}
+            <div className="relative">
+              <select
+                name="complaint_type_id"
+                value={complaintState.complaint_type_id}
+                onChange={handleInputChange}
+                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+              >
+                <option value={undefined}>Select category</option>
+                {complaintTypes.length > 0 &&
+                  complaintTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+              </select>
+              <ChevronDown
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                size={16}
+              />
+            </div>
+            {errors.complaint_type_id && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.complaint_type_id}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+              <User size={16} className="mr-2" />
+              Complaint Against
+            </label>
+            <div className="relative">
+              <select
+                name="against_whom"
+                value={complaintState.against_whom}
+                onChange={handleInputChange}
+                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+              >
+                <option value="">Select a person</option>
+                {employees.length > 0 &&
+                  employees.map((emp) => (
+                    <option key={emp.id} value={emp.id}>
+                      {emp.name}
+                    </option>
+                  ))}
+              </select>
+              <ChevronDown
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                size={16}
+              />
+            </div>
+            {errors.against_whom && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.against_whom}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+              <MessageSquare size={16} className="mr-2" />
+              Description
+            </label>
+            <textarea
+              name="description"
+              value={complaintState.description}
+              onChange={handleInputChange}
+              rows={4}
+              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              placeholder="Describe your complaint..."
             />
-            <div className="flex gap-3 mt-8 text-gray-600">
-              {attachments.length > 0
-                ? attachments.map((file, index) => (
-                    <div
-                      key={index}
-                      className="px-3 py-2 bg-blue-100 text-sm rounded-sm"
-                    >
-                      <span>{file.name}</span>
-                      <button
-                        type="button"
-                        className="ml-2 text-red-500 text-xl"
-                        onClick={() => removeFile(file.name)}
+            {errors.description && (
+              <p className="mt-1 text-red-500 text-sm flex items-center">
+                <AlertCircle size={14} className="mr-1" />
+                {errors.description}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+              <Upload size={16} className="mr-2" />
+              Attachment
+            </label>
+            <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-6 text-center">
+              <Upload className="mx-auto mb-4 text-gray-400 h-10 w-10" />
+              <p className="text-sm text-gray-500 mb-4">
+                Drag and drop files here, or
+              </p>
+              <label
+                htmlFor="file_upload"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg cursor-pointer hover:bg-blue-700 transition-colors"
+              >
+                <Upload size={16} className="mr-2" />
+                Browse Files
+              </label>
+              <input
+                type="file"
+                id="file_upload"
+                name="attachments"
+                className="hidden"
+                accept=".pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt"
+                multiple
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  setAttachments((prev) => [
+                    ...prev,
+                    ...files.filter(
+                      (file) => !prev.some((f) => f.name === file.name)
+                    ),
+                  ]);
+                }}
+              />
+
+              <AnimatePresence>
+                {attachments.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="flex flex-wrap gap-2 mt-4 justify-center"
+                  >
+                    {attachments.map((file, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm"
                       >
-                        &times;
-                      </button>
-                    </div>
-                  ))
-                : "No files selected"}
+                        <FileText size={14} className="text-blue-500" />
+                        <span className="truncate max-w-xs">{file.name}</span>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          type="button"
+                          className="text-gray-400 hover:text-red-500"
+                          onClick={() => removeFile(file.name)}
+                        >
+                          <X size={16} />
+                        </motion.button>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-end">
-          <button
+        <div className="flex justify-end gap-4 pt-4">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             type="submit"
-            disabled={
-              !isValid ||
-              isSubmitting ||
-              complaintState.complaint_type_id === undefined
-            }
-            className="bg-[#001F4D] text-white px-6 py-2 rounded-full hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!isValid || isSubmitting}
+            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </button>
+            {isSubmitting ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                <span>Submitting...</span>
+              </>
+            ) : (
+              <>
+                <Check size={18} />
+                <span>Submit</span>
+              </>
+            )}
+          </motion.button>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 }

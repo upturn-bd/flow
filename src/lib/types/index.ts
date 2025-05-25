@@ -182,25 +182,22 @@ export const commentSchema = z.object({
   commenter_id: z.string(),
   project_id: z.number().optional(),
   company_id: z.number().optional(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const taskSchema = z.object({
   id: z.number().optional(),
-  task_title: z
-    .string()
-    .min(1, { message: "Please enter a valid task title" })
-    .max(200),
-  task_description: z.string().optional(),
-  start_date: z.string().min(1, { message: "Please select a start date" }),
-  end_date: z.string().min(1, { message: "Please select an end date" }),
-  status: z.boolean().default(false),
+  task_title: z.string().min(1, { message: "Title is required" }),
+  task_description: z.string(),
+  start_date: z.string().min(1, { message: "Start date is required" }),
+  end_date: z.string().min(1, { message: "End date is required" }),
+  priority: z.string().min(1, { message: "Priority is required" }),
+  project_id: z.number(),
   milestone_id: z.number().optional(),
-  project_id: z.number().optional(),
-  department_id: z.number().optional(),
+  assignees: z.array(z.string()),
+  status: z.boolean().optional(),
   company_id: z.number().optional(),
-  assignees: z.array(z.string()).optional(),
-  priority: z.string().min(1, { message: "Please select a priority" }),
-  created_by: z.string().optional(),
 });
 
 export const requisitionSchema = z.object({

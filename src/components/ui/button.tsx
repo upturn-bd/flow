@@ -1,18 +1,20 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
   fullWidth?: boolean;
   isLoading?: boolean;
+  iconColorClass?: string;
 }
 
 const variantClasses = {
-  primary: "bg-blue-600 hover:bg-blue-700 text-white shadow",
-  secondary: "bg-gray-200 hover:bg-gray-300 text-gray-800",
-  outline: "border border-gray-300 hover:bg-gray-100 text-gray-800",
-  ghost: "hover:bg-gray-100 text-gray-800",
-  danger: "bg-red-600 hover:bg-red-700 text-white",
+  primary: "bg-blue-600 hover:bg-blue-700 text-white shadow-sm",
+  secondary: "bg-gray-200 hover:bg-gray-300 text-gray-800 shadow-sm",
+  outline: "border border-gray-300 hover:bg-gray-100 text-gray-800 shadow-sm",
+  ghost: "hover:bg-gray-100 text-gray-800 shadow-sm",
+  danger: "bg-red-600 hover:bg-red-700 text-white shadow-sm",
 };
 
 const sizeClasses = {
@@ -31,14 +33,18 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       isLoading = false,
       disabled,
       children,
+      iconColorClass = "",
       ...props
     },
     ref
   ) => {
     return (
-      <button
+      <motion.button
         ref={ref}
         disabled={disabled || isLoading}
+        aria-busy={isLoading}
+        whileHover={!disabled && !isLoading ? { scale: 1.05 } : {}}
+        whileTap={!disabled && !isLoading ? { scale: 0.95 } : {}}
         className={`
           font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
           ${variantClasses[variant]}
@@ -76,7 +82,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ) : (
           children
         )}
-      </button>
+      </motion.button>
     );
   }
 ); 

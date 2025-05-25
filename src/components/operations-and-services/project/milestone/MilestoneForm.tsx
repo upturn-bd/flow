@@ -10,6 +10,7 @@ import {
   X,
   Check,
   ChevronDown,
+  Target,
 } from "lucide-react";
 import { milestoneSchema } from "@/lib/types";
 import { z } from "zod";
@@ -85,7 +86,7 @@ export default function MilestoneForm({
     if (name === "start_date" || name === "end_date") {
       setMilestoneData(prev => ({
         ...prev,
-        [name]: value, // Keep as string for date inputs
+        [name]: value,
       }));
     } else if (name === "weightage") {
       setMilestoneData(prev => ({
@@ -131,23 +132,36 @@ export default function MilestoneForm({
   };
 
   return (
-    <motion.div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
-      <motion.div className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto relative">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto py-8"
+    >
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto relative shadow-xl"
+      >
         {isSubmitting && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-50">
             <LoadingSpinner />
           </div>
         )}
         
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          {mode === 'create' ? 'Add Milestone' : 'Update Milestone'}
-        </h2>
+        <div className="flex items-center gap-3 mb-6">
+          <Target size={24} className="text-gray-600" strokeWidth={2} />
+          <h2 className="text-xl font-semibold text-gray-900">
+            {mode === 'create' ? 'Add Milestone' : 'Update Milestone'}
+          </h2>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <FormInputField
             name="milestone_title"
             label="Milestone Title"
-            icon={<Calendar size={16} className="text-blue-500" />}
+            icon={<Target size={16} className="text-gray-500" strokeWidth={2} />}
             value={milestoneData.milestone_title || ""}
             onChange={handleChange}
             error={errors.milestone_title}
@@ -161,7 +175,7 @@ export default function MilestoneForm({
               name="description"
               onChange={handleChange}
               value={milestoneData.description || ""}
-              className="w-full h-32 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-[#EAF4FF] p-3"
+              className="w-full h-32 rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
             />
           </div>
 
@@ -170,7 +184,7 @@ export default function MilestoneForm({
               name="start_date"
               label="Start Date"
               type="date"
-              icon={<Calendar size={16} className="text-blue-500" />}
+              icon={<Calendar size={16} className="text-gray-500" strokeWidth={2} />}
               value={milestoneData.start_date || ""}
               onChange={handleChange}
               error={errors.start_date}
@@ -180,7 +194,7 @@ export default function MilestoneForm({
               name="end_date"
               label="End Date"
               type="date"
-              icon={<Calendar size={16} className="text-blue-500" />}
+              icon={<Calendar size={16} className="text-gray-500" strokeWidth={2} />}
               value={milestoneData.end_date || ""}
               onChange={handleChange}
               error={errors.end_date}
@@ -190,7 +204,7 @@ export default function MilestoneForm({
           <FormSelectField
             name="status"
             label="Status"
-            icon={<Calendar size={16} className="text-blue-500" />}
+            icon={<Target size={16} className="text-gray-500" strokeWidth={2} />}
             value={milestoneData.status || ""}
             onChange={handleChange}
             error={errors.status}
@@ -204,7 +218,7 @@ export default function MilestoneForm({
 
           <div>
             <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
-              <Calendar size={14} className="text-blue-500" />
+              <Target size={14} className="text-gray-500" strokeWidth={2} />
               Weightage (%)
             </label>
             <input
@@ -216,11 +230,11 @@ export default function MilestoneForm({
               max={100 - currentMilestones
                 .filter(m => m.project_id !== milestoneData.project_id)
                 .reduce((sum, m) => sum + m.weightage, 0)}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-[#EAF4FF] p-3"
+              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
             />
             {errors.weightage && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
-                <AlertCircle size={14} className="mr-1" />
+                <AlertCircle size={14} className="mr-1" strokeWidth={2} />
                 {errors.weightage}
               </p>
             )}
@@ -228,7 +242,7 @@ export default function MilestoneForm({
 
           <div>
             <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
-              <Users size={14} className="text-blue-500" />
+              <Users size={14} className="text-gray-500" strokeWidth={2} />
               Assignees
             </label>
 
@@ -242,13 +256,14 @@ export default function MilestoneForm({
                   setDropdownOpen(true);
                 }}
                 onFocus={() => setDropdownOpen(true)}
-                onBlur={() => setDropdownOpen(false)}
+                onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
                 placeholder="Search for assignees..."
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-[#EAF4FF] p-3 pr-10"
+                className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3 pr-10"
               />
               <Search 
                 size={16} 
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                strokeWidth={2}
               />
 
               <AnimatePresence>
@@ -257,14 +272,14 @@ export default function MilestoneForm({
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                    className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto"
                   >
                     {filteredEmployees.map((emp) => (
                       <motion.li
                         key={emp.id}
                         onClick={() => handleAddAssignee(emp.id)}
                         whileHover={{ backgroundColor: "#f3f4f6" }}
-                        className="cursor-pointer px-4 py-2 hover:bg-gray-100 text-sm"
+                        className="cursor-pointer px-4 py-2 hover:bg-gray-50 text-sm text-gray-700"
                       >
                         {emp.name}
                       </motion.li>
@@ -284,15 +299,15 @@ export default function MilestoneForm({
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
-                      className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center"
+                      className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm flex items-center"
                     >
                       {emp?.name}
                       <button
                         type="button"
-                        className="ml-2 text-blue-500 hover:text-blue-700"
+                        className="ml-2 text-gray-500 hover:text-gray-700"
                         onClick={() => handleRemoveAssignee(assignee)}
                       >
-                        <X size={14} />
+                        <X size={14} strokeWidth={2} />
                       </button>
                     </motion.span>
                   );
@@ -306,10 +321,10 @@ export default function MilestoneForm({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="button"
-              className="flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors"
+              className="flex items-center px-4 py-2 bg-gray-100 border border-gray-200 rounded-md text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm"
               onClick={onCancel}
             >
-              <X size={16} className="mr-2" />
+              <X size={16} className="mr-2" strokeWidth={2} />
               Cancel
             </motion.button>
             
@@ -317,9 +332,9 @@ export default function MilestoneForm({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              className="flex items-center px-4 py-2 bg-blue-600 rounded-md text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
+              className="flex items-center px-4 py-2 bg-gray-800 rounded-md text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm"
             >
-              <Check size={16} className="mr-2" />
+              <Check size={16} className="mr-2" strokeWidth={2} />
               {mode === 'create' ? 'Add Milestone' : 'Update Milestone'}
             </motion.button>
           </div>

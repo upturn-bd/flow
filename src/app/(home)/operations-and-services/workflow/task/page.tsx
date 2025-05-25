@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import TaskCreateModal from "@/components/operations-and-services/task/TaskModal";
 import TaskPage from "@/components/operations-and-services/task/OngoingTasks";
 import CompletedTasksList from "@/components/operations-and-services/task/CompletedTasks";
 import { useState } from "react";
@@ -14,6 +13,9 @@ import {
 } from "lucide-react";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import TaskCreateModal from "@/components/operations-and-services/task/shared/TaskModal";
+import { Task, useTasks } from "@/hooks/useTasks";
+import { toast } from "sonner";
 
 const TABS = [
   {
@@ -29,12 +31,6 @@ const TABS = [
     color: "text-green-600"
   },
   {
-    key: "create-new",
-    label: "Create New",
-    icon: <PlusSquare className="h-5 w-5" />,
-    color: "text-blue-600"
-  },
-  {
     key: "archived",
     label: "Archived",
     icon: <ArchiveIcon className="h-5 w-5" />,
@@ -46,6 +42,19 @@ export default function TasksPage() {
   const [activeTab, setActiveTab] = useState("ongoing");
   const [isLoading, setIsLoading] = useState(false);
   const [tabs, setTabs] = useState<TabItem[]>([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const { createTask } = useTasks();
+
+  const handleCreateTask = async (task: Task) => {
+    const { success, error } = await createTask(task);
+    if (success) {
+      toast.success("Task created successfully");
+      setShowCreateModal(false);
+      setActiveTab("ongoing");
+    } else {
+      toast.error("Failed to create task");
+    }
+  };
 
   function getTabContent(key: string) {
     if (isLoading) {
@@ -61,8 +70,6 @@ export default function TasksPage() {
         return <TaskPage />;
       case "completed":
         return <CompletedTasksList />;
-      case "create-new":
-        return <TaskCreateModal />;
       case "archived":
         return (
           <div className="flex flex-col items-center justify-center p-12 bg-gray-50/50 rounded-xl border border-gray-200 text-center">
@@ -94,20 +101,39 @@ export default function TasksPage() {
       exit="exit"
       className="max-w-6xl mx-auto p-4 sm:p-6"
     >
-      <motion.div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-2">
-          <ClipboardList className="mr-2 h-6 w-6 text-indigo-500" />
-          Task Management
-        </h1>
-        <p className="text-gray-600 max-w-3xl">
-          Manage and track your tasks efficiently. Create, assign, and monitor progress to ensure timely completion of all your activities.
-        </p>
+      <motion.div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-2">
+            <ClipboardList className="mr-2 h-6 w-6 text-indigo-500" />
+            Task Management
+          </h1>
+          <p className="text-gray-600 max-w-3xl">
+            Manage and track your tasks efficiently. Create, assign, and monitor progress to ensure timely completion of all your activities.
+          </p>
+        </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <PlusSquare className="h-5 w-5" />
+          Create Task
+        </button>
       </motion.div>
+      
       {tabs.length > 0 && (
         <TabView
           tabs={tabs}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+        />
+      )}
+
+      {showCreateModal && (
+        <TaskCreateModal
+          milestoneId={0}
+          projectId={0}
+          onSubmit={handleCreateTask}
+          onClose={() => setShowCreateModal(false)}
         />
       )}
     </motion.div>

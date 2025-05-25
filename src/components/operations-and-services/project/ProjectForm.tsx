@@ -121,7 +121,7 @@ export default function ProjectForm({
         <FormInputField
           name="project_title"
           label="Project Name"
-          icon={<FileText size={16} className="text-blue-500" />}
+          icon={<FileText size={16} className="text-gray-500" />}
           value={projectDetails.project_title || ""}
           onChange={handleInputChange}
           error={errors.project_title}
@@ -140,7 +140,7 @@ export default function ProjectForm({
           name="description"
           onChange={handleInputChange}
           value={projectDetails.description}
-          className="w-full h-32 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-[#EAF4FF] p-3"
+          className="w-full h-32 rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
         />
       </motion.div>
 
@@ -152,7 +152,7 @@ export default function ProjectForm({
         <FormInputField
           name="goal"
           label="Goal"
-          icon={<Target size={16} className="text-blue-500" />}
+          icon={<Target size={16} className="text-gray-500" />}
           value={projectDetails.goal || ""}
           onChange={handleInputChange}
         />
@@ -167,7 +167,7 @@ export default function ProjectForm({
           <FormSelectField
             name="department_id"
             label="Department"
-            icon={<Building2 size={16} className="text-blue-500" />}
+            icon={<Building2 size={16} className="text-gray-500" />}
             value={projectDetails.department_id ? projectDetails.department_id.toString() : null}
             onChange={handleInputChange}
             error={errors.department_id}
@@ -187,7 +187,7 @@ export default function ProjectForm({
           <FormSelectField
             name="project_lead_id"
             label="Project Lead"
-            icon={<UserCircle size={16} className="text-blue-500" />}
+            icon={<UserCircle size={16} className="text-gray-500" />}
             value={projectDetails.project_lead_id || null}
             onChange={handleInputChange}
             error={errors.project_lead_id}
@@ -209,7 +209,7 @@ export default function ProjectForm({
           <FormInputField
             name="start_date"
             label="Start Date"
-            icon={<Calendar size={16} className="text-blue-500" />}
+            icon={<Calendar size={16} className="text-gray-500" />}
             type="date"
             value={projectDetails.start_date || ""}
             onChange={handleInputChange}
@@ -225,7 +225,7 @@ export default function ProjectForm({
           <FormInputField
             name="end_date"
             label="End Date"
-            icon={<Calendar size={16} className="text-blue-500" />}
+            icon={<Calendar size={16} className="text-gray-500" />}
             type="date"
             value={projectDetails.end_date || ""}
             onChange={handleInputChange}
@@ -269,10 +269,10 @@ export default function ProjectForm({
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           disabled={!isValid || isSubmitting}
-          className={`bg-blue-600 text-white py-2 px-5 rounded-md font-medium shadow-sm flex items-center transition-all duration-150 ${
+          className={`bg-gray-800 text-white py-2 px-5 rounded-md font-medium shadow-sm flex items-center transition-all duration-150 ${
             !isValid || isSubmitting 
               ? 'opacity-50 cursor-not-allowed' 
-              : 'hover:bg-blue-700 active:bg-blue-800'
+              : 'hover:bg-gray-900 active:bg-gray-950'
           }`}
         >
           {isSubmitting ? (

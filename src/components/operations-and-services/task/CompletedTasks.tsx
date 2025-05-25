@@ -9,7 +9,7 @@ import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { z } from "zod";
 import { taskSchema } from "@/lib/types";
-import TaskDetails from "../project/task/TaskDetails";
+import TaskDetails from "./shared/TaskDetails";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, ExternalLink, Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";

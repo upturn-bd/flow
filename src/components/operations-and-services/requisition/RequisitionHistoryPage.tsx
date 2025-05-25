@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Loader2, 
@@ -13,27 +13,26 @@ import {
   TagIcon, 
   FileText 
 } from "lucide-react";
-import { toast } from "sonner";
 import { extractFilenameFromUrl } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
-import { useRequisitionRequests } from "@/hooks/useRequests";
+import { useRequisitionRequests } from "@/hooks/useRequisition";
 
 export default function RequisitionHistoryPage() {
   const { employees, fetchEmployees } = useEmployees();
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } = useRequisitionInventories();
-  const {fetchRequisitionRequests} = useRequisitionRequests();
+  const {
+    requisitionRequests,
+    loading,
+    error,
+    fetchRequisitionHistory
+  } = useRequisitionRequests();
 
   useEffect(() => {
-    // For history, we fetch with any status that is not Pending
-    fetchRequisitionRequests("Approved").then(() => {
-      // This is a hacky approach since we want both approved and rejected
-      // A better solution would be to modify the hook to accept an array of statuses
-      fetchRequisitionRequests("Rejected");
-    });
-  }, [fetchRequisitionRequests]);
+    fetchRequisitionHistory();
+  }, [fetchRequisitionHistory]);
 
   useEffect(() => {
     fetchEmployees();
@@ -141,7 +140,7 @@ export default function RequisitionHistoryPage() {
                       {(req.from_time || req.to_time) && (
                         <div className="flex items-center gap-2 text-sm text-gray-700">
                           <Clock size={14} />
-                          <span>{req.from_time} - {req.to_time}</span>
+                          <span>{req.from_time || 'N/A'} - {req.to_time || 'N/A'}</span>
                         </div>
                       )}
                     </div>
@@ -149,7 +148,7 @@ export default function RequisitionHistoryPage() {
                     <div className="mt-3 flex items-center gap-2 text-sm text-gray-700">
                       <User size={14} />
                       <span>Requested by: <span className="font-medium">
-                        {employees.find(employee => employee.id === req.employee_id)?.name || "Unknown"}
+                        {employees.find(employee => employee.id === String(req.employee_id))?.name || "Unknown"}
                       </span></span>
                     </div>
                     
@@ -164,9 +163,9 @@ export default function RequisitionHistoryPage() {
                       <div className="mt-2">
                         <p className="text-xs text-gray-500 mb-1">Attachments:</p>
                         <div className="flex flex-wrap gap-2">
-                          {req.attachments.map((attachment, idx) => (
+                          {req.attachments.map((attachment, index) => (
                             <a
-                              key={idx}
+                              key={index}
                               href={attachment}
                               target="_blank"
                               rel="noopener noreferrer"

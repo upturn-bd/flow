@@ -20,7 +20,7 @@ import {
   X
 } from "lucide-react";
 import { toast } from "sonner";
-import { useRequisitionRequests } from "@/hooks/useRequests";
+import { useRequisitionRequests } from "@/hooks/useRequisition";
 
 export default function RequisitionRequestsPage() {
   const [comment, setComment] = useState<string>("");
@@ -49,7 +49,7 @@ export default function RequisitionRequestsPage() {
     fetchRequisitionInventories();
   }, [fetchRequisitionTypes, fetchRequisitionInventories]);
 
-  const handleUpdateRequest = async (action: string, id: number) => {
+  const handleUpdateRequest = async (action: 'Approved' | 'Rejected', id: number) => {
     const success = await updateRequisitionRequest(action, id, comment);
     if (success) {
       toast.success(`Request ${action.toLowerCase()} successfully`);
@@ -150,7 +150,7 @@ export default function RequisitionRequestsPage() {
                     <div className="flex items-center gap-2 text-sm text-gray-700">
                       <User size={14} />
                       <span>Requested by: <span className="font-medium">
-                        {employees.find(employee => employee.id === req.employee_id)?.name || "Unknown"}
+                        {employees.find(employee => employee.id === String(req.employee_id))?.name || "Unknown"}
                       </span></span>
                     </div>
                     
@@ -172,7 +172,7 @@ export default function RequisitionRequestsPage() {
                           name="comment"
                           onChange={(e) => setComment(e.target.value)}
                           placeholder="Add your feedback here..."
-                          value={comment || ""}
+                          value={comment}
                           className="w-full px-4 py-2 rounded-md border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                         />
                       </div>
@@ -184,9 +184,9 @@ export default function RequisitionRequestsPage() {
                             <span>Attachments</span>
                           </p>
                           <div className="flex flex-wrap gap-2">
-                            {req.attachments.map((attachment, idx) => (
+                            {req.attachments.map((attachment, index) => (
                               <a
-                                key={idx}
+                                key={index}
                                 href={attachment}
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -205,7 +205,7 @@ export default function RequisitionRequestsPage() {
                       <motion.button 
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => req.id !== undefined && handleUpdateRequest("Rejected", req.id)}
+                        onClick={() => handleUpdateRequest("Rejected", req.id)}
                         disabled={processingId === req.id}
                         className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                       >
@@ -219,7 +219,7 @@ export default function RequisitionRequestsPage() {
                       <motion.button 
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => req.id !== undefined && handleUpdateRequest("Approved", req.id)}
+                        onClick={() => handleUpdateRequest("Approved", req.id)}
                         disabled={processingId === req.id}
                         className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                       >

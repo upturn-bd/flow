@@ -2,6 +2,7 @@
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEffect, useState } from "react";
 import SettlementCreatePage from "./SettlementCreatePage";
+import SettlementDraftPage from "./SettlementDraftPage";
 import { Receipt, FileEdit, Trash2, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -12,9 +13,9 @@ export default function UpcomingPage() {
   const [displayDraftId, setDisplayDraftId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  function handleDeleteDraft(draftId) {
+  function handleDeleteDraft(draftId: number) {
     const updatedUpcoming = upcoming.filter(
-      (draft) => draft.draft_id !== draftId
+      (draft: any) => draft.draft_id !== draftId
     );
     setUpcoming(updatedUpcoming);
     localStorage.setItem("settlement_drafts", JSON.stringify(updatedUpcoming));
@@ -76,9 +77,9 @@ export default function UpcomingPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
-              {upcoming.map((item, index) => {
+              {upcoming.map((item: any, index: number) => {
                 const claimType = claimTypes.find(
-                  (type) => type.id === item.settlement_type_id
+                  (type: any) => type.id === item.settlement_type_id
                 );
                 
                 return (

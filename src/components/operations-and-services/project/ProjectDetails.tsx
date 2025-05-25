@@ -6,28 +6,31 @@ import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { useEffect, useState } from "react";
 import { Milestone } from "@/hooks/useMilestones";
 import { useMilestones } from "@/hooks/useMilestones";
-import MilestoneCreateModal, {
-  MilestoneUpdateModal,
-} from "./milestone/MilestoneModal";
 import { Comment, useComments } from "@/hooks/useComments";
 import MilestoneDetails from "./milestone/MilestoneDetails";
 import { formatDate } from "@/lib/utils";
 import { projectSchema } from "@/lib/types";
+import { Task, useTasks } from "@/hooks/useTasks";
 import { 
-  Pencil, 
-  Trash2, 
-  Calendar, 
-  ExternalLink,
   Plus, 
+  Building2,
+  User,
+  Clock,
+  Users,
+  CheckCircle,
+  X,
+  Target,
+  Calendar,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { Button } from "@/components/ui/button";
-import FormInputField from "@/components/ui/FormInputField";
-import FormSelectField from "@/components/ui/FormSelectField";
-import TaskCreateModal, { TaskUpdateModal } from "./task/TaskModal";
-import { useTasks } from "@/hooks/useTasks";
+import TaskCreateModal, { TaskUpdateModal } from "../task/shared/TaskModal";
+import { motion } from "framer-motion";
+import MilestoneCreateModal from "./milestone/MilestoneModal";
 
 interface ProjectDetailsProps {
   id: number;
@@ -85,15 +88,25 @@ function formatTime(timestamp: number | Date): string {
   return `${day} ${month}`;
 }
 
-const initialMilestone: Milestone = {
-  milestone_title: "",
-  description: "",
-  start_date: "",
-  end_date: "",
-  weightage: 0,
-  status: "",
-  project_id: 1,
-  assignees: [],
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+};
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+};
+
+const modalVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+  exit: { opacity: 0 },
 };
 
 export default function ProjectDetails({
@@ -106,13 +119,11 @@ export default function ProjectDetails({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { employees, fetchEmployees } = useEmployees();
-  const [user, setUser] = useState<any>(null);
   const [remark, setRemark] = useState<string>("");
   const [displaySubmissionModal, setDisplaySubmissionModal] =
     useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [loadingTasks, setLoadingTasks] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const calculateProgress = (milestones: Milestone[]) => {
     if (!projectDetails || !milestones.length) return;
@@ -161,7 +172,7 @@ export default function ProjectDetails({
   );
   const { createMilestone, updateMilestone, deleteMilestone } = useMilestones();
 
-  const handleCreateMilestone = async (values: any) => {
+  const handleCreateMilestone = async (values: Milestone) => {
     try {
       await createMilestone(values);
       toast.success("Milestone created!");
@@ -172,7 +183,7 @@ export default function ProjectDetails({
     }
   };
 
-  const handleUpdateMilestone = async (values: any) => {
+  const handleUpdateMilestone = async (values: Milestone) => {
     try {
       await updateMilestone(values);
       toast.success("Milestone updated!");
@@ -238,64 +249,72 @@ export default function ProjectDetails({
   };
 
   // Task states and functions
-  const { createTask, updateTask, deleteTask } = useTasks();
-  const [isCreatingProjectTask, setIsCreatingProjectTask] = useState(false);
+  const { createTask, updateTask, deleteTask, fetchTasks } = useTasks();
   const [isCreatingMilestoneTask, setIsCreatingMilestoneTask] = useState<number | null>(null);
   const [selectedTask, setSelectedTask] = useState<any>(null);
-  const [milestoneTasks, setMilestoneTasks] = useState<Record<number, any[]>>({});
 
-  // Fetch tasks for each milestone
-  const fetchTasksByMilestoneId = async (milestoneId: number) => {
-    const client = createClient();
-    const company_id = await getCompanyId();
-    const { data, error } = await client
-      .from("task_records")
-      .select("*")
-      .eq("milestone_id", milestoneId)
-      .eq("company_id", company_id);
-    if (!error) {
-      setMilestoneTasks((prev) => ({ ...prev, [milestoneId]: data || [] }));
+  // Handlers for project tasks
+  const handleCreateProjectTask = async (values: Task) => {
+    try {
+      const result = await createTask(values);
+      if (result.success) {
+        toast.success("Task created successfully!");
+        const updatedTasks = await fetchTasks({projectId});
+        setTasks(updatedTasks);
+        setIsCreatingMilestoneTask(null);
+      } else {
+        throw result.error;
+      }
+    } catch (error) {
+      toast.error("Failed to create task");
+      console.error(error);
     }
   };
 
-  // Fetch all milestone tasks when milestones change
+  const handleUpdateProjectTask = async (values: Task) => {
+    try {
+      const result = await updateTask(values);
+      if (result.success) {
+        toast.success("Task updated successfully!");
+        const updatedTasks = await fetchTasks({projectId});
+        setTasks(updatedTasks);
+        setSelectedTask(null);
+      } else {
+        throw result.error;
+      }
+    } catch (error) {
+      toast.error("Failed to update task");
+      console.error(error);
+    }
+  };
+
+  const handleDeleteProjectTask = async (taskId: number, milestoneId?: number) => {
+    try {
+      const result = await deleteTask(taskId, projectId, milestoneId);
+      if (result.success) {
+        toast.success("Task deleted successfully!");
+        const updatedTasks = await fetchTasks({projectId});
+        setTasks(updatedTasks);
+      } else {
+        throw result.error;
+      }
+    } catch (error) {
+      toast.error("Failed to delete task");
+      console.error(error);
+    }
+  };
+
+  // Remove all milestone task specific handlers since they're the same as project tasks
+  const handleCreateMilestoneTask = handleCreateProjectTask;
+  const handleUpdateMilestoneTask = handleUpdateProjectTask;
+  const handleDeleteMilestoneTask = handleDeleteProjectTask;
+
+  // Fetch tasks when project or milestones change
   useEffect(() => {
-    milestones.forEach((m) => {
-      if (m.id) fetchTasksByMilestoneId(m.id);
-    });
-  }, [milestones]);
-
-  // Handlers for project tasks
-  const handleCreateProjectTask = async (values: any) => {
-    await createTask(values);
-    fetchTasksByProjectId(projectId);
-    setIsCreatingProjectTask(false);
-  };
-  const handleUpdateProjectTask = async (values: any) => {
-    await updateTask(values);
-    fetchTasksByProjectId(projectId);
-    setSelectedTask(null);
-  };
-  const handleDeleteProjectTask = async (id: number) => {
-    await deleteTask(id);
-    fetchTasksByProjectId(projectId);
-  };
-
-  // Handlers for milestone tasks
-  const handleCreateMilestoneTask = async (values: any, milestoneId: number) => {
-    await createTask(values);
-    fetchTasksByMilestoneId(milestoneId);
-    setIsCreatingMilestoneTask(null);
-  };
-  const handleUpdateMilestoneTask = async (values: any, milestoneId: number) => {
-    await updateTask(values);
-    fetchTasksByMilestoneId(milestoneId);
-    setSelectedTask(null);
-  };
-  const handleDeleteMilestoneTask = async (id: number, milestoneId: number) => {
-    await deleteTask(id);
-    fetchTasksByMilestoneId(milestoneId);
-  };
+    if (projectId) {
+      fetchTasks({projectId}).then(setTasks);
+    }
+  }, [projectId, fetchTasks]);
 
   async function fetchProjectDetails(id: number) {
     setLoading(true);
@@ -359,34 +378,6 @@ export default function ProjectDetails({
     }
   }
 
-  async function fetchTasksByProjectId(id: number) {
-    setLoadingTasks(true);
-    const client = createClient();
-    const company_id = await getCompanyId();
-
-    try {
-      const { data, error } = await client
-        .from("task_records")
-        .select("*")
-        .eq("project_id", id)
-        .eq("company_id", company_id)
-        .is("milestone_id", null);
-
-      if (error) {
-        setError("Error fetching tasks");
-        console.error(error);
-        return;
-      }
-
-      setTasks(data || []);
-    } catch (error) {
-      setError("Error fetching tasks");
-      console.error(error);
-    } finally {
-      setLoadingTasks(false);
-    }
-  }
-
   async function fetchCommentsByProjectId(id: number) {
     setLoadingComments(true);
     const client = createClient();
@@ -418,7 +409,6 @@ export default function ProjectDetails({
     if (id) {
       fetchProjectDetails(id);
       fetchMilestonesByProjectId(id);
-      fetchTasksByProjectId(id);
       fetchCommentsByProjectId(id);
       setProjectId(id);
     }
@@ -427,14 +417,6 @@ export default function ProjectDetails({
   useEffect(() => {
     fetchEmployees();
   }, [fetchEmployees]);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await getEmployeeInfo();
-      setUser(user);
-    };
-    fetchUser();
-  }, []);
 
   if (loading) {
     return (
@@ -455,361 +437,389 @@ export default function ProjectDetails({
   return (
     <div>
       {!milestoneDetailsId && (
-        <div className="md:max-w-6xl mx-auto p-6 md:p-10 text-[#2F2F2F] font-sans">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl md:text-2xl font-bold text-[#0074FF] mb-4">
-              Project Details
-            </h2>
+        <motion.div 
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+          className="md:max-w-6xl mx-auto p-6 md:p-10 text-gray-800"
+        >
+          <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Building2 size={24} className="text-gray-600" strokeWidth={1.5} />
+              <h2 className="text-xl font-semibold text-gray-800">Project Details</h2>
+            </div>
             <Button
-              type="button"
+              variant="ghost"
               onClick={onClose}
-              className="bg-blue-900 text-white px-4 py-2 rounded-md"
+              className="p-1 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500"
             >
-              Back
+              <X size={20} strokeWidth={2} />
             </Button>
-          </div>
+          </motion.div>
 
-          <div className="grid gap-2">
-            <div className="flex gap-2">
-              <span className="font-bold">Project Name</span>:
-              <span className="text-[#555]">
-                {projectDetails?.project_title}
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <span className="font-bold">Lead</span>:
-              <span>
-                {employees.filter(
-                  (employee) => employee.id === projectDetails?.project_lead_id
-                )[0]?.name || "N/A"}
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <span className="font-bold">Progress</span>:
-              <span>{projectDetails?.progress || "N/A"}</span>
-            </div>
-            <div className="flex gap-2 items-start">
-              <span className="font-bold">Assignee</span>:
-              <div className="flex flex-wrap gap-2">
-                {projectDetails?.assignees && projectDetails?.assignees.length > 0 &&
-                  projectDetails?.assignees.map((assignee, i) => (
-                    <span
-                      key={i}
-                      className="bg-[#E6F0FF] text-[#0074FF] text-xs px-2 py-1 rounded"
-                    >
-                      {employees.filter(
-                        (employee) => employee.id === assignee
-                      )[0]?.name || "N/A"}
-                    </span>
-                  ))}
+          <motion.div variants={fadeInUp} className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-4">
+            <div className="grid gap-4">
+              <div className="flex items-center gap-2">
+                <Building2 size={16} className="text-gray-500" strokeWidth={1.5} />
+                <span className="font-medium">Project Name:</span>
+                <span className="text-gray-600">
+                  {projectDetails?.project_title}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <User size={16} className="text-gray-500" strokeWidth={1.5} />
+                <span className="font-medium">Lead:</span>
+                <span className="text-gray-600">
+                  {employees.filter(
+                    (employee) => employee.id === projectDetails?.project_lead_id
+                  )[0]?.name || "N/A"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock size={16} className="text-gray-500" strokeWidth={1.5} />
+                <span className="font-medium">Progress:</span>
+                <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs">
+                  {projectDetails?.progress || "N/A"}
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Users size={16} className="text-gray-500 mt-1" strokeWidth={1.5} />
+                <div>
+                  <span className="font-medium">Assignees:</span>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {projectDetails?.assignees && projectDetails?.assignees.length > 0 &&
+                      projectDetails?.assignees.map((assignee, i) => (
+                        <span
+                          key={i}
+                          className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-md"
+                        >
+                          {employees.filter(
+                            (employee) => employee.id === assignee
+                          )[0]?.name || "N/A"}
+                        </span>
+                      ))}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Dates */}
-          <div className="flex gap-6 mt-6 text-sm">
-            <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-gray-500" />
-              <span>
-                <span className="font-semibold">Start:</span>{" "}
-                {formatDate(projectDetails?.start_date || "")}
-              </span>
+            <div className="flex gap-6 mt-6 text-sm">
+              <div className="flex items-center gap-2">
+                <Calendar size={16} className="text-gray-500" strokeWidth={1.5} />
+                <span>
+                  <span className="font-medium">Start:</span>{" "}
+                  {formatDate(projectDetails?.start_date || "")}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar size={16} className="text-gray-500" strokeWidth={1.5} />
+                <span>
+                  <span className="font-medium">End:</span>{" "}
+                  {formatDate(projectDetails?.end_date || "")}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-gray-500" />
-              <span>
-                <span className="font-semibold">End:</span>{" "}
-                {formatDate(projectDetails?.end_date || "")}
-              </span>
+
+            <div className="mt-6 text-gray-600 bg-gray-50 p-4 rounded-md">
+              <p>{projectDetails?.description}</p>
             </div>
-          </div>
 
-          {/* Flow Guidebook */}
-          <div className="mt-6">
-            <p>{projectDetails?.description}</p>
-          </div>
+            {projectDetails?.status !== "Completed" && (
+              <Button
+                variant="primary"
+                onClick={() => setDisplaySubmissionModal(true)}
+                className="w-full mt-8 bg-gray-800 hover:bg-gray-900 text-white"
+              >
+                Submit Project
+              </Button>
+            )}
+          </motion.div>
 
-          {projectDetails?.status !== "Completed" && (
-            <Button
-              type="button"
-              onClick={() => setDisplaySubmissionModal(true)}
-              className="w-full mt-8 bg-[#FFB800] font-semibold py-2 px-6 rounded-md"
-            >
-              Submit Project
-            </Button>
-          )}
           {/* Milestones */}
-          <div className="mt-10">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-[#2F2F2F]">
-                Milestones
-              </h3>
+          <motion.div variants={fadeInUp} className="mt-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Target size={20} className="text-gray-600" strokeWidth={1.5} />
+                <h3 className="text-lg font-semibold text-gray-800">Milestones</h3>
+              </div>
               {projectDetails?.status !== "Completed" &&
                 milestones.reduce((acc, m) => acc + m.weightage, 0) < 100 && (
                   <Button
-                  type="button"
-                  onClick={() => setIsCreatingMilestone(true)}
-                  className="text-white text-xl bg-blue-500 hover:bg-blue-600 active:bg-blue-700 rounded-full w-12 h-12 flex items-center justify-center transition-colors duration-150 shadow-sm"
-                >
-                  <Plus size={24} className="w-8 h-8" />
-                </Button>
+                    variant="ghost"
+                    onClick={() => setIsCreatingMilestone(true)}
+                    className="p-1 rounded-full hover:bg-gray-50 text-gray-500 hover:text-gray-700"
+                  >
+                    <Plus size={20} strokeWidth={2} />
+                  </Button>
                 )}
             </div>
-            <div className="grid md:grid-cols-3 gap-4 mt-4">
-              {!loadingMilestones &&
-                milestones.length > 0 &&
-                milestones.map((m, i) => (
-                    <div key={m.id ?? i} className="bg-blue-100 rounded p-4 space-y-1">
-                    <div className="flex justify-between">
-                      <div className="font-bold text-lg text-blue-900">
-                        Milestone {i + 1}
-                      </div>
-                      {typeof m.id === 'number' && (
-                        <ExternalLink
-                          onClick={() => setMilestoneDetailsId(m.id!)}
-                          size={18}
-                          className="text-slate-800 hover:text-blue-800 cursor-pointer ml-4 md:ml-8"
-                        />
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-700">{m.milestone_title}</p>
-                    <p className="text-sm font-semibold text-black">
-                      Start Date: {m.start_date}
-                    </p>
-                    <p className="text-sm font-semibold text-black">
-                      End Date: {m.end_date}
-                    </p>
-                    <p className="text-sm font-semibold text-black">
-                      Weightage: {m.weightage}
-                    </p>
-                    <div className="flex justify-end gap-2">
+
+            <div className="space-y-4">
+              {milestones.map((m, i) => (
+                <motion.div
+                  key={m.id ?? i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 space-y-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-gray-800">{m.milestone_title}</h4>
+                    <div className="flex gap-2">
                       {typeof m.id === 'number' && (
                         <>
-                          <Pencil
-                            size={16}
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleDisplayUpdateMilestoneModal(m.id!)}
-                            className="text-gray-600 cursor-pointer"
-                          />
-                          <Trash2
+                            className="p-1 rounded-full hover:bg-gray-50 text-gray-500 hover:text-gray-700"
+                          >
+                            <Pencil size={16} strokeWidth={2} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleDeleteMilestone(m.id!)}
-                            size={16}
-                            className="text-red-600 cursor-pointer"
-                          />
+                            className="p-1 rounded-full hover:bg-red-50 text-gray-500 hover:text-red-500"
+                          >
+                            <Trash2 size={16} strokeWidth={2} />
+                          </Button>
                         </>
                       )}
                     </div>
-                    {typeof m.id === 'number' && (
-                      <Button onClick={() => setIsCreatingMilestoneTask(m.id!)}>+ Task</Button>
-                    )}
-                    {typeof m.id === 'number' && milestoneTasks[m.id!] && milestoneTasks[m.id!].map((task: any) => (
-                      <div key={task.id} className="bg-white rounded p-2 mt-2">
+                  </div>
+
+                  <p className="text-sm text-gray-600">{m.description}</p>
+
+                  <div className="flex flex-wrap gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={14} className="text-gray-500" strokeWidth={1.5} />
+                      <span className="text-gray-600">{m.start_date} - {m.end_date}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Target size={14} className="text-gray-500" strokeWidth={1.5} />
+                      <span className="text-gray-600">Weightage: {m.weightage}%</span>
+                    </div>
+                  </div>
+
+                  {typeof m.id === 'number' && tasks
+                    .filter(task => task.milestone_id === m.id)
+                    .map((task: Task) => (
+                      <div key={task.id} className="bg-gray-100 rounded-md p-3 mt-2">
                         <div className="flex justify-between items-center">
-                          <span>{task.task_title}</span>
-                          <div>
-                            <Button onClick={() => setSelectedTask({ ...task, milestoneId: m.id! })}>Edit</Button>
-                            <Button onClick={() => handleDeleteMilestoneTask(task.id, m.id!)}>Delete</Button>
+                          <span className="text-sm text-gray-700">{task.task_title}</span>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSelectedTask(task)}
+                              className="p-1 rounded-full hover:bg-gray-50 text-gray-500 hover:text-gray-700"
+                            >
+                              <Pencil size={14} strokeWidth={2} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteMilestoneTask(task.id!, m.id)}
+                              className="p-1 rounded-full hover:bg-red-50 text-gray-500 hover:text-red-500"
+                            >
+                              <Trash2 size={14} strokeWidth={2} />
+                            </Button>
                           </div>
                         </div>
                       </div>
                     ))}
-                    {isCreatingMilestoneTask === m.id && (
-                      <TaskCreateModal
-                        projectId={projectId}
-                        milestoneId={m.id!}
-                        onClose={() => setIsCreatingMilestoneTask(null)}
-                        onSubmit={(values) => handleCreateMilestoneTask(values, m.id!)}
-                      />
-                    )}
-                    {selectedTask && selectedTask.milestoneId === m.id && (
-                      <TaskUpdateModal
-                        initialData={selectedTask}
-                        onClose={() => setSelectedTask(null)}
-                        onSubmit={(values) => handleUpdateMilestoneTask(values, m.id!)}
-                      />
-                    )}
-                  </div>
-                ))}
-              {loadingMilestones && (
-                <div className="flex items-center justify-center h-32">
-                  <p className="text-gray-500">Loading...</p>
-                </div>
-              )}
-              {!loadingMilestones && milestones.length === 0 && (
-                <div className="flex items-center justify-center h-32">
-                  <p className="text-gray-500">No milestones found.</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Comments */}
-          <div className="mt-10">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-[#2F2F2F]">Comments</h3>
-              {projectDetails?.status !== "Completed" && (
-                <Button
-                  type="button"
-                  onClick={() => setIsCreatingComment(true)}
-                  className="text-white text-xl bg-blue-500 hover:bg-blue-600 active:bg-blue-700 rounded-full w-12 h-12 flex items-center justify-center transition-colors duration-150 shadow-sm"
-                >
-                  <Plus size={24} className="w-8 h-8" />
-                </Button>
-              )}
-            </div>
-            <div className="bg-[#F3F3F3] p-4 rounded-lg mt-4">
-              {!loadingComments &&
-                [...comments]
-                  .sort(
-                    (a, b) => {
-                      const dateA = b.created_at ? new Date(b.created_at).getTime() : 0;
-                      const dateB = a.created_at ? new Date(a.created_at).getTime() : 0;
-                      return dateA - dateB;
-                    }
-                  )
-                  .map((c, i) => (
-                    <div key={i} className={"bg-white p-3 rounded-md mb-3 "}>
-                      <div className="flex justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-gray-700 w-14 h-7 md:w-10 md:h-10 rounded-full bg-gray-300 flex items-center justify-center text-xs md:text-sm">
-                            {employees
-                              .filter(
-                                (employee) => employee.id === c.commenter_id
-                              )[0]
-                              ?.name.charAt(0)}
-                          </span>
-                          <p className="text-sm">{c.comment}</p>
-                        </div>
-                        {c.commenter_id === user.id && (
-                          <Trash2
-                            onClick={() => c.id !== undefined && handleDeleteComment(c.id)}
-                            size={16}
-                            className="text-red-600 cursor-pointer w-7 h-7 md:w-4 md:h-4"
-                          />
-                        )}
-                      </div>
-                      <p className="text-xs text-right text-gray-500 mt-1">
-                        {formatTime(c.created_at!)}
-                      </p>
+                  {tasks.filter(task => task.milestone_id === m.id).length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      <CheckCircle size={32} className="mx-auto opacity-50" strokeWidth={1.5} />
+                      <p>No tasks added yet</p>
                     </div>
-                  ))}
-              {loadingComments && (
-                <div className="flex items-center justify-center h-32">
-                  Loading...
-                </div>
-              )}
+                  )}
+                  {
+                    // Add a button to add a task to the milestone
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsCreatingMilestoneTask(m.id!)}
+                    >
+                      <Plus size={16} strokeWidth={2} />
+                    </Button>
+                  }
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
 
-              {!loadingComments && comments.length === 0 && (
-                <div className="flex items-center justify-center h-32">
-                  No comments found.
+          {/* Tasks Section */}
+          <motion.div variants={fadeInUp} className="mt-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle size={20} className="text-gray-600" strokeWidth={1.5} />
+                <h3 className="text-lg font-semibold text-gray-800">Project Tasks</h3>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {tasks
+                .map((task) => (
+                  <motion.div
+                    key={task.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="bg-white rounded-lg border border-gray-200 shadow-sm p-4"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="font-medium text-gray-800">{task.task_title}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{task.task_description}</p>
+                        <div className="flex gap-4 mt-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <Calendar size={14} strokeWidth={1.5} />
+                            <span>{formatDate(task.start_date)} - {formatDate(task.end_date)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Users size={14} strokeWidth={1.5} />
+                            <span>
+                              {task.assignees?.map((id: string) => 
+                                employees.find(e => e.id === id)?.name
+                              ).join(", ")}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedTask(task)}
+                          className="p-1 rounded-full hover:bg-gray-50 text-gray-500 hover:text-gray-700"
+                        >
+                          <Pencil size={16} strokeWidth={2} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteProjectTask(task.id!)}
+                          className="p-1 rounded-full hover:bg-red-50 text-gray-500 hover:text-red-500"
+                        >
+                          <Trash2 size={16} strokeWidth={2} />
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+
+              {tasks.filter(task => !task.milestone_id).length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <CheckCircle size={32} className="mx-auto mb-3 opacity-50" strokeWidth={1.5} />
+                  <p>No tasks added yet</p>
                 </div>
               )}
             </div>
-          </div>
-          {isCreatingMilestone && (
-            <MilestoneCreateModal
-              currentTotalWeightage={milestones.reduce(
-                (acc, m) => acc + m.weightage,
-                0
-              )}
+          </motion.div>
+
+          {/* Task Modals */}
+          {selectedTask && !selectedTask.milestone_id && (
+            <TaskUpdateModal
+              initialData={selectedTask}
+              onClose={() => setSelectedTask(null)}
+              onSubmit={handleUpdateProjectTask}
+            />
+          )}
+
+          {selectedTask && selectedTask.milestone_id && (
+            <TaskUpdateModal
+              initialData={selectedTask}
+              onClose={() => setSelectedTask(null)}
+              onSubmit={(values) => handleUpdateMilestoneTask(values)}
+            />
+          )}
+
+          {isCreatingMilestoneTask !== null && (
+            <TaskCreateModal
               projectId={projectId}
-              onClose={() => setIsCreatingMilestone(false)}
-              onSubmit={handleCreateMilestone}
+              milestoneId={isCreatingMilestoneTask}
+              onClose={() => setIsCreatingMilestoneTask(null)}
+              onSubmit={(values) => handleCreateMilestoneTask(values)}
             />
           )}
-
-          {selectedMilestone && (
-            <MilestoneUpdateModal
-              currentTotalWeightage={milestones.reduce(
-                (acc, m) => acc + m.weightage,
-                0
-              )}
-              initialData={selectedMilestone}
-              onClose={() => setSelectedMilestone(null)}
-              onSubmit={handleUpdateMilestone}
-            />
-          )}
-
-          {/* Comment Modal */}
-          {isCreatingComment && (
-            <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
-              <form
-                onSubmit={handleCreateComment}
-                className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto"
-              >
-                <h2 className="text-xl font-semibold">Add Comment</h2>
-                <div>
-                  <textarea
-                    name="comment"
-                    onChange={(e) => setComment(e.target.value)}
-                    value={comment}
-                    className="w-full h-32 bg-blue-100 rounded p-3 mt-2"
-                  />
-                </div>
-                <div className="mt-8 flex justify-end space-x-4">
-                  <Button
-                    type="button"
-                    className="px-4 py-2 bg-[#FFC700] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onClick={() => setIsCreatingComment(false)}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={!comment}
-                  >
-                    Save
-                  </Button>
-                </div>
-              </form>
-            </div>
-          )}
-        </div>
+        </motion.div>
       )}
 
-      {/*Submission Modal */}
       {displaySubmissionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto py-8">
-          <form
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-8 backdrop-blur-sm">
+          <motion.form
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={modalVariants}
             onSubmit={submitProject}
-            className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto"
+            className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-200"
           >
-            <h2 className="text-xl font-semibold">Project Submission</h2>
-
-            <div className="mt-4 space-y-2">
-              <label
-                htmlFor="remark"
-                className="block text-sm font-medium text-blue-900"
-              >
-                Remarks
-              </label>
-              <textarea
-                name="remark"
-                onChange={(e) => setRemark(e.target.value)}
-                value={remark}
-                className="w-full h-32 bg-blue-100 rounded p-3 mt-2"
-              />
-            </div>
-            <div className="mt-8 flex justify-end space-x-4">
+            <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <CheckCircle size={24} className="text-gray-600" strokeWidth={1.5} />
+                <h2 className="text-xl font-semibold text-gray-800">Project Submission</h2>
+              </div>
               <Button
-                type="button"
-                className="px-4 py-2 bg-[#FFC700] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                variant="ghost"
                 onClick={() => setDisplaySubmissionModal(false)}
+                className="p-1 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500"
               >
-                Back
+                <X size={20} strokeWidth={2} />
+              </Button>
+            </motion.div>
+
+            <motion.div variants={fadeInUp}>
+              <div className="mb-4">
+                <label className="block font-semibold text-gray-700 mb-2">Remarks</label>
+                <textarea
+                  name="remark"
+                  onChange={(e) => setRemark(e.target.value)}
+                  value={remark}
+                  className="w-full h-32 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                />
+              </div>
+            </motion.div>
+
+            <motion.div variants={fadeIn} className="flex justify-end mt-8 gap-4">
+              <Button
+                variant="outline"
+                onClick={() => setDisplaySubmissionModal(false)}
+                className="border border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
               </Button>
               <Button
                 type="submit"
-                className="px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="primary"
                 disabled={!remark || isSubmitting}
+                className="bg-gray-800 hover:bg-gray-900 text-white"
               >
                 Submit
               </Button>
-            </div>
-          </form>
+            </motion.div>
+          </motion.form>
         </div>
       )}
-      {milestoneDetailsId && <MilestoneDetails id={milestoneDetailsId} onClose={()=> setMilestoneDetailsId(null)}/>}
+
+      {milestoneDetailsId && (
+        <MilestoneDetails 
+          id={milestoneDetailsId} 
+          onClose={() => setMilestoneDetailsId(null)}
+        />
+      )}
+
+      {/* Milestone Modals */}
+      {isCreatingMilestone && (
+        <MilestoneCreateModal
+          currentTotalWeightage={milestones.reduce((acc, m) => acc + (m.weightage || 0), 0)}
+          projectId={projectId}
+          onClose={() => setIsCreatingMilestone(false)}
+          onSubmit={handleCreateMilestone}
+        />
+      )}
     </div>
   );
 }

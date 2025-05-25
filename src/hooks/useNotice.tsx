@@ -3,7 +3,8 @@
 import {
   createNotice as cNotice,
   deleteNotice as dNotice,
-  getNotices,
+  getAllNotices,
+  getNoticesByDepartment,
   updateNotice as uNotice,
 } from "@/lib/api/operations-and-services/notice";
 import { noticeSchema } from "@/lib/types";
@@ -16,10 +17,10 @@ export function useNotices() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchNotices = useCallback(async () => {
+  const fetchNotices = useCallback(async (departmentOnly: boolean = false) => {
     setLoading(true);
     try {
-      const data = await getNotices();
+      const data = departmentOnly ? await getNoticesByDepartment() : await getAllNotices();
       setNotices(data);
     } catch (error) {
       console.error(error);

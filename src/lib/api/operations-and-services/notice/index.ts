@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase/client";
 import { noticeSchema } from "@/lib/types";
 import { z } from "zod";
 
-export async function getNotices() {
+export async function getAllNotices() {
   const company_id = await getCompanyId();
   const user = await getEmployeeInfo();
   const currentDate = new Date().toISOString();
@@ -13,7 +13,23 @@ export async function getNotices() {
     .from("notice_records")
     .select("*")
     .eq("company_id", company_id)
-    .or(`department_id.is.null, department_id.eq.${user.department_id}`)
+    .gte("valid_till", currentDate)
+    .order("valid_from", { ascending: false });
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getNoticesByDepartment() {
+  const company_id = await getCompanyId();
+  const currentDate = new Date().toISOString();
+  const user = await getEmployeeInfo();
+
+  const { data, error } = await supabase
+    .from("notice_records")
+    .select("*")
+    .eq("company_id", company_id)
+    .eq("department_id", user.department_id)
     .gte("valid_till", currentDate)
     .order("valid_from", { ascending: false });
 

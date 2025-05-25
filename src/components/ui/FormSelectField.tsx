@@ -2,6 +2,8 @@
 
 import React from "react";
 import { AlertCircle, ChevronDown } from "lucide-react";
+import { motion } from "framer-motion";
+import { fadeInUp } from "./animations";
 
 type SelectOption = {
   value: string | number;
@@ -35,7 +37,7 @@ export default function FormSelectField({
     <div className="mb-4">
       <label 
         htmlFor={name} 
-        className="block text-sm font-medium text-gray-700 mb-1"
+        className="block text-sm font-semibold text-gray-700 mb-1"
       >
         {label}
       </label>
@@ -48,11 +50,13 @@ export default function FormSelectField({
           name={name}
           value={value === null ? "null" : value}
           onChange={onChange}
-          className={`w-full pl-10 pr-10 py-2.5 text-gray-900 rounded-lg border appearance-none ${
+          aria-invalid={hasError}
+          aria-describedby={hasError ? `${name}-error` : undefined}
+          className={`w-full pl-10 pr-10 py-2.5 text-gray-900 rounded-lg border appearance-none shadow-sm ${
             hasError 
               ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50" 
-              : "border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-[#EAF4FF]"
-          } focus:outline-none focus:ring-2 focus:ring-opacity-50`}
+              : "border-gray-200 focus:ring-blue-500 focus:border-blue-500 bg-white"
+          } focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200`}
         >
           <option value={"null"}>{placeholder}</option>
           {options.map((option) => (
@@ -65,14 +69,29 @@ export default function FormSelectField({
           <ChevronDown size={16} />
         </div>
         {hasError && (
-          <div className="absolute right-8 top-1/2 transform -translate-y-1/2 text-red-500">
+          <motion.div
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="absolute right-8 top-1/2 transform -translate-y-1/2 text-red-500"
+          >
             <AlertCircle size={16} />
-          </div>
+          </motion.div>
         )}
       </div>
       {hasError && (
-        <p className="mt-1 text-sm text-red-600">{error}</p>
+        <motion.p
+          id={`${name}-error`}
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          className="mt-1 text-sm text-red-600"
+        >
+          {error}
+        </motion.p>
       )}
     </div>
   );
-} 
+}

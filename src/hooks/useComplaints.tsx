@@ -4,7 +4,6 @@ import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { ComplaintState } from "@/components/operations-and-services/complaint/ComplaintCreatePage";
 import { z } from "zod";
 
 const complaintTypeSchema = z.object({
@@ -14,6 +13,20 @@ const complaintTypeSchema = z.object({
 });
 
 export type ComplaintType = z.infer<typeof complaintTypeSchema>;
+
+export interface ComplaintState {
+  id: number;
+  status: string;
+  complaint_type_id: number;
+  anonymous: boolean;
+  complainer_id: string;
+  against_whom: string;
+  description: string;
+  comment?: string;
+  attachments?: string[];
+  company_id?: number;
+  approved_by_id?: string;
+}
 
 export function useComplaintTypes() {
   const [complaintTypes, setComplaintTypes] = useState<ComplaintType[]>([]);
@@ -106,7 +119,32 @@ export function useComplaints() {
   }, []);
 
   const fetchComplaintHistory = useCallback(async () => {
-    return fetchComplaints("Pending");
+    setLoading(true);
+
+    try {
+      const user = await getEmployeeInfo();
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("complaint_records")
+        .select("*")
+        .eq("company_id", company_id)
+        .eq("complainer_id", user.id);
+
+      if (error) {
+        setError("Failed to fetch complaint requests");
+        throw error;
+      }
+
+      setComplaints(data || []);
+      return data;
+    } catch (error) {
+      setError("Failed to fetch complaint requests");
+      console.error(error);
+      return [];
+    } finally {
+      setLoading(false);
+    }
   }, [fetchComplaints]);
 
   const updateComplaint = useCallback(
