@@ -196,7 +196,15 @@ function getFormattedEmployeeData(data: any) {
         designation: data.designation,
     };
 }
-export async function getEmployeeInfo() {
+export async function getEmployeeInfo(): Promise<{
+    id: string;
+    name: string;
+    role: string;
+    company_id: number;
+    supervisor_id: string | null;
+    department_id: number;
+    has_approval: string;
+}> {
     // Check if we have cached data in localStorage
     const cachedData = localStorage.getItem('employeeInfo');
     const now = new Date();
@@ -230,7 +238,7 @@ export async function getEmployeeInfo() {
             .single();
 
         if (error?.code === "PGRST116") {
-            console.log("No updated data found");
+            console.log("User data cache used");
             return cachedUserInfo;
         }
 

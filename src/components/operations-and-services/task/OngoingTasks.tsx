@@ -51,7 +51,7 @@ export default function TaskPage() {
 
   return (
     <div>
-      {!editTask && !taskDetailsId && (
+      {!editTask && taskDetailsId === null && (
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -163,7 +163,7 @@ export default function TaskPage() {
             initialData={editTask}
           />
         )}
-        {taskDetailsId && (
+        {taskDetailsId !== null && (
           <TaskDetails
             onClose={() => setTaskDetailsId(null)}
             id={taskDetailsId}

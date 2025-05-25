@@ -7,6 +7,7 @@ import { Trash, Plus, Buildings } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
+import { usePositions } from "@/hooks/usePositions";
 
 interface LineageModalProps {
   initialData?: Lineage[] | null;
@@ -30,41 +31,22 @@ export default function LineageCreateModal({
   onClose,
   isLoading = false,
 }: LineageModalProps) {
-  const { lineages, fetchLineages } = useLineage();
   const [name, setName] = useState<string>("");
-  const [allPositions, setAllPositions] = useState<Position[]>([]);
+  const { positions, loading: positionsLoading, fetchPositions } = usePositions();
   const [hierarchy, setHierarchy] = useState<HierarchyLevel[]>([]);
   const [showAddButton, setShowAddButton] = useState<boolean>(true);
-  const [remainingPositions, setRemainingPositions] = useState<Position[]>([]);
 
   useEffect(() => {
-    async function fetchPositions() {
-      try {
-        const positions = await import("@/lib/api/company").then((module) =>
-          module.getPositions()
-        );
-        setAllPositions(positions);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
     fetchPositions();
-  }, []);
-
-  useEffect(() => {
-    fetchLineages();
-  }, [fetchLineages]);
+  }, [fetchPositions]);
 
   const getAvailablePositions = (levelIndex: number) => {
-    // Get all position IDs that have been selected in previous levels
     const selectedPositionIds = hierarchy
       .slice(0, levelIndex)
       .map((item) => item.position_id)
-      .filter(Boolean) as number[];
-
-    return remainingPositions.filter(
-      (position) => !selectedPositionIds.includes(position.id)
+      .filter((id): id is number => typeof id === 'number');
+    return positions.filter(
+      (position) => typeof position.id === 'number' && !selectedPositionIds.includes(position.id)
     );
   };
 
@@ -104,15 +86,14 @@ export default function LineageCreateModal({
     setHierarchy((prev) => {
       const selectedPositionIds = prev
         .map((l) => l.position_id)
-        .filter(Boolean) as number[];
-      const remainingPositionsNow = remainingPositions.filter(
-        (p) => !selectedPositionIds.includes(p.id)
+        .filter((id): id is number => typeof id === 'number');
+      const remaining = positions.filter(
+        (p) => typeof p.id === 'number' && !selectedPositionIds.includes(p.id)
       );
-
-      if (remainingPositionsNow.length > 0) {
+      if (remaining.length > 0) {
         return [
           ...prev,
-          { level: prev.length + 1, position_id: remainingPositionsNow[0].id },
+          { level: prev.length + 1, position_id: remaining[0].id ?? null },
         ];
       }
       return prev;
@@ -134,25 +115,8 @@ export default function LineageCreateModal({
   };
 
   useEffect(() => {
-    setShowAddButton(remainingPositions.length > 0);
-  }, [remainingPositions]);
-
-  useEffect(() => {
-    if (allPositions.length > 0) {
-      const usedPositionIds = new Set(
-        lineages.map((lineage: Lineage) => lineage.position_id)
-      );
-      const availablePositions = allPositions.filter(
-        (pos) => !usedPositionIds.has(pos.id)
-      );
-      setRemainingPositions(availablePositions);
-
-      // Initialize hierarchy with first available position if empty
-      if (hierarchy.length === 0 && availablePositions.length > 0) {
-        setHierarchy([{ level: 1, position_id: availablePositions[0].id }]);
-      }
-    }
-  }, [lineages, allPositions, hierarchy]);
+    setShowAddButton(hierarchy.length < positions.length);
+  }, [hierarchy, positions]);
 
   // Animation variants
   const modalVariants = {
@@ -172,11 +136,6 @@ export default function LineageCreateModal({
       transition: { duration: 0.2 },
     },
   };
-
-  useEffect(() => {
-    console.log("Hierarchy: ", hierarchy);
-    console.log(remainingPositions);
-  }, [hierarchy, remainingPositions]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
@@ -217,7 +176,7 @@ export default function LineageCreateModal({
 
           <div className="flex flex-col items-center justify-center w-full">
             <div className="flex flex-col w-full max-w-md pr-6">
-              {allPositions.length > 0 &&
+              {positions.length > 0 &&
                 hierarchy.map((level, index) => {
                   const availablePositions = getAvailablePositions(index);
                   return (
@@ -347,25 +306,14 @@ export function LineageUpdateModal({
 }: LineageModalProps) {
   const { lineages, fetchLineages } = useLineage();
   const [name, setName] = useState<string>("");
-  const [allPositions, setAllPositions] = useState<Position[]>([]);
+  const { positions: allPositions, loading: positionsLoading, fetchPositions } = usePositions();
   const [hierarchy, setHierarchy] = useState<HierarchyLevel[]>([]);
   const [showAddButton, setShowAddButton] = useState<boolean>(true);
   const [remainingPositions, setRemainingPositions] = useState<Position[]>([]);
 
   useEffect(() => {
-    async function fetchPositions() {
-      try {
-        const positions = await import("@/lib/api/company").then((module) =>
-          module.getPositions()
-        );
-        setAllPositions(positions);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
     fetchPositions();
-  }, []);
+  }, [fetchPositions]);
 
   useEffect(() => {
     fetchLineages();
@@ -375,14 +323,9 @@ export function LineageUpdateModal({
     const selectedPositionIds = hierarchy
       .slice(0, levelIndex)
       .map((item) => item.position_id)
-      .filter(Boolean) as number[];
-
-    // Include currently selected position in available options
-    const currentPositionId = hierarchy[levelIndex]?.position_id;
-    return remainingPositions.filter(
-      (position) =>
-        !selectedPositionIds.includes(position.id) ||
-        position.id === currentPositionId
+      .filter((id): id is number => typeof id === 'number');
+    return allPositions.filter(
+      (position) => typeof position.id === 'number' && !selectedPositionIds.includes(position.id)
     );
   };
 
@@ -418,19 +361,18 @@ export function LineageUpdateModal({
     });
   };
 
-  const addNewLevel = () => {
+  const addNewLevelUpdate = () => {
     setHierarchy((prev) => {
       const selectedPositionIds = prev
         .map((l) => l.position_id)
-        .filter(Boolean) as number[];
-      const remainingPositionsNow = remainingPositions.filter(
-        (p) => !selectedPositionIds.includes(p.id)
+        .filter((id): id is number => typeof id === 'number');
+      const remaining = allPositions.filter(
+        (p) => typeof p.id === 'number' && !selectedPositionIds.includes(p.id)
       );
-
-      if (remainingPositionsNow.length > 0) {
+      if (remaining.length > 0) {
         return [
           ...prev,
-          { level: prev.length + 1, position_id: remainingPositionsNow[0].id },
+          { level: prev.length + 1, position_id: remaining[0].id ?? null },
         ];
       }
       return prev;
@@ -466,8 +408,8 @@ export function LineageUpdateModal({
           .map((l: Lineage) => l.position_id)
       );
       const availablePositions = allPositions.filter(
-        (pos) => !usedPositionIds.has(pos.id)
-      );
+        (pos) => typeof pos.id === 'number' && !usedPositionIds.has(pos.id)
+      ).map(p => ({ ...p, id: p.id as number }));
       setRemainingPositions(availablePositions);
     }
   }, [lineages, allPositions, initialData]);
@@ -581,7 +523,7 @@ export function LineageUpdateModal({
                   type="button"
                   variant="primary"
                   size="sm"
-                  onClick={addNewLevel}
+                  onClick={addNewLevelUpdate}
                   className="mt-2 flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Plus size={16} weight="bold" />

@@ -16,16 +16,14 @@ import {
   Bell, 
   RefreshCw, 
   AlertCircle, 
-  ChevronDown, 
   Calendar, 
   CheckCircle2, 
   Clock, 
   CheckSquare, 
-  XCircle,
   MapPin,
-  Tag 
 } from "lucide-react";
 import { calculateDistance } from "@/lib/utils/location-utils";
+import { getCurrentTime24HourFormat, getTodaysDate, isOnTime } from "@/lib/utils/time-utils";
 
 const initialAttendanceRecord = {
   tag: "Present",
@@ -95,30 +93,31 @@ export default function HomePage() {
     const coordinates = await getCurrentCoordinates();
     if (!coordinates) return; // Exit if permission denied
 
-    // Get current timestamp in ISO format
-    const now = new Date().toISOString();
-
+    // Get current timestamp in 24-hour format
+    const now = getCurrentTime24HourFormat();
     try {
       // Calculate tag based on site and location data
       const selectedSite = sites.find(site => site.id === attendanceRecord.site_id);
-      // Present if on time and within 100m of the site
-      const isOnTime = new Date(now) < new Date(selectedSite?.check_in!);
-      const isWithin100m = calculateDistance(coordinates, selectedSite?.location) <= 100;
+
+      const onTime = isOnTime({checkInTime: selectedSite?.check_in!, currentTime: now});
+      const isWithin100m = calculateDistance(coordinates, `(${selectedSite?.longitude},${selectedSite?.latitude})`) <= 100;
       
       // Determine attendance status
       let attendanceStatus = 'Absent';
-      if (isOnTime && isWithin100m) {
+      if (onTime && isWithin100m) {
         attendanceStatus = 'Present';
-      } else if (!isOnTime && isWithin100m) {
+      } else if (!onTime && isWithin100m) {
         attendanceStatus = 'Late';
       } else if (!isWithin100m) {
         attendanceStatus = 'Wrong_Location';
       }
       attendanceRecord.tag = attendanceStatus;
-      const { data, error } = await supabase.from("attendance_records").insert({
+      const date = getTodaysDate()
+      
+      const { error } = await supabase.from("attendance_records").insert({
         ...attendanceRecord,
-        attendance_date: now.split("T")[0], // Just the date part (YYYY-MM-DD)
-        check_in_time: now, // Full ISO timestamp
+        attendance_date: date, // Just the date part (YYYY-MM-DD)
+        check_in_time: new Date().toISOString(), // Full ISO timestamp
         employee_id: user.id,
         company_id: user.company_id,
         supervisor_id: user.supervisor_id,

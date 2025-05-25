@@ -239,6 +239,7 @@ export default function SupervisorLineageView() {
         <AnimatePresence>
           {isCreatingLineage && (
             <LineageCreateModal
+              key={`create-lineage-${isCreatingLineage}`}
               onSubmit={handleCreateLineage}
               onClose={() => setIsCreatingLineage(false)}
               isLoading={creating}
@@ -247,6 +248,7 @@ export default function SupervisorLineageView() {
 
           {selectedLineageEdit.length > 0 && (
             <LineageUpdateModal
+              key={`update-lineage-${selectedLineageEdit[0].name}`}
               initialData={selectedLineageEdit[0].details}
               onSubmit={handleUpdateLineage}
               onClose={() => setEditLineage(null)}

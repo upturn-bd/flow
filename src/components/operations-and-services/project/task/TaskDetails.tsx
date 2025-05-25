@@ -56,7 +56,8 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
         .from("task_records")
         .select("*")
         .eq("id", id)
-        .eq("company_id", company_id);
+        .eq("company_id", company_id)
+        .single();
 
       if (error) {
         setError("Error fetching Task details");
@@ -65,7 +66,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
         return;
       }
 
-      setTaskDetails(data[0]);
+      setTaskDetails(data);
 
       const projectId = data[0]?.project_id;
       if (projectId) {
@@ -94,7 +95,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
   }
 
   useEffect(() => {
-    if (id) {
+    if (id !== null) {
       fetchTaskDetails(id);
     }
   }, [id]);

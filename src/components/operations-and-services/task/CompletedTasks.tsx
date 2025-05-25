@@ -197,7 +197,7 @@ function CompletedTasksList() {
           </motion.div>
         )}
 
-        {!selectedTask && !taskDetailsId && !loading && (
+        {!selectedTask && taskDetailsId === null && !loading && (
           <motion.div
             key="content"
             initial={{ opacity: 0 }}
@@ -244,7 +244,7 @@ function CompletedTasksList() {
           </motion.div>
         )}
 
-        {taskDetailsId && (
+        {taskDetailsId !== null && (
           <TaskDetails
             onClose={() => setTaskDetailsId(null)}
             id={taskDetailsId}

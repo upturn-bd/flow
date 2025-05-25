@@ -4,7 +4,7 @@ import { Project } from "@/hooks/useProjects";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { useEffect, useState } from "react";
-import { Milestone } from "./CreateNewProject";
+import { Milestone } from "@/hooks/useMilestones";
 import { useMilestones } from "@/hooks/useMilestones";
 import MilestoneCreateModal, {
   MilestoneUpdateModal,
@@ -17,10 +17,17 @@ import {
   Pencil, 
   Trash2, 
   Calendar, 
-  ExternalLink, 
+  ExternalLink,
+  Plus, 
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { Button } from "@/components/ui/button";
+import FormInputField from "@/components/ui/FormInputField";
+import FormSelectField from "@/components/ui/FormSelectField";
+import TaskCreateModal, { TaskUpdateModal } from "./task/TaskModal";
+import { useTasks } from "@/hooks/useTasks";
 
 interface ProjectDetailsProps {
   id: number;
@@ -230,6 +237,66 @@ export default function ProjectDetails({
     }
   };
 
+  // Task states and functions
+  const { createTask, updateTask, deleteTask } = useTasks();
+  const [isCreatingProjectTask, setIsCreatingProjectTask] = useState(false);
+  const [isCreatingMilestoneTask, setIsCreatingMilestoneTask] = useState<number | null>(null);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [milestoneTasks, setMilestoneTasks] = useState<Record<number, any[]>>({});
+
+  // Fetch tasks for each milestone
+  const fetchTasksByMilestoneId = async (milestoneId: number) => {
+    const client = createClient();
+    const company_id = await getCompanyId();
+    const { data, error } = await client
+      .from("task_records")
+      .select("*")
+      .eq("milestone_id", milestoneId)
+      .eq("company_id", company_id);
+    if (!error) {
+      setMilestoneTasks((prev) => ({ ...prev, [milestoneId]: data || [] }));
+    }
+  };
+
+  // Fetch all milestone tasks when milestones change
+  useEffect(() => {
+    milestones.forEach((m) => {
+      if (m.id) fetchTasksByMilestoneId(m.id);
+    });
+  }, [milestones]);
+
+  // Handlers for project tasks
+  const handleCreateProjectTask = async (values: any) => {
+    await createTask(values);
+    fetchTasksByProjectId(projectId);
+    setIsCreatingProjectTask(false);
+  };
+  const handleUpdateProjectTask = async (values: any) => {
+    await updateTask(values);
+    fetchTasksByProjectId(projectId);
+    setSelectedTask(null);
+  };
+  const handleDeleteProjectTask = async (id: number) => {
+    await deleteTask(id);
+    fetchTasksByProjectId(projectId);
+  };
+
+  // Handlers for milestone tasks
+  const handleCreateMilestoneTask = async (values: any, milestoneId: number) => {
+    await createTask(values);
+    fetchTasksByMilestoneId(milestoneId);
+    setIsCreatingMilestoneTask(null);
+  };
+  const handleUpdateMilestoneTask = async (values: any, milestoneId: number) => {
+    await updateTask(values);
+    fetchTasksByMilestoneId(milestoneId);
+    setSelectedTask(null);
+  };
+  const handleDeleteMilestoneTask = async (id: number, milestoneId: number) => {
+    await deleteTask(id);
+    fetchTasksByMilestoneId(milestoneId);
+  };
+
   async function fetchProjectDetails(id: number) {
     setLoading(true);
     const client = createClient();
@@ -372,7 +439,7 @@ export default function ProjectDetails({
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        Loading...
+        <LoadingSpinner />
       </div>
     );
   }
@@ -393,13 +460,13 @@ export default function ProjectDetails({
             <h2 className="text-xl md:text-2xl font-bold text-[#0074FF] mb-4">
               Project Details
             </h2>
-            <button
+            <Button
               type="button"
               onClick={onClose}
               className="bg-blue-900 text-white px-4 py-2 rounded-md"
             >
               Back
-            </button>
+            </Button>
           </div>
 
           <div className="grid gap-2">
@@ -463,13 +530,13 @@ export default function ProjectDetails({
           </div>
 
           {projectDetails?.status !== "Completed" && (
-            <button
+            <Button
               type="button"
               onClick={() => setDisplaySubmissionModal(true)}
               className="w-full mt-8 bg-[#FFB800] font-semibold py-2 px-6 rounded-md"
             >
               Submit Project
-            </button>
+            </Button>
           )}
           {/* Milestones */}
           <div className="mt-10">
@@ -479,29 +546,31 @@ export default function ProjectDetails({
               </h3>
               {projectDetails?.status !== "Completed" &&
                 milestones.reduce((acc, m) => acc + m.weightage, 0) < 100 && (
-                  <button
-                    type="button"
-                    onClick={() => setIsCreatingMilestone(true)}
-                    className="text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
-                  >
-                    +
-                  </button>
+                  <Button
+                  type="button"
+                  onClick={() => setIsCreatingMilestone(true)}
+                  className="text-white text-xl bg-blue-500 hover:bg-blue-600 active:bg-blue-700 rounded-full w-12 h-12 flex items-center justify-center transition-colors duration-150 shadow-sm"
+                >
+                  <Plus size={24} className="w-8 h-8" />
+                </Button>
                 )}
             </div>
             <div className="grid md:grid-cols-3 gap-4 mt-4">
               {!loadingMilestones &&
                 milestones.length > 0 &&
                 milestones.map((m, i) => (
-                  <div key={m.id} className="bg-blue-100 rounded p-4 space-y-1">
+                    <div key={m.id ?? i} className="bg-blue-100 rounded p-4 space-y-1">
                     <div className="flex justify-between">
                       <div className="font-bold text-lg text-blue-900">
                         Milestone {i + 1}
                       </div>
-                      <ExternalLink
-                        onClick={() => m.id !== undefined && setMilestoneDetailsId(m.id)}
-                        size={18}
-                        className="text-slate-800 hover:text-blue-800 cursor-pointer ml-4 md:ml-8"
-                      />
+                      {typeof m.id === 'number' && (
+                        <ExternalLink
+                          onClick={() => setMilestoneDetailsId(m.id!)}
+                          size={18}
+                          className="text-slate-800 hover:text-blue-800 cursor-pointer ml-4 md:ml-8"
+                        />
+                      )}
                     </div>
                     <p className="text-sm text-gray-700">{m.milestone_title}</p>
                     <p className="text-sm font-semibold text-black">
@@ -514,17 +583,50 @@ export default function ProjectDetails({
                       Weightage: {m.weightage}
                     </p>
                     <div className="flex justify-end gap-2">
-                      <Pencil
-                        size={16}
-                        onClick={() => m.id !== undefined && handleDisplayUpdateMilestoneModal(m.id)}
-                        className="text-gray-600 cursor-pointer"
-                      />
-                      <Trash2
-                        onClick={() => m.id !== undefined && handleDeleteMilestone(m.id)}
-                        size={16}
-                        className="text-red-600 cursor-pointer"
-                      />
+                      {typeof m.id === 'number' && (
+                        <>
+                          <Pencil
+                            size={16}
+                            onClick={() => handleDisplayUpdateMilestoneModal(m.id!)}
+                            className="text-gray-600 cursor-pointer"
+                          />
+                          <Trash2
+                            onClick={() => handleDeleteMilestone(m.id!)}
+                            size={16}
+                            className="text-red-600 cursor-pointer"
+                          />
+                        </>
+                      )}
                     </div>
+                    {typeof m.id === 'number' && (
+                      <Button onClick={() => setIsCreatingMilestoneTask(m.id!)}>+ Task</Button>
+                    )}
+                    {typeof m.id === 'number' && milestoneTasks[m.id!] && milestoneTasks[m.id!].map((task: any) => (
+                      <div key={task.id} className="bg-white rounded p-2 mt-2">
+                        <div className="flex justify-between items-center">
+                          <span>{task.task_title}</span>
+                          <div>
+                            <Button onClick={() => setSelectedTask({ ...task, milestoneId: m.id! })}>Edit</Button>
+                            <Button onClick={() => handleDeleteMilestoneTask(task.id, m.id!)}>Delete</Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {isCreatingMilestoneTask === m.id && (
+                      <TaskCreateModal
+                        projectId={projectId}
+                        milestoneId={m.id!}
+                        onClose={() => setIsCreatingMilestoneTask(null)}
+                        onSubmit={(values) => handleCreateMilestoneTask(values, m.id!)}
+                      />
+                    )}
+                    {selectedTask && selectedTask.milestoneId === m.id && (
+                      <TaskUpdateModal
+                        initialData={selectedTask}
+                        onClose={() => setSelectedTask(null)}
+                        onSubmit={(values) => handleUpdateMilestoneTask(values, m.id!)}
+                      />
+                    )}
                   </div>
                 ))}
               {loadingMilestones && (
@@ -545,13 +647,13 @@ export default function ProjectDetails({
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-[#2F2F2F]">Comments</h3>
               {projectDetails?.status !== "Completed" && (
-                <button
+                <Button
                   type="button"
                   onClick={() => setIsCreatingComment(true)}
-                  className="text-white text-xl bg-blue-500 rounded-full w-7 h-7 grid place-items-center"
+                  className="text-white text-xl bg-blue-500 hover:bg-blue-600 active:bg-blue-700 rounded-full w-12 h-12 flex items-center justify-center transition-colors duration-150 shadow-sm"
                 >
-                  +
-                </button>
+                  <Plus size={24} className="w-8 h-8" />
+                </Button>
               )}
             </div>
             <div className="bg-[#F3F3F3] p-4 rounded-lg mt-4">
@@ -644,20 +746,20 @@ export default function ProjectDetails({
                   />
                 </div>
                 <div className="mt-8 flex justify-end space-x-4">
-                  <button
+                  <Button
                     type="button"
                     className="px-4 py-2 bg-[#FFC700] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     onClick={() => setIsCreatingComment(false)}
                   >
                     Back
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="submit"
                     className="px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!comment}
                   >
                     Save
-                  </button>
+                  </Button>
                 </div>
               </form>
             </div>
@@ -689,20 +791,20 @@ export default function ProjectDetails({
               />
             </div>
             <div className="mt-8 flex justify-end space-x-4">
-              <button
+              <Button
                 type="button"
                 className="px-4 py-2 bg-[#FFC700] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onClick={() => setDisplaySubmissionModal(false)}
               >
                 Back
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 className="px-4 py-2 bg-[#192D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={!remark || isSubmitting}
               >
                 Submit
-              </button>
+              </Button>
             </div>
           </form>
         </div>

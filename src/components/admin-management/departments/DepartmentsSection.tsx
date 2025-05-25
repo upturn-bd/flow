@@ -174,6 +174,7 @@ export default function DepartmentsSection({
       <AnimatePresence>
         {isCreatingDepartment && (
           <DepartmentModal
+            key={`CreateDepartmentModal`}
             employees={employees}
             divisions={divisions}
             onSubmit={handleCreateDepartment}
@@ -182,6 +183,7 @@ export default function DepartmentsSection({
         )}
         {selectedDepartmentView && (
           <DepartmentDetailsModal
+            key={`DepartmentDetailsModal-${selectedDepartmentView.id}`}
             employees={employees}
             divisions={divisions}
             editDepartment={() => setEditDepartment(selectedDepartmentView.id)}
@@ -194,6 +196,7 @@ export default function DepartmentsSection({
         )}
         {selectedDepartmentEdit && (
           <DepartmentModal
+            key={`EditDepartmentModal-${selectedDepartmentEdit.id}`}
             employees={employees}
             divisions={divisions}
             initialData={selectedDepartmentEdit}

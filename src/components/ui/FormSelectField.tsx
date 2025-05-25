@@ -2,8 +2,6 @@
 
 import React from "react";
 import { AlertCircle, ChevronDown } from "lucide-react";
-import { motion } from "framer-motion";
-import { fadeInUp } from "@/components/ui/animations";
 
 type SelectOption = {
   value: string | number;
@@ -34,10 +32,7 @@ export default function FormSelectField({
   const hasError = !!error;
 
   return (
-    <motion.div 
-      variants={fadeInUp}
-      className="mb-4"
-    >
+    <div className="mb-4">
       <label 
         htmlFor={name} 
         className="block text-sm font-medium text-gray-700 mb-1"
@@ -53,11 +48,11 @@ export default function FormSelectField({
           name={name}
           value={value === null ? "null" : value}
           onChange={onChange}
-          className={`w-full pl-10 pr-10 py-2.5 text-gray-900 rounded-lg appearance-none ${
+          className={`w-full pl-10 pr-10 py-2.5 text-gray-900 rounded-lg border appearance-none ${
             hasError 
               ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50" 
               : "border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-[#EAF4FF]"
-          }`}
+          } focus:outline-none focus:ring-2 focus:ring-opacity-50`}
         >
           <option value={"null"}>{placeholder}</option>
           {options.map((option) => (
@@ -78,6 +73,6 @@ export default function FormSelectField({
       {hasError && (
         <p className="mt-1 text-sm text-red-600">{error}</p>
       )}
-    </motion.div>
+    </div>
   );
 } 

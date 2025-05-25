@@ -115,7 +115,7 @@ export default function DivisionsSection({ employees, showNotification }: Divisi
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setViewDivision(div.id)}
+                    onClick={() => setViewDivision(div.id ?? null)}
                     className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs sm:text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
                   >
                     <Eye size={14} />
@@ -124,7 +124,7 @@ export default function DivisionsSection({ employees, showNotification }: Divisi
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleDeleteDivision(div.id)}
+                    onClick={() => handleDeleteDivision(div.id ?? 0)}
                     disabled={divisionDeleteLoading === div.id}
                     className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-red-50 text-red-600 text-xs sm:text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${divisionDeleteLoading === div.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
@@ -154,6 +154,7 @@ export default function DivisionsSection({ employees, showNotification }: Divisi
       <AnimatePresence>
         {isCreatingDivision && (
           <DivisionModal
+            key={`CreateDivisionModal`}
             employees={employees}
             onSubmit={handleCreateDivision}
             onClose={() => setIsCreatingDivision(false)}
@@ -161,8 +162,9 @@ export default function DivisionsSection({ employees, showNotification }: Divisi
         )}
         {selectedDivisionView && (
           <DivisionDetailsModal
-            editDivision={() => setEditDivision(selectedDivisionView.id)}
-            deleteDivision={() => handleDeleteDivision(selectedDivisionView.id)}
+            key={`DivisionDetailsModal-${selectedDivisionView.id}`}
+            editDivision={() => setEditDivision(selectedDivisionView.id ?? null)}
+            deleteDivision={() => handleDeleteDivision(selectedDivisionView.id!)}
             division={selectedDivisionView}
             onClose={() => setViewDivision(null)}
             employees={employees}
@@ -170,6 +172,7 @@ export default function DivisionsSection({ employees, showNotification }: Divisi
         )}
         {selectedDivisionEdit && (
           <DivisionModal
+            key={`EditDivisionModal-${selectedDivisionEdit.id}`}
             employees={employees}
             initialData={selectedDivisionEdit}
             onSubmit={handleUpdateDivision}

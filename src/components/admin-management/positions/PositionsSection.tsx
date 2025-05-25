@@ -127,7 +127,7 @@ export default function PositionsSection({
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setViewPosition(position.id)}
+                    onClick={() => setViewPosition(position.id ?? null)}
                     className="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
                   >
                     <Eye size={14} />
@@ -136,7 +136,7 @@ export default function PositionsSection({
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleDeletePosition(position.id)}
+                    onClick={() => handleDeletePosition(position.id ?? 0)}
                     disabled={positionDeleteLoading === position.id}
                     className={`px-3 py-1.5 rounded-md bg-red-50 text-red-600 text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${
                       positionDeleteLoading === position.id
@@ -172,6 +172,7 @@ export default function PositionsSection({
       <AnimatePresence>
         {isCreatingPosition && (
           <PositionModal
+            key={`CreatePositionModal`}
             departments={departments}
             grades={grades}
             onSubmit={handleCreatePosition}
@@ -180,8 +181,9 @@ export default function PositionsSection({
         )}
         {selectedPositionView && (
           <PositionDetailsModal
-            editPosition={() => setEditPosition(selectedPositionView.id)}
-            deletePosition={() => handleDeletePosition(selectedPositionView.id)}
+            key={`PositionDetailsModal-${selectedPositionView.id}`}
+            editPosition={() => setEditPosition(selectedPositionView.id ?? null)}
+            deletePosition={() => handleDeletePosition(selectedPositionView.id!)}
             position={selectedPositionView}
             onClose={() => setViewPosition(null)}
             departments={departments}
@@ -190,6 +192,7 @@ export default function PositionsSection({
         )}
         {selectedPositionEdit && (
           <PositionModal
+            key={`EditPositionModal-${selectedPositionEdit.id}`}
             departments={departments}
             grades={grades}
             initialData={selectedPositionEdit}

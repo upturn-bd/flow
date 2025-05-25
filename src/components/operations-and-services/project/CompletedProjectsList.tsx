@@ -9,9 +9,11 @@ import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { useEffect, useState } from "react";
 import ProjectDetails from "./ProjectDetails";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, Trash2, Clock, Calendar, Building2, User, Loader2, CheckCircle } from "lucide-react";
+import { ExternalLink, Trash2, Clock, Calendar, Building2, User, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { Button } from "@/components/ui/button";
 
 function ProjectCard({
   project,
@@ -66,9 +68,7 @@ function ProjectCard({
 
   if (employeeLoading || departmentsLoading) {
     return (
-      <div className="flex items-center justify-center h-32">
-        <Loader2 className="h-6 w-6 text-blue-500 animate-spin" />
-      </div>
+      <LoadingSpinner color="blue" text="Loading project info..." height="h-32" />
     );
   }
   
@@ -89,27 +89,23 @@ function ProjectCard({
             </h2>
           </div>
           <div className="flex gap-x-2">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
+            <Button
+              variant="danger"
+              size="sm"
               onClick={handleDelete}
-              disabled={isDeleting}
-              className="p-2 text-gray-600 hover:text-red-600 rounded-full hover:bg-gray-100 disabled:opacity-50"
+              isLoading={isDeleting}
+              className="rounded-full p-2"
             >
-              {isDeleting ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Trash2 size={16} />
-              )}
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
+              <Trash2 size={16} />
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
               onClick={() => id !== undefined && setProjectDetailsId(id)}
-              className="p-2 text-gray-600 hover:text-blue-600 rounded-full hover:bg-gray-100"
+              className="rounded-full p-2"
             >
               <ExternalLink size={16} />
-            </motion.button>
+            </Button>
           </div>
         </div>
         
@@ -230,18 +226,7 @@ function CompletedProjectsList() {
   return (
     <AnimatePresence mode="wait">
       {loading && (
-        <motion.div
-          key="loading"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="flex items-center justify-center h-screen"
-        >
-          <div className="flex flex-col items-center">
-            <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-2" />
-            <p className="text-gray-500">Loading projects...</p>
-          </div>
-        </motion.div>
+        <LoadingSpinner color="blue" text="Loading projects..." height="h-screen" />
       )}
       
       {!selectedProject && !projectDetailsId && !loading && (
