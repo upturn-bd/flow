@@ -1,14 +1,11 @@
 "use client";
 
-import {
-  createLineage as cLineage,
-  deleteLineage as dLineage,
-  getLineages,
-  updateLineage as uLineage,
-} from "@/lib/api/admin-management/supervisor-lineage";
+
 import { lineageSchema } from "@/lib/types";
 import { useState, useCallback } from "react";
 import { z } from "zod";
+import { supabase } from "@/lib/supabase/client";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 
 export type Lineage = z.infer<typeof lineageSchema>;
 
@@ -21,19 +18,38 @@ export function useLineage() {
   const fetchLineages = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getLineages();
-      setLineages(data);
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("lineages")
+        .select("*")
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      setLineages(data || []);
+      return data;
     } catch (error) {
       console.error(error);
+      return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const createLineage = async (lineage: z.infer<typeof lineageSchema>[]) => {
+  const createLineage = useCallback(async (values: z.infer<typeof lineageSchema>[]) => {
     setCreating(true);
     try {
-      const data = await cLineage(lineage);
+      const company_id = await getCompanyId();
+
+      const validatedLineageData = values.map((lineage) => {
+        return { ...lineage, company_id };
+      });
+
+      const { data, error } = await supabase
+        .from("lineages")
+        .insert(validatedLineageData);
+
+      if (error) throw error;
       return { success: true, status: 200, data };
     } catch (error) {
       console.error("Error creating lineage:", error);
@@ -41,12 +57,30 @@ export function useLineage() {
     } finally {
       setCreating(false);
     }
-  };
+  }, []);
 
-  const updateLineage = async (lineage: z.infer<typeof lineageSchema>[]) => {
+  const updateLineage = useCallback(async (values: z.infer<typeof lineageSchema>[]) => {
     setUpdating(true);
     try {
-      const data = await uLineage(lineage);
+      const company_id = await getCompanyId();
+      const formattedPayload = values.map((lineage) => {
+        const { id, ...rest } = lineage;
+        return { ...rest, company_id };
+      });
+
+      const { data: existingLineages, error: fetchError } = await supabase
+        .from("lineages")
+        .delete()
+        .eq("company_id", company_id)
+        .eq("name", formattedPayload[0].name);
+
+      if (fetchError) throw fetchError;
+
+      const { data, error } = await supabase
+        .from("lineages")
+        .insert(formattedPayload);
+
+      if (error) throw error;
       return { success: true, status: 200, data };
     } catch (error) {
       console.error("Error updating lineage:", error);
@@ -54,17 +88,25 @@ export function useLineage() {
     } finally {
       setUpdating(false);
     }
-  };
+  }, []);
 
-  const deleteLineage = async (name: string) => {
+  const deleteLineage = useCallback(async (name: string) => {
     try {
-      const data = await dLineage(name);
-      return { success: true, status: 200, data };
+      const company_id = await getCompanyId();
+
+      const { error } = await supabase
+        .from("lineages")
+        .delete()
+        .eq("name", name)
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      return { success: true, status: 200, data: { message: "Lineage deleted successfully" } };
     } catch (error) {
       console.error("Error deleting lineage:", error);
       throw error;
     }
-  };
+  }, []);
 
   return {
     lineages,

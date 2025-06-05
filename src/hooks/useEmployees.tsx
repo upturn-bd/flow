@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { getEmployeesInfo, getExtendedEmployeesInfo } from "@/lib/api/admin-management/inventory";
+import { supabase } from "@/lib/supabase/client";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 
 export interface Employee {
   id: string;
@@ -27,12 +28,22 @@ export function useEmployees() {
     setLoading(true);
     setError(null);
     try {
-      const response = await getEmployeesInfo();
-      if (response?.data) {
-        setEmployees(response.data);
-        return response.data;
-      }
-      return [];
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("employees")
+        .select("id, first_name, last_name")
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+
+      const employees = data?.map((employee) => ({
+        id: employee.id,
+        name: `${employee.first_name} ${employee.last_name}`,
+      })) || [];
+
+      setEmployees(employees);
+      return employees;
     } catch (err) {
       const errorObj = err instanceof Error ? err : new Error(String(err));
       setError(errorObj);
@@ -47,12 +58,27 @@ export function useEmployees() {
     setLoading(true);
     setError(null);
     try {
-      const response = await getExtendedEmployeesInfo();
-      if (response?.data) {
-        setExtendedEmployees(response.data);
-        return response.data;
-      }
-      return [];
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("employees")
+        .select("id, first_name, last_name, email, phone_number, department_id(name), designation, hire_date")
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+
+      const employees = data?.map((employee) => ({
+        id: employee.id,
+        name: `${employee.first_name} ${employee.last_name}`,
+        email: employee.email,
+        phone: employee.phone_number,
+        department: (employee.department_id as unknown as { name: string })?.name,
+        designation: employee.designation,
+        joinDate: employee.hire_date
+      })) || [];
+
+      setExtendedEmployees(employees);
+      return employees;
     } catch (err) {
       const errorObj = err instanceof Error ? err : new Error(String(err));
       setError(errorObj);

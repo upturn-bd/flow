@@ -1,14 +1,11 @@
 "use client";
 
-import {
-  createSite as cSite,
-  deleteSite as dSite,
-  getSites,
-  updateSite as uSite,
-} from "@/lib/api/admin-management/attendance";
+
 import { siteSchema } from "@/lib/types";
 import { useState, useCallback } from "react";
 import { z } from "zod";
+import { supabase } from "@/lib/supabase/client";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 
 export type Site = z.infer<typeof siteSchema>;
 
@@ -19,31 +16,86 @@ export function useSites() {
   const fetchSites = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getSites();
-      setSites(data);
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("sites")
+        .select("*")
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      setSites(data || []);
+      return data;
     } catch (error) {
       console.error(error);
+      return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const createSite = async (
-    site: Omit<Site, "id" | "company_id" | "created_at" | "updated_at">
+  const createSite = useCallback(async (
+    values: Omit<Site, "id" | "company_id" | "created_at" | "updated_at">
   ) => {
-    const data = await cSite(site);
-    return { success: true, status: 200, data };
-  };
+    try {
+      const company_id = await getCompanyId();
+      
+      // Validate the payload
+      const validated = siteSchema.safeParse(values);
+      if (!validated.success) throw validated.error;
 
-  const updateSite = async (site: Site) => {
-    const data = await uSite(site);
-    return { success: true, status: 200, data };
-  };
+      const { data, error } = await supabase.from("sites").insert({
+        ...values,
+        company_id,
+      });
 
-  const deleteSite = async (id: number) => {
-    const data = await dSite(id);
-    return { success: true, status: 200, data };
-  };
+      if (error) throw error;
+      return { success: true, status: 200, data };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
+
+  const updateSite = useCallback(async (values: Site) => {
+    try {
+      const company_id = await getCompanyId();
+      
+      // Validate the payload
+      const validated = siteSchema.safeParse(values);
+      if (!validated.success) throw validated.error;
+
+      const { data, error } = await supabase
+        .from("sites")
+        .update(values)
+        .eq("id", values.id)
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      return { success: true, status: 200, data };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
+
+  const deleteSite = useCallback(async (id: number) => {
+    try {
+      const company_id = await getCompanyId();
+
+      const { error } = await supabase
+        .from("sites")
+        .delete()
+        .eq("id", id)
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      return { success: true, status: 200, data: null };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
 
   return {
     sites,

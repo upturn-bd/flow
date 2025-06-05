@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { getEmployeesInfo } from "@/lib/api/admin-management/inventory";
+import { supabase } from "@/lib/supabase/client";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 
 // Define type for employee info
 export type EmployeeInfo = {
@@ -18,8 +19,21 @@ export function useEmployeeInfo() {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await getEmployeesInfo();
-      setEmployees(data || []);
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("employees")
+        .select("id, first_name, last_name")
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+
+      const employees = data?.map((employee) => ({
+        id: employee.id,
+        name: `${employee.first_name} ${employee.last_name}`,
+      })) || [];
+
+      setEmployees(employees);
     } catch (err) {
       console.error("Error fetching employee info:", err);
       setError(err instanceof Error ? err : new Error(String(err)));

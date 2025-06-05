@@ -1,15 +1,12 @@
 "use client";
 
-import {
-  createNotice as cNotice,
-  deleteNotice as dNotice,
-  getAllNotices,
-  getNoticesByDepartment,
-  updateNotice as uNotice,
-} from "@/lib/api/operations-and-services/notice";
+
 import { noticeSchema } from "@/lib/types";
 import { useState, useCallback } from "react";
 import { z } from "zod";
+import { supabase } from "@/lib/supabase/client";
+import { getEmployeeInfo } from "@/lib/api/employee";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 
 export type Notice = z.infer<typeof noticeSchema>;
 
@@ -20,29 +17,102 @@ export function useNotices() {
   const fetchNotices = useCallback(async (departmentOnly: boolean = false) => {
     setLoading(true);
     try {
-      const data = departmentOnly ? await getNoticesByDepartment() : await getAllNotices();
-      setNotices(data);
+      const company_id = await getCompanyId();
+      const currentDate = new Date().toISOString();
+      
+      let data, error;
+      
+      if (departmentOnly) {
+        const user = await getEmployeeInfo();
+        ({ data, error } = await supabase
+          .from("notice_records")
+          .select("*")
+          .eq("company_id", company_id)
+          .eq("department_id", user.department_id)
+          .gte("valid_till", currentDate)
+          .order("valid_from", { ascending: false }));
+      } else {
+        ({ data, error } = await supabase
+          .from("notice_records")
+          .select("*")
+          .eq("company_id", company_id)
+          .gte("valid_till", currentDate)
+          .order("valid_from", { ascending: false }));
+      }
+
+      if (error) throw error;
+      setNotices(data || []);
+      return data;
     } catch (error) {
       console.error(error);
+      return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const createNotice = async (notice: Notice) => {
-    const data = await cNotice(notice);
-    return { success: true, status: 200, data };
-  };
+  const createNotice = useCallback(async (values: Notice) => {
+    try {
+      const company_id = await getCompanyId();
+      
+      // Validate the payload
+      const validated = noticeSchema.safeParse(values);
+      if (!validated.success) throw validated.error;
 
-  const updateNotice = async (notice: Notice) => {
-    const data = await uNotice(notice);
-    return { success: true, status: 200, data };
-  };
+      const { data, error } = await supabase
+        .from("notice_records")
+        .insert({
+          ...values,
+          company_id,
+        });
 
-  const deleteNotice = async (id: number) => {
-    const data = await dNotice(id);
-    return { success: true, status: 200, data };
-  };
+      if (error) throw error;
+      return { success: true, status: 200, data };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
+
+  const updateNotice = useCallback(async (values: Notice) => {
+    try {
+      const company_id = await getCompanyId();
+      
+      // Validate the payload
+      const validated = noticeSchema.safeParse(values);
+      if (!validated.success) throw validated.error;
+
+      const { data, error } = await supabase
+        .from("notice_records")
+        .update(values)
+        .eq("id", values.id)
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      return { success: true, status: 200, data };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
+
+  const deleteNotice = useCallback(async (id: number) => {
+    try {
+      const company_id = await getCompanyId();
+
+      const { error } = await supabase
+        .from("notice_records")
+        .delete()
+        .eq("id", id)
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      return { success: true, status: 200, data: null };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
 
   return {
     notices,

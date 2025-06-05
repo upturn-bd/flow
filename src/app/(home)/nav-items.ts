@@ -10,7 +10,6 @@ import {
     User as UserIcon,
     Bell as BellIcon,
   } from "@phosphor-icons/react/dist/ssr";
-import { adminRoutes, employeeRoutes, managerRoutes } from "@/lib/utils/path-utils";
 
 export type NavItem = {
   label: string;
@@ -30,7 +29,7 @@ export const navItems: NavItem[] = [
       label: "hris",
       href: "/hris",
       icon: UserCircleIcon,
-      roles: ["Manager", "Admin"],
+      roles: ["Manager", "Admin", "Employee"],
     },
     {
       label: "operations-and-services",

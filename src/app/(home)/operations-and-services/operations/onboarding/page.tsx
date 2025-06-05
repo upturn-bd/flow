@@ -7,19 +7,8 @@ import { UserPlus, Loader2, Check, X, AlertTriangle, Users, User } from "lucide-
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useEmployees } from "@/hooks/useEmployees";
-
-interface PendingEmployee {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string;
-  department: string;
-  designation: string;
-  job_status: string;
-  hire_date: string;
-  supervisor_id: string;
-}
+import { useOnboarding, PendingEmployee } from "@/hooks/useOnboarding";
+import { useDepartments } from "@/hooks/useDepartments";
 
 const Button = ({
   children,
@@ -47,52 +36,55 @@ const Textarea = ({
 );
 
 export default function OnboardingApprovalPage() {
-  const [requests, setRequests] = useState<PendingEmployee[]>([]);
   const [rejectionReasons, setRejectionReasons] = useState<
     Record<string, string>
   >({});
-  const [loading, setLoading] = useState(true);
   const { employees, fetchEmployees } = useEmployees();
+  const { departments, fetchDepartments } = useDepartments();
+  const {
+    loading,
+    error,
+    pendingEmployees,
+    fetchPendingEmployees,
+    processOnboardingAction,
+    subscribeToOnboardingUpdates,
+  } = useOnboarding();
 
   useEffect(() => {
-    fetch("/api/onboarding/pending")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.data) setRequests(data.data);
-      })
-      .finally(() => setLoading(false));
-    
+    fetchPendingEmployees();
     fetchEmployees();
-  }, [fetchEmployees]);
+    fetchDepartments();
+
+    // Set up realtime subscription
+    const unsubscribe = subscribeToOnboardingUpdates((payload) => {
+      toast.success("Onboarding list updated!");
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [fetchPendingEmployees, fetchEmployees, fetchDepartments, subscribeToOnboardingUpdates]);
 
   const handleInputChange = (id: string, value: string) => {
     setRejectionReasons((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleAction = async (id: string, action: "ACCEPTED" | "REJECTED") => {
-    const reason = rejectionReasons[id] || null;
+    const reason = rejectionReasons[id] || undefined;
     
     try {
-      setLoading(true);
-      const res = await fetch("/api/onboarding/action", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, action, reason }),
-      });
-
-      const result = await res.json();
-
-      if (res.ok) {
-        toast.success(`User ${action.toLowerCase()} successfully`);
-        setRequests((prev) => prev.filter((emp) => emp.id !== id));
-      } else {
-        toast.error(result.error || "Something went wrong");
+      const result = await processOnboardingAction(id, action, reason);
+      if (result.success) {
+        toast.success(result.message);
+        // Clear the rejection reason for this employee
+        setRejectionReasons((prev) => {
+          const { [id]: removed, ...rest } = prev;
+          return rest;
+        });
       }
-    } catch (error) {
-      toast.error("Failed to process request");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to process request");
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -162,7 +154,7 @@ export default function OnboardingApprovalPage() {
         </h1>
       </motion.div>
 
-      {requests.length === 0 ? (
+      {pendingEmployees.length === 0 ? (
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -189,11 +181,11 @@ export default function OnboardingApprovalPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-800">New User Requests</h2>
             <div className="text-sm text-gray-500">
-              {requests.length} request{requests.length !== 1 ? 's' : ''} pending
+              {pendingEmployees.length} request{pendingEmployees.length !== 1 ? 's' : ''} pending
             </div>
           </div>
 
-          {requests.map((emp) => (
+          {pendingEmployees.map((emp: PendingEmployee) => (
             <motion.div
               key={emp.id}
               variants={itemVariants}
@@ -225,7 +217,9 @@ export default function OnboardingApprovalPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-500">Department</span>
-                    <span className="font-medium text-gray-700">{emp.department}</span>
+                    <span className="font-medium text-gray-700">
+                      {departments.find(d => d.id === emp.department_id)?.name || 'Not assigned'}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500">Phone</span>

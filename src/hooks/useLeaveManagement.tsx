@@ -1,16 +1,6 @@
 "use client";
 
-import {
-  createLeaveType as cLeaveType,
-  deleteLeaveType as dLeaveType,
-  getLeaveTypes,
-  updateLeaveType as uLeaveType,
-  createHolidayConfig as cHolidayConfig,
-  deleteHolidayConfig as dHolidayConfig,
-  getHolidayConfigs,
-  updateHolidayConfig as uHolidayConfig,
 
-} from "@/lib/api/admin-management/leave";
 import { leaveTypeSchema, holidayConfigSchema } from "@/lib/types";
 import { useState, useCallback } from "react";
 import { z } from "zod";
@@ -65,15 +55,45 @@ export function useLeaveTypes() {
     }
   }, []);
 
-  const updateLeaveType = async (leaveType: LeaveType) => {
-    const data = await uLeaveType(leaveType);
-    return { success: true, status: 200, data };
-  };
+  const updateLeaveType = useCallback(async (values: LeaveType) => {
+    try {
+      const company_id = await getCompanyId();
+      
+      // Validate the payload
+      const validated = leaveTypeSchema.safeParse(values);
+      if (!validated.success) throw validated.error;
 
-  const deleteLeaveType = async (id: number) => {
-    const data = await dLeaveType(id);
-    return { success: true, status: 200, data };
-  };
+      const { data, error } = await supabase
+        .from("leave_types")
+        .update(values)
+        .eq("id", values.id)
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      return { success: true, status: 200, data };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
+
+  const deleteLeaveType = useCallback(async (id: number) => {
+    try {
+      const company_id = await getCompanyId();
+
+      const { error } = await supabase
+        .from("leave_types")
+        .delete()
+        .eq("id", id)
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      return { success: true, status: 200, data: null };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
 
   return {
     leaveTypes,
@@ -95,29 +115,84 @@ export function useHolidayConfigs() {
   const fetchHolidayConfigs = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getHolidayConfigs();
-      setHolidayConfigs(data);
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("leave_calendars")
+        .select("*")
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      setHolidayConfigs(data || []);
+      return data;
     } catch (error) {
       console.error(error);
+      return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const createHolidayConfig = async (config: HolidayConfig) => {
-    const data = await cHolidayConfig(config);
-    return { success: true, status: 200, data };
-  };
+  const createHolidayConfig = useCallback(async (values: HolidayConfig) => {
+    try {
+      const company_id = await getCompanyId();
+      
+      // Validate the payload
+      const validated = holidayConfigSchema.safeParse(values);
+      if (!validated.success) throw validated.error;
 
-  const updateHolidayConfig = async (config: HolidayConfig) => {
-    const data = await uHolidayConfig(config);
-    return { success: true, status: 200, data };
-  };
+      const { data, error } = await supabase.from("leave_calendars").insert({
+        ...values,
+        company_id,
+      });
 
-  const deleteHolidayConfig = async (id: number) => {
-    const data = await dHolidayConfig(id);
-    return { success: true, status: 200, data };
-  };
+      if (error) throw error;
+      return { success: true, status: 200, data };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
+
+  const updateHolidayConfig = useCallback(async (values: HolidayConfig) => {
+    try {
+      const company_id = await getCompanyId();
+      
+      // Validate the payload
+      const validated = holidayConfigSchema.safeParse(values);
+      if (!validated.success) throw validated.error;
+
+      const { data, error } = await supabase
+        .from("leave_calendars")
+        .update(values)
+        .eq("id", values.id)
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      return { success: true, status: 200, data };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
+
+  const deleteHolidayConfig = useCallback(async (id: number) => {
+    try {
+      const company_id = await getCompanyId();
+
+      const { error } = await supabase
+        .from("leave_calendars")
+        .delete()
+        .eq("id", id)
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      return { success: true, status: 200, data: null };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
 
   return {
     holidayConfigs,

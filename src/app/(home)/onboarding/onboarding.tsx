@@ -29,6 +29,7 @@ import { fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { useCompanyValidation } from "@/hooks/useCompanyValidation";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useDepartments } from "@/hooks/useDepartments";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { getEmployeeId, getUser } from "@/lib/api/employee";
 
 const jobStatuses = [
@@ -94,6 +95,7 @@ export default function EmployeeOnboarding() {
   
   const { employees, fetchEmployees } = useEmployees();
   const { departments, fetchDepartments } = useDepartments();
+  const { getUserOnboardingInfo, submitOnboarding, subscribeToUserOnboardingUpdates } = useOnboarding();
 
   const fetchDepartmentsData = async () => {
     try {
@@ -108,25 +110,22 @@ export default function EmployeeOnboarding() {
       if (status === "rejected") {
         try {
           setLoading(true);
-          const res = await fetch("/api/onboarding");
-          if (res.ok) {
-            const { data } = await res.json();
-            if (data) {
-              const formatted = {
-                ...formData,
-                ...data.userData,
-                company_name: data.companyData.name,
-                company_id: data.userData.company_id,
-              };
-              setCompanyCode(data.companyData.code);
-              setIsCompanyCodeValid(true);
-              setFormData(formatted);
-              setActiveSection("personal");
-              
-              // Fetch departments when application is rejected
-              await fetchDepartmentsData();
-              await fetchEmployees();
-            }
+          const userInfo = await getUserOnboardingInfo();
+          if (userInfo) {
+            const formatted = {
+              ...formData,
+              ...userInfo.userData,
+              company_name: userInfo.companyData.name,
+              company_id: userInfo.userData.company_id,
+            };
+            setCompanyCode(userInfo.companyData.code);
+            setIsCompanyCodeValid(true);
+            setFormData(formatted);
+            setActiveSection("personal");
+            
+            // Fetch departments when application is rejected
+            await fetchDepartmentsData();
+            await fetchEmployees();
           }
         } catch (e) {
           console.error("Failed to fetch rejected data:", e);
@@ -155,6 +154,24 @@ export default function EmployeeOnboarding() {
       getEmployeeId().then(id => setUserId(id));
     }
   }, [companyId]);
+
+  // Set up realtime subscription for user's onboarding status
+  useEffect(() => {
+    if (userId) {
+      const unsubscribe = subscribeToUserOnboardingUpdates(userId, (payload) => {
+        // Redirect to appropriate page based on status change
+        if (payload.new.has_approval === "ACCEPTED") {
+          router.push("/home");
+        } else if (payload.new.has_approval === "REJECTED") {
+          router.push(`/onboarding?status=rejected&reason=${encodeURIComponent(payload.new.rejection_reason || "No reason provided")}`);
+        }
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    }
+  }, [userId, subscribeToUserOnboardingUpdates, router]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -189,13 +206,8 @@ export default function EmployeeOnboarding() {
       
       setErrors({});
       setLoading(true);
-      const res = await fetch("/api/onboarding", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result.data),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Something went wrong");
+      
+      await submitOnboarding(result.data);
       router.push("/onboarding?status=pending");
     } catch (err: any) {
       console.error("Submission error:", err);

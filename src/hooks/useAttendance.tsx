@@ -1,16 +1,12 @@
 "use client";
 
-import {
-  createAttendance as cAttendance,
-  deleteAttendance as dAttendance,
-  getAttendances,
-  updateAttendance as uAttendance,
-} from "@/lib/api/operations-and-services/attendance";
+
 import { attendanceSchema } from "@/lib/types";
 import { useState, useCallback, useEffect } from "react";
 import { z } from "zod";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { supabase } from "@/lib/supabase/client";
+import { getCompanyId } from "@/lib/api/company/companyInfo";
 
 export type Attendance = z.infer<typeof attendanceSchema>;
 
@@ -21,29 +17,86 @@ export function useAttendances() {
   const fetchAttendances = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getAttendances();
-      setAttendances(data);
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("attendance_records")
+        .select("*")
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      setAttendances(data || []);
+      return data;
     } catch (error) {
       console.error(error);
+      return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const createAttendance = async (attendance: Attendance) => {
-    const data = await cAttendance(attendance);
-    return { success: true, status: 200, data };
-  };
+  const createAttendance = useCallback(async (values: Attendance) => {
+    try {
+      const company_id = await getCompanyId();
+      
+      // Validate the payload
+      const validated = attendanceSchema.safeParse(values);
+      if (!validated.success) throw validated.error;
 
-  const updateAttendance = async (attendance: Attendance) => {
-    const data = await uAttendance(attendance);
-    return { success: true, status: 200, data };
-  };
+      const { data, error } = await supabase
+        .from("attendance_records")
+        .insert({
+          ...values,
+          company_id,
+        });
 
-  const deleteAttendance = async (id: number) => {
-    const data = await dAttendance(id);
-    return { success: true, status: 200, data };
-  };
+      if (error) throw error;
+      return { success: true, status: 200, data };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
+
+  const updateAttendance = useCallback(async (values: Attendance) => {
+    try {
+      const company_id = await getCompanyId();
+      
+      // Validate the payload
+      const validated = attendanceSchema.safeParse(values);
+      if (!validated.success) throw validated.error;
+
+      const { data, error } = await supabase
+        .from("attendance_records")
+        .update(values)
+        .eq("id", values.id)
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      return { success: true, status: 200, data };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
+
+  const deleteAttendance = useCallback(async (id: number) => {
+    try {
+      const company_id = await getCompanyId();
+
+      const { error } = await supabase
+        .from("attendance_records")
+        .delete()
+        .eq("id", id)
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+      return { success: true, status: 200, data: null };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }, []);
 
   return {
     attendances,
