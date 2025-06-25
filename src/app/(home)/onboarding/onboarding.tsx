@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Calendar, 
@@ -31,6 +30,8 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { getEmployeeId, getUser } from "@/lib/api/employee";
+import { validateOnboardingForm, validationErrorsToObject } from "@/lib/utils/validation";
+import { OnboardingFormData } from "@/lib/types/schemas";
 
 const jobStatuses = [
   "Active",
@@ -40,29 +41,8 @@ const jobStatuses = [
   "Terminated",
 ] as const;
 
-const formSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  phone_number: z.string().min(1, "Phone number is required"),
-  department_id: z.union([
-    z.number().min(0, "Department is required"),
-    z.string().refine(val => !isNaN(Number(val)), "Department is required")
-  ]).transform(val => typeof val === 'string' ? Number(val) : val),
-  designation: z.string().min(1, "Designation is required"),
-  job_status: z.enum(jobStatuses, {
-    errorMap: () => ({ message: "Job status is required" }),
-  }),
-  hire_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Please enter a valid date",
-  }),
-  company_name: z.string().min(1, "Company name is required"),
-  company_id: z.number().min(0, "Company ID is required"),
-  supervisor_id: z.string().optional(),
-});
-
 export default function EmployeeOnboarding() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<OnboardingFormData>({
     first_name: "",
     last_name: "",
     email: "",
@@ -73,7 +53,7 @@ export default function EmployeeOnboarding() {
     hire_date: "",
     company_name: "",
     company_id: 0,
-    supervisor_id: "",
+    supervisor_id: null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -179,7 +159,7 @@ export default function EmployeeOnboarding() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "department_id" ? parseInt(value) : value,
+      [name]: name === "department_id" ? (value ? parseInt(value) : null) : value,
     }));
     setDirty(true);
     
@@ -196,10 +176,9 @@ export default function EmployeeOnboarding() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const result = formSchema.safeParse(formData);
+      const result = validateOnboardingForm(formData);
       if (!result.success) {
-        const errorMap: Record<string, string> = {};
-        result.error.errors.forEach((e) => (errorMap[e.path[0]] = e.message));
+        const errorMap = validationErrorsToObject(result.errors);
         setErrors(errorMap);
         return;
       }
@@ -207,13 +186,12 @@ export default function EmployeeOnboarding() {
       setErrors({});
       setLoading(true);
       
-      await submitOnboarding(result.data);
+      await submitOnboarding(result.data!);
       router.push("/onboarding?status=pending");
     } catch (err: any) {
       console.error("Submission error:", err);
       if (err?.errors) {
-        const errorMap: Record<string, string> = {};
-        err.errors.forEach((e: any) => (errorMap[e.path[0]] = e.message));
+        const errorMap = validationErrorsToObject(err.errors);
         setErrors(errorMap);
       } else {
         setErrors({ submit: err.message || "Something went wrong. Please try again later." });

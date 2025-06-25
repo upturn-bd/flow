@@ -6,11 +6,8 @@ import {
   getClaimTypes,
   updateClaimType as uClaimType,
 } from "@/lib/api/admin-management/claim-settlement";
-import { claimTypeSchema } from "@/lib/types";
+import { ClaimType } from "@/lib/types/schemas";
 import { useState, useCallback } from "react";
-import { z } from "zod";
-
-export type ClaimType = z.infer<typeof claimTypeSchema>;
 
 export function useClaimTypes() {
   const [claimTypes, setClaimTypes] = useState<ClaimType[]>([]);

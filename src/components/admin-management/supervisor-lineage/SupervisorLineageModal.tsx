@@ -1,8 +1,7 @@
 "use client";
-import { Lineage, useLineage } from "@/hooks/useSupervisorLineage";
+import { useLineage } from "@/hooks/useSupervisorLineage";
+import { Lineage } from "@/lib/types/schemas";
 import { useEffect, useState } from "react";
-import { lineageSchema } from "@/lib/types";
-import { z } from "zod";
 import { Trash, Plus, Buildings } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -11,7 +10,7 @@ import { usePositions } from "@/hooks/usePositions";
 
 interface LineageModalProps {
   initialData?: Lineage[] | null;
-  onSubmit: (values: z.infer<typeof lineageSchema>[]) => void;
+  onSubmit: (values: Lineage[]) => void;
   onClose: () => void;
   isLoading?: boolean;
 }

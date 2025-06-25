@@ -106,21 +106,17 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
 }
 
 // Re-exports for specific type hooks
-import { z } from "zod";
 import { 
-  requisitionTypeSchema, 
-  complaintsTypeSchema,
-  leaveTypeSchema,
-  requisitionInventorySchema,
-  claimTypeSchema
-} from "@/lib/types";
+  RequisitionType,
+  ComplaintsType,
+  LeaveType,
+  RequisitionInventory,
+  ClaimType
+} from "@/lib/types/schemas";
 
 // Types
-export type RequisitionType = z.infer<typeof requisitionTypeSchema>;
-export type ComplaintType = z.infer<typeof complaintsTypeSchema>;
-export type LeaveType = z.infer<typeof leaveTypeSchema>;
-export type RequisitionInventory = z.infer<typeof requisitionInventorySchema>;
-export type ClaimType = z.infer<typeof claimTypeSchema>;
+export type { RequisitionType, LeaveType, RequisitionInventory, ClaimType };
+export type ComplaintType = ComplaintsType;
 
 // Specific hooks using the generic hook
 export function useRequisitionTypes() {

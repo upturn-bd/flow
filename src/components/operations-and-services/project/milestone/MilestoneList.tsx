@@ -88,7 +88,7 @@ export default function MilestoneList({
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Users size={14} strokeWidth={2} />
                     <div className="flex flex-wrap gap-1">
-                      {m.assignees.map(assigneeId => {
+                      {m.assignees.map((assigneeId: string) => {
                         const employee = employees.find(e => e.id === assigneeId);
                         return employee ? (
                           <span 

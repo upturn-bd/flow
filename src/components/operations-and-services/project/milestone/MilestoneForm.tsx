@@ -12,14 +12,14 @@ import {
   ChevronDown,
   Target,
 } from "lucide-react";
-import { milestoneSchema } from "@/lib/types";
-import { z } from "zod";
+import { Milestone } from "@/lib/types/schemas";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-export type Milestone = z.infer<typeof milestoneSchema>;
+// Re-export Milestone type for other components
+export type { Milestone };
 
 interface MilestoneFormProps {
   milestone: Milestone;

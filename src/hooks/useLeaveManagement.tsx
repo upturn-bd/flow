@@ -1,15 +1,15 @@
 "use client";
 
-
-import { leaveTypeSchema, holidayConfigSchema } from "@/lib/types";
+import { LeaveType, HolidayConfig } from "@/lib/types";
+import { validateLeaveType, validateHolidayConfig } from "@/lib/utils/validation";
 import { useState, useCallback } from "react";
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { LeaveState } from "@/components/operations-and-services/leave/LeaveCreatePage";
 
-export type LeaveType = z.infer<typeof leaveTypeSchema>;
+// Re-export types for components
+export type { LeaveType, HolidayConfig };
 
 export function useLeaveTypes() {
   const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
@@ -60,8 +60,12 @@ export function useLeaveTypes() {
       const company_id = await getCompanyId();
       
       // Validate the payload
-      const validated = leaveTypeSchema.safeParse(values);
-      if (!validated.success) throw validated.error;
+      const validation = validateLeaveType(values);
+      if (!validation.success) {
+        const error = new Error("Validation failed");
+        (error as any).issues = validation.errors;
+        throw error;
+      }
 
       const { data, error } = await supabase
         .from("leave_types")
@@ -106,8 +110,6 @@ export function useLeaveTypes() {
   };
 }
 
-export type HolidayConfig = z.infer<typeof holidayConfigSchema>;
-
 export function useHolidayConfigs() {
   const [holidayConfigs, setHolidayConfigs] = useState<HolidayConfig[]>([]);
   const [loading, setLoading] = useState(false);
@@ -138,8 +140,12 @@ export function useHolidayConfigs() {
       const company_id = await getCompanyId();
       
       // Validate the payload
-      const validated = holidayConfigSchema.safeParse(values);
-      if (!validated.success) throw validated.error;
+      const validation = validateHolidayConfig(values);
+      if (!validation.success) {
+        const error = new Error("Validation failed");
+        (error as any).issues = validation.errors;
+        throw error;
+      }
 
       const { data, error } = await supabase.from("leave_calendars").insert({
         ...values,
@@ -159,8 +165,12 @@ export function useHolidayConfigs() {
       const company_id = await getCompanyId();
       
       // Validate the payload
-      const validated = holidayConfigSchema.safeParse(values);
-      if (!validated.success) throw validated.error;
+      const validation = validateHolidayConfig(values);
+      if (!validation.success) {
+        const error = new Error("Validation failed");
+        (error as any).issues = validation.errors;
+        throw error;
+      }
 
       const { data, error } = await supabase
         .from("leave_calendars")

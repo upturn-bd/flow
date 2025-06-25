@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { dirtyValuesChecker, extractFilenameFromUrl } from "@/lib/utils";
 import { Education } from "@/hooks/useEducation";
-import { schoolingSchema, schoolingTypes } from "@/lib/types";
+import { schoolingTypes } from "@/lib/types";
+import { validateSchooling, validationErrorsToObject } from "@/lib/utils/validation";
 import { FiUploadCloud } from "react-icons/fi";
 import { useFileUpload } from "@/hooks/useFileUpload";
 
@@ -47,16 +48,13 @@ export default function EducationModal({
   const [attachments, setAttachments] = useState<File[]>([]);
 
   useEffect(() => {
-    const result = schoolingSchema.safeParse(formValues);
+    const result = validateSchooling(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<Education> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof Education] = err.message as any;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -73,13 +71,10 @@ export default function EducationModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = schoolingSchema.safeParse(formValues);
+    const result = validateSchooling(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<Education> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof Education] = issue.message as any;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;

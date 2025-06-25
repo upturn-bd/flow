@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { leaveTypeSchema, holidayConfigSchema } from "@/lib/types";
-import { z } from "zod";
+import { LeaveType as LeaveTypeInterface, HolidayConfig as HolidayConfigInterface } from "@/lib/types";
+import { validateLeaveType, validateHolidayConfig, validationErrorsToObject } from "@/lib/utils/validation";
 import { LeaveType } from "@/hooks/useConfigTypes";
-import { HolidayConfig } from "@/hooks/useLeaveManagement";
 import { dirtyValuesChecker } from "@/lib/utils";
 import {
   CalendarBlank,
@@ -18,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
-type FormValues = z.infer<typeof leaveTypeSchema>;
+type FormValues = LeaveTypeInterface;
 
 interface LeaveTypeCreateModalProps {
   onSubmit: (values: FormValues) => void;
@@ -48,17 +47,13 @@ export default function LeaveTypeCreateModal({
   const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
-    const result = leaveTypeSchema.safeParse(formValues);
+    const result = validateLeaveType(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        const path = String(err.path[0]);
-        newErrors[path] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -78,21 +73,17 @@ export default function LeaveTypeCreateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = leaveTypeSchema.safeParse(formValues);
+    const result = validateLeaveType(formValues);
 
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const path = String(issue.path[0]);
-        fieldErrors[path] = issue.message;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 
@@ -243,17 +234,13 @@ export function LeaveTypeUpdateModal({
   }, [initialData]);
 
   useEffect(() => {
-    const result = leaveTypeSchema.safeParse(formValues);
+    const result = validateLeaveType(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        const path = String(err.path[0]);
-        newErrors[path] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -268,7 +255,7 @@ export function LeaveTypeUpdateModal({
     >
   ) => {
     const { name, value } = e.target;
-    setFormValues((prev) => ({
+    setFormValues((prev: any) => ({
       ...prev,
       [name]: name === "annual_quota" ? Number(value) : value,
     }));
@@ -277,21 +264,17 @@ export function LeaveTypeUpdateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = leaveTypeSchema.safeParse(formValues);
+    const result = validateLeaveType(formValues);
 
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const path = String(issue.path[0]);
-        fieldErrors[path] = issue.message;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 
@@ -422,7 +405,7 @@ export function LeaveTypeUpdateModal({
   );
 }
 
-type HolidayFormValues = z.infer<typeof holidayConfigSchema>;
+type HolidayFormValues = HolidayConfigInterface;
 
 interface LeaveHolidayCreateModalProps {
   onSubmit: (values: HolidayFormValues) => void;
@@ -431,7 +414,7 @@ interface LeaveHolidayCreateModalProps {
 }
 
 interface LeaveHolidayUpdateModalProps {
-  initialData: HolidayConfig;
+  initialData: HolidayConfigInterface;
   onSubmit: (values: HolidayFormValues) => void;
   onClose: () => void;
   isLoading?: boolean;
@@ -452,17 +435,13 @@ export function LeaveHolidayCreateModal({
   const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
-    const result = holidayConfigSchema.safeParse(formValues);
+    const result = validateHolidayConfig(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        const path = String(err.path[0]);
-        newErrors[path] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -482,21 +461,17 @@ export function LeaveHolidayCreateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = holidayConfigSchema.safeParse(formValues);
+    const result = validateHolidayConfig(formValues);
 
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const path = String(issue.path[0]);
-        fieldErrors[path] = issue.message;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 
@@ -654,17 +629,13 @@ export function LeaveHolidayUpdateModal({
   }, [initialData]);
 
   useEffect(() => {
-    const result = holidayConfigSchema.safeParse(formValues);
+    const result = validateHolidayConfig(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        const path = String(err.path[0]);
-        newErrors[path] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -679,7 +650,7 @@ export function LeaveHolidayUpdateModal({
     >
   ) => {
     const { name, value } = e.target;
-    setFormValues((prev) => ({
+    setFormValues((prev: any) => ({
       ...prev,
       [name]: value,
     }));
@@ -688,21 +659,17 @@ export function LeaveHolidayUpdateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = holidayConfigSchema.safeParse(formValues);
+    const result = validateHolidayConfig(formValues);
 
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const path = String(issue.path[0]);
-        fieldErrors[path] = issue.message;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 

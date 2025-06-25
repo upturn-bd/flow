@@ -11,14 +11,14 @@ import {
   Check,
   X,
 } from "lucide-react";
-import { projectSchema } from "@/lib/types";
-import { z } from "zod";
+import { validateProject, validationErrorsToObject } from "@/lib/utils/validation";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import AssigneeSelect from "./AssigneeSelect";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { Project } from "@/lib/types/schemas";
 
-export type ProjectDetails = z.infer<typeof projectSchema>;
+export type ProjectDetails = Project;
 
 interface ProjectFormProps {
   initialData?: ProjectDetails;
@@ -60,28 +60,28 @@ export default function ProjectForm({
   ) => {
     const { name, value } = e.target;
     if (name === "department_id") {
-      setProjectDetails((prev) => ({ ...prev, [name]: Number(value) }));
+      setProjectDetails((prev: ProjectDetails) => ({ ...prev, [name]: Number(value) }));
     } else if (name === "start_date" || name === "end_date") {
-      setProjectDetails((prev) => ({
+      setProjectDetails((prev: ProjectDetails) => ({
         ...prev,
         [name]: new Date(value).toISOString().split("T")[0],
       }));
     } else {
-      setProjectDetails((prev) => ({ ...prev, [name]: value }));
+      setProjectDetails((prev: ProjectDetails) => ({ ...prev, [name]: value }));
     }
   };
 
   const handleAddAssignee = (id: string) => {
-    setProjectDetails((prev) => ({
+    setProjectDetails((prev: ProjectDetails) => ({
       ...prev,
       assignees: [...(prev.assignees || []), id],
     }));
   };
 
   const handleRemoveAssignee = (id: string) => {
-    setProjectDetails((prev) => ({
+    setProjectDetails((prev: ProjectDetails) => ({
       ...prev,
-      assignees: (prev.assignees || []).filter((a) => a !== id),
+      assignees: (prev.assignees || []).filter((a: string) => a !== id),
     }));
   };
 
@@ -91,16 +91,13 @@ export default function ProjectForm({
   };
 
   useEffect(() => {
-    const result = projectSchema.safeParse(projectDetails);
+    const result = validateProject(projectDetails);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as string] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [projectDetails]);

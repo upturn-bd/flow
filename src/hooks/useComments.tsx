@@ -6,11 +6,8 @@ import {
   getComments,
   updateComment as uComment,
 } from "@/lib/api/operations-and-services/project/comment";
-import { commentSchema } from "@/lib/types";
+import { Comment } from "@/lib/types/schemas";
 import { useState, useCallback } from "react";
-import { z } from "zod";
-
-export type Comment = z.infer<typeof commentSchema>;
 
 export function useComments() {
   const [comments, setComments] = useState<Comment[]>([]);

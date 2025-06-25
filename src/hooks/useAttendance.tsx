@@ -1,14 +1,14 @@
 "use client";
 
-
-import { attendanceSchema } from "@/lib/types";
+import { Attendance } from "@/lib/types";
+import { validateAttendance } from "@/lib/utils/validation";
 import { useState, useCallback, useEffect } from "react";
-import { z } from "zod";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
 
-export type Attendance = z.infer<typeof attendanceSchema>;
+// Re-export Attendance type for components
+export type { Attendance };
 
 export function useAttendances() {
   const [attendances, setAttendances] = useState<Attendance[]>([]);
@@ -40,8 +40,12 @@ export function useAttendances() {
       const company_id = await getCompanyId();
       
       // Validate the payload
-      const validated = attendanceSchema.safeParse(values);
-      if (!validated.success) throw validated.error;
+      const validation = validateAttendance(values);
+      if (!validation.success) {
+        const error = new Error("Validation failed");
+        (error as any).issues = validation.errors;
+        throw error;
+      }
 
       const { data, error } = await supabase
         .from("attendance_records")
@@ -63,8 +67,12 @@ export function useAttendances() {
       const company_id = await getCompanyId();
       
       // Validate the payload
-      const validated = attendanceSchema.safeParse(values);
-      if (!validated.success) throw validated.error;
+      const validation = validateAttendance(values);
+      if (!validation.success) {
+        const error = new Error("Validation failed");
+        (error as any).issues = validation.errors;
+        throw error;
+      }
 
       const { data, error } = await supabase
         .from("attendance_records")

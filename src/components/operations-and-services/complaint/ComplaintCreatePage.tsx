@@ -17,11 +17,9 @@ import {
   User,
   Flag
 } from "lucide-react";
-import { z } from "zod";
-import { complaintRecordSchema } from "@/lib/types";
 import { supabase } from "@/lib/supabase/client";
+import { ComplaintRecord } from "@/lib/types/schemas";
 import { getEmployeeInfo } from "@/lib/api/employee";
-import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
@@ -38,7 +36,7 @@ const initialComplaintRecord = {
   attachments: [],
 };
 
-export type ComplaintState = z.infer<typeof complaintRecordSchema>;
+export type ComplaintState = ComplaintRecord;
 
 interface ComplaintCreatePageProps {
   onClose: () => void;
@@ -59,9 +57,9 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
   ) => {
     const { name, value } = e.target;
     if (name === "complaint_type_id") {
-      setComplaintState((prev) => ({ ...prev, [name]: value ? Number(value) : undefined }));
+      setComplaintState((prev: ComplaintState) => ({ ...prev, [name]: value ? Number(value) : undefined }));
     } else {
-      setComplaintState((prev) => ({ ...prev, [name]: value }));
+      setComplaintState((prev: ComplaintState) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -224,7 +222,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
               <User size={16} className="mr-2" />
               Complaint Against
             </label>
@@ -257,7 +255,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
               <MessageSquare size={16} className="mr-2" />
               Description
             </label>
@@ -278,7 +276,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
               <Upload size={16} className="mr-2" />
               Attachment
             </label>

@@ -1,13 +1,9 @@
 "use client";
 
-
-import { lineageSchema } from "@/lib/types";
+import { Lineage } from "@/lib/types/schemas";
 import { useState, useCallback } from "react";
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-
-export type Lineage = z.infer<typeof lineageSchema>;
 
 export function useLineage() {
   const [lineages, setLineages] = useState<Lineage[]>([]);
@@ -36,7 +32,7 @@ export function useLineage() {
     }
   }, []);
 
-  const createLineage = useCallback(async (values: z.infer<typeof lineageSchema>[]) => {
+  const createLineage = useCallback(async (values: Lineage[]) => {
     setCreating(true);
     try {
       const company_id = await getCompanyId();
@@ -59,7 +55,7 @@ export function useLineage() {
     }
   }, []);
 
-  const updateLineage = useCallback(async (values: z.infer<typeof lineageSchema>[]) => {
+  const updateLineage = useCallback(async (values: Lineage[]) => {
     setUpdating(true);
     try {
       const company_id = await getCompanyId();

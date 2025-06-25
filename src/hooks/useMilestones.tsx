@@ -6,11 +6,11 @@ import {
   getMilestones,
   updateMilestone as uMilestone,
 } from "@/lib/api/operations-and-services/project/milestone";
-import { milestoneSchema } from "@/lib/types";
+import { Milestone } from "@/lib/types/schemas";
 import { useState, useCallback } from "react";
-import { z } from "zod";
 
-export type Milestone = z.infer<typeof milestoneSchema>;
+// Re-export Milestone type for components
+export type { Milestone };
 
 export function useMilestones() {
   const [milestones, setMilestones] = useState<Milestone[]>([]);

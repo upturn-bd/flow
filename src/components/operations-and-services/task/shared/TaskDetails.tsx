@@ -224,7 +224,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
         <div className="bg-gray-50 p-4 rounded-lg">
           {taskDetails?.assignees?.length ? (
             <div className="flex flex-wrap gap-2">
-              {taskDetails.assignees.map((assignee, i) => {
+              {taskDetails.assignees.map((assignee: string, i: number) => {
                 const employee = employees.find(emp => emp.id === assignee);
                 return (
                   <div 

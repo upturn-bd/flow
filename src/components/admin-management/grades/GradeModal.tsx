@@ -1,23 +1,15 @@
 "use client";
 
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Grade } from "@/hooks/useGrades";
-import { z } from "zod";
 import { useEffect, useState } from "react";
+import { Grade } from "@/lib/types/schemas";
+import { validateGrade, validationErrorsToObject } from "@/lib/utils/validation";
 import { motion } from "framer-motion";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { GraduationCap, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
-const schema = z.object({
-  id: z.number().optional(),
-  name: z.string().min(1, "Name is required").max(50),
-  company_id: z.number().optional(),
-});
-
-type FormValues = z.infer<typeof schema>;
+type FormValues = Grade;
 
 interface GradeModalProps {
   initialData?: Grade | null;
@@ -30,7 +22,14 @@ export default function GradeModal({
   onSubmit,
   onClose,
 }: GradeModalProps) {
+  const [formValues, setFormValues] = useState<FormValues>({
+    id: initialData?.id,
+    name: initialData?.name ?? "",
+  });
+  const [errors, setErrors] = useState<Partial<FormValues>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [isValid, setIsValid] = useState(false);
 
   // Animation variants
   const modalVariants = {
@@ -51,37 +50,21 @@ export default function GradeModal({
     }
   };
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { errors, isSubmitting, isValid },
-  } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: initialData || {
-      name: "",
-    },
-  });
-
-  const formValues = watch();
-
   useEffect(() => {
-    if (initialData) {
-      reset(initialData);
+    const result = validateGrade(formValues);
+    if (result.success) {
+      setIsValid(true);
+      setErrors({});
+    } else {
+      setIsValid(false);
+      const newErrors = validationErrorsToObject(result.errors);
+      setErrors(newErrors);
     }
-  }, [initialData, reset]);
+  }, [formValues]);
 
   useEffect(() => {
     if (initialData) {
-      const dirty = dirtyValuesChecker(
-        {
-          id: initialData.id,
-          name: initialData.name,
-          company_id: initialData.company_id,
-        },
-        formValues
-      );
+      const dirty = dirtyValuesChecker(initialData, formValues);
       setIsDirty(dirty);
     } else {
       const dirty = Object.values(formValues).some((v) => v !== "" && v !== 0);
@@ -89,8 +72,32 @@ export default function GradeModal({
     }
   }, [formValues, initialData]);
 
-  const submitHandler = (data: FormValues) => {
-    onSubmit(data);
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormValues((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const result = validateGrade(formValues);
+
+    if (!result.success) {
+      const fieldErrors = validationErrorsToObject(result.errors);
+      setErrors(fieldErrors);
+      setIsSubmitting(false);
+      return;
+    }
+
+    setErrors({});
+    onSubmit(result.data!);
+    setIsSubmitting(false);
   };
 
   return (
@@ -100,7 +107,7 @@ export default function GradeModal({
         animate="visible"
         exit="exit"
         variants={modalVariants}
-        onSubmit={handleSubmit(submitHandler)}
+        onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-gray-200"
       >
         <motion.div variants={fadeInUp} className="flex items-center justify-between">
@@ -129,20 +136,16 @@ export default function GradeModal({
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <GraduationCap className="h-5 w-5 text-gray-500" />
               </div>
-              <Controller
-                control={control}
+              <input
                 name="name"
-                render={({ field }) => (
-                  <input
-                    {...field}
-                    className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all"
-                    placeholder="Enter Grade Name"
-                  />
-                )}
+                value={formValues.name}
+                onChange={handleChange}
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all"
+                placeholder="Enter Grade Name"
               />
             </div>
             {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.name as string}</p>
             )}
           </div>
         </motion.div>
@@ -159,7 +162,7 @@ export default function GradeModal({
           <Button
             type="submit"
             variant="primary"
-            disabled={isSubmitting || !isValid || !isDirty}
+            disabled={isSubmitting || !isValid || (initialData ? !isDirty : false)}
             className="bg-gray-800 hover:bg-gray-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Saving..." : initialData ? "Update" : "Create"}

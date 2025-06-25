@@ -1,7 +1,7 @@
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { complaintsTypeSchema } from "@/lib/types";
+import { ComplaintsType } from "@/lib/types/schemas";
+import { validateComplaintsType } from "@/lib/utils/validation";
 
 export async function getComplaintTypes() {
   const company_id = await getCompanyId();
@@ -16,12 +16,12 @@ export async function getComplaintTypes() {
 }
 
 export async function createComplaintType(
-  payload: z.infer<typeof complaintsTypeSchema>
+  payload: ComplaintsType
 ) {
   const company_id = await getCompanyId();
 
-  const validated = complaintsTypeSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
+  const validated = validateComplaintsType(payload);
+  if (!validated.success) throw new Error(validated.errors.map(e => e.message).join(', '));
 
   const { data, error } = await supabase.from("complaint_types").insert({
     ...payload,

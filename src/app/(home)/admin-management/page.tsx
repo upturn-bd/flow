@@ -1,8 +1,5 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import CompanyBasicsConfigView from "@/components/admin-management/CompanyBasicsConfigView";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,18 +8,21 @@ import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { useCompanyInfo } from "@/hooks/useCompanyInfo";
+import { validateCompanyBasics, validationErrorsToObject } from "@/lib/utils/validation";
+import { CompanyBasics } from "@/lib/types/schemas";
 
-const companyBasicsSchema = z.object({
-  company_name: z.string().min(1, "Company Name is required"),
-  company_id: z.string().min(1, "Company Code is required"),
-  industry_id: z.string().min(1, "Industry is required"),
-  country_id: z.string().min(1, "Country is required"),
-});
-
-type CompanyBasicsFormData = z.infer<typeof companyBasicsSchema>;
+type CompanyBasicsFormData = CompanyBasics;
 
 export default function CompanyBasicsForm() {
   const [loading, setLoading] = useState(true);
+  const [formValues, setFormValues] = useState<CompanyBasicsFormData>({
+    company_name: "",
+    company_id: "",
+    industry_id: "",
+    country_id: "",
+  });
+  const [errors, setErrors] = useState<Partial<Record<keyof CompanyBasicsFormData, string>>>({});
+  const [isValid, setIsValid] = useState(false);
   
   const { 
     companyInfo,
@@ -31,21 +31,12 @@ export default function CompanyBasicsForm() {
     employees,
     fetchCompanyInfo 
   } = useCompanyInfo();
-  
-  const {
-    control,
-    reset,
-    handleSubmit,
-    formState: { errors: formErrors },
-  } = useForm<CompanyBasicsFormData>({
-    resolver: zodResolver(companyBasicsSchema),
-    defaultValues: {
-      company_name: "",
-      company_id: "",
-      industry_id: "",
-      country_id: "",
-    },
-  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormValues(prev => ({ ...prev, [name]: value }));
+    setErrors(prev => ({ ...prev, [name]: "" }));
+  };
 
   useEffect(() => {
     const loadCompanyInfo = async () => {
@@ -59,21 +50,34 @@ export default function CompanyBasicsForm() {
     };
 
     loadCompanyInfo();
-  }, [reset, fetchCompanyInfo]);
+  }, [fetchCompanyInfo]);
 
   useEffect(() => {
     if (companyInfo) {
-      reset({
+      setFormValues({
         company_name: companyInfo.name,
         company_id: companyInfo.code,
         industry_id: companyInfo.industry_id.toString(),
         country_id: companyInfo.country_id.toString(),
       });
     }
-  }, [companyInfo, reset]);
+  }, [companyInfo]);
 
-  const onSubmit = (data: CompanyBasicsFormData) => {
-    console.log(data);
+  useEffect(() => {
+    const result = validateCompanyBasics(formValues);
+    if (result.success) {
+      setIsValid(true);
+      setErrors({});
+    } else {
+      setIsValid(false);
+      const newErrors = validationErrorsToObject(result.errors);
+      setErrors(newErrors);
+    }
+  }, [formValues]);
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log(formValues);
     // Handle form submission here
     // TODO: Update company info
   };
@@ -126,78 +130,54 @@ export default function CompanyBasicsForm() {
               </h2>
             </div>
             
-            <form onSubmit={handleSubmit(onSubmit)} className="p-3 sm:p-6">
+            <form onSubmit={onSubmit} className="p-3 sm:p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Controller
-                  control={control}
+                <FormInputField
                   name="company_name"
-                  render={({ field }) => (
-                    <FormInputField
-                      name="company_name"
-                      label="Company Name"
-                      icon={<Building size={18} />}
-                      value={field.value}
-                      onChange={field.onChange}
-                      readOnly={true}
-                      error={formErrors.company_name?.message}
-                    />
-                  )}
+                  label="Company Name"
+                  icon={<Building size={18} />}
+                  value={formValues.company_name}
+                  onChange={handleChange}
+                  readOnly={true}
+                  error={errors.company_name}
                 />
 
-                <Controller
-                  control={control}
+                <FormInputField
                   name="company_id"
-                  render={({ field }) => (
-                    <FormInputField
-                      name="company_id"
-                      label="Company Code"
-                      icon={<Code size={18} />}
-                      value={field.value}
-                      onChange={field.onChange}
-                      readOnly={true}
-                      error={formErrors.company_id?.message}
-                    />
-                  )}
+                  label="Company Code"
+                  icon={<Code size={18} />}
+                  value={formValues.company_id}
+                  onChange={handleChange}
+                  readOnly={true}
+                  error={errors.company_id}
                 />
 
-                <Controller
-                  control={control}
+                <FormSelectField
                   name="industry_id"
-                  render={({ field }) => (
-                    <FormSelectField
-                      name="industry_id"
-                      label="Industry"
-                      icon={<Briefcase size={18} />}
-                      options={industries.map(industry => ({
-                        value: industry.id.toString(),
-                        label: industry.name
-                      }))}
-                      placeholder="Select Industry"
-                      value={field.value}
-                      onChange={field.onChange}
-                      error={formErrors.industry_id?.message}
-                    />
-                  )}
+                  label="Industry"
+                  icon={<Briefcase size={18} />}
+                  options={industries.map(industry => ({
+                    value: industry.id.toString(),
+                    label: industry.name
+                  }))}
+                  placeholder="Select Industry"
+                  value={formValues.industry_id}
+                  onChange={handleChange}
+                  error={errors.industry_id}
                 />
 
-                <Controller
-                  control={control}
+                <FormSelectField
                   name="country_id"
-                  render={({ field }) => (
-                    <FormSelectField
-                      name="country_id"
-                      label="Country"
-                      icon={<Globe size={18} />}
-                      options={countries.map(country => ({
-                        value: country.id.toString(),
-                        label: country.name
-                      }))}
-                      placeholder="Select Country"
-                      value={field.value}
-                      onChange={field.onChange}
-                      error={formErrors.country_id?.message}
-                    />
-                  )}
+                  label="Country"
+                  icon={<Globe size={18} />}
+                  options={countries.map(country => ({
+                    value: country.id.toString(),
+                    label: country.name
+                  }))}
+                  placeholder="Select Country"
+                  value={formValues.country_id}
+                  onChange={handleChange}
+                  error={errors.country_id}
                 />
               </div>
             </form>

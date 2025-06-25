@@ -1,6 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/api/employee";
-import { z } from "zod";
 
 /**
  * Get the supervisor for the current user

@@ -1,17 +1,16 @@
 "use client";
 
-
-import { newsAndNoticeTypeSchema } from "@/lib/types";
+import { NewsAndNoticeType } from "@/lib/types";
+import { validateNewsAndNoticeType } from "@/lib/utils/validation";
 import { useState, useCallback } from "react";
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
 
-export type NewsAndNoticesType = z.infer<typeof newsAndNoticeTypeSchema>;
+export type { NewsAndNoticeType };
 
 export function useNewsAndNoticesTypes() {
   const [newsAndNoticeTypes, setNewsAndNoticesTypes] = useState<
-    NewsAndNoticesType[]
+    NewsAndNoticeType[]
   >([]);
   const [loading, setLoading] = useState(false);
 
@@ -36,13 +35,17 @@ export function useNewsAndNoticesTypes() {
     }
   }, []);
 
-  const createNewsAndNoticesType = useCallback(async (values: NewsAndNoticesType) => {
+  const createNewsAndNoticesType = useCallback(async (values: NewsAndNoticeType) => {
     try {
       const company_id = await getCompanyId();
       
       // Validate the payload
-      const validated = newsAndNoticeTypeSchema.safeParse(values);
-      if (!validated.success) throw validated.error;
+      const validation = validateNewsAndNoticeType(values);
+      if (!validation.success) {
+        const error = new Error("Validation failed");
+        (error as any).issues = validation.errors;
+        throw error;
+      }
 
       const { data, error } = await supabase.from("notice_types").insert({
         ...values,

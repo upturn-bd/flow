@@ -14,11 +14,11 @@ import {
   getTaskById,
   TaskFilters,
 } from "@/lib/api/operations-and-services/project/task";
-import { taskSchema } from "@/lib/types";
+import { Task } from "@/lib/types/schemas";
 import { useState, useCallback } from "react";
-import { z } from "zod";
 
-export type Task = z.infer<typeof taskSchema>;
+// Re-export Task type for components
+export type { Task };
 
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);

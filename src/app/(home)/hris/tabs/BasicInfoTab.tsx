@@ -4,10 +4,10 @@ import { useEffect, useState, useCallback } from "react";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { useDepartments } from "@/hooks/useDepartments";
 import {
-  basicInfoSchema,
   BasicInfoFormData,
   JOB_STATUS_OPTIONS,
 } from "./basicInfo.constants";
+import { validateBasicInfo, validationErrorsToObject } from "@/lib/utils/validation";
 import { BasicInfoField } from "./BasicInfoField";
 import { motion } from "framer-motion";
 import { User, Briefcase, Calendar, Save, X, CheckCircle, AlertCircle } from "lucide-react";
@@ -107,12 +107,9 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
       setSubmitError(null);
       setSubmitSuccess(false);
 
-      const result = basicInfoSchema.safeParse(formValues);
+      const result = validateBasicInfo(formValues);
       if (!result.success) {
-        const fieldErrors: typeof errors = {};
-        for (const issue of result.error.issues) {
-          fieldErrors[issue.path[0] as keyof BasicInfoFormData] = issue.message;
-        }
+        const fieldErrors = validationErrorsToObject(result.errors);
         setErrors(fieldErrors);
         setIsSubmitting(false);
         return;
@@ -168,16 +165,13 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
   }, [initialData, formValues]);
 
   useEffect(() => {
-    const result = basicInfoSchema.safeParse(formValues);
+    const result = validateBasicInfo(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<Record<keyof BasicInfoFormData, string>> = {};
-      result.error.issues.forEach((issue) => {
-        newErrors[issue.path[0] as keyof BasicInfoFormData] = issue.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);

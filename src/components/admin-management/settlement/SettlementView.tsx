@@ -4,18 +4,17 @@ import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
 import { TrashSimple, Receipt, Money, Plus, Eye } from "@phosphor-icons/react";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
+import { ClaimType } from "@/lib/types/schemas";
 import {
   ClaimTypeCreateModal,
   ClaimTypeUpdateModal,
 } from "./SettlementModal";
-import { claimTypeSchema } from "@/lib/types";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-type SettlementType = z.infer<typeof claimTypeSchema>;
+type SettlementType = ClaimType;
 
 export default function ClaimSettlementView() {
   const {

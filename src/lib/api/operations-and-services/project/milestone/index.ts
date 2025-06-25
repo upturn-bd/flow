@@ -1,7 +1,7 @@
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { milestoneSchema } from "@/lib/types";
+import { Milestone } from "@/lib/types";
+import { validateMilestone } from "@/lib/utils/validation";
 
 export async function getMilestones() {
   const company_id = await getCompanyId();
@@ -15,12 +15,15 @@ export async function getMilestones() {
   return data;
 }
 
-export async function createMilestone(payload: z.infer<typeof milestoneSchema>) {
+export async function createMilestone(payload: Milestone) {
   const company_id = await getCompanyId();
 
-  const validated = milestoneSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
-
+  const validation = validateMilestone(payload);
+  if (!validation.success) {
+    const error = new Error("Validation failed");
+    (error as any).issues = validation.errors;
+    throw error;
+  }
 
   const { data, error } = await supabase.from("milestone_records").insert({
     ...payload,
@@ -31,11 +34,15 @@ export async function createMilestone(payload: z.infer<typeof milestoneSchema>) 
   return data;
 }
 
-export async function updateMilestone(payload: z.infer<typeof milestoneSchema>) {
+export async function updateMilestone(payload: Milestone) {
   const company_id = await getCompanyId();
 
-  const validated = milestoneSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
+  const validation = validateMilestone(payload);
+  if (!validation.success) {
+    const error = new Error("Validation failed");
+    (error as any).issues = validation.errors;
+    throw error;
+  }
 
   const { data, error } = await supabase
     .from("milestone_records")

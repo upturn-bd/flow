@@ -7,14 +7,11 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { z } from "zod";
-import { taskSchema } from "@/lib/types";
+import { Task } from "@/lib/types/schemas";
 import TaskDetails from "./shared/TaskDetails";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, ExternalLink, Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
-
-type Task = z.infer<typeof taskSchema>;
 
 function TaskCard({
   task,

@@ -1,13 +1,10 @@
 "use client";
 
-
-import { requisitionTypeSchema } from "@/lib/types";
+import { RequisitionType } from "@/lib/types";
+import { validateRequisitionType } from "@/lib/utils/validation";
 import { useState, useCallback } from "react";
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-
-export type RequisitionType = z.infer<typeof requisitionTypeSchema>;
 
 export function useRequisitionTypes() {
   const [requisitionTypes, setRequisitionTypes] = useState<RequisitionType[]>(
@@ -41,8 +38,12 @@ export function useRequisitionTypes() {
       const company_id = await getCompanyId();
       
       // Validate the payload
-      const validated = requisitionTypeSchema.safeParse(values);
-      if (!validated.success) throw validated.error;
+      const validation = validateRequisitionType(values);
+      if (!validation.success) {
+        const error = new Error("Validation failed");
+        (error as any).issues = validation.errors;
+        throw error;
+      }
 
       const { data, error } = await supabase.from("requisition_types").insert({
         ...values,

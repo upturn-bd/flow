@@ -6,11 +6,10 @@ import {
   getExperiences,
   updateExperience as uExperience,
 } from "@/lib/api/hris";
-import { experienceSchema } from "@/lib/types";
+import { Experience as ExperienceType } from "@/lib/types";
 import { useState, useCallback } from "react";
-import { z } from "zod";
 
-export type Experience = z.infer<typeof experienceSchema>;
+export type Experience = ExperienceType;
 
 export function useExperience() {
   const [experience, setExperience] = useState<Experience[]>([]);

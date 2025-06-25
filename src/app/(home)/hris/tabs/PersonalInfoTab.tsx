@@ -3,12 +3,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { dirtyValuesChecker } from "@/lib/utils";
 import {
-  personalInfoSchema,
   PersonalFormData,
   Gender,
   BloodGroup,
   MaritalStatus,
 } from "./personalInfo.constants";
+import { validatePersonalInfo, validationErrorsToObject } from "@/lib/utils/validation";
 import { PersonalInfoField } from "./PersonalInfoField";
 import { motion } from "framer-motion";
 import { Calendar, User, Heart, Users, PhoneCall, MapPin, Save, X, CheckCircle, AlertCircle } from "lucide-react";
@@ -100,13 +100,9 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
     setSubmitError(null);
     setSubmitSuccess(false);
 
-    const result = personalInfoSchema.safeParse(formValues);
+    const result = validatePersonalInfo(formValues);
     if (!result.success) {
-      const fieldErrors: Partial<Record<keyof PersonalFormData, string>> = {};
-      result.error.errors.forEach((err) => {
-        const field = err.path[0] as keyof PersonalFormData;
-        fieldErrors[field] = err.message as string;
-      });
+      const fieldErrors = validationErrorsToObject(result.errors);
       setFormErrors(fieldErrors);
       setIsSubmitting(false);
       return;
@@ -127,13 +123,9 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
   };
 
   useEffect(() => {
-    const result = personalInfoSchema.safeParse(formValues);
+    const result = validatePersonalInfo(formValues);
     if (!result.success) {
-      const fieldErrors: Partial<Record<keyof PersonalFormData, string>> = {};
-      result.error.errors.forEach((err) => {
-        const field = err.path[0] as keyof PersonalFormData;
-        fieldErrors[field] = err.message as string;
-      });
+      const fieldErrors = validationErrorsToObject(result.errors);
       setFormErrors(fieldErrors);
       setIsValid(false);
     } else {
@@ -293,7 +285,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
                             <PersonalInfoField
                               name={field.name as keyof PersonalFormData}
                               type={field.type}
-                              value={formValues[field.name as keyof PersonalFormData] || ""}
+                              value={String(formValues[field.name as keyof PersonalFormData] || "")}
                               onChange={handleChange}
                               onBlur={handleBlur}
                               error={formErrors[field.name as keyof PersonalFormData]}

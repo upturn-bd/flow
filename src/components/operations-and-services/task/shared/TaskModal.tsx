@@ -1,8 +1,7 @@
 "use client";
 
-import { Task } from "@/hooks/useTasks";
 import { useEmployees } from "@/hooks/useEmployees";
-import { taskSchema } from "@/lib/types";
+import { validateTask, validationErrorsToObject } from "@/lib/utils/validation";
 import { useEffect, useRef, useState } from "react";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,6 +22,7 @@ import { toast } from "sonner";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { Button } from "@/components/ui/button";
+import { Task } from "@/lib/types/schemas";
 
 interface TaskCreateModalProps {
   milestoneId: number;
@@ -65,14 +65,10 @@ export default function TaskCreateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = taskSchema.safeParse(task);
+    const result = validateTask(task);
 
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const path = issue.path[0].toString();
-        fieldErrors[path] = issue.message;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
@@ -118,17 +114,13 @@ export default function TaskCreateModal({
   }, [fetchEmployees]);
 
   useEffect(() => {
-    const result = taskSchema.safeParse(task);
+    const result = validateTask(task);
     if (result.success) {
       setIsTaskValid(true);
       setErrors({});
     } else {
       setIsTaskValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        const path = err.path[0].toString();
-        newErrors[path] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [task]);
@@ -260,7 +252,7 @@ export default function TaskCreateModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                 <Users className="h-4 w-4 text-gray-500" />
                 Assignees
               </label>
@@ -392,14 +384,10 @@ export function TaskUpdateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = taskSchema.safeParse(task);
+    const result = validateTask(task);
 
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const path = issue.path[0].toString();
-        fieldErrors[path] = issue.message;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
@@ -438,17 +426,13 @@ export function TaskUpdateModal({
   }, [fetchEmployees]);
 
   useEffect(() => {
-    const result = taskSchema.safeParse(task);
+    const result = validateTask(task);
     if (result.success) {
       setIsTaskValid(true);
       setErrors({});
     } else {
       setIsTaskValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        const path = err.path[0].toString();
-        newErrors[path] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [task]);

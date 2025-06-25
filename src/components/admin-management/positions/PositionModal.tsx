@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { z } from "zod";
 import { motion } from "framer-motion";
 import { dirtyValuesChecker } from "@/lib/utils";
-import { Position } from "@/hooks/usePositions";
+import { Position } from "@/lib/types/schemas";
+import { validatePosition, validationErrorsToObject } from "@/lib/utils/validation";
 import {
   BriefcaseBusiness,
   Building,
@@ -14,16 +14,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
-
-// Define the schema using Zod
-const schema = z.object({
-  id: z.number().optional(),
-  name: z.string().min(1, "Name is required").max(50),
-  description: z.string().optional(),
-  department_id: z.number().optional(),
-  grade: z.number().optional(),
-  company_id: z.number().optional(),
-});
 
 interface PositionModalProps {
   initialData?: Position | null;
@@ -97,16 +87,13 @@ export default function PositionModal({
 
   // Update validation state whenever form values change
   useEffect(() => {
-    const result = schema.safeParse(formValues);
+    const result = validatePosition(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as string] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors as Partial<Record<keyof Position, string>>);
     }
   }, [formValues]);

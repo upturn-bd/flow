@@ -1,6 +1,6 @@
 "use client";
 
-import { Notice } from "@/lib/types/notice";
+import { Notice } from "@/lib/types";
 import { validateNotice } from "@/lib/utils/validation";
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";

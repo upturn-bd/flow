@@ -1,16 +1,14 @@
 "use client";
 import { useEmployees } from "@/hooks/useEmployees";
-import { Project } from "@/hooks/useProjects";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
 import { useEffect, useState } from "react";
-import { Milestone } from "@/hooks/useMilestones";
 import { useMilestones } from "@/hooks/useMilestones";
-import { Comment, useComments } from "@/hooks/useComments";
+import {  useComments } from "@/hooks/useComments";
 import MilestoneDetails from "./milestone/MilestoneDetails";
 import { formatDate } from "@/lib/utils";
-import { projectSchema } from "@/lib/types";
-import { Task, useTasks } from "@/hooks/useTasks";
+import { validateProject, validationErrorsToObject } from "@/lib/utils/validation";
+import {  useTasks } from "@/hooks/useTasks";
 import { 
   Plus, 
   Building2,
@@ -31,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import TaskCreateModal, { TaskUpdateModal } from "../task/shared/TaskModal";
 import { motion } from "framer-motion";
 import MilestoneCreateModal from "./milestone/MilestoneModal";
+import { Milestone, Project, Task } from "@/lib/types/schemas";
 
 interface ProjectDetailsProps {
   id: number;
@@ -145,13 +144,17 @@ export default function ProjectDetails({
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const validated = projectSchema.safeParse({
+      const validation = validateProject({
         ...projectDetails,
         remark: remark,
         status: "Completed",
       });
-      if (!validated.success) throw validated.error;
-      onSubmit(validated.data);
+      if (!validation.success) {
+        const error = new Error("Validation failed");
+        (error as any).issues = validation.errors;
+        throw error;
+      }
+      onSubmit(validation.data);
       setDisplaySubmissionModal(false);
     } catch (error) {
       console.error("Error updating project:", error);

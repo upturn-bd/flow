@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { complaintsTypeSchema } from "@/lib/types";
-import { z } from "zod";
+import { ComplaintsType } from "@/lib/types";
+import { validateComplaintsType, validationErrorsToObject } from "@/lib/utils/validation";
 import { Tag, X } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
-type FormValues = z.infer<typeof complaintsTypeSchema>;
+type FormValues = ComplaintsType;
 
 interface ComplaintsModalProps {
   onSubmit: (values: FormValues) => void;
@@ -30,17 +30,13 @@ export default function ComplaintTypeCreateModal({
   const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
-    const result = complaintsTypeSchema.safeParse(formValues);
+    const result = validateComplaintsType(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        const path = String(err.path[0]);
-        newErrors[path] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -51,7 +47,7 @@ export default function ComplaintTypeCreateModal({
     >
   ) => {
     const { name, value } = e.target;
-    setFormValues((prev) => ({
+    setFormValues((prev: FormValues) => ({
       ...prev,
       [name]: value,
     }));
@@ -60,21 +56,17 @@ export default function ComplaintTypeCreateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = complaintsTypeSchema.safeParse(formValues);
+    const result = validateComplaintsType(formValues);
 
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const path = String(issue.path[0]);
-        fieldErrors[path] = issue.message;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 

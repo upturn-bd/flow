@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Notice } from "@/lib/types/notice";
+import { Notice } from "@/lib/types";
 import { validateNotice, validationErrorsToObject } from "@/lib/utils/validation";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useNewsAndNoticesTypes } from "@/hooks/useNewsAndNotices";

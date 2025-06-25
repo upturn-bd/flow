@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { requisitionInventorySchema, requisitionTypeSchema } from "@/lib/types";
-import { z } from "zod";
+import { RequisitionInventory as RequisitionInventoryInterface, RequisitionType as RequisitionTypeInterface } from "@/lib/types";
+import { validateRequisitionType, validateRequisitionInventory, validationErrorsToObject } from "@/lib/utils/validation";
 import { RequisitionInventory, RequisitionType } from "@/hooks/useConfigTypes";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { useDepartments } from "@/hooks/useDepartments";
@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
-type FormValues = z.infer<typeof requisitionTypeSchema>;
+type FormValues = RequisitionTypeInterface;
 
 interface RequisitionTypesModalProps {
   onSubmit: (values: FormValues) => void;
@@ -43,17 +43,13 @@ export default function RequisitionTypeCreateModal({
   const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
-    const result = requisitionTypeSchema.safeParse(formValues);
+    const result = validateRequisitionType(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<FormValues> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof FormValues] =
-          err.message as unknown as undefined;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -73,21 +69,17 @@ export default function RequisitionTypeCreateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = requisitionTypeSchema.safeParse(formValues);
+    const result = validateRequisitionType(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<FormValues> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] =
-          issue.message as unknown as undefined;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 
@@ -191,9 +183,7 @@ export default function RequisitionTypeCreateModal({
   );
 }
 
-type RequisitionInventoryFormValues = z.infer<
-  typeof requisitionInventorySchema
->;
+type RequisitionInventoryFormValues = RequisitionInventoryInterface;
 
 interface RequisitionInventoryCreateModalProps {
   requisitionCategories: RequisitionType[];
@@ -242,17 +232,13 @@ export function RequisitionInventoryCreateModal({
   }, [fetchDepartments, fetchEmployees]);
 
   useEffect(() => {
-    const result = requisitionInventorySchema.safeParse(formValues);
+    const result = validateRequisitionInventory(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<RequisitionInventoryFormValues> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof RequisitionInventoryFormValues] =
-          err.message as unknown as undefined;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -283,21 +269,17 @@ export function RequisitionInventoryCreateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = requisitionInventorySchema.safeParse(formValues);
+    const result = validateRequisitionInventory(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<RequisitionInventoryFormValues> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof RequisitionInventoryFormValues] =
-          issue.message as unknown as undefined;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 
@@ -603,17 +585,13 @@ export function RequisitionInventoryUpdateModal({
   const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
-    const result = requisitionInventorySchema.safeParse(formValues);
+    const result = validateRequisitionInventory(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<RequisitionInventoryFormValues> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof RequisitionInventoryFormValues] =
-          err.message as unknown as undefined;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -645,21 +623,17 @@ export function RequisitionInventoryUpdateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = requisitionInventorySchema.safeParse(formValues);
+    const result = validateRequisitionInventory(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<RequisitionInventoryFormValues> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof RequisitionInventoryFormValues] =
-          issue.message as unknown as undefined;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 

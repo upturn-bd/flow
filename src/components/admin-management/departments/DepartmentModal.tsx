@@ -1,23 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Department } from "@/hooks/useDepartments";
-import { z } from "zod";
+import { Department } from "@/lib/types/schemas";
+import { validateDepartment, validationErrorsToObject } from "@/lib/utils/validation";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { Building, User, FileText, StackSimple } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
-const schema = z.object({
-  id: z.number().optional(),
-  name: z.string().min(1, "Name is required").max(50),
-  head_id: z.string().min(1, "Please select a department head"),
-  description: z.string().optional(),
-  division_id: z.number().optional(),
-});
-
-type FormValues = z.infer<typeof schema>;
+type FormValues = Department;
 
 interface DepartmentModalProps {
   initialData?: Department | null;
@@ -61,17 +53,13 @@ export default function DepartmentModal({
   const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
-    const result = schema.safeParse(formValues);
+    const result = validateDepartment(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        const path = String(err.path[0]);
-        newErrors[path] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -92,20 +80,17 @@ export default function DepartmentModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = schema.safeParse(formValues);
+    const result = validateDepartment(formValues);
 
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[String(issue.path[0])] = issue.message;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { claimTypeSchema } from "@/lib/types";
-import { z } from "zod";
+import { ClaimType as ClaimTypeInterface } from "@/lib/types";
+import { validateClaimType, validationErrorsToObject } from "@/lib/utils/validation";
 import { ClaimType } from "@/hooks/useConfigTypes";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
-type ClaimTypeFormValues = z.infer<typeof claimTypeSchema>;
+type ClaimTypeFormValues = ClaimTypeInterface;
 
 interface Position {
   id: number;
@@ -49,16 +49,13 @@ export function ClaimTypeCreateModal({
   const { employees: allSettlers, loading: loadingEmployees, fetchEmployees } = useEmployees();
 
   useEffect(() => {
-    const result = claimTypeSchema.safeParse(formValues);
+    const result = validateClaimType(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<ClaimTypeFormValues> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof ClaimTypeFormValues] = err.message as unknown as undefined;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -70,17 +67,17 @@ export function ClaimTypeCreateModal({
   ) => {
     const { name, value } = e.target;
     if (name === "allowance") {
-      setFormValues((prev) => ({
+      setFormValues((prev: any) => ({
         ...prev,
         [name]: Number(value),
       }));
     } else if (name === "settlement_level_id") {
-      setFormValues((prev) => ({
+      setFormValues((prev: any) => ({
         ...prev,
         [name]: value === "" ? undefined : Number(value),
       }));
     } else {
-      setFormValues((prev) => ({
+      setFormValues((prev: any) => ({
         ...prev,
         [name]: value,
       }));
@@ -90,20 +87,17 @@ export function ClaimTypeCreateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = claimTypeSchema.safeParse(formValues);
+    const result = validateClaimType(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<ClaimTypeFormValues> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof ClaimTypeFormValues] = issue.message as unknown as undefined; 
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 
@@ -129,20 +123,22 @@ export function ClaimTypeCreateModal({
   // Animation variants
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
+        staggerChildren: 0.1,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.2 } 
-    }
+      transition: {
+        duration: 0.2,
+      },
+    },
   };
 
   return (
@@ -189,37 +185,6 @@ export function ClaimTypeCreateModal({
             {errors.settlement_item && (
               <p className="text-red-500 text-sm mt-1">{errors.settlement_item}</p>
             )}
-          </div>
-
-          <div>
-            <label className="block font-semibold text-gray-700 mb-2">
-              Claim Level
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Buildings size={18} weight="duotone" className="text-gray-500" />
-              </div>
-              <select
-                name="settlement_level_id"
-                value={formValues.settlement_level_id ?? ""}
-                onChange={handleChange}
-                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none"
-              >
-                <option value="">Select Claim Level</option>
-                {allPositions.map((position) => (
-                  <option key={position.id} value={position.id}>
-                    {position.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {errors.settlement_level_id && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.settlement_level_id}
-              </p>
-            )}
-
-
           </div>
 
           <div>
@@ -309,10 +274,10 @@ export function ClaimTypeUpdateModal({
   isLoading = false,
 }: ClaimTypeUpdateModalProps) {
   const [formValues, setFormValues] = useState<ClaimTypeFormValues>({
-    settlement_item: "",
-    allowance: 0,
-    settler_id: "",
-    settlement_level_id: undefined
+    settlement_item: initialData.settlement_item || "",
+    allowance: initialData.allowance || 0,
+    settler_id: initialData.settler_id || "",
+    settlement_level_id: initialData.settlement_level_id || undefined,
   });
   const [errors, setErrors] = useState<Partial<ClaimTypeFormValues>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -326,16 +291,13 @@ export function ClaimTypeUpdateModal({
   }, [initialData]);
 
   useEffect(() => {
-    const result = claimTypeSchema.safeParse(formValues);
+    const result = validateClaimType(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<ClaimTypeFormValues> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof ClaimTypeFormValues] = err.message as unknown as undefined;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -350,13 +312,18 @@ export function ClaimTypeUpdateModal({
     >
   ) => {
     const { name, value } = e.target;
-    if (name === "allowance" || name === "settlement_level_id") {
-      setFormValues((prev) => ({
+    if (name === "allowance") {
+      setFormValues((prev: any) => ({
         ...prev,
         [name]: Number(value),
       }));
+    } else if (name === "settlement_level_id") {
+      setFormValues((prev: any) => ({
+        ...prev,
+        [name]: value === "" ? undefined : Number(value),
+      }));
     } else {
-      setFormValues((prev) => ({
+      setFormValues((prev: any) => ({
         ...prev,
         [name]: value,
       }));
@@ -366,20 +333,17 @@ export function ClaimTypeUpdateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = claimTypeSchema.safeParse(formValues);
+    const result = validateClaimType(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<ClaimTypeFormValues> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof ClaimTypeFormValues] = issue.message as unknown as undefined; 
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 
@@ -405,20 +369,22 @@ export function ClaimTypeUpdateModal({
   // Animation variants
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
+        staggerChildren: 0.1,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.2 } 
-    }
+      transition: {
+        duration: 0.2,
+      },
+    },
   };
 
   return (
@@ -464,40 +430,6 @@ export function ClaimTypeUpdateModal({
             </div>
             {errors.settlement_item && (
               <p className="text-red-500 text-sm mt-1">{errors.settlement_item}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block font-semibold text-gray-700 mb-2">
-              Claim Level
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Buildings size={18} weight="duotone" className="text-gray-500" />
-              </div>
-              <select
-                name="settlement_level_id"
-                value={formValues.settlement_level_id}
-                onChange={handleChange}
-                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
-              >
-                <option value={undefined}>Select Claim Level</option>
-                {allPositions.map((position) => (
-                  <option key={position.id} value={position.id}>
-                    {position.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {errors.settlement_level_id && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.settlement_level_id}
-              </p>
-            )}
-            {formValues.settlement_level_id === undefined && (
-              <p className="text-red-500 text-sm mt-1">
-                Please select a claim level.
-              </p>
             )}
           </div>
 
@@ -569,8 +501,8 @@ export function ClaimTypeUpdateModal({
               isLoading ||
               isSubmitting ||
               !isValid ||
-              Object.keys(errors).length > 0 ||
-              !isDirty
+              !isDirty ||
+              Object.keys(errors).length > 0
             }
             className="bg-gray-800 hover:bg-gray-900 text-white"
           >

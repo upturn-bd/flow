@@ -7,10 +7,10 @@ import {
   updateProject as updateProjectApi, 
   deleteProject as deleteProjectApi 
 } from "@/lib/api/operations-and-services/project";
-import { projectSchema } from "@/lib/types";
-import { z } from "zod";
+import { Project } from "@/lib/types/schemas";
 
-export type Project = z.infer<typeof projectSchema>;
+// Re-export Project type for components
+export type { Project };
 
 export function useProjects() {
   const [projects, setProjects] = useState<Project[]>([]);

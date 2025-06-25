@@ -6,11 +6,10 @@ import {
   getSchoolings,
   updateSchooling,
 } from "@/lib/api/hris";
-import { schoolingSchema } from "@/lib/types";
+import { Schooling } from "@/lib/types";
 import { useState, useCallback } from "react";
-import { z } from "zod";
 
-export type Education = z.infer<typeof schoolingSchema>;
+export type Education = Schooling;
 
 export function useEducation() {
   const [education, setEducation] = useState<Education[]>([]);

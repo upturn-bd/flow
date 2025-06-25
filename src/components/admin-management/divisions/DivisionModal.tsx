@@ -1,22 +1,13 @@
 "use client";
 
-import { z } from "zod";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { dirtyValuesChecker } from "@/lib/utils";
-import { Division } from "@/hooks/useDivisions";
+import { Division } from "@/lib/types/schemas";
+import { validateDivision, validationErrorsToObject } from "@/lib/utils/validation";
 import { Layers, User, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
-
-// Define the schema using Zod
-const schema = z.object({
-  id: z.number().optional(),
-  name: z.string().min(1, "Name is required").max(50),
-  head_id: z.string().min(1, "Please select a division head"),
-  company_id: z.union([z.string(), z.number()]).optional(),
-  created_at: z.string().optional(),
-});
 
 interface DivisionModalProps {
   initialData?: Division | null;
@@ -62,12 +53,9 @@ export default function DivisionModal({
   };
 
   useEffect(() => {
-    const result = schema.safeParse(formValues);
+    const result = validateDivision(formValues);
     if (!result.success) {
-      const fieldErrors: Partial<Division> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof Division] = issue.message as any;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsValid(false);
     } else {
@@ -99,13 +87,10 @@ export default function DivisionModal({
     e.preventDefault();
     setIsSubmitting(true);
 
-    const result = schema.safeParse(formValues);
+    const result = validateDivision(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<Division> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof Division] = issue.message as any;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;

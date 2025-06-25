@@ -11,9 +11,9 @@ export type EmployeeInfo = {
   name: string;
   role: string;
   has_approval: string;
-  company_id?: string;
-  supervisor_id?: string;
-  department_id?: string;
+  company_id?: string | number;
+  supervisor_id?: string | null;
+  department_id?: string | number;
   email?: string;
   phone_number?: string;
   designation?: string;

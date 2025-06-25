@@ -4,11 +4,11 @@ import { createClient } from "@/lib/supabase/client";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { leaveSchema } from "@/lib/types";
+import { Leave } from "@/lib/types";
+import { validateLeave, validationErrorsToObject } from "@/lib/utils/validation";
 import React, { useEffect, useState } from "react";
 import { Calendar, CheckCircle, Clock, Info } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { z } from "zod";
 import { motion } from "framer-motion";
 
 const initialLeaveRecord = {
@@ -19,7 +19,7 @@ const initialLeaveRecord = {
   status: "Pending",
 };
 
-export type LeaveState = z.infer<typeof leaveSchema>;
+export type LeaveState = Leave;
 
 const leaveBalanceData = [
   {
@@ -57,9 +57,9 @@ export default function LeaveCreatePage() {
   ) => {
     const { name, value } = e.target;
     if (name === "type_id") {
-      setLeaveRecord((prev) => ({ ...prev, [name]: Number(value) }));
+      setLeaveRecord((prev: any) => ({ ...prev, [name]: Number(value) }));
     } else {
-      setLeaveRecord((prev) => ({ ...prev, [name]: value }));
+      setLeaveRecord((prev: any) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -107,16 +107,13 @@ export default function LeaveCreatePage() {
   }, [leaveRecord.start_date, leaveRecord.end_date]);
 
   useEffect(() => {
-    const result = leaveSchema.safeParse(leaveRecord);
+    const result = validateLeave(leaveRecord);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<Record<keyof LeaveState, string>> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof LeaveState] = err.message as string;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [leaveRecord]);

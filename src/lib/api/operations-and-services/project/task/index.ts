@@ -1,8 +1,8 @@
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { taskSchema } from "@/lib/types";
+import { Task } from "@/lib/types";
+import { validateTask } from "@/lib/utils/validation";
 
 export interface TaskFilters {
   projectId?: number;
@@ -88,20 +88,24 @@ export async function getTaskById(taskId: number) {
   return data;
 }
 
-export async function createTask(payload: z.infer<typeof taskSchema>) {
+export async function createTask(payload: Task) {
   const company_id = await getCompanyId();
   const user = await getEmployeeInfo();
 
-  const validated = taskSchema.safeParse({
+  const validation = validateTask({
     ...payload,
     created_by: user.id
   });
-  if (!validated.success) throw validated.error;
+  if (!validation.success) {
+    const error = new Error("Validation failed");
+    (error as any).issues = validation.errors;
+    throw error;
+  }
 
   const { data, error } = await supabase
     .from("task_records")
     .insert({
-      ...validated.data,
+      ...validation.data,
       company_id,
     })
     .select()
@@ -111,20 +115,24 @@ export async function createTask(payload: z.infer<typeof taskSchema>) {
   return data;
 }
 
-export async function updateTask(payload: z.infer<typeof taskSchema>) {
+export async function updateTask(payload: Task) {
   const company_id = await getCompanyId();
   const user = await getEmployeeInfo();
 
-  const validated = taskSchema.safeParse({
+  const validation = validateTask({
     ...payload,
     updated_by: user.id,
     updated_at: new Date().toISOString()
   });
-  if (!validated.success) throw validated.error;
+  if (!validation.success) {
+    const error = new Error("Validation failed");
+    (error as any).issues = validation.errors;
+    throw error;
+  }
 
   const { data, error } = await supabase
     .from("task_records")
-    .update(validated.data)
+    .update(validation.data)
     .eq("id", payload.id)
     .eq("company_id", company_id)
     .select()

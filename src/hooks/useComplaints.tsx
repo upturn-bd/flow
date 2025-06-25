@@ -4,15 +4,9 @@ import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { z } from "zod";
+import { ComplaintsType } from "@/lib/types/schemas";
 
-const complaintTypeSchema = z.object({
-  id: z.number().optional(),
-  name: z.string().min(1, "Name is required"),
-  company_id: z.number().optional(),
-});
-
-export type ComplaintType = z.infer<typeof complaintTypeSchema>;
+export type ComplaintType = ComplaintsType;
 
 export interface ComplaintState {
   id: number;

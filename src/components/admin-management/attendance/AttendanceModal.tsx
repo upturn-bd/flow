@@ -2,9 +2,8 @@
 import dynamic from "next/dynamic";
 const ClientMap = dynamic(() => import("./ClientMap"), { ssr: false });
 import { useEffect, useState } from "react";
-import { siteSchema } from "@/lib/types";
-import { z } from "zod";
-import { Site } from "@/hooks/useAttendanceManagement";
+import { validateSite, validationErrorsToObject } from "@/lib/utils/validation";
+import { Site } from "@/lib/types";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { MapPin, Clock, ClockClockwise, Buildings, X } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,7 @@ type Coordinates = {
   lng: number;
 };
 
-type FormValues = z.infer<typeof siteSchema>;
+type FormValues = Site;
 
 interface AttendanceCreateModalProps {
   onSubmit: (values: FormValues) => void;
@@ -50,16 +49,13 @@ export default function AttendanceCreateModal({
   const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
-    const result = siteSchema.safeParse(formValues);
+    const result = validateSite(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<FormValues> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof FormValues] = err.message as any;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -77,20 +73,17 @@ export default function AttendanceCreateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = siteSchema.safeParse(formValues);
+    const result = validateSite(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<FormValues> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] = issue.message as any;
-      }
-      setErrors(fieldErrors);
+      const newErrors = validationErrorsToObject(result.errors);
+      setErrors(newErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 
@@ -291,16 +284,13 @@ export function AttendanceUpdateModal({
   const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
-    const result = siteSchema.safeParse(formValues);
+    const result = validateSite(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<FormValues> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof FormValues] = err.message as any;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -318,20 +308,17 @@ export function AttendanceUpdateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = siteSchema.safeParse(formValues);
+    const result = validateSite(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<FormValues> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] = issue.message as any;
-      }
-      setErrors(fieldErrors);
+      const newErrors = validationErrorsToObject(result.errors);
+      setErrors(newErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 

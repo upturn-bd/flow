@@ -1,9 +1,9 @@
 "use client";
 
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/api/employee";
-import { schoolingSchema, experienceSchema } from "@/lib/types";
+import { Schooling, Experience } from "@/lib/types";
+import { validateSchooling, validateExperience } from "@/lib/utils/validation";
 import { getCompanyId } from "../company/companyInfo";
 import { getEmployeeId } from "../employee";
 
@@ -22,16 +22,20 @@ export async function getSchoolings() {
 }
 
 export async function createSchooling(
-  payload: z.infer<typeof schoolingSchema>
+  payload: Schooling
 ) {
   const company_id = await getCompanyId();
   const uid = await getEmployeeId();
 
-  const validated = schoolingSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
+  const validation = validateSchooling(payload);
+  if (!validation.success) {
+    const error = new Error("Validation failed");
+    (error as any).issues = validation.errors;
+    throw error;
+  }
 
   const { data, error } = await supabase.from("schoolings").insert({
-    ...validated.data,
+    ...validation.data,
     company_id,
     employee_id: uid,
   });
@@ -62,17 +66,21 @@ export async function uploadFile(
 }
 
 export async function updateSchooling(
-  payload: z.infer<typeof schoolingSchema>
+  payload: Schooling
 ) {
   const company_id = await getCompanyId();
   const uid = await getEmployeeId();
 
-  const validated = schoolingSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
+  const validation = validateSchooling(payload);
+  if (!validation.success) {
+    const error = new Error("Validation failed");
+    (error as any).issues = validation.errors;
+    throw error;
+  }
 
   const { data, error } = await supabase
     .from("schoolings")
-    .update({ ...validated.data })
+    .update({ ...validation.data })
     .eq("id", payload.id)
     .eq("employee_id", uid)
     .eq("company_id", company_id);
@@ -111,16 +119,20 @@ export async function getExperiences() {
 }
 
 export async function createExperience(
-  payload: z.infer<typeof experienceSchema>
+  payload: Experience
 ) {
   const company_id = await getCompanyId();
   const uid = await getEmployeeId();
 
-  const validated = experienceSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
+  const validation = validateExperience(payload);
+  if (!validation.success) {
+    const error = new Error("Validation failed");
+    (error as any).issues = validation.errors;
+    throw error;
+  }
 
   const { data, error } = await supabase.from("experiences").insert({
-    ...validated.data,
+    ...validation.data,
     company_id,
     employee_id: uid,
   });
@@ -130,17 +142,21 @@ export async function createExperience(
 }
 
 export async function updateExperience(
-  payload: z.infer<typeof experienceSchema>
+  payload: Experience
 ) {
   const company_id = await getCompanyId();
   const uid = await getEmployeeId();
 
-  const validated = experienceSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
+  const validation = validateExperience(payload);
+  if (!validation.success) {
+    const error = new Error("Validation failed");
+    (error as any).issues = validation.errors;
+    throw error;
+  }
 
   const { data, error } = await supabase
     .from("experiences")
-    .update({ ...validated.data })
+    .update({ ...validation.data })
     .eq("employee_id", uid)
     .eq("company_id", company_id);
 

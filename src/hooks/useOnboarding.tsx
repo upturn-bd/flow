@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { z } from "zod";
 
 // Types for onboarding
 export interface OnboardingData {

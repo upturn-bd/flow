@@ -1,16 +1,4 @@
 /**
- * Type definitions for notice-related objects
- * These replace the Zod schemas
+ * Additional notice-related types and utilities
+ * The Notice interface is exported from schemas.ts
  */
-
-export interface Notice {
-  id?: number;
-  notice_type_id: number;
-  title: string;
-  description: string;
-  urgency: string;
-  valid_from: string;
-  valid_till: string;
-  company_id?: number;
-  department_id?: number;
-}

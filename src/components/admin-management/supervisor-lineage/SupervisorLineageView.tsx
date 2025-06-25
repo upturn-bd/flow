@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
 import { useLineage } from "@/hooks/useSupervisorLineage";
+import { Lineage } from "@/lib/types/schemas";
 import LineageCreateModal, {
   LineageUpdateModal,
 } from "./SupervisorLineageModal";
 import { TrashSimple, Plus, Eye, UsersThree } from "@phosphor-icons/react";
-import { lineageSchema } from "@/lib/types";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -55,7 +54,7 @@ export default function SupervisorLineageView() {
   >([]);
 
   const handleCreateLineage = async (
-    values: z.infer<typeof lineageSchema>[]
+    values: Lineage[]
   ) => {
     try {
       await createLineage(values);
@@ -67,7 +66,7 @@ export default function SupervisorLineageView() {
   };
 
   const handleUpdateLineage = async (
-    values: z.infer<typeof lineageSchema>[]
+    values: Lineage[]
   ) => {
     try {
       await updateLineage(values);

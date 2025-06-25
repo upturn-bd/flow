@@ -3,15 +3,12 @@ import TaskCreateModal, {
   TaskUpdateModal,
 } from "./shared/TaskModal";
 import { useTasks } from "@/hooks/useTasks";
-import { taskSchema } from "@/lib/types";
+import { Task } from "@/lib/types/schemas";
 import { useEffect, useState } from "react";
-import { z } from "zod";
 import TaskDetails from "./shared/TaskDetails";
 import { motion, AnimatePresence } from "framer-motion";
 import { Edit, Trash2, ExternalLink, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
-type Task = z.infer<typeof taskSchema>;
 
 export default function TaskPage() {
   const { tasks, loading, fetchTasks, updateTask, deleteTask } = useTasks();

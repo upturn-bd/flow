@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { newsAndNoticeTypeSchema } from "@/lib/types";
-import { z } from "zod";
+import { NewsAndNoticeType } from "@/lib/types";
+import { validateNewsAndNoticeType, validationErrorsToObject } from "@/lib/utils/validation";
 import { NewspaperClipping, X, Tag } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
 
-type FormValues = z.infer<typeof newsAndNoticeTypeSchema>;
+type FormValues = NewsAndNoticeType;
 
 interface NewsAndNoticesModalProps {
   onSubmit: (values: FormValues) => void;
@@ -30,16 +30,13 @@ export default function NewsAndNoticesCreateModal({
   const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
-    const result = newsAndNoticeTypeSchema.safeParse(formValues);
+    const result = validateNewsAndNoticeType(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof FormValues] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -50,7 +47,7 @@ export default function NewsAndNoticesCreateModal({
     >
   ) => {
     const { name, value } = e.target;
-    setFormValues((prev) => ({
+    setFormValues((prev: any) => ({
       ...prev,
       [name]: value,
     }));
@@ -59,20 +56,17 @@ export default function NewsAndNoticesCreateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = newsAndNoticeTypeSchema.safeParse(formValues);
+    const result = validateNewsAndNoticeType(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<FormValues> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof FormValues] = issue.message as any;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
     }
 
     setErrors({});
-    onSubmit(result.data);
+    onSubmit(result.data!);
     setIsSubmitting(false);
   };
 

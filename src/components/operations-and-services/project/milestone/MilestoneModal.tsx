@@ -8,11 +8,11 @@ import {
   X,
   Check,
 } from "lucide-react";
-import { Milestone } from "@/hooks/useMilestones";
 import { useEmployees } from "@/hooks/useEmployees";
-import { milestoneSchema } from "@/lib/types";
+import { validateMilestone, validationErrorsToObject } from "@/lib/utils/validation";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { Milestone } from "@/lib/types/schemas";
 
 interface MilestoneCreateModalProps {
   currentTotalWeightage: number;
@@ -55,14 +55,10 @@ export default function MilestoneCreateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = milestoneSchema.safeParse(milestone);
+    const result = validateMilestone(milestone);
 
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const path = String(issue.path[0]);
-        fieldErrors[path] = issue.message;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
@@ -105,17 +101,13 @@ export default function MilestoneCreateModal({
   }, [fetchEmployees]);
 
   useEffect(() => {
-    const result = milestoneSchema.safeParse(milestone);
+    const result = validateMilestone(milestone);
     if (result.success) {
       setIsMilestoneValid(true);
       setErrors({});
     } else {
       setIsMilestoneValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        const path = String(err.path[0]);
-        newErrors[path] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [milestone]);
@@ -422,14 +414,10 @@ export function MilestoneUpdateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = milestoneSchema.safeParse(milestone);
+    const result = validateMilestone(milestone);
 
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const path = String(issue.path[0]);
-        fieldErrors[path] = issue.message;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;
@@ -467,17 +455,13 @@ export function MilestoneUpdateModal({
   }, [fetchEmployees]);
 
   useEffect(() => {
-    const result = milestoneSchema.safeParse(milestone);
+    const result = validateMilestone(milestone);
     if (result.success) {
       setIsMilestoneValid(true);
       setErrors({});
     } else {
       setIsMilestoneValid(false);
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        const path = String(err.path[0]);
-        newErrors[path] = err.message;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [milestone]);

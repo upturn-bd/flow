@@ -1,8 +1,8 @@
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { projectSchema } from "@/lib/types";
+import { Project } from "@/lib/types";
+import { validateProject } from "@/lib/utils/validation";
 
 export async function getProjects() {
   const company_id = await getCompanyId();
@@ -43,11 +43,15 @@ export async function getProjects() {
   return formatData;
 }
 
-export async function createProject(payload: z.infer<typeof projectSchema>): Promise<{ id: number }> {
+export async function createProject(payload: Project): Promise<{ id: number }> {
   const company_id = await getCompanyId();
 
-  const validated = projectSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
+  const validation = validateProject(payload);
+  if (!validation.success) {
+    const error = new Error("Validation failed");
+    (error as any).issues = validation.errors;
+    throw error;
+  }
 
   const { data, error } = await supabase.from("project_records").insert({
     ...payload,
@@ -58,13 +62,17 @@ export async function createProject(payload: z.infer<typeof projectSchema>): Pro
   return data;
 }
 
-export async function updateProject(payload: z.infer<typeof projectSchema>) {
+export async function updateProject(payload: Project) {
   const company_id = await getCompanyId();
 
   console.log("payload", payload);
 
-  const validated = projectSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
+  const validation = validateProject(payload);
+  if (!validation.success) {
+    const error = new Error("Validation failed");
+    (error as any).issues = validation.errors;
+    throw error;
+  }
 
   const { data, error } = await supabase
     .from("project_records")

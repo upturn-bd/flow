@@ -233,7 +233,7 @@ export default function MilestoneDetails({
                 <span className="font-medium text-gray-700">Assignees:</span>
                 <div className="flex flex-wrap gap-2">
                   {(milestoneDetails?.assignees && milestoneDetails.assignees.length > 0) ? (
-                    milestoneDetails.assignees.map((assignee, i) => (
+                    milestoneDetails.assignees.map((assignee: string, i: number) => (
                       <span
                         key={i}
                         className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full"

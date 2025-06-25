@@ -1,13 +1,13 @@
 "use client";
 
-
-import { siteSchema } from "@/lib/types";
+import { Site } from "@/lib/types";
+import { validateSite } from "@/lib/utils/validation";
 import { useState, useCallback } from "react";
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
 
-export type Site = z.infer<typeof siteSchema>;
+// Re-export Site type for components
+export type { Site };
 
 export function useSites() {
   const [sites, setSites] = useState<Site[]>([]);
@@ -41,8 +41,12 @@ export function useSites() {
       const company_id = await getCompanyId();
       
       // Validate the payload
-      const validated = siteSchema.safeParse(values);
-      if (!validated.success) throw validated.error;
+      const validation = validateSite(values);
+      if (!validation.success) {
+        const error = new Error("Validation failed");
+        (error as any).issues = validation.errors;
+        throw error;
+      }
 
       const { data, error } = await supabase.from("sites").insert({
         ...values,
@@ -62,8 +66,12 @@ export function useSites() {
       const company_id = await getCompanyId();
       
       // Validate the payload
-      const validated = siteSchema.safeParse(values);
-      if (!validated.success) throw validated.error;
+      const validation = validateSite(values);
+      if (!validation.success) {
+        const error = new Error("Validation failed");
+        (error as any).issues = validation.errors;
+        throw error;
+      }
 
       const { data, error } = await supabase
         .from("sites")

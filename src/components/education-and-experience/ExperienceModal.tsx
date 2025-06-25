@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { Experience } from "@/hooks/useExperience";
-import { experienceSchema } from "@/lib/types";
+import { validateExperience, validationErrorsToObject } from "@/lib/utils/validation";
 
 interface ExperienceModalProps {
   initialData?: Experience | null;
@@ -37,16 +37,13 @@ export default function ExperienceModal({
   const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
-    const result = experienceSchema.safeParse(formValues);
+    const result = validateExperience(formValues);
     if (result.success) {
       setIsValid(true);
       setErrors({});
     } else {
       setIsValid(false);
-      const newErrors: Partial<Experience> = {};
-      result.error.errors.forEach((err) => {
-        newErrors[err.path[0] as keyof Experience] = err.message as any;
-      });
+      const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
   }, [formValues]);
@@ -63,13 +60,10 @@ export default function ExperienceModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = experienceSchema.safeParse(formValues);
+    const result = validateExperience(formValues);
 
     if (!result.success) {
-      const fieldErrors: Partial<Experience> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[issue.path[0] as keyof Experience] = issue.message as any;
-      }
+      const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
       setIsSubmitting(false);
       return;

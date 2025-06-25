@@ -5,8 +5,6 @@ import { FiUploadCloud } from "react-icons/fi";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { IoMdCalendar } from "react-icons/io";
 import { useEmployees } from "@/hooks/useEmployees";
-import { z } from "zod";
-import { requisitionSchema } from "@/lib/types";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
@@ -74,7 +72,7 @@ interface RequisitionDraftPageProps {
   onClose: () => void;
 }
 
-export type RequisitionState = z.infer<typeof requisitionSchema>;
+export type RequisitionState = RequisitionFormState;
 
 // Define a type to handle draft with ID
 interface RequisitionDraft extends Omit<RequisitionFormState, "attachments"> {

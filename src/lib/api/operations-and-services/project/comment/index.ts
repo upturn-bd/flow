@@ -1,7 +1,7 @@
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { commentSchema } from "@/lib/types";
+import { Comment } from "@/lib/types";
+import { validateComment } from "@/lib/utils/validation";
 
 export async function getComments() {
   const company_id = await getCompanyId();
@@ -15,11 +15,15 @@ export async function getComments() {
   return data;
 }
 
-export async function createComment(payload: z.infer<typeof commentSchema>) {
+export async function createComment(payload: Comment) {
   const company_id = await getCompanyId();
 
-  const validated = commentSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
+  const validation = validateComment(payload);
+  if (!validation.success) {
+    const error = new Error("Validation failed");
+    (error as any).issues = validation.errors;
+    throw error;
+  }
 
   const { data, error } = await supabase.from("comments").insert({
     ...payload,
@@ -30,11 +34,15 @@ export async function createComment(payload: z.infer<typeof commentSchema>) {
   return data;
 }
 
-export async function updateComment(payload: z.infer<typeof commentSchema>) {
+export async function updateComment(payload: Comment) {
   const company_id = await getCompanyId();
 
-  const validated = commentSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
+  const validation = validateComment(payload);
+  if (!validation.success) {
+    const error = new Error("Validation failed");
+    (error as any).issues = validation.errors;
+    throw error;
+  }
 
   const { data, error } = await supabase
     .from("comments")

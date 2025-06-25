@@ -1,7 +1,7 @@
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { claimTypeSchema } from "@/lib/types";
+import { ClaimType } from "@/lib/types/schemas";
+import { validateClaimType } from "@/lib/utils/validation";
 
 export async function getClaimTypes() {
   const company_id = await getCompanyId();
@@ -16,12 +16,12 @@ export async function getClaimTypes() {
 }
 
 export async function createClaimType(
-  payload: z.infer<typeof claimTypeSchema>
+  payload: ClaimType
 ) {
   const company_id = await getCompanyId();
 
-  const validated = claimTypeSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
+  const validated = validateClaimType(payload);
+  if (!validated.success) throw new Error(validated.errors.map(e => e.message).join(', '));
 
   const { data, error } = await supabase.from("settlement_types").insert({
     ...payload,
@@ -33,12 +33,12 @@ export async function createClaimType(
 }
 
 export async function updateClaimType(
-  payload: z.infer<typeof claimTypeSchema>
+  payload: ClaimType
 ) {
   const company_id = await getCompanyId();
 
-  const validated = claimTypeSchema.safeParse(payload);
-  if (!validated.success) throw validated.error;
+  const validated = validateClaimType(payload);
+  if (!validated.success) throw new Error(validated.errors.map(e => e.message).join(', '));
 
   const { data, error } = await supabase
     .from("settlement_types")
