@@ -1,13 +1,11 @@
 "use client";
-import NoticeCreateModal, {
-  NoticeUpdateModal,
-} from "@/components/operations-and-services/notice/NoticeModal";
 import { Notice, useNotices } from "@/hooks/useNotice";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Pencil, Trash2, Plus, Clock, CalendarDays, Info, Loader2 } from "lucide-react";
+import { Bell, Pencil, Trash2, Plus, Clock, CalendarDays, Info } from "lucide-react";
 import { toast } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { NoticeUpdateModal, NoticeCreateModal } from "@/components/operations-and-services/notice/NoticeModal";
 
 export default function NoticePage() {
   const {

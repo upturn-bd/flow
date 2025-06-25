@@ -488,11 +488,11 @@ export function RequisitionInventoryCreateModal({
               </div>
               <select
                 name="requisition_category_id"
-                value={formValues.requisition_category_id}
+                value={formValues.requisition_category_id ?? ""}
                 onChange={handleChange}
-                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none"
               >
-                <option value={undefined}>Select Category</option>
+                <option value="">Select Category</option>
                 {requisitionCategories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -505,11 +505,7 @@ export function RequisitionInventoryCreateModal({
                 {errors.requisition_category_id}
               </p>
             )}
-            {formValues.department_id === undefined && (
-              <p className="text-red-500 text-sm mt-1">
-                Please select a category.
-              </p>
-            )}
+
           </div>
 
           <div>
@@ -526,11 +522,11 @@ export function RequisitionInventoryCreateModal({
               </div>
               <select
                 name="department_id"
-                value={formValues.department_id}
+                value={formValues.department_id ?? ""}
                 onChange={handleChange}
-                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none"
               >
-                <option value={undefined}>Select Department</option>
+                <option value="">Select Department</option>
                 {departments.map((department) => (
                   <option key={department.id} value={department.id}>
                     {department.name}
@@ -543,11 +539,7 @@ export function RequisitionInventoryCreateModal({
                 {errors.department_id}
               </p>
             )}
-            {formValues.department_id === undefined && (
-              <p className="text-red-500 text-sm mt-1">
-                Please select a department
-              </p>
-            )}
+
           </div>
         </motion.div>
 
@@ -632,14 +624,15 @@ export function RequisitionInventoryUpdateModal({
     >
   ) => {
     const { name, value } = e.target;
-    if (
-      name === "quantity" ||
-      name === "requisition_category_id" ||
-      name === "department_id"
-    ) {
+    if (name === "quantity") {
       setFormValues((prev) => ({
         ...prev,
         [name]: Number(value),
+      }));
+    } else if (name === "requisition_category_id" || name === "department_id") {
+      setFormValues((prev) => ({
+        ...prev,
+        [name]: value === "" ? undefined : Number(value),
       }));
     } else {
       setFormValues((prev) => ({

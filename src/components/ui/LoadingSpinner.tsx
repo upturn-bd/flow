@@ -1,7 +1,7 @@
 import { LucideIcon } from "lucide-react";
 import { cn } from "./class";
 
-type ColorType = "blue" | "emerald" | "purple" | "amber" | "red" | "gray";
+export type ColorType = "blue" | "emerald" | "purple" | "amber" | "red" | "gray";
 
 type LoadingSpinnerProps = {
   /** Optional icon to display in the center of the spinner */

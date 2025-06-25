@@ -253,21 +253,6 @@ export const complaintRecordSchema = z.object({
   attachments: z.array(z.string()).optional(),
 });
 
-export const noticeSchema = z.object({
-  id: z.number().optional(),
-  notice_type_id: z.number().optional(),
-  title: z
-    .string()
-    .min(1, { message: "Please enter a title" })
-    .max(200, { message: "Title must be 200 characters or fewer" }),
-  description: z.string().min(1, { message: "Please enter a description" }),
-  urgency: z.string().min(1, { message: "Please select an urgency level" }),
-  valid_from: z.string().min(1, { message: "Please select a start date" }),
-  valid_till: z.string().min(1, { message: "Please select an end date" }),
-  company_id: z.number().optional(),
-  department_id: z.number().optional(),
-});
-
 export const attendanceSchema = z.object({
   id: z.number().optional(),
   attendance_date: z

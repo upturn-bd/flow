@@ -1,14 +1,13 @@
 "use client";
 
-
-import { noticeSchema } from "@/lib/types";
+import { Notice } from "@/lib/types/notice";
+import { validateNotice } from "@/lib/utils/validation";
 import { useState, useCallback } from "react";
-import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/api/employee";
 import { getCompanyId } from "@/lib/api/company/companyInfo";
 
-export type Notice = z.infer<typeof noticeSchema>;
+export type { Notice };
 
 export function useNotices() {
   const [notices, setNotices] = useState<Notice[]>([]);
@@ -28,7 +27,7 @@ export function useNotices() {
           .from("notice_records")
           .select("*")
           .eq("company_id", company_id)
-          .eq("department_id", user.department_id)
+          .or(`department_id.eq.${user.department_id},department_id.is.null`)
           .gte("valid_till", currentDate)
           .order("valid_from", { ascending: false }));
       } else {
@@ -56,8 +55,12 @@ export function useNotices() {
       const company_id = await getCompanyId();
       
       // Validate the payload
-      const validated = noticeSchema.safeParse(values);
-      if (!validated.success) throw validated.error;
+      const validation = validateNotice(values);
+      if (!validation.success) {
+        const error = new Error("Validation failed");
+        (error as any).issues = validation.errors;
+        throw error;
+      }
 
       const { data, error } = await supabase
         .from("notice_records")
@@ -79,8 +82,12 @@ export function useNotices() {
       const company_id = await getCompanyId();
       
       // Validate the payload
-      const validated = noticeSchema.safeParse(values);
-      if (!validated.success) throw validated.error;
+      const validation = validateNotice(values);
+      if (!validation.success) {
+        const error = new Error("Validation failed");
+        (error as any).issues = validation.errors;
+        throw error;
+      }
 
       const { data, error } = await supabase
         .from("notice_records")

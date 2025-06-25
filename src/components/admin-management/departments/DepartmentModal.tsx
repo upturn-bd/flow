@@ -83,7 +83,7 @@ export default function DepartmentModal({
   ) => {
     const { name, value } = e.target;
     if (name === "division_id") {
-      setFormValues((prev) => ({ ...prev, [name]: parseInt(value) }));
+      setFormValues((prev) => ({ ...prev, [name]: value === "" ? undefined : parseInt(value) }));
     } else {
       setFormValues((prev) => ({ ...prev, [name]: value }));
     }
@@ -226,11 +226,11 @@ export default function DepartmentModal({
               </div>
               <select
                 name="division_id"
-                value={formValues.division_id}
+                value={formValues.division_id ?? ""}
                 onChange={handleChange}
-                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all appearance-none"
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none"
               >
-                <option value={undefined}>Select Division</option>
+                <option value="">Select Division</option>
                 {divisions.map((division) => (
                   <option key={division.id} value={division.id}>
                     {division.name}
@@ -241,11 +241,7 @@ export default function DepartmentModal({
             {errors.division_id && (
               <p className="text-red-500 text-sm mt-1">{errors.division_id}</p>
             )}
-            {formValues.division_id === undefined && (
-              <p className="text-red-500 text-sm mt-1">
-                Please select a division
-              </p>
-            )}
+
           </div>
 
           <div>
@@ -291,8 +287,7 @@ export default function DepartmentModal({
               isLoading ||
               isSubmitting ||
               !isValid ||
-              (initialData! && !isDirty) ||
-              formValues.division_id === undefined
+              (initialData! && !isDirty)
             }
             className="bg-gray-800 hover:bg-gray-700 text-white"
           >

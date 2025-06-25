@@ -90,6 +90,10 @@ export default function Sidebar() {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href);
+
+          if(item.href === "/home"){
+            return (<div key="none"></div>);
+          }
           
           return (
             <motion.div

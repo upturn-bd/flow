@@ -69,10 +69,15 @@ export function ClaimTypeCreateModal({
     >
   ) => {
     const { name, value } = e.target;
-    if (name === "allowance" || name === "settlement_level_id") {
+    if (name === "allowance") {
       setFormValues((prev) => ({
         ...prev,
         [name]: Number(value),
+      }));
+    } else if (name === "settlement_level_id") {
+      setFormValues((prev) => ({
+        ...prev,
+        [name]: value === "" ? undefined : Number(value),
       }));
     } else {
       setFormValues((prev) => ({
@@ -196,11 +201,11 @@ export function ClaimTypeCreateModal({
               </div>
               <select
                 name="settlement_level_id"
-                value={formValues.settlement_level_id}
+                value={formValues.settlement_level_id ?? ""}
                 onChange={handleChange}
-                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all appearance-none"
+                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none"
               >
-                <option value={undefined}>Select Claim Level</option>
+                <option value="">Select Claim Level</option>
                 {allPositions.map((position) => (
                   <option key={position.id} value={position.id}>
                     {position.name}
@@ -214,11 +219,7 @@ export function ClaimTypeCreateModal({
               </p>
             )}
 
-            {formValues.settlement_level_id === undefined && (
-              <p className="text-red-500 text-sm mt-1">
-                Please select a claim level.
-              </p>
-            )}
+
           </div>
 
           <div>
