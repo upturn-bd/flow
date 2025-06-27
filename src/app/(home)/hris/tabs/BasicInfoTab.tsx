@@ -297,8 +297,8 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                                 touched={!!touched[field.name as keyof BasicInfoFormData]}
                                 options={
                                   field.name === "department_id"
-                                    ? departments.map((dep) => ({
-                                        value: dep.id.toString(),
+                                    ? departments.filter(dep => dep.id != null).map((dep) => ({
+                                        value: dep.id!.toString(),
                                         label: dep.name,
                                       }))
                                     : field.name === "job_status"

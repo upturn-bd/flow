@@ -37,8 +37,11 @@ export function useCompanyInfo() {
       const result = await getCompanyInfoApi();
       
       setCompanyInfo(result);
-      setCountries(result.countries);
-      setIndustries(result.industries);
+      
+      // Fetch countries and industries separately
+      // For now, setting empty arrays - these should be fetched from proper endpoints
+      setCountries([]);
+      setIndustries([]);
       
       // Also fetch employees since they're often needed with company info
       await fetchEmployees();

@@ -56,7 +56,9 @@ export default function PositionsSection({
 
   const handleUpdatePosition = async (values: any) => {
     try {
-      await updatePosition(values);
+      if (editPosition) {
+        await updatePosition(editPosition, values);
+      }
       setEditPosition(null);
       fetchPositions();
       showNotification("Position updated successfully");
@@ -173,8 +175,8 @@ export default function PositionsSection({
         {isCreatingPosition && (
           <PositionModal
             key={`CreatePositionModal`}
-            departments={departments}
-            grades={grades}
+            departments={departments.filter(d => d.id != null) as { id: number; name: string }[]}
+            grades={grades.filter(g => g.id != null) as { id: number; name: string }[]}
             onSubmit={handleCreatePosition}
             onClose={() => setIsCreatingPosition(false)}
           />
@@ -193,8 +195,8 @@ export default function PositionsSection({
         {selectedPositionEdit && (
           <PositionModal
             key={`EditPositionModal-${selectedPositionEdit.id}`}
-            departments={departments}
-            grades={grades}
+            departments={departments.filter(d => d.id != null) as { id: number; name: string }[]}
+            grades={grades.filter(g => g.id != null) as { id: number; name: string }[]}
             initialData={selectedPositionEdit}
             onSubmit={handleUpdatePosition}
             onClose={() => setEditPosition(null)}

@@ -5,7 +5,7 @@ import { NoticeType } from "@/lib/types";
 
 export type { NoticeType };
 
-export function useNewsAndNotices() {
+export function useNoticeTypes() {
   const baseResult = useBaseEntity<NoticeType>({
     tableName: "notice_types",
     entityName: "notice type",
@@ -24,4 +24,4 @@ export function useNewsAndNotices() {
 }
 
 // Backward compatibility alias
-export const useNewsAndNoticesTypes = useNewsAndNotices;
+export const useNewsAndNoticesTypes = useNoticeTypes;

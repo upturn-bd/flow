@@ -21,6 +21,7 @@ import { toast } from "sonner";
 
 export default function ComplaintRequestsPage() {
   const [comment, setComment] = useState<string>("");
+  const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
   const { employees, fetchEmployees } = useEmployees();
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
   const {
@@ -33,7 +34,7 @@ export default function ComplaintRequestsPage() {
   } = useComplaints();
 
   useEffect(() => {
-    fetchComplaints("Submitted");
+    fetchComplaints();
   }, [fetchComplaints]);
 
   useEffect(() => {
@@ -45,11 +46,20 @@ export default function ComplaintRequestsPage() {
   }, [fetchComplaintTypes]);
 
   const handleUpdateRequest = async (action: string, id: number) => {
-    const success = await updateComplaint(action, id, comment);
-    if (success) {
+    setCurrentlyProcessingId(id);
+    const updateData = {
+      status: action,
+      comment: comment
+    };
+    const result = await updateComplaint(id, updateData);
+    if (result.success) {
       toast.success(`Complaint ${action.toLowerCase()} successfully`);
       setComment("");
+      fetchComplaints();
+    } else {
+      toast.error(`Failed to ${action.toLowerCase()} complaint`);
     }
+    setCurrentlyProcessingId(null);
   };
 
   return (
@@ -190,10 +200,10 @@ export default function ComplaintRequestsPage() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleUpdateRequest("Rejected", complaint.id)}
-                        disabled={processingId === complaint.id}
+                        disabled={currentlyProcessingId === complaint.id}
                         className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                       >
-                        {processingId === complaint.id ? (
+                        {currentlyProcessingId === complaint.id ? (
                           <Loader2 size={16} className="animate-spin" />
                         ) : (
                           <X size={16} />
@@ -204,10 +214,10 @@ export default function ComplaintRequestsPage() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleUpdateRequest("Accepted", complaint.id)}
-                        disabled={processingId === complaint.id}
+                        disabled={currentlyProcessingId === complaint.id}
                         className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                       >
-                        {processingId === complaint.id ? (
+                        {currentlyProcessingId === complaint.id ? (
                           <Loader2 size={16} className="animate-spin" />
                         ) : (
                           <Check size={16} />

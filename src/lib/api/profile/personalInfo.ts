@@ -19,6 +19,21 @@ export async function fetchPersonalInfo() {
   return data;
 }
 
+// Alias for current user personal info
+export const fetchCurrentUserPersonalInfo = fetchPersonalInfo;
+
+// Function to fetch another user's personal info by ID
+export async function fetchUserPersonalInfo(userId: string) {
+  const { data, error } = await supabase
+    .from('employees')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function updatePersonalInfo(updates: any) {
   const employeeInfo = await getEmployeeInfo();
   

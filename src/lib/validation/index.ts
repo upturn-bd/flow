@@ -15,6 +15,7 @@ export {
   validateTask, 
   validateClaimType, 
   validateLineage,
+  validateLineageForm,
   validateNotice,
   type EducationData,
   type ExperienceData,
@@ -23,5 +24,6 @@ export {
   type TaskData,
   type ClaimTypeData,
   type LineageData,
+  type LineageFormData,
   type NoticeData
 } from './schemas/advanced';

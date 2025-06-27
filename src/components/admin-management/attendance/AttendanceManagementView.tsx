@@ -37,7 +37,9 @@ export default function AttendanceManagementView() {
   const handleUpdateSite = async (values: any) => {
     try {
       setIsLoading(true);
-      await updateSite(values);
+      if (editSite) {
+        await updateSite(editSite, values);
+      }
       setEditSite(null);
       setSelectedSiteEdit(null);
       fetchSites();

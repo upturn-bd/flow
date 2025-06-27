@@ -8,36 +8,40 @@ import { Button } from '@/components/ui/button';
 
 interface TaskCreateModalProps {
   milestoneId?: number;
-  projectId: number;
+  projectId?: number;
+  departmentId?: number;
   onSubmit: (data: TaskData) => void;
   onClose: () => void;
   isLoading?: boolean;
 }
 
 const priorityOptions = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-  { value: 'urgent', label: 'Urgent' }
+  { value: 'Low', label: 'Low' },
+  { value: 'Medium', label: 'Medium' },
+  { value: 'High', label: 'High' },
 ];
 
 export default function TaskCreateModal({
   milestoneId,
   projectId,
+  departmentId,
   onSubmit,
   onClose,
   isLoading = false
 }: TaskCreateModalProps) {
   const [formData, setFormData] = useState<TaskData>({
-    title: '',
-    description: '',
-    due_date: '',
-    priority: 'medium',
-    status: 'not_started',
+    task_title: '',
+    task_description: '',
+    start_date: '',
+    end_date: '',
+    priority: 'Medium',
+    status: false,
     project_id: projectId,
     milestone_id: milestoneId,
+    department_id: departmentId,
     assignees: []
   });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   
   const { employees, loading: employeesLoading, fetchEmployees } = useEmployees();
@@ -95,8 +99,8 @@ export default function TaskCreateModal({
       <div className="space-y-6">
         <FormField
           label="Task Title"
-          value={formData.title}
-          onChange={(e) => handleInputChange('title', e.target.value)}
+          value={formData.task_title}
+          onChange={(e) => handleInputChange('task_title', e.target.value)}
           placeholder="Enter task title"
           error={errors.title}
           required
@@ -104,20 +108,31 @@ export default function TaskCreateModal({
 
         <TextAreaField
           label="Description"
-          value={formData.description || ''}
-          onChange={(e) => handleInputChange('description', e.target.value)}
+          value={formData.task_description || ''}
+          onChange={(e) => handleInputChange('task_description', e.target.value)}
           placeholder="Enter task description"
           error={errors.description}
           rows={3}
+          required
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <DateField
+            label="Start Date"
+            name="start_date"
+            value={formData.start_date || ''}
+            onChange={(e) => handleInputChange('start_date', e.target.value)}
+            error={errors.start_date}
+            required
+          />
+          
+          <DateField
             label="Due Date"
-            name="due_date"
-            value={formData.due_date || ''}
-            onChange={(e) => handleInputChange('due_date', e.target.value)}
-            error={errors.due_date}
+            name="end_date"
+            value={formData.end_date || ''}
+            onChange={(e) => handleInputChange('end_date', e.target.value)}
+            error={errors.end_date}
+            required
           />
 
           <SelectField
@@ -164,7 +179,7 @@ export default function TaskCreateModal({
           variant="primary"
           onClick={handleSubmit}
           isLoading={isLoading}
-          disabled={!isFormValid() || isLoading}
+          disabled={isLoading}
         >
           Create Task
         </Button>

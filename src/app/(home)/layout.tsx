@@ -21,6 +21,8 @@ export default function HomeLayout({
 
 function ApprovalLayout({ children }: { children: React.ReactNode }) {
   const { isApproved } = useAuth();
+  console.log("ApprovalLayout isApproved:", isApproved);
+  
 
   return <div className="flex h-dvh">
   {isApproved && <Sidebar />}

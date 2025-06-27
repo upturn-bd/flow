@@ -362,7 +362,17 @@ export default function MilestoneDetails({
 
           {selectedTask && (
             <TaskUpdateModal
-              initialData={selectedTask}
+              initialData={{
+                task_title: selectedTask.task_title,
+                task_description: selectedTask.task_description,
+                start_date: selectedTask.start_date,
+                end_date: selectedTask.end_date,
+                priority: selectedTask.priority,
+                status: selectedTask.status || false,
+                project_id: selectedTask.project_id,
+                milestone_id: selectedTask.milestone_id,
+                assignees: selectedTask.assignees,
+              }}
               onClose={() => setSelectedTask(null)}
               onSubmit={handleUpdateTask}
             />

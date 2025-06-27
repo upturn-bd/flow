@@ -31,6 +31,7 @@ import TaskUpdateModal from "../task/shared/TaskUpdateModal";
 import { motion } from "framer-motion";
 import MilestoneCreateModal from "./milestone/MilestoneCreateModal";
 import { Milestone, Project, Task } from "@/lib/types/schemas";
+import { TaskData } from "@/lib/validation/schemas/advanced";
 
 interface ProjectDetailsProps {
   id: number;
@@ -189,10 +190,12 @@ export default function ProjectDetails({
 
   const handleUpdateMilestone = async (values: Milestone) => {
     try {
-      await updateMilestone(values);
-      toast.success("Milestone updated!");
-      setSelectedMilestone(null);
-      fetchMilestonesByProjectId(projectId);
+      if (selectedMilestone?.id) {
+        await updateMilestone(selectedMilestone.id, values);
+        toast.success("Milestone updated!");
+        setSelectedMilestone(null);
+        fetchMilestonesByProjectId(projectId);
+      }
     } catch {
       toast.error("Error updating Milestone.");
     }
@@ -258,9 +261,22 @@ export default function ProjectDetails({
   const [selectedTask, setSelectedTask] = useState<any>(null);
 
   // Handlers for project tasks
-  const handleCreateProjectTask = async (values: Task) => {
+  const handleCreateProjectTask = async (taskData: TaskData) => {
     try {
-      const result = await createTask(values);
+      // Convert TaskData to Task format
+      const task: Task = {
+        task_title: taskData.task_title,
+        task_description: taskData.task_description || '',
+        start_date: taskData.start_date || new Date().toISOString().split('T')[0],
+        end_date: taskData.end_date || new Date().toISOString().split('T')[0],
+        priority: taskData.priority,
+        project_id: taskData.project_id,
+        milestone_id: taskData.milestone_id,
+        assignees: taskData.assignees,
+        status: taskData.status || false,
+      };
+      
+      const result = await createTask(task);
       if (result.success) {
         toast.success("Task created successfully!");
         const updatedTasks = await fetchTasks({projectId});
@@ -275,9 +291,23 @@ export default function ProjectDetails({
     }
   };
 
-  const handleUpdateProjectTask = async (values: Task) => {
+  const handleUpdateProjectTask = async (taskData: TaskData) => {
     try {
-      const result = await updateTask(values);
+      // Convert TaskData to Task format
+      const task: Task = {
+        id: selectedTask?.id,
+        task_title: taskData.task_title,
+        task_description: taskData.task_description || '',
+        start_date: taskData.start_date || selectedTask?.start_date || new Date().toISOString().split('T')[0],
+        end_date: taskData.end_date || selectedTask?.end_date || new Date().toISOString().split('T')[0],
+        priority: taskData.priority,
+        project_id: taskData.project_id,
+        milestone_id: taskData.milestone_id,
+        assignees: taskData.assignees,
+        status: taskData.status !== undefined ? taskData.status : (selectedTask?.status || false),
+      };
+      
+      const result = await updateTask(task);
       if (result.success) {
         toast.success("Task updated successfully!");
         const updatedTasks = await fetchTasks({projectId});

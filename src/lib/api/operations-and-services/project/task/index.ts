@@ -1,7 +1,6 @@
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId } from "@/lib/api";
 import { Task } from "@/lib/types";
-import { validateTask } from "@/lib/utils/validation";
 
 export interface TaskFilters {
   projectId?: number;
@@ -91,22 +90,17 @@ export async function createTask(payload: Task) {
   const company_id = await getCompanyId();
   const user = await getEmployeeInfo();
 
-  const validation = validateTask({
+  const finalData = {
     ...payload,
-    created_by: user.id
-  });
-  if (!validation.success) {
-    const error = new Error("Validation failed");
-    (error as any).issues = validation.errors;
-    throw error;
-  }
+    created_by: user.id,
+    company_id
+  };
 
   const { data, error } = await supabase
     .from("task_records")
-    .insert({
-      ...validation.data,
-      company_id,
-    })
+    .insert(
+      finalData
+    )
     .select()
     .single();
 
@@ -116,26 +110,28 @@ export async function createTask(payload: Task) {
 
 export async function updateTask(payload: Task) {
   const company_id = await getCompanyId();
-  const user = await getEmployeeInfo();
 
-  const validation = validateTask({
+  const finalData = {
     ...payload,
-    updated_by: user.id,
-    updated_at: new Date().toISOString()
+  };
+
+  // Remove undefined values
+  Object.keys(finalData).forEach(key => {
+    if (finalData[key as keyof typeof finalData] === undefined || finalData[key as keyof typeof finalData] === null) {
+      delete finalData[key as keyof typeof finalData];
+    }
   });
-  if (!validation.success) {
-    const error = new Error("Validation failed");
-    (error as any).issues = validation.errors;
-    throw error;
-  }
 
   const { data, error } = await supabase
     .from("task_records")
-    .update(validation.data)
+    .update(finalData)
     .eq("id", payload.id)
     .eq("company_id", company_id)
     .select()
     .single();
+
+    console.log("Update task response:", data, error);
+    
 
   if (error) throw error;
   return data;

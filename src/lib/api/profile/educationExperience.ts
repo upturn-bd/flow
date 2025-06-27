@@ -29,6 +29,28 @@ export async function fetchEducationExperience() {
   };
 }
 
+// Function to fetch user education records
+export async function fetchUserEducation(userId: string) {
+  const { data, error } = await supabase
+    .from('education')
+    .select('*')
+    .eq('employee_id', userId);
+
+  if (error) throw error;
+  return data || [];
+}
+
+// Function to fetch user experience records  
+export async function fetchUserExperience(userId: string) {
+  const { data, error } = await supabase
+    .from('experience')
+    .select('*')
+    .eq('employee_id', userId);
+
+  if (error) throw error;
+  return data || [];
+}
+
 export async function updateEducationExperience(data: { education: any[], experience: any[] }) {
   const employeeInfo = await getEmployeeInfo();
   

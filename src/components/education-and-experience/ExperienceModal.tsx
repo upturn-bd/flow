@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { Experience } from "@/hooks/useExperience";
 import { validateExperience, validationErrorsToObject } from "@/lib/utils/validation";
-import { FormModal } from "@/components/ui/modals";
+import { FormModal, BaseModal } from "@/components/ui/modals";
 import { FormField, TextAreaField } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 
@@ -94,7 +94,7 @@ export default function ExperienceModal({
   const isDisabled = isSubmitting || (initialData ? !isDirty : false) || !isValid;
 
   return (
-    <FormModal
+    <BaseModal
       isOpen={isOpen}
       onClose={onClose}
       title={initialData ? "Edit Experience" : "Add Experience"}
@@ -176,6 +176,6 @@ export default function ExperienceModal({
           </Button>
         </div>
       </form>
-    </FormModal>
+    </BaseModal>
   );
 }

@@ -72,10 +72,12 @@ export function useTasks() {
 
   const createTask = async (task: Task) => {
     try {
+      console.log("Creating task:", task);
+      
       const data = await cTask(task);
       await fetchTasks({
         projectId: task.project_id,
-        milestoneId: task.milestone_id ?? null
+        milestoneId: task.milestone_id,
       });
       if (task.project_id) {
         await fetchTaskStats(task.project_id);
@@ -92,7 +94,7 @@ export function useTasks() {
       const data = await uTask(task);
       await fetchTasks({
         projectId: task.project_id,
-        milestoneId: task.milestone_id ?? null
+        milestoneId: task.milestone_id
       });
       if (task.project_id) {
         await fetchTaskStats(task.project_id);

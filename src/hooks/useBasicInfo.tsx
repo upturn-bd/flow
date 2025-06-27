@@ -68,6 +68,10 @@ export function useBasicInfo() {
 
   const checkIsCurrentUser = useCallback(async (uid?: string | null) => {
     try {
+      if (!uid) {
+        setIsCurrentUser(true); // Default to current user if no uid provided
+        return true;
+      }
       const result = await isCurrentUserProfileApi(uid);
       setIsCurrentUser(result);
       return result;

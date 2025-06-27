@@ -24,6 +24,7 @@ interface LeaveRequest {
 
 export default function LeaveRequestsPage() {
   const [comment, setComment] = useState<string>("");
+  const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
   const { employees, fetchEmployees } = useEmployees();
   const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
   const { 
@@ -36,7 +37,7 @@ export default function LeaveRequestsPage() {
   } = useLeaveRequests();
 
   useEffect(() => {
-    fetchLeaveRequests("Pending");
+    fetchLeaveRequests();
   }, [fetchLeaveRequests]);
 
   useEffect(() => {
@@ -48,8 +49,20 @@ export default function LeaveRequestsPage() {
   }, [fetchLeaveTypes]);
 
   const handleUpdateRequest = async (action: string, id: number) => {
-    await updateLeaveRequest(action, id, comment);
+    setCurrentlyProcessingId(id);
+    const updateData = {
+      status: action,
+      comment: comment
+    };
+    const result = await updateLeaveRequest(id, updateData);
+    if (result.success) {
+      toast.success(`Leave request ${action.toLowerCase()} successfully`);
+      fetchLeaveRequests();
+    } else {
+      toast.error(`Failed to ${action.toLowerCase()} leave request`);
+    }
     setComment("");
+    setCurrentlyProcessingId(null);
   };
 
   if (loading) {
@@ -124,17 +137,17 @@ export default function LeaveRequestsPage() {
               <div className="flex justify-end gap-4 pt-2">
                 <button
                   onClick={() => handleUpdateRequest("Rejected", leaveReq.id || 0)}
-                  disabled={processingId === leaveReq.id}
+                  disabled={currentlyProcessingId === leaveReq.id}
                   className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full disabled:opacity-50"
                 >
-                  {processingId === leaveReq.id ? "Processing..." : "Reject"}
+                  {currentlyProcessingId === leaveReq.id ? "Processing..." : "Reject"}
                 </button>
                 <button
                   onClick={() => handleUpdateRequest("Accepted", leaveReq.id || 0)}
-                  disabled={processingId === leaveReq.id}
+                  disabled={currentlyProcessingId === leaveReq.id}
                   className="bg-[#001F4D] hover:bg-[#002a66] text-white px-6 py-2 rounded-full disabled:opacity-50"
                 >
-                  {processingId === leaveReq.id ? "Processing..." : "Accept"}
+                  {currentlyProcessingId === leaveReq.id ? "Processing..." : "Accept"}
                 </button>
               </div>
             </div>

@@ -19,7 +19,7 @@ export async function getCompanyId(): Promise<number> {
   const { data, error } = await supabase
     .from('employees')
     .select('company_id')
-    .eq('user_id', user.id)
+    .eq('id', user.id)
     .single();
 
   if (error) {
@@ -34,10 +34,15 @@ export async function getCompanyId(): Promise<number> {
  */
 export async function getEmployeeInfo(): Promise<{ 
   id: string; 
+  name: string;
+  role: string;
+  has_approval: string;
   company_id: number; 
   department_id?: number; 
-  role?: string;
   supervisor_id?: string;
+  email?: string;
+  phone_number?: string;
+  designation?: string;
 }> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   
@@ -47,8 +52,8 @@ export async function getEmployeeInfo(): Promise<{
 
   const { data, error } = await supabase
     .from('employees')
-    .select('id, company_id, department_id, role, supervisor_id')
-    .eq('user_id', user.id)
+    .select('id, company_id, department_id, role, supervisor_id, first_name, last_name, has_approval, email, phone_number, designation')
+    .eq('id', user.id)
     .single();
 
   if (error) {
@@ -57,10 +62,15 @@ export async function getEmployeeInfo(): Promise<{
 
   return { 
     id: data.id, 
+    name: `${data.first_name || ''} ${data.last_name || ''}`.trim(),
+    role: data.role || '',
+    has_approval: data.has_approval || '',
     company_id: data.company_id,
     department_id: data.department_id,
-    role: data.role,
-    supervisor_id: data.supervisor_id
+    supervisor_id: data.supervisor_id,
+    email: data.email,
+    phone_number: data.phone_number,
+    designation: data.designation
   };
 }
 

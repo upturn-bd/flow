@@ -163,7 +163,7 @@ export interface Task {
   start_date: string;
   end_date: string;
   priority: string;
-  project_id: number;
+  project_id?: number;
   milestone_id?: number;
   assignees: string[];
   department_id?: number;

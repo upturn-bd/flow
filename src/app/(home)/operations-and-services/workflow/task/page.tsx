@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useContext } from "react";
 import TaskPage from "@/components/operations-and-services/task/OngoingTasks";
 import CompletedTasksList from "@/components/operations-and-services/task/CompletedTasks";
 import { useState } from "react";
@@ -15,7 +15,9 @@ import TabView, { TabItem } from "@/components/ui/TabView";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import TaskCreateModal from "@/components/operations-and-services/task/shared/TaskModal";
 import { Task, useTasks } from "@/hooks/useTasks";
+import { TaskData } from "@/lib/validation/schemas/advanced";
 import { toast } from "sonner";
+import { AuthProvider, useAuth } from "@/lib/auth/auth-context";
 
 const TABS = [
   {
@@ -43,9 +45,24 @@ export default function TasksPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [tabs, setTabs] = useState<TabItem[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const { employeeInfo } = useAuth();
   const { createTask } = useTasks();
 
-  const handleCreateTask = async (task: Task) => {
+  const handleCreateTask = async (taskData: TaskData) => {
+    // Convert TaskData to Task format
+    const task: Task = {
+      task_title: taskData.task_title,
+      task_description: taskData.task_description || '',
+      start_date: taskData.start_date || new Date().toISOString().split('T')[0],
+      end_date: taskData.end_date || new Date().toISOString().split('T')[0],
+      priority: taskData.priority,
+      project_id: taskData.project_id,
+      milestone_id: taskData.milestone_id,
+      department_id: taskData.department_id,
+      assignees: taskData.assignees,
+      status: taskData.status || false,
+    };
+    
     const { success, error } = await createTask(task);
     if (success) {
       toast.success("Task created successfully");
@@ -130,9 +147,8 @@ export default function TasksPage() {
 
       {showCreateModal && (
         <TaskCreateModal
-          milestoneId={0}
-          projectId={0}
           onSubmit={handleCreateTask}
+          departmentId={employeeInfo?.department_id as number}
           onClose={() => setShowCreateModal(false)}
         />
       )}

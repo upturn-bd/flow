@@ -4,16 +4,22 @@
 
 import { supabase } from "@/lib/supabase/client";
 
-export async function validateCompanyCode(code: string) {
+export async function validateCompanyCode(code: string,name: string) {
   const { data, error } = await supabase
     .from('companies')
-    .select('id')
+    .select('id, name')
     .eq('code', code)
+    .eq('name', name)
     .single();
 
   if (error && error.code !== 'PGRST116') {
     throw error;
   }
 
-  return { exists: !!data };
+  return { 
+    exists: !!data,
+    isValid: !!data,
+    id: data?.id || null,
+    name: data?.name || null
+  };
 }

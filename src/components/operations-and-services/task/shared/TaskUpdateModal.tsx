@@ -14,18 +14,15 @@ interface TaskUpdateModalProps {
 }
 
 const priorityOptions = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-  { value: 'urgent', label: 'Urgent' }
+  { value: 'Low', label: 'Low' },
+  { value: 'Medium', label: 'Medium' },
+  { value: 'High', label: 'High' },
+  { value: 'Urgent', label: 'Urgent' }
 ];
 
 const statusOptions = [
-  { value: 'not_started', label: 'Not Started' },
-  { value: 'in_progress', label: 'In Progress' },
+  { value: 'pending', label: 'Pending' },
   { value: 'completed', label: 'Completed' },
-  { value: 'on_hold', label: 'On Hold' },
-  { value: 'cancelled', label: 'Cancelled' }
 ];
 
 export default function TaskUpdateModal({
@@ -82,6 +79,9 @@ export default function TaskUpdateModal({
 
   const isFormValid = () => {
     const validation = validateTask(formData);
+    console.log('Validation data:', formData);
+    console.log('Validation errors:', validation.errors);
+    
     return validation.success;
   };
 
@@ -100,8 +100,8 @@ export default function TaskUpdateModal({
       <div className="space-y-6">
         <FormField
           label="Task Title"
-          value={formData.title}
-          onChange={(e) => handleInputChange('title', e.target.value)}
+          value={formData.task_title}
+          onChange={(e) => handleInputChange('task_title', e.target.value)}
           placeholder="Enter task title"
           error={errors.title}
           required
@@ -109,8 +109,8 @@ export default function TaskUpdateModal({
 
         <TextAreaField
           label="Description"
-          value={formData.description || ''}
-          onChange={(e) => handleInputChange('description', e.target.value)}
+          value={formData.task_description || ''}
+          onChange={(e) => handleInputChange('task_description', e.target.value)}
           placeholder="Enter task description"
           error={errors.description}
           rows={3}
@@ -120,8 +120,8 @@ export default function TaskUpdateModal({
           <DateField
             label="Due Date"
             name="due_date"
-            value={formData.due_date || ''}
-            onChange={(e) => handleInputChange('due_date', e.target.value)}
+            value={formData.end_date || ''}
+            onChange={(e) => handleInputChange('end_date', e.target.value)}
             error={errors.due_date}
           />
 
@@ -138,8 +138,8 @@ export default function TaskUpdateModal({
 
         <SelectField
           label="Status"
-          value={formData.status}
-          onChange={(e) => handleInputChange('status', e.target.value)}
+          value={formData.status ? 'completed' : 'pending'}
+          onChange={(e) => handleInputChange('status', e.target.value === 'completed')}
           options={statusOptions}
           placeholder="Select status"
           error={errors.status}

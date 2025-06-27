@@ -119,7 +119,9 @@ export default function LeaveManagementView() {
   const handleUpdateHolidayConfig = async (values: any) => {
     try {
       setHolidayLoading(true);
-      await updateHolidayConfig(values);
+      if (editHolidayConfig) {
+        await updateHolidayConfig(editHolidayConfig, values);
+      }
       setSelectedHolidayConfigEdit(null);
       setEditHolidayConfig(null);
       fetchHolidayConfigs();

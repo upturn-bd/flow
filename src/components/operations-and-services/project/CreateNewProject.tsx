@@ -177,7 +177,7 @@ export default function CreateNewProjectPage() {
         <ProjectForm
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          departments={departments}
+          departments={departments.filter(d => d.id != null) as { id: number; name: string }[]}
           employees={employees}
           mode="create"
         />
@@ -279,7 +279,7 @@ export function UpdateProjectPage({
           onSubmit={handleSubmit}
           onCancel={onClose}
           isSubmitting={isSubmitting}
-          departments={departments}
+          departments={departments.filter(d => d.id != null) as { id: number; name: string }[]}
           employees={employees}
           mode="edit"
         />

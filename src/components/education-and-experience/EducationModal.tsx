@@ -6,7 +6,7 @@ import { Education } from "@/hooks/useEducation";
 import { schoolingTypes } from "@/lib/types";
 import { validateSchooling, validationErrorsToObject } from "@/lib/utils/validation";
 import { useFileUpload } from "@/hooks/useFileUpload";
-import { FormModal } from "@/components/ui/modals";
+import { FormModal, BaseModal } from "@/components/ui/modals";
 import { FormField, SelectField, FileUploadField } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 
@@ -136,7 +136,7 @@ export default function EducationModal({
   }));
 
   return (
-    <FormModal
+    <BaseModal
       isOpen={isOpen}
       onClose={onClose}
       title={initialData ? "Edit Education" : "Add Education"}
@@ -241,6 +241,6 @@ export default function EducationModal({
           </Button>
         </div>
       </form>
-    </FormModal>
+    </BaseModal>
   );
 }

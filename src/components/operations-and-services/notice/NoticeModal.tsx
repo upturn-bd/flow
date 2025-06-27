@@ -52,7 +52,7 @@ export function NoticeModal({
       reset({
         title: initialData.title || "",
         description: initialData.description || "",
-        urgency: initialData.urgency || "Medium",
+        urgency: (initialData.urgency as "Low" | "Medium" | "High" | "Critical") || "Medium",
         department_id: initialData.department_id || undefined,
         valid_from: initialData.valid_from || "",
         valid_till: initialData.valid_till || "",

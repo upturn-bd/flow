@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/modals';
 import { FormField, HierarchyField } from '@/components/forms';
-import { validateLineage, type LineageData } from '@/lib/validation';
+import { validateLineageForm, type LineageFormData } from '@/lib/validation';
 import { usePositions } from '@/hooks/usePositions';
 import { Buildings } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
@@ -31,7 +31,7 @@ export default function SupervisorLineageUpdateModal({
   onClose,
   isLoading = false
 }: SupervisorLineageUpdateModalProps) {
-  const [formData, setFormData] = useState<LineageData>({
+  const [formData, setFormData] = useState<LineageFormData>({
     name: '',
     hierarchy: []
   });
@@ -60,7 +60,7 @@ export default function SupervisorLineageUpdateModal({
     }
   }, [initialData]);
 
-  const handleInputChange = (field: keyof LineageData, value: any) => {
+  const handleInputChange = (field: keyof LineageFormData, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -77,7 +77,7 @@ export default function SupervisorLineageUpdateModal({
   };
 
   const handleSubmit = () => {
-    const validation = validateLineage(formData);
+    const validation = validateLineageForm(formData);
     
     if (!validation.success && validation.errors) {
       const errorMap: Record<string, string> = {};
@@ -106,7 +106,7 @@ export default function SupervisorLineageUpdateModal({
   };
 
   const isFormValid = () => {
-    const validation = validateLineage(formData);
+    const validation = validateLineageForm(formData);
     return validation.success && 
            formData.hierarchy.length > 0 && 
            formData.hierarchy.every(level => level.position_id !== null) &&
@@ -166,7 +166,7 @@ export default function SupervisorLineageUpdateModal({
           label="Set Hierarchy"
           value={formData.hierarchy}
           onChange={(hierarchy) => handleInputChange('hierarchy', hierarchy)}
-          positions={positions}
+          positions={positions.filter(p => p.id != null) as any}
           error={errors.hierarchy}
           disabled={isLoading}
         />

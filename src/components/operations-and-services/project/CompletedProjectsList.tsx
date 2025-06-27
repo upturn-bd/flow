@@ -78,10 +78,12 @@ function CompletedProjectsList() {
 
   const handleUpdateProject = async (values: any) => {
     try {
-      await updateProject(values);
-      toast.success("Project updated successfully");
-      setSelectedProject(null);
-      fetchCompletedProjects();
+      if (selectedProject?.id) {
+        await updateProject(selectedProject.id, values);
+        toast.success("Project updated successfully");
+        setSelectedProject(null);
+        fetchCompletedProjects();
+      }
     } catch (error) {
       toast.error("Error updating project");
       console.error(error);
@@ -116,7 +118,7 @@ function CompletedProjectsList() {
                       onDelete={() => handleDeleteProject(project.id as number)}
                       onDetails={() => setProjectDetailsId(project.id as number)}
                       employees={employees}
-                      departments={departments}
+                      departments={departments.filter(d => d.id != null) as any}
                       showEdit={false}
                       showDelete={true}
                       showDetails={true}

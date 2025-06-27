@@ -170,7 +170,7 @@ export default function MilestoneUpdateModal({
 
         <AssigneeField
           label="Assignees"
-          value={formData.assignees}
+          value={formData.assignees || []}
           onChange={(assignees) => handleInputChange('assignees', assignees)}
           employees={employees}
           error={errors.assignees}

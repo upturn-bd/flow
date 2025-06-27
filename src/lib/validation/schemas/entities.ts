@@ -3,10 +3,12 @@ import { ValidationResult, ValidationError, validateString, validateNumber, vali
 
 // Department validation
 export interface DepartmentData {
+  id?: number;
   name: string;
-  description?: string;
   head_id?: string;
+  description?: string;
   division_id?: number;
+  company_id?: string | number;
 }
 
 export function validateDepartment(data: DepartmentData): ValidationResult<DepartmentData> {
@@ -37,7 +39,11 @@ export function validateDepartment(data: DepartmentData): ValidationResult<Depar
 
 // Division validation
 export interface DivisionData {
+  id?: number;
   name: string;
+  head_id?: string;
+  company_id?: number | string;
+  created_at?: string;
   description?: string;
 }
 
@@ -63,7 +69,9 @@ export function validateDivision(data: DivisionData): ValidationResult<DivisionD
 
 // Grade validation
 export interface GradeData {
+  id?: number;
   name: string;
+  company_id?: number;
   description?: string;
   basic_salary?: number;
 }
@@ -96,10 +104,12 @@ export function validateGrade(data: GradeData): ValidationResult<GradeData> {
 
 // Position validation
 export interface PositionData {
+  id?: number;
   name: string;
   description?: string;
   department_id?: number;
   grade?: number;
+  company_id?: string | number;
 }
 
 export function validatePosition(data: PositionData): ValidationResult<PositionData> {
@@ -136,7 +146,9 @@ export function validatePosition(data: PositionData): ValidationResult<PositionD
 
 // News and Notice Type validation
 export interface NewsAndNoticeTypeData {
+  id?: number;
   name: string;
+  company_id?: number;
   description?: string;
 }
 
@@ -162,7 +174,9 @@ export function validateNewsAndNoticeType(data: NewsAndNoticeTypeData): Validati
 
 // Complaint Type validation
 export interface ComplaintTypeData {
+  id?: number;
   name: string;
+  company_id?: number;
   description?: string;
 }
 
@@ -188,7 +202,9 @@ export function validateComplaintType(data: ComplaintTypeData): ValidationResult
 
 // Requisition Type validation
 export interface RequisitionTypeData {
+  id?: number;
   name: string;
+  company_id?: number;
 }
 
 export function validateRequisitionType(data: RequisitionTypeData): ValidationResult<RequisitionTypeData> {
@@ -207,11 +223,13 @@ export function validateRequisitionType(data: RequisitionTypeData): ValidationRe
 
 // Requisition Inventory validation
 export interface RequisitionInventoryData {
+  id?: number;
   name: string;
-  description?: string;
-  quantity: number;
-  asset_owner: string;
   requisition_category_id?: number;
+  description?: string;
+  asset_owner: string;
+  quantity: number;
+  company_id?: number;
   department_id?: number;
 }
 
@@ -257,11 +275,13 @@ export function validateRequisitionInventory(data: RequisitionInventoryData): Va
 
 // Inventory validation
 export interface InventoryData {
+  id?: number;
   name: string;
   description?: string;
   quantity?: number;
   unit?: string;
   requisition_type_id?: number;
+  company_id?: number;
 }
 
 export function validateInventory(data: InventoryData): ValidationResult<InventoryData> {
@@ -304,8 +324,10 @@ export function validateInventory(data: InventoryData): ValidationResult<Invento
 
 // Leave Type validation
 export interface LeaveTypeData {
+  id?: number;
   name: string;
   annual_quota: number;
+  company_id?: number;
 }
 
 export function validateLeaveType(data: LeaveTypeData): ValidationResult<LeaveTypeData> {
@@ -328,8 +350,10 @@ export function validateLeaveType(data: LeaveTypeData): ValidationResult<LeaveTy
 
 // Holiday Config validation
 export interface HolidayConfigData {
+  id?: number;
   name: string;
   date: string;
+  company_id?: number;
 }
 
 export function validateHolidayConfig(data: HolidayConfigData): ValidationResult<HolidayConfigData> {
@@ -352,12 +376,14 @@ export function validateHolidayConfig(data: HolidayConfigData): ValidationResult
 
 // Site (Attendance) validation
 export interface SiteData {
+  id?: number;
   name: string;
-  check_in: string;
-  check_out: string;
   longitude: number;
   latitude: number;
+  check_in: string;
+  check_out: string;
   location: string;
+  company_id?: number;
 }
 
 export function validateSite(data: SiteData): ValidationResult<SiteData> {

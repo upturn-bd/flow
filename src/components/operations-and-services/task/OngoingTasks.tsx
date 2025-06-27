@@ -1,5 +1,5 @@
 "use client";
-import TaskCreateModal, {
+import {
   TaskUpdateModal,
 } from "./shared/TaskModal";
 import { useTasks } from "@/hooks/useTasks";
@@ -157,7 +157,19 @@ export default function TaskPage() {
           <TaskUpdateModal
             onSubmit={handleUpdateTask}
             onClose={() => setEditTask(null)}
-            initialData={editTask}
+            initialData={{
+              id: editTask.id,
+              task_title: editTask.task_title,
+              task_description: editTask.task_description,
+              start_date: editTask.start_date,
+              end_date: editTask.end_date,
+              priority: editTask.priority,
+              status: editTask.status || false,
+              project_id: editTask.project_id,
+              milestone_id: editTask.milestone_id,
+              department_id: editTask.department_id,
+              assignees: editTask.assignees,
+            }}
           />
         )}
         {taskDetailsId !== null && (
