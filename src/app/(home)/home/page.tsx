@@ -42,6 +42,7 @@ export default function HomePage() {
     items: attendanceRecords,
     loading: statusLoading,
     fetchItems: checkAttendanceStatus,
+    fetchItem: checkAttendanceStatusForDay,
   } = useAttendanceStatus();
   const { sites, loading: sitesLoading, fetchSites } = useSites();
   const { notices, loading: noticesLoading, fetchNotices } = useNotices();

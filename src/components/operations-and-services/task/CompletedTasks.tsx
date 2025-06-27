@@ -130,49 +130,16 @@ function CompletedTasksList() {
   const { deleteTask } = useTasks();
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  async function fetchTasks() {
-    setLoading(true);
-
-    const company_id = await getCompanyId();
-    const user = await getEmployeeInfo();
-
-    try {
-      const { data, error } = await supabase
-        .from("task_records")
-        .select("*")
-        .eq("company_id", company_id)
-        .eq("status", true)
-        .or(
-          `assignees.cs.{${user.id}}, department_id.eq.${user.department_id}, created_by.eq.${user.id}`
-        );
-
-      if (error) throw error;
-      const formatData = data?.map((item) => {
-        const { created_at, updated_at, ...rest } = item;
-        return {
-          ...rest,
-        };
-      });
-      setTasks(formatData);
-    } catch (error) {
-      toast.error("Failed to fetch tasks");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const {tasks, fetchTasks, loading} = useTasks();
 
   useEffect(() => {
-    fetchTasks();
+    fetchTasks({all:true,status:false});
   }, []);
 
   const handleDeleteTask = async (id: number) => {
     try {
       await deleteTask(id);
-      fetchTasks();
+      fetchTasks({all:true,status:false});
     } catch (error) {
       console.error(error);
     }

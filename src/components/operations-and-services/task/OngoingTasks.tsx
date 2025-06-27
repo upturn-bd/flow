@@ -21,7 +21,7 @@ export default function TaskPage() {
       await updateTask(values);
       toast.success("Task updated successfully");
       setEditTask(null);
-      fetchTasks();
+      fetchTasks({all:true,status:false});
     } catch (error) {
       toast.error("Error updating task");
       console.error(error);
@@ -33,7 +33,7 @@ export default function TaskPage() {
       setDeletingTaskId(id);
       await deleteTask(id);
       toast.success("Task deleted successfully");
-      fetchTasks();
+      fetchTasks({all:true,status:false});
     } catch (error) {
       toast.error("Error deleting task");
       console.error(error);
@@ -43,7 +43,7 @@ export default function TaskPage() {
   };
 
   useEffect(() => {
-    fetchTasks();
+    fetchTasks({all:true,status:false});
   }, [fetchTasks]);
 
   return (

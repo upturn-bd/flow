@@ -3,9 +3,31 @@ import { getEmployeeInfo, getCompanyId } from "@/lib/api";
 import { Task } from "@/lib/types";
 
 export interface TaskFilters {
+  all?: boolean;
   projectId?: number;
-  milestoneId?: number | null;
+  milestoneId?: number;
+  departmentId?: number;
+  includeCompleted?: boolean;
   status?: boolean;
+}
+
+// Get all company tasks
+export async function getCompanyTasks(status?: boolean) {
+  const company_id = await getCompanyId();
+  let query = supabase
+    .from("task_records")
+    .select("*")
+    .eq("company_id", company_id)
+
+  if (status !== undefined) {
+    query = query.eq("status", status);
+  }
+
+  const { data, error } = await query;
+
+  if (error)
+    throw error;
+  return data;
 }
 
 // Get all tasks assigned to user or in their department
@@ -17,9 +39,7 @@ export async function getUserTasks(filters?: TaskFilters) {
     .from("task_records")
     .select("*")
     .eq("company_id", company_id)
-    .or(
-      `assignees.cs.{${user.id}}, created_by.eq.${user.id}, department_id.eq.${user.department_id}`
-    );
+    .contains("assignees", [user.id]);
 
   if (filters?.status !== undefined) {
     query = query.eq("status", filters.status);
@@ -130,8 +150,8 @@ export async function updateTask(payload: Task) {
     .select()
     .single();
 
-    console.log("Update task response:", data, error);
-    
+  console.log("Update task response:", data, error);
+
 
   if (error) throw error;
   return data;

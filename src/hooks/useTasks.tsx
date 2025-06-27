@@ -13,6 +13,7 @@ import {
   getProjectTaskStats,
   getTaskById,
   TaskFilters,
+  getCompanyTasks,
 } from "@/lib/api/operations-and-services/project/task";
 import { Task } from "@/lib/types/schemas";
 import { useState, useCallback } from "react";
@@ -36,13 +37,23 @@ export function useTasks() {
     setError(null);
     try {
       let data: Task[];
-      
-      if (filters?.projectId && typeof filters.milestoneId === 'number') {
+      if (filters?.all) {
+        data = await getCompanyTasks(filters.status);
+      } else if (
+        filters?.projectId &&
+        typeof filters.milestoneId === "number"
+      ) {
         // Fetch tasks for specific milestone
-        data = await getMilestoneTasks(filters.milestoneId);
+        data = await getMilestoneTasks(
+          filters.milestoneId,
+          filters.includeCompleted
+        );
       } else if (filters?.projectId) {
         // Fetch all project tasks
-        data = await getProjectTasks(filters.projectId);
+        data = await getProjectTasks(
+          filters.projectId,
+          filters.includeCompleted
+        );
       } else {
         // Fetch user's tasks
         data = await getUserTasks(filters);
@@ -73,11 +84,11 @@ export function useTasks() {
   const createTask = async (task: Task) => {
     try {
       console.log("Creating task:", task);
-      
+
       const data = await cTask(task);
       await fetchTasks({
         projectId: task.project_id,
-        milestoneId: task.milestone_id,
+        includeCompleted: false,
       });
       if (task.project_id) {
         await fetchTaskStats(task.project_id);
@@ -94,7 +105,7 @@ export function useTasks() {
       const data = await uTask(task);
       await fetchTasks({
         projectId: task.project_id,
-        milestoneId: task.milestone_id
+        milestoneId: task.milestone_id,
       });
       if (task.project_id) {
         await fetchTaskStats(task.project_id);
@@ -106,13 +117,17 @@ export function useTasks() {
     }
   };
 
-  const deleteTask = async (taskId: number, projectId?: number, milestoneId?: number) => {
+  const deleteTask = async (
+    taskId: number,
+    projectId?: number,
+    milestoneId?: number
+  ) => {
     try {
       await dTask(taskId);
       if (projectId) {
         await fetchTasks({
           projectId,
-          milestoneId: milestoneId ?? null
+          milestoneId: milestoneId,
         });
         await fetchTaskStats(projectId);
       }
@@ -123,13 +138,17 @@ export function useTasks() {
     }
   };
 
-  const completeTask = async (taskId: number, projectId?: number, milestoneId?: number) => {
+  const completeTask = async (
+    taskId: number,
+    projectId?: number,
+    milestoneId?: number
+  ) => {
     try {
       const data = await cmpTask(taskId);
       if (projectId) {
         await fetchTasks({
           projectId,
-          milestoneId: milestoneId ?? null
+          milestoneId: milestoneId,
         });
         await fetchTaskStats(projectId);
       }
@@ -140,13 +159,17 @@ export function useTasks() {
     }
   };
 
-  const reopenTask = async (taskId: number, projectId?: number, milestoneId?: number) => {
+  const reopenTask = async (
+    taskId: number,
+    projectId?: number,
+    milestoneId?: number
+  ) => {
     try {
       const data = await ropTask(taskId);
       if (projectId) {
         await fetchTasks({
           projectId,
-          milestoneId: milestoneId ?? null
+          milestoneId: milestoneId,
         });
         await fetchTaskStats(projectId);
       }
@@ -157,7 +180,11 @@ export function useTasks() {
     }
   };
 
-  const updateMilestone = async (taskIds: number[], milestoneId: number | null, projectId: number) => {
+  const updateMilestone = async (
+    taskIds: number[],
+    milestoneId: number | null,
+    projectId: number
+  ) => {
     try {
       const data = await updateTasksMilestone(taskIds, milestoneId);
       await fetchTasks({ projectId });
