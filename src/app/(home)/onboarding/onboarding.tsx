@@ -29,7 +29,7 @@ import { useCompanyValidation } from "@/hooks/useCompanyValidation";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useOnboarding } from "@/hooks/useOnboarding";
-import { getEmployeeId, getUser } from "@/lib/api/employee";
+import { getEmployeeId, getUser } from "@/lib/api";
 import { validateOnboardingForm, validationErrorsToObject } from "@/lib/utils/validation";
 import { OnboardingFormData } from "@/lib/types/schemas";
 
@@ -79,7 +79,7 @@ export default function EmployeeOnboarding() {
 
   const fetchDepartmentsData = async () => {
     try {
-      await fetchDepartments(companyId ?? undefined);
+      await fetchDepartments();
     } catch (error) {
       console.error("Error fetching departments:", error);
     }
@@ -117,8 +117,8 @@ export default function EmployeeOnboarding() {
         if (user) {
           setFormData((prev) => ({
             ...prev,
-            email: user.user?.email ?? "",
-            phone_number: user.user?.phone ?? "",
+            email: user.email ?? "",
+            phone_number: user.phone ?? "",
           }));
         }
       }
@@ -545,7 +545,9 @@ export default function EmployeeOnboarding() {
                         name="department_id"
                         label="Department"
                         icon={<Building2 size={18} />}
-                        options={departments.map(dept => ({ value: dept.id, label: dept.name }))}
+                        options={departments
+                          .filter(dept => dept.id !== undefined)
+                          .map(dept => ({ value: dept.id as number, label: dept.name }))}
                         placeholder="Select Department"
                         value={formData.department_id}
                         onChange={handleChange}

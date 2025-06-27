@@ -2,18 +2,11 @@
  * Type definitions to replace Zod schemas
  */
 
-export const schoolingTypes = [
-  "High School",
-  "College", 
-  "Diploma",
-  "Bachelors",
-  "Masters",
-  "PGD",
-  "PhD",
-  "Post-Doc",
-] as const;
+import { SCHOOLING_TYPES, SchoolingType as ConstantsSchoolingType } from '@/lib/constants';
 
-export type SchoolingType = typeof schoolingTypes[number];
+export const schoolingTypes = Object.values(SCHOOLING_TYPES);
+
+export type SchoolingType = ConstantsSchoolingType;
 
 export interface Schooling {
   type: SchoolingType;
@@ -92,7 +85,7 @@ export interface RequisitionType {
   company_id?: number;
 }
 
-export interface NewsAndNoticeType {
+export interface NoticeType {
   id?: number;
   name: string;
   company_id?: number;

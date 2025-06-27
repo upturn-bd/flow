@@ -2,6 +2,8 @@
  * Simple validation utilities to replace Zod
  */
 
+import { SCHOOLING_TYPE_OPTIONS, STATUS, JOB_STATUS } from '@/lib/constants';
+
 export interface ValidationError {
   field: string;
   message: string;
@@ -118,7 +120,7 @@ export function validateNotice(notice: any): ValidationResult {
  */
 export function validateSchooling(schooling: any): ValidationResult {
   const errors: ValidationError[] = [];
-  const schoolingTypes = ["High School", "College", "Diploma", "Bachelors", "Masters", "PGD", "PhD", "Post-Doc"];
+  const schoolingTypes = SCHOOLING_TYPE_OPTIONS;
 
   if (!schooling.type || !schoolingTypes.includes(schooling.type)) {
     errors.push({ field: 'type', message: 'Please select a valid schooling type' });
@@ -538,7 +540,7 @@ export function validateRequisition(requisition: any): ValidationResult {
     errors.push({ field: 'quantity', message: 'Please enter a valid quantity' });
   }
 
-  const validStatuses = ["Pending", "Approved", "Rejected"];
+  const validStatuses = [STATUS.PENDING, STATUS.APPROVED, STATUS.REJECTED];
   if (requisition.status && !validStatuses.includes(requisition.status)) {
     errors.push({ field: 'status', message: 'Please select a valid status' });
   }
@@ -839,7 +841,7 @@ export function validateOnboardingForm(formData: any): ValidationResult {
   const designationError = validateStringLength(formData.designation, 'designation', 1);
   if (designationError) errors.push(designationError);
 
-  const validJobStatuses = ["Active", "Inactive", "Probation", "Resigned", "Terminated"];
+  const validJobStatuses = Object.values(JOB_STATUS);
   if (!formData.job_status || !validJobStatuses.includes(formData.job_status)) {
     errors.push({ field: 'job_status', message: 'Job status is required' });
   }

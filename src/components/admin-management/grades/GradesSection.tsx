@@ -14,7 +14,13 @@ type GradesSectionProps = {
 };
 
 export default function GradesSection({ showNotification }: GradesSectionProps) {
-  const { grades, loading: gradesLoading, fetchGrades, createGrade, deleteGrade } = useGrades();
+  const { 
+    items: grades, 
+    loading: gradesLoading, 
+    fetchItems: fetchGrades, 
+    createItem: createGrade, 
+    deleteItem: deleteGrade 
+  } = useGrades();
   const [isCreatingGrade, setIsCreatingGrade] = useState(false);
   const [gradeDeleteLoading, setGradeDeleteLoading] = useState<number | null>(null);
 
@@ -85,7 +91,7 @@ export default function GradesSection({ showNotification }: GradesSectionProps) 
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   className="ml-1.5 sm:ml-2 text-red-600 hover:text-red-800 transition-colors"
-                  onClick={() => handleDeleteGrade(grade.id)}
+                  onClick={() => handleDeleteGrade(grade.id ?? 0)}
                   disabled={gradeDeleteLoading === grade.id}
                 >
                   <TrashSimple size={12} className={`${gradeDeleteLoading === grade.id ? 'animate-spin' : ''}`} />
@@ -110,6 +116,7 @@ export default function GradesSection({ showNotification }: GradesSectionProps) 
       <AnimatePresence>
         {isCreatingGrade && (
           <GradeModal
+            isOpen={isCreatingGrade}
             onSubmit={handleCreateGrade}
             onClose={() => setIsCreatingGrade(false)}
           />

@@ -2,7 +2,7 @@ import { useNewsAndNoticesTypes } from "@/hooks/useNewsAndNotices";
 import { Notice } from "@/hooks/useNotice";
 import { useDepartments } from "@/hooks/useDepartments";
 import { createClient } from '@/lib/supabase/client';
-import { getCompanyId } from "@/lib/api/company/companyInfo";
+import { getCompanyId } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { 

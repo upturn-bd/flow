@@ -1,7 +1,7 @@
 "use client";
 
 import { Attendance } from "@/hooks/useAttendance";
-import { getEmployeeInfo } from "@/lib/api/employee";
+import { getEmployeeInfo } from "@/lib/api";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { FaChevronDown, FaCalendarAlt, FaSearch } from "react-icons/fa";

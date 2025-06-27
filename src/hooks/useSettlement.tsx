@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo } from "@/lib/api/employee";
-import { getCompanyId } from "@/lib/api/company/companyInfo";
+import { getEmployeeInfo } from "@/lib/api";
+import { getCompanyId } from "@/lib/api";
 
 export function useSettlementRequests() {
   const [settlementRequests, setSettlementRequests] = useState<any[]>([]);

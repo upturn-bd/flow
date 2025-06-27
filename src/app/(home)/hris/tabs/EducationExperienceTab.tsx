@@ -112,10 +112,12 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
   const handleUpdateEducation = (values: Education) =>
     handleAsyncAction(
       async () => {
-        await updateEducation(values);
-        fetchEducation();
-        showNotification('Education updated successfully', 'success');
-        setEditEducation(null);
+        if (editEducation) {
+          await updateEducation(editEducation, values);
+          fetchEducation();
+          showNotification('Education updated successfully', 'success');
+          setEditEducation(null);
+        }
       },
       setIsEducationActionLoading,
       undefined,
@@ -155,10 +157,12 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
   const handleUpdateExperience = (values: Experience) =>
     handleAsyncAction(
       async () => {
-        await updateExperience(values);
-        fetchExperience();
-        showNotification('Experience updated successfully', 'success');
-        setEditExperience(null);
+        if (editExperience) {
+          await updateExperience(editExperience, values);
+          fetchExperience();
+          showNotification('Experience updated successfully', 'success');
+          setEditExperience(null);
+        }
       },
       setIsExperienceActionLoading,
       undefined,
@@ -459,6 +463,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
         {/* Education Modal */}
         {(isCreatingEducation || editEducation !== null) && (
           <EducationModal
+            isOpen={isCreatingEducation || editEducation !== null}
             initialData={selectedEducationEdit}
             onSubmit={selectedEducationEdit ? handleUpdateEducation : handleCreateEducation}
             onClose={() => {
@@ -471,6 +476,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
         {/* Experience Modal */}
         {(isCreatingExperience || editExperience !== null) && (
           <ExperienceModal
+            isOpen={isCreatingExperience || editExperience !== null}
             initialData={selectedExperienceEdit}
             onSubmit={selectedExperienceEdit ? handleUpdateExperience : handleCreateExperience}
             onClose={() => {

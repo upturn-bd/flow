@@ -2,8 +2,8 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
-import { getEmployeeInfo } from "@/lib/api/employee";
-import { getCompanyId } from "@/lib/api/company/companyInfo";
+import { getEmployeeInfo } from "@/lib/api";
+import { getCompanyId } from "@/lib/api";
 import { Leave } from "@/lib/types";
 import { validateLeave, validationErrorsToObject } from "@/lib/utils/validation";
 import React, { useEffect, useState } from "react";

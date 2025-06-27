@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { getCompanyInfo as getCompanyInfoApi } from "@/lib/api/company/companyInfo";
+import { getCompanyInfo as getCompanyInfoApi } from "@/lib/api";
 import { useEmployees } from "@/hooks/useEmployees";
 
 interface CompanyInfo {
@@ -36,7 +36,7 @@ export function useCompanyInfo() {
     try {
       const result = await getCompanyInfoApi();
       
-      setCompanyInfo(result.company);
+      setCompanyInfo(result);
       setCountries(result.countries);
       setIndustries(result.industries);
       

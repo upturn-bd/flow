@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
-import RequisitionTypeCreateModal, {
+import { 
+  RequisitionTypeModal as RequisitionTypeCreateModal,
   RequisitionInventoryCreateModal,
   RequisitionInventoryUpdateModal,
-} from "./InventoryModal";
+} from "./";
 import { RequisitionInventory, useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { TrashSimple, Package, Tag, Plus, Eye } from "@phosphor-icons/react";
@@ -215,6 +216,7 @@ export default function InventoryManagementView() {
           <AnimatePresence>
             {isCreatingRequisitionType && (
               <RequisitionTypeCreateModal
+                isOpen={isCreatingRequisitionType}
                 onSubmit={handleCreateRequisitionType}
                 onClose={() => setIsCreatingRequisitionType(false)}
                 isLoading={isLoading}
@@ -325,6 +327,7 @@ export default function InventoryManagementView() {
         <AnimatePresence>
           {isCreatingRequisitionInventory && (
             <RequisitionInventoryCreateModal
+              isOpen={isCreatingRequisitionInventory}
               requisitionCategories={requisitionTypes}
               onSubmit={handleCreateRequisitionInventory}
               onClose={() => setIsCreatingRequisitionInventory(false)}
@@ -336,6 +339,7 @@ export default function InventoryManagementView() {
         <AnimatePresence>
           {selectedRequisitionInventoryEdit && (
             <RequisitionInventoryUpdateModal
+              isOpen={!!selectedRequisitionInventoryEdit}
               initialData={selectedRequisitionInventoryEdit}
               requisitionCategories={requisitionTypes}
               onSubmit={handleUpdateRequisitionInventory}

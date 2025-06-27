@@ -46,10 +46,12 @@ export default function DivisionsSection({ employees, showNotification }: Divisi
 
   const handleUpdateDivision = async (values: any) => {
     try {
-      await updateDivision(values);
-      setEditDivision(null);
-      fetchDivisions();
-      showNotification("Division updated successfully");
+      if (editDivision) {
+        await updateDivision(editDivision, values);
+        setEditDivision(null);
+        fetchDivisions();
+        showNotification("Division updated successfully");
+      }
     } catch {
       showNotification("Error updating Division", true);
     }
@@ -155,6 +157,7 @@ export default function DivisionsSection({ employees, showNotification }: Divisi
         {isCreatingDivision && (
           <DivisionModal
             key={`CreateDivisionModal`}
+            isOpen={isCreatingDivision}
             employees={employees}
             onSubmit={handleCreateDivision}
             onClose={() => setIsCreatingDivision(false)}
@@ -173,6 +176,7 @@ export default function DivisionsSection({ employees, showNotification }: Divisi
         {selectedDivisionEdit && (
           <DivisionModal
             key={`EditDivisionModal-${selectedDivisionEdit.id}`}
+            isOpen={!!selectedDivisionEdit}
             employees={employees}
             initialData={selectedDivisionEdit}
             onSubmit={handleUpdateDivision}

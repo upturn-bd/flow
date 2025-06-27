@@ -6,9 +6,9 @@ import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { IoMdCalendar } from "react-icons/io";
 import { useEmployees } from "@/hooks/useEmployees";
 import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo } from "@/lib/api/employee";
-import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
+import { getEmployeeInfo } from "@/lib/api";
+import { getCompanyId } from "@/lib/api";
+import { uploadManyFiles } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload,

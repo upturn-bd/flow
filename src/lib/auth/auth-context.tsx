@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
-import { getEmployeeInfo } from "@/lib/api/employee";
+import { getEmployeeInfo } from "@/lib/api";
 import { navItems } from "@/app/(home)/nav-items";
 
 export type EmployeeInfo = {

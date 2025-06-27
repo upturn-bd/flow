@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, ChangeEvent } from "react";
-import { getEmployeeInfo } from "@/lib/api/employee";
-import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
+import { getEmployeeInfo } from "@/lib/api";
+import { getCompanyId } from "@/lib/api";
+import { uploadManyFiles } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Upload,

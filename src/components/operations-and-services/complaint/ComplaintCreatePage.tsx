@@ -19,8 +19,8 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { ComplaintRecord } from "@/lib/types/schemas";
-import { getEmployeeInfo } from "@/lib/api/employee";
-import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
+import { getEmployeeInfo } from "@/lib/api";
+import { uploadManyFiles } from "@/lib/api";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import { toast } from "sonner";

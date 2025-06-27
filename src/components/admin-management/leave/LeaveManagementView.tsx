@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
-import LeaveTypeCreateModal, {
+import {
+  LeaveTypeCreateModal,
   LeaveHolidayCreateModal,
   LeaveHolidayUpdateModal,
   LeaveTypeUpdateModal,
-} from "./LeaveModal";
+} from "./";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { TrashSimple, Tag, CalendarCheck, CalendarBlank, Plus, Clock, Eye } from "@phosphor-icons/react";
 import { useHolidayConfigs } from "@/hooks/useLeaveManagement";
@@ -376,6 +377,7 @@ export default function LeaveManagementView() {
         <AnimatePresence>
           {isCreatingLeaveType && (
             <LeaveTypeCreateModal
+              isOpen={isCreatingLeaveType}
               onSubmit={handleCreateLeaveType}
               onClose={() => setIsCreatingLeaveType(false)}
               isLoading={typeLoading}
@@ -386,6 +388,7 @@ export default function LeaveManagementView() {
         <AnimatePresence>
           {selectedLeaveTypeEdit && (
             <LeaveTypeUpdateModal
+              isOpen={!!selectedLeaveTypeEdit}
               initialData={selectedLeaveTypeEdit}
               onSubmit={handleUpdateLeaveType}
               onClose={() => {
@@ -400,6 +403,7 @@ export default function LeaveManagementView() {
         <AnimatePresence>
           {isCreatingHolidayConfig && (
             <LeaveHolidayCreateModal
+              isOpen={isCreatingHolidayConfig}
               onSubmit={handleCreateHolidayConfig}
               onClose={() => setIsCreatingHolidayConfig(false)}
               isLoading={holidayLoading}
@@ -410,6 +414,7 @@ export default function LeaveManagementView() {
         <AnimatePresence>
           {selectedHolidayConfigEdit && (
             <LeaveHolidayUpdateModal
+              isOpen={!!selectedHolidayConfigEdit}
               initialData={selectedHolidayConfigEdit}
               onSubmit={handleUpdateHolidayConfig}
               onClose={() => {

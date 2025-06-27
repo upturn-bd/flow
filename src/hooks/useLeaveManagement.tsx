@@ -1,300 +1,57 @@
 "use client";
 
+import { useBaseEntity } from "./core";
 import { LeaveType, HolidayConfig } from "@/lib/types";
-import { validateLeaveType, validateHolidayConfig } from "@/lib/utils/validation";
-import { useState, useCallback } from "react";
-import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo } from "@/lib/api/employee";
-import { getCompanyId } from "@/lib/api/company/companyInfo";
-import { LeaveState } from "@/components/operations-and-services/leave/LeaveCreatePage";
 
-// Re-export types for components
+// Export types for components
 export type { LeaveType, HolidayConfig };
 
 export function useLeaveTypes() {
-  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchLeaveTypes = useCallback(async () => {
-    setLoading(true);
-    try {
-      const company_id = await getCompanyId();
-      const { data, error } = await supabase
-        .from("leave_types")
-        .select("*")
-        .eq("company_id", company_id);
-
-      if (error) throw error;
-      setLeaveTypes(data || []);
-      return data;
-    } catch (error) {
-      setError("Failed to fetch leave types");
-      console.error(error);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const createLeaveType = useCallback(async (values: LeaveType) => {
-    try {
-      const company_id = await getCompanyId();
-      const { data, error } = await supabase
-        .from("leave_types")
-        .insert({
-          ...values,
-          company_id,
-        });
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }, []);
-
-  const updateLeaveType = useCallback(async (values: LeaveType) => {
-    try {
-      const company_id = await getCompanyId();
-      
-      // Validate the payload
-      const validation = validateLeaveType(values);
-      if (!validation.success) {
-        const error = new Error("Validation failed");
-        (error as any).issues = validation.errors;
-        throw error;
-      }
-
-      const { data, error } = await supabase
-        .from("leave_types")
-        .update(values)
-        .eq("id", values.id)
-        .eq("company_id", company_id);
-
-      if (error) throw error;
-      return { success: true, status: 200, data };
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }, []);
-
-  const deleteLeaveType = useCallback(async (id: number) => {
-    try {
-      const company_id = await getCompanyId();
-
-      const { error } = await supabase
-        .from("leave_types")
-        .delete()
-        .eq("id", id)
-        .eq("company_id", company_id);
-
-      if (error) throw error;
-      return { success: true, status: 200, data: null };
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }, []);
-
+  const baseResult = useBaseEntity<LeaveType>({
+    tableName: "leave_types",
+    entityName: "leave type",
+    companyScoped: true,
+  });
+  
   return {
-    leaveTypes,
-    loading,
-    error,
-    fetchLeaveTypes,
-    createLeaveType,
-    updateLeaveType,
-    deleteLeaveType,
+    ...baseResult,
+    leaveTypes: baseResult.items,
+    fetchLeaveTypes: baseResult.fetchItems,
+    createLeaveType: baseResult.createItem,
+    updateLeaveType: baseResult.updateItem,
+    deleteLeaveType: baseResult.deleteItem,
   };
 }
 
 export function useHolidayConfigs() {
-  const [holidayConfigs, setHolidayConfigs] = useState<HolidayConfig[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetchHolidayConfigs = useCallback(async () => {
-    setLoading(true);
-    try {
-      const company_id = await getCompanyId();
-
-      const { data, error } = await supabase
-        .from("leave_calendars")
-        .select("*")
-        .eq("company_id", company_id);
-
-      if (error) throw error;
-      setHolidayConfigs(data || []);
-      return data;
-    } catch (error) {
-      console.error(error);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const createHolidayConfig = useCallback(async (values: HolidayConfig) => {
-    try {
-      const company_id = await getCompanyId();
-      
-      // Validate the payload
-      const validation = validateHolidayConfig(values);
-      if (!validation.success) {
-        const error = new Error("Validation failed");
-        (error as any).issues = validation.errors;
-        throw error;
-      }
-
-      const { data, error } = await supabase.from("leave_calendars").insert({
-        ...values,
-        company_id,
-      });
-
-      if (error) throw error;
-      return { success: true, status: 200, data };
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }, []);
-
-  const updateHolidayConfig = useCallback(async (values: HolidayConfig) => {
-    try {
-      const company_id = await getCompanyId();
-      
-      // Validate the payload
-      const validation = validateHolidayConfig(values);
-      if (!validation.success) {
-        const error = new Error("Validation failed");
-        (error as any).issues = validation.errors;
-        throw error;
-      }
-
-      const { data, error } = await supabase
-        .from("leave_calendars")
-        .update(values)
-        .eq("id", values.id)
-        .eq("company_id", company_id);
-
-      if (error) throw error;
-      return { success: true, status: 200, data };
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }, []);
-
-  const deleteHolidayConfig = useCallback(async (id: number) => {
-    try {
-      const company_id = await getCompanyId();
-
-      const { error } = await supabase
-        .from("leave_calendars")
-        .delete()
-        .eq("id", id)
-        .eq("company_id", company_id);
-
-      if (error) throw error;
-      return { success: true, status: 200, data: null };
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }, []);
-
+  const baseResult = useBaseEntity<HolidayConfig>({
+    tableName: "holiday_configs",
+    entityName: "holiday config",
+    companyScoped: true,
+  });
+  
   return {
-    holidayConfigs,
-    loading,
-    fetchHolidayConfigs,
-    createHolidayConfig,
-    updateHolidayConfig,
-    deleteHolidayConfig,
+    ...baseResult,
+    holidayConfigs: baseResult.items,
+    fetchHolidayConfigs: baseResult.fetchItems,
+    createHolidayConfig: baseResult.createItem,
+    updateHolidayConfig: baseResult.updateItem,
+    deleteHolidayConfig: baseResult.deleteItem,
   };
 }
 
 export function useLeaveRequests() {
-  const [leaveRequests, setLeaveRequests] = useState<LeaveState[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [processingId, setProcessingId] = useState<number | null>(null);
-
-  const fetchLeaveRequests = useCallback(async (status: string = "Pending") => {
-    setLoading(true);
-    
-    try {
-      const user = await getEmployeeInfo();
-      const company_id = await getCompanyId();
-      
-      const { data, error } = await supabase
-        .from("leave_records")
-        .select("*")
-        .eq("company_id", company_id)
-        .eq("requested_to", user.id)
-        .eq("status", status);
-
-      if (error) {
-        setError("Failed to fetch leave requests");
-        throw error;
-      }
-
-      setLeaveRequests(data || []);
-      return data;
-    } catch (error) {
-      setError("Failed to fetch leave requests");
-      console.error(error);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const fetchLeaveHistory = useCallback(async () => {
-    return fetchLeaveRequests("Pending");
-  }, [fetchLeaveRequests]);
-
-  const updateLeaveRequest = useCallback(async (action: string, id: number, comment: string) => {
-    setProcessingId(id);
-    
-    try {
-      const user = await getEmployeeInfo();
-      const company_id = await getCompanyId();
-      
-      const { data, error } = await supabase
-        .from("leave_records")
-        .update({
-          status: action,
-          approved_by_id: user.id,
-          remarks: comment,
-        })
-        .eq("company_id", company_id)
-        .eq("id", id);
-      
-      if (error) {
-        setError("Failed to update leave request");
-        throw error;
-      }
-      
-      // Refresh the requests
-      await fetchLeaveRequests();
-      return true;
-    } catch (error) {
-      setError("Failed to update leave request");
-      console.error(error);
-      return false;
-    } finally {
-      setProcessingId(null);
-    }
-  }, [fetchLeaveRequests]);
+  const baseResult = useBaseEntity<any>({
+    tableName: "leave_requests",
+    entityName: "leave request",
+    companyScoped: true,
+  });
 
   return {
-    leaveRequests,
-    loading,
-    error,
-    processingId,
-    fetchLeaveRequests,
-    fetchLeaveHistory,
-    updateLeaveRequest
+    ...baseResult,
+    leaveRequests: baseResult.items,
+    fetchLeaveRequests: baseResult.fetchItems,
+    updateLeaveRequest: baseResult.updateItem,
+    processingId: baseResult.updating,
   };
 }

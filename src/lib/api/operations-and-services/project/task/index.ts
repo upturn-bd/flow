@@ -1,6 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo } from "@/lib/api/employee";
-import { getCompanyId } from "@/lib/api/company/companyInfo";
+import { getEmployeeInfo, getCompanyId } from "@/lib/api";
 import { Task } from "@/lib/types";
 import { validateTask } from "@/lib/utils/validation";
 

@@ -1,7 +1,7 @@
 "use client";
 import { useEmployees } from "@/hooks/useEmployees";
-import { getEmployeeInfo } from "@/lib/api/employee";
-import { getCompanyId } from "@/lib/api/company/companyInfo";
+import { getEmployeeInfo } from "@/lib/api";
+import { getCompanyId } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useMilestones } from "@/hooks/useMilestones";
 import {  useComments } from "@/hooks/useComments";
@@ -26,9 +26,10 @@ import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { Button } from "@/components/ui/button";
-import TaskCreateModal, { TaskUpdateModal } from "../task/shared/TaskModal";
+import TaskCreateModal from "../task/shared/TaskCreateModal";
+import TaskUpdateModal from "../task/shared/TaskUpdateModal";
 import { motion } from "framer-motion";
-import MilestoneCreateModal from "./milestone/MilestoneModal";
+import MilestoneCreateModal from "./milestone/MilestoneCreateModal";
 import { Milestone, Project, Task } from "@/lib/types/schemas";
 
 interface ProjectDetailsProps {

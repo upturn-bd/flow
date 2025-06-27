@@ -8,7 +8,7 @@ import { ClaimType } from "@/lib/types/schemas";
 import {
   ClaimTypeCreateModal,
   ClaimTypeUpdateModal,
-} from "./SettlementModal";
+} from "./";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
@@ -199,6 +199,7 @@ export default function ClaimSettlementView() {
         <AnimatePresence>
           {isCreatingClaimType && (
             <ClaimTypeCreateModal
+              isOpen={isCreatingClaimType}
               onSubmit={handleCreateClaimType}
               onClose={() => setIsCreatingSettlementType(false)}
               isLoading={isLoading}
@@ -209,6 +210,7 @@ export default function ClaimSettlementView() {
         <AnimatePresence>
           {selectedClaimTypeEdit && (
             <ClaimTypeUpdateModal
+              isOpen={!!selectedClaimTypeEdit}
               initialData={selectedClaimTypeEdit}
               onSubmit={handleUpdateClaimType}
               onClose={() => {

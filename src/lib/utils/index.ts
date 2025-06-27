@@ -1,3 +1,16 @@
+/**
+ * Utilities Index
+ * Core utility functions for the application
+ */
+
+// Re-export utility functions from ./validation and ./path-utils
+export * from './validation';
+export * from './path-utils';
+
+// ====================================================================
+// Helper Functions
+// ====================================================================
+
 export function dirtyValuesChecker<T extends object>(
   initial: T,
   current: T

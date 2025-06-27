@@ -39,18 +39,24 @@ export default function HomePage() {
   } = useModalState();
 
   const {
-    attendanceStatus,
+    items: attendanceRecords,
     loading: statusLoading,
-    attendanceDetails,
-    checkAttendanceStatus,
+    fetchItems: checkAttendanceStatus,
   } = useAttendanceStatus();
   const { sites, loading: sitesLoading, fetchSites } = useSites();
   const { notices, loading: noticesLoading, fetchNotices } = useNotices();
   const { tasks, loading: tasksLoading, fetchTasks } = useTasks();
 
+  // Create attendance status from records
+  const currentAttendanceRecord = attendanceRecords[0] || null;
+  const attendanceStatus = {
+    checkIn: !!currentAttendanceRecord?.check_in_time,
+    checkOut: !!currentAttendanceRecord?.check_out_time,
+  };
+
   useEffect(() => {
     fetchSites();
-    fetchNotices(true);
+    fetchNotices();
     fetchTasks();
   }, [fetchSites, fetchNotices, fetchTasks]);
 
@@ -59,7 +65,7 @@ export default function HomePage() {
   };
 
   const onCheckOut = () => {
-    handleCheckOut(attendanceDetails, checkAttendanceStatus);
+    handleCheckOut(currentAttendanceRecord, checkAttendanceStatus);
   };
 
   return (
@@ -84,7 +90,7 @@ export default function HomePage() {
               notices={notices}
               loading={noticesLoading}
               onNoticeClick={handleNoticeClick}
-              onRefresh={() => fetchNotices(true)}
+              onRefresh={() => fetchNotices()}
             />
           </SectionContainer>
 

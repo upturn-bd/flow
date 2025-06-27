@@ -54,10 +54,12 @@ export default function DepartmentsSection({
 
   const handleUpdateDepartment = async (values: any) => {
     try {
-      await updateDepartment(values);
-      setEditDepartment(null);
-      fetchDepartments();
-      showNotification("Department updated successfully");
+      if (editDepartment) {
+        await updateDepartment(editDepartment, values);
+        setEditDepartment(null);
+        fetchDepartments();
+        showNotification("Department updated successfully");
+      }
     } catch {
       showNotification("Error updating department", true);
     }
@@ -129,7 +131,7 @@ export default function DepartmentsSection({
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setViewDepartment(dept.id)}
+                    onClick={() => setViewDepartment(dept.id ?? null)}
                     className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs sm:text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
                   >
                     <Eye size={14} />
@@ -138,7 +140,7 @@ export default function DepartmentsSection({
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleDeleteDepartment(dept.id)}
+                    onClick={() => handleDeleteDepartment(dept.id ?? 0)}
                     disabled={departmentDeleteLoading === dept.id}
                     className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-red-50 text-red-600 text-xs sm:text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${
                       departmentDeleteLoading === dept.id
@@ -175,6 +177,7 @@ export default function DepartmentsSection({
         {isCreatingDepartment && (
           <DepartmentModal
             key={`CreateDepartmentModal`}
+            isOpen={isCreatingDepartment}
             employees={employees}
             divisions={divisions}
             onSubmit={handleCreateDepartment}
@@ -186,9 +189,9 @@ export default function DepartmentsSection({
             key={`DepartmentDetailsModal-${selectedDepartmentView.id}`}
             employees={employees}
             divisions={divisions}
-            editDepartment={() => setEditDepartment(selectedDepartmentView.id)}
+            editDepartment={() => setEditDepartment(selectedDepartmentView.id ?? null)}
             deleteDepartment={() =>
-              handleDeleteDepartment(selectedDepartmentView.id)
+              handleDeleteDepartment(selectedDepartmentView.id ?? 0)
             }
             department={selectedDepartmentView}
             onClose={() => setViewDepartment(null)}
@@ -197,6 +200,7 @@ export default function DepartmentsSection({
         {selectedDepartmentEdit && (
           <DepartmentModal
             key={`EditDepartmentModal-${selectedDepartmentEdit.id}`}
+            isOpen={!!selectedDepartmentEdit}
             employees={employees}
             divisions={divisions}
             initialData={selectedDepartmentEdit}

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { uploadManyFiles } from "@/lib/api/operations-and-services/requisition";
-import { uploadFile as uploadSingleFile } from "@/lib/api/education-and-experience";
+import { uploadManyFiles } from "@/lib/api";
+import { uploadFile as uploadSingleFile } from "@/lib/api";
 
 export function useFileUpload() {
   const [uploading, setUploading] = useState(false);

@@ -3,7 +3,7 @@
 import { Lineage } from "@/lib/types/schemas";
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId } from "@/lib/api/company/companyInfo";
+import { getCompanyId } from "@/lib/api";
 
 export function useLineage() {
   const [lineages, setLineages] = useState<Lineage[]>([]);

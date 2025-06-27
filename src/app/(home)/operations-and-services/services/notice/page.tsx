@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Pencil, Trash2, Plus, Clock, CalendarDays, Info } from "lucide-react";
 import { toast } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { NoticeUpdateModal, NoticeCreateModal } from "@/components/operations-and-services/notice/NoticeModal";
+import { NoticeCreateModal, NoticeUpdateModal } from "@/components/operations-and-services/notice";
 
 export default function NoticePage() {
   const {
@@ -33,10 +33,12 @@ export default function NoticePage() {
 
   const handleUpdateNotice = async (values: any) => {
     try {
-      await updateNotice(values);
-      toast.success("Notice updated successfully!");
-      setEditNotice(null);
-      fetchNotices();
+      if (editNotice?.id) {
+        await updateNotice(editNotice.id, values);
+        toast.success("Notice updated successfully!");
+        setEditNotice(null);
+        fetchNotices();
+      }
     } catch (error) {
       toast.error("Error updating notice. Please try again.");
       console.error(error);
