@@ -39,17 +39,17 @@ export default function HomePage() {
   } = useModalState();
 
   const {
-    items: attendanceRecords,
     loading: statusLoading,
-    fetchItems: checkAttendanceStatus,
-    fetchItem: checkAttendanceStatusForDay,
+    today,
+    todayLoading,
+    getTodaysAttendance,
   } = useAttendanceStatus();
   const { sites, loading: sitesLoading, fetchSites } = useSites();
   const { notices, loading: noticesLoading, fetchNotices } = useNotices();
   const { tasks, loading: tasksLoading, fetchTasks } = useTasks();
 
   // Create attendance status from records
-  const currentAttendanceRecord = attendanceRecords[0] || null;
+  const currentAttendanceRecord = today;
   const attendanceStatus = {
     checkIn: !!currentAttendanceRecord?.check_in_time,
     checkOut: !!currentAttendanceRecord?.check_out_time,
@@ -59,14 +59,15 @@ export default function HomePage() {
     fetchSites();
     fetchNotices();
     fetchTasks();
+    getTodaysAttendance();
   }, [fetchSites, fetchNotices, fetchTasks]);
 
   const onCheckIn = () => {
-    handleCheckIn(attendanceRecord, sites, checkAttendanceStatus);
+    handleCheckIn(attendanceRecord, sites, getTodaysAttendance);
   };
 
   const onCheckOut = () => {
-    handleCheckOut(currentAttendanceRecord, checkAttendanceStatus);
+    handleCheckOut(currentAttendanceRecord, getTodaysAttendance);
   };
 
   return (
@@ -98,7 +99,7 @@ export default function HomePage() {
           {/* Attendance */}
           <SectionContainer variants={sectionVariants}>
             <AttendanceSection
-              loading={statusLoading}
+              loading={statusLoading || todayLoading}
               attendanceStatus={attendanceStatus}
               attendanceRecord={attendanceRecord}
               sites={sites}

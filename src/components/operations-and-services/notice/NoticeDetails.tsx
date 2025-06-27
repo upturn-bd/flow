@@ -1,21 +1,14 @@
-import { useNewsAndNoticesTypes } from "@/hooks/useNewsAndNotices";
-import { Notice } from "@/hooks/useNotice";
 import { useDepartments } from "@/hooks/useDepartments";
-import { createClient } from '@/lib/supabase/client';
-import { getCompanyId } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  Bell, 
-  ChevronLeft, 
-  Loader2, 
-  XCircle, 
+import {
+  ChevronLeft,
+  Loader2,
+  XCircle,
   Calendar,
-  Info,
-  MessageCircle,
-  Building2
 } from "lucide-react";
 import { toast } from "sonner";
+import { useNotices, useNoticeTypes } from "@/hooks/useNotice";
 
 interface NoticeDetailsProps {
   id: number;
@@ -24,7 +17,7 @@ interface NoticeDetailsProps {
 
 function formatDate(dateStr: string): string {
   if (!dateStr) return "N/A";
-  
+
   const [year, month, dayStr] = dateStr.split("-");
   const day = parseInt(dayStr, 10);
   const months = [
@@ -47,60 +40,34 @@ function formatDate(dateStr: string): string {
 }
 
 export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
-  const [noticeDetails, setNoticeDetails] = useState<Notice | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { departments } = useDepartments();
-  const { newsAndNoticeTypes } = useNewsAndNoticesTypes();
-  const [departmentName, setDepartmentName] = useState<string | null>(null);
-  const [noticeTypeName, setNoticeTypeName] = useState<string | null>(null);
-
-  async function fetchNoticeDetails(id: number) {
-    setLoading(true);
-    const client = createClient();
-    const company_id = await getCompanyId();
-
-    try {
-      const { data, error } = await client
-        .from("notice_records")
-        .select("*")
-        .eq("id", id)
-        .eq("company_id", company_id)
-        .single();
-
-      if (error) {
-        setError("Error fetching notice details");
-        toast.error("Error fetching notice details");
-        console.error(error);
-        return;
-      }
-
-      setNoticeDetails(data);
-
-      // Get department name
-      const department = departments.find(d => d.id === data.department_id);
-      setDepartmentName(department?.name || "N/A");
-
-      // Get notice type name
-      const noticeType = newsAndNoticeTypes.find(t => t.id === data.notice_type_id);
-      setNoticeTypeName(noticeType?.name || "N/A");
-
-    } catch (error) {
-      setError("Error fetching notice details");
-      toast.error("Error fetching notice details");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { noticeType, loading: loadingNoticeType,fetchNoticeType } = useNoticeTypes();
+  const { department, loading: loadingDepartment,fetchDepartment } = useDepartments();
+  const { notice, fetchNotice, loading: loadingNotice } = useNotices();
 
   useEffect(() => {
     if (id !== null) {
-      fetchNoticeDetails(id);
+      const fetchNoticeDetails = async function (id: string) {
+        try {
+          await fetchNotice(id);
+
+        } catch (error) {
+          setError("Error fetching notice details");
+          toast.error("Error fetching notice details");
+          console.error(error);
+        }
+      };
+      fetchNoticeDetails(id.toString());
     }
   }, [id]);
 
-  if (loading) {
+  useEffect(() => {
+    if(!notice) return;
+    fetchNoticeType(notice?.notice_type_id || "");
+    fetchDepartment(notice?.department_id || "");
+  }, [notice]);
+
+  if (loadingNotice || loadingNoticeType || loadingDepartment) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <Loader2 className="h-8 w-8 text-amber-500 animate-spin mb-2" />
@@ -150,29 +117,33 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
       <div className="bg-amber-50 rounded-lg p-5 mb-6">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold text-gray-900">{noticeDetails?.title || "N/A"}</h3>
-            <span className={`text-xs px-2 py-1 rounded-full ${
-              noticeDetails?.urgency === 'High' 
-                ? 'bg-red-100 text-red-800' 
-                : noticeDetails?.urgency === 'Medium'
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-green-100 text-green-800'
-            }`}>
-              {noticeDetails?.urgency || "N/A"}
+            <h3 className="text-lg font-semibold text-gray-900">
+              {notice?.title || "N/A"}
+            </h3>
+            <span
+              className={`text-xs px-2 py-1 rounded-full ${
+                notice?.urgency === "High"
+                  ? "bg-red-100 text-red-800"
+                  : notice?.urgency === "Medium"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : "bg-green-100 text-green-800"
+              }`}
+            >
+              {notice?.urgency || "N/A"}
             </span>
           </div>
-          
+
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <span className="font-medium">Notice Type:</span>
             <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-md text-xs">
-              {noticeTypeName}
+              {noticeType?.name || "N/A"}
             </span>
           </div>
-          
+
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <span className="font-medium">Department:</span>
             <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-xs">
-              {departmentName}
+              {department?.name || "N/A"}
             </span>
           </div>
         </div>
@@ -183,15 +154,19 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
           <Calendar size={18} className="text-amber-500" />
           <div>
             <p className="text-xs text-gray-500">Valid From</p>
-            <p className="font-medium">{formatDate(noticeDetails?.valid_from || "")}</p>
+            <p className="font-medium">
+              {formatDate(notice?.valid_from || "")}
+            </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg">
           <Calendar size={18} className="text-amber-500" />
           <div>
             <p className="text-xs text-gray-500">Valid Till</p>
-            <p className="font-medium">{formatDate(noticeDetails?.valid_till || "")}</p>
+            <p className="font-medium">
+              {formatDate(notice?.valid_till || "")}
+            </p>
           </div>
         </div>
       </div>
@@ -199,9 +174,9 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
       <div className="mb-6">
         <h3 className="text-md font-medium text-gray-700 mb-2">Description</h3>
         <div className="bg-gray-50 p-4 rounded-lg text-gray-700">
-          {noticeDetails?.description || "No description provided."}
+          {notice?.description || "No description provided."}
         </div>
       </div>
     </motion.div>
   );
-} 
+}

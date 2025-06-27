@@ -58,14 +58,14 @@ export default function AttendanceSection({
         ) : (
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-4">
-              {!attendanceStatus.checkOut && !attendanceStatus.checkIn && (
+              {attendanceStatus.checkOut && attendanceStatus.checkIn && (
                 <div className="flex items-center text-green-600 font-medium">
                   <CheckCircle2 className="mr-2 h-5 w-5" />
                   <span>Check-in and check-out completed for today</span>
                 </div>
               )}
               
-              {attendanceStatus.checkIn && (
+              {!attendanceStatus.checkIn && (
                 <div className="space-y-4">
                   <div className="flex flex-col gap-2">
                     <label className="flex items-center text-gray-700 font-medium">
@@ -95,7 +95,7 @@ export default function AttendanceSection({
             </div>
             
             <div className="self-end md:self-center">
-              {attendanceStatus.checkIn && attendanceStatus.checkOut && (
+              {!attendanceStatus.checkIn && !attendanceStatus.checkOut && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

@@ -4,6 +4,36 @@ export interface BaseEntity {
   updated_at?: string;
 }
 
+// Enhanced query interface for flexible querying
+export interface QueryFilters {
+  eq?: Record<string, any>;
+  neq?: Record<string, any>;
+  gt?: Record<string, any>;
+  gte?: Record<string, any>;
+  lt?: Record<string, any>;
+  lte?: Record<string, any>;
+  like?: Record<string, any>;
+  ilike?: Record<string, any>;
+  in?: Record<string, any[]>;
+  contains?: Record<string, any>;
+  is?: Record<string, any>;
+  or?: string;
+  and?: string;
+}
+
+export interface QueryOptions {
+  select?: string;
+  orderBy?: { column: string; ascending?: boolean }[];
+  limit?: number;
+  offset?: number;
+  single?: boolean; // For single record queries
+}
+
+export interface EnhancedQueryOptions {
+  filters?: QueryFilters;
+  options?: QueryOptions;
+}
+
 export interface ApiResponse<T> {
   data?: T;
   error?: string;
@@ -34,6 +64,8 @@ export interface CrudHookResult<T> {
   
   // Actions
   fetchItems: () => Promise<void>;
+  fetchItemsWithQuery: (queryConfig: EnhancedQueryOptions) => Promise<T[]>;
+  fetchSingleWithQuery: (queryConfig: EnhancedQueryOptions) => Promise<T | null>;
   fetchItem: (id: string | number) => Promise<void>;
   createItem: (data: Partial<T>) => Promise<ApiResponse<T>>;
   updateItem: (id: string | number, data: Partial<T>) => Promise<ApiResponse<T>>;

@@ -15,6 +15,8 @@ export function useDepartments() {
   return {
     ...baseResult,
     departments: baseResult.items,
+    department: baseResult.item,
+    fetchDepartment: baseResult.fetchItem,
     fetchDepartments: baseResult.fetchItems,
     createDepartment: baseResult.createItem,
     updateDepartment: baseResult.updateItem,

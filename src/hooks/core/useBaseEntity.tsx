@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { BaseEntity, CrudHookResult, ApiResponse } from "./types";
+import { BaseEntity, CrudHookResult, ApiResponse, EnhancedQueryOptions, QueryFilters, QueryOptions } from "./types";
 import { useApiCall } from "./useApiCall";
 import { api } from "@/lib/api";
 
@@ -23,6 +23,233 @@ export function useBaseEntity<T extends BaseEntity>(
   const [deleting, setDeleting] = useState(false);
   
   const { loading, error, callApi, clearError } = useApiCall();
+
+  // Helper function to build query with filters
+  const buildQuery = useCallback((baseQuery: any, filters: QueryFilters) => {
+    let query = baseQuery;
+    
+    // Apply eq filters
+    if (filters.eq) {
+      Object.entries(filters.eq).forEach(([key, value]) => {
+        query = query.eq(key, value);
+      });
+    }
+    
+    // Apply neq filters
+    if (filters.neq) {
+      Object.entries(filters.neq).forEach(([key, value]) => {
+        query = query.neq(key, value);
+      });
+    }
+    
+    // Apply gt filters
+    if (filters.gt) {
+      Object.entries(filters.gt).forEach(([key, value]) => {
+        query = query.gt(key, value);
+      });
+    }
+    
+    // Apply gte filters
+    if (filters.gte) {
+      Object.entries(filters.gte).forEach(([key, value]) => {
+        query = query.gte(key, value);
+      });
+    }
+    
+    // Apply lt filters
+    if (filters.lt) {
+      Object.entries(filters.lt).forEach(([key, value]) => {
+        query = query.lt(key, value);
+      });
+    }
+    
+    // Apply lte filters
+    if (filters.lte) {
+      Object.entries(filters.lte).forEach(([key, value]) => {
+        query = query.lte(key, value);
+      });
+    }
+    
+    // Apply like filters
+    if (filters.like) {
+      Object.entries(filters.like).forEach(([key, value]) => {
+        query = query.like(key, value);
+      });
+    }
+    
+    // Apply ilike filters
+    if (filters.ilike) {
+      Object.entries(filters.ilike).forEach(([key, value]) => {
+        query = query.ilike(key, value);
+      });
+    }
+    
+    // Apply in filters
+    if (filters.in) {
+      Object.entries(filters.in).forEach(([key, value]) => {
+        query = query.in(key, value);
+      });
+    }
+    
+    // Apply contains filters
+    if (filters.contains) {
+      Object.entries(filters.contains).forEach(([key, value]) => {
+        query = query.contains(key, value);
+      });
+    }
+    
+    // Apply is filters (for null checks)
+    if (filters.is) {
+      Object.entries(filters.is).forEach(([key, value]) => {
+        query = query.is(key, value);
+      });
+    }
+    
+    // Apply or filter
+    if (filters.or) {
+      query = query.or(filters.or);
+    }
+    
+    // Apply and filter (this is usually implicit, but can be used for complex conditions)
+    if (filters.and) {
+      query = query.and(filters.and);
+    }
+    
+    return query;
+  }, []);
+
+  // Helper function to apply query options
+  const applyQueryOptions = useCallback((query: any, options: QueryOptions) => {
+    // Apply ordering
+    if (options.orderBy && options.orderBy.length > 0) {
+      options.orderBy.forEach(({ column, ascending = true }) => {
+        query = query.order(column, { ascending });
+      });
+    }
+    
+    // Apply limit
+    if (options.limit) {
+      query = query.limit(options.limit);
+    }
+    
+    // Apply range/offset
+    if (options.offset !== undefined && options.limit) {
+      query = query.range(options.offset, options.offset + options.limit - 1);
+    }
+    
+    return query;
+  }, []);
+
+  // Enhanced method to fetch items with custom query
+  const fetchItemsWithQuery = useCallback(async (queryConfig: EnhancedQueryOptions): Promise<T[]> => {
+    const { filters = {}, options = {} } = queryConfig;
+    
+    const result = await callApi(
+      async () => {
+        // Apply default scoping
+        const scopingFilters: QueryFilters = { ...filters };
+        
+        // Add company scoping if enabled
+        if (config.companyScoped) {
+          const { getCompanyId } = await import('@/lib/api');
+          const companyId = await getCompanyId();
+          if (!scopingFilters.eq) scopingFilters.eq = {};
+          scopingFilters.eq.company_id = companyId;
+        }
+        
+        // Add user scoping if enabled
+        if (config.userScoped) {
+          const { getUserId } = await import('@/lib/api');
+          const userId = await getUserId();
+          if (!scopingFilters.eq) scopingFilters.eq = {};
+          scopingFilters.eq.user_id = userId;
+        }
+        
+        // Start with select
+        let query = api.client.from(config.tableName).select(options.select || '*');
+        
+        // Build query with filters
+        query = buildQuery(query, scopingFilters);
+        
+        // Apply query options (excluding select since it's already applied)
+        const queryOptions = { ...options, select: undefined };
+        query = applyQueryOptions(query, queryOptions);
+        
+        const { data, error } = await query;
+        if (error) throw error;
+        
+        return (data || []) as unknown as T[];
+      },
+      {
+        showErrorMessage: true,
+      }
+    );
+    
+    if (result) {
+      setItems(result);
+      return result;
+    }
+    
+    return [];
+  }, [callApi, config, buildQuery, applyQueryOptions]);
+
+  // Enhanced method to fetch a single item with custom query
+  const fetchSingleWithQuery = useCallback(async (queryConfig: EnhancedQueryOptions): Promise<T | null> => {
+    const { filters = {}, options = {} } = queryConfig;
+    
+    const result = await callApi(
+      async () => {
+        // Apply default scoping
+        const scopingFilters: QueryFilters = { ...filters };
+        
+        // Add company scoping if enabled
+        if (config.companyScoped) {
+          const { getCompanyId } = await import('@/lib/api');
+          const companyId = await getCompanyId();
+          if (!scopingFilters.eq) scopingFilters.eq = {};
+          scopingFilters.eq.company_id = companyId;
+        }
+        
+        // Add user scoping if enabled
+        if (config.userScoped) {
+          const { getUserId } = await import('@/lib/api');
+          const userId = await getUserId();
+          if (!scopingFilters.eq) scopingFilters.eq = {};
+          scopingFilters.eq.user_id = userId;
+        }
+        
+        // Start with select
+        let query = api.client.from(config.tableName).select(options.select || '*');
+        
+        // Build query with filters
+        query = buildQuery(query, scopingFilters);
+        
+        // Apply query options (excluding limit and select since we want single)
+        const singleOptions = { ...options, limit: undefined, select: undefined };
+        query = applyQueryOptions(query, singleOptions);
+        
+        // Use single() for single record
+        const { data, error } = await query.single();
+        if (error) {
+          if (error.code === 'PGRST116') {
+            return null; // No rows found
+          }
+          throw error;
+        }
+        
+        return data as unknown as T;
+      },
+      {
+        showErrorMessage: true,
+      }
+    );
+    
+    if (result !== null) {
+      setItem(result);
+    }
+    
+    return result;
+  }, [callApi, config, buildQuery, applyQueryOptions]);
 
   const fetchItems = useCallback(async (): Promise<void> => {
     const filters: Record<string, any> = {};
@@ -209,6 +436,8 @@ export function useBaseEntity<T extends BaseEntity>(
     deleting,
     error,
     fetchItems,
+    fetchItemsWithQuery,
+    fetchSingleWithQuery,
     fetchItem,
     createItem,
     updateItem,
