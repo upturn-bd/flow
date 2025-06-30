@@ -7,7 +7,7 @@ export type { Project };
 
 export function useProjects() {
   const baseResult = useBaseEntity<Project>({
-    tableName: "projects",
+    tableName: "project_records",
     entityName: "project",
     companyScoped: true,
   });

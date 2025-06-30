@@ -24,6 +24,8 @@ export function useBaseEntity<T extends BaseEntity>(
   
   const { loading, error, callApi, clearError } = useApiCall();
 
+  config.companyScoped = config.companyScoped ?? true; // Default to true if not provided
+
   // Helper function to build query with filters
   const buildQuery = useCallback((baseQuery: any, filters: QueryFilters) => {
     let query = baseQuery;

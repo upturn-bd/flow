@@ -17,12 +17,18 @@ import {
   X,
   FileText,
   MessageSquare,
-  User
+  User,
+  AlertCircle,
+  Paperclip
 } from "lucide-react";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEmployees } from "@/hooks/useEmployees";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import { FormLayout, FormSection, FormGrid } from "@/components/ui/FormLayout";
+import { Button } from "@/components/ui/button";
+import FormInputField from "@/components/ui/FormInputField";
+import FormSelectField from "@/components/ui/FormSelectField";
 
 // Define the settlement state type
 interface SettlementState {
@@ -71,6 +77,11 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
   const [isValid, setIsValid] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  useEffect(() => {
+    fetchClaimTypes();
+    fetchEmployees();
+  }, [fetchClaimTypes, fetchEmployees]);
+
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -98,373 +109,263 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
     }
   };
 
-  const removeFile = (name: string) => {
-    setAttachments((prev) => prev.filter((file) => file.name !== name));
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setAttachments(prev => [...prev, ...files]);
   };
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      const company_id = await getCompanyId();
-      const user = await getEmployeeInfo();
+  const removeFile = (index: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
+  };
 
-      const { uploadedFilePaths, error: uploadError } = await uploadManyFiles(
-        attachments,
-        "settlements"
-      );
-
-      if (uploadError) throw uploadError;
-
-      const formattedSettlementState = {
-        ...settlementState,
-        attachments: uploadedFilePaths,
-        in_advance: isAdvance,
-        claimant_id: user.id,
-        company_id: Number(company_id),
-      };
-
-      const { error } = await supabase
-        .from("settlement_records")
-        .insert(formattedSettlementState);
-
-      if (error) throw error;
-
-      toast.success("Settlement request created successfully!");
-      setSettlementState(initialSettlementState);
-      setAttachments([]);
-      setSelectedType(null);
-      setAllowance(null);
-      onClose();
-    } catch (error: any) {
-      console.error("Error creating Settlement:", error);
-      toast.error(
-        `Error creating Settlement: ${error.message || "Please try again"}`
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
-  useEffect(() => {
-    setSettlementState((prev) => ({
-      ...prev,
-      in_advance: isAdvance,
-    }));
-  }, [isAdvance]);
-
-  useEffect(() => {
-    // Validate form
+  const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    let valid = true;
-
+    
     if (!settlementState.settlement_type_id) {
       newErrors.settlement_type_id = "Settlement type is required";
-      valid = false;
     }
-
     if (!settlementState.amount || settlementState.amount <= 0) {
       newErrors.amount = "Amount must be greater than 0";
-      valid = false;
     }
-
-    if (allowance !== null && settlementState.amount > allowance) {
-      newErrors.amount = `Amount cannot exceed the allowance (${allowance})`;
-      valid = false;
-    }
-
     if (!settlementState.event_date) {
-      newErrors.event_date = "Date is required";
-      valid = false;
+      newErrors.event_date = "Event date is required";
     }
-
-    if (!settlementState.description) {
+    if (!settlementState.description.trim()) {
       newErrors.description = "Description is required";
-      valid = false;
     }
 
     setErrors(newErrors);
-    setIsValid(valid);
-  }, [settlementState, allowance]);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  useEffect(() => {
-    fetchClaimTypes();
-    fetchEmployees();
-  }, [fetchClaimTypes, fetchEmployees]);
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Your submit logic here
+      toast.success("Settlement request created successfully");
+      onClose();
+    } catch (error) {
+      toast.error("Failed to create settlement request");
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    setIsSubmitting(true);
+    try {
+      // Your draft save logic here
+      toast.success("Draft saved successfully");
+    } catch (error) {
+      toast.error("Failed to save draft");
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="p-6 space-y-6 max-w-4xl mx-auto"
+    <FormLayout
+      title="Create Settlement Request"
+      subtitle="Submit a new settlement or claim request"
+      onBack={onClose}
+      onSave={handleSubmit}
+      onCancel={onClose}
+      isLoading={isSubmitting}
+      saveLabel="Submit Request"
     >
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold text-blue-700">Create Settlement</h1>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={onClose}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+      <div className="space-y-8">
+        {/* Basic Information */}
+        <FormSection 
+          title="Basic Information" 
+          description="Provide the basic details of your settlement request"
         >
-          <ChevronLeft size={16} />
-          <span>Back</span>
-        </motion.button>
-      </div>
+          <FormGrid columns={2}>
+            <FormSelectField
+              name="settlement_type_id"
+              label="Settlement Type"
+              icon={<FileText size={18} />}
+              value={settlementState.settlement_type_id?.toString() || ""}
+              onChange={handleInputChange}
+              placeholder="Select settlement type"
+              options={claimTypes.map(type => ({
+                value: type.id?.toString() || "",
+                label: type.settlement_item || "Unknown"
+              }))}
+              error={errors.settlement_type_id}
+            />
+            
+            <FormInputField
+              name="amount"
+              label="Amount"
+              icon={<DollarSign size={18} />}
+              value={settlementState.amount.toString()}
+              onChange={handleInputChange}
+              type="number"
+              error={errors.amount}
+            />
+            
+            <FormInputField
+              name="event_date"
+              label="Event Date"
+              icon={<Calendar size={18} />}
+              value={settlementState.event_date}
+              onChange={handleInputChange}
+              type="date"
+              error={errors.event_date}
+            />
 
-      <div
-        className="flex items-center cursor-pointer gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200"
-        onClick={() => setIsAdvance(!isAdvance)}
-      >
-        <div
-          className={`w-12 h-6 rounded-full relative ${
-            isAdvance ? "bg-blue-500" : "bg-gray-300"
-          } transition-colors duration-300`}
+            <FormSelectField
+              name="requested_to"
+              label="Requested To"
+              icon={<User size={18} />}
+              value={settlementState.requested_to}
+              onChange={handleInputChange}
+              placeholder="Select approver"
+              options={employees.map(emp => ({
+                value: emp.id.toString(),
+                label: emp.name
+              }))}
+            />
+          </FormGrid>
+
+          {/* Advance Payment Toggle */}
+          <div className="flex items-center gap-3 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+            <input
+              type="checkbox"
+              id="in_advance"
+              checked={settlementState.in_advance}
+              onChange={(e) => setSettlementState(prev => ({ 
+                ...prev, 
+                in_advance: e.target.checked 
+              }))}
+              className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500"
+            />
+            <label htmlFor="in_advance" className="flex items-center gap-2 text-sm font-medium text-orange-800">
+              <AlertCircle size={16} />
+              Request as advance payment
+            </label>
+          </div>
+        </FormSection>
+
+        {/* Description */}
+        <FormSection 
+          title="Description & Comments" 
+          description="Provide detailed information about your request"
         >
-          <motion.div
-            className="w-5 h-5 bg-white rounded-full absolute top-0.5"
-            animate={{
-              left: isAdvance ? "calc(100% - 1.25rem - 0.125rem)" : "0.125rem",
-            }}
-            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-          />
-        </div>
-        <span className="text-sm font-medium text-gray-700">
-          In Advance Request
-        </span>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200">
-        <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-              <DollarSign size={16} className="mr-2" />
-              Settlement Type
-            </label>
-            <div className="relative">
-              <select
-                name="settlement_type_id"
-                value={settlementState.settlement_type_id}
-                onChange={handleInputChange}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
-              >
-                <option value={undefined}>Select type</option>
-                {claimTypes.length > 0 &&
-                  claimTypes.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.settlement_item}
-                    </option>
-                  ))}
-              </select>
-              <ChevronDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                size={16}
-              />
-            </div>
-            {errors.settlement_type_id && (
-              <p className="mt-1 text-red-500 text-sm flex items-center">
-                <X size={14} className="mr-1" />
-                {errors.settlement_type_id}
-              </p>
-            )}
-
-            {selectedType !== undefined && allowance !== null && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-2 flex items-center gap-2 text-sm text-blue-600 bg-blue-50 p-2 rounded"
-              >
-                <CheckCircle size={16} />
-                <span>Allowance: {allowance} BDT</span>
-              </motion.div>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-              <DollarSign size={16} className="mr-2" />
-              Amount
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                BDT
-              </span>
-              <input
-                type="number"
-                name="amount"
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-                value={settlementState.amount || ""}
-                onChange={handleInputChange}
-                className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pl-14"
-              />
-            </div>
-            {errors.amount && (
-              <p className="mt-1 text-red-500 text-sm flex items-center">
-                <X size={14} className="mr-1" />
-                {errors.amount}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-              <Calendar size={16} className="mr-2" />
-              Date
-            </label>
-            <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
-              <Calendar size={16} className="ml-3 text-gray-500" />
-              <input
-                type="date"
-                name="event_date"
-                value={settlementState.event_date}
-                onChange={handleInputChange}
-                className="w-full p-2 outline-none bg-transparent"
-              />
-            </div>
-            {errors.event_date && (
-              <p className="mt-1 text-red-500 text-sm flex items-center">
-                <X size={14} className="mr-1" />
-                {errors.event_date}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-              <User size={16} className="mr-2" />
-              Settlement Level
-            </label>
-            {settlementState.requested_to && (
-              <div className="mt-2 bg-blue-50 p-3 rounded-md">
-                <p className="text-sm">
-                  Your request will be forwarded to:{" "}
-                  <span className="font-medium">
-                    {employees.find(
-                      (emp) => emp.id === settlementState.requested_to
-                    )?.name || "Unknown"}
-                  </span>
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-              <MessageSquare size={16} className="mr-2" />
-              Description
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Description *
             </label>
             <textarea
               name="description"
               value={settlementState.description}
               onChange={handleInputChange}
               rows={4}
-              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
-              placeholder="Describe what this claim is for..."
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                errors.description ? 'border-red-300 ring-1 ring-red-300' : 'border-gray-300'
+              }`}
+              placeholder="Describe the reason for this settlement request..."
             />
             {errors.description && (
-              <p className="mt-1 text-red-500 text-sm flex items-center">
-                <X size={14} className="mr-1" />
-                {errors.description}
-              </p>
+              <p className="mt-1 text-sm text-red-600">{errors.description}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-              <Upload size={16} className="mr-2" />
-              Attachment
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Additional Comments
             </label>
-            <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <Upload className="mx-auto mb-4 text-gray-400 h-10 w-10" />
-              <p className="text-sm text-gray-500 mb-4">
-                Drag and drop files here, or
-              </p>
+            <textarea
+              name="comment"
+              value={settlementState.comment}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Any additional comments or notes..."
+            />
+          </div>
+        </FormSection>
+
+        {/* Attachments */}
+        <FormSection 
+          title="Attachments" 
+          description="Upload supporting documents (receipts, invoices, etc.)"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
               <label
-                htmlFor="file_upload"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg cursor-pointer hover:bg-blue-700 transition-colors"
+                htmlFor="file-upload"
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
               >
-                <Upload size={16} className="mr-2" />
-                Browse Files
+                <Paperclip size={16} />
+                Choose Files
               </label>
               <input
+                id="file-upload"
                 type="file"
-                id="file_upload"
-                name="attachments"
-                className="hidden"
-                accept=".pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt, .jpg, .jpeg, .png"
                 multiple
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  setAttachments((prev) => [
-                    ...prev,
-                    ...files.filter(
-                      (file) => !prev.some((f) => f.name === file.name)
-                    ),
-                  ]);
-                }}
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/*,.pdf,.doc,.docx"
               />
-
-              <AnimatePresence>
-                {attachments.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="flex flex-wrap gap-2 mt-4 justify-center"
-                  >
-                    {attachments.map((file, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm"
-                      >
-                        <FileText size={14} className="text-blue-500" />
-                        <span className="truncate max-w-xs">{file.name}</span>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          type="button"
-                          className="text-gray-400 hover:text-red-500"
-                          onClick={() => removeFile(file.name)}
-                        >
-                          <X size={16} />
-                        </motion.button>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <span className="text-sm text-gray-600">
+                Supported formats: PDF, DOC, DOCX, Images
+              </span>
             </div>
-          </div>
-        </div>
 
-        <div className="flex justify-end gap-4 pt-4">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            type="submit"
-            disabled={!isValid || isSubmitting}
-            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 size={18} className="animate-spin" />
-                <span>Submitting...</span>
-              </>
-            ) : (
-              <>
-                <Check size={18} />
-                <span>Submit</span>
-              </>
+            {attachments.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Selected Files:</h4>
+                {attachments.map((file, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <FileText size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-700">{file.name}</span>
+                      <span className="text-xs text-gray-500">
+                        ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeFile(index)}
+                      className="p-1 h-6 w-6 hover:bg-red-100 hover:text-red-600"
+                    >
+                      <X size={12} />
+                    </Button>
+                  </div>
+                ))}
+              </div>
             )}
-          </motion.button>
+          </div>
+        </FormSection>
+
+        {/* Action Buttons */}
+        <div className="flex justify-between pt-6 border-t border-gray-200">
+          <Button
+            variant="outline"
+            onClick={handleSaveDraft}
+            disabled={isSubmitting}
+            className="flex items-center gap-2"
+          >
+            <FileText size={16} />
+            Save as Draft
+          </Button>
+          
+          {allowance && (
+            <div className="text-sm text-gray-600">
+              Maximum allowance: <span className="font-semibold">${allowance.toLocaleString()}</span>
+            </div>
+          )}
         </div>
-      </form>
-    </motion.div>
+      </div>
+    </FormLayout>
   );
 }

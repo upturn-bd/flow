@@ -7,11 +7,13 @@ interface DetailModalsProps {
   selectedTaskId: number | null;
   onCloseNotice: () => void;
   onCloseTask: () => void;
+  onTaskStatusUpdate: () => void;
 }
 
 export default function DetailModals({
   selectedNoticeId,
   selectedTaskId,
+  onTaskStatusUpdate,
   onCloseNotice,
   onCloseTask,
 }: DetailModalsProps) {
@@ -26,6 +28,7 @@ export default function DetailModals({
       {selectedTaskId !== null && (
         <TaskDetails
           id={selectedTaskId}
+          onTaskStatusUpdate={onTaskStatusUpdate}
           onClose={onCloseTask}
         />
       )}

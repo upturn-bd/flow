@@ -5,10 +5,8 @@ import { extractFilenameFromUrl } from "@/lib/utils";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useSettlementRequests } from "@/hooks/useSettlement";
-import { motion, AnimatePresence } from "framer-motion";
 import { 
   FileText, 
-  Loader2, 
   DollarSign, 
   Calendar, 
   User, 
@@ -16,9 +14,14 @@ import {
   Check, 
   X,
   MessageSquare,
-  XCircle 
+  List
 } from "lucide-react";
 import { toast } from "sonner";
+import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Button } from "@/components/ui/button";
+import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import { ArrowArcLeft } from "@phosphor-icons/react";
 
 // Define the structure of a settlement request
 interface SettlementRequest {
@@ -35,6 +38,7 @@ interface SettlementRequest {
 
 export default function SettlementRequestsPage() {
   const [comment, setComment] = useState<string>("");
+  const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
   const { employees, fetchEmployees } = useEmployees();
   const { claimTypes, fetchClaimTypes } = useClaimTypes();
   const { 
@@ -59,201 +63,188 @@ export default function SettlementRequestsPage() {
   }, [fetchClaimTypes]);
 
   const handleUpdateRequest = async (action: string, id: number) => {
+    setCurrentlyProcessingId(id);
     const success = await updateSettlementRequest(action, id, comment);
     if (success) {
       toast.success(`Settlement request ${action.toLowerCase()} successfully`);
       setComment("");
+      fetchSettlementRequests();
+    } else {
+      toast.error(`Failed to ${action.toLowerCase()} settlement request`);
     }
+    setCurrentlyProcessingId(null);
   };
 
+  if (loading) {
+    return <LoadingSection 
+          text="Loading settlement requests..."
+          icon={List}
+          color="blue"
+          />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className="text-red-500 mb-2">Error loading settlement requests</div>
+        <p className="text-gray-600">{error}</p>
+      </div>
+    );
+  }
+
   return (
-    <AnimatePresence mode="wait">
-      {loading && (
-        <motion.div
-          key="loading"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="flex flex-col items-center justify-center py-16"
-        >
-          <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-2" />
-          <p className="text-gray-500">Loading settlement requests...</p>
-        </motion.div>
+    <div className="space-y-6">
+      {settlementRequests.length > 0 ? (
+        settlementRequests.map((settlement) => (
+          <SettlementRequestCard
+            key={settlement.id}
+            settlement={settlement}
+            employees={employees}
+            claimTypes={claimTypes}
+            comment={comment}
+            setComment={setComment}
+            onApprove={() => handleUpdateRequest("Approved", settlement.id)}
+            onReject={() => handleUpdateRequest("Rejected", settlement.id)}
+            isProcessing={currentlyProcessingId === settlement.id}
+          />
+        ))
+      ) : (
+        <EmptyState
+          icon={<DollarSign className="w-12 h-12" />}
+          title="No pending settlement requests"
+          description="When users submit settlement requests, they'll appear here for review."
+        />
       )}
+    </div>
+  );
+}
+
+function SettlementRequestCard({
+  settlement,
+  employees,
+  claimTypes,
+  comment,
+  setComment,
+  onApprove,
+  onReject,
+  isProcessing
+}: {
+  settlement: SettlementRequest;
+  employees: any[];
+  claimTypes: any[];
+  comment: string;
+  setComment: (value: string) => void;
+  onApprove: () => void;
+  onReject: () => void;
+  isProcessing: boolean;
+}) {
+  const employee = employees.find(emp => emp.id === settlement.claimant_id);
+  const claimType = claimTypes.find(type => type.id === settlement.settlement_type_id);
+
+  const actions = (
+    <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onReject}
+        disabled={isProcessing}
+        className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+      >
+        <X size={14} />
+        Reject
+      </Button>
+      <Button
+        variant="primary"
+        size="sm"
+        onClick={onApprove}
+        disabled={isProcessing}
+        className="flex items-center gap-2"
+        isLoading={isProcessing}
+      >
+        <Check size={14} />
+        Approve
+      </Button>
+    </div>
+  );
+
+  return (
+    <Card>
+      <CardHeader
+        title={claimType?.settlement_item || "Unknown Settlement Type"}
+        subtitle={`Amount: ${settlement.amount} BDT${settlement.in_advance ? " (Advance)" : ""}`}
+        icon={<DollarSign size={20} className="text-green-500" />}
+        action={actions}
+      />
       
-      {error && !loading && (
-        <motion.div
-          key="error"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="flex flex-col items-center justify-center py-16"
-        >
-          <XCircle className="h-12 w-12 text-red-500 mb-2" />
-          <p className="text-red-500 font-medium">{error}</p>
-        </motion.div>
-      )}
-      
-      {!loading && !error && (
-        <motion.div
-          key="content"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="p-6 max-w-5xl mx-auto space-y-6"
-        >
-          <h1 className="text-xl font-bold text-blue-700">Settlement Requests</h1>
-
-          {settlementRequests.length > 0 ? (
-            <div className="space-y-4">
-              <AnimatePresence>
-                {settlementRequests.map((settlement) => (
-                  <motion.div
-                    key={settlement.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.2 }}
-                    className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-start gap-2">
-                        <DollarSign size={18} className="text-green-600 mt-1 flex-shrink-0" />
-                        <div>
-                          <h3 className="font-medium text-gray-900">
-                            {claimTypes.find(type => type.id === settlement.settlement_type_id)?.settlement_item || "Unknown"}
-                          </h3>
-                          <p className="text-sm text-gray-600 font-medium">
-                            Amount: {settlement.amount} BDT
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">
-                        <Clock size={12} />
-                        <span>Pending</span>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
-                      {settlement.event_date && (
-                        <div className="flex items-center gap-2 text-sm text-gray-700">
-                          <Calendar size={14} />
-                          <span>{settlement.event_date}</span>
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <User size={14} />
-                        <span>Requested by: <span className="font-medium">
-                          {employees.find(employee => employee.id === settlement.claimant_id)?.name || "Unknown"}
-                        </span></span>
-                      </div>
-
-                      {settlement.in_advance && (
-                        <div className="flex items-center gap-2 text-sm text-blue-700">
-                          <Clock size={14} />
-                          <span>In Advance Request</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {settlement.description && (
-                      <div className="mt-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-md">
-                        <p className="font-medium mb-1">Description:</p>
-                        <p>{settlement.description}</p>
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                          <MessageSquare size={14} />
-                          <span>Add Comment</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="comment"
-                          onChange={(e) => setComment(e.target.value)}
-                          placeholder="Add your feedback here..."
-                          value={comment}
-                          className="w-full px-4 py-2 rounded-md border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                        />
-                      </div>
-
-                      {settlement.attachments && settlement.attachments.length > 0 && (
-                        <div className="space-y-2">
-                          <p className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                            <FileText size={14} />
-                            <span>Attachments</span>
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {settlement.attachments.map((attachment: string, idx: number) => (
-                              <a
-                                key={idx}
-                                href={attachment}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 text-xs px-2 py-1 rounded"
-                              >
-                                <FileText size={12} />
-                                <span>{extractFilenameFromUrl(attachment)}</span>
-                              </a>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-wrap justify-end gap-4 pt-2">
-                      <motion.button 
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handleUpdateRequest("Rejected", settlement.id)}
-                        disabled={processingId === settlement.id}
-                        className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
-                      >
-                        {processingId === settlement.id ? (
-                          <Loader2 size={16} className="animate-spin" />
-                        ) : (
-                          <X size={16} />
-                        )}
-                        <span>Reject</span>
-                      </motion.button>
-                      <motion.button 
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handleUpdateRequest("Approved", settlement.id)}
-                        disabled={processingId === settlement.id}
-                        className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
-                      >
-                        {processingId === settlement.id ? (
-                          <Loader2 size={16} className="animate-spin" />
-                        ) : (
-                          <Check size={16} />
-                        )}
-                        <span>Approve</span>
-                      </motion.button>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center py-12 text-center"
-            >
-              <div className="bg-gray-100 rounded-full p-4 mb-4">
-                <DollarSign className="h-12 w-12 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900">No pending settlement requests</h3>
-              <p className="mt-1 text-gray-500">When users submit settlement requests, they'll appear here</p>
-            </motion.div>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          <InfoRow
+            icon={<User size={16} />}
+            label="Requested by"
+            value={employee?.name || "Unknown"}
+          />
+          {settlement.event_date && (
+            <InfoRow
+              icon={<Calendar size={16} />}
+              label="Event Date"
+              value={settlement.event_date}
+            />
           )}
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </div>
+
+        <div className="flex items-center justify-between mb-4">
+          <StatusBadge status="Pending" variant="warning" size="sm" />
+          {settlement.in_advance && (
+            <StatusBadge status="In Advance" variant="info" size="sm" />
+          )}
+        </div>
+
+        {settlement.description && (
+          <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Description:</h4>
+            <p className="text-sm text-gray-600">{settlement.description}</p>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <MessageSquare size={16} className="inline mr-2" />
+              Add Comment
+            </label>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Add your feedback here..."
+              rows={3}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          {settlement.attachments && settlement.attachments.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <FileText size={16} />
+                Attachments
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {settlement.attachments.map((attachment: string, idx: number) => (
+                  <a
+                    key={idx}
+                    href={attachment}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 text-xs px-3 py-2 rounded-md"
+                  >
+                    <FileText size={12} />
+                    {extractFilenameFromUrl(attachment)}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

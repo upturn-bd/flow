@@ -10,6 +10,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
+import { Card, CardHeader, CardContent, CardFooter, StatusBadge, InfoRow } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Button } from "@/components/ui/button";
+import { Calendar, User, FileText, MessageSquare, Check, X, CalendarDays } from "lucide-react";
+import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 
 // Add this interface
 interface LeaveRequest {
@@ -67,97 +72,151 @@ export default function LeaveRequestsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        Loading...
+      <LoadingSection 
+          text="Loading leave requests..."
+          icon={Calendar}
+          color="blue"
+          />
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="text-red-500 mb-2">Error loading leave requests</div>
+        <p className="text-gray-600">{error}</p>
       </div>
     );
   }
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen">{error}</div>
-    );
-  }
-  return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <h1 className="text-xl font-bold text-[#003366]">Leave Requests</h1>
 
-      {leaveRequests.length > 0 &&
+  return (
+    <div className="space-y-6">
+      {leaveRequests.length > 0 ? (
         leaveRequests.map((req) => {
           const leaveReq = req as unknown as LeaveRequest;
           return (
-            <div
+            <LeaveRequestCard
               key={leaveReq.id}
-              className="bg-gray-100 rounded-xl p-6 space-y-4 shadow-sm"
-            >
-              <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-                <div className="flex-1 space-y-2 text-sm text-gray-800">
-                  <p>
-                    <span className="font-bold">Category:</span>{" "}
-                    {leaveTypes.find((type) => type.id === leaveReq.type_id)?.name}
-                  </p>
-                  <p>
-                    <span className="font-bold">Requested By:</span>{" "}
-                    {
-                      employees.find(
-                        (employee) => employee.id === leaveReq.employee_id
-                      )?.name
-                    }
-                  </p>
-                  <p>
-                    <span className="font-bold">Description:</span>{" "}
-                    {leaveReq.description}
-                  </p>
-                  <p>
-                    <span className="font-bold">From:</span> {leaveReq.start_date}
-                  </p>
-                  <p>
-                    <span className="font-bold">To:</span> {leaveReq.end_date}
-                  </p>
-                </div>
-
-                <div className="flex-1 space-y-4">
-                  {/* Comment */}
-                  <div>
-                    <label className="block font-semibold text-gray-800 mb-1">
-                      Remarks
-                    </label>
-                    <input
-                      type="text"
-                      name="comment"
-                      onChange={(e) => setComment(e.target.value)}
-                      placeholder="Add a comment"
-                      value={comment || ""}
-                      className="w-full bg-white px-4 py-2 rounded-md border border-gray-300"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-4 pt-2">
-                <button
-                  onClick={() => handleUpdateRequest("Rejected", leaveReq.id || 0)}
-                  disabled={currentlyProcessingId === leaveReq.id}
-                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full disabled:opacity-50"
-                >
-                  {currentlyProcessingId === leaveReq.id ? "Processing..." : "Reject"}
-                </button>
-                <button
-                  onClick={() => handleUpdateRequest("Accepted", leaveReq.id || 0)}
-                  disabled={currentlyProcessingId === leaveReq.id}
-                  className="bg-[#001F4D] hover:bg-[#002a66] text-white px-6 py-2 rounded-full disabled:opacity-50"
-                >
-                  {currentlyProcessingId === leaveReq.id ? "Processing..." : "Accept"}
-                </button>
-              </div>
-            </div>
+              request={leaveReq}
+              employees={employees}
+              leaveTypes={leaveTypes}
+              comment={comment}
+              setComment={setComment}
+              onApprove={() => handleUpdateRequest("Approved", leaveReq.id)}
+              onReject={() => handleUpdateRequest("Rejected", leaveReq.id)}
+              isProcessing={currentlyProcessingId === leaveReq.id}
+            />
           );
-        })}
-      {leaveRequests.length === 0 && (
-        <div className="flex items-center justify-center h-screen">
-          No leave requests available.
-        </div>
+        })
+      ) : (
+        <EmptyState
+          icon={<CalendarDays className="w-12 h-12" />}
+          title="No leave requests"
+          description="There are no pending leave requests at the moment."
+        />
       )}
     </div>
+  );
+}
+
+function LeaveRequestCard({
+  request,
+  employees,
+  leaveTypes,
+  comment,
+  setComment,
+  onApprove,
+  onReject,
+  isProcessing
+}: {
+  request: LeaveRequest;
+  employees: any[];
+  leaveTypes: any[];
+  comment: string;
+  setComment: (value: string) => void;
+  onApprove: () => void;
+  onReject: () => void;
+  isProcessing: boolean;
+}) {
+  const employee = employees.find(emp => emp.id === request.employee_id);
+  const leaveType = leaveTypes.find(type => type.id === request.type_id);
+  
+  const actions = (
+    <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onReject}
+        disabled={isProcessing}
+        className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+      >
+        <X size={14} />
+        Reject
+      </Button>
+      <Button
+        variant="primary"
+        size="sm"
+        onClick={onApprove}
+        disabled={isProcessing}
+        className="flex items-center gap-2"
+        isLoading={isProcessing}
+      >
+        <Check size={14} />
+        Approve
+      </Button>
+    </div>
+  );
+
+  return (
+    <Card>
+      <CardHeader
+        title={`Leave Request #${request.id}`}
+        subtitle={request.description}
+        action={actions}
+      />
+      
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          <InfoRow
+            icon={<FileText size={16} />}
+            label="Type"
+            value={leaveType?.name || "Unknown"}
+          />
+          <InfoRow
+            icon={<User size={16} />}
+            label="Employee"
+            value={employee?.name || "Unknown"}
+          />
+          <InfoRow
+            icon={<Calendar size={16} />}
+            label="From"
+            value={request.start_date}
+          />
+          <InfoRow
+            icon={<Calendar size={16} />}
+            label="To"
+            value={request.end_date}
+          />
+        </div>
+        
+        <div className="space-y-3">
+          <StatusBadge status={request.status} />
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <MessageSquare size={16} className="inline mr-2" />
+              Comment
+            </label>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Add a comment for this decision..."
+              rows={3}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

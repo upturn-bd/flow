@@ -7,6 +7,8 @@ import { useEffect, useRef, useState } from "react";
 import { FaChevronDown, FaCalendarAlt, FaSearch, FaEllipsisV } from "react-icons/fa";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
+import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import { Clock } from "lucide-react";
 
 const ClickableStatusCell = ({
   tag,
@@ -181,12 +183,11 @@ export default function AttendanceLatePage() {
         
         {/* Table */}
         {loading ? (
-          <div className="flex items-center justify-center p-12">
-            <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-700 mb-4"></div>
-              <p className="text-gray-500 text-sm">Loading attendance records...</p>
-            </div>
-          </div>
+          <LoadingSection 
+          text="Loading attendance records..."
+          icon={Clock}
+          color="blue"
+          />
         ) : (
           <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="min-w-full divide-y divide-gray-200">

@@ -4,9 +4,11 @@ import { Attendance } from "@/hooks/useAttendance";
 import { getEmployeeInfo } from "@/lib/api";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { FaChevronDown, FaCalendarAlt, FaSearch } from "react-icons/fa";
+import { FaChevronDown, FaCalendarAlt, FaSearch, FaSpinner } from "react-icons/fa";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
+import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import { Ban } from "lucide-react";
 
 export default function AttendanceAbsentPage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
@@ -93,12 +95,11 @@ export default function AttendanceAbsentPage() {
         
         {/* Table */}
         {loading ? (
-          <div className="flex items-center justify-center p-12">
-            <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-700 mb-4"></div>
-              <p className="text-gray-500 text-sm">Loading attendance records...</p>
-            </div>
-          </div>
+          <LoadingSection 
+          text="Loading attendance records..."
+          icon={Ban}
+          color="blue"
+          />
         ) : (
           <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="min-w-full divide-y divide-gray-200">

@@ -102,8 +102,8 @@ export default function AdministrativeManagement() {
           
           {(() => {
             try {
-              const NewsAndNoticeView = require("@/components/admin-management/news-and-notice/NewsAndNoticeManagementView").default;
-              return <NewsAndNoticeView />;
+              const NoticeView = require("@/components/admin-management/notice/NoticeManagementView").default;
+              return <NoticeView />;
             } catch (e) {
               return <PlaceholderCard title="News & Notices" message="News and notices component not available" />;
             }

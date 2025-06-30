@@ -138,11 +138,18 @@ export default function NoticePage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="flex items-center justify-between mb-8"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
             >
               <div>
                 <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-2">
-                  <Bell className="mr-2 h-6 w-6 text-amber-500" />
+                  <motion.div 
+                    initial={{ scale: 0.9, opacity: 0.5 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="mr-2 h-6 w-6 text-amber-500"
+                  >
+                    <Bell className="h-6 w-6" />
+                  </motion.div>
                   Notices & Announcements
                 </h1>
                 <p className="text-gray-600 max-w-3xl">
@@ -154,9 +161,9 @@ export default function NoticePage() {
                 whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={() => setIsCreatingNotice(true)}
-                className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-sm"
+                className="flex items-center justify-center gap-2 bg-amber-500 hover:brightness-110 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm"
               >
-                <Plus className="h-5 w-5" />
+                <Plus className="h-4 w-4" />
                 <span>Create Notice</span>
               </motion.button>
             </motion.div>

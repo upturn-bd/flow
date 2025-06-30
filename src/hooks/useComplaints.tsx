@@ -33,7 +33,7 @@ export function useComplaintTypes() {
 
 export function useComplaints() {
   const baseResult = useBaseEntity<ComplaintState>({
-    tableName: "complaints", 
+    tableName: "complaint_records", 
     entityName: "complaint",
     companyScoped: true,
   });

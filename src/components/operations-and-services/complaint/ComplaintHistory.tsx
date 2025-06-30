@@ -10,12 +10,14 @@ import {
   CheckCheck, 
   MessageSquare,
   FileText,
-  Clock
+  Clock,
+  List
 } from "lucide-react";
 import { extractFilenameFromUrl } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import { useComplaints } from "@/hooks/useComplaints";
+import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 
 export default function ComplaintHistoryPage() {
   const { employees, fetchEmployees } = useEmployees();
@@ -42,16 +44,11 @@ export default function ComplaintHistoryPage() {
   return (
     <AnimatePresence mode="wait">
       {loading && (
-        <motion.div
-          key="loading"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="flex flex-col items-center justify-center py-16"
-        >
-          <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-2" />
-          <p className="text-gray-500">Loading complaint history...</p>
-        </motion.div>
+        <LoadingSection 
+          text="Loading complaint history..."
+          icon={List}
+          color="blue"
+          />
       )}
       
       {error && !loading && (

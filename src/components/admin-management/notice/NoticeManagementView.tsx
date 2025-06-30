@@ -2,22 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
-import NewsAndNoticesCreateModal from "./NewsAndNoticeModal";
-import { useNewsAndNoticesTypes } from "@/hooks/useNewsAndNotices";
+import NoticesCreateModal from "./NoticeModal";
 import { NewspaperClipping, TrashSimple, Plus } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useNoticeTypes } from "@/hooks/useNotice";
 
-export default function NewsAndNoticeView() {
+export default function NoticeView() {
   const {
     newsAndNoticeTypes,
-    fetchNewsAndNoticesTypes,
-    createNewsAndNoticesType,
-    deleteNewsAndNoticesType,
+    fetchNoticeTypes,
+    createNoticeType,
+    deleteNoticeType,
     loading
-  } = useNewsAndNoticesTypes();
+  } = useNoticeTypes();
   const [isCreatingNewsAndNoticeType, setIsCreatingNewsAndNoticeType] =
     useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,9 +26,9 @@ export default function NewsAndNoticeView() {
   const handleCreateNewsAndNoticeType = async (values: any) => {
     try {
       setIsLoading(true);
-      await createNewsAndNoticesType(values);
+      await createNoticeType(values);
       setIsCreatingNewsAndNoticeType(false);
-      fetchNewsAndNoticesTypes();
+      fetchNoticeTypes();
     } catch (error) {
       console.error("Error creating news & notice type:", error);
     } finally {
@@ -39,8 +39,8 @@ export default function NewsAndNoticeView() {
   const handleDeleteNewsAndNoticeType = async (id: number) => {
     try {
       setDeleteLoading(id);
-      await deleteNewsAndNoticesType(id);
-      fetchNewsAndNoticesTypes();
+      await deleteNoticeType(id);
+      fetchNoticeTypes();
     } catch (error) {
       console.error("Error deleting news & notice type:", error);
     } finally {
@@ -49,8 +49,8 @@ export default function NewsAndNoticeView() {
   };
 
   useEffect(() => {
-    fetchNewsAndNoticesTypes();
-  }, [fetchNewsAndNoticesTypes]);
+    fetchNoticeTypes();
+  }, [fetchNoticeTypes]);
 
   return (
     <Collapsible title="News & Notice">
@@ -134,7 +134,7 @@ export default function NewsAndNoticeView() {
 
         <AnimatePresence>
           {isCreatingNewsAndNoticeType && (
-            <NewsAndNoticesCreateModal
+            <NoticesCreateModal
               onSubmit={handleCreateNewsAndNoticeType}
               onClose={() => setIsCreatingNewsAndNoticeType(false)}
               isLoading={isLoading}

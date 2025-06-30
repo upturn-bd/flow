@@ -75,6 +75,7 @@ export default function HomePage() {
       <DetailModals
         selectedNoticeId={selectedNoticeId}
         selectedTaskId={selectedTaskId}
+        onTaskStatusUpdate={() => fetchTasks()}
         onCloseNotice={closeNotice}
         onCloseTask={closeTask}
       />

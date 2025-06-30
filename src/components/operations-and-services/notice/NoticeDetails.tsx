@@ -6,9 +6,17 @@ import {
   Loader2,
   XCircle,
   Calendar,
+  Bell,
+  AlertCircle,
+  Building2,
+  FileText,
+  AlertCircleIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNotices, useNoticeTypes } from "@/hooks/useNotice";
+import { Card, CardHeader, CardContent, StatusBadge, InfoRow, PriorityBadge } from "@/components/ui/Card";
+import { Button } from "@/components/ui/button";
+import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 
 interface NoticeDetailsProps {
   id: number;
@@ -68,115 +76,111 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
   }, [notice]);
 
   if (loadingNotice || loadingNoticeType || loadingDepartment) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <Loader2 className="h-8 w-8 text-amber-500 animate-spin mb-2" />
-        <p className="text-gray-500">Loading notice details...</p>
-      </div>
-    );
+    return <LoadingSection 
+          text="Loading notice details..."
+          icon={AlertCircleIcon}
+          color="blue"
+          />;
   }
 
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
-        <XCircle className="h-12 w-12 text-red-500 mb-2" />
-        <p className="text-red-500 font-medium">{error}</p>
-        <button
+        <XCircle className="h-12 w-12 text-red-500 mb-4" />
+        <p className="text-red-500 font-medium mb-4">{error}</p>
+        <Button
+          variant="outline"
           onClick={onClose}
-          className="mt-4 flex items-center gap-2 text-amber-600 hover:text-amber-800"
+          className="flex items-center gap-2"
         >
           <ChevronLeft size={16} />
-          <span>Go back</span>
-        </button>
+          Go back
+        </Button>
       </div>
     );
   }
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="md:max-w-4xl mx-auto p-6 md:p-10 bg-white rounded-lg shadow-sm border border-gray-200"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="max-w-4xl mx-auto space-y-6"
     >
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl md:text-2xl font-bold text-amber-700">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+          <Bell className="text-amber-500" size={28} />
           Notice Details
-        </h2>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        </h1>
+        <Button
+          variant="outline"
           onClick={onClose}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"
+          className="flex items-center gap-2"
         >
           <ChevronLeft size={16} />
-          <span>Back</span>
-        </motion.button>
+          Back
+        </Button>
       </div>
 
-      <div className="bg-amber-50 rounded-lg p-5 mb-6">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {notice?.title || "N/A"}
-            </h3>
-            <span
-              className={`text-xs px-2 py-1 rounded-full ${
-                notice?.urgency === "High"
-                  ? "bg-red-100 text-red-800"
-                  : notice?.urgency === "Medium"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-green-100 text-green-800"
-              }`}
-            >
-              {notice?.urgency || "N/A"}
-            </span>
+      {/* Main Notice Card */}
+      <Card variant="elevated">
+        <CardHeader
+          title={notice?.title || "Untitled Notice"}
+          icon={<AlertCircle size={20} className="text-amber-500" />}
+          action={
+            <PriorityBadge 
+              priority={notice?.urgency as "High" | "Medium" | "Low" || "Low"} 
+            />
+          }
+        />
+        
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <InfoRow
+              icon={<FileText size={16} />}
+              label="Notice Type"
+              value={
+                <StatusBadge 
+                  status={noticeType?.name || "Unknown"} 
+                  variant="info" 
+                  size="sm" 
+                />
+              }
+            />
+            <InfoRow
+              icon={<Building2 size={16} />}
+              label="Department"
+              value={
+                <StatusBadge 
+                  status={department?.name || "Unknown"} 
+                  variant="info" 
+                  size="sm" 
+                />
+              }
+            />
+            <InfoRow
+              icon={<Calendar size={16} />}
+              label="Valid From"
+              value={formatDate(notice?.valid_from || "")}
+            />
+            <InfoRow
+              icon={<Calendar size={16} />}
+              label="Valid Till"
+              value={formatDate(notice?.valid_till || "")}
+            />
           </div>
-
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <span className="font-medium">Notice Type:</span>
-            <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-md text-xs">
-              {noticeType?.name || "N/A"}
-            </span>
+          
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-gray-900">Description</h3>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <p className="text-gray-700 leading-relaxed">
+                {notice?.description || "No description provided."}
+              </p>
+            </div>
           </div>
-
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <span className="font-medium">Department:</span>
-            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-xs">
-              {department?.name || "N/A"}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg">
-          <Calendar size={18} className="text-amber-500" />
-          <div>
-            <p className="text-xs text-gray-500">Valid From</p>
-            <p className="font-medium">
-              {formatDate(notice?.valid_from || "")}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg">
-          <Calendar size={18} className="text-amber-500" />
-          <div>
-            <p className="text-xs text-gray-500">Valid Till</p>
-            <p className="font-medium">
-              {formatDate(notice?.valid_till || "")}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-6">
-        <h3 className="text-md font-medium text-gray-700 mb-2">Description</h3>
-        <div className="bg-gray-50 p-4 rounded-lg text-gray-700">
-          {notice?.description || "No description provided."}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 }

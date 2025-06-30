@@ -178,8 +178,6 @@ export async function completeTask(taskId: number) {
     .from("task_records")
     .update({
       status: true,
-      completed_by: user.id,
-      completed_at: new Date().toISOString()
     })
     .eq("id", taskId)
     .eq("company_id", company_id)
@@ -198,8 +196,6 @@ export async function reopenTask(taskId: number) {
     .from("task_records")
     .update({
       status: false,
-      completed_by: null,
-      completed_at: null
     })
     .eq("id", taskId)
     .eq("company_id", company_id)

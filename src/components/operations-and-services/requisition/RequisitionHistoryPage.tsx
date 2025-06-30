@@ -18,6 +18,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { useRequisitionRequests } from "@/hooks/useRequisition";
+import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 
 export default function RequisitionHistoryPage() {
   const { employees, fetchEmployees } = useEmployees();
@@ -46,16 +47,11 @@ export default function RequisitionHistoryPage() {
   return (
     <AnimatePresence mode="wait">
       {loading && (
-        <motion.div
-          key="loading"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="flex flex-col items-center justify-center py-16"
-        >
-          <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-2" />
-          <p className="text-gray-500">Loading requisition history...</p>
-        </motion.div>
+        <LoadingSection 
+          text="Loading requisition history..."
+          icon={Calendar}
+          color="blue"
+          />
       )}
       
       {error && !loading && (

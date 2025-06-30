@@ -4,15 +4,30 @@ import { Attendance } from "@/hooks/useAttendance";
 import { getEmployeeInfo } from "@/lib/api";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { FaChevronDown, FaCalendarAlt, FaSearch, FaMapMarkerAlt, FaUser, FaBuilding, FaClock, FaCalendarDay } from "react-icons/fa";
+import { 
+  Calendar, 
+  MapPin, 
+  User, 
+  Building, 
+  Clock, 
+  ExternalLink,
+  CheckCircle,
+  AlertCircle,
+  User2
+} from "lucide-react";
 import {
   formatTimeFromISO,
   formatDateToDayMonth,
-  getLatitude,
-  getLongitude,
 } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import { useEmployees } from "@/hooks/useEmployees";
+import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Button } from "@/components/ui/button";
+import BaseModal from "@/components/ui/modals/BaseModal";
+import FormSelectField from "@/components/ui/FormSelectField";
+import { toast } from "sonner";
+import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 
 export default function AttendanceRequestsPage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
@@ -21,6 +36,7 @@ export default function AttendanceRequestsPage() {
   const { employees, fetchEmployees } = useEmployees();
   const [selectedRecord, setSelectedRecord] = useState<Attendance | null>(null);
   const [updateTag, setUpdateTag] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function fetchAttendanceData() {
     setLoading(true);
@@ -32,7 +48,6 @@ export default function AttendanceRequestsPage() {
         .select(
           "id, check_in_time, check_out_time, site_id, attendance_date, employee_id, check_out_coordinates, check_in_coordinates, tag"
         )
-        // .eq("supervisor_id", user.id)
         .eq("company_id", user.company_id)
         .eq("tag", "Pending")
         .order("attendance_date", { ascending: false });
@@ -42,6 +57,7 @@ export default function AttendanceRequestsPage() {
       setAttendanceData(data ?? []);
     } catch (error) {
       console.error("Error fetching attendance data:", error);
+      toast.error("Failed to load attendance requests");
     } finally {
       setLoading(false);
     }
@@ -50,7 +66,11 @@ export default function AttendanceRequestsPage() {
   async function handleRequest(e: React.FormEvent) {
     e.preventDefault();
     
+    if (!updateTag || !selectedRecord) return;
+    
+    setIsSubmitting(true);
     const user = await getEmployeeInfo();
+    
     try {
       const { error } = await supabase
         .from("attendance_records")
@@ -60,258 +80,211 @@ export default function AttendanceRequestsPage() {
 
       if (error) throw error;
       
-      // Show success notification
-      const notification = document.createElement('div');
-      notification.className = 'fixed bottom-4 right-4 bg-green-100 text-green-800 px-4 py-3 rounded-lg shadow-lg z-50 animate-fade-in-up';
-      notification.innerHTML = 'Attendance request updated successfully';
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.classList.add('animate-fade-out');
-        setTimeout(() => document.body.removeChild(notification), 500);
-      }, 3000);
-      
+      toast.success("Attendance request updated successfully");
       fetchAttendanceData();
       setSelectedRecord(null);
       setUpdateTag("");
     } catch (error) {
       console.error("Error updating attendance data:", error);
+      toast.error("Failed to update attendance request");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   useEffect(() => {
     fetchAttendanceData();
+    fetchSites();
+    fetchEmployees();
   }, []);
 
-  useEffect(() => {
-    fetchSites();
-  }, [fetchSites]);
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
+  if (loading) {
+    return <LoadingSection 
+          text="Loading attendance requests..."
+          icon={User2}
+          color="blue"
+          />;
+  }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
-      {!selectedRecord ? (
-        <div className="p-4 sm:p-6">
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaCalendarAlt className="text-gray-400" />
-              </div>
-              <input
-                type="date"
-                placeholder="From Date"
-                className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
-              />
-            </div>
-            
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaCalendarAlt className="text-gray-400" />
-              </div>
-              <input
-                type="date"
-                placeholder="To Date"
-                className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
-              />
-            </div>
-            
-            <div className="relative w-full sm:w-auto min-w-[160px]">
-              <select className="appearance-none pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full text-sm">
-                <option value="">Select Site</option>
-                {sites.map((site) => (
-                  <option key={site.id} value={site.id}>
-                    {site.name}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <FaChevronDown className="text-gray-400 text-xs" />
-              </div>
-            </div>
-            
-            <button className="bg-[#192D46] text-white rounded-lg px-4 py-2.5 font-medium hover:bg-[#0f1c2d] transition-colors duration-200 flex items-center justify-center gap-2 text-sm">
-              <FaSearch />
-              <span>Search</span>
-            </button>
-          </div>
-          
-          {/* Requests List */}
-          {loading ? (
-            <div className="flex items-center justify-center p-12">
-              <div className="flex flex-col items-center">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-700 mb-4"></div>
-                <p className="text-gray-500 text-sm">Loading attendance requests...</p>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {attendanceData.length > 0 ? (
-                attendanceData.map((entry, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white rounded-xl p-5 space-y-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200"
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-3">
-                        <div className="flex items-start gap-2">
-                          <FaCalendarDay className="text-blue-500 mt-1 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs text-gray-500 font-medium">Attendance Date</p>
-                            <p className="text-sm font-medium">{formatDateToDayMonth(entry.attendance_date)}</p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-start gap-2">
-                          <FaUser className="text-blue-500 mt-1 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs text-gray-500 font-medium">Employee</p>
-                            <p className="text-sm font-medium">
-                              {employees.find((employee) => employee.id === entry.employee_id)?.name || "Unknown Employee"}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-start gap-2">
-                          <FaBuilding className="text-blue-500 mt-1 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs text-gray-500 font-medium">Site</p>
-                            <p className="text-sm font-medium">
-                              {sites.length > 0 && sites.filter((site) => site.id === entry.site_id)[0]?.name || "Unknown Site"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <div className="flex items-start gap-2">
-                          <FaClock className="text-blue-500 mt-1 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs text-gray-500 font-medium">Check-in / Check-out</p>
-                            <p className="text-sm font-medium">
-                              {entry.check_in_time ? formatTimeFromISO(entry.check_in_time) : "N/A"} - 
-                              {entry.check_out_time ? formatTimeFromISO(entry.check_out_time) : "N/A"}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-start gap-2">
-                          <FaMapMarkerAlt className="text-blue-500 mt-1 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs text-gray-500 font-medium">Check-in Location</p>
-                            {entry.check_in_coordinates ? (
-                              <a
-                                className="text-sm text-blue-600 hover:underline"
-                                target="_blank"
-                                href={`https://www.openstreetmap.org/?mlat=${getLatitude(
-                                  entry.check_in_coordinates as unknown as string
-                                )}&mlon=${getLongitude(entry.check_in_coordinates as unknown as string)}`}
-                              >
-                                View on Map
-                              </a>
-                            ) : (
-                              <p className="text-sm text-gray-500">Not available</p>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-start gap-2">
-                          <FaMapMarkerAlt className="text-blue-500 mt-1 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs text-gray-500 font-medium">Check-out Location</p>
-                            {entry.check_out_coordinates ? (
-                              <a
-                                className="text-sm text-blue-600 hover:underline"
-                                target="_blank"
-                                href={`https://www.openstreetmap.org/?mlat=${getLatitude(
-                                  entry.check_out_coordinates as unknown as string
-                                )}&mlon=${getLongitude(entry.check_out_coordinates as unknown as string)}`}
-                              >
-                                View on Map
-                              </a>
-                            ) : (
-                              <p className="text-sm text-gray-500">Not available</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-end pt-2">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedRecord(entry)}
-                        className="bg-[#192D46] text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-[#0f1c2d] transition-colors duration-200 flex items-center gap-2"
-                      >
-                        Review Request
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="bg-gray-50 rounded-lg p-8 text-center border border-gray-200">
-                  <p className="text-gray-500">No attendance requests found.</p>
-                </div>
-              )}
-            </div>
-          )}
+    <div className="space-y-6">
+      {attendanceData.length > 0 ? (
+        <div className="space-y-4">
+          {attendanceData.map((entry) => (
+            <AttendanceRequestCard
+              key={entry.id}
+              entry={entry}
+              sites={sites}
+              employees={employees}
+              onReview={() => setSelectedRecord(entry)}
+            />
+          ))}
         </div>
       ) : (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-xl w-full max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto shadow-2xl">
-            <div className="p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b">Review Attendance Request</h2>
-              
-              <form onSubmit={handleRequest} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Update Status
-                  </label>
-                  <div className="relative">
-                    <select
-                      onChange={(e) => setUpdateTag(e.target.value)}
-                      value={updateTag}
-                      className="w-full pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none text-sm"
-                    >
-                      <option value="">Select Status</option>
-                      {["Present", "Absent", "Late", "Wrong_Location"].map(
-                        (status) => (
-                          <option key={status} value={status}>
-                            {status.replace("_", " ")}
-                          </option>
-                        )
-                      )}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                      <FaChevronDown className="text-gray-400 text-xs" />
-                    </div>
-                  </div>
-                </div>
+        <EmptyState
+          icon={<Clock className="w-12 h-12" />}
+          title="No pending attendance requests"
+          description="All attendance records have been reviewed."
+        />
+      )}
 
-                <div className="pt-4 border-t flex flex-col sm:flex-row sm:justify-end gap-3">
-                  <button
-                    type="button"
-                    className="w-full sm:w-auto px-4 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all focus:outline-none focus:ring-2 focus:ring-gray-400 font-medium text-sm"
-                    onClick={() => setSelectedRecord(null)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="w-full sm:w-auto px-4 py-2.5 bg-[#192D46] text-white rounded-lg hover:bg-[#0f1c2d] transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
-                    disabled={!updateTag}
-                  >
-                    Save Changes
-                  </button>
-                </div>
-              </form>
+      {/* Review Modal */}
+      <BaseModal
+        isOpen={!!selectedRecord}
+        onClose={() => setSelectedRecord(null)}
+        title="Review Attendance Request"
+        icon={<Clock size={20} />}
+      >
+        {selectedRecord && (
+          <form onSubmit={handleRequest} className="space-y-6">
+            <div className="space-y-4">
+              <InfoRow
+                icon={<User size={16} />}
+                label="Employee"
+                value={employees.find(emp => emp.id === selectedRecord.employee_id)?.name || "Unknown"}
+              />
+              <InfoRow
+                icon={<Calendar size={16} />}
+                label="Date"
+                value={formatDateToDayMonth(selectedRecord.attendance_date)}
+              />
+              <InfoRow
+                icon={<Clock size={16} />}
+                label="Time"
+                value={`${selectedRecord.check_in_time ? formatTimeFromISO(selectedRecord.check_in_time) : 'N/A'} - ${selectedRecord.check_out_time ? formatTimeFromISO(selectedRecord.check_out_time) : 'N/A'}`}
+              />
+              <InfoRow
+                icon={<Building size={16} />}
+                label="Site"
+                value={sites.find(site => site.id === selectedRecord.site_id)?.name || "Unknown"}
+              />
             </div>
+
+            <FormSelectField
+              name="status"
+              label="Update Status"
+              icon={<AlertCircle size={18} />}
+              value={updateTag}
+              onChange={(e) => setUpdateTag(e.target.value)}
+              placeholder="Select new status"
+              options={[
+                { value: "Present", label: "Present" },
+                { value: "Absent", label: "Absent" },
+                { value: "Late", label: "Late" },
+                { value: "Wrong_Location", label: "Wrong Location" },
+              ]}
+            />
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setSelectedRecord(null)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={!updateTag || isSubmitting}
+                isLoading={isSubmitting}
+              >
+                Save Changes
+              </Button>
+            </div>
+          </form>
+        )}
+      </BaseModal>
+    </div>
+  );
+}
+
+function AttendanceRequestCard({
+  entry,
+  sites,
+  employees,
+  onReview
+}: {
+  entry: Attendance;
+  sites: any[];
+  employees: any[];
+  onReview: () => void;
+}) {
+  const employee = employees.find(emp => emp.id === entry.employee_id);
+  const site = sites.find(site => site.id === entry.site_id);
+
+  const getLocationLink = (coordinates: { x: number; y: number } | null) => {
+    if (!coordinates) return null;
+    return `https://www.openstreetmap.org/?mlat=${coordinates.x}&mlon=${coordinates.y}`;
+  };
+
+  const actions = (
+    <Button
+      variant="primary"
+      size="sm"
+      onClick={onReview}
+      className="flex items-center gap-2"
+    >
+      <CheckCircle size={14} />
+      Review
+    </Button>
+  );
+
+  return (
+    <Card>
+      <CardHeader
+        title={`${employee?.name || "Unknown Employee"}`}
+        subtitle={formatDateToDayMonth(entry.attendance_date)}
+        icon={<Clock size={20} className="text-blue-500" />}
+        action={actions}
+      />
+      
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          <InfoRow
+            icon={<Building size={16} />}
+            label="Site"
+            value={site?.name || "Unknown Site"}
+          />
+          <InfoRow
+            icon={<Clock size={16} />}
+            label="Check-in / Check-out"
+            value={`${entry.check_in_time ? formatTimeFromISO(entry.check_in_time) : 'N/A'} - ${entry.check_out_time ? formatTimeFromISO(entry.check_out_time) : 'N/A'}`}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <StatusBadge status="Pending Review" variant="warning" size="sm" />
+          
+          <div className="flex items-center gap-4 text-sm">
+            {entry.check_in_coordinates && (
+              <a
+                href={getLocationLink(entry.check_in_coordinates) || undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+              >
+                <MapPin size={14} />
+                Check-in Location
+                <ExternalLink size={12} />
+              </a>
+            )}
+            {entry.check_out_coordinates && (
+              <a
+                href={getLocationLink(entry.check_out_coordinates) || undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+              >
+                <MapPin size={14} />
+                Check-out Location
+                <ExternalLink size={12} />
+              </a>
+            )}
           </div>
         </div>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }

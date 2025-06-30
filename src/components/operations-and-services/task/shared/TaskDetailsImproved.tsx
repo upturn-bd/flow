@@ -25,18 +25,8 @@ function formatDate(dateStr: string): string {
   const [year, month, dayStr] = dateStr.split("-");
   const day = parseInt(dayStr, 10);
   const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ];
   const monthName = months[parseInt(month, 10) - 1];
 
@@ -74,22 +64,18 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
 
       setTaskDetails(data);
 
-      const projectId = data?.project_id;
-      if (projectId) {
+      // Fetch project name if project_id exists
+      if (data.project_id) {
         const { data: projectData, error: projectError } = await client
           .from("project_records")
           .select("project_title")
-          .eq("id", projectId)
-          .eq("company_id", company_id);
+          .eq("id", data.project_id)
+          .eq("company_id", company_id)
+          .single();
 
-        if (projectError) {
-          setError("Error fetching Project details");
-          toast.error("Error fetching project details");
-          console.error(projectError);
-          return;
+        if (!projectError && projectData) {
+          setProjectName(projectData.project_title);
         }
-
-        setProjectName(projectData?.[0]?.project_title || "N/A");
       }
     } catch (error) {
       setError("Error fetching Task details");
@@ -114,7 +100,6 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
         );
         if (result.success) {
           toast.success("Task reopened successfully!");
-          // Refresh task details
           fetchTaskDetails(id);
         } else {
           throw new Error("Failed to reopen task");
@@ -128,7 +113,6 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
         );
         if (result.success) {
           toast.success("Task marked as completed!");
-          // Refresh task details
           fetchTaskDetails(id);
         } else {
           throw new Error("Failed to complete task");
@@ -192,6 +176,27 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
     );
   }
 
+  const getAssigneeName = () => {
+    if (taskDetails.assignees && taskDetails.assignees.length > 0) {
+      const assignee = employees.find(emp => emp.id === taskDetails.assignees[0]);
+      return assignee?.name || "Unknown";
+    }
+    return "Not assigned";
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+      case 'high':
+        return 'bg-red-100 text-red-800';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'low':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Header */}
@@ -239,11 +244,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
             <InfoRow 
               icon={<User size={16} />}
               label="Assigned to"
-              value={
-                taskDetails?.assignees && taskDetails.assignees.length > 0 
-                  ? `${taskDetails.assignees.length} assignee${taskDetails.assignees.length > 1 ? 's' : ''}`
-                  : "Not assigned"
-              }
+              value={getAssigneeName()}
             />
             
             <InfoRow 
@@ -263,13 +264,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
                 icon={<Clock size={16} />}
                 label="Priority"
                 value={
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    taskDetails.priority === 'High' 
-                      ? 'bg-red-100 text-red-800' 
-                      : taskDetails.priority === 'Medium' 
-                      ? 'bg-yellow-100 text-yellow-800' 
-                      : 'bg-green-100 text-green-800'
-                  }`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(taskDetails.priority)}`}>
                     {taskDetails.priority}
                   </span>
                 }
@@ -284,51 +279,17 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
               />
             )}
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Task Description */}
-      {taskDetails?.task_description && (
-        <Card>
-          <CardHeader 
-            title="Description"
-            icon={<Target size={20} />}
-          />
-          <CardContent>
-            <div className="prose prose-sm max-w-none">
-              <p className="text-gray-700 leading-relaxed">
+          {taskDetails?.task_description && (
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <h4 className="font-medium text-gray-900 mb-2">Description</h4>
+              <p className="text-gray-700 text-sm leading-relaxed">
                 {taskDetails.task_description}
               </p>
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Assignees */}
-      {taskDetails?.assignees && taskDetails.assignees.length > 0 && (
-        <Card>
-          <CardHeader 
-            title="Assignees"
-            icon={<User size={20} />}
-          />
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {taskDetails.assignees.map((assigneeId: string, index: number) => {
-                const employee = employees.find(emp => emp.id === assigneeId);
-                return (
-                  <div 
-                    key={index}
-                    className="flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-200 px-3 py-2 rounded-lg text-sm font-medium"
-                  >
-                    <User size={14} />
-                    <span>{employee?.name || "Unknown Employee"}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

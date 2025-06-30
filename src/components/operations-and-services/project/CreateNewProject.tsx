@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { useDepartments } from "@/hooks/useDepartments";
+import { Department, useDepartments } from "@/hooks/useDepartments";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { useProjects } from "@/hooks/useProjects";
 import { useMilestones } from "@/hooks/useMilestones";
@@ -228,15 +228,17 @@ export default function CreateNewProjectPage() {
 
 export function UpdateProjectPage({
   initialData,
+  employees,
+  departments,
   onSubmit,
   onClose,
 }: {
   initialData: ProjectDetails;
+  employees: { id: string; name: string }[];
+  departments: Department[];
   onSubmit: (data: ProjectDetails) => void;
   onClose: () => void;
 }) {
-  const { departments } = useDepartments();
-  const { employees } = useEmployeeInfo();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (data: ProjectDetails) => {

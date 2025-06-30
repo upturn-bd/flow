@@ -11,13 +11,19 @@ import {
   Check, 
   X,
   MessageSquare,
-  FileText
+  FileText,
+  AlertTriangle,
+  List
 } from "lucide-react";
 import { extractFilenameFromUrl } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaints } from "@/hooks/useComplaints";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import { toast } from "sonner";
+import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Button } from "@/components/ui/button";
+import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 
 export default function ComplaintRequestsPage() {
   const [comment, setComment] = useState<string>("");
@@ -64,186 +70,172 @@ export default function ComplaintRequestsPage() {
 
   return (
     <AnimatePresence mode="wait">
-      {loading && (
-        <motion.div
-          key="loading"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="flex flex-col items-center justify-center py-16"
-        >
-          <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-2" />
-          <p className="text-gray-500">Loading complaint requests...</p>
-        </motion.div>
-      )}
+      {loading && <LoadingSection 
+          text="Loading complaint requests..."
+          icon={List}
+          color="blue"
+          />}
       
       {error && !loading && (
-        <motion.div
-          key="error"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="flex flex-col items-center justify-center py-16"
-        >
-          <XCircle className="h-12 w-12 text-red-500 mb-2" />
+        <div className="flex flex-col items-center justify-center py-16">
+          <XCircle className="h-12 w-12 text-red-500 mb-4" />
           <p className="text-red-500 font-medium">{error}</p>
-        </motion.div>
+        </div>
       )}
       
       {!loading && !error && (
-        <motion.div
-          key="content"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="p-6 max-w-5xl mx-auto space-y-6"
-        >
-          <h1 className="text-xl font-bold text-blue-700">Complaint Requests</h1>
-
+        <div className="space-y-6">
           {complaints.length > 0 ? (
             <div className="space-y-4">
               <AnimatePresence>
                 {complaints.map((complaint) => (
-                  <motion.div
+                  <ComplaintCard
                     key={complaint.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.2 }}
-                    className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-start gap-2">
-                        <Flag className="text-blue-600 mt-1" size={18} />
-                        <div>
-                          <h3 className="font-medium text-gray-900">
-                            {complaintTypes.find(type => type.id === complaint.complaint_type_id)?.name || "Unknown"}
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            {complaint.anonymous ? "Anonymous Complaint" : "Named Complaint"}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">
-                        <Clock size={12} />
-                        <span>Pending</span>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <User size={14} />
-                        <span>Requested by: <span className="font-medium">
-                          {complaint.anonymous ? "Anonymous" : 
-                            employees.find(employee => employee.id === complaint.complainer_id)?.name || "Unknown"}
-                        </span></span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <User size={14} />
-                        <span>Against: <span className="font-medium">
-                          {employees.find(employee => employee.id === complaint.against_whom)?.name || "Unknown"}
-                        </span></span>
-                      </div>
-                    </div>
-                    
-                    {complaint.description && (
-                      <div className="mt-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-md">
-                        <p className="font-medium mb-1">Description:</p>
-                        <p>{complaint.description}</p>
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                          <MessageSquare size={14} />
-                          <span>Add Comment</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="comment"
-                          onChange={(e) => setComment(e.target.value)}
-                          placeholder="Add your feedback here..."
-                          value={comment}
-                          className="w-full px-4 py-2 rounded-md border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                        />
-                      </div>
-
-                      {complaint.attachments && complaint.attachments.length > 0 && (
-                        <div className="space-y-2">
-                          <p className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                            <FileText size={14} />
-                            <span>Attachments</span>
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {complaint.attachments.map((attachment, idx) => (
-                              <a
-                                key={idx}
-                                href={attachment}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 text-xs px-2 py-1 rounded"
-                              >
-                                <FileText size={12} />
-                                <span>{extractFilenameFromUrl(attachment)}</span>
-                              </a>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-wrap justify-end gap-4 pt-2">
-                      <motion.button 
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handleUpdateRequest("Rejected", complaint.id)}
-                        disabled={currentlyProcessingId === complaint.id}
-                        className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
-                      >
-                        {currentlyProcessingId === complaint.id ? (
-                          <Loader2 size={16} className="animate-spin" />
-                        ) : (
-                          <X size={16} />
-                        )}
-                        <span>Reject</span>
-                      </motion.button>
-                      <motion.button 
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handleUpdateRequest("Accepted", complaint.id)}
-                        disabled={currentlyProcessingId === complaint.id}
-                        className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
-                      >
-                        {currentlyProcessingId === complaint.id ? (
-                          <Loader2 size={16} className="animate-spin" />
-                        ) : (
-                          <Check size={16} />
-                        )}
-                        <span>Accept</span>
-                      </motion.button>
-                    </div>
-                  </motion.div>
+                    complaint={complaint}
+                    employees={employees}
+                    complaintTypes={complaintTypes}
+                    comment={comment}
+                    setComment={setComment}
+                    onAccept={() => handleUpdateRequest("Accepted", complaint.id)}
+                    onReject={() => handleUpdateRequest("Rejected", complaint.id)}
+                    isProcessing={currentlyProcessingId === complaint.id}
+                  />
                 ))}
               </AnimatePresence>
             </div>
           ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center py-12 text-center"
-            >
-              <div className="bg-gray-100 rounded-full p-4 mb-4">
-                <Flag className="h-12 w-12 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900">No pending complaint requests</h3>
-              <p className="mt-1 text-gray-500">When users submit complaints, they'll appear here</p>
-            </motion.div>
+            <EmptyState
+              icon={<Flag className="w-12 h-12" />}
+              title="No pending complaint requests"
+              description="When users submit complaints, they'll appear here for review."
+            />
           )}
-        </motion.div>
+        </div>
       )}
     </AnimatePresence>
+  );
+}
+
+function ComplaintCard({
+  complaint,
+  employees,
+  complaintTypes,
+  comment,
+  setComment,
+  onAccept,
+  onReject,
+  isProcessing
+}: {
+  complaint: any;
+  employees: any[];
+  complaintTypes: any[];
+  comment: string;
+  setComment: (value: string) => void;
+  onAccept: () => void;
+  onReject: () => void;
+  isProcessing: boolean;
+}) {
+  const complainer = employees.find(emp => emp.id === complaint.complainer_id);
+  const against = employees.find(emp => emp.id === complaint.against_whom);
+  const type = complaintTypes.find(type => type.id === complaint.complaint_type_id);
+
+  const actions = (
+    <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onReject}
+        disabled={isProcessing}
+        className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+      >
+        <X size={14} />
+        Reject
+      </Button>
+      <Button
+        variant="primary"
+        size="sm"
+        onClick={onAccept}
+        disabled={isProcessing}
+        className="flex items-center gap-2"
+        isLoading={isProcessing}
+      >
+        <Check size={14} />
+        Accept
+      </Button>
+    </div>
+  );
+
+  return (
+    <Card>
+      <CardHeader
+        title={type?.name || "Unknown Complaint Type"}
+        subtitle={complaint.anonymous ? "Anonymous Complaint" : "Named Complaint"}
+        icon={<AlertTriangle size={20} className="text-red-500" />}
+        action={actions}
+      />
+      
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          <InfoRow
+            icon={<User size={16} />}
+            label="Complainant"
+            value={complaint.anonymous ? "Anonymous" : (complainer?.name || "Unknown")}
+          />
+          <InfoRow
+            icon={<User size={16} />}
+            label="Against"
+            value={against?.name || "Unknown"}
+          />
+        </div>
+
+        <StatusBadge status="Pending" variant="warning" size="sm" />
+
+        {complaint.description && (
+          <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Description:</h4>
+            <p className="text-sm text-gray-600">{complaint.description}</p>
+          </div>
+        )}
+
+        <div className="mt-4 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <MessageSquare size={16} className="inline mr-2" />
+              Add Comment
+            </label>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Add your feedback here..."
+              rows={3}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          {complaint.attachments && complaint.attachments.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <FileText size={16} />
+                Attachments
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {complaint.attachments.map((attachment: string, idx: number) => (
+                  <a
+                    key={idx}
+                    href={attachment}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 text-xs px-3 py-2 rounded-md"
+                  >
+                    <FileText size={12} />
+                    {extractFilenameFromUrl(attachment)}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

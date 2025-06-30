@@ -12,9 +12,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ExternalLink, Trash2, Clock, Calendar, Building2, User, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import ProjectCard from "./ProjectCard";
+import { EmptyState } from "@/components/ui/EmptyState";
+import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 
 function CompletedProjectsList() {
   const { deleteProject, updateProject } = useProjects();
@@ -23,8 +24,8 @@ function CompletedProjectsList() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { employees } = useEmployees();
-  const { departments } = useDepartments();
+  const { employees, fetchEmployees, loading: employeesLoading } = useEmployees();
+  const { departments, fetchDepartments, loading: departmentsLoading } = useDepartments();
 
   async function fetchCompletedProjects() {
     setLoading(true);
@@ -63,6 +64,8 @@ function CompletedProjectsList() {
 
   useEffect(() => {
     fetchCompletedProjects();
+    fetchEmployees();
+    fetchDepartments();
   }, []);
 
   const handleDeleteProject = async (id: number) => {
@@ -93,7 +96,11 @@ function CompletedProjectsList() {
   return (
     <AnimatePresence mode="wait">
       {loading && (
-        <LoadingSpinner color="blue" text="Loading projects..." height="h-screen" />
+        <LoadingSection 
+          text="Loading completed projects..."
+          icon={CheckCircle}
+          color="blue"
+        />
       )}
       {!selectedProject && !projectDetailsId && !loading && (
         <motion.div
@@ -108,7 +115,7 @@ function CompletedProjectsList() {
           </h1>
           <div className="space-y-4">
             <AnimatePresence>
-              {projects.length > 0 &&
+              {projects.length > 0 ? (
                 projects.map((project, idx) => (
                   typeof project.id !== "undefined" ? (
                     <ProjectCard
@@ -126,27 +133,23 @@ function CompletedProjectsList() {
                       progressColor="bg-green-100 text-green-800"
                     />
                   ) : null
-                ))}
+                ))
+              ) : (
+                <EmptyState 
+                  icon={<CheckCircle className="h-12 w-12" />}
+                  title="No completed projects"
+                  description="Projects will appear here once they're marked as complete"
+                />
+              )}
             </AnimatePresence>
           </div>
-          {projects.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center py-12 text-center"
-            >
-              <div className="bg-gray-100 rounded-full p-4 mb-4">
-                <CheckCircle className="h-12 w-12 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900">No completed projects</h3>
-              <p className="mt-1 text-gray-500">Projects will appear here once they're marked as complete</p>
-            </motion.div>
-          )}
         </motion.div>
       )}
       {projectDetailsId && (
         <ProjectDetails
           id={projectDetailsId}
+          employees={employees}
+          departments={departments}
           onClose={() => setProjectDetailsId(null)}
           onSubmit={handleUpdateProject}
         />

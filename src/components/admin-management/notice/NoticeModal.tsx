@@ -6,17 +6,17 @@ import { NewspaperClipping } from "@phosphor-icons/react";
 import { FormModal } from "@/components/ui/modals";
 import { FormField } from "@/components/forms";
 
-interface NewsAndNoticesModalProps {
+interface NoticeModalProps {
   onSubmit: (values: NoticeType) => void;
   onClose: () => void;
   isLoading?: boolean;
 }
 
-export default function NewsAndNoticesCreateModal({
+export default function NoticesCreateModal({
   onSubmit,
   onClose,
   isLoading = false,
-}: NewsAndNoticesModalProps) {
+}: NoticeModalProps) {
   const initialValues: NoticeType = {
     name: "",
   };

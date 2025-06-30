@@ -2,18 +2,17 @@
 import ComplaintCreatePage from "@/components/operations-and-services/complaint/ComplaintCreatePage";
 import ComplaintHistoryPage from "@/components/operations-and-services/complaint/ComplaintHistory";
 import ComplaintRequestsPage from "@/components/operations-and-services/complaint/ComplaintRequests";
-import TabView, { TabItem } from "@/components/ui/TabView";
+import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
+import { TabItem } from "@/components/ui/TabView";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   AlertCircle,
-  MessageSquare,
   History,
   BookOpen,
   FilePlus,
   ClipboardCheck,
-  AlertTriangle,
-  ReceiptText
+  AlertTriangle
 } from "lucide-react";
 
 const tabs: TabItem[] = [
@@ -44,7 +43,7 @@ const tabs: TabItem[] = [
     icon: <BookOpen className="h-5 w-5" />,
     color: "text-purple-600",
     content: (
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+      <div className="p-6">
         <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
           <AlertTriangle className="mr-2 h-5 w-5 text-red-500" />
           Complaint Policy
@@ -108,79 +107,18 @@ const tabs: TabItem[] = [
 export default function ComplaintPage() {
   const [activeTab, setActiveTab] = useState("home");
 
-  const pageVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1, 
-      transition: { duration: 0.4, when: "beforeChildren" } 
-    },
-    exit: { 
-      opacity: 0, 
-      transition: { duration: 0.2 } 
-    }
-  };
-
-  const tabContentVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { 
-        type: "spring",
-        stiffness: 300,
-        damping: 30,
-        mass: 1,
-        delay: 0.1
-      } 
-    },
-    exit: { 
-      opacity: 0, 
-      y: -20, 
-      transition: { duration: 0.2 } 
-    }
-  };
-
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      variants={pageVariants}
-      className="max-w-6xl mx-auto p-4 sm:p-6"
-    >
-      <motion.div 
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="flex items-center justify-between mb-8"
-      >
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-2">
-            <AlertCircle className="mr-2 h-6 w-6 text-red-500" />
-            Complaint Management
-          </h1>
-          <p className="text-gray-600 max-w-3xl">
-            Submit, track, and manage workplace complaints and concerns. Our system ensures all issues are addressed promptly and fairly.
-          </p>
-        </div>
-
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setActiveTab("home")}
-          className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
-        >
-          <FilePlus className="h-4 w-4" />
-          New Complaint
-        </motion.button>
-      </motion.div>
-
-      <TabView 
-        tabs={tabs}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        contentVariants={tabContentVariants}
-      />
-    </motion.div>
+    <ServicePageTemplate
+      title="Complaint Management"
+      description="Submit, track, and manage workplace complaints and concerns. Our system ensures all issues are addressed promptly and fairly."
+      icon={<AlertCircle className="h-6 w-6" />}
+      primaryColor="text-red-600"
+      tabs={tabs}
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      actionButtonLabel="New Complaint"
+      actionButtonIcon={<FilePlus className="h-4 w-4" />}
+      actionButtonOnClick={() => setActiveTab("home")}
+    />
   );
 }

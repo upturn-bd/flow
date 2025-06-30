@@ -148,9 +148,8 @@ export function useTasks() {
       if (projectId) {
         await fetchTasks({
           projectId,
-          milestoneId: milestoneId,
+          milestoneId,
         });
-        await fetchTaskStats(projectId);
       }
       return { success: true, data };
     } catch (err) {
@@ -169,9 +168,8 @@ export function useTasks() {
       if (projectId) {
         await fetchTasks({
           projectId,
-          milestoneId: milestoneId,
+          milestoneId,
         });
-        await fetchTaskStats(projectId);
       }
       return { success: true, data };
     } catch (err) {

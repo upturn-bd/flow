@@ -10,8 +10,12 @@ import { getCompanyId } from "@/lib/api";
 import { Task } from "@/lib/types/schemas";
 import TaskDetails from "./shared/TaskDetails";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, ExternalLink, Loader2, CheckCircle } from "lucide-react";
+import { Trash2, ExternalLink, Loader2, CheckCircle, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { LoadingState } from "@/components/ui/LoadingState";
+import { Button } from "@/components/ui/button";
 
 function TaskCard({
   task,
@@ -40,7 +44,7 @@ function TaskCard({
     fetchDepartments();
   }, [fetchEmployees, fetchDepartments]);
 
-  const { id, task_title, department_id, task_description } = task;
+  const { id, task_title, department_id, task_description, end_date } = task;
 
   const handleDelete = async () => {
     if (!id) return;
@@ -58,71 +62,58 @@ function TaskCard({
   };
 
   if (employeeLoading || departmentsLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 text-blue-500 animate-spin mb-2" />
-        <p className="text-sm text-gray-500">Loading task information...</p>
-      </div>
-    );
+    return <LoadingState message="Loading task information..." size="sm" />;
   }
 
+  const department = departments.find((dept) => dept.id === department_id);
+
+  const actions = (
+    <div className="flex items-center gap-2">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleDelete}
+        isLoading={isDeleting}
+        className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
+      >
+        <Trash2 size={14} />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => id !== undefined && setTaskDetailsId(id)}
+        className="p-2 h-8 w-8 hover:bg-gray-50 hover:text-gray-700"
+      >
+        <ExternalLink size={14} />
+      </Button>
+    </div>
+  );
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.2 }}
-      className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all rounded-lg p-5 flex flex-col gap-3"
-    >
-      <div className="flex justify-between items-start">
-        <div className="flex items-start gap-2">
-          <CheckCircle
-            size={18}
-            className="text-green-500 mt-1 flex-shrink-0"
-          />
-          <h2 className="text-md md:text-lg font-semibold text-gray-800">
-            {task_title}
-          </h2>
+    <Card>
+      <CardHeader
+        title={task_title}
+        subtitle={task_description}
+        icon={<CheckCircle size={20} className="text-green-500" />}
+        action={actions}
+      />
+      
+      <CardContent>
+        <div className="flex items-center justify-between">
+          {department && (
+            <StatusBadge status={department.name} variant="info" size="sm" />
+          )}
+          {end_date && (
+            <InfoRow
+              icon={<Calendar size={16} />}
+              label="Completed"
+              value={end_date}
+              className="text-xs"
+            />
+          )}
         </div>
-        <div className="flex gap-x-2">
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="p-2 text-gray-600 hover:text-red-600 rounded-full hover:bg-gray-100 disabled:opacity-50"
-          >
-            {isDeleting ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <Trash2 size={16} />
-            )}
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => id !== undefined && setTaskDetailsId(id)}
-            className="p-2 text-gray-600 hover:text-blue-600 rounded-full hover:bg-gray-100"
-          >
-            <ExternalLink size={16} />
-          </motion.button>
-        </div>
-      </div>
-
-      <div className="mt-2 text-sm text-gray-600">
-        <p>{task_description}</p>
-      </div>
-
-      {department_id &&
-        departments.find((dept) => dept.id === department_id) && (
-          <div className="mt-1">
-            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-              {departments.find((dept) => dept.id === department_id)?.name ||
-                "Unknown department"}
-            </span>
-          </div>
-        )}
-    </motion.div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -149,16 +140,7 @@ function CompletedTasksList() {
     <div>
       <AnimatePresence mode="wait">
         {loading && (
-          <motion.div
-            key="loading"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center py-16"
-          >
-            <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-2" />
-            <p className="text-gray-500">Loading completed tasks...</p>
-          </motion.div>
+          <LoadingState message="Loading completed tasks..." />
         )}
 
         {!selectedTask && taskDetailsId === null && !loading && (
@@ -167,44 +149,27 @@ function CompletedTasksList() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="px-2 py-4 md:p-6 max-w-5xl mx-auto"
+            className="space-y-4"
           >
-            <h1 className="text-xl font-bold text-blue-700 mb-6">
-              Completed Tasks
-            </h1>
-
-            <div className="space-y-4">
-              <AnimatePresence>
-                {tasks.length > 0 ? (
-                  tasks.map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      deleteTask={handleDeleteTask}
-                      setSelectedTask={setSelectedTask}
-                      task={task}
-                      setTaskDetailsId={setTaskDetailsId}
-                    />
-                  ))
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex flex-col items-center justify-center py-12 text-center"
-                  >
-                    <div className="bg-gray-100 rounded-full p-4 mb-4">
-                      <CheckCircle className="h-12 w-12 text-gray-400" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900">
-                      No completed tasks
-                    </h3>
-                    <p className="mt-1 text-gray-500">
-                      Tasks will appear here once they're marked as complete
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            <AnimatePresence>
+              {tasks.length > 0 ? (
+                tasks.map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    deleteTask={handleDeleteTask}
+                    setSelectedTask={setSelectedTask}
+                    task={task}
+                    setTaskDetailsId={setTaskDetailsId}
+                  />
+                ))
+              ) : (
+                <EmptyState
+                  icon={<CheckCircle className="w-12 h-12" />}
+                  title="No completed tasks"
+                  description="Tasks will appear here once they're marked as complete"
+                />
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 
@@ -212,6 +177,7 @@ function CompletedTasksList() {
           <TaskDetails
             onClose={() => setTaskDetailsId(null)}
             id={taskDetailsId}
+            onTaskStatusUpdate={() => fetchTasks({all:true,status:false})}
           />
         )}
       </AnimatePresence>

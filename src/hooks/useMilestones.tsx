@@ -7,7 +7,7 @@ export type { Milestone };
 
 export function useMilestones() {
   const baseResult = useBaseEntity<Milestone>({
-    tableName: "milestones",
+    tableName: "milestone_records",
     entityName: "milestone",
     companyScoped: true,
   });

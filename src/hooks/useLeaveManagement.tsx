@@ -25,7 +25,7 @@ export function useLeaveTypes() {
 
 export function useHolidayConfigs() {
   const baseResult = useBaseEntity<HolidayConfig>({
-    tableName: "holiday_configs",
+    tableName: "weekly_holiday_configs",
     entityName: "holiday config",
     companyScoped: true,
   });
@@ -42,8 +42,8 @@ export function useHolidayConfigs() {
 
 export function useLeaveRequests() {
   const baseResult = useBaseEntity<any>({
-    tableName: "leave_requests",
-    entityName: "leave request",
+    tableName: "leave_records",
+    entityName: "leave record",
     companyScoped: true,
   });
 

@@ -15,8 +15,10 @@ import {
   CheckCheck, 
   XCircle,
   Clock,
-  MessageSquare
+  MessageSquare,
+  FormInput
 } from "lucide-react";
+import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 
 // Define the structure of a settlement request
 interface SettlementRequest {
@@ -57,16 +59,11 @@ export default function SettlementHistoryPage() {
   return (
     <AnimatePresence mode="wait">
       {loading && (
-        <motion.div
-          key="loading"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="flex flex-col items-center justify-center py-16"
-        >
-          <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-2" />
-          <p className="text-gray-500">Loading settlement history...</p>
-        </motion.div>
+        <LoadingSection 
+          text="Loading settlement history..."
+          icon={FormInput}
+          color="blue"
+          />
       )}
       
       {error && !loading && (
