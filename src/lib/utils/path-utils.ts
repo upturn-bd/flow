@@ -6,7 +6,7 @@ const excludePaths = EXCLUDE_PATHS;
 
 // Role-based access control paths
 const employeeRoutes = EMPLOYEE_ROUTES;
-const managerRoutes = [...employeeRoutes, ROUTES.EMPLOYEE.HOME + "/finder"]; // Assuming finder is under home
+const managerRoutes = [...employeeRoutes, "/finder"]; // Assuming finder is under home
 const adminRoutes = [...managerRoutes, ROUTES.ADMIN.MANAGEMENT];
 
 export { authRoutes, excludePaths, employeeRoutes, managerRoutes, adminRoutes };
