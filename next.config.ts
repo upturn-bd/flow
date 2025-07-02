@@ -12,22 +12,33 @@ const nextConfig: NextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    turbo: {
-      resolveAlias: {
-        ws: "false",
-      },
-    },
-  },
-  webpack: (config, { isServer }) => {
-    // Fix for "ws does not work in the browser" error (fallback for non-turbopack builds)
+  webpack: (config, { isServer, dev }) => {
+    // Fix for "ws does not work in the browser" error
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         ws: false,
+        isows: false,
+        net: false,
+        fs: false,
+        tls: false,
+        crypto: false,
+        stream: false,
+        util: false,
+        url: false,
+        zlib: false,
+        http: false,
+        https: false,
+        assert: false,
+        os: false,
+        path: false,
       };
     }
+    
     return config;
+  },
+  experimental: {
+    serverComponentsExternalPackages: ['ws', 'isows'],
   },
 };
 
