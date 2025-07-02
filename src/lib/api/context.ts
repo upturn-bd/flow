@@ -158,8 +158,8 @@ export async function uploadFile(file: File, bucketName: string = 'uploads'): Pr
  * Get the current employee ID (alias for compatibility)
  */
 export async function getEmployeeId(): Promise<string> {
-  const employeeInfo = await getEmployeeInfo();
-  return employeeInfo.id;
+  const employeeInfo = await supabase.auth.getUser();
+  return employeeInfo.data.user?.id || '';
 }
 
 /**

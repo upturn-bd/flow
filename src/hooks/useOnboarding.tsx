@@ -352,7 +352,12 @@ export function useOnboarding() {
           }
         }
       )
-      .subscribe();
+      .on('system', {}, (payload) => {
+        console.log('Channel system event:', payload);
+      })
+      .subscribe((status) => {
+        console.log('User onboarding subscription status:', status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -377,4 +382,4 @@ export function useOnboarding() {
     subscribeToOnboardingUpdates,
     subscribeToUserOnboardingUpdates,
   };
-} 
+}

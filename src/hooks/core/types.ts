@@ -63,7 +63,7 @@ export interface CrudHookResult<T> {
   error: string | null;
   
   // Actions
-  fetchItems: () => Promise<void>;
+  fetchItems: (company_id?:number) => Promise<void>;
   fetchItemsWithQuery: (queryConfig: EnhancedQueryOptions) => Promise<T[]>;
   fetchSingleWithQuery: (queryConfig: EnhancedQueryOptions) => Promise<T | null>;
   fetchItem: (id: string | number) => Promise<void>;

@@ -4,7 +4,7 @@
 
 import { supabase } from "@/lib/supabase/client";
 
-export async function validateCompanyCode(code: string,name: string) {
+export async function validateCompanyCode(name: string,code: string) {
   const { data, error } = await supabase
     .from('companies')
     .select('id, name')

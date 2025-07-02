@@ -24,11 +24,13 @@ export function useEmployees() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchEmployees = useCallback(async () => {
+  const fetchEmployees = useCallback(async (company_id?: number) => {
     setLoading(true);
     setError(null);
     try {
-      const company_id = await getCompanyId();
+      if(company_id === undefined) {
+        company_id = await getCompanyId();
+      }
 
       const { data, error } = await supabase
         .from("employees")

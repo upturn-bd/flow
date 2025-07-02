@@ -77,13 +77,12 @@ export default function EmployeeOnboarding() {
   const { departments, fetchDepartments } = useDepartments();
   const { getUserOnboardingInfo, submitOnboarding, subscribeToUserOnboardingUpdates } = useOnboarding();
 
-  const fetchDepartmentsData = async () => {
-    try {
-      await fetchDepartments();
-    } catch (error) {
-      console.error("Error fetching departments:", error);
-    }
-  };
+  useEffect(() => {
+    console.log(departments, "Departments fetched in onboarding");
+    console.log(employees, "Employees fetched in onboarding");
+  }, [departments,employees]);
+    
+
 
   useEffect(() => {
     const fetchRejectedData = async () => {
@@ -104,7 +103,13 @@ export default function EmployeeOnboarding() {
             setActiveSection("personal");
             
             // Fetch departments when application is rejected
-            await fetchDepartmentsData();
+            await (async () => {
+              try {
+                await fetchDepartments(companyId!);
+              } catch (error) {
+                console.error("Error fetching departments:", error);
+              }
+            })();
             await fetchEmployees();
           }
         } catch (e) {
@@ -128,10 +133,14 @@ export default function EmployeeOnboarding() {
 
   useEffect(() => {
     if (isCompanyCodeValid && formData.company_id) {
-      fetchDepartmentsData();
-      fetchEmployees();
-
-      getEmployeeId().then(id => setUserId(id));
+      try{
+        fetchDepartments(companyId!);
+        fetchEmployees(companyId!);
+        getEmployeeId().then(id => setUserId(id));
+      }
+      catch (error) {
+        console.error("Error fetching departments or employees:", error);
+      }
     }
   }, [companyId]);
 

@@ -19,14 +19,16 @@ export interface ValidationResult {
  * Helper function to validate string length
  */
 function validateStringLength(value: any, fieldName: string, min?: number, max?: number): ValidationError | null {
+  // Capitalize the field name for better error messages
+  const formattedFieldName = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
   if (typeof value !== 'string') {
-    return { field: fieldName, message: `${fieldName} must be a string` };
+    return { field: fieldName, message: `${formattedFieldName} must be a string` };
   }
   if (min !== undefined && value.trim().length < min) {
-    return { field: fieldName, message: min === 1 ? `${fieldName} is required` : `${fieldName} must be at least ${min} characters` };
+    return { field: fieldName, message: min === 1 ? `${formattedFieldName} is required` : `${formattedFieldName} must be at least ${min} characters` };
   }
   if (max !== undefined && value.length > max) {
-    return { field: fieldName, message: `${fieldName} must be ${max} characters or fewer` };
+    return { field: fieldName, message: `${formattedFieldName} must be ${max} characters or fewer` };
   }
   return null;
 }
@@ -676,8 +678,23 @@ export function validateDepartment(department: any): ValidationResult {
   const nameError = validateStringLength(department.name, 'name', 1, 50);
   if (nameError) errors.push(nameError);
 
+  // head_id is required
   const headIdError = validateStringLength(department.head_id, 'head_id', 1);
   if (headIdError) errors.push(headIdError);
+
+  // description is optional
+  if (department.description && department.description.trim()) {
+    const descriptionError = validateStringLength(department.description, 'description', 1, 500);
+    if (descriptionError) errors.push(descriptionError);
+  }
+
+  // division_id is required
+  if (!department.division_id || typeof department.division_id !== 'number' || department.division_id <= 0) {
+    errors.push({
+      field: 'division_id',
+      message: 'Division is required'
+    });
+  }
 
   return {
     success: errors.length === 0,
@@ -694,6 +711,22 @@ export function validatePosition(position: any): ValidationResult {
 
   const nameError = validateStringLength(position.name, 'name', 1, 50);
   if (nameError) errors.push(nameError);
+
+  if (
+    position.department_id === null ||
+    position.department_id === undefined ||
+    typeof position.department_id !== "number"
+  ) {
+    errors.push({ field: "department_id", message: "Department is required" });
+  }
+
+  if (
+    position.grade === null ||
+    position.grade === undefined ||
+    typeof position.grade !== "number"
+  ) {
+    errors.push({ field: "grade", message: "Grade is required" });
+  }
 
   return {
     success: errors.length === 0,

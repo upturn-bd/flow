@@ -96,15 +96,13 @@ export default function DepartmentDetailsModal({
             </div>
           </div>
 
-          {department?.description && (
-            <div className="flex gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
-              <FileText size={20} weight="duotone" className="text-gray-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <div className="text-sm text-gray-600 font-medium">Description</div>
-                <div className="text-gray-800">{department.description}</div>
-              </div>
+          <div className="flex gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <FileText size={20} weight="duotone" className="text-gray-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <div className="text-sm text-gray-600 font-medium">Description</div>
+              <div className="text-gray-800">{department?.description || "No description provided"}</div>
             </div>
-          )}
+          </div>
         </motion.div>
 
         <motion.div variants={fadeIn} className="flex justify-end pt-6 gap-2">

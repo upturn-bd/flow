@@ -87,7 +87,6 @@ export default function DivisionModal({
 
   // Prepare options for employee select
   const employeeOptions = [
-    { value: "", label: "Select Employee" },
     ...employees.map(employee => ({
       value: employee.id,
       label: employee.name
