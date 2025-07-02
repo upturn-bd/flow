@@ -290,77 +290,58 @@ export function useOnboarding() {
     }
   }, []);
 
-  // Set up realtime subscription for pending employees
+  // Set up polling for pending employees (replaces realtime)
   const subscribeToOnboardingUpdates = useCallback((callback?: (payload: any) => void) => {
-    const channel = supabase
-      .channel("onboarding-updates")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "employees",
-          filter: "has_approval=eq.PENDING",
-        },
-        (payload) => {
-          console.log("Onboarding update:", payload);
-          
-          // Update local state based on the change
-          if (payload.eventType === "INSERT") {
-            setPendingEmployees(prev => [...prev, payload.new as PendingEmployee]);
-          } else if (payload.eventType === "UPDATE") {
-            setPendingEmployees(prev => 
-              prev.map(emp => 
-                emp.id === payload.new.id ? payload.new as PendingEmployee : emp
-              )
-            );
-          } else if (payload.eventType === "DELETE") {
-            setPendingEmployees(prev => prev.filter(emp => emp.id !== payload.old.id));
-          }
-
-          // Call custom callback if provided
-          if (callback) {
-            callback(payload);
-          }
+    let intervalId: NodeJS.Timeout;
+    
+    const pollForUpdates = async () => {
+      try {
+        await fetchPendingEmployees();
+        if (callback) {
+          callback({ type: 'polling_update' });
         }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
+      } catch (error) {
+        console.error('Error polling for onboarding updates:', error);
+      }
     };
-  }, []);
 
-  // Subscribe to changes for a specific user's onboarding status
-  const subscribeToUserOnboardingUpdates = useCallback((userId: string, callback?: (payload: any) => void) => {
-    const channel = supabase
-      .channel(`user-onboarding-${userId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "employees",
-          filter: `id=eq.${userId}`,
-        },
-        (payload) => {
-          console.log("User onboarding update:", payload);
-          
-          // Call custom callback if provided
-          if (callback) {
-            callback(payload);
-          }
-        }
-      )
-      .on('system', {}, (payload) => {
-        console.log('Channel system event:', payload);
-      })
-      .subscribe((status) => {
-        console.log('User onboarding subscription status:', status);
-      });
+    // Poll every 30 seconds for updates
+    intervalId = setInterval(pollForUpdates, 30000);
 
     return () => {
-      supabase.removeChannel(channel);
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [fetchPendingEmployees]);
+
+  // Set up polling for user's onboarding status (replaces realtime)
+  const subscribeToUserOnboardingUpdates = useCallback((userId: string, callback?: (payload: any) => void) => {
+    let intervalId: NodeJS.Timeout;
+    
+    const pollForUserUpdates = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("employees")
+          .select("has_approval, rejection_reason")
+          .eq("id", userId)
+          .single();
+
+        if (!error && data && callback) {
+          callback({ new: data });
+        }
+      } catch (error) {
+        console.error('Error polling for user onboarding updates:', error);
+      }
+    };
+
+    // Poll every 10 seconds for user status updates
+    intervalId = setInterval(pollForUserUpdates, 10000);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
     };
   }, []);
 
@@ -378,7 +359,7 @@ export function useOnboarding() {
     processOnboardingAction,
     clearError,
     
-    // Realtime subscriptions
+    // Polling subscriptions (replaces realtime)
     subscribeToOnboardingUpdates,
     subscribeToUserOnboardingUpdates,
   };

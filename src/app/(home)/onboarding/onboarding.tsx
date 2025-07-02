@@ -144,7 +144,7 @@ export default function EmployeeOnboarding() {
     }
   }, [companyId]);
 
-  // Set up realtime subscription for user's onboarding status
+  // Set up polling for user's onboarding status (replaces realtime)
   useEffect(() => {
     if (userId) {
       const unsubscribe = subscribeToUserOnboardingUpdates(userId, (payload) => {

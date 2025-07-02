@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
-import { UserPlus, Loader2, Check, X, AlertTriangle, Users, User } from "lucide-react";
+import { UserPlus, Loader2, Check, X, AlertTriangle, Users, User, RefreshCw } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -55,9 +55,9 @@ export default function OnboardingApprovalPage() {
     fetchEmployees();
     fetchDepartments();
 
-    // Set up realtime subscription
+    // Set up polling for updates (replaces realtime)
     const unsubscribe = subscribeToOnboardingUpdates((payload) => {
-      toast.success("Onboarding list updated!");
+      console.log("Onboarding list polled and updated!");
     });
 
     return () => {
@@ -81,10 +81,21 @@ export default function OnboardingApprovalPage() {
           const { [id]: removed, ...rest } = prev;
           return rest;
         });
+        // Refresh the list manually
+        await fetchPendingEmployees();
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to process request");
       console.error(error);
+    }
+  };
+
+  const handleRefresh = async () => {
+    try {
+      await fetchPendingEmployees();
+      toast.success("List refreshed!");
+    } catch (error) {
+      toast.error("Failed to refresh list");
     }
   };
 
@@ -116,7 +127,7 @@ export default function OnboardingApprovalPage() {
       opacity: 1, 
       y: 0, 
       transition: { 
-        type: "spring",
+        type: "spring" as const,
         stiffness: 260,
         damping: 20 
       } 
@@ -180,8 +191,18 @@ export default function OnboardingApprovalPage() {
         >
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-800">New User Requests</h2>
-            <div className="text-sm text-gray-500">
-              {pendingEmployees.length} request{pendingEmployees.length !== 1 ? 's' : ''} pending
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleRefresh}
+                className="flex items-center gap-2 px-3 py-2 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
+                disabled={loading}
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
+              <div className="text-sm text-gray-500">
+                {pendingEmployees.length} request{pendingEmployees.length !== 1 ? 's' : ''} pending
+              </div>
             </div>
           </div>
 
