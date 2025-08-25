@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import BasicInfoTab from "./tabs/BasicInfoTab";
@@ -16,7 +16,6 @@ import {
   Loader2,
 } from "lucide-react";
 import TabView, { TabItem } from "@/components/ui/TabView";
-import { supabase } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
@@ -26,15 +25,15 @@ function ProfileContent() {
   const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { 
-    isCurrentUser, 
-    loading: profileLoading, 
-    checkIsCurrentUser, 
-    fetchUserName 
+  const {
+    isCurrentUser,
+    loading: profileLoading,
+    checkIsCurrentUser,
+    fetchUserName,
   } = useUserProfile();
 
   const searchParams = useSearchParams();
-  const uid = searchParams.get("uid");
+  const uid = useMemo(() => searchParams.get("uid") || null, [searchParams]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -44,7 +43,7 @@ function ProfileContent() {
         setLoading(true);
         // Check if we are looking at another user
         await checkIsCurrentUser(uid);
-        
+
         // Get user name
         const userInfo = await fetchUserName(uid);
         if (userInfo) {
@@ -73,75 +72,78 @@ function ProfileContent() {
     },
   };
 
-  const TABS: TabItem[] = [
-    {
-      key: "basic",
-      label: "Basic Information",
-      icon: <User className="h-5 w-5" />,
-      color: "text-blue-600",
-      content: <BasicInfoTab uid={uid} />,
-    },
-    {
-      key: "personal",
-      label: "Personal Information",
-      icon: <ClipboardList className="h-5 w-5" />,
-      color: "text-purple-600",
-      content: <PersonalInfoTab uid={uid} />,
-    },
-    {
-      key: "education",
-      label: "Education & Experience",
-      icon: <GraduationCap className="h-5 w-5" />,
-      color: "text-emerald-600",
-      content: <EducationExperienceTab uid={uid} />,
-    },
-    {
-      key: "key-performance-indicator",
-      label: "Key Performance Indicator",
-      icon: <BarChart2 className="h-5 w-5" />,
-      color: "text-amber-600",
-      content: (
-        <div className="flex flex-col items-center justify-center py-16 text-gray-500">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          >
-            <BarChart2 className="h-16 w-16 text-amber-200 mb-4" />
-          </motion.div>
-          <h3 className="text-xl font-medium mb-2">
-            Key Performance Indicator
-          </h3>
-          <p className="mt-2 text-center max-w-md">
-            This feature is coming soon. Performance indicators will help you
-            track your progress and achievements.
-          </p>
-        </div>
-      ),
-    },
-    {
-      key: "performance-evaluation",
-      label: "Performance Evaluation",
-      icon: <FileCheck className="h-5 w-5" />,
-      color: "text-indigo-600",
-      content: (
-        <div className="flex flex-col items-center justify-center py-16 text-gray-500">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          >
-            <FileCheck className="h-16 w-16 text-indigo-200 mb-4" />
-          </motion.div>
-          <h3 className="text-xl font-medium mb-2">Performance Evaluation</h3>
-          <p className="mt-2 text-center max-w-md">
-            This feature is coming soon. Performance evaluations will provide
-            feedback on your work and achievements.
-          </p>
-        </div>
-      ),
-    },
-  ];
+  const TABS: TabItem[] = useMemo(
+    () => [
+      {
+        key: "basic",
+        label: "Basic Information",
+        icon: <User className="h-5 w-5" />,
+        color: "text-blue-600",
+        content: <BasicInfoTab uid={uid} />,
+      },
+      {
+        key: "personal",
+        label: "Personal Information",
+        icon: <ClipboardList className="h-5 w-5" />,
+        color: "text-purple-600",
+        content: <PersonalInfoTab uid={uid} />,
+      },
+      {
+        key: "education",
+        label: "Education & Experience",
+        icon: <GraduationCap className="h-5 w-5" />,
+        color: "text-emerald-600",
+        content: <EducationExperienceTab uid={uid} />,
+      },
+      {
+        key: "key-performance-indicator",
+        label: "Key Performance Indicator",
+        icon: <BarChart2 className="h-5 w-5" />,
+        color: "text-amber-600",
+        content: (
+          <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <BarChart2 className="h-16 w-16 text-amber-200 mb-4" />
+            </motion.div>
+            <h3 className="text-xl font-medium mb-2">
+              Key Performance Indicator
+            </h3>
+            <p className="mt-2 text-center max-w-md">
+              This feature is coming soon. Performance indicators will help you
+              track your progress and achievements.
+            </p>
+          </div>
+        ),
+      },
+      {
+        key: "performance-evaluation",
+        label: "Performance Evaluation",
+        icon: <FileCheck className="h-5 w-5" />,
+        color: "text-indigo-600",
+        content: (
+          <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <FileCheck className="h-16 w-16 text-indigo-200 mb-4" />
+            </motion.div>
+            <h3 className="text-xl font-medium mb-2">Performance Evaluation</h3>
+            <p className="mt-2 text-center max-w-md">
+              This feature is coming soon. Performance evaluations will provide
+              feedback on your work and achievements.
+            </p>
+          </div>
+        ),
+      },
+    ],
+    [uid]
+  );
 
   if (loading) {
     return (
@@ -212,11 +214,7 @@ function ProfileContent() {
         </p>
       </motion.div>
 
-      <TabView
-        tabs={TABS}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+      <TabView tabs={TABS} activeTab={activeTab} setActiveTab={setActiveTab} />
     </motion.div>
   );
 }
@@ -224,12 +222,14 @@ function ProfileContent() {
 // Main page component with Suspense boundary
 export default function ProfilePage() {
   return (
-    <Suspense fallback={
-      <div className="flex flex-col items-center justify-center h-96">
-        <Loader2 className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
-        <p className="text-gray-600">Loading profile data...</p>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex flex-col items-center justify-center h-96">
+          <Loader2 className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
+          <p className="text-gray-600">Loading profile data...</p>
+        </div>
+      }
+    >
       <ProfileContent />
     </Suspense>
   );

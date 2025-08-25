@@ -12,7 +12,7 @@ import {
   validateProject,
   validationErrorsToObject,
 } from "@/lib/utils/validation";
-import { useTasks } from "@/hooks/useTasks";
+import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import {
   Plus,
   Building2,
@@ -89,6 +89,13 @@ export default function ProjectDetails({
   const [remark, setRemark] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Tasks states and functions
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loadingTasks, setLoadingTasks] = useState<boolean>(false);
+  const [isCreatingTask, setIsCreatingTask] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const { getProjectTasks, createTask, updateTask, deleteTask } = useTasks();
+
   // Animation variants
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -109,8 +116,8 @@ export default function ProjectDetails({
   useEffect(() => {
     fetchProjectDetails(projectId);
     fetchMilestonesByProjectId(projectId);
-    fetchTasks();
-  }, [projectId]);
+    getProjectTasks(projectId, TaskStatus.INCOMPLETE);
+  }, [projectId, getProjectTasks]);
 
   const submitProject = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -181,19 +188,12 @@ export default function ProjectDetails({
     }
   };
 
-  // Tasks states and functions
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loadingTasks, setLoadingTasks] = useState<boolean>(false);
-  const [isCreatingTask, setIsCreatingTask] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const { fetchTasks, createTask, updateTask, deleteTask } = useTasks();
-
   const handleCreateTask = async (values: TaskData) => {
     try {
       await createTask({ ...values, project_id: projectId });
       toast.success("Task created!");
       setIsCreatingTask(false);
-      fetchTasks();
+      getProjectTasks(projectId, TaskStatus.INCOMPLETE);
     } catch {
       toast.error("Error creating Task.");
     }
@@ -206,7 +206,7 @@ export default function ProjectDetails({
         // await updateTask(selectedTask.id, values);
         toast.success("Task updated!");
         setSelectedTask(null);
-        fetchTasks();
+        getProjectTasks(projectId, TaskStatus.INCOMPLETE);
       }
     } catch {
       toast.error("Error updating Task.");
@@ -217,7 +217,7 @@ export default function ProjectDetails({
     try {
       await deleteTask(id);
       toast.success("Task deleted!");
-      fetchTasks();
+      getProjectTasks(projectId, TaskStatus.INCOMPLETE);
     } catch {
       toast.error("Error deleting Task.");
     }

@@ -3,7 +3,7 @@
 import { useAttendanceStatus } from "@/hooks/useAttendance";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import { useNotices } from "@/hooks/useNotice";
-import { useTasks } from "@/hooks/useTasks";
+import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import SectionContainer from "@/app/(home)/home/components/SectionContainer";
@@ -46,7 +46,7 @@ export default function HomePage() {
   } = useAttendanceStatus();
   const { sites, loading: sitesLoading, fetchSites } = useSites();
   const { notices, loading: noticesLoading, fetchNotices } = useNotices();
-  const { tasks, loading: tasksLoading, fetchTasks } = useTasks();
+  const { tasks, loading: tasksLoading, getUserTasks } = useTasks();
 
   // Create attendance status from records
   const currentAttendanceRecord = today;
@@ -58,9 +58,9 @@ export default function HomePage() {
   useEffect(() => {
     fetchSites();
     fetchNotices();
-    fetchTasks();
+    getUserTasks(TaskStatus.INCOMPLETE);
     getTodaysAttendance();
-  }, [fetchSites, fetchNotices, fetchTasks]);
+  }, [fetchSites, fetchNotices, getUserTasks]);
 
   const onCheckIn = () => {
     handleCheckIn(attendanceRecord, sites, getTodaysAttendance);
@@ -75,7 +75,7 @@ export default function HomePage() {
       <DetailModals
         selectedNoticeId={selectedNoticeId}
         selectedTaskId={selectedTaskId}
-        onTaskStatusUpdate={() => fetchTasks()}
+        onTaskStatusUpdate={() => getUserTasks(TaskStatus.INCOMPLETE)}
         onCloseNotice={closeNotice}
         onCloseTask={closeTask}
       />

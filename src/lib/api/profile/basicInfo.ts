@@ -23,7 +23,7 @@ export async function fetchUserBasicInfo(userId: string) {
   const { data, error } = await supabase
     .from('employees')
     .select('*')
-    .eq('user_id', userId)
+    .eq('id', userId)
     .single();
 
   if (error) throw error;

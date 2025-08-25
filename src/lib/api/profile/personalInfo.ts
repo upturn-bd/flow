@@ -10,7 +10,7 @@ export async function fetchPersonalInfo() {
   const employeeInfo = await getEmployeeInfo();
   
   const { data, error } = await supabase
-    .from('employees')
+    .from('personal_infos')
     .select('*')
     .eq('id', employeeInfo.id)
     .single();
@@ -25,7 +25,7 @@ export const fetchCurrentUserPersonalInfo = fetchPersonalInfo;
 // Function to fetch another user's personal info by ID
 export async function fetchUserPersonalInfo(userId: string) {
   const { data, error } = await supabase
-    .from('employees')
+    .from('personal_infos')
     .select('*')
     .eq('id', userId)
     .single();
@@ -38,7 +38,7 @@ export async function updatePersonalInfo(updates: any) {
   const employeeInfo = await getEmployeeInfo();
   
   const { data, error } = await supabase
-    .from('employees')
+    .from('personal_infos')
     .update(updates)
     .eq('id', employeeInfo.id)
     .select()

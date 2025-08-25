@@ -2,47 +2,38 @@
 
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
-import { useTasks } from "@/hooks/useTasks";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo } from "@/lib/api";
-import { getCompanyId } from "@/lib/api";
+import { useTasks, TaskStatus } from "@/hooks/useTasks";
+import { useEffect, useState, memo, useRef } from "react";
 import { Task } from "@/lib/types/schemas";
+import { Department } from "@/lib/types/schemas";
 import TaskDetails from "./shared/TaskDetails";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, ExternalLink, Loader2, CheckCircle, Calendar } from "lucide-react";
+import { Trash2, ExternalLink, CheckCircle, Calendar } from "lucide-react";
 import { toast } from "sonner";
-import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  StatusBadge,
+  InfoRow,
+} from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { LoadingState } from "@/components/ui/LoadingState";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui";
 
 function TaskCard({
   task,
   setTaskDetailsId,
   deleteTask,
+  departments,
 }: {
   task: Task;
   setTaskDetailsId: (id: number) => void;
   setSelectedTask: (Task: Task) => void;
   deleteTask: (id: number) => void;
+  departments: Department[];
 }) {
-  const {
-    employees,
-    loading: employeeLoading,
-    fetchEmployees,
-  } = useEmployees();
-  const {
-    departments,
-    loading: departmentsLoading,
-    fetchDepartments,
-  } = useDepartments();
   const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => {
-    fetchEmployees();
-    fetchDepartments();
-  }, [fetchEmployees, fetchDepartments]);
 
   const { id, task_title, department_id, task_description, end_date } = task;
 
@@ -60,10 +51,6 @@ function TaskCard({
       setIsDeleting(false);
     }
   };
-
-  if (employeeLoading || departmentsLoading) {
-    return <LoadingState message="Loading task information..." size="sm" />;
-  }
 
   const department = departments.find((dept) => dept.id === department_id);
 
@@ -97,7 +84,7 @@ function TaskCard({
         icon={<CheckCircle size={20} className="text-green-500" />}
         action={actions}
       />
-      
+
       <CardContent>
         <div className="flex items-center justify-between">
           {department && (
@@ -117,33 +104,50 @@ function TaskCard({
   );
 }
 
-function CompletedTasksList() {
-  const { deleteTask } = useTasks();
+const CompletedTasksList = memo(() => {
+  // Single hook call to avoid multiple instances
+  const { tasks, getCompanyTasks, loading, deleteTask } = useTasks();
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const {tasks, fetchTasks, loading} = useTasks();
+  
+  // Move employee and department fetching to parent level to avoid multiple API calls
+  const { fetchEmployees, loading: employeeLoading } = useEmployees();
+  const { departments, fetchDepartments, loading: departmentsLoading } = useDepartments();
+
+  // Use individual useEffects with empty dependencies to prevent re-renders
+  useEffect(() => {
+    getCompanyTasks(TaskStatus.COMPLETE);
+  }, []); // Empty dependency array
 
   useEffect(() => {
-    fetchTasks({all:true,status:false});
-  }, []);
+    fetchEmployees();
+  }, []); // Empty dependency array
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []); // Empty dependency array
 
   const handleDeleteTask = async (id: number) => {
     try {
       await deleteTask(id);
-      fetchTasks({all:true,status:false});
+      // getCompanyTasks(TaskStatus.COMPLETE); // Removed: useTasks hook handles state update automatically
     } catch (error) {
       console.error(error);
     }
   };
 
+  if (loading || employeeLoading || departmentsLoading) {
+    return (
+      <AnimatePresence mode="wait">
+        <LoadingSpinner text="Loading completed tasks..." />
+      </AnimatePresence>
+    );
+  }
+
   return (
     <div>
       <AnimatePresence mode="wait">
-        {loading && (
-          <LoadingState message="Loading completed tasks..." />
-        )}
-
-        {!selectedTask && taskDetailsId === null && !loading && (
+        {!selectedTask && taskDetailsId === null && (
           <motion.div
             key="content"
             initial={{ opacity: 0 }}
@@ -153,13 +157,14 @@ function CompletedTasksList() {
           >
             <AnimatePresence>
               {tasks.length > 0 ? (
-                tasks.map((task) => (
+                tasks.map((task, index) => (
                   <TaskCard
                     key={task.id}
                     deleteTask={handleDeleteTask}
                     setSelectedTask={setSelectedTask}
                     task={task}
                     setTaskDetailsId={setTaskDetailsId}
+                    departments={departments}
                   />
                 ))
               ) : (
@@ -177,12 +182,12 @@ function CompletedTasksList() {
           <TaskDetails
             onClose={() => setTaskDetailsId(null)}
             id={taskDetailsId}
-            onTaskStatusUpdate={() => fetchTasks({all:true,status:false})}
+            onTaskStatusUpdate={() => {}} // Removed redundant refresh - useTasks handles state automatically
           />
         )}
       </AnimatePresence>
     </div>
   );
-}
+});
 
 export default CompletedTasksList;

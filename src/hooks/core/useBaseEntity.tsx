@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
   BaseEntity,
   CrudHookResult,
@@ -471,7 +471,7 @@ export function useBaseEntity<T extends BaseEntity>(
     setItem(null);
   }, []);
 
-  return {
+  return useMemo(() => ({
     items,
     item,
     loading,
@@ -488,7 +488,24 @@ export function useBaseEntity<T extends BaseEntity>(
     deleteItem,
     clearError,
     clearItem,
-  };
+  }), [
+    items,
+    item,
+    loading,
+    creating,
+    updating,
+    deleting,
+    error,
+    fetchItems,
+    fetchItemsWithQuery,
+    fetchSingleWithQuery,
+    fetchItem,
+    createItem,
+    updateItem,
+    deleteItem,
+    clearError,
+    clearItem,
+  ]);
 }
 
 export default useBaseEntity;

@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { useEducation } from "@/hooks/useEducation";
-import { useExperience } from "@/hooks/useExperience";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import EducationModal from "@/components/education-and-experience/EducationModal";
 import ExperienceModal from "@/components/education-and-experience/ExperienceModal";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,12 +15,13 @@ import {
   Building,
   Calendar 
 } from "lucide-react";
-import { Education } from "@/hooks/useEducation";
-import { Experience } from "@/hooks/useExperience";
+import { Education } from "@/hooks/useProfile";
+import { Experience } from "@/lib/types";
 import { extractFilenameFromUrl } from "@/lib/utils";
-import { FilePdf, MapPin } from "@phosphor-icons/react";
+import { FilePdf } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useProfile } from "@/hooks/useProfile";
+import { showNotification } from "@/lib/utils/notifications";
 
 interface EducationExperienceTabProps {
   uid?: string | null;
@@ -30,191 +29,196 @@ interface EducationExperienceTabProps {
 
 export default function EducationExperienceTab({ uid }: EducationExperienceTabProps) {
   const {
-    education,
-    loading: educationLoading,
-    fetchEducation,
+    educations,
+    experiences,
+    loading,
+    fetchUserEducation,
+    fetchUserExperience,
+    fetchCurrentUserEducation,
+    fetchCurrentUserExperience,
     createEducation,
     updateEducation,
     deleteEducation,
-  } = useEducation();
-  const [editEducation, setEditEducation] = useState<number | null>(null);
-  const [isCreatingEducation, setIsCreatingEducation] = useState(false);
-  const [isEducationActionLoading, setIsEducationActionLoading] = useState(false);
-
-  const {
-    experience,
-    loading: experienceLoading,
-    fetchExperience,
     createExperience,
     updateExperience,
     deleteExperience,
-  } = useExperience();
+    isCurrentUser
+  } = useProfile();
+
+  // Local state for UI management
+  const [editEducation, setEditEducation] = useState<number | null>(null);
+  const [isCreatingEducation, setIsCreatingEducation] = useState(false);
+  const [isEducationActionLoading, setIsEducationActionLoading] = useState(false);
   const [editExperience, setEditExperience] = useState<number | null>(null);
   const [isCreatingExperience, setIsCreatingExperience] = useState(false);
   const [isExperienceActionLoading, setIsExperienceActionLoading] = useState(false);
 
-  const {
-    educations: userEducations,
-    experiences: userExperiences,
-    loading,
-    fetchUserEducation,
-    fetchUserExperience,
-    isCurrentUser
-  } = useProfile();
-
   useEffect(() => {
     const loadData = async () => {
       if (uid) {
-        // Fetch specific user's data
-        await fetchUserEducation(uid);
-        await fetchUserExperience(uid);
+        try {
+          await fetchUserEducation(uid);
+          await fetchUserExperience(uid);
+        } catch (e) {
+          console.error("Error fetching user data:", e);
+        }
       } else {
-        // Fetch current user's data using the hooks
-        fetchEducation();
-        fetchExperience();
+        // Fetch current user's data
+        try {
+          await fetchCurrentUserEducation();
+          await fetchCurrentUserExperience();
+        } catch (e) {
+          console.error("Error fetching current user data:", e);
+        }
       }
     };
     
     loadData();
-  }, [uid, fetchEducation, fetchExperience, fetchUserEducation, fetchUserExperience]);
+  }, [uid, fetchUserEducation, fetchUserExperience, fetchCurrentUserEducation, fetchCurrentUserExperience]);
 
   // Utility for async actions with loading and error handling
-  const handleAsyncAction = async (
+  const handleAsyncAction = useCallback(async (
     action: () => Promise<any>,
     setLoading: (v: boolean) => void,
-    onSuccess?: () => void,
-    onError?: () => void
+    successMessage: string,
+    errorMessage: string,
+    onSuccess?: () => void
   ) => {
     setLoading(true);
     try {
       await action();
-      onSuccess && onSuccess();
-    } catch {
-      onError && onError();
+      showNotification({ message: successMessage, type: 'success' });
+      onSuccess?.();
+    } catch (error) {
+      showNotification({ message: errorMessage, type: 'error' });
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleCreateEducation = (values: Omit<Education, "id">) =>
+  const handleCreateEducation = useCallback((values: Omit<Education, "id">) =>
     handleAsyncAction(
       async () => {
         await createEducation(values);
-        fetchEducation();
-        showNotification('Education created successfully', 'success');
+        // Refresh data based on context
+        if (uid) {
+          await fetchUserEducation(uid);
+        } else {
+          await fetchCurrentUserEducation();
+        }
         setIsCreatingEducation(false);
       },
       setIsEducationActionLoading,
-      undefined,
-      () => showNotification('Error creating education', 'error')
-    );
+      'Education created successfully',
+      'Error creating education'
+    ), [createEducation, uid, fetchUserEducation, fetchCurrentUserEducation, handleAsyncAction]);
 
-  const handleUpdateEducation = (values: Education) =>
+  const handleUpdateEducation = useCallback((values: Education) =>
     handleAsyncAction(
       async () => {
         if (editEducation) {
           await updateEducation(editEducation, values);
-          fetchEducation();
-          showNotification('Education updated successfully', 'success');
+          // Refresh data based on context
+          if (uid) {
+            await fetchUserEducation(uid);
+          } else {
+            await fetchCurrentUserEducation();
+          }
           setEditEducation(null);
         }
       },
       setIsEducationActionLoading,
-      undefined,
-      () => showNotification('Error updating education', 'error')
-    );
+      'Education updated successfully',
+      'Error updating education'
+    ), [editEducation, updateEducation, uid, fetchUserEducation, fetchCurrentUserEducation, handleAsyncAction]);
 
-  const handleDeleteEducation = (id: number) => {
-    if (
-      !window.confirm("Are you sure you want to delete this education record?")
-    )
-      return;
+  const handleDeleteEducation = useCallback((id: number) => {
+    if (!window.confirm("Are you sure you want to delete this education record?")) return;
+    
     handleAsyncAction(
       async () => {
         await deleteEducation(id);
-        fetchEducation();
-        showNotification('Education deleted successfully', 'success');
+        // Refresh data based on context
+        if (uid) {
+          await fetchUserEducation(uid);
+        } else {
+          await fetchCurrentUserEducation();
+        }
       },
       setIsEducationActionLoading,
-      undefined,
-      () => showNotification('Error deleting education', 'error')
+      'Education deleted successfully',
+      'Error deleting education'
     );
-  };
+  }, [deleteEducation, uid, fetchUserEducation, fetchCurrentUserEducation, handleAsyncAction]);
 
-  const handleCreateExperience = (values: Omit<Experience, "id">) =>
+  const handleCreateExperience = useCallback((values: Omit<Experience, "id">) =>
     handleAsyncAction(
       async () => {
         await createExperience(values);
-        fetchExperience();
-        showNotification('Experience created successfully', 'success');
+        // Refresh data based on context
+        if (uid) {
+          await fetchUserExperience(uid);
+        } else {
+          await fetchCurrentUserExperience();
+        }
         setIsCreatingExperience(false);
       },
       setIsExperienceActionLoading,
-      undefined,
-      () => showNotification('Error creating experience', 'error')
-    );
+      'Experience created successfully',
+      'Error creating experience'
+    ), [createExperience, uid, fetchUserExperience, fetchCurrentUserExperience, handleAsyncAction]);
 
-  const handleUpdateExperience = (values: Experience) =>
+  const handleUpdateExperience = useCallback((values: Experience) =>
     handleAsyncAction(
       async () => {
         if (editExperience) {
           await updateExperience(editExperience, values);
-          fetchExperience();
-          showNotification('Experience updated successfully', 'success');
+          // Refresh data based on context
+          if (uid) {
+            await fetchUserExperience(uid);
+          } else {
+            await fetchCurrentUserExperience();
+          }
           setEditExperience(null);
         }
       },
       setIsExperienceActionLoading,
-      undefined,
-      () => showNotification('Error updating experience', 'error')
-    );
+      'Experience updated successfully',
+      'Error updating experience'
+    ), [editExperience, updateExperience, uid, fetchUserExperience, fetchCurrentUserExperience, handleAsyncAction]);
 
-  const handleDeleteExperience = (id: number) => {
-    if (
-      !window.confirm("Are you sure you want to delete this experience record?")
-    )
-      return;
+  const handleDeleteExperience = useCallback((id: number) => {
+    if (!window.confirm("Are you sure you want to delete this experience record?")) return;
+    
     handleAsyncAction(
       async () => {
         await deleteExperience(id);
-        fetchExperience();
-        showNotification('Experience deleted successfully', 'success');
+        // Refresh data based on context
+        if (uid) {
+          await fetchUserExperience(uid);
+        } else {
+          await fetchCurrentUserExperience();
+        }
       },
       setIsExperienceActionLoading,
-      undefined,
-      () => showNotification('Error deleting experience', 'error')
+      'Experience deleted successfully',
+      'Error deleting experience'
     );
-  };
-
-  const showNotification = (message: string, type: 'success' | 'error') => {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in-up ${
-      type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-    }`;
-    notification.innerHTML = message;
-    document.body.appendChild(notification);
-    
-    // Auto remove after 3 seconds
-    setTimeout(() => {
-      notification.classList.add('animate-fade-out');
-      setTimeout(() => document.body.removeChild(notification), 500);
-    }, 3000);
-  };
+  }, [deleteExperience, uid, fetchUserExperience, fetchCurrentUserExperience, handleAsyncAction]);
 
   const selectedEducationEdit = useMemo(
-    () => education.find((d) => d.id === editEducation) ?? null,
-    [education, editEducation]
+    () => educations.find((d: Education) => d.id === editEducation) ?? null,
+    [educations, editEducation]
   );
   const selectedExperienceEdit = useMemo(
-    () => experience.find((d) => d.id === editExperience) ?? null,
-    [experience, editExperience]
+    () => experiences.find((d: Experience) => d.id === editExperience) ?? null,
+    [experiences, editExperience]
   );
 
-  // Determine which data set to use
-  const educationToShow = uid ? userEducations : education;
-  const experienceToShow = uid ? userExperiences : experience;
-  const isDataLoading = uid ? loading : (educationLoading || experienceLoading);
+  // Use the same data source for both viewing and editing since we're using the consolidated hook
+  const educationToShow = educations;
+  const experienceToShow = experiences;
+  const isDataLoading = loading;
 
   const getFileIcon = (filename: string) => {
     const extension = filename.split('.').pop()?.toLowerCase() || '';
@@ -240,7 +244,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
       opacity: 1, 
       y: 0, 
       transition: { 
-        type: "spring",
+        type: "spring" as const,
         stiffness: 260,
         damping: 20 
       } 

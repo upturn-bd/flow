@@ -1,22 +1,43 @@
 "use client";
 
-import {
-  createTask as cTask,
-  deleteTask as dTask,
-  updateTask as uTask,
-  getUserTasks,
-  getProjectTasks,
-  getMilestoneTasks,
-  completeTask as cmpTask,
-  reopenTask as ropTask,
-  updateTasksMilestone,
-  getProjectTaskStats,
-  getTaskById,
-  TaskFilters,
-  getCompanyTasks,
-} from "@/lib/api/operations-and-services/project/task";
+import { supabase } from "@/lib/supabase/client";
+import { getEmployeeInfo, getCompanyId } from "@/lib/api";
 import { Task } from "@/lib/types/schemas";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
+
+// Task status variants
+export enum TaskStatus {
+  INCOMPLETE = "incomplete",
+  COMPLETE = "complete",
+  ALL = "all"
+}
+
+// Task scope variants
+export enum TaskScope {
+  USER_TASKS = "user_tasks",
+  PROJECT_TASKS = "project_tasks", 
+  MILESTONE_TASKS = "milestone_tasks",
+  COMPANY_TASKS = "company_tasks",
+  DEPARTMENT_TASKS = "department_tasks"
+}
+
+// Simplified filter interface
+export interface TaskFilters {
+  scope: TaskScope;
+  status: TaskStatus;
+  projectId?: number;
+  milestoneId?: number;
+  departmentId?: number;
+  assigneeId?: string;
+}
+
+// Task fetch result interface
+export interface TaskFetchResult {
+  tasks: Task[];
+  totalCount: number;
+  completedCount: number;
+  pendingCount: number;
+}
 
 // Re-export Task type for components
 export type { Task };
@@ -32,174 +53,390 @@ export function useTasks() {
     inProgress: number;
   } | null>(null);
 
-  const fetchTasks = useCallback(async (filters?: TaskFilters) => {
+  // Helper function to apply status filtering to query
+  const applyStatusFilter = (query: any, status: TaskStatus) => {
+    if (status === TaskStatus.INCOMPLETE) {
+      return query.eq("status", false);
+    } else if (status === TaskStatus.COMPLETE) {
+      return query.eq("status", true);
+    }
+    // TaskStatus.ALL - no filter applied
+    return query;
+  };
+
+  // Unified fetch function that handles all scenarios
+  const fetchTasks = useCallback(async (filters: TaskFilters): Promise<TaskFetchResult> => {
     setLoading(true);
     setError(null);
+    
     try {
-      let data: Task[];
-      if (filters?.all) {
-        data = await getCompanyTasks(filters.status);
-      } else if (
-        filters?.projectId &&
-        typeof filters.milestoneId === "number"
-      ) {
-        // Fetch tasks for specific milestone
-        data = await getMilestoneTasks(
-          filters.milestoneId,
-          filters.includeCompleted
-        );
-      } else if (filters?.projectId) {
-        // Fetch all project tasks
-        data = await getProjectTasks(
-          filters.projectId,
-          filters.includeCompleted
-        );
-      } else {
-        // Fetch user's tasks
-        data = await getUserTasks(filters);
+      const company_id = await getCompanyId();
+      const user = await getEmployeeInfo();
+
+      let query = supabase
+        .from("task_records")
+        .select("*")
+        .eq("company_id", company_id);
+
+      // Apply scope-specific filters
+      switch (filters.scope) {
+        case TaskScope.USER_TASKS:
+          query = query.contains("assignees", [user.id]);
+          break;
+        case TaskScope.PROJECT_TASKS:
+          if (filters.projectId) {
+            query = query.eq("project_id", filters.projectId);
+          }
+          break;
+        case TaskScope.MILESTONE_TASKS:
+          if (filters.milestoneId) {
+            query = query.eq("milestone_id", filters.milestoneId);
+          }
+          break;
+        case TaskScope.DEPARTMENT_TASKS:
+          if (filters.departmentId) {
+            query = query.eq("department_id", filters.departmentId);
+          }
+          break;
+        case TaskScope.COMPANY_TASKS:
+          // No additional filtering needed
+          break;
+        default:
+          break;
       }
 
-      setTasks(data);
-      return data;
+      // Apply assignee filter if specified
+      if (filters.assigneeId) {
+        query = query.contains("assignees", [filters.assigneeId]);
+      }
+
+      // Apply status filter
+      query = applyStatusFilter(query, filters.status);
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      const result: TaskFetchResult = {
+        tasks: data || [],
+        totalCount: data?.length || 0,
+        completedCount: data?.filter(t => t.status).length || 0,
+        pendingCount: data?.filter(t => !t.status).length || 0,
+      };
+
+      setTasks(result.tasks);
+      return result;
     } catch (err) {
       console.error("Error fetching tasks:", err);
-      setError(err instanceof Error ? err : new Error(String(err)));
-      return [];
+      const errorObj = err instanceof Error ? err : new Error(String(err));
+      setError(errorObj);
+      return { tasks: [], totalCount: 0, completedCount: 0, pendingCount: 0 };
     } finally {
       setLoading(false);
     }
   }, []);
 
+  // Convenience methods for common use cases
+  const getUserTasks = useCallback((status: TaskStatus = TaskStatus.INCOMPLETE) => {
+    return fetchTasks({ scope: TaskScope.USER_TASKS, status });
+  }, [fetchTasks]);
+
+  const getProjectTasks = useCallback((projectId: number, status: TaskStatus = TaskStatus.INCOMPLETE) => {
+    return fetchTasks({ scope: TaskScope.PROJECT_TASKS, projectId, status });
+  }, [fetchTasks]);
+
+  const getMilestoneTasks = useCallback((milestoneId: number, status: TaskStatus = TaskStatus.INCOMPLETE) => {
+    return fetchTasks({ scope: TaskScope.MILESTONE_TASKS, milestoneId, status });
+  }, [fetchTasks]);
+
+  const getCompanyTasks = useCallback((status: TaskStatus = TaskStatus.INCOMPLETE) => {
+    return fetchTasks({ scope: TaskScope.COMPANY_TASKS, status });
+  }, [fetchTasks]);
+
+  const getDepartmentTasks = useCallback((departmentId: number, status: TaskStatus = TaskStatus.INCOMPLETE) => {
+    return fetchTasks({ scope: TaskScope.DEPARTMENT_TASKS, departmentId, status });
+  }, [fetchTasks]);
+
+  // Get task statistics for a project
   const fetchTaskStats = useCallback(async (projectId: number) => {
     try {
-      const data = await getProjectTaskStats(projectId);
-      setStats(data);
-      return data;
+      const result = await fetchTasks({ scope: TaskScope.PROJECT_TASKS, projectId, status: TaskStatus.ALL });
+      
+      const statsData = {
+        total: result.totalCount,
+        completed: result.completedCount,
+        unassigned: result.tasks.filter(t => t.milestone_id === null).length,
+        inProgress: result.pendingCount
+      };
+
+      setStats(statsData);
+      return statsData;
     } catch (err) {
       console.error("Error fetching task stats:", err);
       return null;
     }
+  }, [fetchTasks]);
+
+  // Get a single task by ID
+  const getTaskById = useCallback(async (taskId: number) => {
+    try {
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("task_records")
+        .select("*")
+        .eq("company_id", company_id)
+        .eq("id", taskId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error("Error fetching task by ID:", err);
+      throw err;
+    }
   }, []);
 
-  const createTask = async (task: Task) => {
+  // Create a new task
+  const createTask = useCallback(async (task: Task) => {
     try {
       console.log("Creating task:", task);
+      
+      const company_id = await getCompanyId();
+      const user = await getEmployeeInfo();
 
-      const data = await cTask(task);
-      await fetchTasks({
-        projectId: task.project_id,
-        includeCompleted: false,
-      });
+      const finalData = {
+        ...task,
+        created_by: user.id,
+        company_id
+      };
+
+      const { data, error } = await supabase
+        .from("task_records")
+        .insert(finalData)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Refresh tasks after creation
       if (task.project_id) {
+        await getProjectTasks(task.project_id, TaskStatus.INCOMPLETE);
         await fetchTaskStats(task.project_id);
       }
+
       return { success: true, data };
     } catch (err) {
       console.error("Error creating task:", err);
       return { success: false, error: err };
     }
-  };
+  }, [getProjectTasks, fetchTaskStats]);
 
-  const updateTask = async (task: Task) => {
+  // Update an existing task
+  const updateTask = useCallback(async (task: Task) => {
     try {
-      const data = await uTask(task);
-      await fetchTasks({
-        projectId: task.project_id,
-        milestoneId: task.milestone_id,
+      const company_id = await getCompanyId();
+      
+      const finalData = { ...task };
+      
+      // Remove undefined values
+      Object.keys(finalData).forEach(key => {
+        if (finalData[key as keyof typeof finalData] === undefined || finalData[key as keyof typeof finalData] === null) {
+          delete finalData[key as keyof typeof finalData];
+        }
       });
+
+      const { data, error } = await supabase
+        .from("task_records")
+        .update(finalData)
+        .eq("id", task.id)
+        .eq("company_id", company_id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Refresh tasks after update
       if (task.project_id) {
+        if (task.milestone_id) {
+          await getMilestoneTasks(task.milestone_id, TaskStatus.INCOMPLETE);
+        } else {
+          await getProjectTasks(task.project_id, TaskStatus.INCOMPLETE);
+        }
         await fetchTaskStats(task.project_id);
       }
+
       return { success: true, data };
     } catch (err) {
       console.error("Error updating task:", err);
       return { success: false, error: err };
     }
-  };
+  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
-  const deleteTask = async (
-    taskId: number,
-    projectId?: number,
-    milestoneId?: number
-  ) => {
+  // Delete a task
+  const deleteTask = useCallback(async (taskId: number, projectId?: number, milestoneId?: number) => {
     try {
-      await dTask(taskId);
+      const company_id = await getCompanyId();
+
+      const { error } = await supabase
+        .from("task_records")
+        .delete()
+        .eq("id", taskId)
+        .eq("company_id", company_id);
+
+      if (error) throw error;
+
+      // Refresh tasks after deletion
       if (projectId) {
-        await fetchTasks({
-          projectId,
-          milestoneId: milestoneId,
-        });
+        if (milestoneId) {
+          await getMilestoneTasks(milestoneId, TaskStatus.INCOMPLETE);
+        } else {
+          await getProjectTasks(projectId, TaskStatus.INCOMPLETE);
+        }
         await fetchTaskStats(projectId);
       }
+
       return { success: true };
     } catch (err) {
       console.error("Error deleting task:", err);
       return { success: false, error: err };
     }
-  };
+  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
-  const completeTask = async (
-    taskId: number,
-    projectId?: number,
-    milestoneId?: number
-  ) => {
+  // Mark a task as complete
+  const completeTask = useCallback(async (taskId: number, projectId?: number, milestoneId?: number) => {
     try {
-      const data = await cmpTask(taskId);
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("task_records")
+        .update({ status: true })
+        .eq("id", taskId)
+        .eq("company_id", company_id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Refresh tasks after completion
       if (projectId) {
-        await fetchTasks({
-          projectId,
-          milestoneId,
-        });
+        if (milestoneId) {
+          await getMilestoneTasks(milestoneId, TaskStatus.INCOMPLETE);
+        } else {
+          await getProjectTasks(projectId, TaskStatus.INCOMPLETE);
+        }
+        await fetchTaskStats(projectId);
       }
+
       return { success: true, data };
     } catch (err) {
       console.error("Error completing task:", err);
       return { success: false, error: err };
     }
-  };
+  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
-  const reopenTask = async (
-    taskId: number,
-    projectId?: number,
-    milestoneId?: number
-  ) => {
+  // Reopen a completed task
+  const reopenTask = useCallback(async (taskId: number, projectId?: number, milestoneId?: number) => {
     try {
-      const data = await ropTask(taskId);
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("task_records")
+        .update({ status: false })
+        .eq("id", taskId)
+        .eq("company_id", company_id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Refresh tasks after reopening
       if (projectId) {
-        await fetchTasks({
-          projectId,
-          milestoneId,
-        });
+        if (milestoneId) {
+          await getMilestoneTasks(milestoneId, TaskStatus.INCOMPLETE);
+        } else {
+          await getProjectTasks(projectId, TaskStatus.INCOMPLETE);
+        }
+        await fetchTaskStats(projectId);
       }
+
       return { success: true, data };
     } catch (err) {
       console.error("Error reopening task:", err);
       return { success: false, error: err };
     }
-  };
+  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
-  const updateMilestone = async (
-    taskIds: number[],
-    milestoneId: number | null,
-    projectId: number
-  ) => {
+  // Bulk update task milestone
+  const updateMilestone = useCallback(async (taskIds: number[], milestoneId: number | null, projectId: number) => {
     try {
-      const data = await updateTasksMilestone(taskIds, milestoneId);
-      await fetchTasks({ projectId });
+      const company_id = await getCompanyId();
+      const user = await getEmployeeInfo();
+
+      const { data, error } = await supabase
+        .from("task_records")
+        .update({
+          milestone_id: milestoneId,
+          updated_by: user.id,
+          updated_at: new Date().toISOString()
+        })
+        .in("id", taskIds)
+        .eq("company_id", company_id)
+        .select();
+
+      if (error) throw error;
+
+      // Refresh tasks after milestone update
+      await getProjectTasks(projectId, TaskStatus.INCOMPLETE);
       await fetchTaskStats(projectId);
+
       return { success: true, data };
     } catch (err) {
       console.error("Error updating task milestone:", err);
       return { success: false, error: err };
     }
-  };
+  }, [getProjectTasks, fetchTaskStats]);
 
-  return {
+  return useMemo(() => ({
+    // State
+    tasks,
+    loading,
+    error,
+    stats,
+    
+    // Main fetch function
+    fetchTasks,
+    
+    // Convenience methods
+    getUserTasks,
+    getProjectTasks,
+    getMilestoneTasks,
+    getCompanyTasks,
+    getDepartmentTasks,
+    getTaskById,
+    
+    // Stats
+    fetchTaskStats,
+    
+    // CRUD operations
+    createTask,
+    updateTask,
+    deleteTask,
+    completeTask,
+    reopenTask,
+    updateMilestone,
+  }), [
     tasks,
     loading,
     error,
     stats,
     fetchTasks,
+    getUserTasks,
+    getProjectTasks,
+    getMilestoneTasks,
+    getCompanyTasks,
+    getDepartmentTasks,
+    getTaskById,
     fetchTaskStats,
     createTask,
     updateTask,
@@ -207,5 +444,5 @@ export function useTasks() {
     completeTask,
     reopenTask,
     updateMilestone,
-  };
+  ]);
 }

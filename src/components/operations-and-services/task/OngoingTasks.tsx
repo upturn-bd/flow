@@ -2,19 +2,20 @@
 import {
   TaskUpdateModal,
 } from "./shared/TaskModal";
-import { useTasks } from "@/hooks/useTasks";
+import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import { Task } from "@/lib/types/schemas";
 import { useEffect, useState } from "react";
 import TaskDetails from "./shared/TaskDetails";
 import { motion, AnimatePresence } from "framer-motion";
 import { Edit, Trash2, ExternalLink, Loader2, ClipboardList, Calendar } from "lucide-react";
 import { toast } from "sonner";
-import { Card, CardHeader, CardContent, CardFooter, PriorityBadge, InfoRow } from "@/components/ui/Card";
+import { Card, CardHeader, CardContent, PriorityBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui";
 
 export default function TaskPage() {
-  const { tasks, loading, fetchTasks, updateTask, deleteTask } = useTasks();
+  const { tasks, loading, getCompanyTasks, updateTask, deleteTask } = useTasks();
   const [editTask, setEditTask] = useState<Task | null>(null);
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
@@ -24,7 +25,7 @@ export default function TaskPage() {
       await updateTask(values);
       toast.success("Task updated successfully");
       setEditTask(null);
-      fetchTasks({all:true,status:false});
+      // getCompanyTasks(TaskStatus.INCOMPLETE); // Removed: useTasks hook handles state update automatically
     } catch (error) {
       toast.error("Error updating task");
       console.error(error);
@@ -36,7 +37,7 @@ export default function TaskPage() {
       setDeletingTaskId(id);
       await deleteTask(id);
       toast.success("Task deleted successfully");
-      fetchTasks({all:true,status:false});
+      // getCompanyTasks(TaskStatus.INCOMPLETE); // Removed: useTasks hook handles state update automatically
     } catch (error) {
       toast.error("Error deleting task");
       console.error(error);
@@ -46,8 +47,8 @@ export default function TaskPage() {
   };
 
   useEffect(() => {
-    fetchTasks({all:true,status:false});
-  }, [fetchTasks]);
+    getCompanyTasks(TaskStatus.INCOMPLETE);
+  }, [getCompanyTasks]);
 
   return (
     <div>
@@ -58,10 +59,7 @@ export default function TaskPage() {
           className="space-y-6"
         >
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-2" />
-              <p className="text-gray-500">Loading tasks...</p>
-            </div>
+            <LoadingSpinner text="Loading Tasks..." />
           ) : (
             <div className="grid grid-cols-1 gap-4">
               <AnimatePresence>
@@ -113,7 +111,7 @@ export default function TaskPage() {
           <TaskDetails
             onClose={() => setTaskDetailsId(null)}
             id={taskDetailsId}
-            onTaskStatusUpdate={() => fetchTasks({all:true,status:false})}
+            onTaskStatusUpdate={() => {}} // Removed redundant refresh - useTasks handles state automatically
           />
         )}
       </AnimatePresence>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEmployees } from "@/hooks/useEmployees";
-import { Task, useTasks } from "@/hooks/useTasks";
+import { Task, useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import { getCompanyId } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";

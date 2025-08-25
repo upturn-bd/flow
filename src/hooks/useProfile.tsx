@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { supabase } from "@/lib/supabase/client";
 // Basic Info APIs
 import { 
   fetchCurrentUserBasicInfo as fetchCurrentUserBasicInfoApi, 
@@ -25,8 +26,10 @@ import {
 // Types
 import { BasicInfoFormData } from "@/app/(home)/hris/tabs/basicInfo.constants";
 import { PersonalFormData } from "@/app/(home)/hris/tabs/personalInfo.constants";
-import { Education } from "@/hooks/useEducation";
-import { Experience } from "@/hooks/useExperience";
+import { Schooling, Experience } from "@/lib/types";
+
+// Type aliases for consistency
+export type Education = Schooling;
 
 // Comprehensive profile hook that combines basic info, personal info, and education/experience
 export function useProfile() {
@@ -184,6 +187,195 @@ export function useProfile() {
     }
   }, []);
 
+  // Education CRUD operations
+  const createEducation = useCallback(async (educationData: Omit<Education, "id">) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('schoolings')
+        .insert([educationData])
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      // Update local state
+      setEducations(prev => [...prev, data]);
+      return data;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to create education";
+      setError(errorMessage);
+      console.error(errorMessage, err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const updateEducation = useCallback(async (id: number, educationData: Partial<Education>) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('schoolings')
+        .update(educationData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      // Update local state
+      setEducations(prev => prev.map(item => item.id === id ? data : item));
+      return data;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to update education";
+      setError(errorMessage);
+      console.error(errorMessage, err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteEducation = useCallback(async (id: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase
+        .from('schoolings')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      // Update local state
+      setEducations(prev => prev.filter(item => item.id !== id));
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to delete education";
+      setError(errorMessage);
+      console.error(errorMessage, err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Experience CRUD operations
+  const createExperience = useCallback(async (experienceData: Omit<Experience, "id">) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('experiences')
+        .insert([experienceData])
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      // Update local state
+      setExperiences(prev => [...prev, data]);
+      return data;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to create experience";
+      setError(errorMessage);
+      console.error(errorMessage, err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const updateExperience = useCallback(async (id: number, experienceData: Partial<Experience>) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('experiences')
+        .update(experienceData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      // Update local state
+      setExperiences(prev => prev.map(item => item.id === id ? data : item));
+      return data;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to update experience";
+      setError(errorMessage);
+      console.error(errorMessage, err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteExperience = useCallback(async (id: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase
+        .from('experiences')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      // Update local state
+      setExperiences(prev => prev.filter(item => item.id !== id));
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to delete experience";
+      setError(errorMessage);
+      console.error(errorMessage, err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Fetch current user's education and experience
+  const fetchCurrentUserEducation = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+      
+      return await fetchUserEducation(user.id);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch current user education";
+      setError(errorMessage);
+      console.error(errorMessage, err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchUserEducation]);
+
+  const fetchCurrentUserExperience = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+      
+      return await fetchUserExperience(user.id);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch current user experience";
+      setError(errorMessage);
+      console.error(errorMessage, err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchUserExperience]);
+
   // Comprehensive user data fetch
   const fetchUserProfile = useCallback(async (uid: string) => {
     setLoading(true);
@@ -247,6 +439,18 @@ export function useProfile() {
     // Education and Experience methods
     fetchUserEducation,
     fetchUserExperience,
+    fetchCurrentUserEducation,
+    fetchCurrentUserExperience,
+    
+    // Education CRUD operations
+    createEducation,
+    updateEducation,
+    deleteEducation,
+    
+    // Experience CRUD operations
+    createExperience,
+    updateExperience,
+    deleteExperience,
     
     // Comprehensive fetch method
     fetchUserProfile

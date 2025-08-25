@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/api";
 
@@ -91,12 +91,12 @@ export function useEmployees() {
     }
   }, []);
 
-  return {
+  return useMemo(() => ({
     employees,
     extendedEmployees,
     loading,
     error,
     fetchEmployees,
     fetchExtendedEmployees
-  };
+  }), [employees, extendedEmployees, loading, error, fetchEmployees, fetchExtendedEmployees]);
 }

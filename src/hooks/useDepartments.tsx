@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useBaseEntity } from "./core";
 import { Department } from "@/lib/types";
 
@@ -12,7 +13,7 @@ export function useDepartments() {
     companyScoped: true,
   });
   
-  return {
+  return useMemo(() => ({
     ...baseResult,
     departments: baseResult.items,
     department: baseResult.item,
@@ -21,5 +22,5 @@ export function useDepartments() {
     createDepartment: baseResult.createItem,
     updateDepartment: baseResult.updateItem,
     deleteDepartment: baseResult.deleteItem,
-  };
+  }), [baseResult]);
 }

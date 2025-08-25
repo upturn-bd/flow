@@ -14,7 +14,7 @@ import {
 import TabView, { TabItem } from "@/components/ui/TabView";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import TaskCreateModal from "@/components/operations-and-services/task/shared/TaskModal";
-import { Task, useTasks } from "@/hooks/useTasks";
+import { Task, useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import { TaskData } from "@/lib/validation/schemas/advanced";
 import { toast } from "sonner";
 import { AuthProvider, useAuth } from "@/lib/auth/auth-context";

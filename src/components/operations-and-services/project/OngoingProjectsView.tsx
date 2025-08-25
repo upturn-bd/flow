@@ -30,8 +30,16 @@ function ProjectsList() {
     useProjects();
   const [projectDetailsId, setProjectDetailsId] = useState<number | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const { employees, fetchEmployees, loading:employeesLoading } = useEmployees();
-  const { departments, fetchDepartments, loading:departmentsLoading } = useDepartments();
+  const {
+    employees,
+    fetchEmployees,
+    loading: employeesLoading,
+  } = useEmployees();
+  const {
+    departments,
+    fetchDepartments,
+    loading: departmentsLoading,
+  } = useDepartments();
 
   useEffect(() => {
     fetchProjects();
@@ -45,7 +53,7 @@ function ProjectsList() {
         await updateProject(selectedProject.id, values);
         toast.success("Project updated successfully");
         setSelectedProject(null);
-        fetchProjects();
+        // fetchProjects(); // Removed: useProjects hook handles state update automatically
       }
     } catch (error) {
       toast.error("Error updating project");
@@ -57,24 +65,26 @@ function ProjectsList() {
     try {
       await deleteProject(id);
       toast.success("Project deleted successfully");
-      fetchProjects();
+      // fetchProjects(); // Removed: useProjects hook handles state update automatically
     } catch (error) {
       toast.error("Error deleting project");
       console.error(error);
     }
   };
 
+  if (loading || employeesLoading || departmentsLoading) {
+    return (
+      <LoadingSection
+        icon={Building2}
+        text="Loading projects..."
+        color="blue"
+      />
+    );
+  }
+
   return (
     <AnimatePresence mode="wait">
-      {loading && (
-        <LoadingSection 
-          icon={Building2} 
-          text="Loading projects..." 
-          color="blue" 
-        />
-      )}
-      
-      {!selectedProject && !projectDetailsId && !loading && (
+      {!selectedProject && !projectDetailsId && (
         <motion.div
           key="content"
           initial="hidden"
@@ -82,41 +92,52 @@ function ProjectsList() {
           variants={staggerContainer}
           className="px-4 space-y-6 py-4"
         >
-          <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-4">
+          <motion.div
+            variants={fadeInUp}
+            className="flex items-center gap-3 mb-4"
+          >
             <Building2 size={24} className="text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Ongoing Projects</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Ongoing Projects
+            </h1>
           </motion.div>
 
           <motion.div variants={fadeInUp}>
             <AnimatePresence>
               {projects.length > 0 ? (
                 <div className="space-y-4">
-                  {projects.map((project, idx) => (
+                  {projects.map((project, idx) =>
                     typeof project.id !== "undefined" ? (
                       <ProjectCard
                         key={project.id}
                         project={project}
                         onEdit={() => setSelectedProject(project)}
-                        onDelete={() => handleDeleteProject(project.id as number)}
-                        onDetails={() => setProjectDetailsId(project.id as number)}
+                        onDelete={() =>
+                          handleDeleteProject(project.id as number)
+                        }
+                        onDetails={() =>
+                          setProjectDetailsId(project.id as number)
+                        }
                         employees={employees}
-                        departments={departments.filter(d => d.id != null) as any}
+                        departments={
+                          departments.filter((d) => d.id != null) as any
+                        }
                         showEdit={true}
                         showDelete={true}
                         showDetails={true}
                       />
                     ) : null
-                  ))}
+                  )}
                 </div>
               ) : (
-                <EmptyState 
+                <EmptyState
                   icon={<Building2 className="h-12 w-12" />}
                   title="No ongoing projects found"
                   description="Create new projects to get started and track your work"
                   action={{
                     label: "Create Project",
                     onClick: () => setSelectedProject(emptyProject),
-                    icon: <Plus size={16} />
+                    icon: <Plus size={16} />,
                   }}
                 />
               )}
@@ -136,7 +157,7 @@ function ProjectsList() {
           )}
         </motion.div>
       )}
-      
+
       {!selectedProject && projectDetailsId && (
         <ProjectDetails
           id={projectDetailsId}
@@ -146,7 +167,7 @@ function ProjectsList() {
           onSubmit={handleUpdateProject}
         />
       )}
-      
+
       {!projectDetailsId && selectedProject && (
         <UpdateProjectPage
           initialData={selectedProject}

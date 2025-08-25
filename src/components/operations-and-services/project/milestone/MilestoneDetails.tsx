@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Milestone } from "@/hooks/useMilestones";
-import { Task, useTasks } from "@/hooks/useTasks";
+import { Task, useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import { getCompanyId } from "@/lib/api";
 import { supabase } from "@/lib/supabase/client";
 import { createClient } from '@/lib/supabase/client';
@@ -383,6 +383,7 @@ export default function MilestoneDetails({
       {taskDetailsId && (
         <TaskDetails
           id={taskDetailsId}
+          onTaskStatusUpdate={() => fetchTasksByMilestoneId(milestoneId)}
           onClose={() => setTaskDetailsId(null)}
         />
       )}

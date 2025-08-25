@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { dirtyValuesChecker } from "@/lib/utils";
 import { useDepartments } from "@/hooks/useDepartments";
 import {
   BasicInfoFormData,
@@ -10,10 +9,14 @@ import {
 import { validateBasicInfo, validationErrorsToObject } from "@/lib/utils/validation";
 import { BasicInfoField } from "./BasicInfoField";
 import { motion } from "framer-motion";
-import { User, Briefcase, Calendar, Save, X, CheckCircle, AlertCircle } from "lucide-react";
+import { User, Briefcase, Calendar, CheckCircle, AlertCircle } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { fadeIn } from "@/components/ui/animations";
 import { useProfile } from "@/hooks/useProfile";
+import { useFormState } from "@/hooks/useFormState";
+import ValidationFeedback from "@/components/ui/ValidationFeedback";
+import SubmitActions from "@/components/ui/SubmitActions";
+import { showNotification } from "@/lib/utils/notifications";
 
 const initialFormState: BasicInfoFormData = {
   first_name: "",
@@ -56,49 +59,51 @@ interface BasicInfoTabProps {
 }
 
 export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
-  const [formValues, setFormValues] = useState<BasicInfoFormData>(initialFormState);
   const [initialData, setInitialData] = useState<BasicInfoFormData | null>(null);
-  const [errors, setErrors] = useState<Partial<Record<keyof BasicInfoFormData, string>>>({});
-  const [touched, setTouched] = useState<Partial<Record<keyof BasicInfoFormData, boolean>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [isDirty, setIsDirty] = useState(false);
-  const [isValid, setIsValid] = useState(false);
   const { departments, fetchDepartments } = useDepartments();
   const [loadingDepartments, setLoadingDepartments] = useState(true);
   
   const {
     loading,
     isCurrentUser,
-    basicInfo,
     fetchCurrentUserBasicInfo,
     fetchUserBasicInfo,
     updateBasicInfo: updateBasicInfoApi,
   } = useProfile();
 
-  useEffect(() => {
-    setLoadingDepartments(true);
-    fetchDepartments().finally(() => setLoadingDepartments(false));
-  }, [fetchDepartments]);
+  const {
+    formValues,
+    errors,
+    touched,
+    isDirty,
+    isValid,
+    handleChange: baseHandleChange,
+    handleBlur,
+    resetForm
+  } = useFormState({
+    initialData,
+    validateFn: validateBasicInfo,
+    validationErrorsToObject
+  });
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<any>) => {
       const { name, value } = e.target;
-      setFormValues((prev) => ({
-        ...prev,
-        [name]: name === "department_id" ? Number(value) : value,
-      }));
-      setErrors((prev) => ({ ...prev, [name]: "" }));
+      baseHandleChange({
+        ...e,
+        target: {
+          ...e.target,
+          name,
+          value: name === "department_id" ? Number(value) : value,
+        }
+      });
     },
-    []
+    [baseHandleChange]
   );
-
-  const handleBlur = useCallback((e: React.FocusEvent<any>) => {
-    const { name } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
-  }, []);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -109,8 +114,10 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
 
       const result = validateBasicInfo(formValues);
       if (!result.success) {
-        const fieldErrors = validationErrorsToObject(result.errors);
-        setErrors(fieldErrors);
+        showNotification({ 
+          message: "Please fix the validation errors before submitting", 
+          type: "error" 
+        });
         setIsSubmitting(false);
         return;
       }
@@ -119,10 +126,19 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
         const response = await updateBasicInfoApi(result.data);
         setInitialData(response.data);
         setSubmitSuccess(true);
+        showNotification({ 
+          message: "Basic information updated successfully!", 
+          type: "success" 
+        });
         setTimeout(() => setSubmitSuccess(false), 3000);
         setIsEditMode(false);
       } catch (error) {
-        setSubmitError(error instanceof Error ? error.message : "Unknown error");
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        setSubmitError(errorMessage);
+        showNotification({ 
+          message: errorMessage, 
+          type: "error" 
+        });
       } finally {
         setIsSubmitting(false);
       }
@@ -131,25 +147,31 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
   );
 
   const handleEditToggle = useCallback(() => {
-    if (!isEditMode) setSubmitSuccess(false);
-    setFormValues(initialData ?? formValues);
+    if (!isEditMode) {
+      setSubmitSuccess(false);
+      setSubmitError(null);
+    } else {
+      resetForm();
+    }
     setIsEditMode((prev) => !prev);
-  }, [isEditMode, initialData, formValues]);
+  }, [isEditMode, resetForm]);
+
+  useEffect(() => {
+    setLoadingDepartments(true);
+    fetchDepartments().finally(() => setLoadingDepartments(false));
+  }, [fetchDepartments]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         let data;
         if (uid) {
-          // Fetch specific user's basic info
           data = await fetchUserBasicInfo(uid);
         } else {
-          // Fetch current user's basic info
           data = await fetchCurrentUserBasicInfo();
         }
         
         setInitialData(data);
-        setFormValues(data);
       } catch (error) {
         setSubmitError("Failed to fetch basic info. Please try again later.");
       }
@@ -157,24 +179,6 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
     
     fetchData();
   }, [uid, fetchUserBasicInfo, fetchCurrentUserBasicInfo]);
-
-  useEffect(() => {
-    if (initialData) {
-      setIsDirty(dirtyValuesChecker(initialData, formValues));
-    }
-  }, [initialData, formValues]);
-
-  useEffect(() => {
-    const result = validateBasicInfo(formValues);
-    if (result.success) {
-      setIsValid(true);
-      setErrors({});
-    } else {
-      setIsValid(false);
-      const newErrors = validationErrorsToObject(result.errors);
-      setErrors(newErrors);
-    }
-  }, [formValues]);
 
   const departmentName = useCallback(
     (id: number) => departments.find((dep) => dep.id === id)?.name || "Data unavailable",
@@ -331,42 +335,22 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
           ))}
           
           {isEditMode && isCurrentUser && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="mt-8 flex justify-end gap-3"
-            >
-              <button
-                type="button"
-                onClick={handleEditToggle}
-                className="px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 text-sm font-medium shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
-              >
-                <X className="h-4 w-4 inline mr-1 -mt-px" />
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting || !isDirty || !isValid}
-                className={`px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors ${
-                  isSubmitting || !isDirty || !isValid
-                    ? "opacity-60 cursor-not-allowed"
-                    : "hover:bg-blue-700"
-                }`}
-              >
-                {isSubmitting ? (
-                  <>
-                    <LoadingSpinner className="h-4 w-4 inline mr-1 -mt-px" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 inline mr-1 -mt-px" />
-                    Save Changes
-                  </>
-                )}
-              </button>
-            </motion.div>
+            <>
+              <ValidationFeedback 
+                isDirty={isDirty}
+                isValid={isValid}
+                errors={errors}
+                className="mt-6"
+              />
+              
+              <SubmitActions
+                isSubmitting={isSubmitting}
+                isDirty={isDirty}
+                isValid={isValid}
+                onCancel={handleEditToggle}
+                className="mt-6"
+              />
+            </>
           )}
         </form>
     </motion.div>
