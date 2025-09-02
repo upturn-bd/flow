@@ -86,14 +86,7 @@ export default function RequisitionRequestsPage() {
             <div className="space-y-4">
               <AnimatePresence>
                 {requisitionRequests.map((req) => (
-                  <motion.div
-                    key={req.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Card>
+                    <Card key={req.id}>
                       <CardContent className="space-y-4">
                         <div className="flex justify-between items-start">
                           <div className="flex items-start gap-3">
@@ -219,7 +212,6 @@ export default function RequisitionRequestsPage() {
                         </div>
                       </CardContent>
                     </Card>
-                  </motion.div>
                 ))}
               </AnimatePresence>
             </div>

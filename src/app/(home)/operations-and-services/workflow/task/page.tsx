@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useContext } from "react";
-import TaskPage from "@/components/operations-and-services/task/OngoingTasks";
+import { useEffect, useMemo } from "react";
+import OngoingTaskPage from "@/components/operations-and-services/task/OngoingTasks";
 import CompletedTasksList from "@/components/operations-and-services/task/CompletedTasks";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -12,12 +12,11 @@ import {
   ArchiveIcon
 } from "lucide-react";
 import TabView, { TabItem } from "@/components/ui/TabView";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import TaskCreateModal from "@/components/operations-and-services/task/shared/TaskModal";
-import { Task, useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
+import { Task, useTasks } from "@/hooks/useTasks";
 import { TaskData } from "@/lib/validation/schemas/advanced";
 import { toast } from "sonner";
-import { AuthProvider, useAuth } from "@/lib/auth/auth-context";
+import {  useAuth } from "@/lib/auth/auth-context";
 
 const TABS = [
   {
@@ -41,12 +40,28 @@ const TABS = [
 ];
 
 export default function TasksPage() {
+  
   const [activeTab, setActiveTab] = useState("ongoing");
-  const [isLoading, setIsLoading] = useState(false);
   const [tabs, setTabs] = useState<TabItem[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { employeeInfo } = useAuth();
   const { createTask } = useTasks();
+
+  // Create stable component instances that won't change on re-renders
+  const ongoingTaskPage = useMemo(() => <OngoingTaskPage />, []);
+  const completedTasksList = useMemo(() => <CompletedTasksList />, []);
+  const archivedContent = useMemo(() => (
+    <div className="flex flex-col items-center justify-center p-12 bg-gray-50/50 rounded-xl border border-gray-200 text-center">
+      <ArchiveIcon className="h-16 w-16 text-gray-300 mb-4" />
+      <h3 className="text-xl font-semibold text-gray-700 mb-2">Archived Tasks</h3>
+      <p className="text-gray-500 max-w-md mb-6">
+        This section will store your archived tasks that are no longer active but you want to keep for reference.
+      </p>
+      <p className="text-gray-400 text-sm">
+        Feature coming soon...
+      </p>
+    </div>
+  ), []);
 
   const handleCreateTask = async (taskData: TaskData) => {
     // Convert TaskData to Task format
@@ -74,42 +89,23 @@ export default function TasksPage() {
   };
 
   function getTabContent(key: string) {
-    if (isLoading) {
-      return (
-        <div className="flex justify-center items-center min-h-[300px]">
-          <LoadingSpinner />
-          <p className="mt-4 text-gray-600 font-medium ml-4">Loading content...</p>
-        </div>
-      );
-    }
     switch (key) {
       case "ongoing":
-        return <TaskPage />;
+        return ongoingTaskPage;
       case "completed":
-        return <CompletedTasksList />;
+        return completedTasksList;
       case "archived":
-        return (
-          <div className="flex flex-col items-center justify-center p-12 bg-gray-50/50 rounded-xl border border-gray-200 text-center">
-            <ArchiveIcon className="h-16 w-16 text-gray-300 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">Archived Tasks</h3>
-            <p className="text-gray-500 max-w-md mb-6">
-              This section will store your archived tasks that are no longer active but you want to keep for reference.
-            </p>
-            <p className="text-gray-400 text-sm">
-              Feature coming soon...
-            </p>
-          </div>
-        );
+        return archivedContent;
       default:
-        return <TaskPage />;
+        return ongoingTaskPage;
     }
   }
 
   // Set up tabs with content on mount
-  React.useEffect(() => {
+  useEffect(() => {
     setTabs(TABS.map(tab => ({ ...tab, content: getTabContent(tab.key) })));
     // eslint-disable-next-line
-  }, [isLoading]);
+  }, []);
 
   return (
     <motion.div

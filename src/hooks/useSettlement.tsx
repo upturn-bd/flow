@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId, DatabaseError } from "@/lib/utils/auth";
+import { uploadManyFiles } from "@/lib/utils/files";
 
 export function useSettlementRequests() {
   const [settlementRequests, setSettlementRequests] = useState<any[]>([]);
@@ -112,6 +113,58 @@ export function useSettlementRequests() {
     [fetchSettlementRequests]
   );
 
+  const createSettlementRequest = useCallback(
+    async (settlementData: any, attachments: File[] = []) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const user = await getEmployeeInfo();
+        const company_id = await getCompanyId();
+
+        // Upload files if any
+        let uploadedFilePaths: string[] = [];
+        if (attachments.length > 0) {
+          const uploadResult = await uploadManyFiles(attachments, "settlement");
+          if (uploadResult.error) {
+            throw new Error(uploadResult.error);
+          }
+          uploadedFilePaths = uploadResult.uploadedFilePaths;
+        }
+
+        // Prepare settlement data
+        const formattedSettlementData = {
+          ...settlementData,
+          claimant_id: user.id,
+          company_id,
+          attachments: uploadedFilePaths,
+        };
+
+        const { data, error } = await supabase
+          .from("settlement_records")
+          .insert(formattedSettlementData)
+          .select()
+          .single();
+
+        if (error) {
+          const message = "Failed to create settlement request";
+          setError(message);
+          throw new DatabaseError(`${message}: ${error.message}`);
+        }
+
+        return { success: true, data };
+      } catch (error) {
+        const errorMessage = "Failed to create settlement request";
+        setError(errorMessage);
+        console.error(error);
+        return { success: false, error: errorMessage };
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
   return {
     settlementRequests,
     loading,
@@ -120,5 +173,6 @@ export function useSettlementRequests() {
     fetchSettlementRequests,
     fetchSettlementHistory,
     updateSettlementRequest,
+    createSettlementRequest,
   };
 }

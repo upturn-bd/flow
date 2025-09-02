@@ -4,24 +4,13 @@ import Link from "next/link";
 import {
   ClipboardList, // Task
   BarChart, // Project
-  Briefcase, // Process
-  Users, // Stakeholder
   LogIn, // Attendance
   CalendarX, // Leave
   Bell, // Notice
-  HandMetal, // Requests
   Clipboard, // Requisition
   DollarSign,
   AlertCircle,
-  Star, // Rating
-  Folder, // Digital Storage
-  FileText, // Expenses
-  Package, // Inventory
   UserPlus, // Onboarding
-  LogOut, // Deboarding
-  Wallet, // Payroll
-  Gauge, // Performance
-  BarChart2, // KPI
   File,
   Search,
   BellDot, // Reports
@@ -160,7 +149,7 @@ export default function ServicesPage() {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100,
         damping: 12
       }
@@ -250,37 +239,40 @@ export default function ServicesPage() {
         </div>
       </motion.div>
 
-      <AnimatePresence mode="wait">
-        {filteredSections.length === 0 ? (
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="flex flex-col items-center justify-center p-12 bg-gray-50 rounded-lg border border-gray-200 mt-8"
+      {filteredSections.length === 0 ? (
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center p-12 bg-gray-50 rounded-lg border border-gray-200 mt-8"
+        >
+          <File size={48} className="text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-700 mb-2">No services found</h3>
+          <p className="text-gray-600 text-center max-w-md mb-5">
+            Try searching with different keywords or browse all services
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              setSearchQuery("");
+              setSelectedSection(null);
+            }}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition-colors"
           >
-            <File size={48} className="text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-700 mb-2">No services found</h3>
-            <p className="text-gray-600 text-center max-w-md mb-5">
-              Try searching with different keywords or browse all services
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedSection(null);
-              }}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition-colors"
-            >
-              View all services
-            </motion.button>
-          </motion.div>
-        ) : (
-          filteredSections.map((section) => (
+            View all services
+          </motion.button>
+        </motion.div>
+      ) : (
+        <AnimatePresence>
+          {filteredSections.map((section) => (
             <motion.div 
               key={section.title} 
               className="mb-10"
               variants={sectionVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              layout
             >
               <motion.div 
                 className="flex items-center mb-4"
@@ -308,6 +300,7 @@ export default function ServicesPage() {
                     <motion.div
                       key={item.name}
                       variants={itemVariants}
+                      layout
                     >
                       <Link
                         href={item.path}
@@ -346,9 +339,9 @@ export default function ServicesPage() {
                 })}
               </motion.div>
             </motion.div>
-          ))
-        )}
-      </AnimatePresence>
+          ))}
+        </AnimatePresence>
+      )}
     </motion.div>
   );
 }

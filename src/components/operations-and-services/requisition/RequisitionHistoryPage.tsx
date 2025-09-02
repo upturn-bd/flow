@@ -83,9 +83,9 @@ export default function RequisitionHistoryPage() {
                 {requisitionRequests.map((req) => (
                   <motion.div
                     key={req.id}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 1, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
+                    exit={{ opacity: 1, y: -20 }}
                     transition={{ duration: 0.2 }}
                     className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"
                   >

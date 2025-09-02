@@ -1,34 +1,26 @@
 "use client";
 
 import React, { useEffect, useState, ChangeEvent } from "react";
-import { getEmployeeInfo } from "@/lib/api";
-import { getCompanyId } from "@/lib/api";
-import { uploadManyFiles } from "@/lib/api";
-import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Upload,
   Calendar, 
   DollarSign,
-  ChevronLeft,
-  ChevronDown,
-  CheckCircle,
-  Loader2,
-  Check,
   X,
   FileText,
-  MessageSquare,
   User,
   AlertCircle,
   Paperclip
 } from "lucide-react";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEmployees } from "@/hooks/useEmployees";
-import { supabase } from "@/lib/supabase/client";
+import { useSettlementRequests } from "@/hooks/useSettlement";
 import { toast } from "sonner";
 import { FormLayout, FormSection, FormGrid } from "@/components/ui/FormLayout";
 import { Button } from "@/components/ui/button";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
+import { supabase } from "@/lib/supabase/client";
+import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
+import { uploadManyFiles } from "@/lib/utils/files";
 
 // Define the settlement state type
 interface SettlementState {
@@ -73,6 +65,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
   const [attachments, setAttachments] = useState<File[]>([]);
   const { claimTypes, fetchClaimTypes } = useClaimTypes();
   const { employees, fetchEmployees } = useEmployees();
+  const { createSettlementRequest, loading: submitting } = useSettlementRequests();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -133,6 +126,9 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
     if (!settlementState.description.trim()) {
       newErrors.description = "Description is required";
     }
+    if (!settlementState.requested_to) {
+      newErrors.requested_to = "Approver is required";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -146,9 +142,18 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
 
     setIsSubmitting(true);
     try {
-      // Your submit logic here
-      toast.success("Settlement request created successfully");
-      onClose();
+      const result = await createSettlementRequest(settlementState, attachments);
+      
+      if (result.success) {
+        toast.success("Settlement request created successfully");
+        // Reset form
+        setSettlementState(initialSettlementState);
+        setAttachments([]);
+        setErrors({});
+        onClose();
+      } else {
+        throw new Error(result.error || "Failed to create settlement request");
+      }
     } catch (error) {
       toast.error("Failed to create settlement request");
       console.error(error);
@@ -160,7 +165,15 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
   const handleSaveDraft = async () => {
     setIsSubmitting(true);
     try {
-      // Your draft save logic here
+      // For now, we'll save drafts to localStorage
+      // You can implement proper draft saving to database later
+      const draftData = {
+        settlementState,
+        attachments: attachments.map(file => ({ name: file.name, size: file.size })),
+        timestamp: new Date().toISOString()
+      };
+      
+      localStorage.setItem('settlement_draft', JSON.stringify(draftData));
       toast.success("Draft saved successfully");
     } catch (error) {
       toast.error("Failed to save draft");
@@ -177,7 +190,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
       onBack={onClose}
       onSave={handleSubmit}
       onCancel={onClose}
-      isLoading={isSubmitting}
+      isLoading={isSubmitting || submitting}
       saveLabel="Submit Request"
     >
       <div className="space-y-8">
@@ -232,6 +245,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
                 value: emp.id.toString(),
                 label: emp.name
               }))}
+              error={errors.requested_to}
             />
           </FormGrid>
 
@@ -352,7 +366,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
           <Button
             variant="outline"
             onClick={handleSaveDraft}
-            disabled={isSubmitting}
+            disabled={isSubmitting || submitting}
             className="flex items-center gap-2"
           >
             <FileText size={16} />

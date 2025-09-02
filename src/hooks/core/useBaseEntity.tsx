@@ -8,8 +8,8 @@ import {
   EnhancedQueryOptions,
   QueryFilters,
   QueryOptions,
+  ApiCallOptions,
 } from "./types";
-import { useApiCall } from "./useApiCall";
 import { getCompanyId, getEmployeeInfo, getUserId } from "@/lib/utils/auth";
 import { supabase } from "@/lib/supabase/client";
 
@@ -26,13 +26,61 @@ export function useBaseEntity<T extends BaseEntity>(
 ): CrudHookResult<T> {
   const [items, setItems] = useState<T[]>([]);
   const [item, setItem] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [deleting, setDeleting] = useState(false);
-
-  const { loading, error, callApi, clearError } = useApiCall();
+  const [error, setError] = useState<string | null>(null);
 
   config.companyScoped = config.companyScoped ?? true; // Default to true if not provided
+
+  // Integrated API call handler
+  const callApi = useCallback(
+    async <K,>(
+      apiFunction: () => Promise<K>,
+      options: ApiCallOptions = {}
+    ): Promise<K | null> => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const result = await apiFunction();
+
+        if (options.showSuccessMessage) {
+          // TODO: Implement success toast notification
+          console.log("API call successful");
+        }
+
+        if (options.onSuccess) {
+          options.onSuccess();
+        }
+
+        setLoading(false);
+        return result;
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "An error occurred";
+
+        if (options.showErrorMessage) {
+          // TODO: Implement error toast notification
+          console.error("API call failed:", errorMessage);
+        }
+
+        if (options.onError) {
+          options.onError(errorMessage);
+        }
+
+        setLoading(false);
+        setError(errorMessage);
+        return null;
+      }
+    },
+    []
+  );
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   // Helper function to build query with filters
   const buildQuery = useCallback((baseQuery: any, filters: QueryFilters) => {
@@ -413,7 +461,7 @@ export function useBaseEntity<T extends BaseEntity>(
         }
 
         setCreating(false);
-        return { success: false, error: error || "Failed to create item" };
+        return { success: false, error: "Failed to create item" };
       } catch (err) {
         setCreating(false);
         const errorMessage =
@@ -421,7 +469,7 @@ export function useBaseEntity<T extends BaseEntity>(
         return { success: false, error: errorMessage };
       }
     },
-    [callApi, config.tableName, config.companyScoped, config.userScoped, error]
+    [callApi, config.tableName, config.companyScoped, config.userScoped]
   );
 
   const updateItem = useCallback(
@@ -455,7 +503,7 @@ export function useBaseEntity<T extends BaseEntity>(
         }
 
         setUpdating(false);
-        return { success: false, error: error || "Failed to update item" };
+        return { success: false, error: "Failed to update item" };
       } catch (err) {
         setUpdating(false);
         const errorMessage =
@@ -463,7 +511,7 @@ export function useBaseEntity<T extends BaseEntity>(
         return { success: false, error: errorMessage };
       }
     },
-    [callApi, config.tableName, error]
+    [callApi, config.tableName]
   );
 
   const deleteItem = useCallback(
@@ -497,7 +545,7 @@ export function useBaseEntity<T extends BaseEntity>(
         return { success: false, error: errorMessage };
       }
     },
-    [callApi, config.tableName, error, item]
+    [callApi, config.tableName, item]
   );
 
   const clearItem = useCallback(() => {

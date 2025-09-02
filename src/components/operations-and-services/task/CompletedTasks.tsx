@@ -146,7 +146,6 @@ const CompletedTasksList = memo(() => {
 
   return (
     <div>
-      <AnimatePresence mode="wait">
         {!selectedTask && taskDetailsId === null && (
           <motion.div
             key="content"
@@ -155,7 +154,6 @@ const CompletedTasksList = memo(() => {
             exit={{ opacity: 0 }}
             className="space-y-4"
           >
-            <AnimatePresence>
               {tasks.length > 0 ? (
                 tasks.map((task, index) => (
                   <TaskCard
@@ -174,7 +172,6 @@ const CompletedTasksList = memo(() => {
                   description="Tasks will appear here once they're marked as complete"
                 />
               )}
-            </AnimatePresence>
           </motion.div>
         )}
 
@@ -185,7 +182,6 @@ const CompletedTasksList = memo(() => {
             onTaskStatusUpdate={() => {}} // Removed redundant refresh - useTasks handles state automatically
           />
         )}
-      </AnimatePresence>
     </div>
   );
 });

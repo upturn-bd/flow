@@ -8,7 +8,6 @@ import { useSettlementRequests } from "@/hooks/useSettlement";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   FileText, 
-  Loader2, 
   DollarSign, 
   Calendar, 
   User, 
@@ -91,13 +90,12 @@ export default function SettlementHistoryPage() {
 
           {settlementRequests.length > 0 ? (
             <div className="space-y-4">
-              <AnimatePresence>
                 {settlementRequests.map((settlement) => (
                   <motion.div
                     key={settlement.id}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 1, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
+                    exit={{ opacity: 1, y: -20 }}
                     transition={{ duration: 0.2 }}
                     className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"
                   >
@@ -193,7 +191,6 @@ export default function SettlementHistoryPage() {
                     )}
                   </motion.div>
                 ))}
-              </AnimatePresence>
             </div>
           ) : (
             <motion.div
