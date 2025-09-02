@@ -28,7 +28,7 @@ export function useApiCall(): ApiCallHookResult {
     apiFunction: () => Promise<T>,
     options: ApiCallOptions = {}
   ): Promise<T | null> => {
-    setState({ loading: true, error: null });
+    // setState({ loading: true, error: null }); - was causing duplicate loading
     
     try {
       const result = await apiFunction();
