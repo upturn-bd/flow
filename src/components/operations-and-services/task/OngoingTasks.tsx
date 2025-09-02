@@ -1,21 +1,33 @@
 "use client";
-import {
-  TaskUpdateModal,
-} from "./shared/TaskModal";
-import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
+import { TaskUpdateModal } from "./shared/TaskModal";
+import { useTasks, TaskStatus } from "@/hooks/useTasks";
 import { Task } from "@/lib/types/schemas";
 import { useEffect, useState } from "react";
 import TaskDetails from "./shared/TaskDetails";
-import { motion, AnimatePresence } from "framer-motion";
-import { Edit, Trash2, ExternalLink, Loader2, ClipboardList, Calendar } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
+import {
+  Edit,
+  Trash2,
+  ExternalLink,
+  ClipboardList,
+  Calendar,
+} from "lucide-react";
 import { toast } from "sonner";
-import { Card, CardHeader, CardContent, PriorityBadge, InfoRow } from "@/components/ui/Card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  PriorityBadge,
+  InfoRow,
+} from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui";
 
-export default function TaskPage() {
-  const { tasks, loading, getCompanyTasks, updateTask, deleteTask } = useTasks();
+export default function OngoingTaskPage() {
+  
+  const { tasks, loading, getCompanyTasks, updateTask, deleteTask } =
+    useTasks();
   const [editTask, setEditTask] = useState<Task | null>(null);
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
@@ -25,7 +37,6 @@ export default function TaskPage() {
       await updateTask(values);
       toast.success("Task updated successfully");
       setEditTask(null);
-      // getCompanyTasks(TaskStatus.INCOMPLETE); // Removed: useTasks hook handles state update automatically
     } catch (error) {
       toast.error("Error updating task");
       console.error(error);
@@ -37,7 +48,6 @@ export default function TaskPage() {
       setDeletingTaskId(id);
       await deleteTask(id);
       toast.success("Task deleted successfully");
-      // getCompanyTasks(TaskStatus.INCOMPLETE); // Removed: useTasks hook handles state update automatically
     } catch (error) {
       toast.error("Error deleting task");
       console.error(error);
@@ -48,45 +58,39 @@ export default function TaskPage() {
 
   useEffect(() => {
     getCompanyTasks(TaskStatus.INCOMPLETE);
-  }, [getCompanyTasks]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div>
-      {!editTask && taskDetailsId === null && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="space-y-6"
-        >
-          {loading ? (
-            <LoadingSpinner text="Loading Tasks..." />
+      {!editTask && taskDetailsId === null && loading ? (
+        <LoadingSpinner text="Loading Tasks..." />
+      ) : (
+        <div className="grid grid-cols-1 gap-4">
+          {tasks.length > 0 ? (
+            tasks.map((task) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                onEdit={() => setEditTask(task)}
+                onDelete={() =>
+                  task.id !== undefined && handleDeleteTask(task.id)
+                }
+                onDetails={() =>
+                  task.id !== undefined && setTaskDetailsId(task.id)
+                }
+                isDeleting={deletingTaskId === task.id}
+              />
+            ))
           ) : (
-            <div className="grid grid-cols-1 gap-4">
-              <AnimatePresence>
-                {tasks.length > 0 ? (
-                  tasks.map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      task={task}
-                      onEdit={() => setEditTask(task)}
-                      onDelete={() => task.id !== undefined && handleDeleteTask(task.id)}
-                      onDetails={() => task.id !== undefined && setTaskDetailsId(task.id)}
-                      isDeleting={deletingTaskId === task.id}
-                    />
-                  ))
-                ) : (
-                  <EmptyState
-                    icon={<ClipboardList className="w-12 h-12" />}
-                    title="No tasks available"
-                    description="Create a new task to get started with your project management."
-                  />
-                )}
-              </AnimatePresence>
-            </div>
+            <EmptyState
+              icon={<ClipboardList className="w-12 h-12" />}
+              title="No tasks available"
+              description="Create a new task to get started with your project management."
+            />
           )}
-        </motion.div>
+        </div>
       )}
-      
+
       <AnimatePresence>
         {editTask && (
           <TaskUpdateModal
@@ -119,17 +123,17 @@ export default function TaskPage() {
   );
 }
 
-function TaskCard({ 
-  task, 
-  onEdit, 
-  onDelete, 
-  onDetails, 
-  isDeleting = false 
-}: { 
-  task: Task; 
-  onEdit: () => void; 
-  onDelete: () => void; 
-  onDetails: () => void; 
+function TaskCard({
+  task,
+  onEdit,
+  onDelete,
+  onDetails,
+  isDeleting = false,
+}: {
+  task: Task;
+  onEdit: () => void;
+  onDelete: () => void;
+  onDetails: () => void;
   isDeleting?: boolean;
 }) {
   const actions = (
@@ -169,10 +173,12 @@ function TaskCard({
         subtitle={task.task_description}
         action={actions}
       />
-      
+
       <CardContent>
         <div className="flex items-center justify-between">
-          <PriorityBadge priority={task.priority as "High" | "Medium" | "Low"} />
+          <PriorityBadge
+            priority={task.priority as "High" | "Medium" | "Low"}
+          />
           {task.end_date && (
             <InfoRow
               icon={<Calendar size={16} />}

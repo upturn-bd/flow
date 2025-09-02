@@ -3,7 +3,7 @@
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
 import { Task } from "@/lib/types/schemas";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 
 // Task status variants
 export enum TaskStatus {
@@ -44,7 +44,7 @@ export type { Task };
 
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Start with loading true
   const [error, setError] = useState<Error | null>(null);
   const [stats, setStats] = useState<{
     total: number;
@@ -52,35 +52,36 @@ export function useTasks() {
     unassigned: number;
     inProgress: number;
   } | null>(null);
+  
+  // Use ref to track loading state to avoid dependency issues
+  const isLoadingRef = useRef(false);
 
   // Helper function to apply status filtering to query
-  const applyStatusFilter = (query: any, status: TaskStatus) => {
-    if (status === TaskStatus.INCOMPLETE) {
-      return query.eq("status", false);
-    } else if (status === TaskStatus.COMPLETE) {
-      return query.eq("status", true);
-    }
-    // TaskStatus.ALL - no filter applied
-    return query;
-  };
 
   // Unified fetch function that handles all scenarios
   const fetchTasks = useCallback(async (filters: TaskFilters): Promise<TaskFetchResult> => {
+    
+    // Prevent duplicate calls while loading using ref
+    if (isLoadingRef.current) {
+      return { tasks: [], totalCount: 0, completedCount: 0, pendingCount: 0 };
+    }
+    
+    isLoadingRef.current = true;
     setLoading(true);
     setError(null);
     
     try {
       const company_id = await getCompanyId();
-      const user = await getEmployeeInfo();
-
+      
       let query = supabase
-        .from("task_records")
-        .select("*")
-        .eq("company_id", company_id);
-
+      .from("task_records")
+      .select("*")
+      .eq("company_id", company_id);
+      
       // Apply scope-specific filters
       switch (filters.scope) {
         case TaskScope.USER_TASKS:
+          const user = await getEmployeeInfo();
           query = query.contains("assignees", [user.id]);
           break;
         case TaskScope.PROJECT_TASKS:
@@ -111,7 +112,15 @@ export function useTasks() {
       }
 
       // Apply status filter
-      query = applyStatusFilter(query, filters.status);
+      query = ((query: any, status: TaskStatus) => {
+        if (status === TaskStatus.INCOMPLETE) {
+          return query.eq("status", false);
+        } else if (status === TaskStatus.COMPLETE) {
+          return query.eq("status", true);
+        }
+        // TaskStatus.ALL - no filter applied
+        return query;
+      })(query, filters.status);
 
       const { data, error } = await query;
 
@@ -124,7 +133,16 @@ export function useTasks() {
         pendingCount: data?.filter(t => !t.status).length || 0,
       };
 
-      setTasks(result.tasks);
+      // Only update state if tasks have actually changed
+      setTasks(prevTasks => {
+        const newTasks = result.tasks;
+        // Simple comparison - if length is different or data is different, update
+        if (prevTasks.length !== newTasks.length || 
+            JSON.stringify(prevTasks.map(t => t.id).sort()) !== JSON.stringify(newTasks.map(t => t.id).sort())) {
+          return newTasks;
+        }
+        return prevTasks;
+      });
       return result;
     } catch (err) {
       console.error("Error fetching tasks:", err);
@@ -132,6 +150,7 @@ export function useTasks() {
       setError(errorObj);
       return { tasks: [], totalCount: 0, completedCount: 0, pendingCount: 0 };
     } finally {
+      isLoadingRef.current = false;
       setLoading(false);
     }
   }, []);

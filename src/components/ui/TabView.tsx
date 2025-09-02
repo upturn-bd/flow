@@ -16,29 +16,34 @@ export type TabViewProps = {
   contentVariants?: any;
 };
 
-export const TabView = ({ tabs, activeTab, setActiveTab, contentVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 300,
-      damping: 30
-    }
+export const TabView = ({
+  tabs,
+  activeTab,
+  setActiveTab,
+  contentVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      },
+    },
+    exit: {
+      opacity: 0,
+      y: -20,
+      transition: {
+        duration: 0.3,
+      },
+    },
   },
-  exit: {
-    opacity: 0,
-    y: -20,
-    transition: {
-      duration: 0.3
-    }
-  }
-} }: TabViewProps) => {
+}: TabViewProps) => {
   return (
     <>
       {/* Desktop/Laptop Tab Layout */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.4 }}
@@ -58,14 +63,18 @@ export const TabView = ({ tabs, activeTab, setActiveTab, contentVariants = {
               }
             `}
           >
-            <span className={`${activeTab === tab.key ? tab.color : "text-gray-500"}`}>
+            <span
+              className={`${
+                activeTab === tab.key ? tab.color : "text-gray-500"
+              }`}
+            >
               {tab.icon}
             </span>
             {tab.label}
             {activeTab === tab.key && (
-              <motion.span 
+              <motion.span
                 layoutId="active-tab-indicator"
-                className="absolute left-2 right-2 -bottom-1 h-0.5 rounded-full bg-blue-500" 
+                className="absolute left-2 right-2 -bottom-1 h-0.5 rounded-full bg-blue-500"
               />
             )}
           </motion.button>
@@ -89,24 +98,13 @@ export const TabView = ({ tabs, activeTab, setActiveTab, contentVariants = {
 
       {/* Tab Content */}
       <div className="bg-white rounded-xl shadow-sm p-6">
-        <AnimatePresence mode="wait">
-          {tabs.map((tab) => (
-            activeTab === tab.key && (
-              <motion.div
-                key={`${tab.key}-tab`}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                variants={contentVariants}
-              >
-                {tab.content}
-              </motion.div>
-            )
-          ))}
-        </AnimatePresence>
+        {(() => {
+          const activeTabData = tabs.find((tab) => tab.key === activeTab);
+          return activeTabData ? activeTabData.content : null;
+        })()}
       </div>
     </>
   );
 };
 
-export default TabView; 
+export default TabView;

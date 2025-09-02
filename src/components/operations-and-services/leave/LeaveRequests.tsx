@@ -1,16 +1,10 @@
 "use client";
-
-import { getEmployeeInfo } from "@/lib/api";
-import { getCompanyId } from "@/lib/api";
-import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
-import { LeaveState } from "./LeaveCreatePage";
 import { useEmployees } from "@/hooks/useEmployees";
-import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
-import { Card, CardHeader, CardContent, CardFooter, StatusBadge, InfoRow } from "@/components/ui/Card";
+import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, FileText, MessageSquare, Check, X, CalendarDays } from "lucide-react";
@@ -36,7 +30,6 @@ export default function LeaveRequestsPage() {
     leaveRequests, 
     loading, 
     error, 
-    processingId, 
     fetchLeaveRequests, 
     updateLeaveRequest 
   } = useLeaveRequests();
@@ -54,7 +47,6 @@ export default function LeaveRequestsPage() {
   }, [fetchLeaveTypes]);
 
   const handleUpdateRequest = async (action: string, id: number) => {
-    setCurrentlyProcessingId(id);
     const updateData = {
       status: action,
       comment: comment
