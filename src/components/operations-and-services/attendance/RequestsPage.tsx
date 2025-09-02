@@ -1,7 +1,6 @@
 "use client";
 
 import { Attendance } from "@/hooks/useAttendance";
-import { getEmployeeInfo } from "@/lib/api";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { 
@@ -28,6 +27,7 @@ import BaseModal from "@/components/ui/modals/BaseModal";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { toast } from "sonner";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function AttendanceRequestsPage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);

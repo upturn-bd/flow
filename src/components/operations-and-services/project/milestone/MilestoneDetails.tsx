@@ -14,14 +14,13 @@ import {
 } from "lucide-react";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Milestone } from "@/hooks/useMilestones";
-import { Task, useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
-import { getCompanyId } from "@/lib/api";
-import { supabase } from "@/lib/supabase/client";
+import { Task, useTasks } from "@/hooks/useTasks";
 import { createClient } from '@/lib/supabase/client';
 import TaskCreateModal from "../../task/shared/TaskCreateModal";
 import TaskUpdateModal from "../../task/shared/TaskUpdateModal";
 import TaskDetails from "../../task/shared/TaskDetails";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { getCompanyId } from "@/lib/utils/auth";
 
 interface MilestoneDetailsProps {
   id: number;

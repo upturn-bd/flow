@@ -29,9 +29,9 @@ import { useCompanyValidation } from "@/hooks/useCompanyValidation";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useOnboarding } from "@/hooks/useOnboarding";
-import { getEmployeeId, getUser } from "@/lib/api";
 import { validateOnboardingForm, validationErrorsToObject } from "@/lib/utils/validation";
 import { OnboardingFormData } from "@/lib/types/schemas";
+import { getEmployeeId, getUser } from "@/lib/utils/auth";
 
 const jobStatuses = [
   "Active",

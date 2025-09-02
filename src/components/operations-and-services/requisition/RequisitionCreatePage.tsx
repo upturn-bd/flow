@@ -6,9 +6,6 @@ import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { IoMdCalendar } from "react-icons/io";
 import { useEmployees } from "@/hooks/useEmployees";
 import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo } from "@/lib/api";
-import { getCompanyId } from "@/lib/api";
-import { uploadManyFiles } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload,
@@ -27,6 +24,8 @@ import {
 import { toast } from "sonner";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
+import { getCompanyId, getEmployeeInfo } from "@/lib/utils/auth";
+import { uploadManyFiles } from "@/lib/utils/files";
 
 // Define a proper interface that mirrors the requisition schema
 interface RequisitionFormState {
@@ -300,7 +299,7 @@ export default function RequisitionCreatePage({
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
               <PackageOpen size={16} className="mr-2" />
               Category
             </label>
@@ -391,7 +390,7 @@ export default function RequisitionCreatePage({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+              <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
                 <Calendar size={16} className="mr-2" />
                 Date
               </label>
@@ -416,7 +415,7 @@ export default function RequisitionCreatePage({
             {!isOneOff && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
                     <Clock size={16} className="mr-2" />
                     From
                   </label>
@@ -433,7 +432,7 @@ export default function RequisitionCreatePage({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
                     <Clock size={16} className="mr-2" />
                     To
                   </label>
@@ -468,7 +467,7 @@ export default function RequisitionCreatePage({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
               <Upload size={16} className="mr-2" />
               Attachment
             </label>

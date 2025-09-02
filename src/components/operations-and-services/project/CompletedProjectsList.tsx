@@ -3,19 +3,16 @@
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Project, useProjects } from "@/hooks/useProjects";
-import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo } from "@/lib/api";
-import { getCompanyId } from "@/lib/api";
 import { useEffect, useState } from "react";
 import ProjectDetails from "./ProjectDetails";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, Trash2, Clock, Calendar, Building2, User, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
-import { Button } from "@/components/ui/button";
 import ProjectCard from "./ProjectCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import { getCompanyId } from "@/lib/utils/auth";
 
 function CompletedProjectsList() {
   const { deleteProject, updateProject } = useProjects();

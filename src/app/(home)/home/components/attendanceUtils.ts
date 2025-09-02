@@ -1,5 +1,5 @@
-import { getEmployeeInfo } from "@/lib/api";
 import { supabase } from "@/lib/supabase/client";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 import { calculateDistance } from "@/lib/utils/location-utils";
 import { getCurrentTime24HourFormat, getTodaysDate, isOnTime } from "@/lib/utils/time-utils";
 

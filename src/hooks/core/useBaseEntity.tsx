@@ -10,7 +10,8 @@ import {
   QueryOptions,
 } from "./types";
 import { useApiCall } from "./useApiCall";
-import { api } from "@/lib/api";
+import { getCompanyId, getEmployeeInfo, getUserId } from "@/lib/utils/auth";
+import { supabase } from "@/lib/supabase/client";
 
 interface BaseEntityHookConfig<T> {
   tableName: string;
@@ -161,7 +162,6 @@ export function useBaseEntity<T extends BaseEntity>(
 
           // Add company scoping if enabled
           if (config.companyScoped) {
-            const { getCompanyId } = await import("@/lib/api");
             const companyId = await getCompanyId();
             if (!scopingFilters.eq) scopingFilters.eq = {};
             scopingFilters.eq.company_id = companyId;
@@ -169,14 +169,13 @@ export function useBaseEntity<T extends BaseEntity>(
 
           // Add user scoping if enabled
           if (config.userScoped) {
-            const { getUserId } = await import("@/lib/api");
             const userId = await getUserId();
             if (!scopingFilters.eq) scopingFilters.eq = {};
             scopingFilters.eq.user_id = userId;
           }
 
           // Start with select
-          let query = api.client
+          let query = supabase
             .from(config.tableName)
             .select(options.select || "*");
 
@@ -219,7 +218,6 @@ export function useBaseEntity<T extends BaseEntity>(
 
           // Add company scoping if enabled
           if (config.companyScoped) {
-            const { getCompanyId } = await import("@/lib/api");
             const companyId = await getCompanyId();
             if (!scopingFilters.eq) scopingFilters.eq = {};
             scopingFilters.eq.company_id = companyId;
@@ -227,14 +225,13 @@ export function useBaseEntity<T extends BaseEntity>(
 
           // Add user scoping if enabled
           if (config.userScoped) {
-            const { getUserId } = await import("@/lib/api");
             const userId = await getUserId();
             if (!scopingFilters.eq) scopingFilters.eq = {};
             scopingFilters.eq.user_id = userId;
           }
 
           // Start with select
-          let query = api.client
+          let query = supabase
             .from(config.tableName)
             .select(options.select || "*");
 
@@ -285,27 +282,24 @@ export function useBaseEntity<T extends BaseEntity>(
         } else {
           // If no company_id provided, fetch from API
           // This allows the hook to be used without passing company_id explicitly
-          const { getCompanyId } = await import("@/lib/api");
           filters.company_id = await getCompanyId();
         }
       }
 
       // Add user scoping if enabled
       if (config.userScoped) {
-        const { getUserId } = await import("@/lib/api");
         filters.user_id = await getUserId();
       }
 
       // Handle department scoping with direct Supabase query
       if (config.departmentScoped) {
-        const { getEmployeeInfo } = await import("@/lib/api");
         const employeeInfo = await getEmployeeInfo();
 
         // For department scoped items, we want items that are either:
         // 1. For the user's department, OR
         // 2. Global (department_id is null)
         if (employeeInfo.department_id) {
-          let query = api.client.from(config.tableName).select("*");
+          let query = supabase.from(config.tableName).select("*");
 
           // Apply company scoping if enabled
           if (config.companyScoped && filters.company_id) {
@@ -335,7 +329,18 @@ export function useBaseEntity<T extends BaseEntity>(
       }
 
       const result = await callApi(
-        () => api.getAll<T>(config.tableName, { filters }),
+        async () => {
+          let query = supabase.from(config.tableName).select("*");
+          
+          // Apply each filter
+          Object.entries(filters).forEach(([key, value]) => {
+            query = query.eq(key, value);
+          });
+          
+          const { data, error } = await query;
+          if (error) throw error;
+          return data;
+        },
         {
           showErrorMessage: true,
         }
@@ -355,7 +360,11 @@ export function useBaseEntity<T extends BaseEntity>(
 
   const fetchItem = useCallback(
     async (id: string | number): Promise<void> => {
-      const result = await callApi(() => api.getById<T>(config.tableName, id), {
+      const result = await callApi(async () => {
+        const { data, error } = await supabase.from(config.tableName).select("*").eq("id", id).single();
+        if (error) throw error;
+        return data;
+      }, {
         showErrorMessage: true,
       });
       if (result) {
@@ -373,18 +382,24 @@ export function useBaseEntity<T extends BaseEntity>(
 
         // Add company scoping if enabled
         if (config.companyScoped) {
-          const { getCompanyId } = await import("@/lib/api");
           (createData as any).company_id = await getCompanyId();
         }
 
         // Add user scoping if enabled
         if (config.userScoped) {
-          const { getUserId } = await import("@/lib/api");
           (createData as any).user_id = await getUserId();
         }
 
         const result = await callApi(
-          () => api.create<T>(config.tableName, createData),
+          async () => {
+            const { data, error } = await supabase
+              .from(config.tableName)
+              .insert(createData)
+              .select()
+              .single();
+            if (error) throw error;
+            return data;
+          },
           {
             showSuccessMessage: true,
             showErrorMessage: true,
@@ -392,9 +407,9 @@ export function useBaseEntity<T extends BaseEntity>(
         );
 
         if (result) {
-          setItems((prev) => [...prev, result]);
+          setItems((prev) => [...prev, result as T]);
           setCreating(false);
-          return { success: true, data: result };
+          return { success: true, data: result as T };
         }
 
         setCreating(false);
@@ -414,7 +429,16 @@ export function useBaseEntity<T extends BaseEntity>(
       setUpdating(true);
       try {
         const result = await callApi(
-          () => api.update<T>(config.tableName, id, data),
+          async () => {
+            const { data: updatedData, error } = await supabase
+              .from(config.tableName)
+              .update(data)
+              .eq("id", id)
+              .select()
+              .single();
+            if (error) throw error;
+            return updatedData;
+          },
           {
             showSuccessMessage: true,
             showErrorMessage: true,
@@ -423,11 +447,11 @@ export function useBaseEntity<T extends BaseEntity>(
 
         if (result) {
           setItems((prev) =>
-            prev.map((item) => (item.id === id ? result : item))
+            prev.map((item) => (item.id === id ? result as T : item))
           );
-          setItem(result);
+          setItem(result as T);
           setUpdating(false);
-          return { success: true, data: result };
+          return { success: true, data: result as T };
         }
 
         setUpdating(false);
@@ -446,7 +470,16 @@ export function useBaseEntity<T extends BaseEntity>(
     async (id: string | number): Promise<ApiResponse<boolean>> => {
       setDeleting(true);
       try {
-        await callApi(() => api.delete(config.tableName, id), {
+        await callApi(async() => {
+          const { data, error } = await supabase
+            .from(config.tableName)
+            .delete()
+            .eq("id", id)
+            .select()
+            .single();
+          if (error) throw error;
+          return data;
+        }, {
           showSuccessMessage: true,
           showErrorMessage: true,
         });

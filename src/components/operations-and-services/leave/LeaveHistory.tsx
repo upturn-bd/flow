@@ -1,7 +1,5 @@
 "use client";
 
-import { getEmployeeInfo } from "@/lib/api";
-import { getCompanyId } from "@/lib/api";
 import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
 import { LeaveState } from "./LeaveCreatePage";
@@ -12,13 +10,13 @@ import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { Calendar, User, FileText, Clock } from "lucide-react";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { getCompanyId, getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function LeaveHistoryPage() {
   const [leaveRequests, setLeaveRequests] = useState<LeaveState[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
-  const [comment, setComment] = useState<string>("");
   const { employees, fetchEmployees } = useEmployees();
 
   async function fetchComplaintRequests() {

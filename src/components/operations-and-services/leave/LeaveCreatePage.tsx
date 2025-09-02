@@ -2,14 +2,13 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
-import { getEmployeeInfo } from "@/lib/api";
-import { getCompanyId } from "@/lib/api";
 import { Leave } from "@/lib/types";
 import { validateLeave, validationErrorsToObject } from "@/lib/utils/validation";
 import React, { useEffect, useState } from "react";
 import { Calendar, CheckCircle, Clock, Info } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 
 const initialLeaveRecord = {
   type_id: undefined,

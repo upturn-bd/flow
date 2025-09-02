@@ -1,7 +1,6 @@
 "use client";
 
 import { Attendance } from "@/hooks/useAttendance";
-import { getEmployeeInfo } from "@/lib/api";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown, FaCalendarAlt, FaSearch, FaEllipsisV } from "react-icons/fa";
@@ -9,6 +8,7 @@ import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { Clock } from "lucide-react";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 
 const ClickableStatusCell = ({
   tag,

@@ -1,7 +1,6 @@
 "use client";
 
 import { Attendance } from "@/hooks/useAttendance";
-import { getEmployeeInfo } from "@/lib/api";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { FaChevronDown, FaCalendarAlt, FaSearch, FaSpinner } from "react-icons/fa";
@@ -9,6 +8,7 @@ import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { Ban } from "lucide-react";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function AttendanceAbsentPage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);

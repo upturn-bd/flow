@@ -3,7 +3,6 @@
 import CompletedProjectsList from "@/components/operations-and-services/project/CompletedProjectsList";
 import CreateNewProjectPage from "@/components/operations-and-services/project/CreateNewProject";
 import ProjectsList from "@/components/operations-and-services/project/OngoingProjectsView";
-import { getEmployeeInfo } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -17,6 +16,7 @@ import TabView, { TabItem } from "@/components/ui/TabView";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { fadeInUp } from "@/components/ui/animations";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 
 const TABS = [
   {

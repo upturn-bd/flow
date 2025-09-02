@@ -1,8 +1,5 @@
 "use client";
 
-import { useEmployees } from "@/hooks/useEmployees";
-import { getEmployeeInfo } from "@/lib/api";
-import { getCompanyId } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useMilestones } from "@/hooks/useMilestones";
 import { useComments } from "@/hooks/useComments";
@@ -41,6 +38,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { StatusBadge, InfoRow } from "@/components/ui/Card";
 import BaseModal from "@/components/ui/modals/BaseModal";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import { getCompanyId } from "@/lib/utils/auth";
 
 interface ProjectDetailsProps {
   id: number;

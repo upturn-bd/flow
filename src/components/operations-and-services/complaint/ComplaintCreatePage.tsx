@@ -4,11 +4,9 @@ import React, { useEffect, useState, ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Upload,
-  Calendar,
   ChevronLeft,
   ChevronDown,
   AlertCircle,
-  Save,
   Check,
   Loader2,
   X,
@@ -19,11 +17,11 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { ComplaintRecord } from "@/lib/types/schemas";
-import { getEmployeeInfo } from "@/lib/api";
-import { uploadManyFiles } from "@/lib/api";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import { toast } from "sonner";
+import { getEmployeeInfo } from "@/lib/utils/auth";
+import { uploadManyFiles } from "@/lib/utils/files";
 
 const initialComplaintRecord = {
   complaint_type_id: undefined,
