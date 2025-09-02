@@ -2,26 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-// Basic Info APIs
-import { 
-  fetchCurrentUserBasicInfo as fetchCurrentUserBasicInfoApi, 
-  fetchUserBasicInfo as fetchUserBasicInfoApi, 
-  updateBasicInfo as updateBasicInfoApi,
-  isCurrentUserProfile as isCurrentUserProfileApi
-} from "@/lib/api/profile/basicInfo";
-
-// Personal Info APIs
-import { 
-  fetchCurrentUserPersonalInfo as fetchCurrentUserPersonalInfoApi, 
-  fetchUserPersonalInfo as fetchUserPersonalInfoApi, 
-  updatePersonalInfo as updatePersonalInfoApi
-} from "@/lib/api/profile/personalInfo";
-
-// Education & Experience APIs
-import { 
-  fetchUserEducation as fetchUserEducationApi, 
-  fetchUserExperience as fetchUserExperienceApi 
-} from "@/lib/api/profile/educationExperience";
+import { getEmployeeInfo, getUserId } from "@/lib/utils/auth";
 
 // Types
 import { BasicInfoFormData } from "@/app/(home)/hris/tabs/basicInfo.constants";
@@ -53,7 +34,16 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const result = await fetchCurrentUserBasicInfoApi();
+      const employeeInfo = await getEmployeeInfo();
+      
+      const { data: result, error } = await supabase
+        .from('employees')
+        .select('*')
+        .eq('id', employeeInfo.id)
+        .single();
+
+      if (error) throw error;
+      
       setBasicInfo(result);
       return result;
     } catch (err) {
@@ -70,7 +60,14 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const result = await fetchUserBasicInfoApi(uid);
+      const { data: result, error } = await supabase
+        .from('employees')
+        .select('*')
+        .eq('id', uid)
+        .single();
+
+      if (error) throw error;
+      
       setBasicInfo(result);
       return result;
     } catch (err) {
@@ -87,9 +84,19 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const result = await updateBasicInfoApi(data);
-      setBasicInfo(result.data);
-      return result;
+      const employeeInfo = await getEmployeeInfo();
+      
+      const { data: result, error } = await supabase
+        .from('employees')
+        .update(data)
+        .eq('id', employeeInfo.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setBasicInfo(result);
+      return { data: result };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to update basic info";
       setError(errorMessage);
@@ -105,7 +112,16 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const result = await fetchCurrentUserPersonalInfoApi();
+      const employeeInfo = await getEmployeeInfo();
+      
+      const { data: result, error } = await supabase
+        .from('personal_infos')
+        .select('*')
+        .eq('id', employeeInfo.id)
+        .single();
+
+      if (error) throw error;
+      
       setPersonalInfo(result);
       return result;
     } catch (err) {
@@ -122,7 +138,14 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const result = await fetchUserPersonalInfoApi(uid);
+      const { data: result, error } = await supabase
+        .from('personal_infos')
+        .select('*')
+        .eq('id', uid)
+        .single();
+
+      if (error) throw error;
+      
       setPersonalInfo(result);
       return result;
     } catch (err) {
@@ -139,7 +162,17 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const result = await updatePersonalInfoApi(data);
+      const employeeInfo = await getEmployeeInfo();
+      
+      const { data: result, error } = await supabase
+        .from('personal_infos')
+        .update(data)
+        .eq('id', employeeInfo.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      
       setPersonalInfo(result);
       return result;
     } catch (err) {
@@ -157,9 +190,16 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchUserEducationApi(uid);
-      setEducations(data);
-      return data;
+      const { data, error } = await supabase
+        .from('schoolings')
+        .select('*')
+        .eq('employee_id', uid);
+
+      if (error) throw error;
+      
+      const educationData = data || [];
+      setEducations(educationData);
+      return educationData;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch education data";
       setError(errorMessage);
@@ -174,9 +214,16 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchUserExperienceApi(uid);
-      setExperiences(data);
-      return data;
+      const { data, error } = await supabase
+        .from('experiences')
+        .select('*')
+        .eq('employee_id', uid);
+
+      if (error) throw error;
+      
+      const experienceData = data || [];
+      setExperiences(experienceData);
+      return experienceData;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch experience data";
       setError(errorMessage);
@@ -382,16 +429,28 @@ export function useProfile() {
     setError(null);
     try {
       // Check if this is the current user's profile
-      const isCurrentUserResult = await isCurrentUserProfileApi(uid);
+      const currentUserId = await getUserId();
+      const isCurrentUserResult = currentUserId === uid;
       setIsCurrentUser(isCurrentUserResult);
       
       // Fetch all user data in parallel
-      const [basicInfoData, personalInfoData, educationData, experienceData] = await Promise.all([
-        isCurrentUserResult ? fetchCurrentUserBasicInfoApi() : fetchUserBasicInfoApi(uid),
-        isCurrentUserResult ? fetchCurrentUserPersonalInfoApi() : fetchUserPersonalInfoApi(uid),
-        fetchUserEducationApi(uid),
-        fetchUserExperienceApi(uid)
+      const [basicInfoResult, personalInfoResult, educationResult, experienceResult] = await Promise.all([
+        supabase.from('employees').select('*').eq('id', uid).single(),
+        supabase.from('personal_infos').select('*').eq('id', uid).single(),
+        supabase.from('schoolings').select('*').eq('employee_id', uid),
+        supabase.from('experiences').select('*').eq('employee_id', uid)
       ]);
+      
+      // Handle any errors
+      if (basicInfoResult.error) throw basicInfoResult.error;
+      if (personalInfoResult.error) throw personalInfoResult.error;
+      if (educationResult.error) throw educationResult.error;
+      if (experienceResult.error) throw experienceResult.error;
+      
+      const basicInfoData = basicInfoResult.data;
+      const personalInfoData = personalInfoResult.data;
+      const educationData = educationResult.data || [];
+      const experienceData = experienceResult.data || [];
       
       // Update all states
       setBasicInfo(basicInfoData);

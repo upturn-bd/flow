@@ -1,11 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { 
-  fetchCurrentUserPersonalInfo as fetchCurrentUserPersonalInfoApi, 
-  fetchUserPersonalInfo as fetchUserPersonalInfoApi, 
-  updatePersonalInfo as updatePersonalInfoApi
-} from "@/lib/api/profile/personalInfo";
+import { supabase } from "@/lib/supabase/client";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 import { PersonalFormData } from "@/app/(home)/hris/tabs/personalInfo.constants";
 
 export function usePersonalInfo() {
@@ -17,7 +14,16 @@ export function usePersonalInfo() {
     setLoading(true);
     setError(null);
     try {
-      const result = await fetchCurrentUserPersonalInfoApi();
+      const employeeInfo = await getEmployeeInfo();
+      
+      const { data: result, error } = await supabase
+        .from('personal_infos')
+        .select('*')
+        .eq('id', employeeInfo.id)
+        .single();
+
+      if (error) throw error;
+      
       setData(result);
       return result;
     } catch (err) {
@@ -34,7 +40,14 @@ export function usePersonalInfo() {
     setLoading(true);
     setError(null);
     try {
-      const result = await fetchUserPersonalInfoApi(uid);
+      const { data: result, error } = await supabase
+        .from('personal_infos')
+        .select('*')
+        .eq('id', uid)
+        .single();
+
+      if (error) throw error;
+      
       setData(result);
       return result;
     } catch (err) {
@@ -51,7 +64,17 @@ export function usePersonalInfo() {
     setLoading(true);
     setError(null);
     try {
-      const result = await updatePersonalInfoApi(data);
+      const employeeInfo = await getEmployeeInfo();
+      
+      const { data: result, error } = await supabase
+        .from('personal_infos')
+        .update(data)
+        .eq('id', employeeInfo.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      
       setData(result);
       return result;
     } catch (err) {

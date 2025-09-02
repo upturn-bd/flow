@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { getCompanyInfo as getCompanyInfoApi } from "@/lib/api";
+import { getCompanyInfo as getCompanyInfoApi } from "@/lib/utils/auth";
 import { useEmployees } from "@/hooks/useEmployees";
 
 interface CompanyInfo {

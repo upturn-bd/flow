@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId } from "@/lib/api";
+import { getCompanyId, DatabaseError } from "@/lib/utils/auth";
 
 // Define type for employee info
 export type EmployeeInfo = {
@@ -13,7 +13,7 @@ export type EmployeeInfo = {
 export function useEmployeeInfo() {
   const [employees, setEmployees] = useState<EmployeeInfo[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchEmployeeInfo = useCallback(async () => {
     setLoading(true);
@@ -26,7 +26,9 @@ export function useEmployeeInfo() {
         .select("id, first_name, last_name")
         .eq("company_id", company_id);
 
-      if (error) throw error;
+      if (error) {
+        throw new DatabaseError(`Failed to fetch employee info: ${error.message}`);
+      }
 
       const employees = data?.map((employee) => ({
         id: employee.id,
@@ -35,8 +37,9 @@ export function useEmployeeInfo() {
 
       setEmployees(employees);
     } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch employee info";
       console.error("Error fetching employee info:", err);
-      setError(err instanceof Error ? err : new Error(String(err)));
+      setError(message);
     } finally {
       setLoading(false);
     }

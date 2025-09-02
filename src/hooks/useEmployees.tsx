@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId } from "@/lib/api";
+import { getCompanyId } from "@/lib/utils/auth";
 
 export interface Employee {
   id: string;

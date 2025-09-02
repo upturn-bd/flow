@@ -3,7 +3,7 @@
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { fetchCurrentUserBasicInfo } from "@/lib/api/profile/basicInfo";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export type UserProfileData = {
   id: string;
@@ -32,26 +32,17 @@ export function useUserData() {
         setLoading(true);
         setError(null);
         
-        // Fetch basic user info using client-side function instead of API
-        const data = await fetchCurrentUserBasicInfo();
+        // Get current user employee info
+        const employeeInfo = await getEmployeeInfo();
         
-        // Get the user auth data for the ID
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
-          throw new Error("User not authenticated");
-        }
-        
-        // Fetch additional user data including role
-        const { data: employeeData, error: employeeError } = await supabase
-          .from("employees")
-          .select("role")
-          .eq("id", user.id)
+        // Fetch complete employee data
+        const { data, error } = await supabase
+          .from('employees')
+          .select('*')
+          .eq('id', employeeInfo.id)
           .single();
-          
-        if (employeeError) {
-          throw new Error("Failed to fetch employee role");
-        }
+
+        if (error) throw error;
         
         // If we have a department ID, fetch the department name
         let departmentName = undefined;
@@ -69,8 +60,8 @@ export function useUserData() {
         
         setUserData({
           ...data,
-          id: user.id,
-          role: employeeData.role,
+          id: employeeInfo.id,
+          role: data.role,
           department_name: departmentName
         });
       } catch (error) {
@@ -102,26 +93,17 @@ export function useUserData() {
       setLoading(true);
       setError(null);
       
-      // Use client-side function instead of API
-      const data = await fetchCurrentUserBasicInfo();
+      // Get current user employee info
+      const employeeInfo = await getEmployeeInfo();
       
-      // Get the user auth data for the ID
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-      
-      // Fetch additional user data including role
-      const { data: employeeData, error: employeeError } = await supabase
-        .from("employees")
-        .select("role")
-        .eq("id", user.id)
+      // Fetch complete employee data
+      const { data, error } = await supabase
+        .from('employees')
+        .select('*')
+        .eq('id', employeeInfo.id)
         .single();
-        
-      if (employeeError) {
-        throw new Error("Failed to fetch employee role");
-      }
+
+      if (error) throw error;
       
       // If we have a department ID, fetch the department name
       let departmentName = undefined;
@@ -139,8 +121,8 @@ export function useUserData() {
       
       setUserData({
         ...data,
-        id: user.id,
-        role: employeeData.role,
+        id: employeeInfo.id,
+        role: data.role,
         department_name: departmentName
       });
     } catch (error) {

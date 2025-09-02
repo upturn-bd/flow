@@ -1,15 +1,11 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { 
-  fetchUserEducation as fetchUserEducationApi, 
-  fetchUserExperience as fetchUserExperienceApi 
-} from "@/lib/api/profile/educationExperience";
-import { Education } from "@/hooks/useEducation";
-import { Experience } from "@/hooks/useExperience";
+import { supabase } from "@/lib/supabase/client";
+import { Schooling, Experience } from "@/lib/types/schemas";
 
 export function useEducationExperience() {
-  const [userEducations, setUserEducations] = useState<Education[]>([]);
+  const [userEducations, setUserEducations] = useState<Schooling[]>([]);
   const [userExperiences, setUserExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,9 +14,16 @@ export function useEducationExperience() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchUserEducationApi(uid);
-      setUserEducations(data);
-      return data;
+      const { data, error } = await supabase
+        .from('schoolings')
+        .select('*')
+        .eq('employee_id', uid);
+
+      if (error) throw error;
+      
+      const educationData = data || [];
+      setUserEducations(educationData);
+      return educationData;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch education data";
       setError(errorMessage);
@@ -35,9 +38,16 @@ export function useEducationExperience() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchUserExperienceApi(uid);
-      setUserExperiences(data);
-      return data;
+      const { data, error } = await supabase
+        .from('experiences')
+        .select('*')
+        .eq('employee_id', uid);
+
+      if (error) throw error;
+      
+      const experienceData = data || [];
+      setUserExperiences(experienceData);
+      return experienceData;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch experience data";
       setError(errorMessage);
@@ -53,10 +63,16 @@ export function useEducationExperience() {
     setError(null);
     try {
       // Fetch education and experience records in parallel
-      const [educationData, experienceData] = await Promise.all([
-        fetchUserEducationApi(uid),
-        fetchUserExperienceApi(uid)
+      const [educationResult, experienceResult] = await Promise.all([
+        supabase.from('schoolings').select('*').eq('employee_id', uid),
+        supabase.from('experiences').select('*').eq('employee_id', uid)
       ]);
+      
+      if (educationResult.error) throw educationResult.error;
+      if (experienceResult.error) throw experienceResult.error;
+      
+      const educationData = educationResult.data || [];
+      const experienceData = experienceResult.data || [];
       
       setUserEducations(educationData);
       setUserExperiences(experienceData);

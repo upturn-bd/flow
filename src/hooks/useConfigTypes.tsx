@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId } from "@/lib/api";
+import { getCompanyId, DatabaseError } from "@/lib/utils/auth";
 
 // A generic hook for managing configuration types
 export function useConfigTypes<T extends { id?: number, company_id?: number | null }>(
@@ -21,11 +21,14 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
         .select("*")
         .eq("company_id", company_id);
 
-      if (error) throw error;
+      if (error) {
+        throw new DatabaseError(`Failed to fetch ${tableName}: ${error.message}`);
+      }
       setItems(data || []);
       return data;
     } catch (error) {
-      setError(`Failed to fetch ${tableName}`);
+      const message = error instanceof Error ? error.message : `Failed to fetch ${tableName}`;
+      setError(message);
       console.error(error);
       return [];
     } finally {
@@ -43,7 +46,9 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
           company_id,
         });
 
-      if (error) throw error;
+      if (error) {
+        throw new DatabaseError(`Failed to create ${tableName}: ${error.message}`);
+      }
       
       // Refetch the items to update the list
       await fetchItems();
@@ -65,7 +70,9 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
         })
         .eq("id", values.id);
 
-      if (error) throw error;
+      if (error) {
+        throw new DatabaseError(`Failed to update ${tableName}: ${error.message}`);
+      }
       
       // Refetch the items to update the list
       await fetchItems();
@@ -83,7 +90,9 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
         .delete()
         .eq("id", id);
 
-      if (error) throw error;
+      if (error) {
+        throw new DatabaseError(`Failed to delete ${tableName}: ${error.message}`);
+      }
       
       // Refetch the items to update the list
       await fetchItems();

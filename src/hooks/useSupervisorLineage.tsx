@@ -3,7 +3,7 @@
 import { Lineage } from "@/lib/types/schemas";
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId } from "@/lib/api";
+import { getCompanyId, DatabaseError } from "@/lib/utils/auth";
 
 export function useLineage() {
   const [lineages, setLineages] = useState<Lineage[]>([]);
@@ -21,7 +21,9 @@ export function useLineage() {
         .select("*")
         .eq("company_id", company_id);
 
-      if (error) throw error;
+      if (error) {
+        throw new DatabaseError(`Failed to fetch lineages: ${error.message}`);
+      }
       setLineages(data || []);
       return data;
     } catch (error) {
@@ -45,7 +47,9 @@ export function useLineage() {
         .from("lineages")
         .insert(validatedLineageData);
 
-      if (error) throw error;
+      if (error) {
+        throw new DatabaseError(`Failed to create lineage: ${error.message}`);
+      }
       return { success: true, status: 200, data };
     } catch (error) {
       console.error("Error creating lineage:", error);
@@ -70,13 +74,17 @@ export function useLineage() {
         .eq("company_id", company_id)
         .eq("name", formattedPayload[0].name);
 
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        throw new DatabaseError(`Failed to delete existing lineages: ${fetchError.message}`);
+      }
 
       const { data, error } = await supabase
         .from("lineages")
         .insert(formattedPayload);
 
-      if (error) throw error;
+      if (error) {
+        throw new DatabaseError(`Failed to update lineage: ${error.message}`);
+      }
       return { success: true, status: 200, data };
     } catch (error) {
       console.error("Error updating lineage:", error);
@@ -96,7 +104,9 @@ export function useLineage() {
         .eq("name", name)
         .eq("company_id", company_id);
 
-      if (error) throw error;
+      if (error) {
+        throw new DatabaseError(`Failed to delete lineage: ${error.message}`);
+      }
       return { success: true, status: 200, data: { message: "Lineage deleted successfully" } };
     } catch (error) {
       console.error("Error deleting lineage:", error);

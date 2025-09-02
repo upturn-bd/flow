@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { isCurrentUserProfile as isCurrentUserProfileApi } from "@/lib/api/profile/basicInfo";
+import { getUserId } from "@/lib/utils/auth";
 import { supabase } from "@/lib/supabase/client";
 
 export interface UserInfo {
@@ -23,7 +23,8 @@ export function useUserProfile() {
     }
 
     try {
-      const result = await isCurrentUserProfileApi(uid);
+      const currentUserId = await getUserId();
+      const result = currentUserId === uid;
       setIsCurrentUser(result);
       return result;
     } catch (err) {

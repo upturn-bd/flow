@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { validateCompanyCode as validateCompanyCodeApi } from "@/lib/api/company";
+import { validateCompanyCode as validateCompanyCodeApi } from "@/lib/utils/company";
 
 interface ValidationResult {
   isValid: boolean;

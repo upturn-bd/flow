@@ -1,7 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo, getCompanyId } from "@/lib/api";
+import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
 import { Task } from "@/lib/types/schemas";
 import { useState, useCallback, useMemo } from "react";
 

@@ -2,8 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo } from "@/lib/api";
-import { getCompanyId } from "@/lib/api";
+import { getEmployeeInfo, getCompanyId, DatabaseError } from "@/lib/utils/auth";
 
 export function useSettlementRequests() {
   const [settlementRequests, setSettlementRequests] = useState<any[]>([]);
@@ -27,8 +26,9 @@ export function useSettlementRequests() {
           .eq("status", "Pending");
 
         if (error) {
-          setError("Failed to fetch settlement requests");
-          throw error;
+          const message = "Failed to fetch settlement requests";
+          setError(message);
+          throw new DatabaseError(`${message}: ${error.message}`);
         }
 
         setSettlementRequests(data || []);
@@ -58,8 +58,9 @@ export function useSettlementRequests() {
         .eq("claimant_id", user.id);
 
       if (error) {
-        setError("Failed to fetch settlement requests");
-        throw error;
+        const message = "Failed to fetch settlement history";
+        setError(message);
+        throw new DatabaseError(`${message}: ${error.message}`);
       }
 
       setSettlementRequests(data || []);
@@ -92,8 +93,9 @@ export function useSettlementRequests() {
           .eq("id", id);
 
         if (error) {
-          setError("Failed to update settlement request");
-          throw error;
+          const message = "Failed to update settlement request";
+          setError(message);
+          throw new DatabaseError(`${message}: ${error.message}`);
         }
 
         // Refresh the requests
