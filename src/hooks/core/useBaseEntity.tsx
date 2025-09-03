@@ -26,7 +26,7 @@ export function useBaseEntity<T extends BaseEntity>(
 ): CrudHookResult<T> {
   const [items, setItems] = useState<T[]>([]);
   const [item, setItem] = useState<T | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Changed from true to false
   const [creating, setCreating] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -34,20 +34,18 @@ export function useBaseEntity<T extends BaseEntity>(
 
   config.companyScoped = config.companyScoped ?? true; // Default to true if not provided
 
-  // Integrated API call handler
+  // Simplified API call handler without loading state management
   const callApi = useCallback(
     async <K,>(
       apiFunction: () => Promise<K>,
       options: ApiCallOptions = {}
     ): Promise<K | null> => {
-      setLoading(true);
       setError(null);
 
       try {
         const result = await apiFunction();
 
         if (options.showSuccessMessage) {
-          // TODO: Implement success toast notification
           console.log("API call successful");
         }
 
@@ -55,14 +53,12 @@ export function useBaseEntity<T extends BaseEntity>(
           options.onSuccess();
         }
 
-        setLoading(false);
         return result;
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "An error occurred";
 
         if (options.showErrorMessage) {
-          // TODO: Implement error toast notification
           console.error("API call failed:", errorMessage);
         }
 
@@ -70,7 +66,6 @@ export function useBaseEntity<T extends BaseEntity>(
           options.onError(errorMessage);
         }
 
-        setLoading(false);
         setError(errorMessage);
         return null;
       }
@@ -203,6 +198,8 @@ export function useBaseEntity<T extends BaseEntity>(
     async (queryConfig: EnhancedQueryOptions): Promise<T[]> => {
       const { filters = {}, options = {} } = queryConfig;
 
+      setLoading(true); // Set loading at the method level
+
       const result = await callApi(
         async () => {
           // Apply default scoping
@@ -244,6 +241,8 @@ export function useBaseEntity<T extends BaseEntity>(
         }
       );
 
+      setLoading(false); // Clear loading at the method level
+
       if (result) {
         setItems(result);
         return result;
@@ -258,6 +257,8 @@ export function useBaseEntity<T extends BaseEntity>(
   const fetchSingleWithQuery = useCallback(
     async (queryConfig: EnhancedQueryOptions): Promise<T | null> => {
       const { filters = {}, options = {} } = queryConfig;
+
+      setLoading(true); // Set loading at the method level
 
       const result = await callApi(
         async () => {
@@ -310,6 +311,8 @@ export function useBaseEntity<T extends BaseEntity>(
         }
       );
 
+      setLoading(false); // Clear loading at the method level
+
       if (result !== null) {
         setItem(result);
       }
@@ -321,6 +324,8 @@ export function useBaseEntity<T extends BaseEntity>(
 
   const fetchItems = useCallback(
     async (company_id?: number): Promise<void> => {
+      setLoading(true); // Set loading at the method level
+
       const filters: Record<string, any> = {};
 
       // Add company scoping if enabled
@@ -343,6 +348,7 @@ export function useBaseEntity<T extends BaseEntity>(
       if (config.departmentScoped) {
         const employeeInfo = await getEmployeeInfo();
 
+        
         // For department scoped items, we want items that are either:
         // 1. For the user's department, OR
         // 2. Global (department_id is null)
@@ -369,6 +375,9 @@ export function useBaseEntity<T extends BaseEntity>(
               showErrorMessage: true,
             }
           );
+
+          setLoading(false); // Clear loading at the method level
+
           if (result) {
             setItems(result || []);
           }
@@ -379,12 +388,12 @@ export function useBaseEntity<T extends BaseEntity>(
       const result = await callApi(
         async () => {
           let query = supabase.from(config.tableName).select("*");
-          
+
           // Apply each filter
           Object.entries(filters).forEach(([key, value]) => {
             query = query.eq(key, value);
           });
-          
+
           const { data, error } = await query;
           if (error) throw error;
           return data;
@@ -393,6 +402,9 @@ export function useBaseEntity<T extends BaseEntity>(
           showErrorMessage: true,
         }
       );
+
+      setLoading(false); // Clear loading at the method level
+
       if (result) {
         setItems(result);
       }
@@ -408,6 +420,8 @@ export function useBaseEntity<T extends BaseEntity>(
 
   const fetchItem = useCallback(
     async (id: string | number): Promise<void> => {
+      setLoading(true); // Set loading at the method level
+
       const result = await callApi(async () => {
         const { data, error } = await supabase.from(config.tableName).select("*").eq("id", id).single();
         if (error) throw error;
@@ -415,6 +429,9 @@ export function useBaseEntity<T extends BaseEntity>(
       }, {
         showErrorMessage: true,
       });
+
+      setLoading(false); // Clear loading at the method level
+
       if (result) {
         setItem(result);
       }
@@ -518,7 +535,7 @@ export function useBaseEntity<T extends BaseEntity>(
     async (id: string | number): Promise<ApiResponse<boolean>> => {
       setDeleting(true);
       try {
-        await callApi(async() => {
+        await callApi(async () => {
           const { data, error } = await supabase
             .from(config.tableName)
             .delete()
