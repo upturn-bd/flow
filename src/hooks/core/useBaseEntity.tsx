@@ -18,7 +18,7 @@ interface BaseEntityHookConfig<T> {
   entityName: string;
   companyScoped?: boolean;
   userScoped?: boolean;
-  departmentScoped?: boolean;
+  departmentScoped?: boolean; // New option for department scoping
 }
 
 export function useBaseEntity<T extends BaseEntity>(
@@ -32,7 +32,7 @@ export function useBaseEntity<T extends BaseEntity>(
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  config.companyScoped = config.companyScoped ?? true;
+  config.companyScoped = config.companyScoped ?? true; // Default to true if not provided
 
   // Simplified API call handler without loading state management
   const callApi = useCallback(
@@ -163,7 +163,7 @@ export function useBaseEntity<T extends BaseEntity>(
       query = query.or(filters.or);
     }
 
-    // Apply and filter
+    // Apply and filter (this is usually implicit, but can be used for complex conditions)
     if (filters.and) {
       query = query.and(filters.and);
     }
@@ -197,7 +197,7 @@ export function useBaseEntity<T extends BaseEntity>(
   const fetchItemsWithQuery = useCallback(
     async (queryConfig: EnhancedQueryOptions): Promise<T[]> => {
       const { filters = {}, options = {} } = queryConfig;
-      
+
       setLoading(true); // Set loading at the method level
 
       const result = await callApi(
@@ -257,7 +257,7 @@ export function useBaseEntity<T extends BaseEntity>(
   const fetchSingleWithQuery = useCallback(
     async (queryConfig: EnhancedQueryOptions): Promise<T | null> => {
       const { filters = {}, options = {} } = queryConfig;
-      
+
       setLoading(true); // Set loading at the method level
 
       const result = await callApi(
@@ -333,6 +333,8 @@ export function useBaseEntity<T extends BaseEntity>(
         if (company_id !== undefined) {
           filters.company_id = company_id;
         } else {
+          // If no company_id provided, fetch from API
+          // This allows the hook to be used without passing company_id explicitly
           filters.company_id = await getCompanyId();
         }
       }
@@ -346,6 +348,10 @@ export function useBaseEntity<T extends BaseEntity>(
       if (config.departmentScoped) {
         const employeeInfo = await getEmployeeInfo();
 
+        
+        // For department scoped items, we want items that are either:
+        // 1. For the user's department, OR
+        // 2. Global (department_id is null)
         if (employeeInfo.department_id) {
           let query = supabase.from(config.tableName).select("*");
 
@@ -369,9 +375,9 @@ export function useBaseEntity<T extends BaseEntity>(
               showErrorMessage: true,
             }
           );
-          
+
           setLoading(false); // Clear loading at the method level
-          
+
           if (result) {
             setItems(result || []);
           }
@@ -382,12 +388,12 @@ export function useBaseEntity<T extends BaseEntity>(
       const result = await callApi(
         async () => {
           let query = supabase.from(config.tableName).select("*");
-          
+
           // Apply each filter
           Object.entries(filters).forEach(([key, value]) => {
             query = query.eq(key, value);
           });
-          
+
           const { data, error } = await query;
           if (error) throw error;
           return data;
@@ -396,9 +402,9 @@ export function useBaseEntity<T extends BaseEntity>(
           showErrorMessage: true,
         }
       );
-      
+
       setLoading(false); // Clear loading at the method level
-      
+
       if (result) {
         setItems(result);
       }
@@ -415,7 +421,7 @@ export function useBaseEntity<T extends BaseEntity>(
   const fetchItem = useCallback(
     async (id: string | number): Promise<void> => {
       setLoading(true); // Set loading at the method level
-      
+
       const result = await callApi(async () => {
         const { data, error } = await supabase.from(config.tableName).select("*").eq("id", id).single();
         if (error) throw error;
@@ -423,9 +429,9 @@ export function useBaseEntity<T extends BaseEntity>(
       }, {
         showErrorMessage: true,
       });
-      
+
       setLoading(false); // Clear loading at the method level
-      
+
       if (result) {
         setItem(result);
       }
@@ -529,7 +535,7 @@ export function useBaseEntity<T extends BaseEntity>(
     async (id: string | number): Promise<ApiResponse<boolean>> => {
       setDeleting(true);
       try {
-        await callApi(async() => {
+        await callApi(async () => {
           const { data, error } = await supabase
             .from(config.tableName)
             .delete()
