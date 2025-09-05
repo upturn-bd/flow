@@ -9,64 +9,8 @@ import { useSites } from "@/hooks/useAttendanceManagement";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { Clock } from "lucide-react";
 import { getEmployeeInfo } from "@/lib/utils/auth";
+import ClickableStatusCell from "./ClickableStatusCell";
 
-const ClickableStatusCell = ({
-  tag,
-  handleRequest,
-}: {
-  tag: string;
-  handleRequest: () => void;
-}) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  return (
-    <div className="flex items-center justify-between w-full">
-      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-        tag === "Late" ? "bg-yellow-100 text-yellow-800" : "bg-orange-100 text-orange-800"
-      }`}>
-        {tag === "Late" ? "Late" : "Wrong Location"}
-      </span>
-      <div className="relative" ref={menuRef}>
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="ml-2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100 focus:outline-none"
-          aria-label="Toggle menu"
-        >
-          <FaEllipsisV className="text-sm" />
-        </button>
-
-        {isMenuOpen && (
-          <div className="absolute right-0 mt-1 bg-white border shadow-lg rounded-md py-1 w-40 z-10">
-            <button
-              onClick={() => {
-                handleRequest();
-                setIsMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
-            >
-              Send to Request
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
 export default function AttendanceLatePage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
@@ -96,35 +40,7 @@ export default function AttendanceLatePage() {
     }
   }
 
-  async function handleRequest(id: number) {
-    
-    const user = await getEmployeeInfo();
-    try {
-      const { error } = await supabase
-        .from("attendance_records")
-        .update({ tag: "Pending" })
-        .eq("employee_id", user.id)
-        .eq("company_id", user.company_id)
-        .eq("id", id);
 
-      if (error) throw error;
-      
-      // Show success notification
-      const notification = document.createElement('div');
-      notification.className = 'fixed bottom-4 right-4 bg-green-100 text-green-800 px-4 py-3 rounded-lg shadow-lg z-50 animate-fade-in-up';
-      notification.innerHTML = 'Request sent successfully';
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.classList.add('animate-fade-out');
-        setTimeout(() => document.body.removeChild(notification), 500);
-      }, 3000);
-      
-      fetchAttendanceData();
-    } catch (error) {
-      console.error("Error updating attendance data:", error);
-    }
-  }
 
   useEffect(() => {
     fetchAttendanceData();
@@ -227,7 +143,7 @@ export default function AttendanceLatePage() {
                       <td className="px-4 py-3 text-sm">
                         <ClickableStatusCell
                           tag={entry.tag}
-                          handleRequest={() => handleRequest(entry.id!)}
+                          id={entry.id!}
                         />
                       </td>
                     </tr>
