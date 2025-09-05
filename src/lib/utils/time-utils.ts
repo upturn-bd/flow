@@ -27,3 +27,29 @@ export function getCurrentTime24HourFormat(): string {
   return `${hours}:${minutes}`;
 }
 
+// Check if check-in is late
+export function checkLateStatus(
+  checkInTime: string | null,
+  siteCheckInTime: string
+): 'on-time' | 'late' | 'no-record' {
+  if (!checkInTime) return 'no-record';
+  
+  const checkInDate = new Date(`1970-01-01T${checkInTime}`);
+  const siteTime = new Date(`1970-01-01T${siteCheckInTime}`);
+  
+  return checkInDate > siteTime ? 'late' : 'on-time';
+}
+
+// Check if check-out is early
+export function checkEarlyCheckOut(
+  checkOutTime: string | null,
+  siteCheckOutTime: string
+): 'on-time' | 'early' | 'no-record' {
+  if (!checkOutTime) return 'no-record';
+  
+  const checkOutDate = new Date(`1970-01-01T${checkOutTime}`);
+  const siteTime = new Date(`1970-01-01T${siteCheckOutTime}`);
+  
+  return checkOutDate < siteTime ? 'early' : 'on-time';
+}
+

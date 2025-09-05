@@ -2,11 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, CheckCircle2, Clock, CheckSquare, MapPin } from 'lucide-react';
+import { Calendar, CheckCircle2, Clock, CheckSquare, MapPin, Navigation, AlertTriangle, AlertCircle } from 'lucide-react';
 import { cn } from '@/components/ui/class';
 import SectionHeader from './SectionHeader';
 import LoadingSection from './LoadingSection';
-import { formatDateToDayMonth, formatTimeFromISO } from '@/lib/utils';
+import { formatTimeFromISO } from '@/lib/utils';
+import { calculateDistanceFromCoords, formatDistance } from '@/lib/utils/location-utils';
+import { isOnTime, getCurrentTime24HourFormat, checkLateStatus, checkEarlyCheckOut } from '@/lib/utils/time-utils';
 import { Attendance } from '@/lib/types/schemas';
 import { getEmployeeInfo } from '@/lib/utils/auth';
 import { supabase } from '@/lib/supabase/client';
@@ -55,6 +57,74 @@ export default function AttendanceSection({
   onCheckOut,
 }: AttendanceSectionProps) {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+
+  // Get user's current location
+  const getCurrentLocation = () => {
+    setLocationLoading(true);
+    setLocationError(null);
+
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by this browser");
+      setLocationLoading(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        setLocationLoading(false);
+      },
+      (error) => {
+        let errorMessage = "Failed to get location";
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location access denied by user";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information unavailable";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out";
+            break;
+        }
+        setLocationError(errorMessage);
+        setLocationLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000, // 5 minutes
+      }
+    );
+  };
+
+  // Automatically get location when site is selected
+  useEffect(() => {
+    if (attendanceRecord.site_id && !attendanceStatus.checkIn) {
+      getCurrentLocation();
+    }
+  }, [attendanceRecord.site_id, attendanceStatus.checkIn]);
+
+  // Calculate distance to selected site
+  const getDistanceToSite = (): number | null => {
+    if (!userLocation || !attendanceRecord.site_id) return null;
+    
+    const selectedSite = sites.find(site => site.id === attendanceRecord.site_id);
+    if (!selectedSite) return null;
+
+    return calculateDistanceFromCoords(
+      userLocation.lat,
+      userLocation.lng,
+      selectedSite.latitude,
+      selectedSite.longitude
+    );
+  };
 
   async function fetchAttendanceDataToday() {
     const user = await getEmployeeInfo();
@@ -131,6 +201,84 @@ export default function AttendanceSection({
                       ))}
                     </select>
                   </div>
+
+                  {/* Location Status */}
+                  {attendanceRecord.site_id && (
+                    <div className="space-y-3">
+                      {locationLoading && (
+                        <div className="flex items-center gap-2 text-blue-600 text-sm">
+                          <Navigation className="w-4 h-4 animate-spin" />
+                          Getting your location...
+                        </div>
+                      )}
+
+                      {locationError && (
+                        <div className="flex items-center gap-2 text-red-600 text-sm">
+                          <AlertCircle className="w-4 h-4" />
+                          {locationError}
+                        </div>
+                      )}
+
+                      {userLocation && !locationLoading && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <MapPin className="w-4 h-4 text-blue-600" />
+                              <span className="text-sm font-medium text-blue-800">
+                                Distance to Site:
+                              </span>
+                            </div>
+                            <span className="text-sm font-bold text-blue-900">
+                              {formatDistance(getDistanceToSite() || 0)}
+                            </span>
+                          </div>
+                          
+                          {getDistanceToSite() && getDistanceToSite()! > 100 && (
+                            <div className="flex items-center gap-2 mt-2 text-amber-700 text-xs">
+                              <AlertTriangle className="w-3 h-3" />
+                              You are more than 100m away from the site
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Time Status */}
+                      {(() => {
+                        const selectedSite = sites.find(site => site.id === attendanceRecord.site_id);
+                        const currentTime = getCurrentTime24HourFormat();
+                        const isLate = selectedSite && !isOnTime({
+                          checkInTime: selectedSite.check_in,
+                          currentTime: currentTime
+                        });
+
+                        if (selectedSite) {
+                          return (
+                            <div className={`border rounded-lg p-3 ${isLate ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <Clock className={`w-4 h-4 ${isLate ? 'text-red-600' : 'text-green-600'}`} />
+                                  <span className={`text-sm font-medium ${isLate ? 'text-red-800' : 'text-green-800'}`}>
+                                    Current Time: {currentTime}
+                                  </span>
+                                </div>
+                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                  isLate 
+                                    ? 'bg-red-100 text-red-800' 
+                                    : 'bg-green-100 text-green-800'
+                                }`}>
+                                  {isLate ? 'Late' : 'On Time'}
+                                </span>
+                              </div>
+                              <div className={`text-xs mt-1 ${isLate ? 'text-red-700' : 'text-green-700'}`}>
+                                Expected check-in: {selectedSite.check_in}
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -208,13 +356,58 @@ export default function AttendanceSection({
                       )}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
-                      {entry.check_in_time &&
-                        formatTimeFromISO(entry.check_in_time)}
+                      {entry.check_in_time && (
+                        <div className="space-y-1">
+                          <div>{formatTimeFromISO(entry.check_in_time)}</div>
+                          {sites.length > 0 && (() => {
+                            const site = sites.find(s => s.id === entry.site_id);
+                            if (site) {
+                              const lateStatus = checkLateStatus(
+                                formatTimeFromISO(entry.check_in_time),
+                                site.check_in
+                              );
+                              return (
+                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                  lateStatus === 'late' 
+                                    ? 'bg-red-100 text-red-800' 
+                                    : 'bg-green-100 text-green-800'
+                                }`}>
+                                  {lateStatus === 'late' ? 'Late' : 'On Time'}
+                                </span>
+                              );
+                            }
+                            return null;
+                          })()}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
-                      {entry.check_out_time
-                        ? formatTimeFromISO(entry.check_out_time)
-                        : "N/A"}
+                      {entry.check_out_time ? (
+                        <div className="space-y-1">
+                          <div>{formatTimeFromISO(entry.check_out_time)}</div>
+                          {sites.length > 0 && (() => {
+                            const site = sites.find(s => s.id === entry.site_id);
+                            if (site) {
+                              const earlyStatus = checkEarlyCheckOut(
+                                formatTimeFromISO(entry.check_out_time),
+                                site.check_out
+                              );
+                              return (
+                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                  earlyStatus === 'early' 
+                                    ? 'bg-yellow-100 text-yellow-800' 
+                                    : 'bg-green-100 text-green-800'
+                                }`}>
+                                  {earlyStatus === 'early' ? 'Early' : 'On Time'}
+                                </span>
+                              );
+                            }
+                            return null;
+                          })()}
+                        </div>
+                      ) : (
+                        "N/A"
+                      )}
                     </td>
                     <td className="px-4 py-3 text-sm">
                       {entry.tag === "Present" ? (
