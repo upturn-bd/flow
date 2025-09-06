@@ -6,13 +6,30 @@ import { Bell, User, Search, LogOut, Settings, UserCircle, ShieldAlert } from "l
 import { supabase } from "@/lib/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
+import { useNotifications } from "@/hooks/useNotifications";
+import NotificationDropdown from "@/components/notifications/NotificationDropdown";
 
 export default function TopBar() {
   const { employeeInfo, isApproved } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const notificationButtonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const pathname = usePathname();
+  
+  // Notification hook
+  const { fetchUnreadCount, unreadCount } = useNotifications();
+
+  // Fetch unread count on component mount and when approved
+  useEffect(() => {
+    if (isApproved) {
+      fetchUnreadCount();
+      // Set up interval to refresh unread count every 30 seconds
+      const interval = setInterval(fetchUnreadCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isApproved, fetchUnreadCount]);
 
   // Close the user menu when clicking outside
   useEffect(() => {
@@ -69,15 +86,26 @@ export default function TopBar() {
                 </button>
               </div>
               
-              <Link 
-                href="/notifications"
-                className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors relative"
-              >
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                  3
-                </span>
-              </Link>
+              <div className="relative">
+                <button 
+                  ref={notificationButtonRef}
+                  onClick={() => setNotificationDropdownOpen(!notificationDropdownOpen)}
+                  className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors relative"
+                >
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+                
+                <NotificationDropdown
+                  isOpen={notificationDropdownOpen}
+                  onClose={() => setNotificationDropdownOpen(false)}
+                  triggerRef={notificationButtonRef}
+                />
+              </div>
             </>
           )}
 
