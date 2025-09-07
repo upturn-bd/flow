@@ -236,6 +236,56 @@ export interface Notice {
   department_id?: number;
 }
 
+// Notification System Interfaces (separate from Notice system)
+export interface NotificationType {
+  id?: number;
+  name: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  company_id?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Notification {
+  id?: number;
+  title: string;
+  message: string;
+  type_id?: number;
+  priority: 'low' | 'normal' | 'high' | 'urgent';
+  recipient_id: string;
+  sender_id?: string;
+  is_read: boolean;
+  read_at?: string;
+  action_url?: string;
+  metadata?: Record<string, any>;
+  context?: string;
+  reference_id?: number;
+  reference_table?: string;
+  company_id: number;
+  department_id?: number;
+  expires_at?: string;
+  scheduled_for?: string;
+  created_at?: string;
+  updated_at?: string;
+  // Joined data from notification_types
+  type?: NotificationType;
+}
+
+export interface NotificationPreferences {
+  id?: number;
+  employee_id: string;
+  company_id: number;
+  email_enabled: boolean;
+  push_enabled: boolean;
+  notification_types: Record<string, any>;
+  quiet_hours_start?: string;
+  quiet_hours_end?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface Attendance {
   id?: number;
   attendance_date: string;

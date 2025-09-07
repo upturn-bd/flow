@@ -187,6 +187,7 @@ export const AUTH_ROUTES = [
 export const EXCLUDE_PATHS = [
   ...AUTH_ROUTES,
   '/unauthorized',
+  '/test-notifications',
   ROUTES.API.BASE,
 ];
 

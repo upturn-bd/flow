@@ -3,12 +3,12 @@ import React, { useEffect, useState } from "react";
 import { useEmployees } from "@/hooks/useEmployees";
 import { toast } from "sonner";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
-import { useLeaveRequests } from "@/hooks/useLeaveManagement";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, FileText, MessageSquare, Check, X, CalendarDays } from "lucide-react";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import { useLeaveRequests } from "@/hooks/useLeaveManagement";
 
 // Add this interface
 interface LeaveRequest {
