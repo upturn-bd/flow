@@ -17,12 +17,14 @@ import {
 } from "lucide-react";
 import { useNotifications, Notification } from "@/hooks/useNotifications";
 import { formatRelativeTime } from "@/lib/utils";
+import { Z_INDEX } from "@/lib/theme";
+import Portal from "@/components/ui/Portal";
 import Link from "next/link";
 
 interface NotificationDropdownProps {
   isOpen: boolean;
   onClose: () => void;
-  triggerRef: React.RefObject<HTMLElement>;
+  triggerRef: React.RefObject<HTMLButtonElement>;
 }
 
 const iconMap = {
@@ -58,6 +60,7 @@ export default function NotificationDropdown({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
+  const [position, setPosition] = useState({ top: 0, right: 0 });
   
   const { 
     fetchUserNotifications, 
@@ -66,6 +69,20 @@ export default function NotificationDropdown({
     deleteNotification,
     fetchUnreadCount 
   } = useNotifications();
+
+  // Calculate position relative to trigger
+  useEffect(() => {
+    if (isOpen && triggerRef.current) {
+      const triggerRect = triggerRef.current.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+      
+      setPosition({
+        top: triggerRect.bottom + scrollTop + 8, // 8px gap
+        right: window.innerWidth - triggerRect.right - scrollLeft,
+      });
+    }
+  }, [isOpen, triggerRef]);
 
   // Load notifications when dropdown opens
   useEffect(() => {
@@ -137,15 +154,21 @@ export default function NotificationDropdown({
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        ref={dropdownRef}
-        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-        transition={{ duration: 0.2 }}
-        className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden"
-      >
+    <Portal>
+      <AnimatePresence>
+        <motion.div
+          ref={dropdownRef}
+          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+          transition={{ duration: 0.2 }}
+          className="fixed w-96 bg-white rounded-lg shadow-lg border border-gray-200 max-h-96 overflow-hidden"
+          style={{
+            top: position.top,
+            right: position.right,
+            zIndex: Z_INDEX.DROPDOWN,
+          }}
+        >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
           <div className="flex items-center gap-2">
@@ -215,6 +238,7 @@ export default function NotificationDropdown({
         )}
       </motion.div>
     </AnimatePresence>
+    </Portal>
   );
 }
 
