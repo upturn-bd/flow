@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Bell, 
@@ -66,8 +66,7 @@ export default function NotificationDropdown({
     fetchUserNotifications, 
     markAsRead, 
     markAllAsRead, 
-    deleteNotification,
-    fetchUnreadCount 
+    deleteNotification
   } = useNotifications();
 
   // Calculate position relative to trigger
@@ -89,7 +88,7 @@ export default function NotificationDropdown({
     if (isOpen) {
       loadNotifications();
     }
-  }, [isOpen]);
+  }, [isOpen, loadNotifications]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -110,7 +109,7 @@ export default function NotificationDropdown({
     }
   }, [isOpen, onClose, triggerRef]);
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     setLoading(true);
     try {
       const data = await fetchUserNotifications(20);
@@ -120,7 +119,7 @@ export default function NotificationDropdown({
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchUserNotifications]);
 
   const handleMarkAsRead = async (notificationId: number) => {
     await markAsRead(notificationId);

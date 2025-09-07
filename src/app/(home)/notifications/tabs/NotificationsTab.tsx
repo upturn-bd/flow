@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { 
   Bell, 
@@ -56,9 +56,9 @@ export default function NotificationsTab() {
   // Load notifications on component mount
   useEffect(() => {
     loadNotifications();
-  }, []);
+  }, [loadNotifications]);
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     setLoading(true);
     try {
       const data = await fetchUserNotifications(50); // Load more for the full page
@@ -68,7 +68,7 @@ export default function NotificationsTab() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchUserNotifications]);
 
   const handleMarkAsRead = async (notificationId: number) => {
     await markAsRead(notificationId);
@@ -132,7 +132,7 @@ export default function NotificationsTab() {
         <div className="text-center py-12 text-gray-500">
           <Bell className="h-12 w-12 mx-auto mb-4 text-gray-300" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications</h3>
-          <p>You're all caught up! New notifications will appear here.</p>
+          <p>You&apos;re all caught up! New notifications will appear here.</p>
         </div>
       ) : (
         <div className="space-y-2">
