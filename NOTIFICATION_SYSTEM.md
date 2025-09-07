@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Flow HRIS notification system provides a comprehensive, real-time notification service that operates independently from the existing notices section. The system follows the project's established patterns and conventions.
+Flow notification system provides a comprehensive, real-time notification service that operates independently from the existing notices section. The system follows the project's established patterns and conventions.
 
 ## Features
 
