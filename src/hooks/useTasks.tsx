@@ -397,7 +397,7 @@ export function useTasks() {
         .update({
           milestone_id: milestoneId,
           updated_by: user.id,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toLocaleDateString('sv-SE')()
         })
         .in("id", taskIds)
         .eq("company_id", company_id)

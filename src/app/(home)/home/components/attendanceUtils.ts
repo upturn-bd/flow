@@ -95,7 +95,7 @@ export async function handleCheckIn(
     const { error } = await supabase.from("attendance_records").insert({
       ...attendanceRecord,
       attendance_date: date, // Just the date part (YYYY-MM-DD)
-      check_in_time: new Date().toISOString(), // Full ISO timestamp
+      check_in_time: new Date().toLocaleDateString('sv-SE'), // Full ISO timestamp
       employee_id: user.id,
       company_id: user.company_id,
       supervisor_id: user.supervisor_id,
@@ -124,7 +124,7 @@ export async function handleCheckOut(
   if (!coordinates) return; // Exit if permission denied
 
   // Get current timestamp in ISO format
-  const now = new Date().toISOString();
+  const now = new Date().toLocaleDateString('sv-SE');
 
   try {
     const { data, error } = await supabase

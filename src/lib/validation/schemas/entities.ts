@@ -352,7 +352,8 @@ export function validateLeaveType(data: LeaveTypeData): ValidationResult<LeaveTy
 export interface HolidayConfigData {
   id?: number;
   name: string;
-  date: string;
+  start_day: string;
+  end_day: string;
   company_id?: number;
 }
 
@@ -364,7 +365,7 @@ export function validateHolidayConfig(data: HolidayConfigData): ValidationResult
   if (nameError) errors.push(nameError);
   
   // Validate date (basic string validation, could be enhanced for date format)
-  const dateError = validateString(data.date, 'date', { required: true });
+  const dateError = validateString(data.start_day, 'date', { required: true });
   if (dateError) errors.push(dateError);
   
   return {

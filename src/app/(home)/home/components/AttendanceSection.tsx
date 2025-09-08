@@ -134,9 +134,10 @@ export default function AttendanceSection({
         .select("id, check_in_time, check_out_time, site_id, attendance_date, tag, employee_id")
         .eq("employee_id", user.id)
         .eq("company_id", user.company_id)
-        .eq("attendance_date", new Date().toISOString().split('T')[0])
+        .eq("attendance_date", new Date().toLocaleDateString('sv-SE'))
         .order("attendance_date", { ascending: false });
 
+      console.log(new Date().toLocaleDateString('sv-SE').split('T')[0])
       if (error) throw error;
 
       setAttendanceData(data ?? []);

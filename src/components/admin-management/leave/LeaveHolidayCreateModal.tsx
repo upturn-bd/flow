@@ -19,7 +19,8 @@ export const LeaveHolidayCreateModal: React.FC<LeaveHolidayCreateModalProps> = (
 }) => {
   const defaultData: HolidayConfigData = {
     name: '',
-    date: '',
+    start_day: '',
+    end_day: '',
   };
 
   if (!isOpen) return null;
@@ -50,14 +51,25 @@ export const LeaveHolidayCreateModal: React.FC<LeaveHolidayCreateModalProps> = (
           />
 
           <DateField
-            name="date"
-            label="Holiday Date"
-            value={values.date}
+            name="start_day"
+            label="Holiday Start Date"
+            value={values.start_day}
             onChange={handleChange}
-            error={errors.date}
+            error={errors.start_day}
             required
-            placeholder="Select holiday date"
+            placeholder="Select holiday start date"
           />
+
+          <DateField
+            name="end_day"
+            label="Holiday End Date"
+            value={values.end_day}
+            onChange={handleChange}
+            error={errors.end_day}
+            required
+            placeholder="Select holiday end date"
+          />
+          
         </>
       )}
     </FormModal>

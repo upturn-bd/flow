@@ -110,7 +110,7 @@ export default function NotificationDropdown({
     setNotifications(prev => 
       prev.map(n => 
         n.id === notificationId 
-          ? { ...n, is_read: true, read_at: new Date().toISOString() }
+          ? { ...n, is_read: true, read_at: new Date().toLocaleDateString('sv-SE') }
           : n
       )
     );
@@ -122,7 +122,7 @@ export default function NotificationDropdown({
       prev.map(n => ({ 
         ...n, 
         is_read: true, 
-        read_at: new Date().toISOString() 
+        read_at: new Date().toLocaleDateString('sv-SE')
       }))
     );
   };

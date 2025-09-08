@@ -73,9 +73,17 @@ export interface LeaveType {
 }
 
 export interface HolidayConfig {
+  start_day: string;
+  end_day: string;
   id?: number;
   name: string;
   date: string;
+  company_id?: number;
+}
+
+export interface WeeklyHolidayConfig {
+  id?: number;
+  day: number;
   company_id?: number;
 }
 

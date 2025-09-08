@@ -170,7 +170,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
       const draftData = {
         settlementState,
         attachments: attachments.map(file => ({ name: file.name, size: file.size })),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toLocaleDateString('sv-SE')
       };
       
       localStorage.setItem('settlement_draft', JSON.stringify(draftData));

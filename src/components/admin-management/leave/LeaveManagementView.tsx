@@ -10,7 +10,7 @@ import {
 } from "./";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { TrashSimple, Tag, CalendarCheck, CalendarBlank, Plus, Clock, Eye } from "@phosphor-icons/react";
-import { useHolidayConfigs } from "@/hooks/useLeaveManagement";
+import { useHolidayConfigs, useWeeklyHolidayConfigs } from "@/hooks/useLeaveManagement";
 import { HolidayConfig, LeaveType } from "@/hooks/useLeaveManagement";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,6 +32,58 @@ export default function LeaveManagementView() {
     useState<LeaveType | null>(null);
   const [typeLoading, setTypeLoading] = useState(false);
   const [deleteTypeLoading, setDeleteTypeLoading] = useState<number | null>(null);
+
+  const {
+    weeklyHolidayConfigs,
+    fetchWeeklyHolidayConfigs,
+    createWeeklyHolidayConfig,
+    deleteWeeklyHolidayConfig,
+    updateWeeklyHolidayConfig,
+    loading: weeklyHolidaysLoading
+  } = useWeeklyHolidayConfigs();
+
+  // At the top inside LeaveManagementView component
+  const [weeklyHolidays, setWeeklyHolidays] = useState<number[]>([]); // store day_of_week as 0-6
+
+  // Fetch existing weekly holidays from Supabase
+  useEffect(() => {
+    fetchWeeklyHolidayConfigs();
+  }, [fetchWeeklyHolidayConfigs]);
+
+  useEffect(() => {
+    const loadWeeklyHolidays = async () => {
+      const holidays = weeklyHolidayConfigs;
+      // assuming holidays have a `day_of_week` column (0-6)
+      const days = holidays.map((h: any) => h.day);
+      setWeeklyHolidays(days);
+    };
+    loadWeeklyHolidays();
+  }, [weeklyHolidayConfigs]);
+
+  const toggleWeekday = async (dayIndex: number) => {
+    let newHolidays: number[] = [];
+
+    if (weeklyHolidays.includes(dayIndex)) {
+      // remove holiday
+      newHolidays = weeklyHolidays.filter(d => d !== dayIndex);
+      // delete from Supabase
+      const holidayToDelete = weeklyHolidayConfigs.find((h: any) => h.day === dayIndex);
+      if (holidayToDelete?.id !== undefined) {
+        await deleteWeeklyHolidayConfig(holidayToDelete.id);
+      }
+    } else {
+      // add holiday
+      newHolidays = [...weeklyHolidays, dayIndex];
+      // create in Supabase
+      await createWeeklyHolidayConfig({ day: dayIndex });
+    }
+
+    setWeeklyHolidays(newHolidays);
+  };
+
+  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+
 
   const handleCreateLeaveType = async (values: any) => {
     try {
@@ -94,6 +146,11 @@ export default function LeaveManagementView() {
     updateHolidayConfig,
     loading: holidaysLoading
   } = useHolidayConfigs();
+
+
+
+  console.log(holidayConfigs)
+
   const [editHolidayConfig, setEditHolidayConfig] = useState<number | null>(
     null
   );
@@ -171,18 +228,51 @@ export default function LeaveManagementView() {
   };
 
   return (
-    <Collapsible title="Leave Calendar">
-      <motion.div 
+    <Collapsible title="Holiday & Leave Calendar">
+      <motion.div
         initial="hidden"
         animate="visible"
         variants={staggerContainer}
         className="px-4 space-y-6 py-4"
       >
+        {/* Weekly Holidays Section */}
+        <section className="mt-8">
+          <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-4">
+            <CalendarBlank size={22} weight="duotone" className="text-gray-600" />
+            <h3 className="text-lg font-semibold text-gray-800">Weekly Holidays</h3>
+          </motion.div>
+
+          <motion.div variants={fadeInUp} className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+            {weekdays.map((day, idx) => {
+              const isSelected = weeklyHolidays.includes(idx);
+              return (
+                <div
+                  key={day}
+                  className={`cursor-pointer select-none rounded-lg py-2 text-center font-medium border ${isSelected
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
+                    }`}
+                  onClick={() => toggleWeekday(idx)}
+                >
+                  {day.slice(0, 3)}
+                </div>
+              );
+            })}
+          </motion.div>
+
+
+          {weeklyHolidays.length > 0 && (
+            <p className="mt-2 text-sm text-gray-500">
+              Selected: {weeklyHolidays.map(d => weekdays[d]).join(", ")}
+            </p>
+          )}
+        </section>
+
         {/* Holidays Section */}
         <section>
           <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-4">
             <CalendarCheck size={22} weight="duotone" className="text-gray-600" />
-            <h3 className="text-lg font-semibold text-gray-800">Holidays</h3>
+            <h3 className="text-lg font-semibold text-gray-800">Other Holidays</h3>
           </motion.div>
 
           {holidaysLoading ? (
@@ -222,14 +312,14 @@ export default function LeaveManagementView() {
                             <TrashSimple size={16} weight="bold" />
                           </Button>
                         </div>
-                        
+
                         <div className="mt-2">
                           <span className="flex items-center gap-1.5 text-sm text-gray-600">
                             <CalendarBlank size={16} weight="duotone" className="text-gray-500" />
-                            {formatDate(holiday.date)}
+                            {holiday.start_day == holiday.end_day ? formatDate(holiday.start_day) : `${formatDate(holiday.start_day)} - ${formatDate(holiday.end_day)}`}
                           </span>
                         </div>
-                        
+
                         <div className="flex justify-end mt-3">
                           <Button
                             variant="outline"
@@ -245,7 +335,7 @@ export default function LeaveManagementView() {
                     ))}
                   </motion.div>
                 ) : (
-                  <motion.div 
+                  <motion.div
                     variants={fadeIn}
                     className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200"
                   >
@@ -267,7 +357,7 @@ export default function LeaveManagementView() {
 
           <motion.div variants={fadeIn} className="flex justify-end mt-4">
             <Button
-              variant="primary" 
+              variant="primary"
               onClick={() => setIsCreatingHolidayConfig(true)}
               className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"
             >
@@ -321,14 +411,14 @@ export default function LeaveManagementView() {
                             <TrashSimple size={16} weight="bold" />
                           </Button>
                         </div>
-                        
+
                         <div className="mt-2">
                           <span className="flex items-center gap-1.5 text-sm bg-gray-100 px-2 py-1 rounded text-gray-700 w-fit">
                             <Clock size={16} weight="duotone" className="text-gray-500" />
                             Annual quota: {type.annual_quota} days
                           </span>
                         </div>
-                        
+
                         <div className="flex justify-end mt-3">
                           <Button
                             variant="outline"
@@ -344,7 +434,7 @@ export default function LeaveManagementView() {
                     ))}
                   </motion.div>
                 ) : (
-                  <motion.div 
+                  <motion.div
                     variants={fadeIn}
                     className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200"
                   >
@@ -366,7 +456,7 @@ export default function LeaveManagementView() {
 
           <motion.div variants={fadeIn} className="flex justify-end mt-4">
             <Button
-              variant="primary" 
+              variant="primary"
               onClick={() => setIsCreatingLeaveType(true)}
               className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"
             >
