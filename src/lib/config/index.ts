@@ -257,7 +257,7 @@ export const APP_INFO = {
   
   // Build information
   BUILD: {
-    DATE: process.env.BUILD_DATE || new Date().toISOString(),
+    DATE: process.env.BUILD_DATE || new Date().toLocaleDateString('sv-SE'),
     COMMIT: process.env.BUILD_COMMIT || 'unknown',
     BRANCH: process.env.BUILD_BRANCH || 'main',
   },

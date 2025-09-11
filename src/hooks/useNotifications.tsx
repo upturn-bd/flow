@@ -111,7 +111,7 @@ export function useNotifications() {
         .from('notifications')
         .update({ 
           is_read: true, 
-          read_at: new Date().toISOString() 
+          read_at: new Date().toLocaleDateString('sv-SE')
         })
         .eq('id', notificationId);
 
@@ -142,7 +142,7 @@ export function useNotifications() {
         .from('notifications')
         .update({ 
           is_read: true, 
-          read_at: new Date().toISOString() 
+          read_at: new Date().toLocaleDateString('sv-SE')
         })
         .eq('company_id', company_id)
         .eq('recipient_id', user_id)

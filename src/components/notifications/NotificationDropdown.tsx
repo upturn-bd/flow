@@ -123,10 +123,10 @@ export default function NotificationDropdown({
 
   const handleMarkAsRead = async (notificationId: number) => {
     await markAsRead(notificationId);
-    setNotifications(prev =>
-      prev.map(n =>
-        n.id === notificationId
-          ? { ...n, is_read: true, read_at: new Date().toISOString() }
+    setNotifications(prev => 
+      prev.map(n => 
+        n.id === notificationId 
+          ? { ...n, is_read: true, read_at: new Date().toLocaleDateString('sv-SE') }
           : n
       )
     );
@@ -134,11 +134,12 @@ export default function NotificationDropdown({
 
   const handleMarkAllAsRead = async () => {
     await markAllAsRead();
-    setNotifications(prev =>
-      prev.map(n => ({
-        ...n,
-        is_read: true,
-        read_at: new Date().toISOString()
+    setNotifications(prev => 
+      prev.map(n => ({ 
+        ...n, 
+        is_read: true, 
+        read_at: new Date().toLocaleDateString('sv-SE')
+
       }))
     );
   };

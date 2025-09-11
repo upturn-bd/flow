@@ -52,7 +52,7 @@ export function useAttendances() {
   const getTodaysAttendance = useCallback(async (employeeId?: string): Promise<Attendance | null> => {
     setTodayLoading(true);
     // Get today's date in YYYY-MM-DD format
-    const today = new Date().toISOString().split('T')[0]; // Get YYYY-MM-DD format
+    const today = new Date().toLocaleDateString('sv-SE'); // Get YYYY-MM-DD format
     
     const attendance = await getAttendanceForDate(today, employeeId);
     setTodayLoading(false);

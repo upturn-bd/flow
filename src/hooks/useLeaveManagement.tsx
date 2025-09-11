@@ -1,7 +1,7 @@
 "use client";
 
 import { useBaseEntity } from "./core";
-import { LeaveType, HolidayConfig } from "@/lib/types";
+import { LeaveType, HolidayConfig, WeeklyHolidayConfig } from "@/lib/types";
 
 // Export types for components
 export type { LeaveType, HolidayConfig };
@@ -25,7 +25,7 @@ export function useLeaveTypes() {
 
 export function useHolidayConfigs() {
   const baseResult = useBaseEntity<HolidayConfig>({
-    tableName: "weekly_holiday_configs",
+    tableName: "other_holiday_configs",
     entityName: "holiday config",
     companyScoped: true,
   });
@@ -53,5 +53,22 @@ export function useLeaveRequests() {
     fetchLeaveRequests: baseResult.fetchItems,
     updateLeaveRequest: baseResult.updateItem,
     processingId: baseResult.updating,
+  };
+}
+
+export function useWeeklyHolidayConfigs() {
+  const baseResult = useBaseEntity<WeeklyHolidayConfig>({
+    tableName: "weekly_holiday_configs",
+    entityName: "weekly holiday config",
+    companyScoped: true,
+  });
+
+  return {
+    ...baseResult,
+    weeklyHolidayConfigs: baseResult.items,
+    fetchWeeklyHolidayConfigs: baseResult.fetchItems,
+    createWeeklyHolidayConfig: baseResult.createItem,
+    updateWeeklyHolidayConfig: baseResult.updateItem,
+    deleteWeeklyHolidayConfig: baseResult.deleteItem,
   };
 }

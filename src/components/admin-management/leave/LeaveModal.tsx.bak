@@ -427,7 +427,7 @@ export function LeaveHolidayCreateModal({
 }: LeaveHolidayCreateModalProps) {
   const [formValues, setFormValues] = useState<HolidayFormValues>({
     name: "",
-    date: new Date().toISOString().split("T")[0],
+    date: new Date().toLocaleDateString('sv-SE'),
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -616,7 +616,7 @@ export function LeaveHolidayUpdateModal({
 }: LeaveHolidayUpdateModalProps) {
   const [formValues, setFormValues] = useState<HolidayFormValues>({
     name: "",
-    date: new Date().toISOString().split("T")[0],
+    date: new Date().toLocaleDateString('sv-SE')().split("T")[0],
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});

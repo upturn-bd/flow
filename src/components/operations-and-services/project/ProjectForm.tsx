@@ -64,7 +64,7 @@ export default function ProjectForm({
     } else if (name === "start_date" || name === "end_date") {
       setProjectDetails((prev: ProjectDetails) => ({
         ...prev,
-        [name]: new Date(value).toISOString().split("T")[0],
+        [name]: new Date(value).toLocaleDateString('sv-SE'),
       }));
     } else {
       setProjectDetails((prev: ProjectDetails) => ({ ...prev, [name]: value }));

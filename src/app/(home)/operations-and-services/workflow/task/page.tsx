@@ -68,8 +68,8 @@ export default function TasksPage() {
     const task: Task = {
       task_title: taskData.task_title,
       task_description: taskData.task_description || '',
-      start_date: taskData.start_date || new Date().toISOString().split('T')[0],
-      end_date: taskData.end_date || new Date().toISOString().split('T')[0],
+      start_date: taskData.start_date || new Date().toLocaleDateString('sv-SE'),
+      end_date: taskData.end_date || new Date().toLocaleDateString('sv-SE'),
       priority: taskData.priority,
       project_id: taskData.project_id,
       milestone_id: taskData.milestone_id,
