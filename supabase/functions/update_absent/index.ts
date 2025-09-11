@@ -10,7 +10,7 @@ serve(async (req: any) => {
 
   let count = 1;
 
-  const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
+  const today = new Date().toLocaleDateString('sv-SE'); // yyyy-mm-dd
 
 
   // 1. Get companies with liveAbsent = true
@@ -52,9 +52,32 @@ serve(async (req: any) => {
 
       let absent = true;
       const today_day = new Date().getDay();
-      if (today_day === 5 || today_day === 6) {
+
+      const { data: weeklyHolidays, error: whErr } = await supabase
+        .from("weekly_holiday_configs")
+        .select("day")
+        .eq("company_id", company.id);
+
+      if (whErr) {
+        console.error(`Error fetching weekly holidays for company ${company.id}:`, whErr);
+      }
+
+      if (weeklyHolidays && weeklyHolidays.some((h: any) => h.day === today_day)) {
         count++;
-        // If today is Saturday or Friday, skip marking absent
+        absent = false;
+      }
+
+      const { data: otherHolidays, error: ohErr } = await supabase
+        .from("other_holiday_configs")
+        .select("id")
+        .eq("company_id", company.id)
+        .lte("start_day", today)
+        .gte("end_day", today);
+      if (ohErr) {
+        console.error(`Error fetching other holidays for company ${company.id}:`, ohErr);
+      }
+
+      if (otherHolidays && otherHolidays.length > 0) {
         absent = false;
       }
 
@@ -99,6 +122,8 @@ serve(async (req: any) => {
           console.log("Record inserted:", insertData);
         }
       }
+
+
 
 
       // If no record OR record exists but no check_in_time → mark absent

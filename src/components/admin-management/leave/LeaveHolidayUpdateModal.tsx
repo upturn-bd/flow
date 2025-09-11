@@ -47,13 +47,23 @@ export const LeaveHolidayUpdateModal: React.FC<LeaveHolidayUpdateModalProps> = (
           />
 
           <DateField
-            name="date"
-            label="Holiday Date"
-            value={values.date}
+            name="start_day"
+            label="Holiday Start Date"
+            value={values.start_day}
             onChange={handleChange}
-            error={errors.date}
+            error={errors.start_day}
             required
-            placeholder="Select holiday date"
+            placeholder="Select holiday start date"
+          />
+
+          <DateField
+            name="end_day"
+            label="Holiday End Date"
+            value={values.end_day}
+            onChange={handleChange}
+            error={errors.end_day}
+            required
+            placeholder="Select holiday end date"
           />
         </>
       )}
