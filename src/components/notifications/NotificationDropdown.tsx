@@ -2,12 +2,12 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Bell, 
-  X, 
-  Check, 
-  Clock, 
-  AlertCircle, 
+import {
+  Bell,
+  X,
+  Check,
+  Clock,
+  AlertCircle,
   Calendar,
   Briefcase,
   User,
@@ -52,20 +52,20 @@ const priorityColors = {
   'low': 'border-l-gray-500 bg-gray-50',
 };
 
-export default function NotificationDropdown({ 
-  isOpen, 
-  onClose, 
-  triggerRef 
+export default function NotificationDropdown({
+  isOpen,
+  onClose,
+  triggerRef
 }: NotificationDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [position, setPosition] = useState({ top: 0, right: 0 });
-  
-  const { 
-    fetchUserNotifications, 
-    markAsRead, 
-    markAllAsRead, 
+
+  const {
+    fetchUserNotifications,
+    markAsRead,
+    markAllAsRead,
     deleteNotification
   } = useNotifications();
 
@@ -75,14 +75,24 @@ export default function NotificationDropdown({
       const triggerRect = triggerRef.current.getBoundingClientRect();
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-      
+
       setPosition({
         top: triggerRect.bottom + scrollTop + 8, // 8px gap
         right: window.innerWidth - triggerRect.right - scrollLeft,
       });
     }
   }, [isOpen, triggerRef]);
-
+  const loadNotifications = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchUserNotifications(20);
+      setNotifications(data || []);
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchUserNotifications]);
   // Load notifications when dropdown opens
   useEffect(() => {
     if (isOpen) {
@@ -94,7 +104,7 @@ export default function NotificationDropdown({
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
-        dropdownRef.current && 
+        dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node) &&
         triggerRef.current &&
         !triggerRef.current.contains(event.target as Node)
@@ -109,23 +119,13 @@ export default function NotificationDropdown({
     }
   }, [isOpen, onClose, triggerRef]);
 
-  const loadNotifications = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await fetchUserNotifications(20);
-      setNotifications(data || []);
-    } catch (error) {
-      console.error('Error loading notifications:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchUserNotifications]);
+
 
   const handleMarkAsRead = async (notificationId: number) => {
     await markAsRead(notificationId);
-    setNotifications(prev => 
-      prev.map(n => 
-        n.id === notificationId 
+    setNotifications(prev =>
+      prev.map(n =>
+        n.id === notificationId
           ? { ...n, is_read: true, read_at: new Date().toISOString() }
           : n
       )
@@ -134,11 +134,11 @@ export default function NotificationDropdown({
 
   const handleMarkAllAsRead = async () => {
     await markAllAsRead();
-    setNotifications(prev => 
-      prev.map(n => ({ 
-        ...n, 
-        is_read: true, 
-        read_at: new Date().toISOString() 
+    setNotifications(prev =>
+      prev.map(n => ({
+        ...n,
+        is_read: true,
+        read_at: new Date().toISOString()
       }))
     );
   };
@@ -168,75 +168,75 @@ export default function NotificationDropdown({
             zIndex: Z_INDEX.DROPDOWN,
           }}
         >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-gray-600" />
-            <h3 className="font-semibold text-gray-900">Notifications</h3>
-            {unreadNotifications.length > 0 && (
-              <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
-                {unreadNotifications.length}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-1">
-            {unreadNotifications.length > 0 && (
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <Bell className="h-5 w-5 text-gray-600" />
+              <h3 className="font-semibold text-gray-900">Notifications</h3>
+              {unreadNotifications.length > 0 && (
+                <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
+                  {unreadNotifications.length}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              {unreadNotifications.length > 0 && (
+                <button
+                  onClick={handleMarkAllAsRead}
+                  className="text-blue-600 hover:bg-blue-50 p-1 rounded"
+                  title="Mark all as read"
+                >
+                  <CheckCheck className="h-4 w-4" />
+                </button>
+              )}
               <button
-                onClick={handleMarkAllAsRead}
-                className="text-blue-600 hover:bg-blue-50 p-1 rounded"
-                title="Mark all as read"
+                onClick={onClose}
+                className="text-gray-400 hover:bg-gray-100 p-1 rounded"
               >
-                <CheckCheck className="h-4 w-4" />
+                <X className="h-4 w-4" />
               </button>
-            )}
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:bg-gray-100 p-1 rounded"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            </div>
           </div>
-        </div>
 
-        {/* Content */}
-        <div className="max-h-80 overflow-y-auto">
-          {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            </div>
-          ) : notifications.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <Bell className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-              <p>No notifications yet</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-100">
-              {notifications.map((notification) => (
-                <NotificationItem
-                  key={notification.id}
-                  notification={notification}
-                  onMarkAsRead={handleMarkAsRead}
-                  onDelete={handleDeleteNotification}
-                />
-              ))}
+          {/* Content */}
+          <div className="max-h-80 overflow-y-auto">
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              </div>
+            ) : notifications.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <Bell className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                <p>No notifications yet</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {notifications.map((notification) => (
+                  <NotificationItem
+                    key={notification.id}
+                    notification={notification}
+                    onMarkAsRead={handleMarkAsRead}
+                    onDelete={handleDeleteNotification}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          {notifications.length > 0 && (
+            <div className="border-t border-gray-100 px-4 py-2">
+              <Link
+                href="/notifications"
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                onClick={onClose}
+              >
+                View all notifications
+              </Link>
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        {notifications.length > 0 && (
-          <div className="border-t border-gray-100 px-4 py-2">
-            <Link
-              href="/notifications"
-              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-              onClick={onClose}
-            >
-              View all notifications
-            </Link>
-          </div>
-        )}
-      </motion.div>
-    </AnimatePresence>
+        </motion.div>
+      </AnimatePresence>
     </Portal>
   );
 }
@@ -247,10 +247,10 @@ interface NotificationItemProps {
   onDelete: (id: number) => void;
 }
 
-function NotificationItem({ 
-  notification, 
-  onMarkAsRead, 
-  onDelete 
+function NotificationItem({
+  notification,
+  onMarkAsRead,
+  onDelete
 }: NotificationItemProps) {
   const IconComponent = iconMap[notification.type?.icon as keyof typeof iconMap] || Bell;
   const iconColor = colorMap[notification.type?.color as keyof typeof colorMap] || 'text-gray-500';
@@ -266,7 +266,7 @@ function NotificationItem({
         <div className={`flex-shrink-0 ${iconColor}`}>
           <IconComponent className="h-5 w-5" />
         </div>
-        
+
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
@@ -276,7 +276,7 @@ function NotificationItem({
               <p className={`text-sm mt-1 ${!notification.is_read ? 'text-gray-700' : 'text-gray-500'}`}>
                 {notification.message}
               </p>
-              
+
               <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
                 <span className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
@@ -289,7 +289,7 @@ function NotificationItem({
                 )}
               </div>
             </div>
-            
+
             {!notification.is_read && (
               <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></div>
             )}
@@ -307,7 +307,7 @@ function NotificationItem({
                 Mark read
               </button>
             )}
-            
+
             {notification.action_url && (
               <Link
                 href={notification.action_url}
@@ -318,7 +318,7 @@ function NotificationItem({
                 View
               </Link>
             )}
-            
+
             <button
               onClick={() => onDelete(notification.id!)}
               className="text-red-600 hover:bg-red-100 p-1 rounded text-xs flex items-center gap-1"

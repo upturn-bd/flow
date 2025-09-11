@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { 
-  Bell, 
-  Clock, 
-  AlertCircle, 
+import {
+  Bell,
+  Clock,
+  AlertCircle,
   Calendar,
   Briefcase,
   User,
@@ -45,19 +45,13 @@ const priorityStyles = {
 export default function NotificationsTab() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
-  
-  const { 
-    fetchUserNotifications, 
-    markAsRead, 
+
+  const {
+    fetchUserNotifications,
+    markAsRead,
     deleteNotification,
-    markAllAsRead 
+    markAllAsRead
   } = useNotifications();
-
-  // Load notifications on component mount
-  useEffect(() => {
-    loadNotifications();
-  }, [loadNotifications]);
-
   const loadNotifications = useCallback(async () => {
     setLoading(true);
     try {
@@ -69,12 +63,18 @@ export default function NotificationsTab() {
       setLoading(false);
     }
   }, [fetchUserNotifications]);
+  // Load notifications on component mount
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
+
+
 
   const handleMarkAsRead = async (notificationId: number) => {
     await markAsRead(notificationId);
-    setNotifications(prev => 
-      prev.map(n => 
-        n.id === notificationId 
+    setNotifications(prev =>
+      prev.map(n =>
+        n.id === notificationId
           ? { ...n, is_read: true, read_at: new Date().toISOString() }
           : n
       )
@@ -83,7 +83,7 @@ export default function NotificationsTab() {
 
   const handleMarkAllAsRead = async () => {
     await markAllAsRead();
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(n => ({ ...n, is_read: true, read_at: new Date().toISOString() }))
     );
   };
@@ -116,7 +116,7 @@ export default function NotificationsTab() {
             </span>
           )}
         </div>
-        
+
         {unreadNotifications.length > 0 && (
           <button
             onClick={handleMarkAllAsRead}
@@ -174,7 +174,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
           <div className={`flex-shrink-0 ${iconColor} mt-0.5`}>
             <IconComponent className="h-5 w-5" />
           </div>
-          
+
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h4 className={`font-medium truncate ${!notification.is_read ? 'text-gray-900' : 'text-gray-700'}`}>
@@ -184,11 +184,11 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
                 <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
               )}
             </div>
-            
+
             <p className={`text-sm mb-2 ${!notification.is_read ? 'text-gray-700' : 'text-gray-600'}`}>
               {notification.message}
             </p>
-            
+
             <div className="flex items-center gap-4 text-xs text-gray-500">
               <span className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
@@ -202,7 +202,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
             </div>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-1 ml-2">
           {notification.action_url && (
             <Link
@@ -213,7 +213,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
               <ExternalLink className="h-4 w-4" />
             </Link>
           )}
-          
+
           {!notification.is_read && (
             <button
               onClick={() => onMarkAsRead(notification.id!)}
@@ -223,7 +223,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
               <Check className="h-4 w-4" />
             </button>
           )}
-          
+
           <button
             onClick={() => onDelete(notification.id!)}
             className="text-red-600 hover:bg-red-50 p-1.5 rounded"
