@@ -14,10 +14,9 @@ interface NoticeCreateModalProps {
 }
 
 const urgencyOptions = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-  { value: 'urgent', label: 'Urgent' }
+  { value: 'Low', label: 'Low' },
+  { value: 'Medium', label: 'Medium' },
+  { value: 'High', label: 'High' },
 ];
 
 export default function NoticeCreateModal({
@@ -35,9 +34,9 @@ export default function NoticeCreateModal({
     department_id: undefined
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   const { items: departments, loading: departmentsLoading, fetchItems: fetchDepartments } = useDepartments();
-    const { items: noticeTypes, loading: noticesLoading, fetchItems: fetchNoticeTypes } = useNoticeTypes();
+  const { items: noticeTypes, loading: noticesLoading, fetchItems: fetchNoticeTypes } = useNoticeTypes();
 
   useEffect(() => {
     fetchDepartments();
@@ -49,7 +48,7 @@ export default function NoticeCreateModal({
       ...prev,
       [field]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => {
@@ -67,9 +66,9 @@ export default function NoticeCreateModal({
       notice_type_id: formData.notice_type_id || undefined,
       department_id: formData.department_id || undefined,
     };
-    
+
     const validation = validateNotice(dataToValidate);
-    
+
     if (!validation.success && validation.errors) {
       const errorMap: Record<string, string> = {};
       validation.errors.forEach(error => {
@@ -170,8 +169,9 @@ export default function NoticeCreateModal({
             value={formData.notice_type_id?.toString() || ''}
             onChange={(e) => handleInputChange('notice_type_id', e.target.value ? parseInt(e.target.value) : undefined)}
             options={noticeTypeOptions}
-            placeholder="Select notice type (optional)"
+            placeholder="Select notice type"
             error={errors.notice_type_id}
+            required
           />
 
           <SelectField
@@ -179,8 +179,9 @@ export default function NoticeCreateModal({
             value={formData.department_id?.toString() || ''}
             onChange={(e) => handleInputChange('department_id', e.target.value ? parseInt(e.target.value) : undefined)}
             options={departmentOptions}
-            placeholder="Select department (optional)"
+            placeholder="Select department"
             error={errors.department_id}
+            required
           />
         </div>
       </div>

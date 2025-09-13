@@ -4,12 +4,14 @@ import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId, DatabaseError } from "@/lib/utils/auth";
 import { uploadManyFiles } from "@/lib/utils/files";
+import { useNotifications } from "./useNotifications";
 
 export function useSettlementRequests() {
   const [settlementRequests, setSettlementRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<number | null>(null);
+  const { createNotification } = useNotifications();
 
   const fetchSettlementRequests = useCallback(
     async () => {
@@ -101,6 +103,20 @@ export function useSettlementRequests() {
 
         // Refresh the requests
         await fetchSettlementRequests();
+
+        const recipients = [user.supervisor_id].filter(Boolean) as string[]
+
+        createNotification({
+          title: "Settlement Request Update",
+          message: `A settlement request has been ${action.toLowerCase()}`,
+          priority: 'normal',
+          type_id: 6,
+          recipient_id: recipients,
+          action_url: '/operations-and-services/services/settlement',
+          company_id: user.company_id,
+          department_id: user.department_id
+        });
+
         return true;
       } catch (error) {
         setError("Failed to update settlement request");
@@ -151,6 +167,20 @@ export function useSettlementRequests() {
           setError(message);
           throw new DatabaseError(`${message}: ${error.message}`);
         }
+
+
+        const recipients = [user.supervisor_id].filter(Boolean) as string[]
+
+        createNotification({
+          title: "New Settlement Request",
+          message: `A new settlement request has been submitted by ${user.name}.`,
+          priority: 'normal',
+          type_id: 6,
+          recipient_id: recipients,
+          action_url: '/operations-and-services/services/settlement',
+          company_id: user.company_id,
+          department_id: settlementData.department_id
+        });
 
         return { success: true, data };
       } catch (error) {

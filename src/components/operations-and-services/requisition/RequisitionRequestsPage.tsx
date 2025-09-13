@@ -54,8 +54,8 @@ export default function RequisitionRequestsPage() {
     fetchRequisitionInventories();
   }, [fetchRequisitionTypes, fetchRequisitionInventories]);
 
-  const handleUpdateRequest = async (action: 'Approved' | 'Rejected', id: number) => {
-    const success = await updateRequisitionRequest(action, id, comment);
+  const handleUpdateRequest = async (action: 'Approved' | 'Rejected', id: number, employee_id: string) => {
+    const success = await updateRequisitionRequest(action, id, comment, employee_id);
     if (success) {
       toast.success(`Request ${action.toLowerCase()} successfully`);
       setComment("");
@@ -184,7 +184,7 @@ export default function RequisitionRequestsPage() {
                           <motion.button 
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            onClick={() => handleUpdateRequest("Rejected", req.id)}
+                            onClick={() => handleUpdateRequest("Rejected", req.id, req.employee_id || "")}
                             disabled={processingId === req.id}
                             className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                           >
@@ -198,7 +198,7 @@ export default function RequisitionRequestsPage() {
                           <motion.button 
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            onClick={() => handleUpdateRequest("Approved", req.id)}
+                            onClick={() => handleUpdateRequest("Approved", req.id, req.employee_id || "")}
                             disabled={processingId === req.id}
                             className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                           >

@@ -15,7 +15,7 @@ export function useNotificationTypes() {
     entityName: "notification type",
     companyScoped: true,
   });
-  
+
   return {
     ...baseResult,
     notificationTypes: baseResult.items,
@@ -57,7 +57,7 @@ export function useNotifications() {
           type:notification_types(*)
         `)
         .eq('company_id', company_id)
-        .eq('recipient_id', user_id)
+        .eq('recipient_id', [user_id])
         .order('created_at', { ascending: false })
         .limit(limit);
 
@@ -87,7 +87,7 @@ export function useNotifications() {
         .from('notifications')
         .select('*', { count: 'exact', head: true })
         .eq('company_id', company_id)
-        .eq('recipient_id', user_id)
+        .eq('recipient_id', [user_id])
         .eq('is_read', false);
 
       if (error) {
@@ -109,8 +109,8 @@ export function useNotifications() {
     try {
       const { error } = await supabase
         .from('notifications')
-        .update({ 
-          is_read: true, 
+        .update({
+          is_read: true,
           read_at: new Date().toLocaleDateString('sv-SE')
         })
         .eq('id', notificationId);
@@ -140,8 +140,8 @@ export function useNotifications() {
 
       const { error } = await supabase
         .from('notifications')
-        .update({ 
-          is_read: true, 
+        .update({
+          is_read: true,
           read_at: new Date().toLocaleDateString('sv-SE')
         })
         .eq('company_id', company_id)
@@ -164,25 +164,24 @@ export function useNotifications() {
   const createNotification = useCallback(async (notificationData: Partial<Notification>) => {
     try {
       const company_id = await getCompanyId();
-      
+
       if (!company_id) {
         return { success: false, error: 'Company ID not found' };
       }
 
-      const { data, error } = await supabase
-        .from('notifications')
-        .insert({
-          ...notificationData,
-          company_id,
-        })
-        .select()
-        .single();
 
-      if (error) {
-        throw error;
-      }
+      const res = await fetch(`https://hprpwdtlwqtzodygssdc.supabase.co/functions/v1/create_notification`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
+         },
+        body: JSON.stringify({ notificationData }),
+      });
 
-      return { success: true, data };
+      return await res.json(); // waits for server 
+
+
     } catch (error) {
       console.error('Error creating notification:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
@@ -216,7 +215,7 @@ export function useNotifications() {
     notifications: baseResult.items,
     notification: baseResult.item,
     unreadCount,
-    
+
     // Enhanced functions
     fetchUserNotifications,
     fetchUnreadCount,
@@ -224,7 +223,7 @@ export function useNotifications() {
     markAllAsRead,
     createNotification,
     deleteNotification,
-    
+
     // Base functions
     fetchNotifications: baseResult.fetchItems,
     fetchNotification: baseResult.fetchItem,
@@ -256,7 +255,7 @@ export const createSystemNotification = async (
   } = {}
 ) => {
   const company_id = await getCompanyId();
-  
+
   if (!company_id) {
     return { success: false, error: 'Company ID not found' };
   }

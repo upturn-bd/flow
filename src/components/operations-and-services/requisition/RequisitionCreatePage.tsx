@@ -26,6 +26,8 @@ import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { getCompanyId, getEmployeeInfo } from "@/lib/utils/auth";
 import { uploadManyFiles } from "@/lib/utils/files";
+import { useNotifications } from "@/hooks/useNotifications";
+import { create } from "domain";
 
 // Define a proper interface that mirrors the requisition schema
 interface RequisitionFormState {
@@ -126,6 +128,8 @@ export default function RequisitionCreatePage({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
+  const { createNotification } = useNotifications();
+
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -175,6 +179,20 @@ export default function RequisitionCreatePage({
       toast.success("Requisition created successfully!");
       setRequisitionState(initialRequisitionState);
       setAttachments([]);
+
+      const recipients = [user.supervisor_id, formattedRequisitionState.asset_owner].filter(Boolean) as string[];
+      createNotification({
+        title: "New Requisition Created",
+        message: `A new requisition has been created by ${user.name}.`,
+        priority: 'normal',
+        type_id: 6,
+        recipient_id: recipients,
+        action_url: '/operations-and-services/services/requisition',
+        company_id: user.company_id,
+        department_id: user.department_id
+      });
+
+
     } catch (error) {
       console.error("Error creating Requisition:", error);
       toast.error("Error creating Requisition. Please try again.");
@@ -276,9 +294,8 @@ export default function RequisitionCreatePage({
         onClick={() => setIsOneOff(!isOneOff)}
       >
         <div
-          className={`w-12 h-6 rounded-full relative ${
-            isOneOff ? "bg-blue-500" : "bg-gray-300"
-          } transition-colors duration-300`}
+          className={`w-12 h-6 rounded-full relative ${isOneOff ? "bg-blue-500" : "bg-gray-300"
+            } transition-colors duration-300`}
         >
           <motion.div
             className="w-5 h-5 bg-white rounded-full absolute top-0.5"
@@ -982,20 +999,20 @@ export function RequisitionDraftPage({
             <div className="flex gap-3 mt-8 text-gray-600">
               {attachments.length > 0
                 ? attachments.map((file, index) => (
-                    <div
-                      key={index}
-                      className="px-3 py-2 bg-blue-100 text-sm rounded-sm"
+                  <div
+                    key={index}
+                    className="px-3 py-2 bg-blue-100 text-sm rounded-sm"
+                  >
+                    <span>{file.name}</span>
+                    <button
+                      type="button"
+                      className="ml-2 text-red-500 text-xl"
+                      onClick={() => removeFile(file.name)}
                     >
-                      <span>{file.name}</span>
-                      <button
-                        type="button"
-                        className="ml-2 text-red-500 text-xl"
-                        onClick={() => removeFile(file.name)}
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  ))
+                      &times;
+                    </button>
+                  </div>
+                ))
                 : "No files selected"}
             </div>
           </div>

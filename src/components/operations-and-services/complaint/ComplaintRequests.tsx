@@ -57,7 +57,14 @@ export default function ComplaintRequestsPage() {
       status: action,
       comment: comment
     };
-    const result = await updateComplaint(id, updateData);
+
+    console.log(updateData)
+
+    const complaint = complaints.find(comp => comp.id === id)
+    const againstId = complaint?.against_whom
+    const againstEmp = employees.find(emp => emp.id === againstId)
+
+    const result = await updateComplaint(id, updateData, againstEmp?.name || "");
     if (result.success) {
       toast.success(`Complaint ${action.toLowerCase()} successfully`);
       setComment("");
@@ -96,8 +103,8 @@ export default function ComplaintRequestsPage() {
                     complaintTypes={complaintTypes}
                     comment={comment}
                     setComment={setComment}
-                    onAccept={() => handleUpdateRequest("Accepted", complaint.id)}
-                    onReject={() => handleUpdateRequest("Rejected", complaint.id)}
+                    onAccept={() => handleUpdateRequest("Resolved", complaint.id)}
+                    onReject={() => handleUpdateRequest("Resolved", complaint.id)}
                     isProcessing={currentlyProcessingId === complaint.id}
                   />
                 ))}

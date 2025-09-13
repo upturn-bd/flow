@@ -1,5 +1,6 @@
 "use client";
 
+import { useNotifications } from "@/hooks/useNotifications";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useState, useRef, useEffect } from "react";
@@ -14,6 +15,7 @@ const ClickableStatusCell = ({
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
     const [status, setStatus] = useState(tag);
+    const { createNotification } = useNotifications();
 
     async function handleRequest() {
         console.log("Request sent for", id);
@@ -40,6 +42,20 @@ const ClickableStatusCell = ({
                 setTimeout(() => document.body.removeChild(notification), 500);
             }, 3000);
             setStatus("Pending");
+
+            const recipients = [user.supervisor_id].filter(Boolean) as string[];
+            createNotification({
+                title: "Attendance Update Requested",
+                message: `An attendance update has been requested by ${user.name}.`,
+                priority: 'normal',
+                type_id: 5,
+                recipient_id: recipients,
+                action_url: '/operations-and-services/services/attendance',
+                company_id: user.company_id,
+                department_id: user.department_id
+            });
+
+
             // Refresh attendance data
         } catch (error) {
             console.error("Error updating attendance data:", error);

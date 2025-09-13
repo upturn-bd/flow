@@ -9,6 +9,7 @@ import { Calendar, CheckCircle, Clock, Info } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 import { getEmployeeInfo } from "@/lib/utils/auth";
+import { useLeaveRequests } from "@/hooks/useLeaveManagement";
 
 const initialLeaveRecord = {
   type_id: undefined,
@@ -49,6 +50,10 @@ export default function LeaveCreatePage() {
   const [isValid, setIsValid] = useState(false);
   const [daysCount, setDaysCount] = useState(0);
 
+  console.log(leaveTypes, 'leave types');
+
+  const { createLeaveRequest } = useLeaveRequests();
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -76,9 +81,7 @@ export default function LeaveCreatePage() {
         requested_to: user.supervisor_id,
       };
 
-      const { data, error } = await client
-        .from("leave_records")
-        .insert(formattedSettlementState);
+      const { error } = await createLeaveRequest(formattedSettlementState);
 
       if (error) throw error;
 

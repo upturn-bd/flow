@@ -183,6 +183,8 @@ export function useLeaveTypes() {
     deleteItem: deleteLeaveType
   } = useConfigTypes<LeaveType>('leave_types');
   
+  console.log(leaveTypes, 'leave types hook');
+
   return {
     leaveTypes,
     loading,

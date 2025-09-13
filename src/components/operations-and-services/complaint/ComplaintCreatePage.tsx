@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
+import {
   Upload,
   ChevronLeft,
   ChevronDown,
@@ -22,6 +22,7 @@ import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import { toast } from "sonner";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { uploadManyFiles } from "@/lib/utils/files";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const initialComplaintRecord = {
   complaint_type_id: undefined,
@@ -49,6 +50,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
+  const { createNotification } = useNotifications()
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -96,6 +98,22 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
       setComplaintState(initialComplaintRecord);
       setAttachments([]);
       onClose();
+
+      const recipients = [user.supervisor_id].filter(Boolean) as string[]
+
+      const complaintAuthor = formattedComplaintState.anonymous ? "" : `by ${user.name}`
+
+      createNotification({
+        title: "New Complaint Filed",
+        message: `A new complaint has been filed ${complaintAuthor}`,
+        priority: 'normal',
+        type_id: 6,
+        recipient_id: recipients,
+        action_url: '/operations-and-services/services/complaint',
+        company_id: user.company_id,
+        department_id: user.department_id
+      });
+
     } catch (error: any) {
       console.error("Error creating Complaint:", error);
       toast.error(`Error creating Complaint: ${error.message || "Please try again"}`);
@@ -167,9 +185,8 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
         onClick={() => setIsAnonymous(!isAnonymous)}
       >
         <div
-          className={`w-12 h-6 rounded-full relative ${
-            isAnonymous ? "bg-blue-500" : "bg-gray-300"
-          } transition-colors duration-300`}
+          className={`w-12 h-6 rounded-full relative ${isAnonymous ? "bg-blue-500" : "bg-gray-300"
+            } transition-colors duration-300`}
         >
           <motion.div
             className="w-5 h-5 bg-white rounded-full absolute top-0.5"
