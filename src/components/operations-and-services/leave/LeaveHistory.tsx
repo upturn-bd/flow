@@ -102,7 +102,7 @@ export default function LeaveHistoryPage() {
                       <StatusBadge 
                         status={req.status || "pending"} 
                         variant={
-                          req.status === "Approved" ? "success" : 
+                          req.status === "Accepted" ? "success" : 
                           req.status === "Rejected" ? "error" : "warning"
                         }
                       />

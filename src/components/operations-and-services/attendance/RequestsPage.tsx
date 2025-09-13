@@ -3,12 +3,12 @@
 import { Attendance } from "@/hooks/useAttendance";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { 
-  Calendar, 
-  MapPin, 
-  User, 
-  Building, 
-  Clock, 
+import {
+  Calendar,
+  MapPin,
+  User,
+  Building,
+  Clock,
   ExternalLink,
   CheckCircle,
   AlertCircle,
@@ -28,6 +28,7 @@ import FormSelectField from "@/components/ui/FormSelectField";
 import { toast } from "sonner";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { getEmployeeInfo } from "@/lib/utils/auth";
+import { useNotifications } from "@/hooks/useNotifications";
 
 export default function AttendanceRequestsPage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
@@ -38,9 +39,11 @@ export default function AttendanceRequestsPage() {
   const [updateTag, setUpdateTag] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { createNotification } = useNotifications();
+
   async function fetchAttendanceData() {
     setLoading(true);
-    
+
     const user = await getEmployeeInfo();
     try {
       const { data, error } = await supabase
@@ -65,12 +68,12 @@ export default function AttendanceRequestsPage() {
 
   async function handleRequest(e: React.FormEvent) {
     e.preventDefault();
-    
+
     if (!updateTag || !selectedRecord) return;
-    
+
     setIsSubmitting(true);
     const user = await getEmployeeInfo();
-    
+
     try {
       const { error } = await supabase
         .from("attendance_records")
@@ -79,7 +82,20 @@ export default function AttendanceRequestsPage() {
         .eq("id", selectedRecord?.id);
 
       if (error) throw error;
-      
+
+      const recipients = [selectedRecord.employee_id].filter(Boolean) as string[];
+      createNotification({
+        title: "Attendance Request Updated",
+        message: `Your attendance request for ${formatDateToDayMonth(selectedRecord.attendance_date)} has been updated to status: ${updateTag}.`,
+        priority: 'normal',
+        type_id: 5,
+        recipient_id: recipients,
+        action_url: '/operations-and-services/services/attendance',
+        company_id: user.company_id,
+        department_id: user.department_id
+      });
+
+
       toast.success("Attendance request updated successfully");
       fetchAttendanceData();
       setSelectedRecord(null);
@@ -99,11 +115,11 @@ export default function AttendanceRequestsPage() {
   }, []);
 
   if (loading) {
-    return <LoadingSection 
-          text="Loading attendance requests..."
-          icon={User2}
-          color="blue"
-          />;
+    return <LoadingSection
+      text="Loading attendance requests..."
+      icon={User2}
+      color="blue"
+    />;
   }
 
   return (
@@ -239,7 +255,7 @@ function AttendanceRequestCard({
         icon={<Clock size={20} className="text-blue-500" />}
         action={actions}
       />
-      
+
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
           <InfoRow
@@ -256,7 +272,7 @@ function AttendanceRequestCard({
 
         <div className="space-y-2">
           <StatusBadge status="Pending Review" variant="warning" size="sm" />
-          
+
           <div className="flex items-center gap-4 text-sm">
             {entry.check_in_coordinates && (
               <a

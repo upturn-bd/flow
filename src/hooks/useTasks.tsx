@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
 import { Task } from "@/lib/types/schemas";
 import { useState, useCallback, useMemo, useRef } from "react";
+import { useNotifications } from "./useNotifications";
 
 // Task status variants
 export enum TaskStatus {
@@ -15,7 +16,7 @@ export enum TaskStatus {
 // Task scope variants
 export enum TaskScope {
   USER_TASKS = "user_tasks",
-  PROJECT_TASKS = "project_tasks", 
+  PROJECT_TASKS = "project_tasks",
   MILESTONE_TASKS = "milestone_tasks",
   COMPANY_TASKS = "company_tasks",
   DEPARTMENT_TASKS = "department_tasks"
@@ -52,32 +53,34 @@ export function useTasks() {
     unassigned: number;
     inProgress: number;
   } | null>(null);
-  
+
   // Use ref to track loading state to avoid dependency issues
   const isLoadingRef = useRef(false);
+
+  const { createNotification } = useNotifications();
 
   // Helper function to apply status filtering to query
 
   // Unified fetch function that handles all scenarios
   const fetchTasks = useCallback(async (filters: TaskFilters): Promise<TaskFetchResult> => {
-    
+
     // Prevent duplicate calls while loading using ref
     if (isLoadingRef.current) {
       return { tasks: [], totalCount: 0, completedCount: 0, pendingCount: 0 };
     }
-    
+
     isLoadingRef.current = true;
     setLoading(true);
     setError(null);
-    
+
     try {
       const company_id = await getCompanyId();
-      
+
       let query = supabase
-      .from("task_records")
-      .select("*")
-      .eq("company_id", company_id);
-      
+        .from("task_records")
+        .select("*")
+        .eq("company_id", company_id);
+
       // Apply scope-specific filters
       switch (filters.scope) {
         case TaskScope.USER_TASKS:
@@ -137,8 +140,8 @@ export function useTasks() {
       setTasks(prevTasks => {
         const newTasks = result.tasks;
         // Simple comparison - if length is different or data is different, update
-        if (prevTasks.length !== newTasks.length || 
-            JSON.stringify(prevTasks.map(t => t.id).sort()) !== JSON.stringify(newTasks.map(t => t.id).sort())) {
+        if (prevTasks.length !== newTasks.length ||
+          JSON.stringify(prevTasks.map(t => t.id).sort()) !== JSON.stringify(newTasks.map(t => t.id).sort())) {
           return newTasks;
         }
         return prevTasks;
@@ -180,7 +183,7 @@ export function useTasks() {
   const fetchTaskStats = useCallback(async (projectId: number) => {
     try {
       const result = await fetchTasks({ scope: TaskScope.PROJECT_TASKS, projectId, status: TaskStatus.ALL });
-      
+
       const statsData = {
         total: result.totalCount,
         completed: result.completedCount,
@@ -220,7 +223,7 @@ export function useTasks() {
   const createTask = useCallback(async (task: Task) => {
     try {
       console.log("Creating task:", task);
-      
+
       const company_id = await getCompanyId();
       const user = await getEmployeeInfo();
 
@@ -244,6 +247,49 @@ export function useTasks() {
         await fetchTaskStats(task.project_id);
       }
 
+      // Notify assignees if any
+      type notificationPriority = 'low' | 'normal' | 'high' | 'urgent';
+      let notificationPriority: notificationPriority = 'normal';
+      switch (task.priority) {
+        case 'low':
+          notificationPriority = 'low';
+          break;
+        case 'medium':
+          notificationPriority = 'normal';
+          break;
+        case 'high':
+          notificationPriority = 'high';
+          break;
+        default:
+          notificationPriority = 'normal';
+          break;
+      }
+
+      const assignees = task.assignees || [];
+      createNotification({
+        title: "New Task Assigned",
+        message: `A new task "${task.task_title}" has been assigned to you.`,
+        priority: notificationPriority,
+        type_id: 3, // Assuming 3 is the type ID for task assignment
+        recipient_id: assignees,
+        action_url: '/operations-and-services/workflow/task',
+        company_id: company_id,
+        department_id: task.department_id
+      });
+
+      createNotification({
+        title: "New Task Created",
+        message: `A new task "${task.task_title}" has been created by ${user.name}.`,
+        priority: notificationPriority,
+        type_id: 3, // Assuming 3 is the type ID for task assignment
+        recipient_id: [user.supervisor_id].filter(Boolean) as string[],
+        action_url: '/operations-and-services/workflow/task',
+        company_id: company_id,
+        department_id: task.department_id
+      });
+
+
+
       return { success: true, data };
     } catch (err) {
       console.error("Error creating task:", err);
@@ -255,9 +301,10 @@ export function useTasks() {
   const updateTask = useCallback(async (task: Task) => {
     try {
       const company_id = await getCompanyId();
-      
+      const user = await getEmployeeInfo();
+
       const finalData = { ...task };
-      
+
       // Remove undefined values
       Object.keys(finalData).forEach(key => {
         if (finalData[key as keyof typeof finalData] === undefined || finalData[key as keyof typeof finalData] === null) {
@@ -284,6 +331,22 @@ export function useTasks() {
         }
         await fetchTaskStats(task.project_id);
       }
+
+      const recipients = task.assignees;
+      if (user.supervisor_id) {
+        recipients.push(user.supervisor_id);
+      }
+      createNotification({
+        title: "Task Updated",
+        message: `The task "${task.task_title}" has been updated.`,
+        priority: 'normal',
+        type_id: 3, // 3 is the type ID for task assignment
+        recipient_id: recipients,
+        action_url: '/operations-and-services/workflow/task',
+        company_id: company_id,
+        department_id: task.department_id
+      });
+      
 
       return { success: true, data };
     } catch (err) {
@@ -397,7 +460,7 @@ export function useTasks() {
         .update({
           milestone_id: milestoneId,
           updated_by: user.id,
-          updated_at: new Date().toLocaleDateString('sv-SE')()
+          updated_at: new Date().toLocaleDateString('sv-SE')
         })
         .in("id", taskIds)
         .eq("company_id", company_id)
@@ -422,10 +485,10 @@ export function useTasks() {
     loading,
     error,
     stats,
-    
+
     // Main fetch function
     fetchTasks,
-    
+
     // Convenience methods
     getUserTasks,
     getProjectTasks,
@@ -433,10 +496,10 @@ export function useTasks() {
     getCompanyTasks,
     getDepartmentTasks,
     getTaskById,
-    
+
     // Stats
     fetchTaskStats,
-    
+
     // CRUD operations
     createTask,
     updateTask,

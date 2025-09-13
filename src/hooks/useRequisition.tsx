@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
+import { useNotifications } from "./useNotifications";
 
 export interface RequisitionState {
   id: number;
@@ -14,7 +15,7 @@ export interface RequisitionState {
   to_time?: string;
   description?: string;
   attachments?: string[];
-  employee_id: number;
+  employee_id: string;
   company_id: number;
   status: 'Pending' | 'Approved' | 'Rejected';
   approved_by_id?: number;
@@ -27,6 +28,7 @@ export function useRequisitionRequests() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<number | null>(null);
+  const { createNotification } = useNotifications();
 
   const fetchRequisitionRequests = useCallback(
     async (status: string = "Pending") => {
@@ -75,7 +77,7 @@ export function useRequisitionRequests() {
         .from("requisition_records")
         .select("*")
         .eq("company_id", company_id);
-        // .eq("asset_owner", user.id);
+      // .eq("asset_owner", user.id);
 
       if (error) {
         setError("Failed to fetch requisition history");
@@ -94,7 +96,7 @@ export function useRequisitionRequests() {
   }, []);
 
   const updateRequisitionRequest = useCallback(
-    async (action: string, id: number, comment: string) => {
+    async (action: string, id: number, comment: string, employee_id: string) => {
       setProcessingId(id);
 
       try {
@@ -118,6 +120,19 @@ export function useRequisitionRequests() {
 
         // Refresh the requests
         await fetchRequisitionRequests();
+
+        const recipients = [employee_id].filter(Boolean) as string[];
+        createNotification({
+          title: `Requisition ${action}`,
+          message: `Your requisition request has been ${action.toLowerCase()}.`,
+          priority: 'normal',
+          type_id: 6,
+          recipient_id: recipients,
+          action_url: '/operations-and-services/services/requisition',
+          company_id: user.company_id,
+          department_id: user.department_id
+        })
+
         return true;
       } catch (error) {
         setError("Failed to update requisition request");

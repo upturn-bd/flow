@@ -1,7 +1,10 @@
 "use client";
 
+import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useBaseEntity } from "./core";
 import { LeaveType, HolidayConfig, WeeklyHolidayConfig } from "@/lib/types";
+import { useNotifications } from "./useNotifications";
+import { create } from "domain";
 
 // Export types for components
 export type { LeaveType, HolidayConfig };
@@ -12,7 +15,7 @@ export function useLeaveTypes() {
     entityName: "leave type",
     companyScoped: true,
   });
-  
+
   return {
     ...baseResult,
     leaveTypes: baseResult.items,
@@ -29,7 +32,7 @@ export function useHolidayConfigs() {
     entityName: "holiday config",
     companyScoped: true,
   });
-  
+
   return {
     ...baseResult,
     holidayConfigs: baseResult.items,
@@ -47,11 +50,66 @@ export function useLeaveRequests() {
     companyScoped: true,
   });
 
+  const { createNotification } = useNotifications();
+  const createLeaveRequest = async (leaveData: any) => {
+    try {
+      const user = await getEmployeeInfo();
+      const company_id = user.company_id;
+      const result = await baseResult.createItem(leaveData);
+      const recipients = [user.supervisor_id].filter(Boolean) as string[];
+      createNotification({
+        title: "New Leave Request",
+        message: `A new leave request has been submitted by ${user.name}.`,
+        priority: 'normal',
+        type_id: 2,
+        recipient_id: recipients,
+        action_url: '/operations-and-services/services/leave',
+        company_id: user.company_id,
+        department_id: user.department_id
+      })
+
+      return result;
+    } catch (error) {
+      console.error("Error creating leave request:", error);
+      throw error;
+    }
+  }
+
+
+  const updateLeaveRequest = async (leaveId: number, leaveData: any) => {
+    try {
+      const user = await getEmployeeInfo();
+
+      const result = await baseResult.updateItem(leaveId, leaveData);
+
+      const recipients = [user.id].filter(Boolean) as string[];
+
+
+      createNotification({
+        title: "Leave request updated",
+        message: `Your leave request has been updated to status: ${leaveData.status}.`,
+        priority: 'normal',
+        type_id: 2,
+        recipient_id: recipients,
+        action_url: '/operations-and-services/services/leave',
+        company_id: user.company_id,
+        department_id: user.department_id
+      });
+
+      return result;
+    } catch (error) {
+      console.error("Error updating leave request:", error);
+      throw error;
+    }
+
+  }
+
   return {
     ...baseResult,
     leaveRequests: baseResult.items,
+    createLeaveRequest,
     fetchLeaveRequests: baseResult.fetchItems,
-    updateLeaveRequest: baseResult.updateItem,
+    updateLeaveRequest,
     processingId: baseResult.updating,
   };
 }

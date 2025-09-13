@@ -230,11 +230,12 @@ export interface ComplaintRecord {
   anonymous?: boolean;
   against_whom: string;
   attachments?: string[];
+  department_id?: number;
 }
 
 export interface Notice {
   id?: number;
-  notice_type_id: number;
+  notice_type_id: number | null;
   title: string;
   description: string;
   urgency: string;
@@ -262,7 +263,7 @@ export interface Notification {
   message: string;
   type_id?: number;
   priority: 'low' | 'normal' | 'high' | 'urgent';
-  recipient_id: string;
+  recipient_id: string[];
   sender_id?: string;
   is_read: boolean;
   read_at?: string;
