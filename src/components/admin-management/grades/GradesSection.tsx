@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useGrades } from "@/hooks/useGrades";
+import { useAdminData } from "@/contexts/AdminDataContext";
 import GradeModal from "./GradeModal";
 import { GraduationCap, Plus } from "lucide-react";
 import { fadeInUp } from "@/components/ui/animations";
@@ -14,25 +14,20 @@ type GradesSectionProps = {
 };
 
 export default function GradesSection({ showNotification }: GradesSectionProps) {
+  // Use context instead of individual hook
   const { 
-    items: grades, 
-    loading: gradesLoading, 
-    fetchItems: fetchGrades, 
-    createItem: createGrade, 
-    deleteItem: deleteGrade 
-  } = useGrades();
+    grades, 
+    gradesLoading, 
+    createGrade, 
+    deleteGrade 
+  } = useAdminData();
   const [isCreatingGrade, setIsCreatingGrade] = useState(false);
   const [gradeDeleteLoading, setGradeDeleteLoading] = useState<number | null>(null);
-
-  useEffect(() => {
-    fetchGrades();
-  }, [fetchGrades]);
 
   const handleCreateGrade = async (values: any) => {
     try {
       await createGrade(values);
       setIsCreatingGrade(false);
-      fetchGrades();
       showNotification("Grade created successfully");
     } catch {
       showNotification("Error creating Grade", true);
@@ -42,9 +37,8 @@ export default function GradesSection({ showNotification }: GradesSectionProps) 
   const handleDeleteGrade = async (id: number) => {
     try {
       setGradeDeleteLoading(id);
-      await deleteGrade(id);
+      await deleteGrade(id.toString());
       showNotification("Grade deleted successfully");
-      fetchGrades();
     } catch {
       showNotification("Error deleting Grade", true);
     } finally {

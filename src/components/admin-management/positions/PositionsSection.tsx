@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { usePositions } from "@/hooks/usePositions";
-import { useDepartments } from "@/hooks/useDepartments";
-import { useGrades } from "@/hooks/useGrades";
+import { useAdminData } from "@/contexts/AdminDataContext";
 import PositionDetailsModal from "./PositionDetailsModal";
 import PositionModal from "./PositionModal";
 import { BriefcaseBusiness, Plus, Eye } from "lucide-react";
@@ -19,16 +17,16 @@ type PositionsSectionProps = {
 export default function PositionsSection({
   showNotification,
 }: PositionsSectionProps) {
-  const { departments, fetchDepartments } = useDepartments();
-  const { grades, fetchGrades } = useGrades();
+  // Use context instead of individual hooks
   const {
+    departments,
+    grades,
     positions,
-    loading: positionsLoading,
-    fetchPositions,
+    positionsLoading,
     createPosition,
     updatePosition,
     deletePosition,
-  } = usePositions();
+  } = useAdminData();
 
   const [viewPosition, setViewPosition] = useState<number | null>(null);
   const [editPosition, setEditPosition] = useState<number | null>(null);
@@ -37,17 +35,10 @@ export default function PositionsSection({
     number | null
   >(null);
 
-  useEffect(() => {
-    fetchPositions();
-    fetchDepartments();
-    fetchGrades();
-  }, [fetchPositions, fetchDepartments, fetchGrades]);
-
   const handleCreatePosition = async (values: any) => {
     try {
       await createPosition(values);
       setIsCreatingPosition(false);
-      fetchPositions();
       showNotification("Position created successfully");
     } catch {
       showNotification("Error creating Position", true);
@@ -57,10 +48,9 @@ export default function PositionsSection({
   const handleUpdatePosition = async (values: any) => {
     try {
       if (editPosition) {
-        await updatePosition(editPosition, values);
+        await updatePosition(editPosition.toString(), values);
       }
       setEditPosition(null);
-      fetchPositions();
       showNotification("Position updated successfully");
     } catch {
       showNotification("Error updating Position", true);
@@ -70,9 +60,8 @@ export default function PositionsSection({
   const handleDeletePosition = async (id: number) => {
     try {
       setPositionDeleteLoading(id);
-      await deletePosition(id);
+      await deletePosition(id.toString());
       showNotification("Position deleted successfully");
-      fetchPositions();
     } catch {
       showNotification("Error deleting Position", true);
     } finally {

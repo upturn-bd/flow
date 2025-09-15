@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useDepartments } from "@/hooks/useDepartments";
-import { useDivisions } from "@/hooks/useDivisions";
+import { useAdminData } from "@/contexts/AdminDataContext";
 import DepartmentModal from "./DepartmentModal";
 import DepartmentDetailsModal from "./DepartmentDetailsModal";
 import { Building, Plus, Eye, X } from "lucide-react";
@@ -12,23 +11,22 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { TrashSimple } from "@phosphor-icons/react";
 
 type DepartmentsSectionProps = {
-  employees: { id: string; name: string }[];
   showNotification: (message: string, isError?: boolean) => void;
 };
 
 export default function DepartmentsSection({
-  employees,
   showNotification,
 }: DepartmentsSectionProps) {
-  const { divisions, fetchDivisions } = useDivisions();
+  // Use context instead of individual hooks
   const {
     departments,
-    loading: departmentsLoading,
-    fetchDepartments,
+    divisions,
+    employees,
+    departmentsLoading,
     createDepartment,
     updateDepartment,
     deleteDepartment,
-  } = useDepartments();
+  } = useAdminData();
   const [viewDepartment, setViewDepartment] = useState<number | null>(null);
   const [editDepartment, setEditDepartment] = useState<number | null>(null);
   const [isCreatingDepartment, setIsCreatingDepartment] = useState(false);
@@ -36,16 +34,10 @@ export default function DepartmentsSection({
     number | null
   >(null);
 
-  useEffect(() => {
-    fetchDepartments();
-    fetchDivisions();
-  }, [fetchDepartments, fetchDivisions]);
-
   const handleCreateDepartment = async (values: any) => {
     try {
       await createDepartment(values);
       setIsCreatingDepartment(false);
-      fetchDepartments();
       showNotification("Department created successfully");
     } catch {
       showNotification("Error creating department", true);
@@ -55,9 +47,8 @@ export default function DepartmentsSection({
   const handleUpdateDepartment = async (values: any) => {
     try {
       if (editDepartment) {
-        await updateDepartment(editDepartment, values);
+        await updateDepartment(editDepartment.toString(), values);
         setEditDepartment(null);
-        fetchDepartments();
         showNotification("Department updated successfully");
       }
     } catch {
@@ -68,9 +59,8 @@ export default function DepartmentsSection({
   const handleDeleteDepartment = async (id: number) => {
     try {
       setDepartmentDeleteLoading(id);
-      await deleteDepartment(id);
+      await deleteDepartment(id.toString());
       showNotification("Department deleted successfully");
-      fetchDepartments();
     } catch {
       showNotification("Error deleting department", true);
     } finally {
