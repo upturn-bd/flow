@@ -19,7 +19,7 @@ export function validateNotification(data: Partial<Notification>): NotificationV
     errors.push({ field: "message", message: "Message is required" });
   }
 
-  if (!data.recipient_id || data.recipient_id.trim().length === 0) {
+  if (!data.recipient_id || data.recipient_id.length === 0) {
     errors.push({ field: "recipient_id", message: "Recipient is required" });
   }
 

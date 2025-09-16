@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building, Settings, ChevronRight, ChevronLeft, LoaderCircle, CheckCircle2, XCircle } from "lucide-react";
@@ -303,7 +303,18 @@ function AdminManagementContent() {
 export default function AdminManagement() {
   return (
     <AdminDataProvider>
-      <AdminManagementContent />
+      <Suspense fallback={
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm p-6 max-w-6xl mx-auto mt-8"
+        >
+          <LoaderCircle className="w-12 h-12 text-gray-500 animate-spin mb-4" />
+          <p className="text-gray-600">Loading admin management...</p>
+        </motion.div>
+      }>
+        <AdminManagementContent />
+      </Suspense>
     </AdminDataProvider>
   );
 }

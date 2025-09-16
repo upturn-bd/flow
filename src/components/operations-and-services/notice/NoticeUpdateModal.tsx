@@ -5,11 +5,11 @@ import { validateNotice, type NoticeData } from '@/lib/validation';
 import { useDepartments } from '@/hooks/useDepartments';
 import { Bell } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
-import { useNotices } from '@/hooks/useNotice';
+import { Notice, useNotices } from '@/hooks/useNotice';
 
 interface NoticeUpdateModalProps {
-  initialData: NoticeData;
-  onSubmit: (data: NoticeData) => void;
+  initialData: Notice;
+  onSubmit: (data: Notice) => void;
   onClose: () => void;
   isLoading?: boolean;
 }
@@ -27,7 +27,7 @@ export default function NoticeUpdateModal({
   onClose,
   isLoading = false
 }: NoticeUpdateModalProps) {
-  const [formData, setFormData] = useState<NoticeData>(initialData);
+  const [formData, setFormData] = useState<Notice>(initialData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
   const { items: departments, loading: departmentsLoading, fetchItems: fetchDepartments } = useDepartments();
@@ -42,7 +42,7 @@ export default function NoticeUpdateModal({
     setFormData(initialData);
   }, [initialData]);
 
-  const handleInputChange = (field: keyof NoticeData, value: any) => {
+  const handleInputChange = (field: keyof Notice, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
