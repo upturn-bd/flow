@@ -14,6 +14,7 @@ import {
   File,
   Search,
   BellDot, // Reports
+  Users
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -98,6 +99,13 @@ const sections = [
         description: "Employee onboarding workflow and tasks",
         color: "bg-purple-100 text-purple-700 border-purple-200"
       },
+      {
+        name: "HRIS",
+        path: "/operations-and-services/operations/hris",
+        icon: Users,
+        description: "Human Resource Information System",
+        color: "bg-blue-100 text-blue-700 border-blue-200"
+      }
     ],
   },
 ];
