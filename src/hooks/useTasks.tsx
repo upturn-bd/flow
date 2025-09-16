@@ -248,28 +248,12 @@ export function useTasks() {
       }
 
       // Notify assignees if any
-      type notificationPriority = 'low' | 'normal' | 'high' | 'urgent';
-      let notificationPriority: notificationPriority = 'normal';
-      switch (task.priority) {
-        case 'low':
-          notificationPriority = 'low';
-          break;
-        case 'medium':
-          notificationPriority = 'normal';
-          break;
-        case 'high':
-          notificationPriority = 'high';
-          break;
-        default:
-          notificationPriority = 'normal';
-          break;
-      }
 
       const assignees = task.assignees || [];
       createNotification({
         title: "New Task Assigned",
         message: `A new task "${task.task_title}" has been assigned to you.`,
-        priority: notificationPriority,
+        priority: task.priority,
         type_id: 3, // Assuming 3 is the type ID for task assignment
         recipient_id: assignees,
         action_url: '/operations-and-services/workflow/task',
@@ -280,7 +264,7 @@ export function useTasks() {
       createNotification({
         title: "New Task Created",
         message: `A new task "${task.task_title}" has been created by ${user.name}.`,
-        priority: notificationPriority,
+        priority: task.priority,
         type_id: 3, // Assuming 3 is the type ID for task assignment
         recipient_id: [user.supervisor_id].filter(Boolean) as string[],
         action_url: '/operations-and-services/workflow/task',

@@ -33,6 +33,7 @@ export default function TaskUpdateModal({
 }: TaskUpdateModalProps) {
   const [formData, setFormData] = useState<TaskData>(initialData);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(isLoading);
   
   const { employees, loading: employeesLoading, fetchEmployees } = useEmployees();
 
@@ -60,7 +61,8 @@ export default function TaskUpdateModal({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setLoading(true);
     const validation = validateTask(formData);
     
     if (!validation.success && validation.errors) {
@@ -73,8 +75,9 @@ export default function TaskUpdateModal({
     }
 
     if (validation.success && validation.data) {
-      onSubmit(validation.data);
+      await onSubmit(validation.data);
     }
+    setLoading(false);
   };
 
   const isFormValid = () => {
@@ -152,7 +155,7 @@ export default function TaskUpdateModal({
           onChange={(assignees) => handleInputChange('assignees', assignees)}
           employees={employees}
           error={errors.assignees}
-          disabled={isLoading || employeesLoading}
+          disabled={loading || employeesLoading}
           placeholder="Search and select assignees..."
         />
 
@@ -170,7 +173,7 @@ export default function TaskUpdateModal({
           type="button"
           variant="outline"
           onClick={onClose}
-          disabled={isLoading}
+          disabled={loading}
         >
           Cancel
         </Button>
@@ -178,7 +181,7 @@ export default function TaskUpdateModal({
           type="button"
           variant="primary"
           onClick={handleSubmit}
-          isLoading={isLoading}
+          isLoading={loading}
           disabled={!isFormValid() || !hasChanges() || isLoading}
         >
           Update Task

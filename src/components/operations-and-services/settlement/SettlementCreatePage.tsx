@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState, ChangeEvent } from "react";
-import { 
-  Calendar, 
+import {
+  Calendar,
   DollarSign,
   X,
   FileText,
@@ -113,7 +113,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!settlementState.settlement_type_id) {
       newErrors.settlement_type_id = "Settlement type is required";
     }
@@ -143,7 +143,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
     setIsSubmitting(true);
     try {
       const result = await createSettlementRequest(settlementState, attachments);
-      
+
       if (result.success) {
         toast.success("Settlement request created successfully");
         // Reset form
@@ -172,7 +172,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
         attachments: attachments.map(file => ({ name: file.name, size: file.size })),
         timestamp: new Date().toLocaleDateString('sv-SE')
       };
-      
+
       localStorage.setItem('settlement_draft', JSON.stringify(draftData));
       toast.success("Draft saved successfully");
     } catch (error) {
@@ -195,8 +195,8 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
     >
       <div className="space-y-8">
         {/* Basic Information */}
-        <FormSection 
-          title="Basic Information" 
+        <FormSection
+          title="Basic Information"
           description="Provide the basic details of your settlement request"
         >
           <FormGrid columns={2}>
@@ -213,7 +213,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
               }))}
               error={errors.settlement_type_id}
             />
-            
+
             <FormInputField
               name="amount"
               label="Amount"
@@ -223,7 +223,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
               type="number"
               error={errors.amount}
             />
-            
+
             <FormInputField
               name="event_date"
               label="Event Date"
@@ -250,18 +250,19 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
           </FormGrid>
 
           {/* Advance Payment Toggle */}
-          <div className="flex items-center gap-3 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+          <div className="flex items-center p-4 bg-orange-50 border border-orange-200 rounded-lg">
             <input
               type="checkbox"
               id="in_advance"
               checked={settlementState.in_advance}
-              onChange={(e) => setSettlementState(prev => ({ 
-                ...prev, 
-                in_advance: e.target.checked 
+              onChange={(e) => setSettlementState(prev => ({
+                ...prev,
+                in_advance: e.target.checked
               }))}
               className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500"
+              style={{ display: 'block', flex: 'none' }}
             />
-            <label htmlFor="in_advance" className="flex items-center gap-2 text-sm font-medium text-orange-800">
+            <label htmlFor="in_advance" className="flex items-center gap-2 text-sm font-medium text-orange-800 ml-2">
               <AlertCircle size={16} />
               Request as advance payment
             </label>
@@ -269,8 +270,8 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
         </FormSection>
 
         {/* Description */}
-        <FormSection 
-          title="Description & Comments" 
+        <FormSection
+          title="Description & Comments"
           description="Provide detailed information about your request"
         >
           <div>
@@ -282,9 +283,8 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
               value={settlementState.description}
               onChange={handleInputChange}
               rows={4}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.description ? 'border-red-300 ring-1 ring-red-300' : 'border-gray-300'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.description ? 'border-red-300 ring-1 ring-red-300' : 'border-gray-300'
+                }`}
               placeholder="Describe the reason for this settlement request..."
             />
             {errors.description && (
@@ -308,8 +308,8 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
         </FormSection>
 
         {/* Attachments */}
-        <FormSection 
-          title="Attachments" 
+        <FormSection
+          title="Attachments"
           description="Upload supporting documents (receipts, invoices, etc.)"
         >
           <div className="space-y-4">
@@ -372,7 +372,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
             <FileText size={16} />
             Save as Draft
           </Button>
-          
+
           {allowance && (
             <div className="text-sm text-gray-600">
               Maximum allowance: <span className="font-semibold">${allowance.toLocaleString()}</span>

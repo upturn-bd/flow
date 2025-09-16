@@ -18,7 +18,7 @@ export function useFileUpload() {
       }
       return { success: true, fileUrls: result.uploadedFilePaths };
     } catch (err) {
-      console.error("Error uploading files:", err);
+      console.log(err);
       setError(err instanceof Error ? err : new Error(String(err)));
       return { success: false, error: err };
     } finally {

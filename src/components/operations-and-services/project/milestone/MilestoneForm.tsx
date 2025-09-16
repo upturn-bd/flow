@@ -2,23 +2,20 @@
 
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
+import {
   Calendar,
   Users,
   Search,
   AlertCircle,
   X,
   Check,
-  ChevronDown,
   Target,
 } from "lucide-react";
 import { Milestone } from "@/lib/types/schemas";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
-import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-// Re-export Milestone type for other components
 export type { Milestone };
 
 interface MilestoneFormProps {
@@ -28,20 +25,21 @@ interface MilestoneFormProps {
   onCancel: () => void;
   employees: { id: string; name: string }[];
   currentMilestones: Milestone[];
-  mode: 'create' | 'edit';
+  mode: "create" | "edit";
 }
 
-export const validateMilestone = (milestone: Milestone, currentMilestones: Milestone[]): Record<string, string> => {
+export const validateMilestone = (
+  milestone: Milestone,
+  currentMilestones: Milestone[]
+): Record<string, string> => {
   const errors: Record<string, string> = {};
 
-  // Basic validation
   if (!milestone.milestone_title) errors.milestone_title = "Title is required";
   if (!milestone.start_date) errors.start_date = "Start date is required";
   if (!milestone.end_date) errors.end_date = "End date is required";
   if (!milestone.status) errors.status = "Status is required";
   if (!milestone.weightage) errors.weightage = "Weightage is required";
 
-  // Date validation
   if (milestone.start_date && milestone.end_date) {
     const start = new Date(milestone.start_date);
     const end = new Date(milestone.end_date);
@@ -50,13 +48,12 @@ export const validateMilestone = (milestone: Milestone, currentMilestones: Miles
     }
   }
 
-  // Weightage validation
   const totalExistingWeightage = currentMilestones
-    .filter(m => m.milestone_title !== milestone.milestone_title)
+    .filter((m) => m.milestone_title !== milestone.milestone_title)
     .reduce((sum, m) => sum + m.weightage, 0);
-  
+
   const remainingWeightage = 100 - totalExistingWeightage;
-  
+
   if (milestone.weightage > remainingWeightage) {
     errors.weightage = `Weightage cannot exceed ${remainingWeightage}%`;
   }
@@ -71,30 +68,36 @@ export default function MilestoneForm({
   onCancel,
   employees,
   currentMilestones,
-  mode
+  mode,
 }: MilestoneFormProps) {
   const [milestoneData, setMilestoneData] = useState<Milestone>(milestone);
-  const [milestoneAssignees, setMilestoneAssignees] = useState<string[]>(milestone.assignees || []);
+  const [milestoneAssignees, setMilestoneAssignees] = useState<string[]>(
+    milestone.assignees || []
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
     if (name === "start_date" || name === "end_date") {
-      setMilestoneData(prev => ({
+      setMilestoneData((prev) => ({
         ...prev,
         [name]: value,
       }));
     } else if (name === "weightage") {
-      setMilestoneData(prev => ({
+      setMilestoneData((prev) => ({
         ...prev,
         [name]: value ? parseInt(value) : 0,
       }));
     } else {
-      setMilestoneData(prev => ({ ...prev, [name]: value }));
+      setMilestoneData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -105,19 +108,17 @@ export default function MilestoneForm({
   );
 
   const handleAddAssignee = (id: string) => {
-    setMilestoneAssignees(prev => [...prev, id]);
+    setMilestoneAssignees((prev) => [...prev, id]);
     setSearchTerm("");
     setDropdownOpen(false);
     inputRef.current?.focus();
   };
 
   const handleRemoveAssignee = (id: string) => {
-    setMilestoneAssignees(prev => prev.filter(a => a !== id));
+    setMilestoneAssignees((prev) => prev.filter((a) => a !== id));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = () => {
     const validationErrors = validateMilestone(
       { ...milestoneData, assignees: milestoneAssignees },
       currentMilestones
@@ -128,17 +129,19 @@ export default function MilestoneForm({
       return;
     }
 
+    milestoneData.status = "Not Started"; // Default status for new milestones
+
     onSubmit({ ...milestoneData, assignees: milestoneAssignees });
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto py-8"
     >
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
@@ -149,15 +152,16 @@ export default function MilestoneForm({
             <LoadingSpinner />
           </div>
         )}
-        
+
         <div className="flex items-center gap-3 mb-6">
           <Target size={24} className="text-gray-600" strokeWidth={2} />
           <h2 className="text-xl font-semibold text-gray-900">
-            {mode === 'create' ? 'Add Milestone' : 'Update Milestone'}
+            {mode === "create" ? "Add Milestone" : "Update Milestone"}
           </h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* removed <form>, replaced with <div> */}
+        <div className="space-y-4">
           <FormInputField
             name="milestone_title"
             label="Milestone Title"
@@ -201,7 +205,7 @@ export default function MilestoneForm({
             />
           </div>
 
-          <FormSelectField
+          {/* <FormSelectField
             name="status"
             label="Status"
             icon={<Target size={16} className="text-gray-500" strokeWidth={2} />}
@@ -209,12 +213,12 @@ export default function MilestoneForm({
             onChange={handleChange}
             error={errors.status}
             options={[
-              { value: "Ongoing", label: "Ongoing" },
+              { value: "Not Started", label: "Not Started" },
+              { value: "In Progress", label: "In Progress" },
               { value: "Completed", label: "Completed" },
-              { value: "Archived", label: "Archived" }
             ]}
             placeholder="Select status"
-          />
+          /> */}
 
           <div>
             <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
@@ -227,9 +231,12 @@ export default function MilestoneForm({
               onChange={handleChange}
               value={milestoneData.weightage?.toString() || ""}
               min="1"
-              max={100 - currentMilestones
-                .filter(m => m.project_id !== milestoneData.project_id)
-                .reduce((sum, m) => sum + m.weightage, 0)}
+              max={
+                100 -
+                currentMilestones
+                  .filter((m) => m.project_id !== milestoneData.project_id)
+                  .reduce((sum, m) => sum + m.weightage, 0)
+              }
               className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
             />
             {errors.weightage && (
@@ -260,8 +267,8 @@ export default function MilestoneForm({
                 placeholder="Search for assignees..."
                 className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3 pr-10"
               />
-              <Search 
-                size={16} 
+              <Search
+                size={16}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                 strokeWidth={2}
               />
@@ -327,19 +334,20 @@ export default function MilestoneForm({
               <X size={16} className="mr-2" strokeWidth={2} />
               Cancel
             </motion.button>
-            
+
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              type="submit"
+              type="button"
+              onClick={handleSubmit}
               className="flex items-center px-4 py-2 bg-gray-800 rounded-md text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm"
             >
               <Check size={16} className="mr-2" strokeWidth={2} />
-              {mode === 'create' ? 'Add Milestone' : 'Update Milestone'}
+              {mode === "create" ? "Add Milestone" : "Update Milestone"}
             </motion.button>
           </div>
-        </form>
+        </div>
       </motion.div>
     </motion.div>
   );
-} 
+}

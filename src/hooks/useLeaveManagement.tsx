@@ -5,6 +5,8 @@ import { useBaseEntity } from "./core";
 import { LeaveType, HolidayConfig, WeeklyHolidayConfig } from "@/lib/types";
 import { useNotifications } from "./useNotifications";
 import { create } from "domain";
+import { useState } from "react";
+import { supabase } from "@/lib/supabase/client";
 
 // Export types for components
 export type { LeaveType, HolidayConfig };
@@ -49,6 +51,9 @@ export function useLeaveRequests() {
     entityName: "leave record",
     companyScoped: true,
   });
+
+  const [leaveRequests, setLeaveRequests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const { createNotification } = useNotifications();
   const createLeaveRequest = async (leaveData: any) => {
@@ -96,6 +101,7 @@ export function useLeaveRequests() {
         department_id: user.department_id
       });
 
+
       return result;
     } catch (error) {
       console.error("Error updating leave request:", error);
@@ -104,11 +110,33 @@ export function useLeaveRequests() {
 
   }
 
+  const fetchLeaveRequests = async () => {
+    try {
+      setLoading(true);
+      
+      const user = await getEmployeeInfo();
+      const { data, error } = await supabase
+        .from("leave_records")
+        .select("*")
+        .eq("requested_to", user.id)
+        .eq("status", "Pending")
+
+      if (error) throw error;
+
+      setLeaveRequests(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching leave requests:", error);
+      throw error;
+    }
+  }
+
   return {
     ...baseResult,
-    leaveRequests: baseResult.items,
+    loading,
+    leaveRequests,
     createLeaveRequest,
-    fetchLeaveRequests: baseResult.fetchItems,
+    fetchLeaveRequests,
     updateLeaveRequest,
     processingId: baseResult.updating,
   };

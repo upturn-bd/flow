@@ -4,6 +4,8 @@ import { ComplaintsType } from "@/lib/types/schemas";
 import { useBaseEntity } from "./core/useBaseEntity";
 import { useNotifications } from "./useNotifications";
 import { getEmployeeInfo } from "@/lib/utils/auth";
+import { useState } from "react";
+import { supabase } from "@/lib/supabase/client";
 
 export type ComplaintType = ComplaintsType;
 
@@ -40,6 +42,9 @@ export function useComplaints() {
     companyScoped: true,
   });
 
+  const [complaintRequests, setComplaintRequests] = useState<ComplaintState[]>([]);
+  const [requestLoading, setRequestLoading] = useState(false);
+
   const { createNotification } = useNotifications()
 
   const updateComplaint = async (complaintId: number, complaintData: any, againstName: string)  => {
@@ -69,10 +74,36 @@ export function useComplaints() {
     }
   }
 
+
+  const fetchComplaintRequests = async () => {
+    try {
+      console.log("Fetching complaint requests...");
+      setRequestLoading(true);
+      const user = await getEmployeeInfo();
+      const { data, error } = await supabase
+        .from("complaint_records")
+        .select("*")
+        .eq("status", "Submitted")
+        .eq("requested_to", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      setComplaintRequests(data);
+      setRequestLoading(false);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return {
     ...baseResult,
+    complaintRequests,
+    requestLoading,
     complaints: baseResult.items,
     fetchComplaints: baseResult.fetchItems,
+    fetchComplaintRequests,
     fetchComplaintHistory: baseResult.fetchItems,
     updateComplaint,
     processingId: baseResult.updating,

@@ -76,6 +76,7 @@ export default function MilestoneList({
                       </span>
                       <div className="flex gap-1">
                         <Button
+                          type="button"
                           variant="ghost"
                           size="sm"
                           onClick={() => m.id && onEdit(m.id)}
@@ -83,6 +84,7 @@ export default function MilestoneList({
                           <Pencil size={14} />
                         </Button>
                         <Button
+                          type="button"
                           variant="ghost"
                           size="sm"
                           onClick={() => m.id && onDelete(m.id)}

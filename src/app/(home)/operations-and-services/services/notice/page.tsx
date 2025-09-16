@@ -3,7 +3,7 @@ import { Notice, useNotices } from "@/hooks/useNotice";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Pencil, Trash2, Plus, Clock, CalendarDays, Info } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { NoticeCreateModal, NoticeUpdateModal } from "@/components/operations-and-services/notice";
 
@@ -17,12 +17,15 @@ export default function NoticePage() {
     deleteNotice,
   } = useNotices();
   const [isCreatingNotice, setIsCreatingNotice] = useState(false);
+  const [isUpdatingNotice, setIsUpdatingNotice] = useState(false);
   const [editNotice, setEditNotice] = useState<Notice | null>(null);
-  
+  const [isCreatingNoticeButtonLoading, setIsCreatingNoticeButtonLoading] = useState(false);  
   const handleCreateNotice = async (values: any) => {
     try {
+      setIsCreatingNoticeButtonLoading(true);
       await createNotice(values);
       toast.success("Notice created successfully!");
+      setIsCreatingNoticeButtonLoading(false);
       setIsCreatingNotice(false);
       fetchNotices();
     } catch (error) {
@@ -33,11 +36,13 @@ export default function NoticePage() {
 
   const handleUpdateNotice = async (values: any) => {
     try {
+      setIsUpdatingNotice(true);
       if (editNotice?.id) {
         await updateNotice(editNotice.id, values);
-        toast.success("Notice updated successfully!");
         setEditNotice(null);
         fetchNotices();
+        setIsUpdatingNotice(false);
+        toast.success("Notice updated successfully!");
       }
     } catch (error) {
       toast.error("Error updating notice. Please try again.");
@@ -96,7 +101,6 @@ export default function NoticePage() {
       opacity: 1, 
       y: 0, 
       transition: { 
-        type: "spring",
         stiffness: 260,
         damping: 20 
       } 
@@ -264,15 +268,20 @@ export default function NoticePage() {
         {isCreatingNotice && (
           <NoticeCreateModal 
             onClose={() => setIsCreatingNotice(false)}
-            onSubmit={handleCreateNotice} 
+            onSubmit={handleCreateNotice}
+            isLoading={isCreatingNoticeButtonLoading} 
           />
         )}
 
         {editNotice && (
           <NoticeUpdateModal 
-            initialData={editNotice}
+            initialData={{
+              ...editNotice,
+              notice_type_id: editNotice.notice_type_id === null ? undefined : editNotice.notice_type_id
+            }}
             onClose={() => setEditNotice(null)}
             onSubmit={handleUpdateNotice}
+            isLoading={isUpdatingNotice}
           />
         )}
       </AnimatePresence>

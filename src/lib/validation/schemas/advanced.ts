@@ -243,7 +243,7 @@ export interface TaskData {
   task_description: string;
   start_date: string;
   end_date: string;
-  priority: string;
+  priority: "low" | "normal" | "high" | "urgent";
   project_id?: number;
   milestone_id?: number;
   assignees: string[];

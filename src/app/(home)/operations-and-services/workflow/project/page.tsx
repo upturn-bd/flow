@@ -113,17 +113,11 @@ export default function ProjectPage() {
           Efficiently manage your projects from start to finish. Create, assign, and track progress to ensure successful completion of all project milestones.
         </p>
       </div>
-      {tabs.length > 0 ? (
         <TabView
           tabs={tabs}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
-      ) : (
-        <div className="p-4 sm:p-6 bg-gray-50 rounded-lg text-center text-gray-500">
-          No projects found. Click the plus button to add one.
-        </div>
-      )}
     </motion.section>
   );
 }

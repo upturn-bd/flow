@@ -13,10 +13,10 @@ import {
 } from "lucide-react";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import TaskCreateModal from "@/components/operations-and-services/task/shared/TaskModal";
-import { Task, useTasks } from "@/hooks/useTasks";
+import { Task, TaskScope, TaskStatus, useTasks } from "@/hooks/useTasks";
 import { TaskData } from "@/lib/validation/schemas/advanced";
 import { toast } from "sonner";
-import {  useAuth } from "@/lib/auth/auth-context";
+import { useAuth } from "@/lib/auth/auth-context";
 
 const TABS = [
   {
@@ -40,7 +40,7 @@ const TABS = [
 ];
 
 export default function TasksPage() {
-  
+
   const [activeTab, setActiveTab] = useState("ongoing");
   const [tabs, setTabs] = useState<TabItem[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -77,13 +77,16 @@ export default function TasksPage() {
       assignees: taskData.assignees,
       status: taskData.status || false,
     };
-    
+
     const { success, error } = await createTask(task);
     if (success) {
       toast.success("Task created successfully");
+      console.log("Testing toast success")
       setShowCreateModal(false);
       setActiveTab("ongoing");
     } else {
+      console.log("Testing toast fail")
+
       toast.error("Failed to create task");
     }
   };
@@ -132,7 +135,7 @@ export default function TasksPage() {
           Create Task
         </button>
       </motion.div>
-      
+
       {tabs.length > 0 && (
         <TabView
           tabs={tabs}

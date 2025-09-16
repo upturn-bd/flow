@@ -3,11 +3,12 @@ import { motion } from "framer-motion";
 
 interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 
   'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration'> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger" | "pending" | "complete";
   size?: "sm" | "md" | "lg";
   fullWidth?: boolean;
   isLoading?: boolean;
   iconColorClass?: string;
+  text?: string;
 }
 
 const variantClasses = {
@@ -16,6 +17,8 @@ const variantClasses = {
   outline: "border border-gray-300 hover:bg-gray-100 text-gray-800 shadow-sm",
   ghost: "hover:bg-gray-100 text-gray-800 shadow-sm",
   danger: "bg-red-600 hover:bg-red-700 text-white shadow-sm",
+  pending: "bg-yellow-200 hover:bg-yellow-300 text-yellow-700 shadow-sm",
+  complete: "bg-green-200 hover:bg-green-300 text-green-700 shadow-sm",
 };
 
 const sizeClasses = {
@@ -34,6 +37,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       isLoading = false,
       disabled,
       children,
+      text="",
       iconColorClass = "",
       ...props
     },
@@ -44,7 +48,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         aria-busy={isLoading}
-        whileHover={!disabled && !isLoading ? { scale: 1.05 } : {}}
+        whileHover={!disabled && !isLoading ? { scale: 1.02 } : {}}
         whileTap={!disabled && !isLoading ? { scale: 0.95 } : {}}
         className={`
           font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
@@ -78,10 +82,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
+
             {children}
           </div>
         ) : (
-          children
+          <>
+            {children}
+                      <span>{text}</span>
+
+          </>
         )}
       </motion.button>
     );

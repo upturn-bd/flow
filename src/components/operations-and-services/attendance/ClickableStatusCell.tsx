@@ -1,5 +1,6 @@
 "use client";
 
+import SuccessToast from "@/components/ui/SuccessToast";
 import { useNotifications } from "@/hooks/useNotifications";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/utils/auth";
@@ -16,6 +17,7 @@ const ClickableStatusCell = ({
     const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
     const [status, setStatus] = useState(tag);
     const { createNotification } = useNotifications();
+    const [showSuccess, setShowSuccess] = useState(false);
 
     async function handleRequest() {
         console.log("Request sent for", id);
@@ -32,15 +34,7 @@ const ClickableStatusCell = ({
             if (error) throw error;
 
             // Show success notification
-            const notification = document.createElement('div');
-            notification.className = 'fixed bottom-4 right-4 bg-green-100 text-green-800 px-4 py-3 rounded-lg shadow-lg z-50 animate-fade-in-up';
-            notification.innerHTML = 'Request sent successfully';
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.classList.add('animate-fade-out');
-                setTimeout(() => document.body.removeChild(notification), 500);
-            }, 3000);
+            SuccessToast({ message: "Attendance update request sent successfully." });
             setStatus("Pending");
 
             const recipients = [user.supervisor_id].filter(Boolean) as string[];
@@ -136,6 +130,7 @@ const ClickableStatusCell = ({
                     </button>
                 </div>
             )}
+
         </div>
     );
 };

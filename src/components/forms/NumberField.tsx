@@ -18,6 +18,7 @@ interface NumberFieldProps {
   showIncrementButtons?: boolean;
   onIncrement?: () => void;
   onDecrement?: () => void;
+  disabled?: boolean;
 }
 
 export const NumberField: React.FC<NumberFieldProps> = ({
@@ -36,6 +37,7 @@ export const NumberField: React.FC<NumberFieldProps> = ({
   showIncrementButtons = false,
   onIncrement,
   onDecrement,
+  disabled=false
 }) => {
   const IconComponent = icon || <Hash size={18} weight="duotone" className="text-gray-500" />;
 
@@ -63,6 +65,7 @@ export const NumberField: React.FC<NumberFieldProps> = ({
             min={min}
             max={max}
             step={step}
+            disabled={disabled}
             placeholder={placeholder}
             className="w-16 text-center p-2.5 border-t border-b border-gray-300 outline-none"
           />
@@ -87,6 +90,7 @@ export const NumberField: React.FC<NumberFieldProps> = ({
             min={min}
             max={max}
             step={step}
+            disabled={disabled}
             placeholder={placeholder}
             className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
           />
