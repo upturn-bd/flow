@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { extractFilenameFromUrl } from "@/lib/utils";
+import { extractFileNameFromStoragePath, extractFilenameFromUrl } from "@/lib/utils";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useSettlementRequests } from "@/hooks/useSettlement";
@@ -33,6 +33,7 @@ interface SettlementRequest {
   description?: string;
   in_advance?: boolean;
   attachments?: string[];
+  attachment_download_urls?: string[];
   status: string;
 }
 
@@ -231,13 +232,13 @@ function SettlementRequestCard({
                 {settlement.attachments.map((attachment: string, idx: number) => (
                   <a
                     key={idx}
-                    href={attachment}
+                    href={settlement.attachment_download_urls ? settlement.attachment_download_urls[idx] : '#'}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 text-xs px-3 py-2 rounded-md"
                   >
                     <FileText size={12} />
-                    {extractFilenameFromUrl(attachment)}
+                    {extractFileNameFromStoragePath(attachment)}
                   </a>
                 ))}
               </div>

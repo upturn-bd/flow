@@ -15,11 +15,9 @@ interface MilestoneUpdateModalProps {
 }
 
 const statusOptions = [
-  { value: 'not_started', label: 'Not Started' },
-  { value: 'in_progress', label: 'In Progress' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'on_hold', label: 'On Hold' },
-  { value: 'cancelled', label: 'Cancelled' }
+  { value: 'Not Started', label: 'Not Started' },
+  { value: 'In Progress', label: 'In Progress' },
+  { value: 'Completed', label: 'Completed' },
 ];
 
 export default function MilestoneUpdateModal({
@@ -31,7 +29,7 @@ export default function MilestoneUpdateModal({
 }: MilestoneUpdateModalProps) {
   const [formData, setFormData] = useState<MilestoneData>(initialData);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   const { employees, loading: employeesLoading, fetchEmployees } = useEmployees();
 
   useEffect(() => {
@@ -47,7 +45,7 @@ export default function MilestoneUpdateModal({
       ...prev,
       [field]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => {
@@ -60,7 +58,7 @@ export default function MilestoneUpdateModal({
 
   const handleSubmit = () => {
     const validation = validateMilestone(formData);
-    
+
     if (!validation.success && validation.errors) {
       const errorMap: Record<string, string> = {};
       validation.errors.forEach(error => {
@@ -86,16 +84,9 @@ export default function MilestoneUpdateModal({
 
   const getMaxWeightage = () => {
     // For updates, we need to account for the current milestone's weightage
-    return 100 - (currentTotalWeightage - (initialData.weightage || 0));
+    return 100 - (currentTotalWeightage);
   };
 
-  const getWeightageError = () => {
-    const maxWeightage = getMaxWeightage();
-    if (formData.weightage > maxWeightage) {
-      return `Weightage cannot exceed ${maxWeightage}% (Current total excluding this milestone: ${currentTotalWeightage - (initialData.weightage || 0)}%)`;
-    }
-    return undefined;
-  };
 
   return (
     <BaseModal
@@ -124,6 +115,25 @@ export default function MilestoneUpdateModal({
           rows={3}
         />
 
+        <div className="flex flex-wrap gap-2 mt-6">
+          <span className="text-sm font-medium text-blue-700 bg-blue-100 px-4 py-1 rounded-full shadow-sm">
+            Weightage: {formData.weightage}%
+          </span>
+
+          <span
+            className={`text-sm font-medium px-4 py-1 rounded-full shadow-sm ${formData.status === "Not Started"
+                ? "text-red-700 bg-red-100"
+                : formData.status === "In Progress"
+                  ? "text-yellow-700 bg-yellow-100"
+                  : formData.status === "Completed"
+                    ? "text-green-700 bg-green-100"
+                    : "text-gray-700 bg-gray-100"
+              }`}
+          >
+            Status: {formData.status}
+          </span>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <DateField
             label="Start Date"
@@ -144,29 +154,8 @@ export default function MilestoneUpdateModal({
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <NumberField
-            label="Weightage (%)"
-            name="weightage"
-            value={formData.weightage}
-            onChange={(value) => handleInputChange('weightage', value)}
-            min={0}
-            max={getMaxWeightage()}
-            error={errors.weightage || getWeightageError()}
-            placeholder="Enter weightage percentage"
-            required
-          />
 
-          <SelectField
-            label="Status"
-            value={formData.status}
-            onChange={(e) => handleInputChange('status', e.target.value)}
-            options={statusOptions}
-            placeholder="Select status"
-            error={errors.status}
-            required
-          />
-        </div>
+
 
         <AssigneeField
           label="Assignees"
@@ -178,7 +167,7 @@ export default function MilestoneUpdateModal({
           placeholder="Search and select assignees..."
         />
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-sm text-blue-800">
             <strong>Current Project Weightage:</strong> {currentTotalWeightage}%
             <br />
@@ -186,8 +175,10 @@ export default function MilestoneUpdateModal({
             <br />
             <strong>Original Milestone Weightage:</strong> {initialData.weightage}%
           </p>
-        </div>
+        </div> */}
       </div>
+
+
 
       <div className="flex justify-end mt-8 gap-4">
         <Button
@@ -203,7 +194,7 @@ export default function MilestoneUpdateModal({
           variant="primary"
           onClick={handleSubmit}
           isLoading={isLoading}
-          disabled={!isFormValid() || !hasChanges() || !!getWeightageError() || isLoading}
+          disabled={!isFormValid() || !hasChanges() || isLoading}
         >
           Update Milestone
         </Button>

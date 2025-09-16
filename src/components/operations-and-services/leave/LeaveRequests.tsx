@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, User, FileText, MessageSquare, Check, X, CalendarDays } from "lucide-react";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
+import { set } from "react-hook-form";
 
 // Add this interface
 interface LeaveRequest {
@@ -24,33 +25,26 @@ interface LeaveRequest {
 export default function LeaveRequestsPage() {
   const [comment, setComment] = useState<string>("");
   const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
+
   const { employees, fetchEmployees } = useEmployees();
   const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
-  const { 
-    leaveRequests, 
-    loading, 
-    error, 
-    fetchLeaveRequests, 
-    updateLeaveRequest 
+  const {
+    leaveRequests,
+    loading,
+    error,
+    fetchLeaveRequests,
+    updateLeaveRequest
   } = useLeaveRequests();
 
   useEffect(() => {
     fetchLeaveRequests();
-  }, [fetchLeaveRequests]);
-
-  useEffect(() => {
     fetchEmployees();
-  }, [fetchEmployees]);
-
-  useEffect(() => {
     fetchLeaveTypes();
-  }, [fetchLeaveTypes]);
+  }, []);
 
   const handleUpdateRequest = async (action: string, id: number) => {
-    const updateData = {
-      status: action,
-      comment: comment
-    };
+    setCurrentlyProcessingId(id);
+    const updateData = { status: action, remarks: comment };
     const result = await updateLeaveRequest(id, updateData);
     if (result.success) {
       toast.success(`Leave request ${action.toLowerCase()} successfully`);
@@ -64,14 +58,14 @@ export default function LeaveRequestsPage() {
 
   if (loading) {
     return (
-      <LoadingSection 
-          text="Loading leave requests..."
-          icon={Calendar}
-          color="blue"
-          />
-    );
+      <LoadingSection
+        text="Loading leave requests..."
+        icon={Calendar}
+        color="blue"
+      />
+    )
   }
-  
+
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -85,7 +79,7 @@ export default function LeaveRequestsPage() {
     <div className="space-y-6">
       {leaveRequests.length > 0 ? (
         leaveRequests.map((req) => {
-          const leaveReq = req as unknown as LeaveRequest;
+          const leaveReq = req as LeaveRequest;
           return (
             <LeaveRequestCard
               key={leaveReq.id}
@@ -94,7 +88,7 @@ export default function LeaveRequestsPage() {
               leaveTypes={leaveTypes}
               comment={comment}
               setComment={setComment}
-              onApprove={() => handleUpdateRequest("Approved", leaveReq.id)}
+              onApprove={() => handleUpdateRequest("Accepted", leaveReq.id)}
               onReject={() => handleUpdateRequest("Rejected", leaveReq.id)}
               isProcessing={currentlyProcessingId === leaveReq.id}
             />
@@ -132,7 +126,7 @@ function LeaveRequestCard({
 }) {
   const employee = employees.find(emp => emp.id === request.employee_id);
   const leaveType = leaveTypes.find(type => type.id === request.type_id);
-  
+
   const actions = (
     <div className="flex items-center gap-2">
       <Button
@@ -166,7 +160,7 @@ function LeaveRequestCard({
         subtitle={request.description}
         action={actions}
       />
-      
+
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
           <InfoRow
@@ -190,10 +184,10 @@ function LeaveRequestCard({
             value={request.end_date}
           />
         </div>
-        
+
         <div className="space-y-3">
           <StatusBadge status={request.status} />
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <MessageSquare size={16} className="inline mr-2" />

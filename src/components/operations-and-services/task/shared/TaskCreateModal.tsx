@@ -5,6 +5,8 @@ import { validateTask, type TaskData } from '@/lib/validation';
 import { useEmployees } from '@/hooks/useEmployees';
 import { CheckSquare } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
+import SuccessToast from '@/components/ui/SuccessToast';
+import { useTasks } from '@/hooks/useTasks';
 
 interface TaskCreateModalProps {
   milestoneId?: number;
@@ -16,9 +18,10 @@ interface TaskCreateModalProps {
 }
 
 const priorityOptions = [
-  { value: 'Low', label: 'Low' },
-  { value: 'Medium', label: 'Medium' },
-  { value: 'High', label: 'High' },
+  { value: 'low', label: 'Low' },
+  { value: 'normal', label: 'Medium' },
+  { value: 'high', label: 'High' },
+  { value: 'urgent', label: 'Urgent' }
 ];
 
 export default function TaskCreateModal({
@@ -34,7 +37,7 @@ export default function TaskCreateModal({
     task_description: '',
     start_date: '',
     end_date: '',
-    priority: 'Medium',
+    priority: 'normal',
     status: false,
     project_id: projectId,
     milestone_id: milestoneId,
@@ -43,7 +46,10 @@ export default function TaskCreateModal({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(isLoading);
   
+  const {getCompanyTasks} = useTasks();
+
   const { employees, loading: employeesLoading, fetchEmployees } = useEmployees();
 
   useEffect(() => {
@@ -66,22 +72,32 @@ export default function TaskCreateModal({
     }
   };
 
-  const handleSubmit = () => {
+const handleSubmit = async () => {
+  setLoading(true);
+
+  try {
     const validation = validateTask(formData);
-    
+
     if (!validation.success && validation.errors) {
       const errorMap: Record<string, string> = {};
       validation.errors.forEach(error => {
         errorMap[error.field] = error.message;
       });
       setErrors(errorMap);
-      return;
+      return; // exit, but loading will be reset in finally
     }
 
     if (validation.success && validation.data) {
-      onSubmit(validation.data);
+      await onSubmit(validation.data); // wait until finished
     }
-  };
+
+    getCompanyTasks()
+
+  } finally {
+    setLoading(false); // always reset
+  }
+};
+
 
   const isFormValid = () => {
     const validation = validateTask(formData);
@@ -152,7 +168,7 @@ export default function TaskCreateModal({
           onChange={(assignees) => handleInputChange('assignees', assignees)}
           employees={employees}
           error={errors.assignees}
-          disabled={isLoading || employeesLoading}
+          disabled={loading || employeesLoading}
           placeholder="Search and select assignees..."
         />
 
@@ -170,7 +186,7 @@ export default function TaskCreateModal({
           type="button"
           variant="outline"
           onClick={onClose}
-          disabled={isLoading}
+          disabled={loading}
         >
           Cancel
         </Button>
@@ -178,8 +194,8 @@ export default function TaskCreateModal({
           type="button"
           variant="primary"
           onClick={handleSubmit}
-          isLoading={isLoading}
-          disabled={isLoading}
+          isLoading={loading}
+          disabled={loading}
         >
           Create Task
         </Button>

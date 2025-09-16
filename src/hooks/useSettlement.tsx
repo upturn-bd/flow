@@ -140,8 +140,9 @@ export function useSettlementRequests() {
 
         // Upload files if any
         let uploadedFilePaths: string[] = [];
+        let uploadResult = null;
         if (attachments.length > 0) {
-          const uploadResult = await uploadManyFiles(attachments, "settlement");
+          uploadResult = await uploadManyFiles(attachments, "settlement");
           if (uploadResult.error) {
             throw new Error(uploadResult.error);
           }
@@ -154,6 +155,7 @@ export function useSettlementRequests() {
           claimant_id: user.id,
           company_id,
           attachments: uploadedFilePaths,
+          attachment_download_urls: uploadResult ? uploadResult.publicUrls : [],
         };
 
         const { data, error } = await supabase

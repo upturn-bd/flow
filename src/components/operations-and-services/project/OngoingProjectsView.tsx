@@ -5,7 +5,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { Project, useProjects } from "@/hooks/useProjects";
 import { useEffect, useState } from "react";
 import ProjectDetails from "./ProjectDetails";
-import { UpdateProjectPage } from "./CreateNewProject";
+import CreateNewProjectPage, { UpdateProjectPage } from "./CreateNewProject";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -144,7 +144,7 @@ function ProjectsList() {
             </AnimatePresence>
           </motion.div>
 
-          {projects.length > 0 && (
+          {/* {projects.length > 0 && (
             <motion.div variants={fadeIn} className="flex justify-end mt-4">
               <Button
                 onClick={() => setSelectedProject(emptyProject)}
@@ -154,7 +154,7 @@ function ProjectsList() {
                 Add Project
               </Button>
             </motion.div>
-          )}
+          )} */}
         </motion.div>
       )}
 
@@ -171,9 +171,9 @@ function ProjectsList() {
       {!projectDetailsId && selectedProject && (
         <UpdateProjectPage
           initialData={selectedProject}
-          onSubmit={handleUpdateProject}
           employees={employees}
           departments={departments}
+          onSubmit={handleUpdateProject}
           onClose={() => setSelectedProject(null)}
         />
       )}

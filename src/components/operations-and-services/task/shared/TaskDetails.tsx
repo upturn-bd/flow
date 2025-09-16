@@ -263,9 +263,9 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
                 label="Priority"
                 value={
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    taskDetails.priority === 'High' 
+                    taskDetails.priority === 'high' 
                       ? 'bg-red-100 text-red-800' 
-                      : taskDetails.priority === 'Medium' 
+                      : taskDetails.priority === 'normal' 
                       ? 'bg-yellow-100 text-yellow-800' 
                       : 'bg-green-100 text-green-800'
                   }`}>

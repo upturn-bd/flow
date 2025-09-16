@@ -14,9 +14,10 @@ interface NoticeCreateModalProps {
 }
 
 const urgencyOptions = [
-  { value: 'Low', label: 'Low' },
-  { value: 'Medium', label: 'Medium' },
-  { value: 'High', label: 'High' },
+  { value: 'low', label: 'Low' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'high', label: 'High' },
+  { value: 'urgent', label: 'Urgent' },
 ];
 
 export default function NoticeCreateModal({
@@ -59,7 +60,7 @@ export default function NoticeCreateModal({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Transform data for validation (convert empty strings to undefined for optional fields)
     const dataToValidate = {
       ...formData,
@@ -79,8 +80,9 @@ export default function NoticeCreateModal({
     }
 
     if (validation.success && validation.data) {
-      onSubmit(validation.data);
+      await onSubmit(validation.data);
     }
+
   };
 
   const isFormValid = () => {

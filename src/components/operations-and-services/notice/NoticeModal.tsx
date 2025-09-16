@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 interface NoticeFormData {
   title: string;
   description: string;
-  urgency: "Low" | "Medium" | "High" | "Critical";
+  urgency: "low" | "normal" | "high" | "urgent";
   department_id?: number;
   valid_from: string;
   valid_till: string;
@@ -40,7 +40,7 @@ export function NoticeModal({
     defaultValues: {
       title: "",
       description: "",
-      urgency: "Medium",
+      urgency: "normal",
       department_id: undefined,
       valid_from: "",
       valid_till: "",
@@ -52,7 +52,7 @@ export function NoticeModal({
       reset({
         title: initialData.title || "",
         description: initialData.description || "",
-        urgency: (initialData.urgency as "Low" | "Medium" | "High" | "Critical") || "Medium",
+        urgency: (initialData.urgency as "low" | "normal" | "high" | "urgent") || "normal",
         department_id: initialData.department_id || undefined,
         valid_from: initialData.valid_from || "",
         valid_till: initialData.valid_till || "",
@@ -61,7 +61,7 @@ export function NoticeModal({
       reset({
         title: "",
         description: "",
-        urgency: "Medium",
+        urgency: "normal",
         department_id: undefined,
         valid_from: "",
         valid_till: "",
@@ -129,10 +129,10 @@ export function NoticeModal({
               {...register("urgency")}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-              <option value="Critical">Critical</option>
+              <option value="low">Low</option>
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
             </select>
           </div>
 

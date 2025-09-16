@@ -170,7 +170,7 @@ export interface Task {
   task_description: string;
   start_date: string;
   end_date: string;
-  priority: string;
+  priority: "low" | "normal" | "high" | "urgent";
   project_id?: number;
   milestone_id?: number;
   assignees: string[];
@@ -215,6 +215,7 @@ export interface SettlementRecord {
   company_id?: string;
   in_advance?: boolean;
   attachments?: string[];
+  attachment_download_urls?: string[];
 }
 
 export interface ComplaintRecord {
@@ -238,7 +239,7 @@ export interface Notice {
   notice_type_id: number | null;
   title: string;
   description: string;
-  urgency: string;
+  urgency: "low" | "normal" | "high" | "urgent";
   valid_from: string;
   valid_till: string;
   company_id?: number;

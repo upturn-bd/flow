@@ -32,7 +32,7 @@ export function useNotices() {
       createNotification({
         title: "New Notice Published",
         message: `A new notice "${notice.title}" has been published.`,
-        priority: 'normal',
+        priority: notice.urgency || 'normal',
         type_id: 6,
         recipient_id: recipients,
         action_url: '/operations-and-services/services/notice',
@@ -56,7 +56,7 @@ export function useNotices() {
       createNotification({
         title: "Notice Updated",
         message: `The notice "${notice.title}" has been updated.`,
-        priority: 'normal',
+        priority: notice.urgency || 'normal',
         type_id: 6,
         recipient_id: recipients,
         action_url: '/operations-and-services/workflow/notice',

@@ -15,7 +15,7 @@ import {
   AlertTriangle,
   List
 } from "lucide-react";
-import { extractFilenameFromUrl } from "@/lib/utils";
+import { extractFileNameFromStoragePath, extractFilenameFromUrl } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaints } from "@/hooks/useComplaints";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
@@ -32,16 +32,19 @@ export default function ComplaintRequestsPage() {
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
   const {
     complaints,
+    complaintRequests,
     loading,
     error,
+    requestLoading,
     processingId,
     fetchComplaints,
+    fetchComplaintRequests,
     updateComplaint,
   } = useComplaints();
 
   useEffect(() => {
-    fetchComplaints();
-  }, [fetchComplaints]);
+    fetchComplaintRequests();
+  }, []);
 
   useEffect(() => {
     fetchEmployees();
@@ -68,7 +71,7 @@ export default function ComplaintRequestsPage() {
     if (result.success) {
       toast.success(`Complaint ${action.toLowerCase()} successfully`);
       setComment("");
-      fetchComplaints();
+      fetchComplaintRequests();
     } else {
       toast.error(`Failed to ${action.toLowerCase()} complaint`);
     }
@@ -77,25 +80,25 @@ export default function ComplaintRequestsPage() {
 
   return (
     <AnimatePresence mode="wait">
-      {loading && <LoadingSection 
+      {requestLoading && <LoadingSection 
           text="Loading complaint requests..."
           icon={List}
           color="blue"
           />}
       
-      {error && !loading && (
+      {error && !requestLoading && (
         <div className="flex flex-col items-center justify-center py-16">
           <XCircle className="h-12 w-12 text-red-500 mb-4" />
           <p className="text-red-500 font-medium">{error}</p>
         </div>
       )}
       
-      {!loading && !error && (
+      {!requestLoading && !error && (
         <div className="space-y-6">
-          {complaints.length > 0 ? (
+          {complaintRequests.length > 0 ? (
             <div className="space-y-4">
               <AnimatePresence>
-                {complaints.map((complaint) => (
+                {complaintRequests.map((complaint) => (
                   <ComplaintCard
                     key={complaint.id}
                     complaint={complaint}
@@ -229,13 +232,13 @@ function ComplaintCard({
                 {complaint.attachments.map((attachment: string, idx: number) => (
                   <a
                     key={idx}
-                    href={attachment}
+                    href={complaint.attachment_download_urls ? complaint.attachment_download_urls[idx] : '#'}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 text-xs px-3 py-2 rounded-md"
                   >
                     <FileText size={12} />
-                    {extractFilenameFromUrl(attachment)}
+                    {extractFileNameFromStoragePath(attachment)}
                   </a>
                 ))}
               </div>

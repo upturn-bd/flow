@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Department, useDepartments } from "@/hooks/useDepartments";
@@ -39,47 +39,40 @@ const initialProjectDetails: ProjectDetails = {
 };
 
 export default function CreateNewProjectPage() {
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { departments, fetchDepartments } = useDepartments();
   const { employees, fetchEmployeeInfo } = useEmployeeInfo();
   const { createProject } = useProjects();
   const { createMilestone } = useMilestones();
-  const [milestone, setMilestone] = useState<Milestone>(initialMilestone);
-  const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [isCreatingMilestone, setIsCreatingMilestone] = useState(false);
-  const [selectedMilestone, setSelectedMilestone] = useState<number | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchDepartments();
     fetchEmployeeInfo();
   }, [fetchDepartments, fetchEmployeeInfo]);
 
-  const handleSubmit = async (data: ProjectDetails) => {
+  const handleSubmit = async (
+    data: ProjectDetails,
+    milestones: any[]
+  ) => {
     setIsSubmitting(true);
-    setErrors({});
 
     try {
-      // Validate milestones if any
-      if (milestones.length > 0) {
-        const totalWeightage = milestones.reduce((sum, m) => sum + m.weightage, 0);
-        if (totalWeightage !== 100) {
-          setErrors({ milestone_weightage: "Total milestone weightage must equal 100%" });
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
-      // Create project using hook
       const projectResult = await createProject({ ...data });
       if (!projectResult.success) {
         throw new Error("Failed to create project");
       }
+
       let projectId: number | undefined;
       if (projectResult.data) {
-        if (Array.isArray(projectResult.data) && projectResult.data.length > 0) {
+        if (
+          Array.isArray(projectResult.data) &&
+          projectResult.data.length > 0
+        ) {
           projectId = projectResult.data[0].id;
-        } else if (typeof projectResult.data === 'object' && 'id' in projectResult.data) {
+        } else if (
+          typeof projectResult.data === "object" &&
+          "id" in projectResult.data
+        ) {
           projectId = projectResult.data.id;
         }
       }
@@ -87,52 +80,27 @@ export default function CreateNewProjectPage() {
         throw new Error("Project ID not returned after creation");
       }
 
-      // Create milestones if any using hook
+      // Create milestones if provided
       if (milestones.length > 0) {
         for (const m of milestones) {
           const milestoneToCreate = { ...m, project_id: projectId };
           const milestoneResult = await createMilestone(milestoneToCreate);
           if (!milestoneResult.success) {
-            // Rollback project creation
-            await supabase
-              .from("project_records")
-              .delete()
-              .match({ id: projectId });
-            console.error("Failed to create milestones:", milestoneResult);
-            throw new Error("Failed to create milestones");
+            await supabase.from("project_records").delete().match({ id: projectId });
+            throw new Error("Failed to create milestones", { cause: milestoneResult.error });
           }
         }
       }
 
-      // Reset form
-      setMilestones([]);
-      setMilestone(initialMilestone);
       toast.success("Project created successfully!");
     } catch (error) {
       console.error("Error creating project:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to create project");
-      setErrors({ submit: "Failed to create project. Please try again." });
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create project"
+      );
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleAddMilestone = (newMilestone: Milestone) => {
-    setMilestones((prev) => [...prev, { ...newMilestone, project_id: prev.length + 1 }]);
-    setIsCreatingMilestone(false);
-  };
-
-  const handleUpdateMilestone = (updatedMilestone: Milestone) => {
-    setMilestones((prev) =>
-      prev.map((m) =>
-        m.project_id === selectedMilestone ? updatedMilestone : m
-      )
-    );
-    setSelectedMilestone(null);
-  };
-
-  const handleDeleteMilestone = (id: number) => {
-    setMilestones((prev) => prev.filter((m) => m.project_id !== id));
   };
 
   return (
@@ -142,90 +110,35 @@ export default function CreateNewProjectPage() {
       variants={staggerContainer}
       className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6"
     >
-      <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
+      <motion.div
+        variants={fadeInUp}
+        className="flex items-center justify-between mb-6"
+      >
         <div className="flex items-center gap-3">
           <Building2 size={24} className="text-gray-600" strokeWidth={1.5} />
-          <h2 className="text-xl font-semibold text-gray-800">Create New Project</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Create New Project
+          </h2>
         </div>
       </motion.div>
-      
-      {errors.submit && (
-        <motion.div
-          variants={fadeInUp}
-          className="bg-red-50 border border-red-200 p-4 rounded-md mb-4"
-        >
-          <p className="text-red-700 flex items-center">
-            <AlertCircle size={16} className="mr-2" strokeWidth={2} />
-            {errors.submit}
-          </p>
-        </motion.div>
-      )}
-
-      {errors.milestone_weightage && (
-        <motion.div
-          variants={fadeInUp}
-          className="bg-red-50 border border-red-200 p-4 rounded-md mb-4"
-        >
-          <p className="text-red-700 flex items-center">
-            <AlertCircle size={16} className="mr-2" strokeWidth={2} />
-            {errors.milestone_weightage}
-          </p>
-        </motion.div>
-      )}
 
       <motion.div variants={fadeInUp}>
         <ProjectForm
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          departments={departments.filter(d => d.id != null) as { id: number; name: string }[]}
+          departments={
+            departments.filter((d) => d.id != null) as {
+              id: number;
+              name: string;
+            }[]
+          }
           employees={employees}
           mode="create"
         />
       </motion.div>
-
-      <motion.div variants={fadeInUp}>
-        <MilestoneList
-          milestones={milestones}
-          onEdit={(id) => {
-            const milestoneToUpdate = milestones.find((m) => m.project_id === id);
-            if (milestoneToUpdate) {
-              setMilestone(milestoneToUpdate);
-              setSelectedMilestone(id);
-            }
-          }}
-          onDelete={handleDeleteMilestone}
-          onAdd={() => setIsCreatingMilestone(true)}
-          employees={employees}
-        />
-      </motion.div>
-
-      {isCreatingMilestone && (
-        <MilestoneForm
-          milestone={milestone}
-          onSubmit={handleAddMilestone}
-          onCancel={() => setIsCreatingMilestone(false)}
-          employees={employees}
-          currentMilestones={milestones}
-          mode="create"
-          isSubmitting={isSubmitting}
-        />
-      )}
-
-      {selectedMilestone && (
-        <MilestoneForm
-          milestone={milestone}
-          onSubmit={handleUpdateMilestone}
-          onCancel={() => setSelectedMilestone(null)}
-          employees={employees}
-          currentMilestones={milestones.filter((m) => m.project_id !== selectedMilestone)}
-          mode="edit"
-          isSubmitting={isSubmitting}
-        />
-      )}
     </motion.div>
   );
 }
-
 export function UpdateProjectPage({
   initialData,
   employees,

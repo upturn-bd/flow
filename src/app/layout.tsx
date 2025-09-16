@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 
 import "./globals.css";
 import 'leaflet/dist/leaflet.css';
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,7 +35,10 @@ export default function RootLayout({
           }
         />
       </head>
-      <body className={`${geistSans.className} antialiased`}>{children}</body>
+      <body className={`${geistSans.className} antialiased`}>{children}
+
+        <Toaster position="bottom-right" richColors />
+      </body>
     </html>
   );
 }

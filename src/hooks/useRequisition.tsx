@@ -15,6 +15,7 @@ export interface RequisitionState {
   to_time?: string;
   description?: string;
   attachments?: string[];
+  attachment_download_urls?: string[];
   employee_id: string;
   company_id: number;
   status: 'Pending' | 'Approved' | 'Rejected';
@@ -41,7 +42,7 @@ export function useRequisitionRequests() {
 
         const { data, error } = await supabase
           .from("requisition_records")
-          .select("*")
+          .select("*") 
           .eq("company_id", company_id)
           .eq("asset_owner", user.id)
           .eq("status", status);

@@ -50,14 +50,22 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const { createNotification } = useNotifications()
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+
+    // mark field as touched
+    setTouched((prev) => ({ ...prev, [name]: true }));
+
     if (name === "complaint_type_id") {
-      setComplaintState((prev: ComplaintState) => ({ ...prev, [name]: value ? Number(value) : undefined }));
+      setComplaintState((prev: ComplaintState) => ({
+        ...prev,
+        [name]: value ? Number(value) : undefined,
+      }));
     } else {
       setComplaintState((prev: ComplaintState) => ({ ...prev, [name]: value }));
     }
@@ -72,7 +80,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
     const user = await getEmployeeInfo();
     setIsSubmitting(true);
     try {
-      const { uploadedFilePaths, error: uploadError } = await uploadManyFiles(
+      const { uploadedFilePaths, error: uploadError, publicUrls } = await uploadManyFiles(
         attachments,
         "complaints"
       );
@@ -82,6 +90,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
       const formattedComplaintState = {
         ...complaintState,
         attachments: uploadedFilePaths,
+        attachment_download_urls: publicUrls,
         anonymous: isAnonymous,
         complainer_id: isAnonymous ? null : user.id,
         company_id: user.company_id,
@@ -97,23 +106,23 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
       toast.success("Complaint created successfully!");
       setComplaintState(initialComplaintRecord);
       setAttachments([]);
+      setTouched({});
       onClose();
 
-      const recipients = [user.supervisor_id].filter(Boolean) as string[]
+      const recipients = [user.supervisor_id].filter(Boolean) as string[];
 
-      const complaintAuthor = formattedComplaintState.anonymous ? "" : `by ${user.name}`
+      const complaintAuthor = formattedComplaintState.anonymous ? "" : `by ${user.name}`;
 
       createNotification({
         title: "New Complaint Filed",
         message: `A new complaint has been filed ${complaintAuthor}`,
-        priority: 'normal',
+        priority: "normal",
         type_id: 6,
         recipient_id: recipients,
-        action_url: '/operations-and-services/services/complaint',
+        action_url: "/operations-and-services/services/complaint",
         company_id: user.company_id,
-        department_id: user.department_id
+        department_id: user.department_id,
       });
-
     } catch (error: any) {
       console.error("Error creating Complaint:", error);
       toast.error(`Error creating Complaint: ${error.message || "Please try again"}`);
@@ -134,7 +143,6 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
     const newErrors: Record<string, string> = {};
     let valid = true;
 
-    console.log(complaintState.complaint_type_id);
     if (!complaintState.complaint_type_id && complaintState.complaint_type_id !== 0) {
       newErrors.complaint_type_id = "Please select a category";
       valid = false;
@@ -185,8 +193,9 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
         onClick={() => setIsAnonymous(!isAnonymous)}
       >
         <div
-          className={`w-12 h-6 rounded-full relative ${isAnonymous ? "bg-blue-500" : "bg-gray-300"
-            } transition-colors duration-300`}
+          className={`w-12 h-6 rounded-full relative ${
+            isAnonymous ? "bg-blue-500" : "bg-gray-300"
+          } transition-colors duration-300`}
         >
           <motion.div
             className="w-5 h-5 bg-white rounded-full absolute top-0.5"
@@ -201,8 +210,12 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
         </span>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200"
+      >
         <div className="space-y-4">
+          {/* Category */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
               <Flag size={16} className="mr-2" />
@@ -215,7 +228,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
                 onChange={handleInputChange}
                 className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
-                <option value={undefined}>Select category</option>
+                <option value={""}>Select category</option>
                 {complaintTypes.length > 0 &&
                   complaintTypes.map((type) => (
                     <option key={type.id} value={type.id}>
@@ -228,7 +241,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
                 size={16}
               />
             </div>
-            {errors.complaint_type_id && (
+            {touched.complaint_type_id && errors.complaint_type_id && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
                 <AlertCircle size={14} className="mr-1" />
                 {errors.complaint_type_id}
@@ -236,6 +249,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
             )}
           </div>
 
+          {/* Complaint Against */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
               <User size={16} className="mr-2" />
@@ -261,7 +275,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
                 size={16}
               />
             </div>
-            {errors.against_whom && (
+            {touched.against_whom && errors.against_whom && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
                 <AlertCircle size={14} className="mr-1" />
                 {errors.against_whom}
@@ -269,6 +283,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
             )}
           </div>
 
+          {/* Description */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
               <MessageSquare size={16} className="mr-2" />
@@ -282,7 +297,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
               className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
               placeholder="Describe your complaint..."
             />
-            {errors.description && (
+            {touched.description && errors.description && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
                 <AlertCircle size={14} className="mr-1" />
                 {errors.description}
@@ -290,6 +305,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
             )}
           </div>
 
+          {/* Attachments */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
               <Upload size={16} className="mr-2" />
@@ -361,6 +377,7 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
           </div>
         </div>
 
+        {/* Submit */}
         <div className="flex justify-end gap-4 pt-4">
           <motion.button
             whileHover={{ scale: 1.02 }}

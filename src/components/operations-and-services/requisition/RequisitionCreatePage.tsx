@@ -28,6 +28,7 @@ import { getCompanyId, getEmployeeInfo } from "@/lib/utils/auth";
 import { uploadManyFiles } from "@/lib/utils/files";
 import { useNotifications } from "@/hooks/useNotifications";
 import { create } from "domain";
+import { useFileUpload } from "@/hooks/useFileUpload";
 
 // Define a proper interface that mirrors the requisition schema
 interface RequisitionFormState {
@@ -125,15 +126,21 @@ export default function RequisitionCreatePage({
     useRequisitionInventories();
   const { employees, fetchEmployees } = useEmployees();
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
   const { createNotification } = useNotifications();
+  const { uploadFiles } = useFileUpload();
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    
+    // Mark field as touched
+    setTouchedFields(prev => ({ ...prev, [name]: true }));
+    
     if (
       name === "quantity" ||
       name === "requisition_category_id" ||
@@ -145,17 +152,32 @@ export default function RequisitionCreatePage({
     }
   };
 
+  const handleFieldBlur = (fieldName: string) => {
+    setTouchedFields(prev => ({ ...prev, [fieldName]: true }));
+  };
+
   const removeFile = (name: string) => {
     setAttachments((prev) => prev.filter((file) => file.name !== name));
   };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    
+    // Mark all fields as touched on submit attempt
+    setTouchedFields({
+      requisition_category_id: true,
+      item_id: true,
+      quantity: true,
+      date: true,
+      from_time: true,
+      to_time: true,
+    });
+
     const company_id = await getCompanyId();
     const user = await getEmployeeInfo();
     setIsSubmitting(true);
     try {
-      const { uploadedFilePaths, error: uploadError } = await uploadManyFiles(
+      const { uploadedFilePaths, error: uploadError, publicUrls } = await uploadManyFiles(
         attachments,
         "requisition"
       );
@@ -165,6 +187,7 @@ export default function RequisitionCreatePage({
       const formattedRequisitionState = {
         ...requisitionState,
         attachments: uploadedFilePaths,
+        attachment_download_urls: publicUrls,
         employee_id: user.id,
         company_id,
         asset_owner: requisitionInventories.filter(
@@ -179,6 +202,7 @@ export default function RequisitionCreatePage({
       toast.success("Requisition created successfully!");
       setRequisitionState(initialRequisitionState);
       setAttachments([]);
+      setTouchedFields({});
 
       const recipients = [user.supervisor_id, formattedRequisitionState.asset_owner].filter(Boolean) as string[];
       createNotification({
@@ -191,7 +215,6 @@ export default function RequisitionCreatePage({
         company_id: user.company_id,
         department_id: user.department_id
       });
-
 
     } catch (error) {
       console.error("Error creating Requisition:", error);
@@ -209,6 +232,7 @@ export default function RequisitionCreatePage({
     toast.success("Draft saved successfully!");
     setRequisitionState(initialRequisitionState);
     setAttachments([]);
+    setTouchedFields({});
     onClose();
   }
 
@@ -325,6 +349,7 @@ export default function RequisitionCreatePage({
                 name="requisition_category_id"
                 value={requisitionState.requisition_category_id}
                 onChange={handleInputChange}
+                onBlur={() => handleFieldBlur('requisition_category_id')}
                 className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value={undefined}>Select category</option>
@@ -339,10 +364,10 @@ export default function RequisitionCreatePage({
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
                 size={16}
               />
-              {errors.requisition_category_id && (
+              {touchedFields.requisition_category_id && errors.requisition_category_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
                   <AlertCircle size={14} className="mr-1" />
-                  Please select a category
+                  {errors.requisition_category_id}
                 </p>
               )}
             </div>
@@ -357,6 +382,7 @@ export default function RequisitionCreatePage({
                 name="item_id"
                 value={requisitionState.item_id}
                 onChange={handleInputChange}
+                onBlur={() => handleFieldBlur('item_id')}
                 className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value={undefined}>Select item</option>
@@ -377,10 +403,10 @@ export default function RequisitionCreatePage({
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
                 size={16}
               />
-              {errors.item_id && (
+              {touchedFields.item_id && errors.item_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
                   <AlertCircle size={14} className="mr-1" />
-                  Please select an item
+                  {errors.item_id}
                 </p>
               )}
             </div>
@@ -395,9 +421,10 @@ export default function RequisitionCreatePage({
               name="quantity"
               value={requisitionState.quantity}
               onChange={handleInputChange}
+              onBlur={() => handleFieldBlur('quantity')}
               className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
-            {errors.quantity && (
+            {touchedFields.quantity && errors.quantity && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
                 <AlertCircle size={14} className="mr-1" />
                 {errors.quantity}
@@ -418,10 +445,11 @@ export default function RequisitionCreatePage({
                   name="date"
                   value={requisitionState.date}
                   onChange={handleInputChange}
+                  onBlur={() => handleFieldBlur('date')}
                   className="w-full p-2 outline-none bg-transparent"
                 />
               </div>
-              {errors.date && (
+              {touchedFields.date && errors.date && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
                   <AlertCircle size={14} className="mr-1" />
                   {errors.date}
@@ -443,9 +471,16 @@ export default function RequisitionCreatePage({
                       name="from_time"
                       value={requisitionState.from_time}
                       onChange={handleInputChange}
+                      onBlur={() => handleFieldBlur('from_time')}
                       className="w-full p-2 outline-none bg-transparent"
                     />
                   </div>
+                  {touchedFields.from_time && errors.from_time && (
+                    <p className="mt-1 text-red-500 text-sm flex items-center">
+                      <AlertCircle size={14} className="mr-1" />
+                      {errors.from_time}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -460,9 +495,16 @@ export default function RequisitionCreatePage({
                       name="to_time"
                       value={requisitionState.to_time}
                       onChange={handleInputChange}
+                      onBlur={() => handleFieldBlur('to_time')}
                       className="w-full p-2 outline-none bg-transparent"
                     />
                   </div>
+                  {touchedFields.to_time && errors.to_time && (
+                    <p className="mt-1 text-red-500 text-sm flex items-center">
+                      <AlertCircle size={14} className="mr-1" />
+                      {errors.to_time}
+                    </p>
+                  )}
                 </div>
               </>
             )}
@@ -609,13 +651,20 @@ export function RequisitionDraftPage({
     useRequisitionInventories();
   const { employees, fetchEmployees } = useEmployees();
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
+
+  const { uploadFiles } = useFileUpload();
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    
+    // Mark field as touched
+    setTouchedFields(prev => ({ ...prev, [name]: true }));
+    
     if (
       name === "quantity" ||
       name === "requisition_category_id" ||
@@ -627,17 +676,32 @@ export function RequisitionDraftPage({
     }
   };
 
+  const handleFieldBlur = (fieldName: string) => {
+    setTouchedFields(prev => ({ ...prev, [fieldName]: true }));
+  };
+
   const removeFile = (name: string) => {
     setAttachments((prev) => prev.filter((file) => file.name !== name));
   };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    
+    // Mark all fields as touched on submit attempt
+    setTouchedFields({
+      requisition_category_id: true,
+      item_id: true,
+      quantity: true,
+      date: true,
+      from_time: true,
+      to_time: true,
+    });
+
     const company_id = await getCompanyId();
     const user = await getEmployeeInfo();
     setIsSubmitting(true);
     try {
-      const { uploadedFilePaths, error: uploadError } = await uploadManyFiles(
+      const { uploadedFilePaths, error: uploadError, publicUrls } = await uploadManyFiles(
         attachments,
         "requisition"
       );
@@ -650,6 +714,7 @@ export function RequisitionDraftPage({
       const formattedRequisitionState = {
         ...requisitionData,
         attachments: uploadedFilePaths,
+        attachment_download_urls: publicUrls,
         employee_id: user.id,
         company_id,
         asset_owner: requisitionInventories.filter(
@@ -666,6 +731,7 @@ export function RequisitionDraftPage({
       toast.success("Requisition created successfully!");
       setRequisitionState(initialRequisitionState);
       setAttachments([]);
+      setTouchedFields({});
 
       // Remove the draft from localStorage
       const drafts = localStorage.getItem("requisition-drafts");
@@ -710,6 +776,7 @@ export function RequisitionDraftPage({
         toast.success("Draft updated successfully!");
         setRequisitionState(initialRequisitionState);
         setAttachments([]);
+        setTouchedFields({});
         onClose();
       }
     }
@@ -730,6 +797,15 @@ export function RequisitionDraftPage({
         });
         setIsOneOff(draft.is_one_off);
         // Note: attachments won't be restored from localStorage
+        // Mark fields as touched since they have values from the draft
+        setTouchedFields({
+          requisition_category_id: !!draft.requisition_category_id,
+          item_id: !!draft.item_id,
+          quantity: !!draft.quantity,
+          date: !!draft.date,
+          from_time: !!draft.from_time,
+          to_time: !!draft.to_time,
+        });
       }
     }
   }, [draftId]);
@@ -825,6 +901,7 @@ export function RequisitionDraftPage({
               name="requisition_category_id"
               value={requisitionState.requisition_category_id}
               onChange={handleInputChange}
+              onBlur={() => handleFieldBlur('requisition_category_id')}
               className="w-full bg-blue-100 rounded p-3 appearance-none"
             >
               <option value={undefined}>Select category</option>
@@ -841,18 +918,13 @@ export function RequisitionDraftPage({
               </svg>
             </div>
           </div>
-          {errors.requisition_category_id && (
+          {touchedFields.requisition_category_id && errors.requisition_category_id && (
             <p className="text-red-500 text-sm mt-1">
               {errors.requisition_category_id}
             </p>
           )}
-          {requisitionState.requisition_category_id === undefined && (
-            <p className="mt-1 text-red-500 text-sm flex items-center">
-              <AlertCircle size={14} className="mr-1" />
-              Please select a category
-            </p>
-          )}
         </div>
+        
         <div>
           <label className="block text-lg font-bold text-blue-700">Item</label>
           <div className="relative">
@@ -860,6 +932,7 @@ export function RequisitionDraftPage({
               name="item_id"
               value={requisitionState.item_id}
               onChange={handleInputChange}
+              onBlur={() => handleFieldBlur('item_id')}
               className="w-full bg-blue-100 rounded p-3 appearance-none"
             >
               <option value={undefined}>Select item</option>
@@ -882,16 +955,11 @@ export function RequisitionDraftPage({
               </svg>
             </div>
           </div>
-          {errors.item_id && (
+          {touchedFields.item_id && errors.item_id && (
             <p className="text-red-500 text-sm mt-1">{errors.item_id}</p>
           )}
-          {requisitionState.item_id === undefined && (
-            <p className="mt-1 text-red-500 text-sm flex items-center">
-              <AlertCircle size={14} className="mr-1" />
-              Please select an item
-            </p>
-          )}
         </div>
+        
         <div>
           <label className="block font-bold text-[#003366] mb-1">
             Quantity
@@ -901,9 +969,10 @@ export function RequisitionDraftPage({
             name="quantity"
             value={requisitionState.quantity}
             onChange={handleInputChange}
+            onBlur={() => handleFieldBlur('quantity')}
             className="w-full bg-[#EAF4FF] px-4 py-2 rounded-md"
           />
-          {errors.quantity && (
+          {touchedFields.quantity && errors.quantity && (
             <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>
           )}
         </div>
@@ -918,9 +987,13 @@ export function RequisitionDraftPage({
                 name="date"
                 value={requisitionState.date}
                 onChange={handleInputChange}
+                onBlur={() => handleFieldBlur('date')}
                 className="outline-none w-full"
               />
             </div>
+            {touchedFields.date && errors.date && (
+              <p className="text-red-500 text-sm mt-1">{errors.date}</p>
+            )}
           </div>
 
           {!isOneOff && (
@@ -933,8 +1006,12 @@ export function RequisitionDraftPage({
                 name="from_time"
                 value={requisitionState.from_time}
                 onChange={handleInputChange}
+                onBlur={() => handleFieldBlur('from_time')}
                 className="w-full bg-white shadow px-4 py-2 rounded-md"
               />
+              {touchedFields.from_time && errors.from_time && (
+                <p className="text-red-500 text-sm mt-1">{errors.from_time}</p>
+              )}
             </div>
           )}
 
@@ -946,8 +1023,12 @@ export function RequisitionDraftPage({
                 name="to_time"
                 value={requisitionState.to_time}
                 onChange={handleInputChange}
+                onBlur={() => handleFieldBlur('to_time')}
                 className="w-full bg-white shadow px-4 py-2 rounded-md"
               />
+              {touchedFields.to_time && errors.to_time && (
+                <p className="text-red-500 text-sm mt-1">{errors.to_time}</p>
+              )}
             </div>
           )}
         </div>
@@ -1029,12 +1110,7 @@ export function RequisitionDraftPage({
           </button>
           <button
             type="submit"
-            disabled={
-              !isValid ||
-              isSubmitting ||
-              !requisitionState.requisition_category_id ||
-              !requisitionState.item_id
-            }
+            disabled={!isValid || isSubmitting}
             className="bg-[#001F4D] text-white px-6 py-2 rounded-full hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Submitting..." : "Submit"}

@@ -23,6 +23,7 @@ import {
   Pencil,
   Trash2,
   Projector,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -39,6 +40,7 @@ import { StatusBadge, InfoRow } from "@/components/ui/Card";
 import BaseModal from "@/components/ui/modals/BaseModal";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { getCompanyId } from "@/lib/utils/auth";
+import { MilestoneUpdateModal } from "./milestone";
 
 interface ProjectDetailsProps {
   id: number;
@@ -150,7 +152,10 @@ export default function ProjectDetails({
   const [milestoneDetailsId, setMilestoneDetailsId] = useState<number | null>(
     null
   );
-  const { createMilestone, updateMilestone, deleteMilestone } = useMilestones();
+
+
+
+  const { createMilestone, updateMilestone, deleteMilestone, updateMilestoneStatus } = useMilestones();
 
   const handleCreateMilestone = async (values: Milestone) => {
     try {
@@ -167,9 +172,9 @@ export default function ProjectDetails({
     try {
       if (selectedMilestone?.id) {
         await updateMilestone(selectedMilestone.id, values);
-        toast.success("Milestone updated!");
         setSelectedMilestone(null);
         fetchMilestonesByProjectId(projectId);
+        toast.success("Milestone updated!");
       }
     } catch {
       toast.error("Error updating Milestone.");
@@ -301,6 +306,17 @@ export default function ProjectDetails({
         return "info";
     }
   };
+
+  const onMilestoneStatusUpdate = async (milestoneId: number, updatedMilestoneData: Milestone) => {
+    try {
+      await updateMilestoneStatus(milestoneId, updatedMilestoneData, projectDetails?.progress || 0);
+      toast.success("Milestone status updated!");
+      fetchMilestonesByProjectId(projectId);
+      fetchProjectDetails(projectId);
+    } catch {
+      toast.error("Error updating milestone status.");
+    }
+  }
 
   if (loading) {
     return (
@@ -444,7 +460,7 @@ export default function ProjectDetails({
                   <div className="pt-4 border-t border-gray-100">
                     <Button
                       onClick={() => setDisplaySubmissionModal(true)}
-                      className="w-full"
+                      className="flex items-center justify-center gap-2"
                     >
                       <CheckCircle size={16} className="mr-2" />
                       Submit Project
@@ -493,13 +509,58 @@ export default function ProjectDetails({
                         className="border border-gray-200 rounded-lg p-4 space-y-3"
                       >
                         <div className="flex items-center justify-between">
-                          <h4 className="font-semibold text-gray-900">
-                            {milestone.milestone_title}
-                          </h4>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-blue-600">
+                          <div className="flex items-center justify-center gap-3">
+                            <h4 className="font-semibold text-gray-900">
+                              {milestone.milestone_title}
+                            </h4>
+                            <span className="text-xs font-medium bg-blue-100 px-2 py-1 rounded-full text-blue-600">
                               {milestone.weightage}%
                             </span>
+                            {milestone.status === "Completed" && (
+                              <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-1 rounded-full">
+                                Completed
+                              </span>
+                            )}
+
+                            {milestone.status === "In Progress" && (
+                              <span className="text-xs font-medium text-yellow-700 bg-yellow-100 px-2 py-1 rounded-full">
+                                In Progress
+                              </span>
+                            )}
+
+                            {milestone.status === "Not Started" && (
+                              <span className="text-xs font-medium text-red-700 bg-red-100 px-2 py-1 rounded-full">
+                                Not Started
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+
+                            {milestone.status === "Not Started" && (
+                              <Button
+                                variant="pending"
+                                size="sm"
+                                text="Mark as In Progress"
+                                onClick={() =>
+                                  milestone.id &&
+                                  onMilestoneStatusUpdate(milestone.id, { ...milestone, status: "In Progress" } )
+                                }
+                              >
+                              </Button>
+                            )}
+
+                            {milestone.status === "In Progress" && (
+                              <Button
+                                variant="complete"
+                                size="sm"
+                                text="Mark as Complete"
+                                onClick={() =>
+                                  milestone.id &&
+                                  onMilestoneStatusUpdate(milestone.id, { ...milestone, status: "Completed" } )
+                                }
+                              >
+                              </Button>)}
                             {projectDetails.status !== "Completed" && (
                               <div className="flex gap-1">
                                 <Button
@@ -511,18 +572,22 @@ export default function ProjectDetails({
                                 >
                                   <Pencil size={14} />
                                 </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    milestone.id &&
-                                    handleDeleteMilestone(milestone.id)
-                                  }
-                                >
-                                  <Trash2 size={14} />
-                                </Button>
+                       <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              milestone.id &&
+                              setMilestoneDetailsId(milestone.id)
+                            }
+                          >
+                            <ExternalLink size={14} />
+                          </Button>
+
+
                               </div>
                             )}
+
+
                           </div>
                         </div>
 
@@ -534,16 +599,6 @@ export default function ProjectDetails({
                           <span>
                             {milestone.start_date} - {milestone.end_date}
                           </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              milestone.id &&
-                              setMilestoneDetailsId(milestone.id)
-                            }
-                          >
-                            View Details
-                          </Button>
                         </div>
                       </motion.div>
                     ))}
@@ -556,10 +611,10 @@ export default function ProjectDetails({
                     action={
                       projectDetails.status !== "Completed"
                         ? {
-                            label: "Add First Milestone",
-                            onClick: () => setIsCreatingMilestone(true),
-                            icon: <Plus size={16} />,
-                          }
+                          label: "Add First Milestone",
+                          onClick: () => setIsCreatingMilestone(true),
+                          icon: <Plus size={16} />,
+                        }
                         : undefined
                     }
                   />
@@ -627,6 +682,19 @@ export default function ProjectDetails({
           projectId={projectId}
           onClose={() => setIsCreatingMilestone(false)}
           onSubmit={handleCreateMilestone}
+        />
+      )}
+
+      {selectedMilestone && (
+        <MilestoneUpdateModal
+          initialData={selectedMilestone}
+          currentTotalWeightage={milestones.reduce(
+            (acc, m) =>
+              acc + (m.weightage || 0) - (selectedMilestone?.weightage || 0),
+            0
+          )}
+          onClose={() => setSelectedMilestone(null)}
+          onSubmit={handleUpdateMilestone}
         />
       )}
     </div>

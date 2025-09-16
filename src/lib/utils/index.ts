@@ -65,6 +65,14 @@ export function extractFilenameFromUrl(url: string) {
   return name;
 }
 
+export function extractFileNameFromStoragePath (filePath: string) {
+  const parts = filePath.split("/");
+  if (parts.length < 2) return filePath;
+  else return parts.slice(1).join("/");
+}
+
+
+
 export function formatDate(dateStr: string): string {
   const [year, month, dayStr] = dateStr.split("-");
   const day = parseInt(dayStr, 10);
