@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useDivisions } from "@/hooks/useDivisions";
+import { useAdminData } from "@/contexts/AdminDataContext";
 import DivisionModal from "./DivisionModal";
 import DivisionDetailsModal from "./DivisionDetailsModal";
 import { Layers, Plus, Eye, X } from "lucide-react";
@@ -11,33 +11,28 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { TrashSimple } from "@phosphor-icons/react";
 
 type DivisionsSectionProps = {
-  employees: { id: string; name: string }[];
   showNotification: (message: string, isError?: boolean) => void;
 };
 
-export default function DivisionsSection({ employees, showNotification }: DivisionsSectionProps) {
+export default function DivisionsSection({ showNotification }: DivisionsSectionProps) {
+  // Use context instead of individual hook
   const {
     divisions,
-    loading: divisionsLoading,
-    fetchDivisions,
+    employees,
+    divisionsLoading,
     createDivision,
     updateDivision,
     deleteDivision,
-  } = useDivisions();
+  } = useAdminData();
   const [viewDivision, setViewDivision] = useState<number | null>(null);
   const [editDivision, setEditDivision] = useState<number | null>(null);
   const [isCreatingDivision, setIsCreatingDivision] = useState(false);
   const [divisionDeleteLoading, setDivisionDeleteLoading] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchDivisions();
-  }, [fetchDivisions]);
-
   const handleCreateDivision = async (values: any) => {
     try {
       await createDivision(values);
       setIsCreatingDivision(false);
-      fetchDivisions();
       showNotification("Division created successfully");
     } catch {
       showNotification("Error creating Division", true);
@@ -47,9 +42,8 @@ export default function DivisionsSection({ employees, showNotification }: Divisi
   const handleUpdateDivision = async (values: any) => {
     try {
       if (editDivision) {
-        await updateDivision(editDivision, values);
+        await updateDivision(editDivision.toString(), values);
         setEditDivision(null);
-        fetchDivisions();
         showNotification("Division updated successfully");
       }
     } catch {
@@ -60,9 +54,8 @@ export default function DivisionsSection({ employees, showNotification }: Divisi
   const handleDeleteDivision = async (id: number) => {
     try {
       setDivisionDeleteLoading(id);
-      await deleteDivision(id);
+      await deleteDivision(id.toString());
       showNotification("Division deleted successfully");
-      fetchDivisions();
     } catch {
       showNotification("Error deleting Division", true);
     } finally {

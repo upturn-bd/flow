@@ -1,4 +1,5 @@
 // Advanced validation schemas for complex entities
+import { Notice } from '@/lib/types';
 import { ValidationResult, ValidationError, validateString, validateNumber, validateRequired, validateEmail } from './common';
 
 // Education/Experience validation (Schooling)
@@ -434,7 +435,7 @@ export interface NoticeData {
   department_id?: number;
 }
 
-export function validateNotice(data: NoticeData): ValidationResult<NoticeData> {
+export function validateNotice(data: Notice): ValidationResult<Notice> {
   const errors: ValidationError[] = [];
 
   // Validate title

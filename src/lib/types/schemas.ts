@@ -236,7 +236,7 @@ export interface ComplaintRecord {
 
 export interface Notice {
   id?: number;
-  notice_type_id: number | null;
+  notice_type_id?: number;
   title: string;
   description: string;
   urgency: "low" | "normal" | "high" | "urgent";

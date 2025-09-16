@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Info, X } from "lucide-react";
 import { useState } from "react";
 import { staggerContainer } from "@/components/ui/animations";
+import { useAdminData } from "@/contexts/AdminDataContext";
 
 // Import the section components directly
 import DivisionsSection from "@/components/admin-management/divisions/DivisionsSection";
@@ -11,12 +12,9 @@ import DepartmentsSection from "@/components/admin-management/departments/Depart
 import GradesSection from "@/components/admin-management/grades/GradesSection";
 import PositionsSection from "@/components/admin-management/positions/PositionsSection";
 
-// Add prop type
-type CompanyBasicsConfigViewProps = {
-  employees: { id: string; name: string }[];
-};
-
-export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConfigViewProps) {
+export default function CompanyBasicsConfigView() {
+  // Use context instead of props
+  const { employees } = useAdminData();
   // Notification state
   const [notification, setNotification] = useState<{ message: string; isError: boolean; visible: boolean }>({
     message: '',
@@ -65,7 +63,6 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
         {/* Divisions Section */}
         <div className="mb-8">
           <DivisionsSection 
-            employees={employees} 
             showNotification={showNotification} 
           />
         </div>
@@ -73,7 +70,6 @@ export default function CompanyBasicsConfigView({ employees }: CompanyBasicsConf
         {/* Departments Section */}
         <div className="mb-8">
           <DepartmentsSection 
-            employees={employees} 
             showNotification={showNotification} 
           />
         </div>

@@ -208,7 +208,6 @@ export default function NoticePage() {
                 {notices.map((notice) => (
                   <motion.div
                     key={notice.id}
-                    variants={itemVariants}
                     layout
                     whileHover={{ 
                       y: -4,

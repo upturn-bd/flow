@@ -2,7 +2,6 @@
 export * from './schemas/common';
 export * from './schemas/entities';
 export * from './schemas/advanced';
-export * from './notifications';
 
 // Legacy compatibility - re-export ValidationResult with generic parameter
 export type { ValidationResult } from './schemas/common';
