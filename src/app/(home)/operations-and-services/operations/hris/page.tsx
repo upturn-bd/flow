@@ -36,7 +36,7 @@ export default function FinderPage() {
 
   const { extendedEmployees, loading, fetchExtendedEmployees } = useEmployees();
 
-  useEffect(() => {
+  useEffect(() => { 
     fetchExtendedEmployees();
   }, [fetchExtendedEmployees]);
 
