@@ -4,6 +4,8 @@ import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/utils/auth";
 import { Payroll, PayrollAdjustment } from "@/lib/types/schemas";
+import { createPayrollNotification } from "@/lib/utils/notifications";
+import { formatDate } from "@/lib/utils";
 
 export function usePayroll() {
   const [payrolls, setPayrolls] = useState<Payroll[]>([]);
@@ -125,6 +127,49 @@ export function usePayroll() {
             : payroll
         )
       );
+
+      // Send notification to employee about payroll status change
+      try {
+        const payroll = payrolls.find(p => p.id === payrollId);
+        if (payroll && payroll.employee_id) {
+          if (status === 'Adjusted') {
+            const adjustmentReason = adjustments && adjustments.length > 0 
+              ? adjustments.map(adj => adj.type).join(', ')
+              : 'Payroll adjusted';
+            
+            await createPayrollNotification(
+              payroll.employee_id,
+              'adjusted',
+              {
+                gradeName: payroll.grade_name,
+                newAmount: updateData.total_amount || payroll.total_amount,
+                adjustmentReason
+              },
+              {
+                referenceId: payrollId,
+                actionUrl: '/operations-and-services/services/payroll'
+              }
+            );
+          } else if (status === 'Paid') {
+            await createPayrollNotification(
+              payroll.employee_id,
+              'paid',
+              {
+                gradeName: payroll.grade_name,
+                amount: payroll.total_amount,
+                date: formatDate(payroll.generation_date)
+              },
+              {
+                referenceId: payrollId,
+                actionUrl: '/operations-and-services/services/payroll'
+              }
+            );
+          }
+        }
+      } catch (notificationError) {
+        console.warn('Failed to send payroll notification:', notificationError);
+        // Don't fail the entire operation for notification errors
+      }
 
       return data;
     } catch (err) {

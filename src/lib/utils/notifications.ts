@@ -131,6 +131,34 @@ export const NotificationTemplates = {
       priority: "normal" as const,
     }),
   },
+
+  // Payroll notifications
+  payroll: {
+    generated: (gradeName: string, amount: number, date: string) => ({
+      title: "Payroll Generated",
+      message: `Your payroll for ${gradeName} (৳${amount.toLocaleString()}) has been generated for ${date}`,
+      context: "payroll",
+      priority: "normal" as const,
+    }),
+    adjusted: (gradeName: string, newAmount: number, adjustmentReason: string) => ({
+      title: "Payroll Adjusted",
+      message: `Your payroll for ${gradeName} has been adjusted to ৳${newAmount.toLocaleString()}. Reason: ${adjustmentReason}`,
+      context: "payroll",
+      priority: "high" as const,
+    }),
+    paid: (gradeName: string, amount: number, date: string) => ({
+      title: "Payroll Processed",
+      message: `Your payroll payment for ${gradeName} (৳${amount.toLocaleString()}) has been processed for ${date}`,
+      context: "payroll",
+      priority: "normal" as const,
+    }),
+    supervisorPending: (employeeName: string, amount: number, date: string) => ({
+      title: "Payroll Pending Approval",
+      message: `Payroll for ${employeeName} (৳${amount.toLocaleString()}) is pending your approval for ${date}`,
+      context: "payroll",
+      priority: "normal" as const,
+    }),
+  },
 };
 
 // Helper functions to create notifications
@@ -300,6 +328,45 @@ export const createSystemNotificationHelper = async (
       break;
     default:
       throw new Error('Invalid system notification type');
+  }
+
+  return await createSystemNotification(
+    recipientId,
+    template.title,
+    template.message,
+    {
+      priority: template.priority,
+      context: template.context,
+      referenceId: options.referenceId,
+      actionUrl: options.actionUrl,
+    }
+  );
+};
+
+// Payroll notification helper
+export const createPayrollNotification = async (
+  recipientId: string,
+  type: 'generated' | 'adjusted' | 'paid' | 'supervisorPending',
+  data: any,
+  options: { referenceId?: number; actionUrl?: string } = {}
+) => {
+  let template;
+  
+  switch (type) {
+    case 'generated':
+      template = NotificationTemplates.payroll.generated(data.gradeName, data.amount, data.date);
+      break;
+    case 'adjusted':
+      template = NotificationTemplates.payroll.adjusted(data.gradeName, data.newAmount, data.adjustmentReason);
+      break;
+    case 'paid':
+      template = NotificationTemplates.payroll.paid(data.gradeName, data.amount, data.date);
+      break;
+    case 'supervisorPending':
+      template = NotificationTemplates.payroll.supervisorPending(data.employeeName, data.amount, data.date);
+      break;
+    default:
+      throw new Error('Invalid payroll notification type');
   }
 
   return await createSystemNotification(
