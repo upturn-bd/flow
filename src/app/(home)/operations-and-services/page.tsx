@@ -14,7 +14,8 @@ import {
   File,
   Search,
   BellDot, // Reports
-  Users
+  Users,
+  CreditCard, // Payroll
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -85,6 +86,13 @@ const sections = [
         icon: AlertCircle,
         description: "Submit and track workplace issues and concerns",
         color: "bg-red-100 text-red-700 border-red-200"
+      },
+      {
+        name: "Payroll",
+        path: "/operations-and-services/services/payroll",
+        icon: CreditCard,
+        description: "View payroll history and manage salary information",
+        color: "bg-indigo-100 text-indigo-700 border-indigo-200"
       },
     ],
   },
