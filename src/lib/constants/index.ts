@@ -50,6 +50,9 @@ export const STATUS = {
   PROCESSING: 'Processing',
   PROCESSED: 'Processed',
   PAID: 'Paid',
+  
+  // Account Status
+  COMPLETE: 'Complete',
 } as const;
 
 // Type definitions for status values
@@ -60,6 +63,7 @@ export type AttendanceStatus = typeof STATUS.PRESENT | typeof STATUS.ABSENT | ty
 export type LeaveStatus = typeof STATUS.LEAVE_APPLIED | typeof STATUS.LEAVE_APPROVED | typeof STATUS.LEAVE_REJECTED | typeof STATUS.LEAVE_CANCELLED;
 export type ComplaintStatus = typeof STATUS.SUBMITTED | typeof STATUS.INVESTIGATING | typeof STATUS.RESOLVED | typeof STATUS.CLOSED;
 export type SettlementStatus = typeof STATUS.REQUESTED | typeof STATUS.PROCESSING | typeof STATUS.PROCESSED | typeof STATUS.PAID;
+export type AccountStatus = typeof STATUS.COMPLETE | typeof STATUS.PENDING;
 
 // ==============================================================================
 // Priority Constants
@@ -370,4 +374,45 @@ export const SELECT_OPTIONS = {
   MARITAL_STATUS: Object.values(MARITAL_STATUS),
   BLOOD_GROUP: Object.values(BLOOD_GROUP),
   SCHOOLING_TYPES: Object.values(SCHOOLING_TYPES),
+  ACCOUNT_STATUS: [STATUS.COMPLETE, STATUS.PENDING],
+  PAYMENT_METHODS: PAYMENT_METHODS,
+  CURRENCIES: CURRENCIES,
 } as const;
+
+// ==============================================================================
+// Account System Constants
+// ==============================================================================
+
+export const PAYMENT_METHODS = [
+  'Cash',
+  'Bank',
+  'Credit Card',
+  'Mobile Banking',
+  'Check',
+  'Online Transfer',
+] as const;
+
+export const CURRENCIES = [
+  'BDT', // Bangladesh Taka - Default
+  'USD', // US Dollar
+  'EUR', // Euro
+  'GBP', // British Pound
+  'JPY', // Japanese Yen
+  'INR', // Indian Rupee
+] as const;
+
+export const ACCOUNT_CATEGORIES = {
+  INCOME: 'Income',
+  EXPENSE: 'Expense',
+  PAYROLL: 'Payroll', 
+  OFFICE_SUPPLIES: 'Office Supplies',
+  UTILITIES: 'Utilities',
+  TRAVEL: 'Travel',
+  CLIENT_PAYMENT: 'Client Payment',
+  VENDOR_PAYMENT: 'Vendor Payment',
+  MISCELLANEOUS: 'Miscellaneous',
+} as const;
+
+export type PaymentMethod = typeof PAYMENT_METHODS[number];
+export type Currency = typeof CURRENCIES[number];
+export type AccountCategory = typeof ACCOUNT_CATEGORIES[keyof typeof ACCOUNT_CATEGORIES];
