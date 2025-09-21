@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/utils/auth";
 import { Account } from "@/lib/types/schemas";
+import { createAccountNotification } from "@/lib/utils/notifications";
 
 export interface AccountFormData {
   title: string;
@@ -77,6 +78,44 @@ export function useAccounts() {
 
       // Update local state
       setAccounts(prev => [data, ...prev]); // Add to beginning (newest first)
+      
+      // Send notification for transaction creation
+      try {
+        await createAccountNotification(
+          userId!,
+          'transactionCreated',
+          {
+            title: data.title,
+            amount: data.amount,
+            currency: data.currency,
+          },
+          {
+            referenceId: data.id,
+            actionUrl: '/admin-management?tab=accounts',
+          }
+        );
+
+        // Send alert for large transactions (over 50,000 BDT or equivalent)
+        if (Math.abs(data.amount) > 50000) {
+          await createAccountNotification(
+            userId!,
+            'largeTransaction',
+            {
+              title: data.title,
+              amount: data.amount,
+              currency: data.currency,
+            },
+            {
+              referenceId: data.id,
+              actionUrl: '/admin-management?tab=accounts',
+            }
+          );
+        }
+      } catch (notificationError) {
+        // Don't fail the transaction creation if notification fails
+        console.warn('Failed to send account notification:', notificationError);
+      }
+
       return data;
     } catch (err) {
       const errorObj = err instanceof Error ? err : new Error(String(err));

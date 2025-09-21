@@ -6,6 +6,7 @@ import { getCompanyId } from "@/lib/utils/auth";
 import { Payroll, PayrollAdjustment } from "@/lib/types/schemas";
 import { createPayrollNotification } from "@/lib/utils/notifications";
 import { formatDate } from "@/lib/utils";
+import { createAccountFromPayroll, PayrollAccountEntry } from "@/lib/utils/payroll-accounts";
 
 export function usePayroll() {
   const [payrolls, setPayrolls] = useState<Payroll[]>([]);
@@ -198,6 +199,44 @@ export function usePayroll() {
     setError(null);
   }, []);
 
+  // Create account entry from payroll (for automatic accounting)
+  const logPayrollToAccounts = useCallback(async (payroll: Payroll) => {
+    try {
+      const payrollAccountData: PayrollAccountEntry = {
+        payroll_id: payroll.id!,
+        employee_id: payroll.employee_id,
+        total_amount: payroll.total_amount,
+        basic_salary: payroll.basic_salary,
+        adjustments: payroll.adjustments,
+        generation_date: payroll.generation_date,
+      };
+
+      const account = await createAccountFromPayroll(payrollAccountData);
+      return account;
+    } catch (error) {
+      console.error('Error logging payroll to accounts:', error);
+      throw error;
+    }
+  }, []);
+
+  // Process payroll with automatic account creation
+  const processPayrollWithAccounting = useCallback(async (payrollId: number) => {
+    try {
+      // Update payroll status to Paid
+      const updatedPayroll = await updatePayrollStatus(payrollId, 'Paid');
+      
+      // Create corresponding account entry
+      if (updatedPayroll) {
+        await logPayrollToAccounts(updatedPayroll);
+      }
+
+      return updatedPayroll;
+    } catch (error) {
+      console.error('Error processing payroll with accounting:', error);
+      throw error;
+    }
+  }, [updatePayrollStatus, logPayrollToAccounts]);
+
   return {
     // State
     payrolls,
@@ -210,5 +249,9 @@ export function usePayroll() {
     fetchSupervisedPayrolls,
     updatePayrollStatus,
     clearError,
+    
+    // Accounting Integration
+    logPayrollToAccounts,
+    processPayrollWithAccounting,
   };
 }
