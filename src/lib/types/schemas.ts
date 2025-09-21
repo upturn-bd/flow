@@ -345,6 +345,7 @@ export interface Position {
 export interface Grade {
   id?: number;
   name: string;
+  basic_salary?: number;
   company_id?: number;
 }
 
@@ -396,4 +397,25 @@ export interface OnboardingFormData {
   company_name: string;
   company_id: number;
   supervisor_id: string | null;
+}
+
+// Payroll System Interfaces
+export interface PayrollAdjustment {
+  type: string;
+  amount: number; // positive for additions, negative for deductions
+}
+
+export interface Payroll {
+  id?: number;
+  employee_id: string;
+  grade_name: string; // snapshot of the grade name
+  basic_salary: number; // snapshot of the basic salary
+  adjustments: PayrollAdjustment[]; // JSON array
+  total_amount: number;
+  generation_date: string;
+  company_id: number;
+  status: 'Paid' | 'Pending' | 'Adjusted';
+  supervisor_id: string;
+  created_at?: string;
+  updated_at?: string;
 }

@@ -1,14 +1,14 @@
 // import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+// import { Geist } from "next/font/google";
 
 import "./globals.css";
 import 'leaflet/dist/leaflet.css';
 import { Toaster } from "sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// const geistSans = Geist({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+// });
 
 export const metadata = {
   title: "Upturn",
@@ -35,7 +35,7 @@ export default function RootLayout({
           }
         />
       </head>
-      <body className={`${geistSans.className} antialiased`}>{children}
+      <body className="antialiased">{children}
 
         <Toaster position="bottom-right" richColors />
       </body>
