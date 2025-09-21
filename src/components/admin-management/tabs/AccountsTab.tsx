@@ -24,7 +24,7 @@ import { PAYMENT_METHODS, CURRENCIES, STATUS } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
 import FormModal from "@/components/ui/modals/FormModal";
 import BaseForm from "@/components/forms/BaseForm";
-import { useFormState } from "@/hooks/useFormState";
+import { useFormValidation } from "@/hooks/core/useFormValidation";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 
@@ -40,28 +40,31 @@ interface AccountFormData {
 }
 
 const validateAccountForm = (data: AccountFormData) => {
-  const errors: Partial<Record<keyof AccountFormData, string>> = {};
+  const errors: Array<{field: string, message: string}> = [];
 
-  if (!data.title.trim()) errors.title = "Title is required";
-  if (!data.from_source.trim()) errors.from_source = "Source is required";
-  if (!data.transaction_date.trim()) errors.transaction_date = "Transaction date is required";
-  if (!data.amount.trim()) errors.amount = "Amount is required";
+  if (!data.title.trim()) errors.push({ field: 'title', message: 'Title is required' });
+  if (!data.from_source.trim()) errors.push({ field: 'from_source', message: 'Source is required' });
+  if (!data.transaction_date.trim()) errors.push({ field: 'transaction_date', message: 'Transaction date is required' });
+  if (!data.amount.trim()) errors.push({ field: 'amount', message: 'Amount is required' });
   
   const amount = parseFloat(data.amount);
-  if (isNaN(amount)) errors.amount = "Amount must be a valid number";
+  if (isNaN(amount)) errors.push({ field: 'amount', message: 'Amount must be a valid number' });
   
-  if (!data.currency.trim()) errors.currency = "Currency is required";
+  if (!data.currency.trim()) errors.push({ field: 'currency', message: 'Currency is required' });
 
   // Validate JSON format for additional_data if provided
   if (data.additional_data.trim()) {
     try {
       JSON.parse(data.additional_data);
     } catch {
-      errors.additional_data = "Additional data must be valid JSON";
+      errors.push({ field: 'additional_data', message: 'Additional data must be valid JSON' });
     }
   }
 
-  return errors;
+  return {
+    success: errors.length === 0,
+    errors
+  };
 };
 
 export default function AccountsTab() {
@@ -83,40 +86,6 @@ export default function AccountsTab() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
-  const {
-    formState,
-    errors,
-    isSubmitting,
-    handleInputChange,
-    handleSubmit,
-    resetForm,
-    setFormState,
-  } = useFormState<AccountFormData>({
-    initialState: {
-      title: "",
-      method: "",
-      status: "Pending" as const,
-      from_source: "",
-      transaction_date: new Date().toISOString().split('T')[0], // Today's date
-      amount: "",
-      currency: "BDT",
-      additional_data: "",
-    },
-    validator: validateAccountForm,
-  });
-
-  useEffect(() => {
-    fetchAccounts();
-  }, [fetchAccounts]);
-
-  const filteredAccounts = accounts.filter(account => {
-    const matchesSearch = account.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         account.from_source.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         account.method?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'All' || account.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
   const handleCreateAccount = async (data: AccountFormData) => {
     const accountData = {
       title: data.title.trim(),
@@ -131,7 +100,7 @@ export default function AccountsTab() {
 
     await createAccount(accountData);
     setIsCreateModalOpen(false);
-    resetForm();
+    createForm.resetForm();
   };
 
   const handleEditAccount = async (data: AccountFormData) => {
@@ -151,12 +120,54 @@ export default function AccountsTab() {
     await updateAccount(selectedAccount.id!, accountData);
     setIsEditModalOpen(false);
     setSelectedAccount(null);
-    resetForm();
+    editForm.resetForm();
   };
+
+  const createForm = useFormValidation<AccountFormData>({
+    initialValues: {
+      title: "",
+      method: "",
+      status: "Pending" as const,
+      from_source: "",
+      transaction_date: new Date().toISOString().split('T')[0], // Today's date
+      amount: "",
+      currency: "BDT",
+      additional_data: "",
+    },
+    validationFn: validateAccountForm,
+    onSubmit: handleCreateAccount,
+  });
+
+  const editForm = useFormValidation<AccountFormData>({
+    initialValues: {
+      title: "",
+      method: "",
+      status: "Pending" as const,
+      from_source: "",
+      transaction_date: new Date().toISOString().split('T')[0],
+      amount: "",
+      currency: "BDT",
+      additional_data: "",
+    },
+    validationFn: validateAccountForm,
+    onSubmit: handleEditAccount,
+  });
+
+  useEffect(() => {
+    fetchAccounts();
+  }, [fetchAccounts]);
+
+  const filteredAccounts = accounts.filter(account => {
+    const matchesSearch = account.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         account.from_source.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         account.method?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || account.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const handleEditClick = (account: Account) => {
     setSelectedAccount(account);
-    setFormState({
+    editForm.setValues({
       title: account.title,
       method: account.method || "",
       status: account.status,
@@ -386,23 +397,23 @@ export default function AccountsTab() {
         isOpen={isCreateModalOpen}
         onClose={() => {
           setIsCreateModalOpen(false);
-          resetForm();
+          createForm.resetForm();
         }}
         title="Create New Transaction"
         description="Add a new financial transaction to the accounts system"
       >
         <BaseForm
-          onSubmit={(e) => handleSubmit(e, handleCreateAccount)}
-          isSubmitting={isSubmitting}
+          onSubmit={createForm.handleSubmit}
+          isSubmitting={false} // We'll handle this differently
           submitText="Create Transaction"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInputField
               label="Transaction Title"
               name="title"
-              value={formState.title}
-              onChange={handleInputChange}
-              error={errors.title}
+              value={createForm.values.title}
+              onChange={createForm.handleChange}
+              error={createForm.errors.title}
               placeholder="e.g., Office supplies purchase"
               required
             />
@@ -410,9 +421,9 @@ export default function AccountsTab() {
             <FormSelectField
               label="Payment Method"
               name="method"
-              value={formState.method}
-              onChange={handleInputChange}
-              error={errors.method}
+              value={createForm.values.method}
+              onChange={createForm.handleChange}
+              error={createForm.errors.method}
               options={PAYMENT_METHODS.map(method => ({ value: method, label: method }))}
               placeholder="Select method (optional)"
             />
@@ -422,9 +433,9 @@ export default function AccountsTab() {
             <FormInputField
               label="From Source"
               name="from_source"
-              value={formState.from_source}
-              onChange={handleInputChange}
-              error={errors.from_source}
+              value={createForm.values.from_source}
+              onChange={createForm.handleChange}
+              error={createForm.errors.from_source}
               placeholder="e.g., Petty Cash, Bank Account"
               required
             />
@@ -432,9 +443,9 @@ export default function AccountsTab() {
             <FormSelectField
               label="Status"
               name="status"
-              value={formState.status}
-              onChange={handleInputChange}
-              error={errors.status}
+              value={createForm.values.status}
+              onChange={createForm.handleChange}
+              error={createForm.errors.status}
               options={[
                 { value: 'Pending', label: 'Pending' },
                 { value: 'Complete', label: 'Complete' }
@@ -448,9 +459,9 @@ export default function AccountsTab() {
               label="Transaction Date"
               name="transaction_date"
               type="date"
-              value={formState.transaction_date}
-              onChange={handleInputChange}
-              error={errors.transaction_date}
+              value={createForm.values.transaction_date}
+              onChange={createForm.handleChange}
+              error={createForm.errors.transaction_date}
               required
             />
 
@@ -459,9 +470,9 @@ export default function AccountsTab() {
               name="amount"
               type="number"
               step="0.01"
-              value={formState.amount}
-              onChange={handleInputChange}
-              error={errors.amount}
+              value={createForm.values.amount}
+              onChange={createForm.handleChange}
+              error={createForm.errors.amount}
               placeholder="0.00"
               helpText="Use negative values for expenses"
               required
@@ -470,9 +481,9 @@ export default function AccountsTab() {
             <FormSelectField
               label="Currency"
               name="currency"
-              value={formState.currency}
-              onChange={handleInputChange}
-              error={errors.currency}
+              value={createForm.values.currency}
+              onChange={createForm.handleChange}
+              error={createForm.errors.currency}
               options={CURRENCIES.map(currency => ({ value: currency, label: currency }))}
               required
             />
@@ -481,9 +492,9 @@ export default function AccountsTab() {
           <FormInputField
             label="Additional Data (JSON)"
             name="additional_data"
-            value={formState.additional_data}
-            onChange={handleInputChange}
-            error={errors.additional_data}
+            value={createForm.values.additional_data}
+            onChange={createForm.handleChange}
+            error={createForm.errors.additional_data}
             placeholder='{"user_id": "EMP001", "category": "office_supplies"}'
             helpText="Optional JSON data for additional information"
             textarea
@@ -497,23 +508,23 @@ export default function AccountsTab() {
         onClose={() => {
           setIsEditModalOpen(false);
           setSelectedAccount(null);
-          resetForm();
+          editForm.resetForm();
         }}
         title="Edit Transaction"
         description="Modify the selected financial transaction"
       >
         <BaseForm
-          onSubmit={(e) => handleSubmit(e, handleEditAccount)}
-          isSubmitting={isSubmitting}
+          onSubmit={editForm.handleSubmit}
+          isSubmitting={false}
           submitText="Update Transaction"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInputField
               label="Transaction Title"
               name="title"
-              value={formState.title}
-              onChange={handleInputChange}
-              error={errors.title}
+              value={editForm.values.title}
+              onChange={editForm.handleChange}
+              error={editForm.errors.title}
               placeholder="e.g., Office supplies purchase"
               required
             />
@@ -521,9 +532,9 @@ export default function AccountsTab() {
             <FormSelectField
               label="Payment Method"
               name="method"
-              value={formState.method}
-              onChange={handleInputChange}
-              error={errors.method}
+              value={editForm.values.method}
+              onChange={editForm.handleChange}
+              error={editForm.errors.method}
               options={PAYMENT_METHODS.map(method => ({ value: method, label: method }))}
               placeholder="Select method (optional)"
             />
@@ -533,9 +544,9 @@ export default function AccountsTab() {
             <FormInputField
               label="From Source"
               name="from_source"
-              value={formState.from_source}
-              onChange={handleInputChange}
-              error={errors.from_source}
+              value={editForm.values.from_source}
+              onChange={editForm.handleChange}
+              error={editForm.errors.from_source}
               placeholder="e.g., Petty Cash, Bank Account"
               required
             />
@@ -543,9 +554,9 @@ export default function AccountsTab() {
             <FormSelectField
               label="Status"
               name="status"
-              value={formState.status}
-              onChange={handleInputChange}
-              error={errors.status}
+              value={editForm.values.status}
+              onChange={editForm.handleChange}
+              error={editForm.errors.status}
               options={[
                 { value: 'Pending', label: 'Pending' },
                 { value: 'Complete', label: 'Complete' }
@@ -559,9 +570,9 @@ export default function AccountsTab() {
               label="Transaction Date"
               name="transaction_date"
               type="date"
-              value={formState.transaction_date}
-              onChange={handleInputChange}
-              error={errors.transaction_date}
+              value={editForm.values.transaction_date}
+              onChange={editForm.handleChange}
+              error={editForm.errors.transaction_date}
               required
             />
 
@@ -570,9 +581,9 @@ export default function AccountsTab() {
               name="amount"
               type="number"
               step="0.01"
-              value={formState.amount}
-              onChange={handleInputChange}
-              error={errors.amount}
+              value={editForm.values.amount}
+              onChange={editForm.handleChange}
+              error={editForm.errors.amount}
               placeholder="0.00"
               helpText="Use negative values for expenses"
               required
@@ -581,9 +592,9 @@ export default function AccountsTab() {
             <FormSelectField
               label="Currency"
               name="currency"
-              value={formState.currency}
-              onChange={handleInputChange}
-              error={errors.currency}
+              value={editForm.values.currency}
+              onChange={editForm.handleChange}
+              error={editForm.errors.currency}
               options={CURRENCIES.map(currency => ({ value: currency, label: currency }))}
               required
             />
@@ -592,9 +603,9 @@ export default function AccountsTab() {
           <FormInputField
             label="Additional Data (JSON)"
             name="additional_data"
-            value={formState.additional_data}
-            onChange={handleInputChange}
-            error={errors.additional_data}
+            value={editForm.values.additional_data}
+            onChange={editForm.handleChange}
+            error={editForm.errors.additional_data}
             placeholder='{"user_id": "EMP001", "category": "office_supplies"}'
             helpText="Optional JSON data for additional information"
             textarea
