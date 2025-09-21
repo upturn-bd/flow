@@ -65,7 +65,7 @@ export default function TopBar() {
 
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-5 h-16">
-      <div className="px-4 md:px-6 h-full flex items-center justify-between">
+      <div className="pr-4 md:pr-6 h-full flex items-center justify-between">
         {/* Left side */}
         <div className="flex items-center">
           {!isAuthorized && (

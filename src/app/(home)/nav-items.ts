@@ -38,12 +38,6 @@ export const navItems: NavItem[] = [
       roles: ["Employee", "Manager", "Admin"],
     },
     {
-      label: "finder",
-      href: "/finder",
-      icon: MagnifyingGlassIcon,
-      roles: ["Manager", "Admin"],
-    },
-    {
       label: "admin-management",
       href: "/admin-management",
       icon: UserGearIcon,

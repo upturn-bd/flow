@@ -2,127 +2,247 @@
 
 import { cn } from "@/components/ui/class";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  ClipboardList,
+  BarChart,
+  Box,
+  LogIn,
+  CalendarX,
+  Bell,
+  Clipboard,
+  DollarSign,
+  AlertCircle,
+  Settings,
+  UserPlus,
+  Users,
+  User,
+} from "lucide-react";
 
 export default function Sidebar() {
-  const { employeeInfo, isApproved, getAuthorizedNavItems } = useAuth();
+  const { isApproved, getAuthorizedNavItems } = useAuth();
   const pathname = usePathname();
   const navItems = getAuthorizedNavItems();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Animation variants
-  const sidebarVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { 
-      opacity: 1, 
-      x: 0,
-      transition: {
-        duration: 0.4,
-        staggerChildren: 0.1
-      }
+  // track submenu toggle
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>('operations-and-services');
+
+  // auto-open submenu if user is inside operations-and-services/*
+  useEffect(() => {
+    if (pathname.startsWith("/operations-and-services")) {
+      setOpenSubmenu("operations-and-services");
     }
-  };
+  }, [pathname]);
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: -10 },
-    visible: { 
-      opacity: 1, 
-      x: 0,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 30
-      }
-    }
-  };
+  if (!isApproved) return null;
 
-  const logoVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: { 
-      opacity: 1, 
-      scale: 1,
-      transition: { 
-        delay: 0.2, 
-        duration: 0.5,
-        type: "spring",
-        stiffness: 300
-      }
-    }
-  };
-
-  // Hide the sidebar for unapproved users
-  if (!isApproved) {
-    return null;
-  }
-
+  // Submenu items for Operations & Services
+  const operationsSubmenu = [
+    { label: "Task", desc: "Assign, track and manage day-to-day tasks", href: "/operations-and-services/workflow/task", icon: ClipboardList },
+    { label: "Project", desc: "Plan and execute complex projects with milestones", href: "/operations-and-services/workflow/project", icon: BarChart },
+    { label: "Attendance", desc: "Track and manage your daily attendance", href: "/operations-and-services/services/attendance", icon: LogIn },
+    { label: "Leave", desc: "Apply and manage time off and leaves", href: "/operations-and-services/services/leave", icon: CalendarX },
+    { label: "Notice", desc: "Important company announcements and notices", href: "/operations-and-services/services/notice", icon: Bell },
+    { label: "Requisition", desc: "Request equipment, supplies and services", href: "/operations-and-services/services/requisition", icon: Clipboard },
+    { label: "Settlement", desc: "Manage and track expense reimbursements", href: "/operations-and-services/services/settlement", icon: DollarSign },
+    { label: "Complaint", desc: "Submit and track workplace issues and concerns", href: "/operations-and-services/services/complaint", icon: AlertCircle },
+    { label: "Onboarding", desc: "Employee onboarding workflow and tasks", href: "/operations-and-services/services/onboarding", icon: UserPlus },
+    { label: "HRIS", desc: "Human Resource Information System", href: "/operations-and-services/services/hris", icon: Users },
+  ];
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={sidebarVariants}
-      className="w-20 fixed left-0 top-0 h-screen md:flex flex-col hidden shadow-xl z-50"
-      style={{
-        background: "linear-gradient(135.32deg, #001731 24.86%, #002363 100%)",
-      }}
+    <motion.aside
+      initial={{ x: -100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className={cn(
+        "sticky top-0 h-screen z-40 shadow-xl flex flex-col",
+        "bg-gradient-to-b from-[#001731] to-[#002363]",
+        isCollapsed ? "w-20" : "w-64"
+      )}
     >
-      <motion.div 
-        variants={logoVariants}
-        className="absolute top-8 left-1/3 -translate-x-1/2 w-20 h-20 rounded-full bg-[#001731] flex items-center justify-center shadow-lg"
-      >
-        <Link href="/home" className="p-6">
-          <Image 
-            width={100} 
-            height={100} 
-            src="/nav-logo.png" 
+      {/* Logo Section */}
+      <div className="flex items-center justify-between px-4 py-6">
+        <Link href="/home" className="flex items-center space-x-3">
+          <Image
+            src="/nav-logo.png"
+            width={40}
+            height={40}
             alt="Logo"
             className="object-contain"
           />
+          {!isCollapsed && (
+            <span className="text-white text-lg font-semibold tracking-wide px-2">
+              Upturn Flow
+            </span>
+          )}
         </Link>
-      </motion.div>
 
-      <motion.nav
-        variants={sidebarVariants} 
-        className="flex flex-col items-center w-full mt-32 space-y-8"
-      >
+        {/* Collapse Button */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="p-2 rounded-md text-gray-300 hover:text-white hover:bg-[#001c4f] transition-colors"
+        >
+          {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
+        </button>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex flex-col mt-4 space-y-2 px-2">
         {navItems.map((item) => {
+          console.log(item)
+          let displayLabel;
+          switch (item.label) {
+            case 'home':
+              displayLabel = "Dashboard";
+              break;
+            case "hris":
+              displayLabel = "My Profile";
+              break;
+            case "operations-and-services":
+              displayLabel = "Operations & Services";
+              break;
+            case "admin-management":
+              displayLabel = "Company Configuration";
+              break;
+            default:
+              displayLabel = item.label
+                .charAt(0)
+                .toUpperCase()
+                .concat(item.label.slice(1).replace(/-/g, " "));
+          }
+
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href);
 
-          if(item.href === "/home"){
-            return (<div key="none"></div>);
+          // special handling for Operations & Services
+          if (item.label === "operations-and-services") {
+            return (
+              <div key={item.label} className="relative">
+                <div
+                  className={cn(
+                    "flex items-center justify-between w-full px-4 py-3 rounded-lg transition-colors",
+                    isActive
+                      ? "bg-yellow-400 text-black font-medium"
+                      : "text-gray-300 hover:text-white hover:bg-[#001c4f]"
+                  )}
+                >
+                  {/* Left Section: Link to main page */}
+                  <Link
+                    href={item.href}
+                    className="flex items-center gap-3 flex-1"
+                  >
+                    <Icon size={22} weight={isActive ? "fill" : "regular"} />
+                    {!isCollapsed && <span>{displayLabel}</span>}
+                  </Link>
+
+                  {/* Right Section: Chevron toggle */}
+                  {!isCollapsed && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setOpenSubmenu(
+                          openSubmenu === item.label ? null : item.label
+                        );
+                      }}
+                      className="ml-2"
+                    >
+                      {openSubmenu === item.label ? (
+                        <ChevronUp size={18} />
+                      ) : (
+                        <ChevronDown size={18} />
+                      )}
+                    </button>
+                  )}
+                </div>
+
+                {/* Submenu */}
+                <AnimatePresence>
+                  {openSubmenu === item.label && !isCollapsed && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="ml-10 mt-4 flex flex-col gap-1"
+                    >
+                      {operationsSubmenu.map((sub) => {
+                        const subActive = pathname.startsWith(sub.href);
+                        const SubIcon = sub.icon;
+                        return (
+                          <Link
+                            key={sub.href}
+                            href={sub.href}
+                            className={cn(
+                              "px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-2",
+                              subActive
+                                ? "bg-[#3645637a] text-white font-medium"
+                                : "text-gray-300 hover:text-white hover:bg-[#36456357]"
+                            )}
+                          >
+                            <SubIcon size={18} />
+                            <span>{sub.label}</span>
+                          </Link>
+                        );
+                      })}
+
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
           }
-          
+
+          // default rendering for other menu items
           return (
             <motion.div
               key={item.label}
-              variants={itemVariants}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative w-full flex justify-center"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="relative"
             >
-              <Link 
+              <Link
                 href={item.href}
                 className={cn(
-                  "flex items-center justify-center h-14 w-14 rounded-md transition-colors",
-                  isActive ? "text-yellow-400" : "text-gray-300 hover:text-white"
+                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                  isActive
+                    ? "bg-yellow-400 text-black font-medium"
+                    : "text-gray-300 hover:text-white hover:bg-[#001c4f]"
                 )}
-                title={item.label.charAt(0).toUpperCase() + item.label.slice(1).replace(/-/g, " ")}
+                title={displayLabel}
               >
-                <Icon size={40} weight={isActive ? "fill" : "regular"} />
-                {isActive && (
-                  <motion.div 
-                    layoutId="sidebar-indicator" 
-                    className="absolute left-0 w-1 h-12 bg-yellow-400 rounded-r-md"
-                  />
-                )}
+                <Icon size={22} weight={isActive ? "fill" : "regular"} />
+                {!isCollapsed && <span>{displayLabel}</span>}
               </Link>
             </motion.div>
           );
         })}
-      </motion.nav>
-    </motion.div>
+      </nav>
+
+      {/* Footer */}
+      <div className="mt-auto mb-6 px-4">
+        <Link href={"/settings"}>
+          <div
+            className={cn(
+              "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
+              "text-gray-300 hover:text-white hover:bg-[#001c4f]"
+            )}
+          >
+            <Settings size={22} />
+            {!isCollapsed && <span className="text-sm">Settings</span>}
+          </div>
+        </Link>
+
+      </div>
+    </motion.aside>
   );
 }
