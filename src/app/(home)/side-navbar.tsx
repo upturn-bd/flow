@@ -23,6 +23,7 @@ import {
   Settings,
   UserPlus,
   Users,
+  CreditCard,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -53,8 +54,9 @@ export default function Sidebar() {
     { label: "Requisition", desc: "Request equipment, supplies and services", href: "/operations-and-services/services/requisition", icon: Clipboard },
     { label: "Settlement", desc: "Manage and track expense reimbursements", href: "/operations-and-services/services/settlement", icon: DollarSign },
     { label: "Complaint", desc: "Submit and track workplace issues and concerns", href: "/operations-and-services/services/complaint", icon: AlertCircle },
-    { label: "Onboarding", desc: "Employee onboarding workflow and tasks", href: "/operations-and-services/services/onboarding", icon: UserPlus },
-    { label: "HRIS", desc: "Human Resource Information System", href: "/operations-and-services/services/hris", icon: Users },
+    { label: "Payroll", desc: "Manage and track payroll information", href: "/operations-and-services/services/payroll", icon: CreditCard },
+    { label: "Onboarding", desc: "Employee onboarding workflow and tasks", href: "/operations-and-services/operations/onboarding", icon: UserPlus },
+    { label: "HRIS", desc: "Human Resource Information System", href: "/operations-and-services/operations/hris", icon: Users },
   ];
   return (
     <motion.aside
