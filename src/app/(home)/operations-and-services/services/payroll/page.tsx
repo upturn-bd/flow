@@ -8,12 +8,15 @@ import {
   ClipboardCheck, 
   Calculator,
   AlertTriangle,
-  TrendingUp
+  TrendingUp,
+  Users,
+  Plus
 } from "lucide-react";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
 import PayrollHistoryPage from "@/components/operations-and-services/payroll/PayrollHistory";
 import PayrollRequestsPage from "@/components/operations-and-services/payroll/PayrollRequests";
+import PayrollGenerationModal from "@/components/operations-and-services/payroll/PayrollGenerationModal";
 
 const tabs: TabItem[] = [
   { 
@@ -68,19 +71,33 @@ const tabs: TabItem[] = [
 
 export default function PayrollPage() {
   const [activeTab, setActiveTab] = useState("history");
+  const [showGenerationModal, setShowGenerationModal] = useState(false);
+
+  const handleGenerationSuccess = () => {
+    // Refresh the history and requests tabs after successful generation
+    setActiveTab("history");
+  };
 
   return (
-    <ServicePageTemplate
-      title="Payroll Management"
-      description="View your payroll history, manage salary adjustments, and track compensation details."
-      icon={<CreditCard className="h-7 w-7" />}
-      primaryColor="text-indigo-600"
-      tabs={tabs}
-      activeTab={activeTab}
-      setActiveTab={setActiveTab}
-      actionButtonLabel="View History"
-      actionButtonIcon={<History className="h-4 w-4" />}
-      actionButtonOnClick={() => setActiveTab("history")}
-    />
+    <>
+      <ServicePageTemplate
+        title="Payroll Management"
+        description="View your payroll history, manage salary adjustments, and track compensation details."
+        icon={<CreditCard className="h-7 w-7" />}
+        primaryColor="text-indigo-600"
+        tabs={tabs}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        actionButtonLabel="Generate Payroll"
+        actionButtonIcon={<Users className="h-4 w-4" />}
+        actionButtonOnClick={() => setShowGenerationModal(true)}
+      />
+      
+      <PayrollGenerationModal
+        isOpen={showGenerationModal}
+        onClose={() => setShowGenerationModal(false)}
+        onSuccess={handleGenerationSuccess}
+      />
+    </>
   );
 }

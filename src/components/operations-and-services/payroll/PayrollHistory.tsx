@@ -45,7 +45,7 @@ const getStatusIcon = (status: string) => {
   switch (status) {
     case 'Paid':
       return <CheckCircle className="h-5 w-5 text-green-500" />;
-    case 'Adjusted':
+    case 'Published': // Updated from 'Adjusted'
       return <AlertTriangle className="h-5 w-5 text-amber-500" />;
     case 'Pending':
     default:
@@ -57,7 +57,7 @@ const getStatusColor = (status: string) => {
   switch (status) {
     case 'Paid':
       return 'bg-green-50 text-green-700 border-green-200';
-    case 'Adjusted':
+    case 'Published': // Updated from 'Adjusted'
       return 'bg-amber-50 text-amber-700 border-amber-200';
     case 'Pending':
     default:
@@ -161,17 +161,17 @@ export default function PayrollHistoryPage() {
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <AlertTriangle className="h-8 w-8 text-amber-600" />
+                  <div className="bg-white rounded-lg border border-gray-200 p-4">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <AlertTriangle className="h-8 w-8 text-amber-600" />
+                      </div>
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">Published</p>
+                        <p className="text-2xl font-semibold text-gray-900">{payrollStats.published}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Adjusted</p>
-                    <p className="text-2xl font-semibold text-gray-900">{payrollStats.adjusted}</p>
-                  </div>
-                </div>
-              </div>
             </motion.div>
           )}
 

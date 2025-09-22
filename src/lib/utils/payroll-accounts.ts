@@ -4,111 +4,124 @@
  */
 
 import { supabase } from "@/lib/supabase/client";
-import { Payroll, Account } from "@/lib/types/schemas";
+import { Payroll, Account, PayrollAccountEntry } from "@/lib/types/schemas";
 import { getCompanyId } from "@/lib/utils/auth";
 import { createAccountNotification } from "@/lib/utils/notifications";
 
-export interface PayrollAccountEntry {
-  payroll_id: number;
-  employee_id: string;
-  total_amount: number;
-  basic_salary: number;
-  adjustments: Array<{type: string; amount: number}>;
-  generation_date: string;
-}
-
 /**
- * Create an account entry from payroll data
+ * Create an account entry from payroll data with enhanced error handling and retry mechanism
  */
 export async function createAccountFromPayroll(
   payrollData: PayrollAccountEntry,
-  userId?: string
+  userId?: string,
+  maxRetries: number = 3
 ): Promise<Account> {
-  try {
-    const company_id = await getCompanyId();
-    
-    // Get current user if userId not provided
-    if (!userId) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-      userId = user.id;
-    }
-
-    // Get employee name for title
-    const { data: employee } = await supabase
-      .from("employees")
-      .select("first_name, last_name")
-      .eq("id", payrollData.employee_id)
-      .single();
-
-    const employeeName = employee 
-      ? `${employee.first_name} ${employee.last_name}`
-      : `Employee ${payrollData.employee_id}`;
-
-    // Create account entry
-    const accountData = {
-      title: `Payroll - ${employeeName} (${payrollData.generation_date})`,
-      method: 'Bank', // Payroll typically goes through bank
-      company_id,
-      status: 'Complete' as const, // Payroll entries are typically complete when logged
-      from_source: 'Payroll System',
-      transaction_date: payrollData.generation_date,
-      amount: -Math.abs(payrollData.total_amount), // Negative because it's an expense for the company
-      currency: 'BDT',
-      additional_data: {
-        payroll_id: payrollData.payroll_id,
-        employee_id: payrollData.employee_id,
-        basic_salary: payrollData.basic_salary,
-        adjustments: payrollData.adjustments,
-        category: 'payroll',
-        generated_by: 'system'
-      },
-      created_by: userId,
-    };
-
-    const { data, error } = await supabase
-      .from("accounts")
-      .insert([accountData])
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    // Send notification for automatic payroll logging
+  let attempts = 0;
+  
+  while (attempts < maxRetries) {
     try {
-      await createAccountNotification(
-        userId!,
-        'payrollLogged',
-        {
-          employeeName,
-          amount: payrollData.total_amount,
-          date: payrollData.generation_date,
-        },
-        {
-          referenceId: data.id,
-          actionUrl: '/admin-management?tab=accounts',
-        }
-      );
-    } catch (notificationError) {
-      // Don't fail the account creation if notification fails
-      console.warn('Failed to send payroll account notification:', notificationError);
-    }
+      const company_id = await getCompanyId();
+      
+      // Get current user if userId not provided
+      if (!userId) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("User not authenticated");
+        userId = user.id;
+      }
 
-    return data;
-  } catch (error) {
-    console.error('Error creating account from payroll:', error);
-    throw error;
+      // Use employee name from payrollData if available, otherwise fetch
+      let employeeName = payrollData.employee_name;
+      if (!employeeName) {
+        const { data: employee } = await supabase
+          .from("employees")
+          .select("first_name, last_name")
+          .eq("id", payrollData.employee_id)
+          .single();
+
+        employeeName = employee 
+          ? `${employee.first_name} ${employee.last_name}`
+          : `Employee ${payrollData.employee_id}`;
+      }
+
+      // Create account entry with enhanced data
+      const accountData = {
+        title: `Payroll - ${employeeName} (${payrollData.generation_date})`,
+        method: 'Bank', // Payroll typically goes through bank
+        company_id,
+        status: 'Complete' as const, // Payroll entries are typically complete when logged
+        from_source: `Payroll System - ${payrollData.source || 'payroll_generation'}`,
+        transaction_date: payrollData.generation_date,
+        amount: -Math.abs(payrollData.total_amount), // Negative because it's an expense for the company
+        currency: 'BDT',
+        additional_data: {
+          payroll_id: payrollData.payroll_id,
+          employee_id: payrollData.employee_id,
+          employee_name: employeeName, // Store employee name
+          basic_salary: payrollData.basic_salary,
+          adjustments: payrollData.adjustments,
+          source: payrollData.source || 'payroll_generation',
+          category: 'payroll',
+          generated_by: 'system',
+          sync_attempt: attempts + 1
+        },
+        created_by: userId,
+      };
+
+      const { data, error } = await supabase
+        .from("accounts")
+        .insert([accountData])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Send notification for automatic payroll logging
+      try {
+        await createAccountNotification(
+          userId!,
+          'payrollLogged',
+          {
+            employeeName,
+            amount: payrollData.total_amount,
+            date: payrollData.generation_date,
+          },
+          {
+            referenceId: data.id,
+            actionUrl: '/admin-management?tab=accounts',
+          }
+        );
+      } catch (notificationError) {
+        // Don't fail the account creation if notification fails
+        console.warn('Failed to send payroll account notification:', notificationError);
+      }
+
+      return data;
+    } catch (error) {
+      attempts++;
+      console.error(`Account creation attempt ${attempts} failed:`, error);
+      
+      if (attempts >= maxRetries) {
+        console.error('Max retries reached for account creation:', error);
+        throw error;
+      }
+      
+      // Wait before retry (exponential backoff)
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempts) * 1000));
+    }
   }
+  
+  throw new Error('Account creation failed after all retry attempts');
 }
 
 /**
- * Create account entries for multiple payroll records
+ * Create account entries for multiple payroll records with enhanced error handling
  */
 export async function createAccountsFromPayrolls(
   payrollsData: PayrollAccountEntry[],
   userId?: string
-): Promise<Account[]> {
+): Promise<{ success: Account[], failed: { payroll: PayrollAccountEntry, error: any }[] }> {
   const results: Account[] = [];
+  const failed: { payroll: PayrollAccountEntry, error: any }[] = [];
   
   for (const payroll of payrollsData) {
     try {
@@ -116,11 +129,11 @@ export async function createAccountsFromPayrolls(
       results.push(account);
     } catch (error) {
       console.error(`Error creating account for payroll ${payroll.payroll_id}:`, error);
-      // Continue processing other payrolls even if one fails
+      failed.push({ payroll, error });
     }
   }
   
-  return results;
+  return { success: results, failed };
 }
 
 /**

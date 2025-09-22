@@ -31,7 +31,7 @@ interface ExtendedPayroll {
   adjustments: PayrollAdjustment[];
   total_amount: number;
   generation_date: string;
-  status: 'Paid' | 'Pending' | 'Adjusted';
+  status: 'Paid' | 'Pending' | 'Published'; // Updated from 'Adjusted'
   created_at: string;
   employee?: {
     first_name: string;
@@ -49,7 +49,7 @@ const getStatusIcon = (status: string) => {
   switch (status) {
     case 'Paid':
       return <CheckCircle className="h-5 w-5 text-green-500" />;
-    case 'Adjusted':
+    case 'Published': // Updated from 'Adjusted'
       return <AlertTriangle className="h-5 w-5 text-amber-500" />;
     case 'Pending':
     default:
@@ -61,7 +61,7 @@ const getStatusColor = (status: string) => {
   switch (status) {
     case 'Paid':
       return 'bg-green-50 text-green-700 border-green-200';
-    case 'Adjusted':
+    case 'Published': // Updated from 'Adjusted'
       return 'bg-amber-50 text-amber-700 border-amber-200';
     case 'Pending':
     default:
@@ -123,7 +123,7 @@ export default function PayrollRequestsPage() {
       // Filter out empty adjustments
       const validAdjustments = adjustments.filter(adj => adj.type.trim() && adj.amount !== 0);
       
-      const status = validAdjustments.length > 0 ? 'Adjusted' : 'Paid';
+      const status = validAdjustments.length > 0 ? 'Published' : 'Paid'; // Updated from 'Adjusted'
       await updatePayrollStatus(editingPayroll, status, validAdjustments);
       
       setEditingPayroll(null);
@@ -382,7 +382,7 @@ export default function PayrollRequestsPage() {
                           )}
                           
                           {/* Action Buttons */}
-                          {payroll.status === 'Pending' && (
+                          {(payroll.status === 'Pending' || payroll.status === 'Published') && ( // Updated to include 'Published'
                             <div className="flex items-center justify-end space-x-2 mt-4 pt-4 border-t border-gray-100">
                               <button
                                 onClick={() => handleEditPayroll(payroll)}

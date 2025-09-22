@@ -7,9 +7,25 @@ ADD COLUMN IF NOT EXISTS fiscal_year_start DATE DEFAULT '2024-01-01',
 ADD COLUMN IF NOT EXISTS pay_frequency VARCHAR(20) DEFAULT 'monthly',
 ADD COLUMN IF NOT EXISTS live_payroll_enabled BOOLEAN DEFAULT false;
 
--- 2. Update grades table to include basic_salary (if not already added)
-ALTER TABLE grades 
+-- 2. Update employees table to include basic_salary (moved from grades)
+ALTER TABLE employees 
 ADD COLUMN IF NOT EXISTS basic_salary DECIMAL(12,2) DEFAULT 0.00;
+
+-- 3. Create salary change audit log table
+CREATE TABLE IF NOT EXISTS salary_change_log (
+  id SERIAL PRIMARY KEY,
+  employee_id UUID REFERENCES employees(id) ON DELETE CASCADE,
+  company_id INTEGER REFERENCES companies(id) ON DELETE CASCADE,
+  change_data JSONB NOT NULL, -- stores old_value, new_value, reason, etc.
+  changed_by UUID REFERENCES employees(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 4. Add indexes for salary change log
+CREATE INDEX IF NOT EXISTS idx_salary_change_log_employee_id ON salary_change_log(employee_id);
+CREATE INDEX IF NOT EXISTS idx_salary_change_log_company_id ON salary_change_log(company_id);
+CREATE INDEX IF NOT EXISTS idx_salary_change_log_changed_by ON salary_change_log(changed_by);
+CREATE INDEX IF NOT EXISTS idx_salary_change_log_created_at ON salary_change_log(created_at);
 
 -- 3. Create payrolls table
 CREATE TABLE IF NOT EXISTS payrolls (
@@ -21,7 +37,7 @@ CREATE TABLE IF NOT EXISTS payrolls (
   total_amount DECIMAL(12,2) NOT NULL,
   generation_date DATE NOT NULL,
   company_id INTEGER REFERENCES companies(id) ON DELETE CASCADE,
-  status VARCHAR(20) DEFAULT 'Pending' CHECK (status IN ('Paid', 'Pending', 'Adjusted')),
+  status VARCHAR(20) DEFAULT 'Pending' CHECK (status IN ('Paid', 'Pending', 'Published')),
   supervisor_id UUID REFERENCES employees(id) ON DELETE SET NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -70,7 +86,35 @@ CREATE POLICY "Supervisors can update supervisee payrolls" ON payrolls
     supervisor_id = auth.uid()::uuid
   );
 
--- 6. Create trigger for updated_at timestamp
+-- 8. Add RLS policies for salary_change_log
+ALTER TABLE salary_change_log ENABLE ROW LEVEL SECURITY;
+
+-- Policy for employees to see their own salary changes
+CREATE POLICY "Employees can view their own salary changes" ON salary_change_log
+  FOR SELECT USING (
+    employee_id = auth.uid()::uuid
+  );
+
+-- Policy for company admins to see all company salary changes
+CREATE POLICY "Company admins can view all company salary changes" ON salary_change_log
+  FOR SELECT USING (
+    company_id IN (
+      SELECT company_id FROM employees 
+      WHERE id = auth.uid()::uuid 
+      AND role IN ('Admin', 'Manager')
+    )
+  );
+
+-- Policy for admins to insert salary change logs
+CREATE POLICY "Admins can insert salary change logs" ON salary_change_log
+  FOR INSERT WITH CHECK (
+    changed_by = auth.uid()::uuid
+    AND company_id IN (
+      SELECT company_id FROM employees 
+      WHERE id = auth.uid()::uuid 
+      AND role IN ('Admin', 'Manager')
+    )
+  );
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN

@@ -36,7 +36,7 @@ serve(async (req: any) => {
       console.log(`Processing payroll for company ${company.id}`);
 
       try {
-        // 2. Get all employees for this company with their grade information
+        // 2. Get all employees for this company with their grade information and basic salary
         const { data: employees, error: empErr } = await supabase
           .from("employees")
           .select(`
@@ -46,11 +46,13 @@ serve(async (req: any) => {
             email,
             supervisor_id,
             grade_id,
-            grades!inner(name, basic_salary)
+            basic_salary,
+            grades!inner(name)
           `)
           .eq("company_id", company.id)
           .eq("has_approval", true)
-          .not("grade_id", "is", null);
+          .not("grade_id", "is", null)
+          .not("basic_salary", "is", null);
 
         if (empErr) {
           console.error(`Error fetching employees for company ${company.id}:`, empErr);
@@ -68,7 +70,7 @@ serve(async (req: any) => {
         // 3. Generate payroll records for each employee
         const payrollRecords = employees.map((emp: any) => {
           const grade = emp.grades;
-          const basicSalary = grade?.basic_salary || 0;
+          const basicSalary = emp.basic_salary || 0; // Use employee's basic_salary
 
           return {
             employee_id: emp.id,

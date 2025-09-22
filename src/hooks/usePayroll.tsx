@@ -3,10 +3,10 @@
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/utils/auth";
-import { Payroll, PayrollAdjustment } from "@/lib/types/schemas";
+import { Payroll, PayrollAdjustment, PayrollAccountEntry } from "@/lib/types/schemas";
 import { createPayrollNotification } from "@/lib/utils/notifications";
 import { formatDate } from "@/lib/utils";
-import { createAccountFromPayroll, PayrollAccountEntry } from "@/lib/utils/payroll-accounts";
+import { createAccountFromPayroll } from "@/lib/utils/payroll-accounts";
 
 export function usePayroll() {
   const [payrolls, setPayrolls] = useState<Payroll[]>([]);
@@ -90,7 +90,7 @@ export function usePayroll() {
   // Update payroll status (for adjustments)
   const updatePayrollStatus = useCallback(async (
     payrollId: number, 
-    status: 'Paid' | 'Pending' | 'Adjusted',
+    status: 'Paid' | 'Pending' | 'Published', // Updated status types
     adjustments?: PayrollAdjustment[]
   ) => {
     setLoading(true);
@@ -133,10 +133,10 @@ export function usePayroll() {
       try {
         const payroll = payrolls.find(p => p.id === payrollId);
         if (payroll && payroll.employee_id) {
-          if (status === 'Adjusted') {
+          if (status === 'Published') { // Updated from 'Adjusted'
             const adjustmentReason = adjustments && adjustments.length > 0 
               ? adjustments.map(adj => adj.type).join(', ')
-              : 'Payroll adjusted';
+              : 'Payroll published';
             
             await createPayrollNotification(
               payroll.employee_id,
@@ -184,13 +184,13 @@ export function usePayroll() {
 
   // Get payroll statistics
   const payrollStats = useMemo(() => {
-    if (!payrolls.length) return { total: 0, paid: 0, pending: 0, adjusted: 0 };
+    if (!payrolls.length) return { total: 0, paid: 0, pending: 0, published: 0 }; // Updated from 'adjusted' to 'published'
     
     return {
       total: payrolls.length,
       paid: payrolls.filter(p => p.status === 'Paid').length,
       pending: payrolls.filter(p => p.status === 'Pending').length,
-      adjusted: payrolls.filter(p => p.status === 'Adjusted').length,
+      published: payrolls.filter(p => p.status === 'Published').length, // Updated from 'adjusted'
     };
   }, [payrolls]);
 
@@ -202,13 +202,26 @@ export function usePayroll() {
   // Create account entry from payroll (for automatic accounting)
   const logPayrollToAccounts = useCallback(async (payroll: Payroll) => {
     try {
+      // Get employee name for the account entry
+      const { data: employee } = await supabase
+        .from("employees")
+        .select("first_name, last_name")
+        .eq("id", payroll.employee_id)
+        .single();
+
+      const employeeName = employee 
+        ? `${employee.first_name} ${employee.last_name}`
+        : `Employee ${payroll.employee_id}`;
+
       const payrollAccountData: PayrollAccountEntry = {
         payroll_id: payroll.id!,
         employee_id: payroll.employee_id,
+        employee_name: employeeName,
         total_amount: payroll.total_amount,
         basic_salary: payroll.basic_salary,
         adjustments: payroll.adjustments,
         generation_date: payroll.generation_date,
+        source: payroll.status === 'Published' ? 'manual_adjustment' : 'payroll_generation'
       };
 
       const account = await createAccountFromPayroll(payrollAccountData);
@@ -237,6 +250,125 @@ export function usePayroll() {
     }
   }, [updatePayrollStatus, logPayrollToAccounts]);
 
+  // Check for pending payrolls for any employee in the company
+  const checkPendingPayrolls = useCallback(async () => {
+    try {
+      const companyId = await getCompanyId();
+      
+      const { data, error } = await supabase
+        .from("payrolls")
+        .select("id, employee_id, generation_date")
+        .eq("company_id", companyId)
+        .in("status", ["Pending", "Published"])
+        .limit(1);
+
+      if (error) throw error;
+      
+      return data && data.length > 0 ? data[0] : null;
+    } catch (error) {
+      console.error('Error checking pending payrolls:', error);
+      return null;
+    }
+  }, []);
+
+  // Generate payroll for company with retry mechanism
+  const generatePayrollWithRetry = useCallback(async (
+    generationDate: string,
+    maxRetries: number = 3
+  ) => {
+    setLoading(true);
+    setError(null);
+    
+    let attempts = 0;
+    const failedOperations: string[] = [];
+    
+    while (attempts < maxRetries) {
+      try {
+        // Check if there are pending payrolls first
+        const pendingPayroll = await checkPendingPayrolls();
+        if (pendingPayroll) {
+          throw new Error(`Cannot generate payroll. There is a pending payroll for employee from ${pendingPayroll.generation_date}`);
+        }
+
+        // Call the edge function for payroll generation
+        const { data, error } = await supabase.functions.invoke('generate_payroll', {
+          body: { generation_date: generationDate }
+        });
+
+        if (error) throw error;
+
+        // If successful, publish payrolls (change status to Published)
+        const { error: publishError } = await supabase
+          .from("payrolls")
+          .update({ status: 'Published' })
+          .eq("generation_date", generationDate)
+          .eq("status", "Pending");
+
+        if (publishError) {
+          // Log the error but don't fail completely
+          failedOperations.push('Failed to publish some payrolls');
+          console.error('Error publishing payrolls:', publishError);
+        }
+
+        // Sync with accounts system
+        try {
+          const { data: generatedPayrolls } = await supabase
+            .from("payrolls")
+            .select("*")
+            .eq("generation_date", generationDate)
+            .eq("status", "Published");
+
+          if (generatedPayrolls && generatedPayrolls.length > 0) {
+            for (const payroll of generatedPayrolls) {
+              try {
+                await logPayrollToAccounts(payroll);
+              } catch (accountError) {
+                failedOperations.push(`Failed to sync payroll ${payroll.id} to accounts`);
+                console.error(`Failed to sync payroll ${payroll.id}:`, accountError);
+              }
+            }
+          }
+        } catch (syncError) {
+          failedOperations.push('Failed to sync with accounts system');
+          console.error('Account sync error:', syncError);
+        }
+
+        setLoading(false);
+        
+        // Return results with any failed operations noted
+        return {
+          success: true,
+          data,
+          failedOperations: failedOperations.length > 0 ? failedOperations : null
+        };
+
+      } catch (error) {
+        attempts++;
+        console.error(`Payroll generation attempt ${attempts} failed:`, error);
+        
+        if (attempts >= maxRetries) {
+          // Final attempt failed, rollback any partial changes
+          try {
+            await supabase
+              .from("payrolls")
+              .delete()
+              .eq("generation_date", generationDate)
+              .eq("status", "Pending");
+          } catch (rollbackError) {
+            console.error('Failed to rollback payroll generation:', rollbackError);
+          }
+          
+          setError(error instanceof Error ? error : new Error(String(error)));
+          setLoading(false);
+          throw error;
+        }
+        
+        // Wait before retry (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempts) * 1000));
+      }
+    }
+  }, [checkPendingPayrolls, logPayrollToAccounts]);
+
   return {
     // State
     payrolls,
@@ -253,5 +385,9 @@ export function usePayroll() {
     // Accounting Integration
     logPayrollToAccounts,
     processPayrollWithAccounting,
+
+    // Enhanced Payroll Generation
+    checkPendingPayrolls,
+    generatePayrollWithRetry,
   };
 }
