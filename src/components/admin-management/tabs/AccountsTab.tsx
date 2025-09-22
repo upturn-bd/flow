@@ -17,7 +17,8 @@ import {
   CheckCircle,
   Clock,
   X,
-  Minus
+  Minus,
+  Text
 } from "lucide-react";
 import { staggerContainer, fadeInUp } from "@/components/ui/animations";
 import { useAccounts } from "@/hooks/useAccounts";
@@ -217,6 +218,34 @@ export default function AccountsTab() {
     }
   };
 
+  // Helper function to parse key-value pairs from string, preserving empty pairs for editing
+  const parseAdditionalDataForEdit = (text: string): KeyValuePair[] => {
+    if (!text.trim()) return [];
+    
+    const lines = text.split('\n');
+    const pairs: KeyValuePair[] = [];
+    
+    lines.forEach(line => {
+      const colonIndex = line.indexOf(':');
+      if (colonIndex >= 0) {
+        const key = line.substring(0, colonIndex).trim();
+        const value = line.substring(colonIndex + 1).trim();
+        pairs.push({ key, value });
+      }
+    });
+    
+    return pairs;
+  };
+
+  // Helper function to convert stored additional_data object to string for editing
+  const formatStoredDataForEdit = (data: any): string => {
+    if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+      return '';
+    }
+    
+    return Object.entries(data).map(([key, value]) => `${key}:${value}`).join('\n');
+  };
+
   // Helper function to convert object to key-value pairs array
   const formatDataForEdit = (data: any): KeyValuePair[] => {
     if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
@@ -232,6 +261,13 @@ export default function AccountsTab() {
   // Helper function to convert key-value pairs array to string
   const stringifyAdditionalData = (pairs: KeyValuePair[]): string => {
     return pairs
+      .map(pair => `${pair.key.trim()}:${pair.value.trim()}`)
+      .join('\n');
+  };
+
+  // Helper function to convert key-value pairs array to string for final submission (filters empty pairs)
+  const stringifyAdditionalDataForSubmission = (pairs: KeyValuePair[]): string => {
+    return pairs
       .filter(pair => pair.key.trim() && pair.value.trim())
       .map(pair => `${pair.key.trim()}:${pair.value.trim()}`)
       .join('\n');
@@ -246,7 +282,7 @@ export default function AccountsTab() {
       transaction_date: data.transaction_date,
       amount: parseFloat(data.amount),
       currency: data.currency.trim(),
-      additional_data: parseAdditionalData(data.additional_data),
+      additional_data: parseAdditionalData(stringifyAdditionalDataForSubmission(parseAdditionalDataForEdit(data.additional_data))),
     };
 
     await createAccount(accountData);
@@ -264,7 +300,7 @@ export default function AccountsTab() {
       transaction_date: data.transaction_date,
       amount: parseFloat(data.amount),
       currency: data.currency.trim(),
-      additional_data: parseAdditionalData(data.additional_data),
+      additional_data: parseAdditionalData(stringifyAdditionalDataForSubmission(parseAdditionalDataForEdit(data.additional_data))),
     };
 
     await updateAccount(selectedAccount.id!, accountData);
@@ -533,12 +569,12 @@ export default function AccountsTab() {
           if (!values.title.trim()) errors.push({ field: 'title', message: 'Title is required' });
           if (!values.from_source.trim()) errors.push({ field: 'from_source', message: 'From source is required' });
           if (!values.transaction_date) errors.push({ field: 'transaction_date', message: 'Transaction date is required' });
-          if (!values.amount.trim()) errors.push({ field: 'amount', message: 'Amount is required' });
+          if (!values.amount) errors.push({ field: 'amount', message: 'Amount is required' });
           if (!values.currency.trim()) errors.push({ field: 'currency', message: 'Currency is required' });
           if (!values.status) errors.push({ field: 'status', message: 'Status is required' });
 
           // Validate amount is a number
-          if (values.amount.trim() && isNaN(parseFloat(values.amount))) {
+          if (values.amount && isNaN(parseFloat(values.amount))) {
             errors.push({ field: 'amount', message: 'Amount must be a valid number' });
           }
 
@@ -553,7 +589,7 @@ export default function AccountsTab() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInputField
-                icon={<DollarSign size={18} />}
+                icon={<Text size={18} />}
                 label="Transaction Title"
                 name="title"
                 value={values.title}
@@ -632,7 +668,7 @@ export default function AccountsTab() {
             </div>
 
             <KeyValueEditor
-              pairs={formatDataForEdit(parseAdditionalData(values.additional_data))}
+              pairs={parseAdditionalDataForEdit(values.additional_data)}
               onChange={(pairs) => {
                 const stringValue = stringifyAdditionalData(pairs);
                 const event = {
@@ -663,19 +699,19 @@ export default function AccountsTab() {
             transaction_date: selectedAccount.transaction_date,
             amount: selectedAccount.amount.toString(),
             currency: selectedAccount.currency,
-            additional_data: stringifyAdditionalData(formatDataForEdit(selectedAccount.additional_data))
+            additional_data: formatStoredDataForEdit(selectedAccount.additional_data)
           }}
           validationFn={(values) => {
             const errors = [];
             if (!values.title.trim()) errors.push({ field: 'title', message: 'Title is required' });
             if (!values.from_source.trim()) errors.push({ field: 'from_source', message: 'From source is required' });
             if (!values.transaction_date) errors.push({ field: 'transaction_date', message: 'Transaction date is required' });
-            if (!values.amount.trim()) errors.push({ field: 'amount', message: 'Amount is required' });
+            if (!values.amount) errors.push({ field: 'amount', message: 'Amount is required' });
             if (!values.currency.trim()) errors.push({ field: 'currency', message: 'Currency is required' });
             if (!values.status) errors.push({ field: 'status', message: 'Status is required' });
 
             // Validate amount is a number
-            if (values.amount.trim() && isNaN(parseFloat(values.amount))) {
+            if (values.amount && isNaN(parseFloat(values.amount))) {
               errors.push({ field: 'amount', message: 'Amount must be a valid number' });
             }
 
@@ -693,7 +729,7 @@ export default function AccountsTab() {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormInputField
-                  icon={<DollarSign size={18} />}
+                  icon={<Text size={18} />}
                   label="Transaction Title"
                   name="title"
                   value={values.title}
@@ -772,7 +808,7 @@ export default function AccountsTab() {
               </div>
 
               <KeyValueEditor
-                pairs={formatDataForEdit(parseAdditionalData(values.additional_data))}
+                pairs={parseAdditionalDataForEdit(values.additional_data)}
                 onChange={(pairs) => {
                   const stringValue = stringifyAdditionalData(pairs);
                   const event = {
