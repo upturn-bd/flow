@@ -34,6 +34,11 @@ export default function FormNumberField({
 }: FormNumberFieldProps) {
   const hasError = !!error;
   
+  // Ensure value is properly handled - convert NaN to empty string, undefined/null to empty string
+  const displayValue = value === null || value === undefined || (typeof value === 'number' && isNaN(value)) 
+    ? '' 
+    : value.toString();
+  
   return (
     <div className="mb-4">
       <label 
@@ -49,7 +54,7 @@ export default function FormNumberField({
         <input
           id={name}
           name={name}
-          value={value}
+          value={displayValue}
           onChange={onChange}
           type="number"
           min={min}

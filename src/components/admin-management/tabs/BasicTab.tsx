@@ -21,7 +21,8 @@ export default function BasicTab() {
     countries,
     industries,
     employees,
-    loading
+    loading,
+    updateCompanySettings
   } = useAdminData();
   const [formValues, setFormValues] = useState<CompanyBasicsFormData>({
     company_name: "",
@@ -44,9 +45,18 @@ export default function BasicTab() {
     setErrors(prev => ({ ...prev, [name]: "" }));
   };
 
-  const handleSettingsChange = (field: string, value: any) => {
+  const handleSettingsChange = async (field: string, value: any) => {
+    // Update local state immediately for responsive UI
     setFormValues(prev => ({ ...prev, [field]: value }));
     setErrors(prev => ({ ...prev, [field]: "" }));
+
+    // Auto-save to database
+    try {
+      await updateCompanySettings({ [field]: value });
+    } catch (error) {
+      console.error('Failed to update company setting:', error);
+      // Could add toast notification here
+    }
   };
 
   useEffect(() => {
@@ -59,7 +69,7 @@ export default function BasicTab() {
         // Operations Settings - add defaults if not present
         live_absent_enabled: companyInfo.live_absent_enabled ?? false,
         // Payroll Settings - add defaults if not present
-        payroll_generation_day: companyInfo.payroll_generation_day ?? 1,
+        payroll_generation_day: companyInfo.payroll_generation_day ?? 5,
         fiscal_year_start: companyInfo.fiscal_year_start ?? "2024-01-01",
         live_payroll_enabled: companyInfo.live_payroll_enabled ?? false,
       });

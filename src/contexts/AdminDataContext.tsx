@@ -64,6 +64,7 @@ interface AdminDataContextType {
   refreshGrades: () => Promise<any>;
   refreshPositions: () => Promise<any>;
   refreshCompanyInfo: () => Promise<any>;
+  updateCompanySettings: (settings: any) => Promise<any>;
 
   // Computed properties
   isSetupComplete: boolean;
@@ -131,6 +132,7 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
     industries,
     employees,
     fetchCompanyInfo,
+    updateCompanySettings,
     loading: companyLoading,
     error: companyError,
   } = useCompanyInfo();
@@ -359,6 +361,7 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
     refreshGrades: fetchGrades,
     refreshPositions: fetchPositions,
     refreshCompanyInfo: fetchCompanyInfo,
+    updateCompanySettings,
 
     // Computed properties
     isSetupComplete,

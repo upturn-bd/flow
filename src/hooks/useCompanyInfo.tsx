@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { getCompanyInfo as getCompanyInfoApi } from "@/lib/utils/auth";
+import { getCompanyInfo as getCompanyInfoApi, updateCompanySettings as updateCompanySettingsApi } from "@/lib/utils/auth";
 import { useEmployees } from "@/hooks/useEmployees";
 
 interface CompanyInfo {
@@ -10,6 +10,10 @@ interface CompanyInfo {
   code: string;
   industry_id: number;
   country_id: number;
+  live_absent_enabled?: boolean;
+  payroll_generation_day?: number;
+  fiscal_year_start?: string;
+  live_payroll_enabled?: boolean;
 }
 
 interface Country {
@@ -57,6 +61,29 @@ export function useCompanyInfo() {
     }
   }, [fetchEmployees]);
 
+  const updateCompanySettings = useCallback(async (settings: {
+    live_absent_enabled?: boolean;
+    payroll_generation_day?: number;
+    fiscal_year_start?: string;
+    live_payroll_enabled?: boolean;
+    industry_id?: number;
+    country_id?: number;
+  }) => {
+    try {
+      await updateCompanySettingsApi(settings);
+      
+      // Update local state
+      setCompanyInfo(prev => prev ? { ...prev, ...settings } : null);
+      
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to update company settings";
+      setError(errorMessage);
+      console.error(errorMessage, err);
+      throw err;
+    }
+  }, []);
+
   return {
     companyInfo,
     countries,
@@ -64,6 +91,7 @@ export function useCompanyInfo() {
     employees,
     loading,
     error,
-    fetchCompanyInfo
+    fetchCompanyInfo,
+    updateCompanySettings
   };
 } 

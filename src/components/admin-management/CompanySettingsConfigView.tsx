@@ -34,7 +34,14 @@ export default function CompanySettingsConfigView({
   };
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = field === 'payroll_generation_day' ? parseInt(e.target.value) : e.target.value;
+    let value: any = e.target.value;
+    
+    // Convert to appropriate type based on field
+    if (field === 'payroll_generation_day') {
+      const numValue = parseInt(value);
+      value = isNaN(numValue) ? 1 : numValue; // Default to 1 if invalid
+    }
+    
     onChange(field, value);
   };
 

@@ -103,12 +103,22 @@ export async function getUserId(): Promise<string> {
 /**
  * Get the current company information
  */
-export async function getCompanyInfo(): Promise<{ id: number; name: string; code: string; industry_id: number; country_id: number }> {
+export async function getCompanyInfo(): Promise<{ 
+  id: number; 
+  name: string; 
+  code: string; 
+  industry_id: number; 
+  country_id: number;
+  live_absent_enabled?: boolean;
+  payroll_generation_day?: number;
+  fiscal_year_start?: string;
+  live_payroll_enabled?: boolean;
+}> {
   const companyId = await getCompanyId();
   
   const { data, error } = await supabase
     .from('companies')
-    .select('id, name, code, industry_id, country_id')
+    .select('*')
     .eq('id', companyId)
     .single();
 
@@ -117,6 +127,29 @@ export async function getCompanyInfo(): Promise<{ id: number; name: string; code
   }
 
   return data;
+}
+
+/**
+ * Update company settings
+ */
+export async function updateCompanySettings(settings: {
+  live_absent_enabled?: boolean;
+  payroll_generation_day?: number;
+  fiscal_year_start?: string;
+  live_payroll_enabled?: boolean;
+  industry_id?: number;
+  country_id?: number;
+}): Promise<void> {
+  const companyId = await getCompanyId();
+  
+  const { error } = await supabase
+    .from('companies')
+    .update(settings)
+    .eq('id', companyId);
+
+  if (error) {
+    throw new DatabaseError('Failed to update company settings', error.code);
+  }
 }
 
 /**

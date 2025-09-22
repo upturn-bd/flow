@@ -32,7 +32,8 @@ export default function SetupStep1({
     divisions,
     grades,
     positions,
-    isSetupComplete
+    isSetupComplete,
+    updateCompanySettings
   } = useAdminData();
   const [formValues, setFormValues] = useState<CompanyBasicsFormData>({
     company_name: "",
@@ -55,9 +56,18 @@ export default function SetupStep1({
     setErrors(prev => ({ ...prev, [name]: "" }));
   };
 
-  const handleSettingsChange = (field: string, value: any) => {
+  const handleSettingsChange = async (field: string, value: any) => {
+    // Update local state immediately for responsive UI
     setFormValues(prev => ({ ...prev, [field]: value }));
     setErrors(prev => ({ ...prev, [field]: "" }));
+
+    // Auto-save to database
+    try {
+      await updateCompanySettings({ [field]: value });
+    } catch (error) {
+      console.error('Failed to update company setting:', error);
+      // Could add toast notification here
+    }
   };
 
   useEffect(() => {
