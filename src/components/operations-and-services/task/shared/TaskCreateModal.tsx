@@ -118,7 +118,7 @@ const handleSubmit = async () => {
           value={formData.task_title}
           onChange={(e) => handleInputChange('task_title', e.target.value)}
           placeholder="Enter task title"
-          error={errors.title}
+          error={errors.task_title}
           required
         />
 
@@ -127,7 +127,7 @@ const handleSubmit = async () => {
           value={formData.task_description || ''}
           onChange={(e) => handleInputChange('task_description', e.target.value)}
           placeholder="Enter task description"
-          error={errors.description}
+          error={errors.task_description}
           rows={3}
           required
         />
@@ -149,6 +149,7 @@ const handleSubmit = async () => {
             onChange={(e) => handleInputChange('end_date', e.target.value)}
             error={errors.end_date}
             required
+            min={formData.start_date || undefined}
           />
 
           <SelectField

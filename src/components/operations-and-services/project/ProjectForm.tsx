@@ -10,6 +10,7 @@ import {
   Calendar,
   Check,
   X,
+  AlertCircle,
 } from "lucide-react";
 import {
   validateProject,
@@ -25,6 +26,7 @@ import MilestoneList from "./milestone/MilestoneList";
 import MilestoneForm from "./milestone/MilestoneForm";
 import { useMilestones } from "@/hooks/useMilestones";
 import { MilestoneUpdateModal } from "./milestone";
+import { fadeInUp } from "@/components/ui/animations";
 
 export type ProjectDetails = Project;
 
@@ -51,16 +53,7 @@ const initialProjectDetails: ProjectDetails = {
   assignees: [],
 };
 
-const initialMilestone: Milestone = {
-  milestone_title: "",
-  description: "",
-  start_date: "",
-  end_date: "",
-  weightage: 0,
-  status: "Not Started",
-  project_id: 0,
-  assignees: [],
-};
+
 
 export default function ProjectForm({
   initialData = initialProjectDetails,
@@ -77,8 +70,7 @@ export default function ProjectForm({
   const [isValid, setIsValid] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({}); // track touched fields
 
-  // milestone state
-  const [milestone, setMilestone] = useState<Milestone>(initialMilestone);
+
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [isCreatingMilestone, setIsCreatingMilestone] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState<number | null>(
@@ -90,6 +82,20 @@ export default function ProjectForm({
   const getTotalMilestoneWeightage = () => {
     return milestones.reduce((sum, m) => sum + m.weightage, 0);
   }
+
+  const initialMilestone: Milestone = {
+    milestone_title: "",
+    description: "",
+    start_date: "",
+    end_date: "",
+    weightage: 100 - getTotalMilestoneWeightage(),
+    status: "Not Started",
+    project_id: 0,
+    assignees: [],
+  };
+
+  // milestone state
+  const [milestone, setMilestone] = useState<Milestone>(initialMilestone);
 
   useEffect(() => {
     const fetchMilestones = async () => {
@@ -161,6 +167,7 @@ export default function ProjectForm({
         });
         return;
       }
+      console.log(totalWeightage)
     }
 
     // validate before submit
@@ -171,28 +178,39 @@ export default function ProjectForm({
     }
 
     onSubmit(projectDetails, milestones);
+
+
   };
 
   useEffect(() => {
     const result = validateProject(projectDetails);
-    if (result.success) {
-      setIsValid(true);
-      setErrors({});
-    } else {
-      setIsValid(false);
-      const newErrors = validationErrorsToObject(result.errors);
 
-      // only keep errors for touched fields
-      const filteredErrors: Record<string, string> = {};
-      for (const key in newErrors) {
-        if (touched[key]) {
-          filteredErrors[key] = newErrors[key];
+    setErrors((prevErrors) => {
+      const fieldErrors: Record<string, string> = {};
+
+      if (!result.success) {
+        const newErrors = validationErrorsToObject(result.errors);
+        // only keep errors for touched fields
+        for (const key in newErrors) {
+          if (touched[key]) {
+            fieldErrors[key] = newErrors[key];
+          }
         }
       }
 
-      setErrors(filteredErrors);
-    }
+      // preserve non-field errors
+      const nonFieldErrors = Object.fromEntries(
+        Object.entries(prevErrors).filter(
+          ([key]) => key === "milestone_weightage"
+        )
+      );
+
+      return { ...fieldErrors, ...nonFieldErrors };
+    });
+
+    setIsValid(result.success);
   }, [projectDetails, touched]);
+
 
   const handleAddMilestone = (newMilestone: Milestone) => {
     setMilestones((prev) => [
@@ -227,13 +245,7 @@ export default function ProjectForm({
       )}
 
       {/* errors */}
-      {errors.milestone_weightage && (
-        <div className="bg-red-50 border border-red-200 p-4 rounded-md mb-4">
-          <p className="text-red-700 flex items-center">
-            {errors.milestone_weightage}
-          </p>
-        </div>
-      )}
+
 
       {/* Project fields */}
       <motion.div
@@ -263,8 +275,28 @@ export default function ProjectForm({
           name="description"
           onChange={handleInputChange}
           value={projectDetails.description}
-          className="w-full h-32 rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+          className={`p-3 w-full h-32 rounded-md border-2  bg-white
+    ${errors.description
+              ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50"
+              : "border-gray-200"
+            }
+    focus:ring-blue-500 focus:border-blue-500 focus:outline-none
+  `}
         />
+
+
+        {errors.description && (
+          <motion.p
+            id={`${name}-error`}
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="mt-1 text-sm text-red-600"
+          >
+            {errors.description}
+          </motion.p>
+        )}
       </motion.div>
 
       <motion.div
@@ -336,6 +368,7 @@ export default function ProjectForm({
           onChange={handleInputChange}
           error={errors.end_date}
           readOnly={!projectDetails.start_date}
+          min={projectDetails.start_date || ""}
         />
       </div>
 
@@ -372,6 +405,7 @@ export default function ProjectForm({
           onCancel={() => setIsCreatingMilestone(false)}
           employees={employees}
           currentMilestones={milestones}
+          currentWeightage={getTotalMilestoneWeightage()}
           mode="create"
           isSubmitting={isSubmitting}
         />
@@ -384,6 +418,14 @@ export default function ProjectForm({
           onClose={() => setSelectedMilestone(null)}
           currentTotalWeightage={getTotalMilestoneWeightage()}
         />
+      )}
+
+      {errors.milestone_weightage && (
+        <div className="bg-red-50 border border-red-200 p-4 rounded-md mb-4">
+          <p className="text-red-700 flex items-center">
+            {errors.milestone_weightage}
+          </p>
+        </div>
       )}
 
       {/* Submit */}
@@ -406,23 +448,15 @@ export default function ProjectForm({
           type="submit"
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          disabled={!isValid || isSubmitting}
-          className={`bg-gray-800 text-white py-2 px-5 rounded-md font-medium shadow-sm flex items-center transition-all duration-150 ${!isValid || isSubmitting
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-gray-900 active:bg-gray-950"
+          disabled={isSubmitting}
+          className={`bg-gray-800 text-white py-2 px-5 rounded-md font-medium shadow-sm flex items-center transition-all duration-150 ${isSubmitting
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-gray-900 active:bg-gray-950"
             }`}
         >
-          {isSubmitting ? (
-            <>
-              <LoadingSpinner />
-              {mode === "create" ? "Creating..." : "Updating..."}
-            </>
-          ) : (
-            <>
-              <Check size={16} className="mr-2" />
-              {mode === "create" ? "Create Project" : "Update Project"}
-            </>
-          )}
+          <Check size={16} className="mr-2" />
+          {mode === "create" ? "Create Project" : "Update Project"}
+
         </motion.button>
       </div>
     </form>

@@ -436,6 +436,15 @@ export function validateProject(project: any): ValidationResult {
     errors.push({ field: 'project_lead_id', message: 'Please select a project lead' });
   }
 
+  if (!project.description || typeof project.description !== 'string' || project.description.trim().length === 0) {
+    errors.push({ field: 'description', message: 'Please enter a project description' });
+  }
+
+  if (!project.department_id || typeof project.department_id !== 'number' || project.department_id === 0) {
+    errors.push({ field: 'department_id', message: 'Please select a department' });
+  }
+
+  
   return {
     success: errors.length === 0,
     data: errors.length === 0 ? project : undefined,

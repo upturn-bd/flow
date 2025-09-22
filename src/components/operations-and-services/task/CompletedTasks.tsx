@@ -109,7 +109,7 @@ const CompletedTasksList = memo(() => {
   const { tasks, getCompanyTasks, loading, deleteTask } = useTasks();
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  
+
   // Move employee and department fetching to parent level to avoid multiple API calls
   const { fetchEmployees, loading: employeeLoading } = useEmployees();
   const { departments, fetchDepartments, loading: departmentsLoading } = useDepartments();
@@ -146,42 +146,46 @@ const CompletedTasksList = memo(() => {
 
   return (
     <div>
-        {!selectedTask && taskDetailsId === null && (
-          <motion.div
-            key="content"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="space-y-4"
-          >
-              {tasks.length > 0 ? (
-                tasks.map((task, index) => (
-                  <TaskCard
-                    key={task.id}
-                    deleteTask={handleDeleteTask}
-                    setSelectedTask={setSelectedTask}
-                    task={task}
-                    setTaskDetailsId={setTaskDetailsId}
-                    departments={departments}
-                  />
-                ))
-              ) : (
-                <EmptyState
-                  icon={<CheckCircle className="w-12 h-12" />}
-                  title="No completed tasks"
-                  description="Tasks will appear here once they're marked as complete"
+      {!selectedTask && (
+        <motion.div
+          key="content"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="space-y-4"
+        >
+          {tasks.length > 0 ? (
+            tasks.map((task) => (
+              <div key={task.id}>
+                <TaskCard
+                  deleteTask={handleDeleteTask}
+                  setSelectedTask={setSelectedTask}
+                  task={task}
+                  setTaskDetailsId={setTaskDetailsId}
+                  departments={departments}
                 />
-              )}
-          </motion.div>
-        )}
 
-        {taskDetailsId !== null && (
-          <TaskDetails
-            onClose={() => setTaskDetailsId(null)}
-            id={taskDetailsId}
-            onTaskStatusUpdate={() => {}} // Removed redundant refresh - useTasks handles state automatically
-          />
-        )}
+                {/* Show TaskDetails right below the clicked TaskCard */}
+                <AnimatePresence>
+                  {taskDetailsId === task.id && (
+                    <TaskDetails
+                      onClose={() => setTaskDetailsId(null)}
+                      id={taskDetailsId}
+                      onTaskStatusUpdate={() => { }}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
+            ))
+          ) : (
+            <EmptyState
+              icon={<CheckCircle className="w-12 h-12" />}
+              title="No completed tasks"
+              description="Tasks will appear here once they're marked as complete"
+            />
+          )}
+        </motion.div>
+      )}
     </div>
   );
 });

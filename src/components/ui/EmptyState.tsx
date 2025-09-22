@@ -66,6 +66,7 @@ export function EmptyState({
           transition={{ delay: 0.4 }}
         >
           <Button
+          type="button"
             onClick={action.onClick}
             variant="primary"
             className="flex items-center gap-2"

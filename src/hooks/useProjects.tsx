@@ -62,8 +62,11 @@ export function useProjects() {
       const user = await getEmployeeInfo();
       const company_id = user.company_id;
 
-      const result = await baseResult.updateItem(projectId, project);
-
+      const {data:result, error} = await baseResult.updateItem(projectId, project);
+      if (error) {
+        console.log(error)
+        throw error;
+      }
       const recipients = [...(project.assignees || []), project.project_lead_id, user.supervisor_id].filter(Boolean) as string[];
 
 

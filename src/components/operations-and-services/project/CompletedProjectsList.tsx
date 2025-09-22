@@ -14,7 +14,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { getCompanyId } from "@/lib/utils/auth";
 
-function CompletedProjectsList() {
+function CompletedProjectsList({setActiveTab}: {setActiveTab: (key:string) => void}) {
   const { deleteProject, updateProject } = useProjects();
   const [projectDetailsId, setProjectDetailsId] = useState<number | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -149,6 +149,7 @@ function CompletedProjectsList() {
           departments={departments}
           onClose={() => setProjectDetailsId(null)}
           onSubmit={handleUpdateProject}
+          setActiveTab={setActiveTab}
         />
       )}
     </AnimatePresence>

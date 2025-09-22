@@ -26,6 +26,7 @@ interface MilestoneFormProps {
   employees: { id: string; name: string }[];
   currentMilestones: Milestone[];
   mode: "create" | "edit";
+  currentWeightage: number;
 }
 
 export const validateMilestone = (
@@ -69,6 +70,7 @@ export default function MilestoneForm({
   employees,
   currentMilestones,
   mode,
+  currentWeightage,
 }: MilestoneFormProps) {
   const [milestoneData, setMilestoneData] = useState<Milestone>(milestone);
   const [milestoneAssignees, setMilestoneAssignees] = useState<string[]>(
@@ -202,6 +204,7 @@ export default function MilestoneForm({
               value={milestoneData.end_date || ""}
               onChange={handleChange}
               error={errors.end_date}
+              min={milestoneData.start_date || undefined}
             />
           </div>
 

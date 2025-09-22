@@ -43,6 +43,7 @@ export default function MilestoneList({
         action={
           totalWeightage < 100 && (
             <Button
+            type="button"
               variant="outline"
               size="sm"
               onClick={onAdd}

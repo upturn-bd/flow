@@ -73,11 +73,11 @@ export default function ProjectPage() {
   function getTabContent(key: string) {
     switch (key) {
       case "create-new":
-        return <CreateNewProjectPage />;
+        return <CreateNewProjectPage setActiveTab={setActiveTab} />;
       case "ongoing":
-        return <ProjectsList />;
+        return <ProjectsList setActiveTab={setActiveTab}/>;
       case "completed":
-        return <CompletedProjectsList />;
+        return <CompletedProjectsList setActiveTab={setActiveTab}/>;
       case "archived":
         return (
           <div className="flex flex-col items-center justify-center p-12 bg-gray-50/50 rounded-xl border border-gray-200 text-center">
@@ -92,7 +92,7 @@ export default function ProjectPage() {
           </div>
         );
       default:
-        return <ProjectsList />;
+        return <ProjectsList setActiveTab={setActiveTab}/>;
     }
   }
 

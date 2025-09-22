@@ -43,8 +43,9 @@ export default function OngoingTaskPage() {
   }, [getCompanyTasks]);
 
   const handleUpdateTask = async (values: any) => {
-    try {3
-      const {data} = await updateTask(values);
+    try {
+      3
+      const { data } = await updateTask(values);
       toast.success("Task updated successfully");
       setTasksList((prev) =>
         prev.map((task) =>
@@ -64,6 +65,7 @@ export default function OngoingTaskPage() {
       setDeletingTaskId(id);
       await deleteTask(id);
       toast.success("Task deleted successfully");
+      setTasksList((prev) => prev.filter((task) => task.id !== id));
       getCompanyTasks()
     } catch (error) {
       toast.error("Error deleting task");
@@ -83,20 +85,32 @@ export default function OngoingTaskPage() {
         <LoadingSpinner text="Loading Tasks..." />
       ) : (
         <div className="grid grid-cols-1 gap-4">
-          {tasksList.length > 0 ? (
-            tasksList.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onEdit={() => setEditTask(task)}
-                onDelete={() =>
-                  task.id !== undefined && handleDeleteTask(task.id)
-                }
-                onDetails={() =>
-                  task.id !== undefined && setTaskDetailsId(task.id)
-                }
-                isDeleting={deletingTaskId === task.id}
-              />
+          {tasks.length > 0 ? (
+            tasks.map((task) => (
+              <div key={task.id}>
+                <TaskCard
+                  task={task}
+                  onEdit={() => setEditTask(task)}
+                  onDelete={() =>
+                    task.id !== undefined && handleDeleteTask(task.id)
+                  }
+                  onDetails={() =>
+                    task.id !== undefined && setTaskDetailsId(task.id)
+                  }
+                  isDeleting={deletingTaskId === task.id}
+                />
+
+                {/* Show details immediately after the clicked card */}
+                <AnimatePresence>
+                  {taskDetailsId === task.id && (
+                    <TaskDetails
+                      onClose={() => setTaskDetailsId(null)}
+                      id={taskDetailsId}
+                      onTaskStatusUpdate={() => { }}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
             ))
           ) : (
             <EmptyState
@@ -107,7 +121,6 @@ export default function OngoingTaskPage() {
           )}
         </div>
       )}
-
       <AnimatePresence>
         {editTask && (
           <TaskUpdateModal
@@ -126,13 +139,6 @@ export default function OngoingTaskPage() {
               department_id: editTask.department_id,
               assignees: editTask.assignees,
             }}
-          />
-        )}
-        {taskDetailsId !== null && (
-          <TaskDetails
-            onClose={() => setTaskDetailsId(null)}
-            id={taskDetailsId}
-            onTaskStatusUpdate={() => { }} // Removed redundant refresh - useTasks handles state automatically
           />
         )}
       </AnimatePresence>

@@ -247,6 +247,8 @@ export function useTasks() {
         await fetchTaskStats(task.project_id);
       }
 
+      setTasks(prev => [...prev, data]);
+
       // Notify assignees if any
 
       const assignees = task.assignees || [];
@@ -304,6 +306,8 @@ export function useTasks() {
         .select()
         .single();
 
+        console.log(data)
+
       if (error) throw error;
 
       // Refresh tasks after update
@@ -315,6 +319,8 @@ export function useTasks() {
         }
         await fetchTaskStats(task.project_id);
       }
+
+      setTasks(prev => prev.map(t => t.id === data.id ? data : t));
 
       const recipients = task.assignees;
       if (user.supervisor_id) {
@@ -361,6 +367,8 @@ export function useTasks() {
         }
         await fetchTaskStats(projectId);
       }
+
+      setTasks(prev => prev.filter(t => t.id !== taskId));
 
       return { success: true };
     } catch (err) {

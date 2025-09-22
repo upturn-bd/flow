@@ -25,7 +25,7 @@ const emptyProject: Project = {
   assignees: [],
 };
 
-function ProjectsList() {
+function ProjectsList({setActiveTab} : {setActiveTab: (key:string) => void}) {
   const { projects, loading, fetchProjects, updateProject, deleteProject } =
     useProjects();
   const [projectDetailsId, setProjectDetailsId] = useState<number | null>(null);
@@ -49,10 +49,11 @@ function ProjectsList() {
 
   const handleUpdateProject = async (values: any) => {
     try {
-      if (selectedProject?.id) {
-        await updateProject(selectedProject.id, values);
+      if (values?.id) {
+        await updateProject(values.id, values);
         toast.success("Project updated successfully");
         setSelectedProject(null);
+        if (values.status === 'Completed') setActiveTab('completed')
         // fetchProjects(); // Removed: useProjects hook handles state update automatically
       }
     } catch (error) {
@@ -60,6 +61,10 @@ function ProjectsList() {
       console.error(error);
     }
   };
+
+  const handleCreateProject = () => {
+    setActiveTab("create-new");
+  }
 
   const handleDeleteProject = async (id: number) => {
     try {
@@ -71,6 +76,8 @@ function ProjectsList() {
       console.error(error);
     }
   };
+
+
 
   if (loading || employeesLoading || departmentsLoading) {
     return (
@@ -136,7 +143,7 @@ function ProjectsList() {
                   description="Create new projects to get started and track your work"
                   action={{
                     label: "Create Project",
-                    onClick: () => setSelectedProject(emptyProject),
+                    onClick: handleCreateProject,
                     icon: <Plus size={16} />,
                   }}
                 />
@@ -165,6 +172,7 @@ function ProjectsList() {
           departments={departments}
           onClose={() => setProjectDetailsId(null)}
           onSubmit={handleUpdateProject}
+          setActiveTab={setActiveTab}
         />
       )}
 

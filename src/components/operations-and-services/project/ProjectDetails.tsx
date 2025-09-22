@@ -48,6 +48,7 @@ interface ProjectDetailsProps {
   departments: Department[];
   onClose: () => void;
   onSubmit: (data: Project) => void;
+  setActiveTab: (key: string) => void;
 }
 
 function formatTime(timestamp: number | Date): string {
@@ -81,6 +82,7 @@ export default function ProjectDetails({
   onSubmit,
   employees,
   departments,
+  setActiveTab,
 }: ProjectDetailsProps) {
   const [projectDetails, setProjectDetails] = useState<Project | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -134,6 +136,7 @@ export default function ProjectDetails({
         throw error;
       }
       onSubmit(validation.data);
+      console.log(validation.data)
       setDisplaySubmissionModal(false);
     } catch (error) {
       console.error("Error updating project:", error);

@@ -84,6 +84,7 @@ export default function TasksPage() {
       console.log("Testing toast success")
       setShowCreateModal(false);
       setActiveTab("ongoing");
+      
     } else {
       console.log("Testing toast fail")
 

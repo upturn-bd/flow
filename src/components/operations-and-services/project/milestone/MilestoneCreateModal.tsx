@@ -34,11 +34,12 @@ export default function MilestoneCreateModal({
     description: '',
     start_date: '',
     end_date: '',
-    weightage: 0,
+    weightage: 100 - currentTotalWeightage,
     status: 'not_started',
     project_id: projectId,
     assignees: []
   });
+  console.log(formData)
   const [errors, setErrors] = useState<Record<string, string>>({});
   
   const { employees, loading: employeesLoading, fetchEmployees } = useEmployees();

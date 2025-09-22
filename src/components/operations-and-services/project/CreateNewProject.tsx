@@ -38,7 +38,7 @@ const initialProjectDetails: ProjectDetails = {
   assignees: [],
 };
 
-export default function CreateNewProjectPage() {
+export default function CreateNewProjectPage({setActiveTab}: {setActiveTab: (key:string) => void}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { departments, fetchDepartments } = useDepartments();
   const { employees, fetchEmployeeInfo } = useEmployeeInfo();
@@ -93,6 +93,8 @@ export default function CreateNewProjectPage() {
       }
 
       toast.success("Project created successfully!");
+
+      setActiveTab('ongoing')
     } catch (error) {
       console.error("Error creating project:", error);
       toast.error(

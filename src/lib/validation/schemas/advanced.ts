@@ -179,7 +179,7 @@ export interface MilestoneData {
   start_date: string;
   end_date: string;
   status: string;
-  weightage: number;
+  weightage: number | undefined;
   project_id?: number;
   company_id?: number;
   assignees?: string[];

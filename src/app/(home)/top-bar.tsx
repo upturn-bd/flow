@@ -21,30 +21,26 @@ export default function TopBar() {
   // Notification hook
   const { fetchUnreadCount, unreadCount } = useNotifications();
 
-  // Fetch unread count on component mount and when approved
+  // Fetch unread count on mount and every 30 seconds
   useEffect(() => {
     if (isApproved) {
       fetchUnreadCount();
-      // Set up interval to refresh unread count every 30 seconds
       const interval = setInterval(fetchUnreadCount, 30000);
       return () => clearInterval(interval);
     }
   }, [isApproved, fetchUnreadCount]);
 
-  // Close the user menu when clicking outside
+  // Close user menu on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setUserMenuOpen(false);
       }
     }
-    
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  
+
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -54,21 +50,17 @@ export default function TopBar() {
     }
   };
 
-  // Check if current path is authorized based on approval status
   const basePath = `/${pathname.split('/')[1]}`;
   const isAuthorized = isApproved || basePath === "/account";
 
-  // If the user isn't approved, show a special header for account pages only
-  if (!isApproved && basePath !== "/account") {
-    return null;
-  }
+  if (!isAuthorized) return null;
 
   return (
-    <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-5 h-16">
+    <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-[1000] h-16">
       <div className="pr-4 md:pr-6 h-full flex items-center justify-between">
         {/* Left side */}
         <div className="flex items-center">
-          {!isAuthorized && (
+          {!isApproved && (
             <div className="flex items-center text-amber-600">
               <ShieldAlert className="h-5 w-5 mr-2" />
               <span className="text-sm font-medium hidden md:inline">Restricted access</span>
@@ -99,12 +91,17 @@ export default function TopBar() {
                     </span>
                   )}
                 </button>
-                
-                <NotificationDropdown
-                  isOpen={notificationDropdownOpen}
-                  onClose={() => setNotificationDropdownOpen(false)}
-                  triggerRef={notificationButtonRef}
-                />
+
+                {/* Notification dropdown */}
+                {notificationDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-2 z-[1100] border border-gray-200">
+                    <NotificationDropdown
+                      isOpen={notificationDropdownOpen}
+                      onClose={() => setNotificationDropdownOpen(false)}
+                      triggerRef={notificationButtonRef}
+                    />
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -121,10 +118,10 @@ export default function TopBar() {
                 {employeeInfo?.name || 'Profile'}
               </span>
             </button>
-            
-            {/* User dropdown menu */}
+
+            {/* User dropdown */}
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 border border-gray-200">
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-[1100] border border-gray-200">
                 <div className="px-4 py-2 border-b border-gray-100">
                   <p className="text-sm font-medium text-gray-900">{employeeInfo?.name || 'User'}</p>
                   <p className="text-xs text-gray-500">{employeeInfo?.role || 'Role'}</p>
@@ -132,7 +129,7 @@ export default function TopBar() {
                     <p className="text-xs mt-1 text-amber-500">Pending approval</p>
                   )}
                 </div>
-                
+
                 <Link 
                   href="/account" 
                   className=" px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
@@ -141,7 +138,7 @@ export default function TopBar() {
                   <UserCircle className="h-4 w-4 mr-2" />
                   My Account
                 </Link>
-                
+
                 <Link 
                   href="/account/settings" 
                   className=" px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
@@ -150,7 +147,7 @@ export default function TopBar() {
                   <Settings className="h-4 w-4 mr-2" />
                   Settings
                 </Link>
-                
+
                 <div className="border-t border-gray-100 mt-1">
                   <button 
                     onClick={() => {
@@ -170,4 +167,4 @@ export default function TopBar() {
       </div>
     </header>
   );
-} 
+}

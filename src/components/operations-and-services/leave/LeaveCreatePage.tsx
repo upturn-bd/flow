@@ -27,7 +27,7 @@ const leaveBalanceData = [
   { count: "11", type: "Sick Leave", color: "bg-purple-100 border-purple-300 text-purple-800" },
 ];
 
-export default function LeaveCreatePage() {
+export default function LeaveCreatePage({setActiveTab}: {setActiveTab: (key: string) => void}) {
   const [leaveRecord, setLeaveRecord] = useState<LeaveState>(initialLeaveRecord);
   const [errors, setErrors] = useState<Partial<Record<keyof LeaveState, string>>>({});
   const [touched, setTouched] = useState<Partial<Record<keyof LeaveState, boolean>>>({});
@@ -107,6 +107,7 @@ export default function LeaveCreatePage() {
       toast.success("Leave application submitted successfully!");
       setLeaveRecord(initialLeaveRecord);
       setTouched({});
+      setActiveTab('history')
     } catch (error) {
       console.error("Error creating Leave:", error);
       toast.error("Failed to submit leave application. Please try again.");
