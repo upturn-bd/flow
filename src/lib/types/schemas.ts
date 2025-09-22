@@ -399,6 +399,27 @@ export interface OnboardingFormData {
   supervisor_id: string | null;
 }
 
+// Account System Interface
+export type AccountStatus = "Complete" | "Pending";
+export type PaymentMethod = "Cash" | "Bank" | string; // String allows free text
+
+export interface Account {
+  id?: number;
+  title: string;
+  method?: string | null; // Nullable dropdown
+  company_id: number;
+  status: AccountStatus;
+  from_source: string; // Renamed from 'from' to avoid conflicts
+  transaction_date: string; // ISO date string
+  amount: number; // Supports negative values for expenses
+  currency: string; // Default BDT, but allows free text
+  additional_data?: Record<string, any>; // JSONB data
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+}
+
 // Payroll System Interfaces
 export interface PayrollAdjustment {
   type: string;

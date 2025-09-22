@@ -159,6 +159,34 @@ export const NotificationTemplates = {
       priority: "normal" as const,
     }),
   },
+
+  // Account-related notifications  
+  account: {
+    transactionCreated: (title: string, amount: number, currency: string) => ({
+      title: "New Transaction Created",
+      message: `A new transaction "${title}" for ${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency} has been added`,
+      context: "account",
+      priority: "normal" as const,
+    }),
+    payrollLogged: (employeeName: string, amount: number, date: string) => ({
+      title: "Payroll Logged to Accounts",
+      message: `Payroll payment for ${employeeName} (৳${Math.abs(amount).toLocaleString()}) has been automatically logged to accounts for ${date}`,
+      context: "account",
+      priority: "low" as const,
+    }),
+    largeTransaction: (title: string, amount: number, currency: string) => ({
+      title: "Large Transaction Alert",
+      message: `A large transaction "${title}" for ${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency} requires attention`,
+      context: "account", 
+      priority: "high" as const,
+    }),
+    statusChanged: (title: string, oldStatus: string, newStatus: string) => ({
+      title: "Transaction Status Updated",
+      message: `Transaction "${title}" status changed from ${oldStatus} to ${newStatus}`,
+      context: "account",
+      priority: "normal" as const,
+    }),
+  },
 };
 
 // Helper functions to create notifications
@@ -367,6 +395,45 @@ export const createPayrollNotification = async (
       break;
     default:
       throw new Error('Invalid payroll notification type');
+  }
+
+  return await createSystemNotification(
+    recipientId,
+    template.title,
+    template.message,
+    {
+      priority: template.priority,
+      context: template.context,
+      referenceId: options.referenceId,
+      actionUrl: options.actionUrl,
+    }
+  );
+};
+
+// Account notification helper
+export const createAccountNotification = async (
+  recipientId: string,
+  type: 'transactionCreated' | 'payrollLogged' | 'largeTransaction' | 'statusChanged',
+  data: any,
+  options: { referenceId?: number; actionUrl?: string } = {}
+) => {
+  let template;
+  
+  switch (type) {
+    case 'transactionCreated':
+      template = NotificationTemplates.account.transactionCreated(data.title, data.amount, data.currency);
+      break;
+    case 'payrollLogged':
+      template = NotificationTemplates.account.payrollLogged(data.employeeName, data.amount, data.date);
+      break;
+    case 'largeTransaction':
+      template = NotificationTemplates.account.largeTransaction(data.title, data.amount, data.currency);
+      break;
+    case 'statusChanged':
+      template = NotificationTemplates.account.statusChanged(data.title, data.oldStatus, data.newStatus);
+      break;
+    default:
+      throw new Error('Invalid account notification type');
   }
 
   return await createSystemNotification(
