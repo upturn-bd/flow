@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building, Settings, ChevronRight, ChevronLeft, LoaderCircle, CheckCircle2, XCircle } from "lucide-react";
+import { Building, Settings, ChevronRight, ChevronLeft, LoaderCircle, CheckCircle2, XCircle, CreditCard } from "lucide-react";
 import { staggerContainer } from "@/components/ui/animations";
 
 // Import context
@@ -14,6 +14,7 @@ import SetupStep1 from "@/components/admin-management/setup/SetupStep1";
 import SetupStep2 from "@/components/admin-management/setup/SetupStep2";
 import BasicTab from "@/components/admin-management/tabs/BasicTab";
 import AdvancedTab from "@/components/admin-management/tabs/AdvancedTab";
+import AccountsTab from "@/components/admin-management/tabs/AccountsTab";
 
 // Main content component that uses the context
 function AdminManagementContent() {
@@ -269,6 +270,17 @@ function AdminManagementContent() {
           <Settings size={16} />
           Advanced
         </button>
+        <button
+          onClick={() => handleTabChange('accounts')}
+          className={`px-6 py-3 font-medium text-sm rounded-tr-xl transition-colors duration-200 flex items-center gap-2 ${
+            currentTab === 'accounts'
+              ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+          }`}
+        >
+          <CreditCard size={16} />
+          Accounts
+        </button>
       </motion.div>
 
       {/* Tab content */}
@@ -283,7 +295,7 @@ function AdminManagementContent() {
           >
             <BasicTab />
           </motion.div>
-        ) : (
+        ) : currentTab === 'advanced' ? (
           <motion.div
             key="advanced"
             initial={{ opacity: 0, y: 20 }}
@@ -293,7 +305,17 @@ function AdminManagementContent() {
           >
             <AdvancedTab />
           </motion.div>
-        )}
+        ) : currentTab === 'accounts' ? (
+          <motion.div
+            key="accounts"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <AccountsTab />
+          </motion.div>
+        ) : null}
       </AnimatePresence>
     </motion.div>
   );

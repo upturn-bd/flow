@@ -345,6 +345,7 @@ export interface Position {
 export interface Grade {
   id?: number;
   name: string;
+  basic_salary?: number;
   company_id?: number;
 }
 
@@ -353,6 +354,12 @@ export interface CompanyBasics {
   company_id: string;
   industry_id: string;
   country_id: string;
+  // Operations Settings
+  live_absent_enabled: boolean;
+  // Payroll Settings
+  payroll_generation_day: number;
+  fiscal_year_start: string; // Date format: YYYY-MM-DD (e.g., "2024-01-01")
+  live_payroll_enabled: boolean;
 }
 
 export interface BasicInfo {
@@ -396,4 +403,46 @@ export interface OnboardingFormData {
   company_name: string;
   company_id: number;
   supervisor_id: string | null;
+}
+
+// Account System Interface
+export type AccountStatus = "Complete" | "Pending";
+export type PaymentMethod = "Cash" | "Bank" | string; // String allows free text
+
+export interface Account {
+  id?: number;
+  title: string;
+  method?: string | null; // Nullable dropdown
+  company_id: number;
+  status: AccountStatus;
+  from_source: string; // Renamed from 'from' to avoid conflicts
+  transaction_date: string; // ISO date string
+  amount: number; // Supports negative values for expenses
+  currency: string; // Default BDT, but allows free text
+  additional_data?: Record<string, any>; // JSONB data
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+}
+
+// Payroll System Interfaces
+export interface PayrollAdjustment {
+  type: string;
+  amount: number; // positive for additions, negative for deductions
+}
+
+export interface Payroll {
+  id?: number;
+  employee_id: string;
+  grade_name: string; // snapshot of the grade name
+  basic_salary: number; // snapshot of the basic salary
+  adjustments: PayrollAdjustment[]; // JSON array
+  total_amount: number;
+  generation_date: string;
+  company_id: number;
+  status: 'Paid' | 'Pending' | 'Adjusted';
+  supervisor_id: string;
+  created_at?: string;
+  updated_at?: string;
 }

@@ -14,7 +14,6 @@ import {
   ChevronUp,
   ClipboardList,
   BarChart,
-  Box,
   LogIn,
   CalendarX,
   Bell,
@@ -24,7 +23,6 @@ import {
   Settings,
   UserPlus,
   Users,
-  User,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -96,7 +94,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-col mt-4 space-y-2 px-2">
+      <nav className="flex flex-col mt-4 space-y-2 px-2 flex-1 overflow-y-auto">
         {navItems.map((item) => {
           console.log(item)
           let displayLabel;
