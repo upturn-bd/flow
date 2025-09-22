@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useDepartments } from "@/hooks/useDepartments";
+import { useSalaryManagement } from "@/hooks/useSalaryManagement";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 import {
   BasicInfoFormData,
   JOB_STATUS_OPTIONS,
@@ -9,7 +11,7 @@ import {
 import { validateBasicInfo, validationErrorsToObject } from "@/lib/utils/validation";
 import { BasicInfoField } from "./BasicInfoField";
 import { motion } from "framer-motion";
-import { User, Briefcase, Calendar, CheckCircle, AlertCircle } from "lucide-react";
+import { User, Briefcase, Calendar, CheckCircle, AlertCircle, DollarSign } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { fadeIn } from "@/components/ui/animations";
 import { useProfile } from "@/hooks/useProfile";
@@ -28,6 +30,7 @@ const initialFormState: BasicInfoFormData = {
   job_status: "",
   hire_date: "",
   id_input: "",
+  basic_salary: 0,
 };
 
 const fieldGroups = [
@@ -50,6 +53,7 @@ const fieldGroups = [
       { name: "job_status", label: "Job Status", type: "text" },
       { name: "hire_date", label: "Hire Date", type: "date" },
       { name: "id_input", label: "Employee ID", type: "text" },
+      { name: "basic_salary", label: "Basic Salary (BDT)", type: "number", adminOnly: true },
     ],
   },
 ];
@@ -64,7 +68,11 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [currentUserRole, setCurrentUserRole] = useState<string>("");
+  const [targetEmployeeId, setTargetEmployeeId] = useState<string>("");
+  
   const { departments, fetchDepartments } = useDepartments();
+  const { updateEmployeeSalary } = useSalaryManagement();
   const [loadingDepartments, setLoadingDepartments] = useState(true);
   
   const {
@@ -123,6 +131,19 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
       }
 
       try {
+        // Check if salary changed and user has permission
+        const oldSalary = initialData?.basic_salary || 0;
+        const newSalary = result.data.basic_salary || 0;
+        
+        if (oldSalary !== newSalary && (currentUserRole === 'Admin' || currentUserRole === 'Manager')) {
+          // Update salary separately with audit logging
+          await updateEmployeeSalary(
+            targetEmployeeId || uid || '', 
+            newSalary,
+            'Salary updated via HRIS profile'
+          );
+        }
+
         const response = await updateBasicInfoApi(result.data);
         setInitialData(response.data);
         setSubmitSuccess(true);
@@ -143,7 +164,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
         setIsSubmitting(false);
       }
     },
-    [formValues, updateBasicInfoApi]
+    [formValues, updateBasicInfoApi, initialData, currentUserRole, updateEmployeeSalary, targetEmployeeId, uid]
   );
 
   const handleEditToggle = useCallback(() => {
@@ -157,6 +178,17 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
   }, [isEditMode, resetForm]);
 
   useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const employeeInfo = await getEmployeeInfo();
+        setCurrentUserRole(employeeInfo.role);
+      } catch (error) {
+        console.error('Failed to fetch user role:', error);
+      }
+    };
+
+    fetchUserRole();
+    
     setLoadingDepartments(true);
     fetchDepartments().finally(() => setLoadingDepartments(false));
   }, [fetchDepartments]);
@@ -167,8 +199,11 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
         let data;
         if (uid) {
           data = await fetchUserBasicInfo(uid);
+          setTargetEmployeeId(uid);
         } else {
           data = await fetchCurrentUserBasicInfo();
+          const employeeInfo = await getEmployeeInfo();
+          setTargetEmployeeId(employeeInfo.id);
         }
         
         setInitialData(data);
@@ -272,7 +307,20 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
               <div className="overflow-hidden border border-gray-200 rounded-lg shadow-sm">
                 <table className="min-w-full divide-y divide-gray-200">
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {group.fields.map((field, fieldIndex) => (
+                    {group.fields
+                      .filter((field: any) => {
+                        // Show admin-only fields only to Admin/Manager or for viewing
+                        if (field.adminOnly) {
+                          return currentUserRole === 'Admin' || currentUserRole === 'Manager' || !isEditMode;
+                        }
+                        return true;
+                      })
+                      .map((field: any, fieldIndex) => {
+                        const canEditField = field.adminOnly 
+                          ? (currentUserRole === 'Admin' || currentUserRole === 'Manager')
+                          : isCurrentUser;
+                        
+                        return (
                       <motion.tr 
                         key={field.name} 
                         className={isEditMode ? "hover:bg-blue-50 transition-colors" : ""}
@@ -281,10 +329,15 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                         transition={{ delay: fieldIndex * 0.05 + groupIndex * 0.1 }}
                       >
                         <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal sm:whitespace-nowrap text-sm font-medium text-gray-800 bg-gray-50 w-1/3">
-                          {field.label}
+                          <div className="flex items-center">
+                            {field.label}
+                            {field.adminOnly && (
+                              <DollarSign className="h-4 w-4 text-amber-500 ml-1" title="Admin/Manager Only" />
+                            )}
+                          </div>
                         </td>
                         <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal text-sm text-gray-600">
-                          {isEditMode && isCurrentUser ? (
+                          {isEditMode && canEditField ? (
                             <div className="max-w-full overflow-hidden">
                               <BasicInfoField
                                 name={field.name as keyof BasicInfoFormData}
@@ -292,6 +345,8 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                                 type={field.type}
                                 value={
                                   field.name === "department_id"
+                                    ? formValues[field.name]?.toString() || ""
+                                    : field.name === "basic_salary"
                                     ? formValues[field.name]?.toString() || ""
                                     : formValues[field.name as keyof BasicInfoFormData] || ""
                                 }
@@ -312,9 +367,13 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                                       }))
                                     : undefined
                                 }
-                                disabled={!isEditMode || !isCurrentUser}
+                                readOnly={field.adminOnly && !(currentUserRole === 'Admin' || currentUserRole === 'Manager')}
+                                disabled={!canEditField}
                                 loading={field.name === "department_id" ? loadingDepartments : false}
                               />
+                              {field.adminOnly && (currentUserRole !== 'Admin' && currentUserRole !== 'Manager') && (
+                                <p className="text-xs text-amber-600 mt-1">Only administrators can edit this field</p>
+                              )}
                             </div>
                           ) : (
                             <div className="py-1 break-words">
@@ -322,12 +381,14 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                                 ? departmentName(Number(formValues[field.name])) 
                                 : field.name === "hire_date" && formValues[field.name]
                                 ? new Date(formValues[field.name]).toLocaleDateString()
+                                : field.name === "basic_salary"
+                                ? `৳${(formValues[field.name] || 0).toLocaleString()}`
                                 : formValues[field.name as keyof BasicInfoFormData] || "—"}
                             </div>
                           )}
                         </td>
                       </motion.tr>
-                    ))}
+                    )})}
                   </tbody>
                 </table>
               </div>
