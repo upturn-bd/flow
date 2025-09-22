@@ -17,7 +17,7 @@ serve(async (req: any) => {
   const { data: companies, error: compErr } = await supabase
     .from("companies")
     .select("id")
-    .eq("liveAbsentEnabled", true);
+    .eq("live_absent_enabled", true);
 
   if (compErr) {
     console.error("Error fetching companies:", compErr);

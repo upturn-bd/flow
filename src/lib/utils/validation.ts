@@ -780,6 +780,23 @@ export function validateCompanyBasics(companyBasics: any): ValidationResult {
   const countryIdError = validateStringLength(companyBasics.country_id, 'country_id', 1);
   if (countryIdError) errors.push(countryIdError);
 
+  // Validate boolean fields
+  if (typeof companyBasics.live_absent_enabled !== 'boolean') {
+    errors.push({ field: 'live_absent_enabled', message: 'Live absent tracking setting is required' });
+  }
+
+  if (typeof companyBasics.live_payroll_enabled !== 'boolean') {
+    errors.push({ field: 'live_payroll_enabled', message: 'Live payroll setting is required' });
+  }
+
+  // Validate payroll generation day (1-31)
+  const payrollDayError = validateNumber(companyBasics.payroll_generation_day, 'payroll_generation_day', 1, 31);
+  if (payrollDayError) errors.push(payrollDayError);
+
+  // Validate fiscal year start date
+  const fiscalYearError = validateDate(companyBasics.fiscal_year_start, 'fiscal_year_start');
+  if (fiscalYearError) errors.push(fiscalYearError);
+
   return {
     success: errors.length === 0,
     data: errors.length === 0 ? companyBasics : undefined,
