@@ -15,7 +15,9 @@ import {
   Building,
   LoaderCircle,
   CheckCircle,
-  Clock
+  Clock,
+  X,
+  Minus
 } from "lucide-react";
 import { staggerContainer, fadeInUp } from "@/components/ui/animations";
 import { useAccounts } from "@/hooks/useAccounts";
@@ -23,8 +25,6 @@ import { Account } from "@/lib/types/schemas";
 import { PAYMENT_METHODS, CURRENCIES, STATUS } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
 import FormModal from "@/components/ui/modals/FormModal";
-import BaseForm from "@/components/forms/BaseForm";
-import { useFormValidation } from "@/hooks/core/useFormValidation";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 
@@ -36,36 +36,95 @@ interface AccountFormData {
   transaction_date: string;
   amount: string;
   currency: string;
-  additional_data: string; // JSON string for form input
+  additional_data: string; // We'll keep this as string for form compatibility
 }
 
-const validateAccountForm = (data: AccountFormData) => {
-  const errors: Array<{field: string, message: string}> = [];
+// KeyValueEditor component for managing additional data
+interface KeyValuePair {
+  key: string;
+  value: string;
+}
 
-  if (!data.title.trim()) errors.push({ field: 'title', message: 'Title is required' });
-  if (!data.from_source.trim()) errors.push({ field: 'from_source', message: 'Source is required' });
-  if (!data.transaction_date.trim()) errors.push({ field: 'transaction_date', message: 'Transaction date is required' });
-  if (!data.amount.trim()) errors.push({ field: 'amount', message: 'Amount is required' });
-  
-  const amount = parseFloat(data.amount);
-  if (isNaN(amount)) errors.push({ field: 'amount', message: 'Amount must be a valid number' });
-  
-  if (!data.currency.trim()) errors.push({ field: 'currency', message: 'Currency is required' });
+interface KeyValueEditorProps {
+  pairs: KeyValuePair[];
+  onChange: (pairs: KeyValuePair[]) => void;
+  error?: string;
+}
 
-  // Validate JSON format for additional_data if provided
-  if (data.additional_data.trim()) {
-    try {
-      JSON.parse(data.additional_data);
-    } catch {
-      errors.push({ field: 'additional_data', message: 'Additional data must be valid JSON' });
-    }
-  }
-
-  return {
-    success: errors.length === 0,
-    errors
+function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
+  const addPair = () => {
+    onChange([...pairs, { key: '', value: '' }]);
   };
-};
+
+  const removePair = (index: number) => {
+    onChange(pairs.filter((_, i) => i !== index));
+  };
+
+  const updatePair = (index: number, field: 'key' | 'value', newValue: string) => {
+    const newPairs = [...pairs];
+    newPairs[index][field] = newValue;
+    onChange(newPairs);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="block text-sm font-medium text-gray-700">
+          Additional Data (Optional)
+        </label>
+        <button
+          type="button"
+          onClick={addPair}
+          className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+        >
+          <Plus size={14} className="mr-1" />
+          Add Field
+        </button>
+      </div>
+      
+      {pairs.length === 0 ? (
+        <div className="text-center py-4 border-2 border-dashed border-gray-200 rounded-lg">
+          <p className="text-sm text-gray-500 italic">No additional data fields</p>
+          <p className="text-xs text-gray-400 mt-1">Click "Add Field" to create key-value pairs</p>
+        </div>
+      ) : (
+        <div className="space-y-2 max-h-48 overflow-y-auto">
+          {pairs.map((pair, index) => (
+            <div key={index} className="flex gap-2 items-center p-2 bg-gray-50 rounded-lg">
+              <input
+                type="text"
+                placeholder="Key (e.g., reference)"
+                value={pair.key}
+                onChange={(e) => updatePair(index, 'key', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              />
+              <span className="text-gray-400 font-mono">:</span>
+              <input
+                type="text"
+                placeholder="Value (e.g., REF123)"
+                value={pair.value}
+                onChange={(e) => updatePair(index, 'value', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              />
+              <button
+                type="button"
+                onClick={() => removePair(index)}
+                className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+                title="Remove field"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {error && (
+        <p className="text-red-600 text-xs mt-1">{error}</p>
+      )}
+    </div>
+  );
+}
 
 export default function AccountsTab() {
   const {
@@ -86,6 +145,98 @@ export default function AccountsTab() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
+  // Helper function to format additional data for display
+  const formatAdditionalData = (data: any) => {
+    if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+      return <span className="text-gray-500 italic text-xs">No additional data</span>;
+    }
+
+    const entries = Object.entries(data);
+    const displayCount = Math.min(entries.length, 2); // Show max 2 chips to prevent overflow
+
+    return (
+      <div className="flex flex-wrap gap-1">
+        {entries.slice(0, displayCount).map(([key, value]) => (
+          <span
+            key={key}
+            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border max-w-32"
+            title={`${key}: ${value}`}
+          >
+            <span className="font-semibold">{key}:</span>
+            <span className="ml-1 truncate">
+              {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+            </span>
+          </span>
+        ))}
+        {entries.length > displayCount && (
+          <span 
+            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 cursor-help"
+            title={`Additional fields: ${entries.slice(displayCount).map(([k, v]) => `${k}: ${v}`).join(', ')}`}
+          >
+            +{entries.length - displayCount} more
+          </span>
+        )}
+      </div>
+    );
+  };
+
+  // Helper function to parse key-value pairs from array to object
+  const parseAdditionalDataFromPairs = (pairs: KeyValuePair[]) => {
+    const data: Record<string, string> = {};
+    pairs.forEach(pair => {
+      if (pair.key.trim() && pair.value.trim()) {
+        data[pair.key.trim()] = pair.value.trim();
+      }
+    });
+    return data;
+  };
+
+  // Helper function to parse key-value pairs from string to object
+  const parseAdditionalData = (text: string) => {
+    if (!text.trim()) return {};
+    
+    try {
+      // Try to parse as JSON first (for backward compatibility)
+      return JSON.parse(text);
+    } catch {
+      // If not JSON, treat as key:value pairs separated by newlines
+      const data: Record<string, string> = {};
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      lines.forEach(line => {
+        const colonIndex = line.indexOf(':');
+        if (colonIndex > 0) {
+          const key = line.substring(0, colonIndex).trim();
+          const value = line.substring(colonIndex + 1).trim();
+          if (key && value) {
+            data[key] = value;
+          }
+        }
+      });
+      return data;
+    }
+  };
+
+  // Helper function to convert object to key-value pairs array
+  const formatDataForEdit = (data: any): KeyValuePair[] => {
+    if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+      return [];
+    }
+    
+    return Object.entries(data).map(([key, value]) => ({
+      key,
+      value: String(value)
+    }));
+  };
+
+  // Helper function to convert key-value pairs array to string
+  const stringifyAdditionalData = (pairs: KeyValuePair[]): string => {
+    return pairs
+      .filter(pair => pair.key.trim() && pair.value.trim())
+      .map(pair => `${pair.key.trim()}:${pair.value.trim()}`)
+      .join('\n');
+  };
+
   const handleCreateAccount = async (data: AccountFormData) => {
     const accountData = {
       title: data.title.trim(),
@@ -95,12 +246,11 @@ export default function AccountsTab() {
       transaction_date: data.transaction_date,
       amount: parseFloat(data.amount),
       currency: data.currency.trim(),
-      additional_data: data.additional_data.trim() ? JSON.parse(data.additional_data) : {},
+      additional_data: parseAdditionalData(data.additional_data),
     };
 
     await createAccount(accountData);
     setIsCreateModalOpen(false);
-    createForm.resetForm();
   };
 
   const handleEditAccount = async (data: AccountFormData) => {
@@ -114,44 +264,13 @@ export default function AccountsTab() {
       transaction_date: data.transaction_date,
       amount: parseFloat(data.amount),
       currency: data.currency.trim(),
-      additional_data: data.additional_data.trim() ? JSON.parse(data.additional_data) : {},
+      additional_data: parseAdditionalData(data.additional_data),
     };
 
     await updateAccount(selectedAccount.id!, accountData);
     setIsEditModalOpen(false);
     setSelectedAccount(null);
-    editForm.resetForm();
   };
-
-  const createForm = useFormValidation<AccountFormData>({
-    initialValues: {
-      title: "",
-      method: "",
-      status: "Pending" as const,
-      from_source: "",
-      transaction_date: new Date().toISOString().split('T')[0], // Today's date
-      amount: "",
-      currency: "BDT",
-      additional_data: "",
-    },
-    validationFn: validateAccountForm,
-    onSubmit: handleCreateAccount,
-  });
-
-  const editForm = useFormValidation<AccountFormData>({
-    initialValues: {
-      title: "",
-      method: "",
-      status: "Pending" as const,
-      from_source: "",
-      transaction_date: new Date().toISOString().split('T')[0],
-      amount: "",
-      currency: "BDT",
-      additional_data: "",
-    },
-    validationFn: validateAccountForm,
-    onSubmit: handleEditAccount,
-  });
 
   useEffect(() => {
     fetchAccounts();
@@ -165,18 +284,16 @@ export default function AccountsTab() {
     return matchesSearch && matchesStatus;
   });
 
+  // Calculate filtered summary based on current filters
+  const filteredSummary = {
+    total: filteredAccounts.length,
+    complete: filteredAccounts.filter(account => account.status === 'Complete').length,
+    pending: filteredAccounts.filter(account => account.status === 'Pending').length,
+    totalAmount: filteredAccounts.reduce((sum, account) => sum + account.amount, 0)
+  };
+
   const handleEditClick = (account: Account) => {
     setSelectedAccount(account);
-    editForm.setValues({
-      title: account.title,
-      method: account.method || "",
-      status: account.status,
-      from_source: account.from_source,
-      transaction_date: account.transaction_date,
-      amount: account.amount.toString(),
-      currency: account.currency,
-      additional_data: account.additional_data ? JSON.stringify(account.additional_data, null, 2) : "",
-    });
     setIsEditModalOpen(true);
   };
 
@@ -260,10 +377,10 @@ export default function AccountsTab() {
             <div className="bg-white/10 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-1">
                 <DollarSign size={16} />
-                <span className="text-sm opacity-90">Net Amount</span>
+                <span className="text-sm opacity-90">Net Amount (Status-wise)</span>
               </div>
               <span className="text-xl font-bold">
-                {summary.totalAmount.toLocaleString('en-US', { 
+                {filteredSummary.totalAmount.toLocaleString('en-US', { 
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
                 })} BDT
@@ -324,6 +441,7 @@ export default function AccountsTab() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Additional Data</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
@@ -365,6 +483,9 @@ export default function AccountsTab() {
                           )}
                         </span>
                       </td>
+                      <td className="px-6 py-4 max-w-xs overflow-hidden">
+                        {formatAdditionalData(account.additional_data)}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center gap-2">
                           <button
@@ -393,225 +514,281 @@ export default function AccountsTab() {
       </motion.div>
 
       {/* Create Account Modal */}
-      <FormModal
-        isOpen={isCreateModalOpen}
-        onClose={() => {
-          setIsCreateModalOpen(false);
-          createForm.resetForm();
-        }}
+      <FormModal<AccountFormData>
         title="Create New Transaction"
-        description="Add a new financial transaction to the accounts system"
+        icon={<Plus size={24} />}
+        isOpen={isCreateModalOpen}
+        initialValues={{
+          title: '',
+          method: '',
+          status: 'Pending',
+          from_source: '',
+          transaction_date: new Date().toISOString().split('T')[0],
+          amount: '',
+          currency: 'BDT',
+          additional_data: ''
+        }}
+        validationFn={(values) => {
+          const errors = [];
+          if (!values.title.trim()) errors.push({ field: 'title', message: 'Title is required' });
+          if (!values.from_source.trim()) errors.push({ field: 'from_source', message: 'From source is required' });
+          if (!values.transaction_date) errors.push({ field: 'transaction_date', message: 'Transaction date is required' });
+          if (!values.amount.trim()) errors.push({ field: 'amount', message: 'Amount is required' });
+          if (!values.currency.trim()) errors.push({ field: 'currency', message: 'Currency is required' });
+          if (!values.status) errors.push({ field: 'status', message: 'Status is required' });
+
+          // Validate amount is a number
+          if (values.amount.trim() && isNaN(parseFloat(values.amount))) {
+            errors.push({ field: 'amount', message: 'Amount must be a valid number' });
+          }
+
+          return errors.length === 0 ? { success: true, data: values } : { success: false, errors };
+        }}
+        onSubmit={handleCreateAccount}
+        onClose={() => setIsCreateModalOpen(false)}
+        isLoading={loading}
+        submitButtonText="Create Transaction"
       >
-        <BaseForm
-          onSubmit={createForm.handleSubmit}
-          isSubmitting={false} // We'll handle this differently
-          submitText="Create Transaction"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInputField
-              label="Transaction Title"
-              name="title"
-              value={createForm.values.title}
-              onChange={createForm.handleChange}
-              error={createForm.errors.title}
-              placeholder="e.g., Office supplies purchase"
-              required
-            />
-            
-            <FormSelectField
-              label="Payment Method"
-              name="method"
-              value={createForm.values.method}
-              onChange={createForm.handleChange}
-              error={createForm.errors.method}
-              options={PAYMENT_METHODS.map(method => ({ value: method, label: method }))}
-              placeholder="Select method (optional)"
-            />
-          </div>
+        {({ values, errors, handleChange }) => (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormInputField
+                icon={<DollarSign size={18} />}
+                label="Transaction Title"
+                name="title"
+                value={values.title}
+                onChange={handleChange}
+                error={errors.title}
+              />
+              
+              <FormSelectField
+                icon={<CreditCard size={18} />}
+                label="Payment Method"
+                name="method"
+                value={values.method}
+                onChange={handleChange}
+                error={errors.method}
+                options={PAYMENT_METHODS.map(method => ({ value: method, label: method }))}
+                placeholder="Select method (optional)"
+              />
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInputField
-              label="From Source"
-              name="from_source"
-              value={createForm.values.from_source}
-              onChange={createForm.handleChange}
-              error={createForm.errors.from_source}
-              placeholder="e.g., Petty Cash, Bank Account"
-              required
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormInputField
+                icon={<Building size={18} />}
+                label="From Source"
+                name="from_source"
+                value={values.from_source}
+                onChange={handleChange}
+                error={errors.from_source}
+              />
 
-            <FormSelectField
-              label="Status"
-              name="status"
-              value={createForm.values.status}
-              onChange={createForm.handleChange}
-              error={createForm.errors.status}
-              options={[
-                { value: 'Pending', label: 'Pending' },
-                { value: 'Complete', label: 'Complete' }
-              ]}
-              required
-            />
-          </div>
+              <FormSelectField
+                icon={<CheckCircle size={18} />}
+                label="Status"
+                name="status"
+                value={values.status}
+                onChange={handleChange}
+                error={errors.status}
+                options={[
+                  { value: 'Pending', label: 'Pending' },
+                  { value: 'Complete', label: 'Complete' }
+                ]}
+                placeholder="Select status"
+              />
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormInputField
-              label="Transaction Date"
-              name="transaction_date"
-              type="date"
-              value={createForm.values.transaction_date}
-              onChange={createForm.handleChange}
-              error={createForm.errors.transaction_date}
-              required
-            />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <FormInputField
+                icon={<Calendar size={18} />}
+                label="Transaction Date"
+                name="transaction_date"
+                type="date"
+                value={values.transaction_date}
+                onChange={handleChange}
+                error={errors.transaction_date}
+              />
 
-            <FormInputField
-              label="Amount"
-              name="amount"
-              type="number"
-              step="0.01"
-              value={createForm.values.amount}
-              onChange={createForm.handleChange}
-              error={createForm.errors.amount}
-              placeholder="0.00"
-              helpText="Use negative values for expenses"
-              required
-            />
+              <FormInputField
+                icon={<DollarSign size={18} />}
+                label="Amount"
+                name="amount"
+                type="number"
+                value={values.amount}
+                onChange={handleChange}
+                error={errors.amount}
+              />
 
-            <FormSelectField
-              label="Currency"
-              name="currency"
-              value={createForm.values.currency}
-              onChange={createForm.handleChange}
-              error={createForm.errors.currency}
-              options={CURRENCIES.map(currency => ({ value: currency, label: currency }))}
-              required
-            />
-          </div>
+              <FormSelectField
+                icon={<DollarSign size={18} />}
+                label="Currency"
+                name="currency"
+                value={values.currency}
+                onChange={handleChange}
+                error={errors.currency}
+                options={CURRENCIES.map(currency => ({ value: currency, label: currency }))}
+                placeholder="Select currency"
+              />
+            </div>
 
-          <FormInputField
-            label="Additional Data (JSON)"
-            name="additional_data"
-            value={createForm.values.additional_data}
-            onChange={createForm.handleChange}
-            error={createForm.errors.additional_data}
-            placeholder='{"user_id": "EMP001", "category": "office_supplies"}'
-            helpText="Optional JSON data for additional information"
-            textarea
-          />
-        </BaseForm>
+            <KeyValueEditor
+              pairs={formatDataForEdit(parseAdditionalData(values.additional_data))}
+              onChange={(pairs) => {
+                const stringValue = stringifyAdditionalData(pairs);
+                const event = {
+                  target: {
+                    name: 'additional_data',
+                    value: stringValue
+                  }
+                } as any;
+                handleChange(event);
+              }}
+              error={errors.additional_data}
+            />
+          </>
+        )}
       </FormModal>
 
       {/* Edit Account Modal */}
-      <FormModal
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          setSelectedAccount(null);
-          editForm.resetForm();
-        }}
-        title="Edit Transaction"
-        description="Modify the selected financial transaction"
-      >
-        <BaseForm
-          onSubmit={editForm.handleSubmit}
-          isSubmitting={false}
-          submitText="Update Transaction"
+      {selectedAccount && (
+        <FormModal<AccountFormData>
+          title="Edit Transaction"
+          icon={<Edit size={24} />}
+          isOpen={isEditModalOpen}
+          initialValues={{
+            title: selectedAccount.title,
+            method: selectedAccount.method || '',
+            status: selectedAccount.status,
+            from_source: selectedAccount.from_source,
+            transaction_date: selectedAccount.transaction_date,
+            amount: selectedAccount.amount.toString(),
+            currency: selectedAccount.currency,
+            additional_data: stringifyAdditionalData(formatDataForEdit(selectedAccount.additional_data))
+          }}
+          validationFn={(values) => {
+            const errors = [];
+            if (!values.title.trim()) errors.push({ field: 'title', message: 'Title is required' });
+            if (!values.from_source.trim()) errors.push({ field: 'from_source', message: 'From source is required' });
+            if (!values.transaction_date) errors.push({ field: 'transaction_date', message: 'Transaction date is required' });
+            if (!values.amount.trim()) errors.push({ field: 'amount', message: 'Amount is required' });
+            if (!values.currency.trim()) errors.push({ field: 'currency', message: 'Currency is required' });
+            if (!values.status) errors.push({ field: 'status', message: 'Status is required' });
+
+            // Validate amount is a number
+            if (values.amount.trim() && isNaN(parseFloat(values.amount))) {
+              errors.push({ field: 'amount', message: 'Amount must be a valid number' });
+            }
+
+            return errors.length === 0 ? { success: true, data: values } : { success: false, errors };
+          }}
+          onSubmit={handleEditAccount}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedAccount(null);
+          }}
+          isLoading={loading}
+          submitButtonText="Update Transaction"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInputField
-              label="Transaction Title"
-              name="title"
-              value={editForm.values.title}
-              onChange={editForm.handleChange}
-              error={editForm.errors.title}
-              placeholder="e.g., Office supplies purchase"
-              required
-            />
-            
-            <FormSelectField
-              label="Payment Method"
-              name="method"
-              value={editForm.values.method}
-              onChange={editForm.handleChange}
-              error={editForm.errors.method}
-              options={PAYMENT_METHODS.map(method => ({ value: method, label: method }))}
-              placeholder="Select method (optional)"
-            />
-          </div>
+          {({ values, errors, handleChange }) => (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormInputField
+                  icon={<DollarSign size={18} />}
+                  label="Transaction Title"
+                  name="title"
+                  value={values.title}
+                  onChange={handleChange}
+                  error={errors.title}
+                />
+                
+                <FormSelectField
+                  icon={<CreditCard size={18} />}
+                  label="Payment Method"
+                  name="method"
+                  value={values.method}
+                  onChange={handleChange}
+                  error={errors.method}
+                  options={PAYMENT_METHODS.map(method => ({ value: method, label: method }))}
+                  placeholder="Select method (optional)"
+                />
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInputField
-              label="From Source"
-              name="from_source"
-              value={editForm.values.from_source}
-              onChange={editForm.handleChange}
-              error={editForm.errors.from_source}
-              placeholder="e.g., Petty Cash, Bank Account"
-              required
-            />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormInputField
+                  icon={<Building size={18} />}
+                  label="From Source"
+                  name="from_source"
+                  value={values.from_source}
+                  onChange={handleChange}
+                  error={errors.from_source}
+                />
 
-            <FormSelectField
-              label="Status"
-              name="status"
-              value={editForm.values.status}
-              onChange={editForm.handleChange}
-              error={editForm.errors.status}
-              options={[
-                { value: 'Pending', label: 'Pending' },
-                { value: 'Complete', label: 'Complete' }
-              ]}
-              required
-            />
-          </div>
+                <FormSelectField
+                  icon={<CheckCircle size={18} />}
+                  label="Status"
+                  name="status"
+                  value={values.status}
+                  onChange={handleChange}
+                  error={errors.status}
+                  options={[
+                    { value: 'Pending', label: 'Pending' },
+                    { value: 'Complete', label: 'Complete' }
+                  ]}
+                  placeholder="Select status"
+                />
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormInputField
-              label="Transaction Date"
-              name="transaction_date"
-              type="date"
-              value={editForm.values.transaction_date}
-              onChange={editForm.handleChange}
-              error={editForm.errors.transaction_date}
-              required
-            />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormInputField
+                  icon={<Calendar size={18} />}
+                  label="Transaction Date"
+                  name="transaction_date"
+                  type="date"
+                  value={values.transaction_date}
+                  onChange={handleChange}
+                  error={errors.transaction_date}
+                />
 
-            <FormInputField
-              label="Amount"
-              name="amount"
-              type="number"
-              step="0.01"
-              value={editForm.values.amount}
-              onChange={editForm.handleChange}
-              error={editForm.errors.amount}
-              placeholder="0.00"
-              helpText="Use negative values for expenses"
-              required
-            />
+                <FormInputField
+                  icon={<DollarSign size={18} />}
+                  label="Amount"
+                  name="amount"
+                  type="number"
+                  value={values.amount}
+                  onChange={handleChange}
+                  error={errors.amount}
+                />
 
-            <FormSelectField
-              label="Currency"
-              name="currency"
-              value={editForm.values.currency}
-              onChange={editForm.handleChange}
-              error={editForm.errors.currency}
-              options={CURRENCIES.map(currency => ({ value: currency, label: currency }))}
-              required
-            />
-          </div>
+                <FormSelectField
+                  icon={<DollarSign size={18} />}
+                  label="Currency"
+                  name="currency"
+                  value={values.currency}
+                  onChange={handleChange}
+                  error={errors.currency}
+                  options={CURRENCIES.map(currency => ({ value: currency, label: currency }))}
+                  placeholder="Select currency"
+                />
+              </div>
 
-          <FormInputField
-            label="Additional Data (JSON)"
-            name="additional_data"
-            value={editForm.values.additional_data}
-            onChange={editForm.handleChange}
-            error={editForm.errors.additional_data}
-            placeholder='{"user_id": "EMP001", "category": "office_supplies"}'
-            helpText="Optional JSON data for additional information"
-            textarea
-          />
-        </BaseForm>
-      </FormModal>
+              <KeyValueEditor
+                pairs={formatDataForEdit(parseAdditionalData(values.additional_data))}
+                onChange={(pairs) => {
+                  const stringValue = stringifyAdditionalData(pairs);
+                  const event = {
+                    target: {
+                      name: 'additional_data',
+                      value: stringValue
+                    }
+                  } as any;
+                  handleChange(event);
+                }}
+                error={errors.additional_data}
+              />
+            </>
+          )}
+        </FormModal>
+      )}
     </>
   );
 }

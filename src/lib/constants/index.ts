@@ -361,25 +361,6 @@ export const UI = {
 } as const;
 
 // ==============================================================================
-// Export Arrays for Select Options
-// ==============================================================================
-
-export const SELECT_OPTIONS = {
-  STATUS: Object.values(STATUS),
-  PRIORITY: Object.values(PRIORITY),
-  URGENCY: Object.values(URGENCY),
-  JOB_STATUS: Object.values(JOB_STATUS),
-  USER_ROLES: Object.values(USER_ROLES),
-  GENDER: Object.values(GENDER),
-  MARITAL_STATUS: Object.values(MARITAL_STATUS),
-  BLOOD_GROUP: Object.values(BLOOD_GROUP),
-  SCHOOLING_TYPES: Object.values(SCHOOLING_TYPES),
-  ACCOUNT_STATUS: [STATUS.COMPLETE, STATUS.PENDING],
-  PAYMENT_METHODS: PAYMENT_METHODS,
-  CURRENCIES: CURRENCIES,
-} as const;
-
-// ==============================================================================
 // Account System Constants
 // ==============================================================================
 
@@ -412,6 +393,26 @@ export const ACCOUNT_CATEGORIES = {
   VENDOR_PAYMENT: 'Vendor Payment',
   MISCELLANEOUS: 'Miscellaneous',
 } as const;
+
+// ==============================================================================
+// Export Arrays for Select Options
+// ==============================================================================
+
+export const SELECT_OPTIONS = {
+  STATUS: Object.values(STATUS),
+  PRIORITY: Object.values(PRIORITY),
+  URGENCY: Object.values(URGENCY),
+  JOB_STATUS: Object.values(JOB_STATUS),
+  USER_ROLES: Object.values(USER_ROLES),
+  GENDER: Object.values(GENDER),
+  MARITAL_STATUS: Object.values(MARITAL_STATUS),
+  BLOOD_GROUP: Object.values(BLOOD_GROUP),
+  SCHOOLING_TYPES: Object.values(SCHOOLING_TYPES),
+  ACCOUNT_STATUS: [STATUS.COMPLETE, STATUS.PENDING],
+  PAYMENT_METHODS: PAYMENT_METHODS,
+  CURRENCIES: CURRENCIES,
+} as const;
+
 
 export type PaymentMethod = typeof PAYMENT_METHODS[number];
 export type Currency = typeof CURRENCIES[number];

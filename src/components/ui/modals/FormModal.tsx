@@ -12,14 +12,15 @@ interface FormModalProps<T> {
   validationFn: (values: T) => { success: boolean; data?: T; errors?: any[] };
   onSubmit: (values: T) => void;
   onClose: () => void;
+  isOpen: boolean;
   isLoading?: boolean;
   submitButtonText?: string;
   size?: "sm" | "md" | "lg" | "xl";
-  children: (props: {
+  children: ReactNode | ((props: {
     values: T;
     errors: Record<string, string>;
     handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
-  }) => ReactNode;
+  }) => ReactNode);
 }
 
 export default function FormModal<T extends Record<string, any>>({
@@ -29,6 +30,7 @@ export default function FormModal<T extends Record<string, any>>({
   validationFn,
   onSubmit,
   onClose,
+  isOpen,
   isLoading = false,
   submitButtonText = "Submit",
   size = "md",
@@ -111,7 +113,7 @@ export default function FormModal<T extends Record<string, any>>({
 
   return (
     <BaseModal
-      isOpen={true}
+      isOpen={isOpen}
       onClose={onClose}
       title={title}
       icon={icon}
@@ -119,7 +121,10 @@ export default function FormModal<T extends Record<string, any>>({
     >
       <form onSubmit={handleSubmit}>
         <div className="space-y-4">
-          {children({ values: formValues, errors, handleChange })}
+          {typeof children === 'function' 
+            ? children({ values: formValues, errors, handleChange })
+            : children
+          }
         </div>
         
         <div className="flex justify-end mt-8 gap-4">
