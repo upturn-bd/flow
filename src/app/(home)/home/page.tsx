@@ -3,8 +3,8 @@
 import { useAttendanceStatus } from "@/hooks/useAttendance";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import { useNotices } from "@/hooks/useNotice";
-import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
-import { useEffect, useState } from "react";
+import { useTasks, TaskStatus } from "@/hooks/useTasks";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import SectionContainer from "@/app/(home)/home/components/SectionContainer";
 import NewsReminderSection from "@/app/(home)/home/components/NewsReminderSection";
@@ -15,20 +15,15 @@ import { handleCheckIn, handleCheckOut } from "@/app/(home)/home/components/atte
 import { pageVariants, sectionVariants } from "@/app/(home)/home/components/animations";
 import { useModalState } from "@/app/(home)/home/components/useModalState";
 
-
-const initialAttendanceRecord: {
-  tag: string;
-  site_id: number | undefined;
-} = {
+const initialAttendanceRecord: { tag: string; site_id: number | undefined } = {
   tag: "Present",
   site_id: undefined,
 };
 
 export default function HomePage() {
-  const [attendanceRecord, setAttendanceRecord] = useState(
-    initialAttendanceRecord
-  );
-  
+  const [attendanceRecord, setAttendanceRecord] = useState(initialAttendanceRecord);
+  const [processing, setProcessing] = useState(false); // block button clicks while updating
+
   const {
     selectedNoticeId,
     selectedTaskId,
@@ -38,36 +33,55 @@ export default function HomePage() {
     closeTask,
   } = useModalState();
 
-  const {
-    loading: statusLoading,
-    today,
-    todayLoading,
-    getTodaysAttendance,
-  } = useAttendanceStatus();
+  const { today, todayLoading, getTodaysAttendance } = useAttendanceStatus();
   const { sites, loading: sitesLoading, fetchSites } = useSites();
   const { notices, loading: noticesLoading, fetchNotices } = useNotices();
   const { tasks, loading: tasksLoading, getUserTasks } = useTasks();
+  const [attendanceLoading, setAttendanceLoading] = useState(false)
 
-  // Create attendance status from records
+
   const currentAttendanceRecord = today;
-  const attendanceStatus = {
-    checkIn: !!currentAttendanceRecord?.check_in_time,
-    checkOut: !!currentAttendanceRecord?.check_out_time,
-  };
 
+  // Derived attendance status
+  const attendanceStatus = useMemo(() => ({
+    checkIn: !!today?.check_in_time,
+    checkOut: !!today?.check_out_time,
+  }), [today]);
+
+  // Fetch initial data
   useEffect(() => {
     fetchSites();
     fetchNotices();
     getUserTasks(TaskStatus.INCOMPLETE);
     getTodaysAttendance();
-  }, [fetchSites, fetchNotices, getUserTasks]);
+  }, []);
 
-  const onCheckIn = () => {
-    handleCheckIn(attendanceRecord, sites, getTodaysAttendance);
+  // Check-in handler
+  const onCheckIn = async () => {
+    setAttendanceLoading(true)
+    setProcessing(true);
+    try {
+      await handleCheckIn(attendanceRecord, sites, getTodaysAttendance);
+    } finally {
+      setProcessing(false);
+      setAttendanceLoading(false)
+    }
   };
 
-  const onCheckOut = () => {
-    handleCheckOut(currentAttendanceRecord, getTodaysAttendance);
+  // Check-out handler
+  const onCheckOut = async () => {
+    setAttendanceLoading(true)
+    setProcessing(true);
+    console.log(today)
+    try {
+      if (today?.id) {
+        await handleCheckOut(today.id);
+      }
+    } finally {
+      setProcessing(false);
+      setAttendanceLoading(false)
+
+    }
   };
 
   return (
@@ -79,9 +93,9 @@ export default function HomePage() {
         onCloseNotice={closeNotice}
         onCloseTask={closeTask}
       />
-      
+
       {selectedNoticeId === null && selectedTaskId === null && (
-        <motion.div 
+        <motion.div
           initial="hidden"
           animate="visible"
           variants={pageVariants}
@@ -100,7 +114,8 @@ export default function HomePage() {
           {/* Attendance */}
           <SectionContainer variants={sectionVariants}>
             <AttendanceSection
-              loading={statusLoading || todayLoading}
+              loading={todayLoading}
+              attendanceLoading={attendanceLoading}
               attendanceStatus={attendanceStatus}
               attendanceRecord={attendanceRecord}
               sites={sites}

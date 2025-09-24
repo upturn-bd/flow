@@ -3,7 +3,7 @@
 import { Attendance } from "@/hooks/useAttendance";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { FaChevronDown, FaCalendarAlt, FaSearch, FaSpinner } from "react-icons/fa";
+import { FaChevronDown, FaCalendarAlt, FaSearch } from "react-icons/fa";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
@@ -13,21 +13,33 @@ import { getEmployeeInfo } from "@/lib/utils/auth";
 export default function AttendanceAbsentPage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Filters state
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [siteId, setSiteId] = useState("");
+
   const { sites, fetchSites } = useSites();
 
-  async function fetchAttendanceData() {
+  // Fetch attendance with filters
+  const fetchAttendanceData = async () => {
     setLoading(true);
-    
     const user = await getEmployeeInfo();
+
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("attendance_records")
         .select("id, check_in_time, check_out_time, site_id, attendance_date, tag, employee_id")
         .eq("employee_id", user.id)
         .eq("company_id", user.company_id)
-        .eq("tag", "Absent")
+        .eq("tag", "Absent") // only Absent for this page
         .order("attendance_date", { ascending: false });
 
+      if (fromDate) query = query.gte("attendance_date", fromDate);
+      if (toDate) query = query.lte("attendance_date", toDate);
+      if (siteId) query = query.eq("site_id", siteId);
+
+      const { data, error } = await query;
       if (error) throw error;
 
       setAttendanceData(data ?? []);
@@ -36,7 +48,7 @@ export default function AttendanceAbsentPage() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     fetchAttendanceData();
@@ -49,6 +61,7 @@ export default function AttendanceAbsentPage() {
   return (
     <div className="bg-white rounded-lg shadow-sm">
       <div className="p-4 sm:p-6">
+
         {/* Filters */}
         <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6">
           <div className="relative">
@@ -57,49 +70,52 @@ export default function AttendanceAbsentPage() {
             </div>
             <input
               type="date"
-              placeholder="From Date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
               className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
             />
           </div>
-          
+
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <FaCalendarAlt className="text-gray-400" />
             </div>
             <input
               type="date"
-              placeholder="To Date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
               className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
             />
           </div>
-          
+
           <div className="relative w-full sm:w-auto min-w-[160px]">
-            <select className="appearance-none pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full text-sm">
+            <select
+              value={siteId}
+              onChange={(e) => setSiteId(e.target.value)}
+              className="appearance-none pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full text-sm"
+            >
               <option value="">Select Site</option>
               {sites.map((site) => (
-                <option key={site.id} value={site.id}>
-                  {site.name}
-                </option>
+                <option key={site.id} value={site.id}>{site.name}</option>
               ))}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <FaChevronDown className="text-gray-400 text-xs" />
             </div>
           </div>
-          
-          <button className="bg-[#192D46] text-white rounded-lg px-4 py-2.5 font-medium hover:bg-[#0f1c2d] transition-colors duration-200 flex items-center justify-center gap-2 text-sm">
+
+          <button
+            onClick={fetchAttendanceData}
+            className="bg-[#192D46] text-white rounded-lg px-4 py-2.5 font-medium hover:bg-[#0f1c2d] transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+          >
             <FaSearch />
             <span>Search</span>
           </button>
         </div>
-        
+
         {/* Table */}
         {loading ? (
-          <LoadingSection 
-          text="Loading attendance records..."
-          icon={Ban}
-          color="blue"
-          />
+          <LoadingSection text="Loading attendance records..." icon={Ban} color="blue" />
         ) : (
           <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="min-w-full divide-y divide-gray-200">
@@ -115,23 +131,13 @@ export default function AttendanceAbsentPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {attendanceData.length > 0 ? (
                   attendanceData.map((entry, idx) => (
-                    <tr 
-                      key={idx}
-                      className="hover:bg-gray-50 transition-colors duration-150"
-                    >
-                      <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
-                        {formatDateToDayMonth(entry.attendance_date)}
-                      </td>
+                    <tr key={idx} className="hover:bg-gray-50 transition-colors duration-150">
+                      <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{formatDateToDayMonth(entry.attendance_date)}</td>
                       <td className="px-4 py-3 text-sm text-gray-900">
-                        {sites.length > 0 && sites.filter((site) => site.id === entry.site_id)[0]?.name || "Unknown Site"}
-                        {sites.length === 0 && (
-                          <span className="inline-flex items-center animate-pulse text-gray-400">
-                            Loading...
-                          </span>
-                        )}
+                        {sites.find((s) => s.id === entry.site_id)?.name || "Unknown Site"}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
-                        {entry.check_in_time && formatTimeFromISO(entry.check_in_time)}
+                        {entry.check_in_time ? formatTimeFromISO(entry.check_in_time) : "N/A"}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                         {entry.check_out_time ? formatTimeFromISO(entry.check_out_time) : "N/A"}

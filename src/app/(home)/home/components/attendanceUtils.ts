@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
+import { getLocalNow } from "@/lib/utils";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { calculateDistance } from "@/lib/utils/location-utils";
 import { getCurrentTime24HourFormat, getTodaysDate, isOnTime } from "@/lib/utils/time-utils";
@@ -95,7 +96,7 @@ export async function handleCheckIn(
     const { error } = await supabase.from("attendance_records").insert({
       ...attendanceRecord,
       attendance_date: date, // Just the date part (YYYY-MM-DD)
-      check_in_time: new Date().toLocaleDateString('sv-SE'), // Full ISO timestamp
+      check_in_time: new Date().toISOString(), // Full ISO timestamp
       employee_id: user.id,
       company_id: user.company_id,
       supervisor_id: user.supervisor_id,
@@ -116,15 +117,14 @@ export async function handleCheckIn(
 }
 
 export async function handleCheckOut(
-  attendanceDetails: any,
-  checkAttendanceStatus: () => void
+  attendanceId: number,
 ) {
   const user = await getEmployeeInfo();
   const coordinates = await getCurrentCoordinates();
   if (!coordinates) return; // Exit if permission denied
 
   // Get current timestamp in ISO format
-  const now = new Date().toLocaleDateString('sv-SE');
+  const now = new Date().toISOString();
 
   try {
     const { data, error } = await supabase
@@ -135,15 +135,13 @@ export async function handleCheckOut(
       })
       .eq("employee_id", user.id)
       .eq("company_id", user.company_id)
-      .eq("id", attendanceDetails?.id)
-      .eq("attendance_date", now.split("T")[0]);
+      .eq("id", attendanceId)
 
     if (error) {
       console.error("Check-out error:", error);
       alert("Failed to record check-out");
     } else {
       alert("Check-out recorded successfully!");
-      checkAttendanceStatus();
     }
   } catch (err) {
     console.error("Unexpected error:", err);

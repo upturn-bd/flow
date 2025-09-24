@@ -53,6 +53,7 @@ export default function AttendanceRequestsPage() {
         )
         .eq("company_id", user.company_id)
         .eq("tag", "Pending")
+        .eq("supervisor_id", user.supervisor_id)
         .order("attendance_date", { ascending: false });
 
       if (error) throw error;

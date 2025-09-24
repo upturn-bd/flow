@@ -37,6 +37,7 @@ interface AttendanceStatus {
 
 interface AttendanceSectionProps {
   loading: boolean;
+  attendanceLoading: boolean;
   attendanceStatus: AttendanceStatus;
   attendanceRecord: AttendanceRecord;
   sites: Site[];
@@ -48,6 +49,7 @@ interface AttendanceSectionProps {
 
 export default function AttendanceSection({
   loading,
+  attendanceLoading,
   attendanceStatus,
   attendanceRecord,
   sites,
@@ -57,9 +59,11 @@ export default function AttendanceSection({
   onCheckOut,
 }: AttendanceSectionProps) {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
-  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number, lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
+  const [checkInCompleted, setCheckInCompleted] = useState(false)
+  const [checkOutCompleted, setCheckOutCompleted] = useState(false)
 
   // Get user's current location
   const getCurrentLocation = () => {
@@ -106,15 +110,17 @@ export default function AttendanceSection({
 
   // Automatically get location when site is selected
   useEffect(() => {
-    if (attendanceRecord.site_id && !attendanceStatus.checkIn) {
+    if (attendanceRecord.site_id && !checkInCompleted) {
       getCurrentLocation();
     }
-  }, [attendanceRecord.site_id, attendanceStatus.checkIn]);
+
+    console.log(checkInCompleted, checkOutCompleted)
+  }, [attendanceRecord.site_id, checkInCompleted]);
 
   // Calculate distance to selected site
   const getDistanceToSite = (): number | null => {
     if (!userLocation || !attendanceRecord.site_id) return null;
-    
+
     const selectedSite = sites.find(site => site.id === attendanceRecord.site_id);
     if (!selectedSite) return null;
 
@@ -140,42 +146,69 @@ export default function AttendanceSection({
       console.log(new Date().toLocaleDateString('sv-SE').split('T')[0])
       if (error) throw error;
 
+
       setAttendanceData(data ?? []);
+
+      console.log(data)
+
+      if (data[0]) {
+        if (data[0].check_in_time !== undefined && data[0].check_in_time !== null) {
+          setCheckInCompleted(true)
+        }
+
+        if (data[0].check_out_time !== undefined && data[0].check_out_time !== null) {
+          setCheckOutCompleted(true)
+        }
+
+      }
+
     } catch (error) {
       console.error("Error fetching attendance data:", error);
     }
   }
 
+
+  const handleCheckIn = async () => {
+    
+    await onCheckIn();
+    fetchAttendanceDataToday()
+  }
+
+  const handleCheckOut = async () => {
+    await onCheckOut()
+    fetchAttendanceDataToday()
+  }
+
   useEffect(() => {
     fetchAttendanceDataToday();
-  });
+  }, []);
 
   return (
     <>
       <SectionHeader title="Attendance Today" icon={Calendar} />
       <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-        {loading ? (
+        {loading || attendanceLoading ? (
           <LoadingSection text="Loading attendance status..." icon={Calendar} />
         ) : (
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             {/* LEFT COLUMN */}
             <div className="space-y-4">
 
-              {attendanceStatus.checkOut && attendanceStatus.checkIn && (
+              {checkOutCompleted && checkInCompleted && (
                 <div className="flex items-center text-green-600 font-medium">
                   <CheckCircle2 className="mr-2 h-5 w-5" />
                   <span>Both check-in and check-out completed for today</span>
                 </div>
               )}
 
-              {!attendanceStatus.checkOut && attendanceStatus.checkIn && (
+              {!checkOutCompleted && checkInCompleted && (
                 <div className="flex items-center text-green-600 font-medium">
                   <CheckCircle2 className="mr-2 h-5 w-5" />
                   <span>Check-in completed for today</span>
                 </div>
               )}
 
-              {!attendanceStatus.checkIn && (
+              {!checkInCompleted && (
                 <div className="space-y-4">
                   <div className="flex flex-col gap-2">
                     <label className="flex items-center text-gray-700 font-medium">
@@ -233,7 +266,7 @@ export default function AttendanceSection({
                               {formatDistance(getDistanceToSite() || 0)}
                             </span>
                           </div>
-                          
+
                           {getDistanceToSite() && getDistanceToSite()! > 100 && (
                             <div className="flex items-center gap-2 mt-2 text-amber-700 text-xs">
                               <AlertTriangle className="w-3 h-3" />
@@ -262,11 +295,10 @@ export default function AttendanceSection({
                                     Current Time: {currentTime}
                                   </span>
                                 </div>
-                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                                  isLate 
-                                    ? 'bg-red-100 text-red-800' 
+                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${isLate
+                                    ? 'bg-red-100 text-red-800'
                                     : 'bg-green-100 text-green-800'
-                                }`}>
+                                  }`}>
                                   {isLate ? 'Late' : 'On Time'}
                                 </span>
                               </div>
@@ -286,12 +318,12 @@ export default function AttendanceSection({
 
             {/* RIGHT COLUMN */}
             <div className="self-end md:self-center">
-              {!attendanceStatus.checkIn && !attendanceStatus.checkOut && (
+              {!checkInCompleted && !checkOutCompleted && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   type="button"
-                  onClick={onCheckIn}
+                  onClick={handleCheckIn}
                   disabled={!attendanceRecord.site_id || !attendanceRecord.tag}
                   className={cn(
                     "bg-blue-600 text-white font-medium rounded-lg px-5 py-2.5 flex items-center gap-2",
@@ -304,11 +336,11 @@ export default function AttendanceSection({
                 </motion.button>
               )}
 
-              {attendanceStatus.checkIn && !attendanceStatus.checkOut && (
+              {checkInCompleted && !checkOutCompleted && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={onCheckOut}
+                  onClick={handleCheckOut}
                   type="button"
                   className="bg-yellow-500 text-white font-medium rounded-lg px-5 py-2.5 flex items-center gap-2"
                 >
@@ -368,11 +400,10 @@ export default function AttendanceSection({
                                 site.check_in
                               );
                               return (
-                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                                  lateStatus === 'late' 
-                                    ? 'bg-red-100 text-red-800' 
+                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${lateStatus === 'late'
+                                    ? 'bg-red-100 text-red-800'
                                     : 'bg-green-100 text-green-800'
-                                }`}>
+                                  }`}>
                                   {lateStatus === 'late' ? 'Late' : 'On Time'}
                                 </span>
                               );
@@ -394,11 +425,10 @@ export default function AttendanceSection({
                                 site.check_out
                               );
                               return (
-                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                                  earlyStatus === 'early' 
-                                    ? 'bg-yellow-100 text-yellow-800' 
+                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${earlyStatus === 'early'
+                                    ? 'bg-yellow-100 text-yellow-800'
                                     : 'bg-green-100 text-green-800'
-                                }`}>
+                                  }`}>
                                   {earlyStatus === 'early' ? 'Early' : 'On Time'}
                                 </span>
                               );

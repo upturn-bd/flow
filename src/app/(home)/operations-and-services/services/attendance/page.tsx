@@ -3,6 +3,7 @@
 import AttendanceAbsentPage from "@/components/operations-and-services/attendance/AbsentPage";
 import AttendanceLatePage from "@/components/operations-and-services/attendance/LatePage";
 import AttendancePresentPage from "@/components/operations-and-services/attendance/PresentPage";
+import AttendanceRecordsPage from "@/components/operations-and-services/attendance/RecordsPage";
 import AttendanceRequestsPage from "@/components/operations-and-services/attendance/RequestsPage";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
@@ -16,6 +17,13 @@ import {
 import { useState } from "react";
 
 const tabs: TabItem[] = [
+  {
+    key: "records",
+    label: "Records",
+    icon: <Calendar className="h-5 w-5" />,
+    color: "text-gray-600",
+    content: <AttendanceRecordsPage />
+  },
   { 
     key: "present", 
     label: "Present",
@@ -47,7 +55,7 @@ const tabs: TabItem[] = [
 ];
 
 export default function AttendancePage() {
-  const [activeTab, setActiveTab] = useState("present");
+  const [activeTab, setActiveTab] = useState("records");
 
   return (
     <ServicePageTemplate

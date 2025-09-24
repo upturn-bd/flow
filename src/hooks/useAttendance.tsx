@@ -53,8 +53,9 @@ export function useAttendances() {
     setTodayLoading(true);
     // Get today's date in YYYY-MM-DD format
     const today = new Date().toLocaleDateString('sv-SE'); // Get YYYY-MM-DD format
-    
     const attendance = await getAttendanceForDate(today, employeeId);
+        setToday(attendance)
+
     setTodayLoading(false);
     return attendance;
   }, [getAttendanceForDate]);
