@@ -31,7 +31,6 @@ CREATE INDEX IF NOT EXISTS idx_salary_change_log_created_at ON salary_change_log
 CREATE TABLE IF NOT EXISTS payrolls (
   id SERIAL PRIMARY KEY,
   employee_id UUID REFERENCES employees(id) ON DELETE CASCADE,
-  grade_name VARCHAR(255) NOT NULL, -- snapshot of grade name
   basic_salary DECIMAL(12,2) NOT NULL, -- snapshot of basic salary
   adjustments JSONB DEFAULT '[]', -- array of PayrollAdjustment objects
   total_amount DECIMAL(12,2) NOT NULL,

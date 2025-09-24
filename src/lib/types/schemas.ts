@@ -440,7 +440,6 @@ export interface PayrollAdjustment {
 export interface Payroll {
   id?: number;
   employee_id: string;
-  grade_name: string; // snapshot of the grade name
   basic_salary: number; // snapshot of the basic salary
   adjustments: PayrollAdjustment[]; // JSON array
   total_amount: number;
