@@ -348,7 +348,7 @@ export interface Position {
 export interface Grade {
   id?: number;
   name: string;
-  basic_salary?: number;
+  basic_salary?: number; // Deprecated - salary moved to employees table
   company_id?: number;
 }
 
@@ -375,6 +375,7 @@ export interface BasicInfo {
   job_status: string;
   hire_date: string;
   id_input: string;
+  basic_salary?: number; // Added for admin/manager editable salary
 }
 
 export interface PersonalInfo {
@@ -406,6 +407,7 @@ export interface OnboardingFormData {
   company_name: string;
   company_id: number;
   supervisor_id: string | null;
+  basic_salary?: number; // Added for salary management
 }
 
 // Account System Interface
@@ -444,8 +446,36 @@ export interface Payroll {
   total_amount: number;
   generation_date: string;
   company_id: number;
-  status: 'Paid' | 'Pending' | 'Adjusted';
+  status: 'Paid' | 'Pending' | 'Published'; // Updated: 'Adjusted' -> 'Published'
   supervisor_id: string;
   created_at?: string;
   updated_at?: string;
+}
+
+// Salary Change Audit Trail
+export interface SalaryChangeLog {
+  id?: number;
+  employee_id: string;
+  company_id: number;
+  change_data: {
+    old_value: number;
+    new_value: number;
+    reason?: string;
+    employee_name: string;
+    changed_at: string;
+  };
+  changed_by: string;
+  created_at?: string;
+}
+
+// Enhanced Account Entry for Payroll Integration
+export interface PayrollAccountEntry {
+  payroll_id: number;
+  employee_id: string;
+  employee_name: string; // Added as requested
+  total_amount: number;
+  basic_salary: number;
+  adjustments: PayrollAdjustment[];
+  generation_date: string;
+  source: 'Adjusted' | 'Generated'; // Added source tracking
 }

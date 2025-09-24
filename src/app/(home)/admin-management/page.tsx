@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building, Settings, ChevronRight, ChevronLeft, LoaderCircle, CheckCircle2, XCircle, CreditCard } from "lucide-react";
+import { Building, Settings, ChevronRight, ChevronLeft, LoaderCircle, CheckCircle2, XCircle, CreditCard, DollarSign } from "lucide-react";
 import { staggerContainer } from "@/components/ui/animations";
 
 // Import context
@@ -15,6 +15,7 @@ import SetupStep2 from "@/components/admin-management/setup/SetupStep2";
 import BasicTab from "@/components/admin-management/tabs/BasicTab";
 import AdvancedTab from "@/components/admin-management/tabs/AdvancedTab";
 import AccountsTab from "@/components/admin-management/tabs/AccountsTab";
+import { EmployeeSalaryList } from "@/components/admin-management/salary/SalaryManagement";
 
 // Main content component that uses the context
 function AdminManagementContent() {
@@ -272,7 +273,7 @@ function AdminManagementContent() {
         </button>
         <button
           onClick={() => handleTabChange('accounts')}
-          className={`px-6 py-3 font-medium text-sm rounded-tr-xl transition-colors duration-200 flex items-center gap-2 ${
+          className={`px-6 py-3 font-medium text-sm transition-colors duration-200 flex items-center gap-2 ${
             currentTab === 'accounts'
               ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -280,6 +281,17 @@ function AdminManagementContent() {
         >
           <CreditCard size={16} />
           Accounts
+        </button>
+        <button
+          onClick={() => handleTabChange('salaries')}
+          className={`px-6 py-3 font-medium text-sm rounded-tr-xl transition-colors duration-200 flex items-center gap-2 ${
+            currentTab === 'salaries'
+              ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+          }`}
+        >
+          <DollarSign size={16} />
+          Salaries
         </button>
       </motion.div>
 
@@ -314,6 +326,16 @@ function AdminManagementContent() {
             transition={{ duration: 0.3 }}
           >
             <AccountsTab />
+          </motion.div>
+        ) : currentTab === 'salaries' ? (
+          <motion.div
+            key="salaries"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <EmployeeSalaryList />
           </motion.div>
         ) : null}
       </AnimatePresence>

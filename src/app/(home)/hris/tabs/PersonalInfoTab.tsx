@@ -108,13 +108,13 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
           };
           setInitialData(personalInfoData);
         } else {
+          // No personal info record exists yet - use defaults
           setInitialData(defaultPersonalFormValues);
         }
       } catch (error) {
-        showNotification({
-          message: "Failed to fetch personal info. Please try again later.",
-          type: "error"
-        });
+        console.error("Error fetching personal info:", error);
+        // Don't show error notification for missing records - just use defaults
+        setInitialData(defaultPersonalFormValues);
       }
     };
     fetchPersonalInfo();
@@ -124,16 +124,53 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Since all fields are optional, we can directly submit
     try {
-      await updatePersonalInfoApi(formValues);
+      // Only send fields that have actually changed to avoid unnecessary updates
+      const changedFields: Partial<PersonalFormData> = {};
+      
+      Object.keys(formValues).forEach((key) => {
+        const typedKey = key as keyof PersonalFormData;
+        const oldValue = initialData[typedKey];
+        const newValue = formValues[typedKey];
+        
+        // Include field if it has changed (including from empty to filled or vice versa)
+        if (oldValue !== newValue) {
+          (changedFields as any)[typedKey] = newValue;
+        }
+      });
+
+      console.log('Personal info fields being updated:', changedFields);
+
+      // Only proceed if there are changes to make
+      if (Object.keys(changedFields).length === 0) {
+        showNotification({ 
+          message: "No changes to save", 
+          type: "info" 
+        });
+        setIsEditMode(false);
+        return;
+      }
+
+      // Always attempt update - the hook handles empty updates gracefully
+      await updatePersonalInfoApi(changedFields);
+      
+      // Update initial data with the new values
+      setInitialData({ ...initialData, ...changedFields });
+      
       showNotification({ 
         message: "Personal information updated successfully!", 
         type: "success" 
       });
       setIsEditMode(false);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    } catch (error: any) {
+      let errorMessage = "Failed to update personal information";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       showNotification({ 
         message: errorMessage, 
         type: "error" 
