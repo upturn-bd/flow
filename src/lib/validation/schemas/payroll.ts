@@ -17,10 +17,6 @@ export const validatePayroll = (payroll: Partial<Payroll>): ValidationError[] =>
     errors.push({ field: "employee_id", message: "Employee ID is required" });
   }
 
-  if (!payroll.grade_name?.trim()) {
-    errors.push({ field: "grade_name", message: "Grade name is required" });
-  }
-
   if (payroll.basic_salary === undefined || payroll.basic_salary < 0) {
     errors.push({ field: "basic_salary", message: "Valid basic salary is required" });
   }

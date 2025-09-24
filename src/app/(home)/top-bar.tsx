@@ -14,7 +14,7 @@ export default function TopBar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const notificationButtonRef = useRef<HTMLButtonElement>(null);
+  const notificationButtonRef = useRef<HTMLButtonElement>(null!);
   const router = useRouter();
   const pathname = usePathname();
   

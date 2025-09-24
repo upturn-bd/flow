@@ -123,7 +123,7 @@ export function StatusIndicator({
   const Component = animate ? motion.span : "span";
   const iconProps = animate && Icon === Loader2 ? {
     animate: { rotate: 360 },
-    transition: { duration: 1, repeat: Infinity, ease: "linear" }
+    transition: { duration: 1, repeat: Infinity }
   } : {};
 
   return (

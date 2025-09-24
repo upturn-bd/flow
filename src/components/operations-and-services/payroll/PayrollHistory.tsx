@@ -27,7 +27,6 @@ import { PayrollAdjustment } from "@/lib/types/schemas";
 interface ExtendedPayroll {
   id?: number;
   employee_id: string;
-  grade_name: string;
   basic_salary: number;
   adjustments: Array<{type: string; amount: number}>;
   total_amount: number;

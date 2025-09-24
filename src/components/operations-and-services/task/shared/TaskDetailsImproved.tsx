@@ -2,7 +2,6 @@
 
 import { useEmployees } from "@/hooks/useEmployees";
 import { Task, useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
-import { getCompanyId } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar, ChevronLeft, User, CheckCircle, XCircle, Clock, Target } from "lucide-react";
@@ -12,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import { getCompanyId } from "@/lib/utils/auth";
 
 interface TaskDetailsProps {
   id: number;

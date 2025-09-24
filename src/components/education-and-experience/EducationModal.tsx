@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { dirtyValuesChecker } from "@/lib/utils";
-import { Education } from "@/hooks/useEducation";
 import { schoolingTypes } from "@/lib/types";
 import { validateSchooling, validationErrorsToObject } from "@/lib/utils/validation";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { FormModal, BaseModal } from "@/components/ui/modals";
 import { FormField, SelectField, FileUploadField } from "@/components/forms";
 import { Button } from "@/components/ui/button";
+import { Education } from "@/hooks/useProfile";
 
 interface EducationModalProps {
   isOpen: boolean;

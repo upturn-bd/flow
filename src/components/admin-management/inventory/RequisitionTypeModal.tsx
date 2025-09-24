@@ -31,6 +31,7 @@ export const RequisitionTypeModal: React.FC<RequisitionTypeModalProps> = ({
       validationFn={validateRequisitionType}
       onSubmit={onSubmit}
       onClose={onClose}
+      isOpen={isOpen}
       isLoading={isLoading}
       submitButtonText="Create Category"
       size="sm"

@@ -9,12 +9,14 @@ import { FormField } from "@/components/forms";
 interface ComplaintsModalProps {
   onSubmit: (values: ComplaintsType) => void;
   onClose: () => void;
+  isOpen: boolean;
   isLoading?: boolean;
 }
 
 export default function ComplaintTypeCreateModal({
   onSubmit,
   onClose,
+  isOpen,
   isLoading = false,
 }: ComplaintsModalProps) {
   const initialValues: ComplaintsType = {
@@ -29,6 +31,7 @@ export default function ComplaintTypeCreateModal({
       validationFn={validateComplaintsType}
       onSubmit={onSubmit}
       onClose={onClose}
+      isOpen={isOpen}
       isLoading={isLoading}
       submitButtonText="Create Type"
     >

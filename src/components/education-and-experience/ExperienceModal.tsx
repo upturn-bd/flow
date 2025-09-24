@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { dirtyValuesChecker } from "@/lib/utils";
-import { Experience } from "@/hooks/useExperience";
+import { Experience } from "@/lib/types/schemas";
 import { validateExperience, validationErrorsToObject } from "@/lib/utils/validation";
 import { FormModal, BaseModal } from "@/components/ui/modals";
 import { FormField, TextAreaField } from "@/components/forms";
@@ -59,7 +59,7 @@ export default function ExperienceModal({
     >
   ) => {
     const { name, value } = e.target;
-    setFormValues((prev) => ({ ...prev, [name]: value }));
+    setFormValues((prev: Experience) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

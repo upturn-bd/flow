@@ -137,6 +137,7 @@ export default function ComplaintsView() {
             <ComplaintTypeCreateModal
               onSubmit={handleCreateComplaintType}
               onClose={() => setIsCreatingComplaintType(false)}
+              isOpen={isCreatingComplaintType}
               isLoading={isLoading}
             />
           )}

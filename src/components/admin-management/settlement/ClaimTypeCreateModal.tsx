@@ -50,6 +50,7 @@ export const ClaimTypeCreateModal: React.FC<ClaimTypeCreateModalProps> = ({
       validationFn={validateClaimType}
       onSubmit={onSubmit}
       onClose={onClose}
+      isOpen={isOpen}
       isLoading={isLoading}
       submitButtonText="Create Settlement Item"
       size="md"

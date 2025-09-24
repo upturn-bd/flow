@@ -32,9 +32,7 @@ export default function BasicTab() {
     // Operations Settings
     live_absent_enabled: false,
     // Payroll Settings
-    payroll_generation_day: 1,
     fiscal_year_start: "2024-01-01",
-    live_payroll_enabled: false,
   });
   const [errors, setErrors] = useState<Partial<Record<keyof CompanyBasicsFormData, string>>>({});
   const [isValid, setIsValid] = useState(false);
@@ -68,10 +66,7 @@ export default function BasicTab() {
         country_id: companyInfo.country_id?.toString() || "",
         // Operations Settings - add defaults if not present
         live_absent_enabled: companyInfo.live_absent_enabled ?? false,
-        // Payroll Settings - add defaults if not present
-        payroll_generation_day: companyInfo.payroll_generation_day ?? 5,
         fiscal_year_start: companyInfo.fiscal_year_start ?? "2024-01-01",
-        live_payroll_enabled: companyInfo.live_payroll_enabled ?? false,
       });
     }
   }, [companyInfo]);
@@ -176,16 +171,12 @@ export default function BasicTab() {
         <CompanySettingsConfigView
           formValues={{
             live_absent_enabled: formValues.live_absent_enabled,
-            payroll_generation_day: formValues.payroll_generation_day,
             fiscal_year_start: formValues.fiscal_year_start,
-            live_payroll_enabled: formValues.live_payroll_enabled,
           }}
           onChange={handleSettingsChange}
           errors={{
             live_absent_enabled: errors.live_absent_enabled,
-            payroll_generation_day: errors.payroll_generation_day,
             fiscal_year_start: errors.fiscal_year_start,
-            live_payroll_enabled: errors.live_payroll_enabled,
           }}
         />
       </motion.div>

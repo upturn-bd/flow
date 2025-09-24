@@ -155,6 +155,17 @@ export function usePayroll() {
       try {
         const payroll = payrolls.find(p => p.id === payrollId);
         if (payroll && payroll.employee_id) {
+          // Get employee name for notifications
+          const { data: employee } = await supabase
+            .from("employees")
+            .select("first_name, last_name")
+            .eq("id", payroll.employee_id)
+            .single();
+
+          const employeeName = employee 
+            ? `${employee.first_name} ${employee.last_name}`
+            : 'Employee';
+
           if (status === 'Published') { // Updated from 'Adjusted'
             const adjustmentReason = adjustments && adjustments.length > 0 
               ? adjustments.map(adj => adj.type).join(', ')
@@ -162,9 +173,9 @@ export function usePayroll() {
             
             await createPayrollNotification(
               payroll.employee_id,
-              'adjusted',
+              'published',
               {
-                gradeName: payroll.grade_name,
+                employeeName,
                 newAmount: updateData.total_amount || payroll.total_amount,
                 adjustmentReason
               },
@@ -178,7 +189,7 @@ export function usePayroll() {
               payroll.employee_id,
               'paid',
               {
-                gradeName: payroll.grade_name,
+                employeeName,
                 amount: payroll.total_amount,
                 date: formatDate(payroll.generation_date)
               },
@@ -342,7 +353,6 @@ export function usePayroll() {
         // 2. Generate payroll records for each employee
         const payrollRecords = employees.map((emp: any) => ({
           employee_id: emp.id,
-          grade_name: 'N/A', // Since we're not using grades anymore
           basic_salary: emp.basic_salary || 0,
           adjustments: [], // No adjustments by default
           total_amount: emp.basic_salary || 0,
@@ -380,18 +390,25 @@ export function usePayroll() {
         // 4. Create notifications for employees (accounts sync happens when status changes to Published)
         try {
           for (const payroll of insertedPayrolls) {
-            await supabase
-              .from("notifications")
-              .insert({
-                recipient_id: payroll.employee_id,
-                title: "New Payroll Generated",
-                message: `Your payroll for ${generationDate} has been generated and is pending review.`,
-                context: "payroll",
-                priority: "normal",
-                company_id: companyId,
-                reference_id: payroll.id,
-                created_at: new Date().toISOString()
-              });
+            // Get employee name for the notification
+            const employee = employees.find(emp => emp.id === payroll.employee_id);
+            const employeeName = employee 
+              ? `${employee.first_name} ${employee.last_name}`
+              : 'Employee';
+
+            await createPayrollNotification(
+              payroll.employee_id,
+              'generated',
+              {
+                employeeName,
+                amount: payroll.total_amount,
+                date: generationDate
+              },
+              {
+                referenceId: payroll.id,
+                actionUrl: '/operations-and-services/services/payroll'
+              }
+            );
           }
         } catch (notifErr) {
           console.warn('Notification creation failed:', notifErr);

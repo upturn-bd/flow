@@ -32,6 +32,7 @@ export const LeaveTypeCreateModal: React.FC<LeaveTypeCreateModalProps> = ({
       validationFn={validateLeaveType}
       onSubmit={onSubmit}
       onClose={onClose}
+      isOpen={isOpen}
       isLoading={isLoading}
       submitButtonText="Create Leave Type"
       size="sm"

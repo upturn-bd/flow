@@ -47,6 +47,7 @@ export const RequisitionInventoryUpdateModal: React.FC<RequisitionInventoryUpdat
       validationFn={validateRequisitionInventory}
       onSubmit={onSubmit}
       onClose={onClose}
+      isOpen={isOpen}
       isLoading={isLoading}
       submitButtonText="Update Item"
       size="md"

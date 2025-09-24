@@ -9,6 +9,7 @@ import {
   validateProject,
   validationErrorsToObject,
 } from "@/lib/utils/validation";
+import { type MilestoneData } from "@/lib/validation/schemas/advanced";
 import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import {
   Plus,
@@ -163,9 +164,14 @@ export default function ProjectDetails({
 
   const { createMilestone, updateMilestone, deleteMilestone, updateMilestoneStatus } = useMilestones();
 
-  const handleCreateMilestone = async (values: Milestone) => {
+  const handleCreateMilestone = async (values: MilestoneData) => {
     try {
-      await createMilestone(values);
+      // Ensure weightage is a number before creating milestone
+      const milestoneData = {
+        ...values,
+        weightage: values.weightage ?? 0
+      };
+      await createMilestone(milestoneData);
       toast.success("Milestone created!");
       setIsCreatingMilestone(false);
       fetchMilestonesByProjectId(projectId);
@@ -174,10 +180,15 @@ export default function ProjectDetails({
     }
   };
 
-  const handleUpdateMilestone = async (values: Milestone) => {
+  const handleUpdateMilestone = async (values: MilestoneData) => {
     try {
       if (selectedMilestone?.id) {
-        await updateMilestone(selectedMilestone.id, values);
+        // Ensure weightage is a number before updating milestone
+        const milestoneData = {
+          ...values,
+          weightage: values.weightage ?? 0
+        };
+        await updateMilestone(selectedMilestone.id, milestoneData);
         setSelectedMilestone(null);
         fetchMilestonesByProjectId(projectId);
         toast.success("Milestone updated!");

@@ -92,7 +92,7 @@ export default function MilestoneCreateModal({
 
   const getWeightageError = () => {
     const maxWeightage = getMaxWeightage();
-    if (formData.weightage > maxWeightage) {
+    if (formData.weightage != null && formData.weightage > maxWeightage) {
       return `Weightage cannot exceed ${maxWeightage}% (Current total: ${currentTotalWeightage}%)`;
     }
     return undefined;
@@ -150,7 +150,7 @@ export default function MilestoneCreateModal({
           <NumberField
             label="Weightage (%)"
             name="weightage"
-            value={formData.weightage}
+            value={formData.weightage ?? 0}
             onChange={(value) => handleInputChange('weightage', value)}
             min={0}
             max={getMaxWeightage()}

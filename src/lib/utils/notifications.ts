@@ -134,21 +134,21 @@ export const NotificationTemplates = {
 
   // Payroll notifications
   payroll: {
-    generated: (gradeName: string, amount: number, date: string) => ({
+    generated: (employeeName: string, amount: number, date: string) => ({
       title: "Payroll Generated",
-      message: `Your payroll for ${gradeName} (৳${amount.toLocaleString()}) has been generated for ${date}`,
+      message: `Your payroll (৳${amount.toLocaleString()}) has been generated for ${date}`,
       context: "payroll",
       priority: "normal" as const,
     }),
-    adjusted: (gradeName: string, newAmount: number, adjustmentReason: string) => ({
-      title: "Payroll Adjusted",
-      message: `Your payroll for ${gradeName} has been adjusted to ৳${newAmount.toLocaleString()}. Reason: ${adjustmentReason}`,
+    published: (employeeName: string, newAmount: number, adjustmentReason: string) => ({
+      title: "Payroll Published",
+      message: `Your payroll has been published with amount ৳${newAmount.toLocaleString()}. ${adjustmentReason ? `Reason: ${adjustmentReason}` : ''}`,
       context: "payroll",
       priority: "high" as const,
     }),
-    paid: (gradeName: string, amount: number, date: string) => ({
+    paid: (employeeName: string, amount: number, date: string) => ({
       title: "Payroll Processed",
-      message: `Your payroll payment for ${gradeName} (৳${amount.toLocaleString()}) has been processed for ${date}`,
+      message: `Your payroll payment (৳${amount.toLocaleString()}) has been processed for ${date}`,
       context: "payroll",
       priority: "normal" as const,
     }),
@@ -374,7 +374,7 @@ export const createSystemNotificationHelper = async (
 // Payroll notification helper
 export const createPayrollNotification = async (
   recipientId: string,
-  type: 'generated' | 'adjusted' | 'paid' | 'supervisorPending',
+  type: 'generated' | 'published' | 'paid' | 'supervisorPending',
   data: any,
   options: { referenceId?: number; actionUrl?: string } = {}
 ) => {
@@ -382,13 +382,13 @@ export const createPayrollNotification = async (
   
   switch (type) {
     case 'generated':
-      template = NotificationTemplates.payroll.generated(data.gradeName, data.amount, data.date);
+      template = NotificationTemplates.payroll.generated(data.employeeName, data.amount, data.date);
       break;
-    case 'adjusted':
-      template = NotificationTemplates.payroll.adjusted(data.gradeName, data.newAmount, data.adjustmentReason);
+    case 'published':
+      template = NotificationTemplates.payroll.published(data.employeeName, data.newAmount, data.adjustmentReason);
       break;
     case 'paid':
-      template = NotificationTemplates.payroll.paid(data.gradeName, data.amount, data.date);
+      template = NotificationTemplates.payroll.paid(data.employeeName, data.amount, data.date);
       break;
     case 'supervisorPending':
       template = NotificationTemplates.payroll.supervisorPending(data.employeeName, data.amount, data.date);
