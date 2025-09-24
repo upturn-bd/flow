@@ -38,7 +38,7 @@ const initialProjectDetails: ProjectDetails = {
   assignees: [],
 };
 
-export default function CreateNewProjectPage({setActiveTab}: {setActiveTab: (key:string) => void}) {
+export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (key: string) => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { departments, fetchDepartments } = useDepartments();
   const { employees, fetchEmployeeInfo } = useEmployeeInfo();
@@ -155,11 +155,30 @@ export function UpdateProjectPage({
   onClose: () => void;
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { createMilestone , updateMilestone} = useMilestones()
 
-  const handleSubmit = async (data: ProjectDetails) => {
+  const handleSubmit = async (data: ProjectDetails, milestones: any) => {
     setIsSubmitting(true);
     try {
       await onSubmit(data);
+
+      const projectId = data.id;
+
+      if (milestones.length > 0) {
+        for (const m of milestones) {
+          const milestoneToCreate = { ...m, project_id: projectId };
+          if (m.id) {
+            const milestoneResult = await updateMilestone(m.id, milestoneToCreate)
+          } else {
+            const milestoneResult = await createMilestone(milestoneToCreate);
+            if (!milestoneResult.success) {
+              await supabase.from("project_records").delete().match({ id: projectId });
+              throw new Error("Failed to create milestones", { cause: milestoneResult.error });
+            }
+          }
+
+        }
+      }
       onClose();
     } catch (error) {
       console.error("Error updating project:", error);

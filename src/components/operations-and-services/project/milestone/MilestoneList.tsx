@@ -19,8 +19,8 @@ import { InfoRow } from "@/components/ui/Card";
 
 interface MilestoneListProps {
   milestones: MilestoneType[];
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
+  onEdit: (milestone_title: string) => void;
+  onDelete: (milestone_title: string) => void;
   onAdd: () => void;
   employees: { id: string; name: string }[];
 }
@@ -80,7 +80,10 @@ export default function MilestoneList({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => m.id && onEdit(m.id)}
+                          onClick={() => {
+                            console.log(m)
+                            m.milestone_title && onEdit(m.milestone_title)
+                          }}
                         >
                           <Pencil size={14} />
                         </Button>
@@ -88,7 +91,7 @@ export default function MilestoneList({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => m.id && onDelete(m.id)}
+                          onClick={() => m.milestone_title && onDelete(m.milestone_title)}
                         >
                           <Trash2 size={14} />
                         </Button>

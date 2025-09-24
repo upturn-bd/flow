@@ -177,6 +177,9 @@ export interface Task {
   department_id?: number;
   status?: boolean;
   company_id?: number;
+  created_at?: Date;
+  updated_at?: Date;
+  created_by?: string;
 }
 
 export type RequisitionStatus = "Pending" | "Approved" | "Rejected";

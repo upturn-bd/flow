@@ -4,7 +4,9 @@ import { useBaseEntity } from "./core";
 import { Project } from "@/lib/types";
 import { useNotifications } from "./useNotifications";
 import { getEmployeeInfo, getUser, getUserId } from "@/lib/utils/auth";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
+import { supabase } from "@/lib/supabase/client";
+import { ProjectDetails } from "@/components/operations-and-services/project/ProjectForm";
 
 export type { Project };
 
@@ -17,7 +19,38 @@ export function useProjects() {
 
   const { createNotification } = useNotifications();
 
+  const [ongoingProjects, setOngoingProjects] = useState<ProjectDetails[]>([]);
+
+  const [ongoingLoading, setOngoingLoading] = useState(false);
+
   // Wrap createProject to include notification creation
+
+  const fetchOngoingProjects = async () => {
+    try {
+      setOngoingLoading(true)
+      const user = await getEmployeeInfo();
+
+      const { data, error } = await supabase
+        .from("project_records")
+        .select('*')
+        .eq("company_id", user.company_id)
+        .eq("department_id", user.department_id)
+        .eq("status", "Ongoing")
+
+      if (error) throw error;
+
+      console.log(data)
+
+      setOngoingProjects(data)
+
+      setOngoingLoading(false)
+      return data
+
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
+  }
 
   const createProject = async (project: Project) => {
     try {
@@ -29,6 +62,8 @@ export function useProjects() {
 
       console.log(project.company_id, project.department_id, 'company and department');
 
+
+
       createNotification({
         title: "New Project Assigned",
         message: `A new project "${project.project_title}" has been assigned to you.`,
@@ -37,7 +72,7 @@ export function useProjects() {
         recipient_id: recipients,
         action_url: '/operations-and-services/workflow/project',
         company_id: company_id,
-        department_id: project.department_id
+        department_id: user.department_id
       });
 
       createNotification({
@@ -48,7 +83,7 @@ export function useProjects() {
         recipient_id: [user.supervisor_id].filter(Boolean) as string[],
         action_url: '/operations-and-services/workflow/project',
         company_id: company_id,
-        department_id: project.department_id
+        department_id: user.department_id
       });
       return result;
     } catch (error) {
@@ -62,7 +97,9 @@ export function useProjects() {
       const user = await getEmployeeInfo();
       const company_id = user.company_id;
 
-      const {data:result, error} = await baseResult.updateItem(projectId, project);
+      console.log("Completing project", projectId, project)
+
+      const { data: result, error } = await baseResult.updateItem(projectId, project);
       if (error) {
         console.log(error)
         throw error;
@@ -90,6 +127,9 @@ export function useProjects() {
 
   return {
     ...baseResult,
+    ongoingProjects,
+    ongoingLoading,
+    fetchOngoingProjects,
     projects: baseResult.items,
     fetchProjects: baseResult.fetchItems,
     createProject,

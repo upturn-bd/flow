@@ -220,7 +220,7 @@ export function useTasks() {
   }, []);
 
   // Create a new task
-  const createTask = useCallback(async (task: Task) => {
+  const createTask = async (task: Task) => {
     try {
       console.log("Creating task:", task);
 
@@ -233,21 +233,27 @@ export function useTasks() {
         company_id
       };
 
+      console.log(finalData)
+
+      // Clean up undefined values
+
+
       const { data, error } = await supabase
         .from("task_records")
         .insert(finalData)
         .select()
-        .single();
 
       if (error) throw error;
 
       // Refresh tasks after creation
-      if (task.project_id) {
-        await getProjectTasks(task.project_id, TaskStatus.INCOMPLETE);
-        await fetchTaskStats(task.project_id);
-      }
+      // if (task.project_id) {
+      //   await getProjectTasks(task.project_id, TaskStatus.INCOMPLETE);
+      //   await fetchTaskStats(task.project_id);
+      // }
 
-      setTasks(prev => [...prev, data]);
+
+      const newTask = data?.[0];
+      setTasks(prev => [newTask, ...prev]);
 
       // Notify assignees if any
 
@@ -281,7 +287,7 @@ export function useTasks() {
       console.error("Error creating task:", err);
       return { success: false, error: err };
     }
-  }, [getProjectTasks, fetchTaskStats]);
+  };
 
   // Update an existing task
   const updateTask = useCallback(async (task: Task) => {
@@ -306,19 +312,19 @@ export function useTasks() {
         .select()
         .single();
 
-        console.log(data)
+      console.log(data)
 
       if (error) throw error;
 
       // Refresh tasks after update
-      if (task.project_id) {
-        if (task.milestone_id) {
-          await getMilestoneTasks(task.milestone_id, TaskStatus.INCOMPLETE);
-        } else {
-          await getProjectTasks(task.project_id, TaskStatus.INCOMPLETE);
-        }
-        await fetchTaskStats(task.project_id);
-      }
+      // if (task.project_id) {
+      //   if (task.milestone_id) {
+      //     await getMilestoneTasks(task.milestone_id, TaskStatus.INCOMPLETE);
+      //   } else {
+      //     await getProjectTasks(task.project_id, TaskStatus.INCOMPLETE);
+      //   }
+      //   await fetchTaskStats(task.project_id);
+      // }
 
       setTasks(prev => prev.map(t => t.id === data.id ? data : t));
 
@@ -336,7 +342,7 @@ export function useTasks() {
         company_id: company_id,
         department_id: task.department_id
       });
-      
+
 
       return { success: true, data };
     } catch (err) {

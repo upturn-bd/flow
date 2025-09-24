@@ -41,6 +41,7 @@ import BaseModal from "@/components/ui/modals/BaseModal";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { getCompanyId } from "@/lib/utils/auth";
 import { MilestoneUpdateModal } from "./milestone";
+import MilestoneListItem from "./milestone/MilestoneListItem";
 
 interface ProjectDetailsProps {
   id: number;
@@ -114,6 +115,8 @@ export default function ProjectDetails({
       },
     },
   };
+
+
 
   useEffect(() => {
     fetchProjectDetails(projectId);
@@ -321,385 +324,300 @@ export default function ProjectDetails({
     }
   }
 
-  if (loading) {
-    return (
-      <LoadingSection
-        text="Loading project details..."
-        icon={Projector}
-        color="blue"
-      />
-    );
-  }
 
-  if (error) {
-    return (
-      <EmptyState
-        icon={<Building2 className="h-12 w-12" />}
-        title="Error loading project"
-        description={error}
-      />
-    );
-  }
 
-  if (!projectDetails) {
-    return (
-      <EmptyState
-        icon={<Building2 className="h-12 w-12" />}
-        title="Project not found"
-        description="The requested project could not be found"
-      />
-    );
-  }
 
+
+if (loading) {
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      {!milestoneDetailsId && (
+    <LoadingSection
+      text="Loading project details..."
+      icon={Projector}
+      color="blue"
+    />
+  );
+}
+
+if (error) {
+  return (
+    <EmptyState
+      icon={<Building2 className="h-12 w-12" />}
+      title="Error loading project"
+      description={error}
+    />
+  );
+}
+
+if (!projectDetails) {
+  return (
+    <EmptyState
+      icon={<Building2 className="h-12 w-12" />}
+      title="Project not found"
+      description="The requested project could not be found"
+    />
+  );
+}
+
+return (
+  <div className="max-w-6xl mx-auto p-6 space-y-6">
+    {!milestoneDetailsId && (
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={staggerContainer}
+        className="space-y-6"
+      >
+        {/* Header */}
         <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer}
-          className="space-y-6"
+          variants={fadeInUp}
+          className="flex items-center justify-between"
         >
-          {/* Header */}
-          <motion.div
-            variants={fadeInUp}
-            className="flex items-center justify-between"
+          <div className="flex items-center gap-3">
+            <Building2 size={24} className="text-blue-600" />
+            <h1 className="text-2xl font-bold text-gray-900">
+              Project Details
+            </h1>
+          </div>
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full"
           >
-            <div className="flex items-center gap-3">
-              <Building2 size={24} className="text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">
-                Project Details
-              </h1>
-            </div>
-            <Button
-              variant="ghost"
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full"
-            >
-              <X size={20} />
-            </Button>
-          </motion.div>
+            <X size={20} />
+          </Button>
+        </motion.div>
 
-          {/* Project Overview */}
-          <motion.div variants={fadeInUp}>
-            <Card>
-              <CardHeader
-                title={projectDetails.project_title}
-                subtitle={projectDetails.description}
-                icon={<Building2 size={20} />}
-                action={
-                  <StatusBadge
-                    status={projectDetails.status || "pending"}
-                    variant={getStatusVariant(projectDetails.status)}
-                  />
-                }
-              />
+        {/* Project Overview */}
+        <motion.div variants={fadeInUp}>
+          <Card>
+            <CardHeader
+              title={projectDetails.project_title}
+              subtitle={projectDetails.description}
+              icon={<Building2 size={20} />}
+              action={
+                <StatusBadge
+                  status={projectDetails.status || "pending"}
+                  variant={getStatusVariant(projectDetails.status)}
+                />
+              }
+            />
 
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <InfoRow
-                    icon={<User size={16} />}
-                    label="Project Lead"
-                    value={
-                      employees.find(
-                        (emp) => emp.id === projectDetails.project_lead_id
-                      )?.name || "Not assigned"
-                    }
-                  />
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <InfoRow
+                  icon={<User size={16} />}
+                  label="Project Lead"
+                  value={
+                    employees.find(
+                      (emp) => emp.id === projectDetails.project_lead_id
+                    )?.name || "Not assigned"
+                  }
+                />
 
-                  <InfoRow
-                    icon={<Clock size={16} />}
-                    label="Progress"
-                    value={`${projectDetails.progress || 0}%`}
-                  />
+                <InfoRow
+                  icon={<Clock size={16} />}
+                  label="Progress"
+                  value={`${projectDetails.progress || 0}%`}
+                />
 
-                  <InfoRow
-                    icon={<Calendar size={16} />}
-                    label="Start Date"
-                    value={formatDate(projectDetails.start_date || "")}
-                  />
+                <InfoRow
+                  icon={<Calendar size={16} />}
+                  label="Start Date"
+                  value={formatDate(projectDetails.start_date || "")}
+                />
 
-                  <InfoRow
-                    icon={<Calendar size={16} />}
-                    label="End Date"
-                    value={formatDate(projectDetails.end_date || "")}
-                  />
-
-                  {projectDetails.assignees &&
-                    projectDetails.assignees.length > 0 && (
-                      <InfoRow
-                        icon={<Users size={16} />}
-                        label="Team Members"
-                        value={`${projectDetails.assignees.length} members`}
-                      />
-                    )}
-                </div>
+                <InfoRow
+                  icon={<Calendar size={16} />}
+                  label="End Date"
+                  value={formatDate(projectDetails.end_date || "")}
+                />
 
                 {projectDetails.assignees &&
                   projectDetails.assignees.length > 0 && (
-                    <div className="mt-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">
-                        Assigned Team:
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {projectDetails.assignees.map((assigneeId: string) => {
-                          const employee = employees.find(
-                            (emp) => emp.id === assigneeId
-                          );
-                          return employee ? (
-                            <span
-                              key={assigneeId}
-                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                            >
-                              {employee.name}
-                            </span>
-                          ) : null;
-                        })}
-                      </div>
-                    </div>
+                    <InfoRow
+                      icon={<Users size={16} />}
+                      label="Team Members"
+                      value={`${projectDetails.assignees.length} members`}
+                    />
                   )}
+              </div>
 
-                {projectDetails.status !== "Completed" && (
-                  <div className="pt-4 border-t border-gray-100">
-                    <Button
-                      onClick={() => setDisplaySubmissionModal(true)}
-                      className="flex items-center justify-center gap-2"
-                    >
-                      <CheckCircle size={16} className="mr-2" />
-                      Submit Project
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Milestones Section */}
-          <motion.div variants={fadeInUp}>
-            <Card>
-              <CardHeader
-                title="Milestones"
-                icon={<Target size={20} />}
-                action={
-                  projectDetails.status !== "Completed" &&
-                  milestones.reduce((acc, m) => acc + m.weightage, 0) < 100 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsCreatingMilestone(true)}
-                    >
-                      <Plus size={16} className="mr-2" />
-                      Add Milestone
-                    </Button>
-                  )
-                }
-              />
-
-              <CardContent>
-                {loadingMilestones ? (
-                  <LoadingSection
-                    text="Loading milestones..."
-                    icon={Projector}
-                    color="blue"
-                  />
-                ) : milestones.length > 0 ? (
-                  <div className="space-y-4">
-                    {milestones.map((milestone, index) => (
-                      <motion.div
-                        key={milestone.id ?? index}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="border border-gray-200 rounded-lg p-4 space-y-3"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center justify-center gap-3">
-                            <h4 className="font-semibold text-gray-900">
-                              {milestone.milestone_title}
-                            </h4>
-                            <span className="text-xs font-medium bg-blue-100 px-2 py-1 rounded-full text-blue-600">
-                              {milestone.weightage}%
-                            </span>
-                            {milestone.status === "Completed" && (
-                              <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-1 rounded-full">
-                                Completed
-                              </span>
-                            )}
-
-                            {milestone.status === "In Progress" && (
-                              <span className="text-xs font-medium text-yellow-700 bg-yellow-100 px-2 py-1 rounded-full">
-                                In Progress
-                              </span>
-                            )}
-
-                            {milestone.status === "Not Started" && (
-                              <span className="text-xs font-medium text-red-700 bg-red-100 px-2 py-1 rounded-full">
-                                Not Started
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-
-                            {milestone.status === "Not Started" && (
-                              <Button
-                                variant="pending"
-                                size="sm"
-                                text="Mark as In Progress"
-                                onClick={() =>
-                                  milestone.id &&
-                                  onMilestoneStatusUpdate(milestone.id, { ...milestone, status: "In Progress" } )
-                                }
-                              >
-                              </Button>
-                            )}
-
-                            {milestone.status === "In Progress" && (
-                              <Button
-                                variant="complete"
-                                size="sm"
-                                text="Mark as Complete"
-                                onClick={() =>
-                                  milestone.id &&
-                                  onMilestoneStatusUpdate(milestone.id, { ...milestone, status: "Completed" } )
-                                }
-                              >
-                              </Button>)}
-                            {projectDetails.status !== "Completed" && (
-                              <div className="flex gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    setSelectedMilestone(milestone)
-                                  }
-                                >
-                                  <Pencil size={14} />
-                                </Button>
-                       <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              milestone.id &&
-                              setMilestoneDetailsId(milestone.id)
-                            }
+              {projectDetails.assignees &&
+                projectDetails.assignees.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">
+                      Assigned Team:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {projectDetails.assignees.map((assigneeId: string) => {
+                        const employee = employees.find(
+                          (emp) => emp.id === assigneeId
+                        );
+                        return employee ? (
+                          <span
+                            key={assigneeId}
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
                           >
-                            <ExternalLink size={14} />
-                          </Button>
-
-
-                              </div>
-                            )}
-
-
-                          </div>
-                        </div>
-
-                        <p className="text-sm text-gray-600">
-                          {milestone.description}
-                        </p>
-
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <span>
-                            {milestone.start_date} - {milestone.end_date}
+                            {employee.name}
                           </span>
-                        </div>
-                      </motion.div>
-                    ))}
+                        ) : null;
+                      })}
+                    </div>
                   </div>
-                ) : (
-                  <EmptyState
-                    icon={<Target className="h-8 w-8" />}
-                    title="No milestones yet"
-                    description="Add milestones to track project progress"
-                    action={
-                      projectDetails.status !== "Completed"
-                        ? {
-                          label: "Add First Milestone",
-                          onClick: () => setIsCreatingMilestone(true),
-                          icon: <Plus size={16} />,
-                        }
-                        : undefined
-                    }
-                  />
                 )}
-              </CardContent>
-            </Card>
-          </motion.div>
+
+              {projectDetails.status !== "Completed" && (
+                <div className="pt-4 border-t border-gray-100">
+                  <Button
+                    onClick={() => setDisplaySubmissionModal(true)}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle size={16} className="mr-2" />
+                    Submit Project
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </motion.div>
-      )}
 
-      {/* Submission Modal */}
-      {displaySubmissionModal && (
-        <BaseModal
-          isOpen={displaySubmissionModal}
-          onClose={() => setDisplaySubmissionModal(false)}
-          title="Project Submission"
-          icon={<CheckCircle size={20} />}
-        >
-          <form onSubmit={submitProject} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Remarks
-              </label>
-              <textarea
-                name="remark"
-                value={remark}
-                onChange={(e) => setRemark(e.target.value)}
-                placeholder="Add your final remarks about the project..."
-                className="w-full h-32 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
+        {/* Milestones Section */}
+        <motion.div variants={fadeInUp}>
+          <Card>
+            <CardHeader
+              title="Milestones"
+              icon={<Target size={20} />}
+              action={
+                projectDetails.status !== "Completed" &&
+                milestones.reduce((acc, m) => acc + m.weightage, 0) < 100 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsCreatingMilestone(true)}
+                  >
+                    <Plus size={16} className="mr-2" />
+                    Add Milestone
+                  </Button>
+                )
+              }
+            />
 
-            <div className="flex justify-end gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setDisplaySubmissionModal(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={!remark || isSubmitting}>
-                {isSubmitting ? "Submitting..." : "Submit Project"}
-              </Button>
-            </div>
-          </form>
-        </BaseModal>
-      )}
+            <CardContent>
+              {loadingMilestones ? (
+                <LoadingSection
+                  text="Loading milestones..."
+                  icon={Projector}
+                  color="blue"
+                />
+              ) : milestones.length > 0 ? (
+                <div className="space-y-4">
+                  {milestones.map((milestone, index) => (
+                    <MilestoneListItem
+                      key={milestone.id ?? index}
+                      milestone={milestone}
+                      projectDetails={projectDetails}
+                      onMilestoneStatusUpdate={onMilestoneStatusUpdate}
+                      setSelectedMilestone={setSelectedMilestone}
+                      setMilestoneDetailsId={setMilestoneDetailsId}
+                      index={index}
+                    />
+                  ))}
 
-      {/* Milestone Details Modal */}
-      {milestoneDetailsId && (
-        <MilestoneDetails
-          id={milestoneDetailsId}
-          onClose={() => setMilestoneDetailsId(null)}
-        />
-      )}
+                </div>
+              ) : (
+                <EmptyState
+                  icon={<Target className="h-8 w-8" />}
+                  title="No milestones yet"
+                  description="Add milestones to track project progress"
+                  action={
+                    projectDetails.status !== "Completed"
+                      ? {
+                        label: "Add First Milestone",
+                        onClick: () => setIsCreatingMilestone(true),
+                        icon: <Plus size={16} />,
+                      }
+                      : undefined
+                  }
+                />
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
+    )}
 
-      {/* Milestone Create Modal */}
-      {isCreatingMilestone && (
-        <MilestoneCreateModal
-          currentTotalWeightage={milestones.reduce(
-            (acc, m) => acc + (m.weightage || 0),
-            0
-          )}
-          projectId={projectId}
-          onClose={() => setIsCreatingMilestone(false)}
-          onSubmit={handleCreateMilestone}
-        />
-      )}
+    {/* Submission Modal */}
+    {displaySubmissionModal && (
+      <BaseModal
+        isOpen={displaySubmissionModal}
+        onClose={() => setDisplaySubmissionModal(false)}
+        title="Project Submission"
+        icon={<CheckCircle size={20} />}
+      >
+        <form onSubmit={submitProject} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Remarks
+            </label>
+            <textarea
+              name="remark"
+              value={remark}
+              onChange={(e) => setRemark(e.target.value)}
+              placeholder="Add your final remarks about the project..."
+              className="w-full h-32 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
 
-      {selectedMilestone && (
-        <MilestoneUpdateModal
-          initialData={selectedMilestone}
-          currentTotalWeightage={milestones.reduce(
-            (acc, m) =>
-              acc + (m.weightage || 0) - (selectedMilestone?.weightage || 0),
-            0
-          )}
-          onClose={() => setSelectedMilestone(null)}
-          onSubmit={handleUpdateMilestone}
-        />
-      )}
-    </div>
-  );
+          <div className="flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDisplaySubmissionModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!remark || isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit Project"}
+            </Button>
+          </div>
+        </form>
+      </BaseModal>
+    )}
+
+    {/* Milestone Details Modal */}
+    {milestoneDetailsId && (
+      <MilestoneDetails
+        id={milestoneDetailsId}
+        onClose={() => setMilestoneDetailsId(null)}
+      />
+    )}
+
+    {/* Milestone Create Modal */}
+    {isCreatingMilestone && (
+      <MilestoneCreateModal
+        currentTotalWeightage={milestones.reduce(
+          (acc, m) => acc + (m.weightage || 0),
+          0
+        )}
+        projectId={projectId}
+        onClose={() => setIsCreatingMilestone(false)}
+        onSubmit={handleCreateMilestone}
+      />
+    )}
+
+    {selectedMilestone && (
+      <MilestoneUpdateModal
+        initialData={selectedMilestone}
+        currentTotalWeightage={milestones.reduce(
+          (acc, m) =>
+            acc + (m.weightage || 0) - (selectedMilestone?.weightage || 0),
+          0
+        )}
+        onClose={() => setSelectedMilestone(null)}
+        onSubmit={handleUpdateMilestone}
+      />
+    )}
+  </div>
+);
 }

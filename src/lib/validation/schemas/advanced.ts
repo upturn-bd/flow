@@ -215,14 +215,14 @@ export function validateMilestone(data: MilestoneData): ValidationResult<Milesto
   if (weightageError) errors.push(weightageError);
 
   // Validate status
-  const statusError = validateString(data.status, 'status', { required: true });
-  if (statusError) errors.push(statusError);
+  // const statusError = validateString(data.status, 'status', { required: true });
+  // if (statusError) errors.push(statusError);
 
   // Validate project_id if provided
-  if (data.project_id !== undefined) {
-    const projectError = validateNumber(data.project_id, 'project_id', { min: 1 });
-    if (projectError) errors.push(projectError);
-  }
+  // if (data.project_id !== undefined) {
+  //   const projectError = validateNumber(data.project_id, 'project_id', { min: 1 });
+  //   if (projectError) errors.push(projectError);
+  // }
 
   // Validate assignees if provided
   if (data.assignees && !Array.isArray(data.assignees)) {

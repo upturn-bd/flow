@@ -36,9 +36,27 @@ export default function MilestoneUpdateModal({
     fetchEmployees();
   }, [fetchEmployees]);
 
+  function formatDateForInput(date: string | Date | undefined): string {
+    if (!date) return "";
+    const d = new Date(date);
+    // Use local time to get YYYY-MM-DD
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
   useEffect(() => {
     setFormData(initialData);
+    console.log("initial data in modal", initialData)
+    setFormData({
+      ...initialData,
+      start_date: formatDateForInput(initialData.start_date),
+      end_date: formatDateForInput(initialData.end_date),
+    });
   }, [initialData]);
+
+
 
   const handleInputChange = (field: keyof MilestoneData, value: any) => {
     setFormData(prev => ({
@@ -57,6 +75,7 @@ export default function MilestoneUpdateModal({
   };
 
   const handleSubmit = () => {
+    console.log(formData)
     const validation = validateMilestone(formData);
 
     if (!validation.success && validation.errors) {
@@ -122,12 +141,12 @@ export default function MilestoneUpdateModal({
 
           <span
             className={`text-sm font-medium px-4 py-1 rounded-full shadow-sm ${formData.status === "Not Started"
-                ? "text-red-700 bg-red-100"
-                : formData.status === "In Progress"
-                  ? "text-yellow-700 bg-yellow-100"
-                  : formData.status === "Completed"
-                    ? "text-green-700 bg-green-100"
-                    : "text-gray-700 bg-gray-100"
+              ? "text-red-700 bg-red-100"
+              : formData.status === "In Progress"
+                ? "text-yellow-700 bg-yellow-100"
+                : formData.status === "Completed"
+                  ? "text-green-700 bg-green-100"
+                  : "text-gray-700 bg-gray-100"
               }`}
           >
             Status: {formData.status}
@@ -194,7 +213,7 @@ export default function MilestoneUpdateModal({
           variant="primary"
           onClick={handleSubmit}
           isLoading={isLoading}
-          disabled={!isFormValid() || !hasChanges() || isLoading}
+          disabled={!hasChanges() || isLoading}
         >
           Update Milestone
         </Button>

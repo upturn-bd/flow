@@ -31,27 +31,17 @@ export default function OngoingTaskPage() {
   const [editTask, setEditTask] = useState<Task | null>(null);
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
-  const [tasksList, setTasksList] = useState(tasks)
 
   useEffect(() => {
-    const fetchUpdatedTasks = async () => {
-      const updatedTasks = await getCompanyTasks();
-      setTasksList(updatedTasks.tasks);
-    }
+    console.log("current", tasks)
+  }, [tasks]);
+  console.log("Rendering tasks:", tasks);
 
-    fetchUpdatedTasks();
-  }, [getCompanyTasks]);
 
   const handleUpdateTask = async (values: any) => {
     try {
-      3
       const { data } = await updateTask(values);
       toast.success("Task updated successfully");
-      setTasksList((prev) =>
-        prev.map((task) =>
-          task.id === data.id ? { ...task, ...data } : task
-        )
-      );
 
       setEditTask(null);
     } catch (error) {
@@ -65,8 +55,6 @@ export default function OngoingTaskPage() {
       setDeletingTaskId(id);
       await deleteTask(id);
       toast.success("Task deleted successfully");
-      setTasksList((prev) => prev.filter((task) => task.id !== id));
-      getCompanyTasks()
     } catch (error) {
       toast.error("Error deleting task");
       console.error(error);
@@ -86,6 +74,7 @@ export default function OngoingTaskPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {tasks.length > 0 ? (
+
             tasks.map((task) => (
               <div key={task.id}>
                 <TaskCard

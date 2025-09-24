@@ -39,6 +39,7 @@ interface ProjectFormProps {
   departments: { id: number; name: string }[];
   employees: { id: string; name: string }[];
   mode: "create" | "edit";
+  initialMilestones?: Milestone[];
 }
 
 const initialProjectDetails: ProjectDetails = {
@@ -57,6 +58,7 @@ const initialProjectDetails: ProjectDetails = {
 
 export default function ProjectForm({
   initialData = initialProjectDetails,
+  initialMilestones,
   onSubmit,
   onCancel,
   isSubmitting,
@@ -73,9 +75,7 @@ export default function ProjectForm({
 
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [isCreatingMilestone, setIsCreatingMilestone] = useState(false);
-  const [selectedMilestone, setSelectedMilestone] = useState<number | null>(
-    null
-  );
+  const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
 
   const { fetchProjectMilestones, updateMilestone } = useMilestones();
 
@@ -90,7 +90,7 @@ export default function ProjectForm({
     end_date: "",
     weightage: 100 - getTotalMilestoneWeightage(),
     status: "Not Started",
-    project_id: 0,
+    project_id: initialData.id || 0,
     assignees: [],
   };
 
@@ -108,6 +108,22 @@ export default function ProjectForm({
 
     fetchMilestones();
   }, [initialData.id]);
+
+
+  const handleAddMilestoneClick = () => {
+    setMilestone({
+      milestone_title: "",
+      description: "",
+      start_date: "",
+      end_date: "",
+      weightage: Math.max(1, 100 - getTotalMilestoneWeightage()),
+      status: "Not Started",
+      project_id: initialData.id || 0,
+      assignees: [],
+    });
+    setIsCreatingMilestone(true);
+  };
+
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -213,18 +229,18 @@ export default function ProjectForm({
 
 
   const handleAddMilestone = (newMilestone: Milestone) => {
+    const projectId = initialData.id || 0; // use existing project ID if editing
     setMilestones((prev) => [
       ...prev,
-      { ...newMilestone, project_id: prev.length + 1 },
+      { ...newMilestone, project_id: projectId },
     ]);
     setIsCreatingMilestone(false);
   };
 
+
   const handleUpdateMilestone = async (updatedMilestone: Milestone) => {
     setMilestones((prev) =>
-      prev.map((m) =>
-        m.id === selectedMilestone ? updatedMilestone : m
-      )
+      prev.map((m) => (m.id === updatedMilestone.id ? updatedMilestone : m))
     );
 
     await updateMilestone(updatedMilestone.id || 0, updatedMilestone);
@@ -232,12 +248,18 @@ export default function ProjectForm({
     setSelectedMilestone(null);
   };
 
-  const handleDeleteMilestone = (id: number) => {
-    setMilestones((prev) => prev.filter((m) => m.project_id !== id));
+
+  const handleDeleteMilestone = (milestone_title: string) => {
+    setMilestones((prev) => prev.filter((m) => m.milestone_title !== milestone_title));
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 relative">
+    <form onSubmit={handleSubmit} onKeyDown={(e) => {
+      const target = e.target as HTMLElement;
+      if (e.key === "Enter" && target.tagName !== "TEXTAREA") {
+        e.preventDefault();
+      }
+    }} className="space-y-6 relative">
       {isSubmitting && (
         <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-50">
           <LoadingSpinner />
@@ -383,20 +405,19 @@ export default function ProjectForm({
       {/* Milestones */}
       <MilestoneList
         milestones={milestones}
-        onEdit={(id) => {
-          const milestoneToUpdate = milestones.find((m) => m.id === id);
-          console.log(selectedMilestone)
-
+        onEdit={(milestone_title) => {
+          console.log(milestones)
+          const milestoneToUpdate = milestones.find((m) => m.milestone_title === milestone_title);
           if (milestoneToUpdate) {
-            setMilestone(milestoneToUpdate);
-            setSelectedMilestone(id);
-            console.log(selectedMilestone)
+            setSelectedMilestone(milestoneToUpdate);
           }
         }}
+
         onDelete={handleDeleteMilestone}
-        onAdd={() => setIsCreatingMilestone(true)}
+        onAdd={handleAddMilestoneClick}
         employees={employees}
       />
+
 
       {isCreatingMilestone && (
         <MilestoneForm
@@ -413,7 +434,7 @@ export default function ProjectForm({
 
       {selectedMilestone && (
         <MilestoneUpdateModal
-          initialData={milestone}
+          initialData={selectedMilestone}
           onSubmit={handleUpdateMilestone}
           onClose={() => setSelectedMilestone(null)}
           currentTotalWeightage={getTotalMilestoneWeightage()}

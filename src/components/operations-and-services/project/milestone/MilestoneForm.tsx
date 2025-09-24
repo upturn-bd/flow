@@ -205,6 +205,7 @@ export default function MilestoneForm({
               onChange={handleChange}
               error={errors.end_date}
               min={milestoneData.start_date || undefined}
+              readOnly={!milestoneData.start_date}
             />
           </div>
 

@@ -25,8 +25,8 @@ const emptyProject: Project = {
   assignees: [],
 };
 
-function ProjectsList({setActiveTab} : {setActiveTab: (key:string) => void}) {
-  const { projects, loading, fetchProjects, updateProject, deleteProject } =
+function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void }) {
+  const { loading, ongoingProjects, fetchOngoingProjects, projects, ongoingLoading, fetchProjects, updateProject, deleteProject } =
     useProjects();
   const [projectDetailsId, setProjectDetailsId] = useState<number | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -42,19 +42,20 @@ function ProjectsList({setActiveTab} : {setActiveTab: (key:string) => void}) {
   } = useDepartments();
 
   useEffect(() => {
-    fetchProjects();
+    fetchOngoingProjects();
     fetchEmployees();
     fetchDepartments();
-  }, [fetchProjects, fetchEmployees, fetchDepartments]);
+  }, []);
 
   const handleUpdateProject = async (values: any) => {
     try {
       if (values?.id) {
-        await updateProject(values.id, values);
+        const result = await updateProject(values.id, values);
+        console.log(result)
         toast.success("Project updated successfully");
         setSelectedProject(null);
         if (values.status === 'Completed') setActiveTab('completed')
-        // fetchProjects(); // Removed: useProjects hook handles state update automatically
+        fetchOngoingProjects()
       }
     } catch (error) {
       toast.error("Error updating project");
@@ -70,6 +71,7 @@ function ProjectsList({setActiveTab} : {setActiveTab: (key:string) => void}) {
     try {
       await deleteProject(id);
       toast.success("Project deleted successfully");
+      fetchOngoingProjects()
       // fetchProjects(); // Removed: useProjects hook handles state update automatically
     } catch (error) {
       toast.error("Error deleting project");
@@ -78,8 +80,7 @@ function ProjectsList({setActiveTab} : {setActiveTab: (key:string) => void}) {
   };
 
 
-
-  if (loading || employeesLoading || departmentsLoading) {
+  if (ongoingLoading || loading) {
     return (
       <LoadingSection
         icon={Building2}
@@ -111,9 +112,9 @@ function ProjectsList({setActiveTab} : {setActiveTab: (key:string) => void}) {
 
           <motion.div variants={fadeInUp}>
             <AnimatePresence>
-              {projects.length > 0 ? (
+              {ongoingProjects.length > 0 ? (
                 <div className="space-y-4">
-                  {projects.map((project, idx) =>
+                  {ongoingProjects.map((project, idx) =>
                     typeof project.id !== "undefined" ? (
                       <ProjectCard
                         key={project.id}
