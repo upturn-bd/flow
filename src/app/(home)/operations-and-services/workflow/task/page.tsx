@@ -45,11 +45,55 @@ export default function TasksPage() {
   const [tabs, setTabs] = useState<TabItem[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { employeeInfo } = useAuth();
-  const { createTask } = useTasks();
+  
+  // Centralized task management
+  const { 
+    tasks, 
+    loading, 
+    createTask, 
+    updateTask, 
+    deleteTask, 
+    getUserTasks,  
+  } = useTasks();
 
-  // Create stable component instances that won't change on re-renders
-  const ongoingTaskPage = useMemo(() => <OngoingTaskPage />, []);
-  const completedTasksList = useMemo(() => <CompletedTasksList />, []);
+  // Filter tasks by status
+  const ongoingTasks = useMemo(() => 
+    tasks.filter(task => !task.status), 
+    [tasks]
+  );
+  
+  const completedTasks = useMemo(() => 
+    tasks.filter(task => task.status), 
+    [tasks]
+  );
+
+  // Load all tasks on mount
+  useEffect(() => {
+    getUserTasks(TaskStatus.ALL); // Load both ongoing and completed tasks
+  }, [getUserTasks]);
+
+  useEffect(() => {
+    console.log(tasks);
+  },[tasks])
+
+  // Create stable component instances with centralized data
+  const ongoingTaskPage = useMemo(() => (
+    <OngoingTaskPage 
+      tasks={ongoingTasks}
+      loading={loading}
+      updateTask={updateTask}
+      deleteTask={deleteTask}
+    />
+  ), [ongoingTasks, loading, updateTask, deleteTask]);
+  
+  const completedTasksList = useMemo(() => (
+    <CompletedTasksList 
+      tasks={completedTasks}
+      loading={loading}
+      deleteTask={deleteTask}
+    />
+  ), [completedTasks, loading, deleteTask]);
+  
   const archivedContent = useMemo(() => (
     <div className="flex flex-col items-center justify-center p-12 bg-gray-50/50 rounded-xl border border-gray-200 text-center">
       <ArchiveIcon className="h-16 w-16 text-gray-300 mb-4" />
@@ -62,6 +106,26 @@ export default function TasksPage() {
       </p>
     </div>
   ), []);
+
+  const getTabContent = useMemo(() => {
+    return (key: string) => {
+      switch (key) {
+        case "ongoing":
+          return ongoingTaskPage;
+        case "completed":
+          return completedTasksList;
+        case "archived":
+          return archivedContent;
+        default:
+          return ongoingTaskPage;
+      }
+    }
+  }, [ongoingTaskPage, completedTasksList, archivedContent]);
+
+  // Update tabs content whenever task data changes
+  useEffect(() => {
+    setTabs(TABS.map(tab => ({ ...tab, content: getTabContent(tab.key) })));
+  }, [getTabContent]);
 
   const handleCreateTask = async (taskData: TaskData) => {
     // Convert TaskData to Task format
@@ -81,35 +145,15 @@ export default function TasksPage() {
     const { success, error } = await createTask(task);
     if (success) {
       toast.success("Task created successfully");
-      console.log("Testing toast success")
       setShowCreateModal(false);
       setActiveTab("ongoing");
-      
+      // Refresh the task list to show the new task
+      await getUserTasks(TaskStatus.ALL);
     } else {
-      console.log("Testing toast fail")
-
       toast.error("Failed to create task");
+      console.error("Error creating task:", error);
     }
   };
-
-  function getTabContent(key: string) {
-    switch (key) {
-      case "ongoing":
-        return ongoingTaskPage;
-      case "completed":
-        return completedTasksList;
-      case "archived":
-        return archivedContent;
-      default:
-        return ongoingTaskPage;
-    }
-  }
-
-  // Set up tabs with content on mount
-  useEffect(() => {
-    setTabs(TABS.map(tab => ({ ...tab, content: getTabContent(tab.key) })));
-    // eslint-disable-next-line
-  }, []);
 
   return (
     <motion.div

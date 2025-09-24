@@ -2,7 +2,7 @@
 
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
-import { useTasks, TaskStatus } from "@/hooks/useTasks";
+import { TaskFilters } from "@/hooks/useTasks";
 import { useEffect, useState, memo, useRef } from "react";
 import { Task } from "@/lib/types/schemas";
 import { Department } from "@/lib/types/schemas";
@@ -25,7 +25,7 @@ function TaskCard({
   task,
   setTaskDetailsId,
   deleteTask,
-  departments,
+  departments
 }: {
   task: Task;
   setTaskDetailsId: (id: number) => void;
@@ -104,20 +104,23 @@ function TaskCard({
   );
 }
 
-const CompletedTasksList = memo(() => {
-  // Single hook call to avoid multiple instances
-  const { tasks, getCompanyTasks, loading, deleteTask } = useTasks();
+interface CompletedTasksListProps {
+  tasks: Task[];
+  loading: boolean;
+  deleteTask: (taskId: number, projectId?: number, milestoneId?: number) => Promise<{ success: boolean; error?: any; }>;
+}
+
+const CompletedTasksList = memo(({ 
+  tasks, 
+  loading, 
+  deleteTask, 
+}: CompletedTasksListProps) => {
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Move employee and department fetching to parent level to avoid multiple API calls
   const { fetchEmployees, loading: employeeLoading } = useEmployees();
   const { departments, fetchDepartments, loading: departmentsLoading } = useDepartments();
-
-  // Use individual useEffects with empty dependencies to prevent re-renders
-  useEffect(() => {
-    getCompanyTasks(TaskStatus.COMPLETE);
-  }, []); // Empty dependency array
 
   useEffect(() => {
     fetchEmployees();
@@ -167,7 +170,7 @@ const CompletedTasksList = memo(() => {
 
                 {/* Show TaskDetails right below the clicked TaskCard */}
                 <AnimatePresence>
-                  {taskDetailsId === task.id && (
+                  {taskDetailsId === task.id && taskDetailsId !== null && (
                     <TaskDetails
                       onClose={() => setTaskDetailsId(null)}
                       id={taskDetailsId}

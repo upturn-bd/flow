@@ -1,6 +1,6 @@
 "use client";
 import { TaskUpdateModal } from "./shared/TaskModal";
-import { useTasks, TaskStatus } from "@/hooks/useTasks";
+import { TaskFilters } from "@/hooks/useTasks";
 import { Task } from "@/lib/types/schemas";
 import { useEffect, useState } from "react";
 import TaskDetails from "./shared/TaskDetails";
@@ -24,25 +24,28 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui";
 
-export default function OngoingTaskPage() {
+interface OngoingTaskPageProps {
+  tasks: Task[];
+  loading: boolean;
+  updateTask: (task: Task) => Promise<{ success: boolean; data?: any; error?: any; }>;
+  deleteTask: (taskId: number, projectId?: number, milestoneId?: number) => Promise<{ success: boolean; error?: any; }>;
+}
 
-  const { tasks, loading, getCompanyTasks, updateTask, deleteTask, fetchTasks } =
-    useTasks();
+export default function OngoingTaskPage({ 
+  tasks, 
+  loading, 
+  updateTask, 
+  deleteTask
+}: OngoingTaskPageProps) {
+
   const [editTask, setEditTask] = useState<Task | null>(null);
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
-
-  useEffect(() => {
-    console.log("current", tasks)
-  }, [tasks]);
-  console.log("Rendering tasks:", tasks);
-
 
   const handleUpdateTask = async (values: any) => {
     try {
       const { data } = await updateTask(values);
       toast.success("Task updated successfully");
-
       setEditTask(null);
     } catch (error) {
       toast.error("Error updating task");
@@ -62,10 +65,6 @@ export default function OngoingTaskPage() {
       setDeletingTaskId(null);
     }
   };
-
-  useEffect(() => {
-    getCompanyTasks(TaskStatus.INCOMPLETE);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div>

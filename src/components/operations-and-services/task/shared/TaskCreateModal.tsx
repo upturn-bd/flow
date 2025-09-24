@@ -48,8 +48,6 @@ export default function TaskCreateModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(isLoading);
   
-  const {getCompanyTasks} = useTasks();
-
   const { employees, loading: employeesLoading, fetchEmployees } = useEmployees();
 
   useEffect(() => {
@@ -90,9 +88,6 @@ const handleSubmit = async () => {
     if (validation.success && validation.data) {
       await onSubmit(validation.data); // wait until finished
     }
-
-    getCompanyTasks()
-
   } finally {
     setLoading(false); // always reset
   }
