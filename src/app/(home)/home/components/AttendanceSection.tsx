@@ -391,7 +391,7 @@ export default function AttendanceSection({
                     <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                       {entry.check_in_time && (
                         <div className="space-y-1">
-                          <div>{formatTimeFromISO(entry.check_in_time)}</div>
+                          <div className='mb-2' >{formatTimeFromISO(entry.check_in_time)}</div>
                           {sites.length > 0 && (() => {
                             const site = sites.find(s => s.id === entry.site_id);
                             if (site) {
@@ -416,7 +416,7 @@ export default function AttendanceSection({
                     <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                       {entry.check_out_time ? (
                         <div className="space-y-1">
-                          <div>{formatTimeFromISO(entry.check_out_time)}</div>
+                          <div className='mb-2'>{formatTimeFromISO(entry.check_out_time)}</div>
                           {sites.length > 0 && (() => {
                             const site = sites.find(s => s.id === entry.site_id);
                             if (site) {

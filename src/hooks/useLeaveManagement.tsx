@@ -7,6 +7,7 @@ import { useNotifications } from "./useNotifications";
 import { create } from "domain";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { useLeaveBalances } from "./useLeaveBalances";
 
 // Export types for components
 export type { LeaveType, HolidayConfig };
@@ -55,6 +56,8 @@ export function useLeaveRequests() {
   const [leaveRequests, setLeaveRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const { reduceBalance } = useLeaveBalances()
+
   const { createNotification } = useNotifications();
   const createLeaveRequest = async (leaveData: any) => {
     try {
@@ -81,7 +84,7 @@ export function useLeaveRequests() {
   }
 
 
-  const updateLeaveRequest = async (leaveId: number, leaveData: any) => {
+  const updateLeaveRequest = async (leaveId: number, leaveData: any, leaveTypeId: number, employeeId: string, start_date: string, end_date: string) => {
     try {
       const user = await getEmployeeInfo();
 
@@ -89,6 +92,25 @@ export function useLeaveRequests() {
 
       const recipients = [user.id].filter(Boolean) as string[];
 
+      if (leaveData.status === "Accepted") {
+        const parseDate = (str: string) => new Date(str.replace(" ", "T"));
+
+        const start = parseDate(start_date);
+        const end = parseDate(end_date);
+
+        const startUtc = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+        const endUtc = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
+
+        const diffInDays = Math.floor((endUtc - startUtc) / (1000 * 60 * 60 * 24)) + 1;
+
+        console.log(diffInDays);
+        console.log("Duff dats,", diffInDays)
+        await reduceBalance(
+          employeeId,  // make sure the field name matches your table
+          leaveTypeId,
+          diffInDays
+        );
+      }
 
       createNotification({
         title: "Leave request updated",
@@ -113,7 +135,7 @@ export function useLeaveRequests() {
   const fetchLeaveRequests = async () => {
     try {
       setLoading(true);
-      
+
       const user = await getEmployeeInfo();
       const { data, error } = await supabase
         .from("leave_records")

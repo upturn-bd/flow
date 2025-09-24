@@ -42,10 +42,10 @@ export default function LeaveRequestsPage() {
     fetchLeaveTypes();
   }, []);
 
-  const handleUpdateRequest = async (action: string, id: number) => {
+  const handleUpdateRequest = async (action: string, id: number, leaveTypeId: number, employeeId: string, start_date: string, end_date: string) => {
     setCurrentlyProcessingId(id);
     const updateData = { status: action, remarks: comment };
-    const result = await updateLeaveRequest(id, updateData);
+    const result = await updateLeaveRequest(id, updateData, leaveTypeId, employeeId, start_date, end_date);
     if (result.success) {
       toast.success(`Leave request ${action.toLowerCase()} successfully`);
       fetchLeaveRequests();
@@ -88,8 +88,8 @@ export default function LeaveRequestsPage() {
               leaveTypes={leaveTypes}
               comment={comment}
               setComment={setComment}
-              onApprove={() => handleUpdateRequest("Accepted", leaveReq.id)}
-              onReject={() => handleUpdateRequest("Rejected", leaveReq.id)}
+              onApprove={() => handleUpdateRequest("Accepted", leaveReq.id, leaveReq.type_id, leaveReq.employee_id, leaveReq.start_date, leaveReq.end_date)}
+              onReject={() => handleUpdateRequest("Rejected", leaveReq.id, leaveReq.type_id, leaveReq.employee_id, leaveReq.start_date, leaveReq.end_date)}
               isProcessing={currentlyProcessingId === leaveReq.id}
             />
           );

@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
+import { useLeaveBalances } from "@/hooks/useLeaveBalances";
+import { LoadingSpinner } from "@/components/ui";
 
 const initialLeaveRecord = {
   type_id: undefined,
@@ -21,13 +23,9 @@ const initialLeaveRecord = {
 
 export type LeaveState = Leave;
 
-const leaveBalanceData = [
-  { count: "15", type: "Annual Leave", color: "bg-green-100 border-green-300 text-green-800" },
-  { count: "09", type: "Casual Leave", color: "bg-blue-100 border-blue-300 text-blue-800" },
-  { count: "11", type: "Sick Leave", color: "bg-purple-100 border-purple-300 text-purple-800" },
-];
 
-export default function LeaveCreatePage({setActiveTab}: {setActiveTab: (key: string) => void}) {
+
+export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: string) => void }) {
   const [leaveRecord, setLeaveRecord] = useState<LeaveState>(initialLeaveRecord);
   const [errors, setErrors] = useState<Partial<Record<keyof LeaveState, string>>>({});
   const [touched, setTouched] = useState<Partial<Record<keyof LeaveState, boolean>>>({});
@@ -43,6 +41,7 @@ export default function LeaveCreatePage({setActiveTab}: {setActiveTab: (key: str
     fetchLeaveTypes();
   }, [fetchLeaveTypes]);
 
+
   // Calculate days between start and end
   useEffect(() => {
     if (leaveRecord.start_date && leaveRecord.end_date) {
@@ -55,6 +54,15 @@ export default function LeaveCreatePage({setActiveTab}: {setActiveTab: (key: str
       setDaysCount(0);
     }
   }, [leaveRecord.start_date, leaveRecord.end_date]);
+
+  const [user, setUser] = useState<any>(null);
+  const { balances: leaveBalances, loading: balancesLoading } = useLeaveBalances(user?.id, user?.company_id);
+
+  // Fetch employee info
+  useEffect(() => {
+    getEmployeeInfo().then(setUser);
+  }, []);
+
 
   // Validate leave
   useEffect(() => {
@@ -89,6 +97,18 @@ export default function LeaveCreatePage({setActiveTab}: {setActiveTab: (key: str
 
     if (!isValid) return;
 
+    // Check leave balance
+    const balanceRecord = leaveBalances.find(b => b.type_id === leaveRecord.type_id);
+    if (!balanceRecord) {
+      toast.error("No leave balance found for this leave type.");
+      return;
+    }
+
+    if (daysCount > balanceRecord.balance) {
+      toast.error(`Insufficient leave balance. You only have ${balanceRecord.balance} day${balanceRecord.balance !== 1 ? "s" : ""} remaining for the selected leave type.`);
+      return;
+    }
+
     const client = createClient();
     const user = await getEmployeeInfo();
     setIsSubmitting(true);
@@ -107,7 +127,7 @@ export default function LeaveCreatePage({setActiveTab}: {setActiveTab: (key: str
       toast.success("Leave application submitted successfully!");
       setLeaveRecord(initialLeaveRecord);
       setTouched({});
-      setActiveTab('history')
+      setActiveTab('history');
     } catch (error) {
       console.error("Error creating Leave:", error);
       toast.error("Failed to submit leave application. Please try again.");
@@ -125,15 +145,26 @@ export default function LeaveCreatePage({setActiveTab}: {setActiveTab: (key: str
         <h1 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
           <Clock className="mr-2 h-5 w-5 text-blue-600" /> Leave Balance
         </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-          {leaveBalanceData.map(({ count, type, color }) => (
-            <div key={type} className={`border rounded-lg px-4 py-5 text-center ${color} border transition-all hover:shadow-md`}>
-              <div className="font-bold text-lg mb-1">{count} Days</div>
-              <div className="text-sm">{type}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 min-h-[100px]">
+          {balancesLoading ? (
+            <div className="col-span-full flex justify-center items-center h-full">
+              <div className="animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full"></div>
             </div>
-          ))}
+          ) : (
+            leaveBalances.map(balance => (
+              <div
+                key={balance.type_id}
+                className={`border rounded-lg px-4 py-5 text-center ${balance.color} border transition-all hover:shadow-md`}
+              >
+                <div className="font-bold text-lg mb-1">{balance.balance} Days</div>
+                <div className="text-sm">{balance.leave_type_name}</div>
+              </div>
+            ))
+          )}
         </div>
       </section>
+
+
 
       {/* Leave Form */}
       <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
