@@ -474,5 +474,5 @@ export interface PayrollAccountEntry {
   basic_salary: number;
   adjustments: PayrollAdjustment[];
   generation_date: string;
-  source: 'payroll_generation' | 'manual_adjustment'; // Added source tracking
+  source: 'Adjusted' | 'Generated'; // Added source tracking
 }

@@ -51,8 +51,8 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
       const result = await generatePayrollWithRetry(selectedDate);
       setResults({
         success: true,
-        data: result.data,
-        failedOperations: result.failedOperations || undefined
+        data: result?.data,
+        failedOperations: result?.failedOperations || undefined
       });
       
       if (onSuccess) {
@@ -158,7 +158,7 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
                     Confirm Payroll Generation
                   </h3>
                   <p className="text-sm text-gray-500 mb-4">
-                    This will generate payroll records for all eligible employees on {formatDate(selectedDate)}. 
+                    This will generate payroll records for all employees with basic salary &gt; 0 on {formatDate(selectedDate)}. 
                     The payrolls will be automatically published and synced with the accounts system.
                   </p>
                 </div>
@@ -196,8 +196,8 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
                   Generating Payroll...
                 </h3>
                 <p className="text-sm text-gray-500">
-                  Please wait while we process payroll records and sync with the accounts system.
-                  This may take a few moments.
+                  Creating payroll records for eligible employees and syncing with accounts system.
+                  This may take a few moments depending on the number of employees.
                 </p>
               </div>
             </motion.div>
@@ -229,8 +229,30 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
                 {results.success ? (
                   <div className="space-y-2">
                     <p className="text-sm text-gray-600">
-                      Payroll records have been generated and published for {formatDate(selectedDate)}.
+                      Payroll records have been generated as <span className="font-medium text-blue-600">Pending</span> for {formatDate(selectedDate)}. 
+                      You can review and publish them in the Pending tab.
                     </p>
+                    
+                    {/* Show generation statistics */}
+                    {results.data && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-3">
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                          <div>
+                            <p className="text-sm font-medium text-blue-800">{results.data.generated || 0}</p>
+                            <p className="text-xs text-blue-600">Generated</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-blue-800">{results.data.status || 'Pending'}</p>
+                            <p className="text-xs text-blue-600">Status</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-blue-800">{results.data.employees || 0}</p>
+                            <p className="text-xs text-blue-600">Eligible Employees</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
                     {results.failedOperations && results.failedOperations.length > 0 && (
                       <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mt-3">
                         <p className="text-sm font-medium text-amber-800 mb-1">Partial Success:</p>

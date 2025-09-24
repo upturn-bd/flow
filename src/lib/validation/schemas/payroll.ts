@@ -42,8 +42,8 @@ export const validatePayroll = (payroll: Partial<Payroll>): ValidationError[] =>
   }
 
   // Status validation
-  if (payroll.status && !['Paid', 'Pending', 'Adjusted'].includes(payroll.status)) {
-    errors.push({ field: "status", message: "Invalid status. Must be Paid, Pending, or Adjusted" });
+  if (payroll.status && !['Paid', 'Pending', 'Published'].includes(payroll.status)) {
+    errors.push({ field: "status", message: "Invalid status. Must be Paid, Pending, or Published" });
   }
 
   // Date validation

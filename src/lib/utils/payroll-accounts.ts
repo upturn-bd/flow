@@ -48,8 +48,8 @@ export async function createAccountFromPayroll(
         title: `Payroll - ${employeeName} (${payrollData.generation_date})`,
         method: 'Bank', // Payroll typically goes through bank
         company_id,
-        status: 'Complete' as const, // Payroll entries are typically complete when logged
-        from_source: `Payroll System - ${payrollData.source || 'payroll_generation'}`,
+        status: 'Pending' as const, // Payroll entries are typically complete when logged
+        from_source: `Payroll System - ${payrollData.source || 'Generated'}`,
         transaction_date: payrollData.generation_date,
         amount: -Math.abs(payrollData.total_amount), // Negative because it's an expense for the company
         currency: 'BDT',
@@ -156,6 +156,72 @@ export async function checkPayrollAccountExists(payrollId: number): Promise<bool
   } catch (error) {
     console.error('Error checking payroll account existence:', error);
     return false;
+  }
+}
+
+/**
+ * Update account status to Complete when payroll is marked as paid
+ */
+export async function markPayrollAccountComplete(payrollId: number): Promise<Account | null> {
+  try {
+    const company_id = await getCompanyId();
+    
+    // Find the account entry for this payroll
+    const { data: existingAccount, error: findError } = await supabase
+      .from("accounts")
+      .select("*")
+      .eq("company_id", company_id)
+      .contains("additional_data", { payroll_id: payrollId })
+      .single();
+
+    if (findError) throw findError;
+    
+    if (!existingAccount) {
+      console.warn(`No account entry found for payroll ${payrollId}`);
+      return null;
+    }
+
+    // Update the account status to Complete
+    const { data, error } = await supabase
+      .from("accounts")
+      .update({ 
+        status: 'Complete',
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", existingAccount.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    console.log(`Account entry ${existingAccount.id} marked as Complete for payroll ${payrollId}`);
+    
+    // Send notification about account completion
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await createAccountNotification(
+          user.id,
+          'statusChanged',
+          {
+            employeeName: existingAccount.additional_data?.employee_name || 'Employee',
+            amount: Math.abs(existingAccount.amount),
+            date: existingAccount.transaction_date,
+          },
+          {
+            referenceId: existingAccount.id,
+            actionUrl: '/admin-management?tab=accounts',
+          }
+        );
+      }
+    } catch (notificationError) {
+      console.warn('Failed to send payroll completion notification:', notificationError);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error marking payroll account as complete:', error);
+    throw error;
   }
 }
 

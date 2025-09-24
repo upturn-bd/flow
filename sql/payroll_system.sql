@@ -86,6 +86,26 @@ CREATE POLICY "Supervisors can update supervisee payrolls" ON payrolls
     supervisor_id = auth.uid()::uuid
   );
 
+-- Policy for admins to insert new payrolls
+CREATE POLICY "Admins can insert payrolls" ON payrolls
+  FOR INSERT WITH CHECK (
+    company_id IN (
+      SELECT company_id FROM employees 
+      WHERE id = auth.uid()::uuid 
+      AND role IN ('Admin', 'Manager')
+    )
+  );
+
+-- Policy for admins to update all company payrolls
+CREATE POLICY "Admins can update all company payrolls" ON payrolls
+  FOR UPDATE USING (
+    company_id IN (
+      SELECT company_id FROM employees 
+      WHERE id = auth.uid()::uuid 
+      AND role IN ('Admin', 'Manager')
+    )
+  );
+
 -- 8. Add RLS policies for salary_change_log
 ALTER TABLE salary_change_log ENABLE ROW LEVEL SECURITY;
 

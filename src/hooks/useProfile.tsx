@@ -80,15 +80,33 @@ export function useProfile() {
     }
   }, []);
 
-  const updateBasicInfo = useCallback(async (data: BasicInfoFormData) => {
+  const updateBasicInfo = useCallback(async (data: Partial<BasicInfoFormData>) => {
     setLoading(true);
     setError(null);
     try {
       const employeeInfo = await getEmployeeInfo();
       
+      // Filter out undefined values and empty objects
+      const updateData = Object.fromEntries(
+        Object.entries(data).filter(([_, value]) => value !== undefined && value !== null)
+      );
+      
+      if (Object.keys(updateData).length === 0) {
+        // No data to update, return current info
+        const { data: currentData, error: fetchError } = await supabase
+          .from('employees')
+          .select('*')
+          .eq('id', employeeInfo.id)
+          .single();
+        
+        if (fetchError) throw fetchError;
+        setBasicInfo(currentData);
+        return { data: currentData };
+      }
+      
       const { data: result, error } = await supabase
         .from('employees')
-        .update(data)
+        .update(updateData)
         .eq('id', employeeInfo.id)
         .select()
         .single();
@@ -97,11 +115,23 @@ export function useProfile() {
       
       setBasicInfo(result);
       return { data: result };
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update basic info";
+    } catch (err: any) {
+      let errorMessage = "Failed to update basic info";
+      
+      // Handle specific PostgreSQL error codes
+      if (err?.code === '23505') {
+        if (err?.details?.includes('email')) {
+          errorMessage = "This email address is already in use by another employee.";
+        } else {
+          errorMessage = "This information conflicts with existing data. Please check your inputs.";
+        }
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      
       setError(errorMessage);
-      console.error(errorMessage, err);
-      throw err;
+      console.error("Update basic info error:", err);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -120,14 +150,27 @@ export function useProfile() {
         .eq('id', employeeInfo.id)
         .single();
 
+      // Handle case where no personal info record exists yet
+      if (error && error.code === 'PGRST116') {
+        // No personal info record found - this is not an error, just return null
+        setPersonalInfo(null);
+        return null;
+      }
+      
       if (error) throw error;
       
       setPersonalInfo(result);
       return result;
-    } catch (err) {
+    } catch (err: any) {
+      // Don't treat missing records as errors
+      if (err?.code === 'PGRST116') {
+        setPersonalInfo(null);
+        return null;
+      }
+      
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch personal info";
       setError(errorMessage);
-      console.error(errorMessage, err);
+      console.error("Fetch personal info error:", err);
       throw err;
     } finally {
       setLoading(false);
@@ -144,42 +187,106 @@ export function useProfile() {
         .eq('id', uid)
         .single();
 
+      // Handle case where no personal info record exists yet
+      if (error && error.code === 'PGRST116') {
+        // No personal info record found - this is not an error, just return null
+        setPersonalInfo(null);
+        return null;
+      }
+      
       if (error) throw error;
       
       setPersonalInfo(result);
       return result;
-    } catch (err) {
+    } catch (err: any) {
+      // Don't treat missing records as errors
+      if (err?.code === 'PGRST116') {
+        setPersonalInfo(null);
+        return null;
+      }
+      
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch user's personal info";
       setError(errorMessage);
-      console.error(errorMessage, err);
+      console.error("Fetch user personal info error:", err);
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const updatePersonalInfo = useCallback(async (data: PersonalFormData) => {
+  const updatePersonalInfo = useCallback(async (data: Partial<PersonalFormData>) => {
     setLoading(true);
     setError(null);
     try {
       const employeeInfo = await getEmployeeInfo();
       
+      // Filter out empty values and enum fields that are empty strings
+      const cleanData = Object.fromEntries(
+        Object.entries(data).filter(([key, value]) => {
+          // Remove completely empty values
+          if (value === null || value === undefined) return false;
+          
+          // For enum fields (gender, blood_group, marital_status), filter out empty strings
+          const enumFields = ['gender', 'blood_group', 'marital_status'];
+          if (enumFields.includes(key) && value === '') return false;
+          
+          // Keep all other non-empty values (including empty strings for text fields)
+          return true;
+        })
+      );
+      
+      // If no valid data to update, return current data
+      if (Object.keys(cleanData).length === 0) {
+        const { data: currentData } = await supabase
+          .from('personal_infos')
+          .select('*')
+          .eq('id', employeeInfo.id)
+          .single();
+        
+        if (currentData) {
+          setPersonalInfo(currentData);
+          return currentData;
+        }
+      }
+      
+      // Try to update existing record
       const { data: result, error } = await supabase
         .from('personal_infos')
-        .update(data)
+        .update(cleanData)
         .eq('id', employeeInfo.id)
         .select()
         .single();
 
+      // If record doesn't exist, create it (upsert)
+      if (error && error.code === 'PGRST116') {
+        const { data: insertResult, error: insertError } = await supabase
+          .from('personal_infos')
+          .insert({ id: employeeInfo.id, ...cleanData })
+          .select()
+          .single();
+          
+        if (insertError) throw insertError;
+        setPersonalInfo(insertResult);
+        return insertResult;
+      }
+      
       if (error) throw error;
       
       setPersonalInfo(result);
       return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update personal info";
+    } catch (err: any) {
+      let errorMessage = "Failed to update personal info";
+      
+      // Handle specific enum validation errors
+      if (err?.code === '22P02' && err?.message?.includes('enum')) {
+        errorMessage = "Invalid selection for dropdown fields. Please check your selections.";
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      
       setError(errorMessage);
-      console.error(errorMessage, err);
-      throw err;
+      console.error("Update personal info error:", err);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }

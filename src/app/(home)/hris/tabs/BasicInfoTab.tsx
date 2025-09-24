@@ -144,7 +144,51 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
           );
         }
 
-        const response = await updateBasicInfoApi(result.data);
+        // Only update fields that have actually changed to avoid unique constraint violations
+        const changedFields: Partial<BasicInfoFormData> = {};
+        
+        if (initialData) {
+          Object.keys(result.data).forEach((key) => {
+            const typedKey = key as keyof BasicInfoFormData;
+            const oldValue = initialData[typedKey];
+            const newValue = result.data[typedKey];
+            
+            // Skip if values are the same (including proper comparison for numbers and strings)
+            if (oldValue !== newValue) {
+              // Special handling for numeric fields
+              if (typedKey === 'department_id' || typedKey === 'basic_salary') {
+                if (Number(oldValue) !== Number(newValue)) {
+                  (changedFields as any)[typedKey] = newValue;
+                }
+              } else if (typedKey === 'email') {
+                // Extra validation for email to ensure we're not setting the same email
+                const trimmedOld = String(oldValue || '').trim().toLowerCase();
+                const trimmedNew = String(newValue || '').trim().toLowerCase();
+                if (trimmedOld !== trimmedNew) {
+                  (changedFields as any)[typedKey] = newValue;
+                }
+              } else {
+                (changedFields as any)[typedKey] = newValue;
+              }
+            }
+          });
+        } else {
+          // If no initial data, update all fields except basic_salary (handled separately)
+          Object.keys(result.data).forEach((key) => {
+            if (key !== 'basic_salary') {
+              (changedFields as any)[key] = (result.data as any)[key];
+            }
+          });
+        }
+
+        // Remove basic_salary from the update as it's handled separately above
+        delete (changedFields as any).basic_salary;
+
+        // Log what fields are being updated (for debugging)
+        console.log('Fields being updated:', changedFields);
+
+        // Always attempt the update - the hook will handle empty updates gracefully
+        const response = await updateBasicInfoApi(changedFields);
         setInitialData(response.data);
         setSubmitSuccess(true);
         showNotification({ 
@@ -153,8 +197,20 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
         });
         setTimeout(() => setSubmitSuccess(false), 3000);
         setIsEditMode(false);
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      } catch (error: any) {
+        let errorMessage = "Failed to update basic information";
+        
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        } else if (error?.message) {
+          errorMessage = error.message;
+        }
+        
+        // Add more context for common errors
+        if (errorMessage.includes("email") && errorMessage.includes("already in use")) {
+          errorMessage = "Cannot update: This email address is already registered to another employee.";
+        }
+        
         setSubmitError(errorMessage);
         showNotification({ 
           message: errorMessage, 
@@ -331,9 +387,6 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                         <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal sm:whitespace-nowrap text-sm font-medium text-gray-800 bg-gray-50 w-1/3">
                           <div className="flex items-center">
                             {field.label}
-                            {field.adminOnly && (
-                              <DollarSign className="h-4 w-4 text-amber-500 ml-1" title="Admin/Manager Only" />
-                            )}
                           </div>
                         </td>
                         <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal text-sm text-gray-600">
@@ -345,10 +398,10 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                                 type={field.type}
                                 value={
                                   field.name === "department_id"
-                                    ? formValues[field.name]?.toString() || ""
+                                    ? (formValues[field.name as keyof BasicInfoFormData] as number)?.toString() || ""
                                     : field.name === "basic_salary"
-                                    ? formValues[field.name]?.toString() || ""
-                                    : formValues[field.name as keyof BasicInfoFormData] || ""
+                                    ? (formValues[field.name as keyof BasicInfoFormData] as number)?.toString() || ""
+                                    : (formValues[field.name as keyof BasicInfoFormData] as string) || ""
                                 }
                                 onChange={handleChange}
                                 onBlur={handleBlur}
@@ -378,12 +431,12 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                           ) : (
                             <div className="py-1 break-words">
                               {field.name === "department_id" 
-                                ? departmentName(Number(formValues[field.name])) 
-                                : field.name === "hire_date" && formValues[field.name]
-                                ? new Date(formValues[field.name]).toLocaleDateString()
+                                ? departmentName(Number(formValues[field.name as keyof BasicInfoFormData])) 
+                                : field.name === "hire_date" && formValues[field.name as keyof BasicInfoFormData]
+                                ? new Date(formValues[field.name as keyof BasicInfoFormData] as string).toLocaleDateString()
                                 : field.name === "basic_salary"
-                                ? `৳${(formValues[field.name] || 0).toLocaleString()}`
-                                : formValues[field.name as keyof BasicInfoFormData] || "—"}
+                                ? `৳${((formValues[field.name as keyof BasicInfoFormData] as number) || 0).toLocaleString()}`
+                                : (formValues[field.name as keyof BasicInfoFormData] as string) || "—"}
                             </div>
                           )}
                         </td>
