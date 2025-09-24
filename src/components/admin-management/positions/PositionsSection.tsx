@@ -168,6 +168,7 @@ export default function PositionsSection({
             grades={grades.filter(g => g.id != null) as { id: number; name: string }[]}
             onSubmit={handleCreatePosition}
             onClose={() => setIsCreatingPosition(false)}
+            isOpen={isCreatingPosition}
           />
         )}
         {selectedPositionView && (
@@ -189,6 +190,7 @@ export default function PositionsSection({
             initialData={selectedPositionEdit}
             onSubmit={handleUpdatePosition}
             onClose={() => setEditPosition(null)}
+            isOpen={!!selectedPositionEdit}
           />
         )}
       </AnimatePresence>

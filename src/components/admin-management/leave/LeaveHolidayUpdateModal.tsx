@@ -29,6 +29,7 @@ export const LeaveHolidayUpdateModal: React.FC<LeaveHolidayUpdateModalProps> = (
       validationFn={validateHolidayConfig}
       onSubmit={onSubmit}
       onClose={onClose}
+      isOpen={isOpen}
       isLoading={isLoading}
       submitButtonText="Update Holiday"
       size="sm"

@@ -359,10 +359,7 @@ export interface CompanyBasics {
   country_id: string;
   // Operations Settings
   live_absent_enabled: boolean;
-  // Payroll Settings
-  payroll_generation_day: number;
   fiscal_year_start: string; // Date format: YYYY-MM-DD (e.g., "2024-01-01")
-  live_payroll_enabled: boolean;
 }
 
 export interface BasicInfo {

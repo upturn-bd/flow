@@ -45,6 +45,7 @@ export const ClaimTypeUpdateModal: React.FC<ClaimTypeUpdateModalProps> = ({
       validationFn={validateClaimType}
       onSubmit={onSubmit}
       onClose={onClose}
+      isOpen={isOpen}
       isLoading={isLoading}
       submitButtonText="Update Settlement Item"
       size="md"

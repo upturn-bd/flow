@@ -9,12 +9,14 @@ import { FormField } from "@/components/forms";
 interface NoticeModalProps {
   onSubmit: (values: NoticeType) => void;
   onClose: () => void;
+  isOpen: boolean;
   isLoading?: boolean;
 }
 
 export default function NoticesCreateModal({
   onSubmit,
   onClose,
+  isOpen,
   isLoading = false,
 }: NoticeModalProps) {
   const initialValues: NoticeType = {
@@ -29,6 +31,7 @@ export default function NoticesCreateModal({
       validationFn={validateNewsAndNoticeType}
       onSubmit={onSubmit}
       onClose={onClose}
+      isOpen={isOpen}
       isLoading={isLoading}
       submitButtonText="Create Type"
     >

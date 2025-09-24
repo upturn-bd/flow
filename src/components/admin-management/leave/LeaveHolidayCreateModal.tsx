@@ -33,6 +33,7 @@ export const LeaveHolidayCreateModal: React.FC<LeaveHolidayCreateModalProps> = (
       validationFn={validateHolidayConfig}
       onSubmit={onSubmit}
       onClose={onClose}
+      isOpen={isOpen}
       isLoading={isLoading}
       submitButtonText="Create Holiday"
       size="sm"

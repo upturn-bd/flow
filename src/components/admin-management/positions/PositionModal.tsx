@@ -10,6 +10,7 @@ interface PositionModalProps {
   initialData?: Position | null;
   onSubmit: (values: Position) => void;
   onClose: () => void;
+  isOpen: boolean;
   departments: { id: number; name: string }[];
   grades: { id: number; name: string }[];
   isLoading?: boolean;
@@ -21,6 +22,7 @@ export default function PositionModal({
   departments,
   grades,
   onClose,
+  isOpen,
   isLoading = false,
 }: PositionModalProps) {
   const initialValues: Position = initialData || {
@@ -55,6 +57,7 @@ export default function PositionModal({
       validationFn={validatePosition}
       onSubmit={onSubmit}
       onClose={onClose}
+      isOpen={isOpen}
       isLoading={isLoading}
       submitButtonText={initialData ? "Update Position" : "Create Position"}
       size="md"

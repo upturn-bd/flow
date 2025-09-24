@@ -29,6 +29,7 @@ export const LeaveTypeUpdateModal: React.FC<LeaveTypeUpdateModalProps> = ({
       validationFn={validateLeaveType}
       onSubmit={onSubmit}
       onClose={onClose}
+      isOpen={isOpen}
       isLoading={isLoading}
       submitButtonText="Update Leave Type"
       size="sm"

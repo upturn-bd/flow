@@ -59,7 +59,6 @@ export default function Collapsible({ title, children }: CollapsibleProps) {
             initial="hidden"
             animate="visible"
             exit="exit"
-            variants={contentVariants}
             className="overflow-hidden bg-gray-200 border-t border-gray-200"
           >
             <div className="p-4">{children}</div>

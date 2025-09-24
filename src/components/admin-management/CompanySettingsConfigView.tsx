@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Settings, Calendar, DollarSign, Clock, Activity } from "lucide-react";
+import { Settings, Calendar, DollarSign, Clock, Activity, Timer } from "lucide-react";
 import { staggerContainer } from "@/components/ui/animations";
 import FormToggleField from "@/components/ui/FormToggleField";
 import FormNumberField from "@/components/ui/FormNumberField";
@@ -10,9 +10,7 @@ import FormDateField from "@/components/ui/FormDateField";
 interface CompanySettingsConfigViewProps {
   formValues: {
     live_absent_enabled: boolean;
-    payroll_generation_day: number;
     fiscal_year_start: string;
-    live_payroll_enabled: boolean;
   };
   onChange: (field: string, value: any) => void;
   errors: {
@@ -79,7 +77,7 @@ export default function CompanySettingsConfigView({
         </div>
       </motion.div>
 
-      {/* Payroll Settings */}
+      {/* Time Settings */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -88,34 +86,12 @@ export default function CompanySettingsConfigView({
       >
         <div className="border-b border-gray-200 px-3 py-4">
           <h3 className="text-lg font-semibold text-gray-700 flex items-center">
-            <DollarSign className="w-5 h-5 mr-2 text-gray-600" />
-            Payroll Settings
+            <Timer className="w-5 h-5 mr-2 text-gray-600" />
+            Time Settings
           </h3>
         </div>
         
         <div className="p-3 sm:p-6 space-y-4">
-          <FormToggleField
-            name="live_payroll_enabled"
-            label="Live Payroll Processing"
-            icon={<DollarSign size={18} />}
-            checked={formValues.live_payroll_enabled}
-            onChange={handleToggleChange('live_payroll_enabled')}
-            error={errors.live_payroll_enabled}
-            description="Enable automated payroll generation and processing"
-          />
-
-          <FormNumberField
-            name="payroll_generation_day"
-            label="Payroll Generation Day"
-            icon={<Calendar size={18} />}
-            value={formValues.payroll_generation_day}
-            onChange={handleInputChange('payroll_generation_day')}
-            min={1}
-            max={31}
-            error={errors.payroll_generation_day}
-            placeholder="Enter day (1-31)"
-          />
-
           <FormDateField
             name="fiscal_year_start"
             label="Fiscal Year Start"

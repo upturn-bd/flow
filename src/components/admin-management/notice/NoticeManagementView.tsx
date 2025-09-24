@@ -137,6 +137,7 @@ export default function NoticeView() {
             <NoticesCreateModal
               onSubmit={handleCreateNewsAndNoticeType}
               onClose={() => setIsCreatingNewsAndNoticeType(false)}
+              isOpen={isCreatingNewsAndNoticeType}
               isLoading={isLoading}
             />
           )}

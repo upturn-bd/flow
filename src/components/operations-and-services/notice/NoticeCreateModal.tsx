@@ -28,7 +28,7 @@ export default function NoticeCreateModal({
   const [formData, setFormData] = useState<NoticeData>({
     title: '',
     description: '',
-    urgency: '',
+    urgency: 'normal',
     valid_from: '',
     valid_till: '',
     notice_type_id: undefined,
@@ -68,7 +68,7 @@ export default function NoticeCreateModal({
       department_id: formData.department_id || undefined,
     };
 
-    const validation = validateNotice(dataToValidate);
+    const validation = validateNotice(dataToValidate as any);
 
     if (!validation.success && validation.errors) {
       const errorMap: Record<string, string> = {};
@@ -90,7 +90,7 @@ export default function NoticeCreateModal({
       ...formData,
       notice_type_id: formData.notice_type_id || undefined,
       department_id: formData.department_id || undefined,
-    });
+    } as any);
     return validation.success;
   };
 

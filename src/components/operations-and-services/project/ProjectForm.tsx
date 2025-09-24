@@ -16,6 +16,7 @@ import {
   validateProject,
   validationErrorsToObject,
 } from "@/lib/utils/validation";
+import { type MilestoneData } from "@/lib/validation/schemas/advanced";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import AssigneeSelect from "./AssigneeSelect";
@@ -238,12 +239,18 @@ export default function ProjectForm({
   };
 
 
-  const handleUpdateMilestone = async (updatedMilestone: Milestone) => {
+  const handleUpdateMilestone = async (updatedMilestone: MilestoneData) => {
+    // Ensure weightage is a number before updating
+    const milestoneData = {
+      ...updatedMilestone,
+      weightage: updatedMilestone.weightage ?? 0
+    };
+    
     setMilestones((prev) =>
-      prev.map((m) => (m.id === updatedMilestone.id ? updatedMilestone : m))
+      prev.map((m) => (m.id === milestoneData.id ? milestoneData as any : m))
     );
 
-    await updateMilestone(updatedMilestone.id || 0, updatedMilestone);
+    await updateMilestone(milestoneData.id || 0, milestoneData);
 
     setSelectedMilestone(null);
   };

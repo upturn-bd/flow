@@ -54,6 +54,7 @@ export const RequisitionInventoryCreateModal: React.FC<RequisitionInventoryCreat
       validationFn={validateRequisitionInventory}
       onSubmit={onSubmit}
       onClose={onClose}
+      isOpen={isOpen}
       isLoading={isLoading}
       submitButtonText="Create Item"
       size="md"
