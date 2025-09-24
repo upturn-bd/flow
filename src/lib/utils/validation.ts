@@ -851,6 +851,12 @@ export function validateBasicInfo(basicInfo: any): ValidationResult {
   const idError = validateStringLength(basicInfo.id_input, 'id_input', 1);
   if (idError) errors.push(idError);
 
+  // Validate basic salary if provided (optional field, but must be valid number if present)
+  if (basicInfo.basic_salary !== undefined && basicInfo.basic_salary !== null) {
+    const salaryError = validateNumber(Number(basicInfo.basic_salary), 'basic_salary', 0);
+    if (salaryError) errors.push(salaryError);
+  }
+
   return {
     success: errors.length === 0,
     data: errors.length === 0 ? basicInfo : undefined,
