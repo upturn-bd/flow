@@ -16,9 +16,6 @@ CREATE TABLE accounts (
   amount DECIMAL(15,2) NOT NULL, -- 2-digit precision, supports negative values
   currency VARCHAR(10) NOT NULL DEFAULT 'BDT', -- Free text field, default BDT
   
-  -- Stakeholder Reference (optional)
-  stakeholder_id INTEGER, -- References stakeholders table
-  
   -- Additional Data (JSONB for flexible storage)
   additional_data JSONB DEFAULT '{}', -- Stores user_id and other relevant data
   
@@ -34,7 +31,6 @@ CREATE INDEX idx_accounts_company_id ON accounts(company_id);
 CREATE INDEX idx_accounts_transaction_date ON accounts(transaction_date DESC); -- Newest first
 CREATE INDEX idx_accounts_status_company ON accounts(status, company_id);
 CREATE INDEX idx_accounts_method_company ON accounts(method, company_id);
-CREATE INDEX idx_accounts_stakeholder_id ON accounts(stakeholder_id); -- For stakeholder transactions
 CREATE INDEX idx_accounts_created_at ON accounts(created_at DESC);
 CREATE INDEX idx_accounts_additional_data ON accounts USING GIN (additional_data); -- For JSONB queries
 

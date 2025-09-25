@@ -421,7 +421,6 @@ export interface Account {
   transaction_date: string; // ISO date string
   amount: number; // Supports negative values for expenses
   currency: string; // Default BDT, but allows free text
-  stakeholder_id?: number; // Optional reference to stakeholder
   additional_data?: Record<string, any>; // JSONB data
   created_at?: string;
   updated_at?: string;

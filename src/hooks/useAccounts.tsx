@@ -14,7 +14,6 @@ export interface AccountFormData {
   transaction_date: string;
   amount: number;
   currency: string;
-  stakeholder_id?: number; // Optional reference to stakeholder
   additional_data?: Record<string, any>;
 }
 
