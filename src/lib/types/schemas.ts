@@ -421,6 +421,7 @@ export interface Account {
   transaction_date: string; // ISO date string
   amount: number; // Supports negative values for expenses
   currency: string; // Default BDT, but allows free text
+  stakeholder_id?: number; // Optional reference to stakeholder
   additional_data?: Record<string, any>; // JSONB data
   created_at?: string;
   updated_at?: string;
@@ -446,6 +447,65 @@ export interface Payroll {
   supervisor_id: string;
   created_at?: string;
   updated_at?: string;
+}
+
+// Stakeholder Management System Interfaces
+export interface StakeholderContact {
+  name: string;
+  role: string;
+  phone: string;
+  email: string;
+  address: string;
+}
+
+export interface StakeholderType {
+  id?: number;
+  name: string;
+  description?: string;
+  company_id: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Stakeholder {
+  id?: number;
+  name: string;
+  address?: string;
+  stakeholder_type_id?: number;
+  manager_id?: number; // Employee ID who manages this stakeholder
+  contact_details?: {
+    contacts: StakeholderContact[];
+  };
+  assigned_employees?: string[]; // Array of employee IDs
+  company_id: number;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+  // Joined data
+  stakeholder_type?: StakeholderType;
+}
+
+export type StakeholderIssueStatus = 'Open' | 'In Progress' | 'Resolved' | 'Closed';
+export type StakeholderIssuePriority = 'Low' | 'Medium' | 'High' | 'Critical';
+
+export interface StakeholderIssue {
+  id?: number;
+  stakeholder_id: number;
+  transaction_id?: number; // Optional reference to accounts table
+  title: string;
+  description?: string;
+  status: StakeholderIssueStatus;
+  priority: StakeholderIssuePriority;
+  assigned_to?: number; // Employee ID responsible for resolving
+  company_id: number;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  resolved_at?: string;
+  resolved_by?: string;
+  // Joined data
+  stakeholder?: Stakeholder;
 }
 
 // Salary Change Audit Trail

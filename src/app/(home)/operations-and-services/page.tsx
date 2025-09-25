@@ -16,6 +16,7 @@ import {
   BellDot, // Reports
   Users,
   CreditCard, // Payroll
+  Building2, // Stakeholder
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -93,6 +94,13 @@ const sections = [
         icon: CreditCard,
         description: "View payroll history and manage salary information",
         color: "bg-indigo-100 text-indigo-700 border-indigo-200"
+      },
+      {
+        name: "Stakeholder",
+        path: "/operations-and-services/services/stakeholder",
+        icon: Building2,
+        description: "Manage stakeholder relationships and track issues",
+        color: "bg-purple-100 text-purple-700 border-purple-200"
       },
     ],
   },
