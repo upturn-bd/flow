@@ -24,6 +24,8 @@ import {
   UserPlus,
   Users,
   CreditCard,
+  List,
+  X,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -31,11 +33,12 @@ export default function Sidebar() {
   const pathname = usePathname();
   const navItems = getAuthorizedNavItems();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false); // Mobile toggle
 
-  // track submenu toggle
-  const [openSubmenu, setOpenSubmenu] = useState<string | null>('operations-and-services');
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(
+    "operations-and-services"
+  );
 
-  // auto-open submenu if user is inside operations-and-services/*
   useEffect(() => {
     if (pathname.startsWith("/operations-and-services")) {
       setOpenSubmenu("operations-and-services");
@@ -44,29 +47,41 @@ export default function Sidebar() {
 
   if (!isApproved) return null;
 
-  // Submenu items for Operations & Services
   const operationsSubmenu = [
-    { label: "Task", desc: "Assign, track and manage day-to-day tasks", href: "/operations-and-services/workflow/task", icon: ClipboardList },
-    { label: "Project", desc: "Plan and execute complex projects with milestones", href: "/operations-and-services/workflow/project", icon: BarChart },
-    { label: "Attendance", desc: "Track and manage your daily attendance", href: "/operations-and-services/services/attendance", icon: LogIn },
-    { label: "Leave", desc: "Apply and manage time off and leaves", href: "/operations-and-services/services/leave", icon: CalendarX },
-    { label: "Notice", desc: "Important company announcements and notices", href: "/operations-and-services/services/notice", icon: Bell },
-    { label: "Requisition", desc: "Request equipment, supplies and services", href: "/operations-and-services/services/requisition", icon: Clipboard },
-    { label: "Settlement", desc: "Manage and track expense reimbursements", href: "/operations-and-services/services/settlement", icon: DollarSign },
-    { label: "Complaint", desc: "Submit and track workplace issues and concerns", href: "/operations-and-services/services/complaint", icon: AlertCircle },
-    { label: "Payroll", desc: "Manage and track payroll information", href: "/operations-and-services/services/payroll", icon: CreditCard },
-    { label: "Onboarding", desc: "Employee onboarding workflow and tasks", href: "/operations-and-services/operations/onboarding", icon: UserPlus },
-    { label: "HRIS", desc: "Human Resource Information System", href: "/operations-and-services/operations/hris", icon: Users },
+    { label: "Task", href: "/operations-and-services/workflow/task", icon: ClipboardList },
+    { label: "Project", href: "/operations-and-services/workflow/project", icon: BarChart },
+    { label: "Attendance", href: "/operations-and-services/services/attendance", icon: LogIn },
+    { label: "Leave", href: "/operations-and-services/services/leave", icon: CalendarX },
+    { label: "Notice", href: "/operations-and-services/services/notice", icon: Bell },
+    { label: "Requisition", href: "/operations-and-services/services/requisition", icon: Clipboard },
+    { label: "Settlement", href: "/operations-and-services/services/settlement", icon: DollarSign },
+    { label: "Complaint", href: "/operations-and-services/services/complaint", icon: AlertCircle },
+    { label: "Payroll", href: "/operations-and-services/services/payroll", icon: CreditCard },
+    { label: "Onboarding", href: "/operations-and-services/operations/onboarding", icon: UserPlus },
+    { label: "HRIS", href: "/operations-and-services/operations/hris", icon: Users },
   ];
-  return (
+
+  // Hamburger button for mobile
+  const HamburgerButton = () => (
+    <button
+      className="md:hidden fixed top-4 left-4 z-[1001] p-2 rounded-md bg-[#001731] text-white"
+      onClick={() => setMobileOpen(!mobileOpen)}
+    >
+      {mobileOpen ? <X size={24} /> : <List size={24} />}
+    </button>
+  );
+
+  const SidebarContent = (
     <motion.aside
-      initial={{ x: -100, opacity: 0 }}
+      initial={{ x: -300, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.4 }}
+      exit={{ x: -300, opacity: 0 }}
+      transition={{ duration: 0.3 }}
       className={cn(
         "sticky top-0 h-screen z-40 shadow-xl flex flex-col",
         "bg-gradient-to-b from-[#001731] to-[#002363]",
-        isCollapsed ? "w-20" : "w-64"
+        isCollapsed ? "w-20" : "w-64",
+        "md:relative fixed left-0 top-0" // fixed for mobile
       )}
     >
       {/* Logo Section */}
@@ -85,8 +100,6 @@ export default function Sidebar() {
             </span>
           )}
         </Link>
-
-        {/* Collapse Button */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="p-2 rounded-md text-gray-300 hover:text-white hover:bg-[#001c4f] transition-colors"
@@ -98,10 +111,9 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex flex-col mt-4 space-y-2 px-2 flex-1 overflow-y-auto">
         {navItems.map((item) => {
-          console.log(item)
           let displayLabel;
           switch (item.label) {
-            case 'home':
+            case "home":
               displayLabel = "Dashboard";
               break;
             case "hris":
@@ -114,16 +126,14 @@ export default function Sidebar() {
               displayLabel = "Company Configuration";
               break;
             default:
-              displayLabel = item.label
-                .charAt(0)
-                .toUpperCase()
-                .concat(item.label.slice(1).replace(/-/g, " "));
+              displayLabel =
+                item.label.charAt(0).toUpperCase() +
+                item.label.slice(1).replace(/-/g, " ");
           }
 
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href);
 
-          // special handling for Operations & Services
           if (item.label === "operations-and-services") {
             return (
               <div key={item.label} className="relative">
@@ -135,16 +145,11 @@ export default function Sidebar() {
                       : "text-gray-300 hover:text-white hover:bg-[#001c4f]"
                   )}
                 >
-                  {/* Left Section: Link to main page */}
-                  <Link
-                    href={item.href}
-                    className="flex items-center gap-3 flex-1"
-                  >
+                  <Link href={item.href} className="flex items-center gap-3 flex-1">
                     <Icon size={22} weight={isActive ? "fill" : "regular"} />
                     {!isCollapsed && <span>{displayLabel}</span>}
                   </Link>
 
-                  {/* Right Section: Chevron toggle */}
                   {!isCollapsed && (
                     <button
                       onClick={(e) => {
@@ -165,7 +170,6 @@ export default function Sidebar() {
                   )}
                 </div>
 
-                {/* Submenu */}
                 <AnimatePresence>
                   {openSubmenu === item.label && !isCollapsed && (
                     <motion.div
@@ -194,7 +198,6 @@ export default function Sidebar() {
                           </Link>
                         );
                       })}
-
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -202,7 +205,6 @@ export default function Sidebar() {
             );
           }
 
-          // default rendering for other menu items
           return (
             <motion.div
               key={item.label}
@@ -241,8 +243,28 @@ export default function Sidebar() {
             {!isCollapsed && <span className="text-sm">Settings</span>}
           </div>
         </Link>
-
       </div>
     </motion.aside>
+  );
+
+  return (
+    <>
+      <HamburgerButton />
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            className="fixed inset-0 bg-black/30 md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMobileOpen(false)}
+          >
+            {SidebarContent}
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Show sidebar normally on desktop */}
+      <div className="hidden md:flex">{SidebarContent}</div>
+    </>
   );
 }
