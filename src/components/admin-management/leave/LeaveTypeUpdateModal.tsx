@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormModal } from '@/components/ui/modals';
-import { FormField, NumberField } from '@/components/forms';
+import { FormField, NumberField, SelectField } from '@/components/forms';
 import { validateLeaveType, type LeaveTypeData } from '@/lib/validation';
 import { Tag } from '@phosphor-icons/react';
 
@@ -20,6 +20,16 @@ export const LeaveTypeUpdateModal: React.FC<LeaveTypeUpdateModalProps> = ({
   isLoading = false,
 }) => {
   if (!isOpen) return null;
+
+  const colorOptions = [
+    { label: 'Red', value: 'red' },
+    { label: 'Orange', value: 'orange' },
+    { label: 'Yellow', value: 'yellow' },
+    { label: 'Green', value: 'green' },
+    { label: 'Blue', value: 'blue' },
+    { label: 'Indigo', value: 'indigo' },
+    { label: 'Violet', value: 'violet' },
+  ];
 
   return (
     <FormModal<LeaveTypeData>
@@ -56,6 +66,28 @@ export const LeaveTypeUpdateModal: React.FC<LeaveTypeUpdateModalProps> = ({
             required
             min={1}
             placeholder="Enter annual quota"
+          />
+
+          <NumberField
+            name="max_carryover"
+            label="Maximum Carryover Days"
+            value={values.max_carryover || 0}
+            onChange={handleChange}
+            error={errors.max_carryover}
+            required
+            min={0}
+            placeholder="Enter max days that can be carried over"
+          />
+
+          <SelectField
+            name="color"
+            label="Leave Type Color"
+            value={values.color}
+            onChange={handleChange}
+            error={errors.color}
+            required
+            options={colorOptions}
+            placeholder="Select a color"
           />
         </>
       )}

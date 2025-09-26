@@ -1,7 +1,6 @@
 "use client";
 
 import { AuthProvider, useAuth } from "@/lib/auth/auth-context";
-import MobileBottomNav from "./mobile-bottom-nav";
 import Sidebar from "./side-navbar";
 import TopBar from "./top-bar";
 
@@ -30,6 +29,5 @@ function ApprovalLayout({ children }: { children: React.ReactNode }) {
       {children}
     </main>
   </div>
-  {isApproved && <MobileBottomNav />}
 </div>;
 }

@@ -154,7 +154,7 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
             leaveBalances.map(balance => (
               <div
                 key={balance.type_id}
-                className={`border rounded-lg px-4 py-5 text-center ${balance.color} border transition-all hover:shadow-md`}
+                className={`border rounded-lg px-4 py-5 text-center bg-${balance.color}-100 text-${balance.color}-800 border transition-all hover:shadow-md`}
               >
                 <div className="font-bold text-lg mb-1">{balance.balance} Days</div>
                 <div className="text-sm">{balance.leave_type_name}</div>

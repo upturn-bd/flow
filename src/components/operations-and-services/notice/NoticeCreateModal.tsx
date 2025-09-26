@@ -202,7 +202,7 @@ export default function NoticeCreateModal({
           variant="primary"
           onClick={handleSubmit}
           isLoading={isLoading}
-          disabled={!isFormValid() || isLoading}
+          disabled={isLoading}
         >
           Create Notice
         </Button>

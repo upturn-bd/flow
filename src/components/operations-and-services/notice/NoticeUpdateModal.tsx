@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField } from '@/components/forms';
@@ -29,26 +31,27 @@ export default function NoticeUpdateModal({
 }: NoticeUpdateModalProps) {
   const [formData, setFormData] = useState<Notice>(initialData);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
-  const { items: departments, loading: departmentsLoading, fetchItems: fetchDepartments } = useDepartments();
-  const { items: noticeTypes, fetchItems: fetchNoticesTypes } = useNotices();
 
+  const { items: departments, fetchItems: fetchDepartments } = useDepartments();
+  const { items: noticeTypes, fetchItems: fetchNoticeTypes } = useNotices();
+
+  // Fetch once on mount
   useEffect(() => {
     fetchDepartments();
-    fetchNoticesTypes();
-  }, [fetchDepartments, fetchNoticesTypes]);
+    fetchNoticeTypes();
+  }, []);
 
+  // Set initial data once when modal opens
   useEffect(() => {
     setFormData(initialData);
-  }, [initialData]);
+  }, [initialData.id]); // Only update if a new notice is passed in
 
   const handleInputChange = (field: keyof Notice, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
-    
-    // Clear error when user starts typing
+
     if (errors[field]) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -59,7 +62,6 @@ export default function NoticeUpdateModal({
   };
 
   const handleSubmit = () => {
-    // Transform data for validation (convert empty strings to undefined for optional fields)
     const dataToValidate = {
       ...formData,
       notice_type_id: formData.notice_type_id || undefined,
@@ -91,11 +93,8 @@ export default function NoticeUpdateModal({
     return validation.success;
   };
 
-  const hasChanges = () => {
-    return JSON.stringify(formData) !== JSON.stringify(initialData);
-  };
+  const hasChanges = () => JSON.stringify(formData) !== JSON.stringify(initialData);
 
-  // Prepare options for selects
   const departmentOptions = departments.map((dept: any) => ({
     value: dept.id.toString(),
     label: dept.name

@@ -328,6 +328,8 @@ export interface LeaveTypeData {
   name: string;
   annual_quota: number;
   company_id?: number;
+  max_carryover?: number;
+  color?: string;
 }
 
 export function validateLeaveType(data: LeaveTypeData): ValidationResult<LeaveTypeData> {
@@ -355,6 +357,7 @@ export interface HolidayConfigData {
   start_day: string;
   end_day: string;
   company_id?: number;
+  max_carryover?: number;
 }
 
 export function validateHolidayConfig(data: HolidayConfigData): ValidationResult<HolidayConfigData> {
