@@ -246,6 +246,32 @@ export const MARITAL_STATUS = {
 export type MaritalStatus = typeof MARITAL_STATUS[keyof typeof MARITAL_STATUS];
 
 // ==============================================================================
+// Stakeholder Management Constants
+// ==============================================================================
+
+export const STAKEHOLDER_ISSUE_STATUS = {
+  OPEN: 'Open',
+  IN_PROGRESS: 'In Progress',
+  RESOLVED: 'Resolved',
+  CLOSED: 'Closed',
+} as const;
+
+export type StakeholderIssueStatus = typeof STAKEHOLDER_ISSUE_STATUS[keyof typeof STAKEHOLDER_ISSUE_STATUS];
+
+export const STAKEHOLDER_ISSUE_PRIORITY = {
+  LOW: 'Low',
+  MEDIUM: 'Medium',
+  HIGH: 'High',
+  CRITICAL: 'Critical',
+} as const;
+
+export type StakeholderIssuePriority = typeof STAKEHOLDER_ISSUE_PRIORITY[keyof typeof STAKEHOLDER_ISSUE_PRIORITY];
+
+// Options arrays for dropdowns
+export const STAKEHOLDER_ISSUE_STATUS_OPTIONS = Object.values(STAKEHOLDER_ISSUE_STATUS);
+export const STAKEHOLDER_ISSUE_PRIORITY_OPTIONS = Object.values(STAKEHOLDER_ISSUE_PRIORITY);
+
+// ==============================================================================
 // Blood Group Constants
 // ==============================================================================
 
