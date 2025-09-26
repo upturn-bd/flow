@@ -332,13 +332,123 @@ function StakeholderInfoTab({
   );
 }
 
-// Issues Tab Component (Placeholder for now)
+// Issues Tab Component
 function StakeholderIssuesTab({ stakeholderId }: { stakeholderId: number }) {
+  const { stakeholderIssues, fetchStakeholderIssues } = useStakeholders();
+  const [loading, setLoading] = useState(true);
+
+  // Get issues for this stakeholder
+  const stakeholderSpecificIssues = stakeholderIssues.filter(
+    issue => issue.stakeholder_id === stakeholderId
+  );
+
+  useEffect(() => {
+    fetchStakeholderIssues().finally(() => setLoading(false));
+  }, [fetchStakeholderIssues]);
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex items-center justify-center py-8">
+          <LoadingSpinner className="h-6 w-6 text-purple-600" />
+          <span className="ml-3 text-gray-600">Loading issues...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <p className="text-gray-500 text-center py-8">
-        Issues functionality will be implemented in the next phase.
-      </p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Issues ({stakeholderSpecificIssues.length})
+          </h3>
+          <button className="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+            <AlertTriangle className="h-4 w-4 mr-2" />
+            Report Issue
+          </button>
+        </div>
+
+        {/* Issues Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {['Open', 'In Progress', 'Resolved', 'Closed'].map((status) => {
+            const count = stakeholderSpecificIssues.filter(issue => issue.status === status).length;
+            const colors = {
+              'Open': 'bg-red-50 text-red-600',
+              'In Progress': 'bg-yellow-50 text-yellow-600', 
+              'Resolved': 'bg-green-50 text-green-600',
+              'Closed': 'bg-gray-50 text-gray-600'
+            };
+            
+            return (
+              <div key={status} className={`rounded-lg p-4 ${colors[status as keyof typeof colors]}`}>
+                <div className="text-center">
+                  <p className="text-2xl font-bold">{count}</p>
+                  <p className="text-sm font-medium">{status}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Issues List */}
+      <div className="bg-white rounded-lg border border-gray-200">
+        {stakeholderSpecificIssues.length > 0 ? (
+          <div className="divide-y divide-gray-200">
+            {stakeholderSpecificIssues.map((issue) => (
+              <div key={issue.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h4 className="font-medium text-gray-900">{issue.title}</h4>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        issue.status === 'Open' ? 'bg-red-100 text-red-800' :
+                        issue.status === 'In Progress' ? 'bg-yellow-100 text-yellow-800' :
+                        issue.status === 'Resolved' ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {issue.status}
+                      </span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        issue.priority === 'Critical' ? 'bg-red-100 text-red-800' :
+                        issue.priority === 'High' ? 'bg-orange-100 text-orange-800' :
+                        issue.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {issue.priority}
+                      </span>
+                    </div>
+                    {issue.description && (
+                      <p className="text-gray-600 text-sm mb-3">{issue.description}</p>
+                    )}
+                    <div className="flex items-center space-x-4 text-xs text-gray-500">
+                      <span>Created {new Date(issue.created_at || '').toLocaleDateString()}</span>
+                      {issue.resolved_at && (
+                        <span>Resolved {new Date(issue.resolved_at).toLocaleDateString()}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-12 text-center">
+            <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No issues reported</h3>
+            <p className="text-gray-600 mb-4">
+              This stakeholder has no reported issues at the moment.
+            </p>
+            <button className="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              Report First Issue
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
