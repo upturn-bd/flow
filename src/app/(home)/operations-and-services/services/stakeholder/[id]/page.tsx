@@ -15,7 +15,12 @@ import {
   AlertTriangle,
   DollarSign,
   Eye,
-  EyeOff
+  EyeOff,
+  X,
+  Calendar,
+  CreditCard,
+  FileText,
+  Building
 } from 'lucide-react';
 import { useStakeholders } from '@/hooks/useStakeholders';
 import { useEmployees } from '@/hooks/useEmployees';
@@ -23,8 +28,12 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useAuth } from '@/lib/auth/auth-context';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import TabView, { TabItem } from '@/components/ui/TabView';
+import { useFormState } from '@/hooks/useFormState';
 import { Stakeholder } from '@/lib/types/schemas';
 import { fadeInUp, staggerContainer } from '@/components/ui/animations';
+import BaseModal from '@/components/ui/modals/BaseModal';
+import FormInputField from '@/components/ui/FormInputField';
+import { createAccountNotification } from '@/lib/utils/notifications';
 
 export default function StakeholderDetailsPage() {
   const params = useParams();
@@ -154,6 +163,7 @@ export default function StakeholderDetailsPage() {
           stakeholderId={stakeholderId}
           transactions={stakeholderTransactions}
           assignedEmployees={assignedEmployeeDetails}
+          stakeholder={stakeholder}
         />
       ),
     },
@@ -333,56 +343,478 @@ function StakeholderIssuesTab({ stakeholderId }: { stakeholderId: number }) {
   );
 }
 
-// Transactions Tab Component (Placeholder for now)
+// Transactions Tab Component 
 function StakeholderTransactionsTab({ 
   stakeholderId, 
   transactions, 
-  assignedEmployees 
+  assignedEmployees,
+  stakeholder
 }: { 
   stakeholderId: number; 
   transactions: any[]; 
-  assignedEmployees: any[]; 
+  assignedEmployees: any[];
+  stakeholder: Stakeholder | null;
 }) {
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const { createAccount } = useAccounts();
+  const [creating, setCreating] = useState(false);
+
+  const handleCreateTransaction = async (transactionData: any) => {
+    setCreating(true);
+    try {
+      // Add stakeholder_id to additional_data
+      const accountData = {
+        ...transactionData,
+        additional_data: {
+          ...transactionData.additional_data,
+          stakeholder_id: stakeholderId
+        }
+      };
+
+      const newTransaction = await createAccount(accountData);
+      setShowCreateForm(false);
+      
+      // Send notifications to assigned employees
+      if (assignedEmployees.length > 0) {
+        const notificationPromises = assignedEmployees.map(async (employee) => {
+          try {
+            // Determine notification type based on amount
+            const isLargeTransaction = Math.abs(transactionData.amount) > 50000;
+            const notificationType = isLargeTransaction ? 'stakeholderLargeTransaction' : 'stakeholderTransaction';
+            
+            await createAccountNotification(
+              employee.id.toString(),
+              notificationType,
+              {
+                title: transactionData.title,
+                amount: transactionData.amount,
+                currency: transactionData.currency,
+                stakeholderName: stakeholder?.name || 'Unknown Stakeholder'
+              },
+              {
+                referenceId: newTransaction.id,
+                actionUrl: `/operations-and-services/services/stakeholder/${stakeholderId}?tab=transactions`
+              }
+            );
+          } catch (notificationError) {
+            console.warn(`Failed to send notification to ${employee.name}:`, notificationError);
+          }
+        });
+        
+        await Promise.all(notificationPromises);
+      }
+      
+    } catch (error) {
+      console.error('Failed to create transaction:', error);
+      throw error;
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">
-          Transactions ({transactions.length})
-        </h3>
-        {/* TODO: Add transaction creation button */}
-      </div>
-      {transactions.length > 0 ? (
-        <div className="space-y-4">
-          {transactions.map((transaction) => (
-            <div key={transaction.id} className="border border-gray-200 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-gray-900">{transaction.title}</h4>
-                  <p className="text-sm text-gray-600">
-                    {transaction.from_source} • {new Date(transaction.transaction_date).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className={`font-semibold ${transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {transaction.amount >= 0 ? '+' : ''}{transaction.amount.toLocaleString()} {transaction.currency}
-                  </p>
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                    transaction.status === 'Complete' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {transaction.status}
-                  </span>
-                </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Transactions ({transactions.length})
+          </h3>
+          <button
+            onClick={() => setShowCreateForm(true)}
+            className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+          >
+            <DollarSign className="h-4 w-4 mr-2" />
+            Add Transaction
+          </button>
+        </div>
+
+        {/* Transaction Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-green-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <DollarSign className="h-8 w-8 text-green-600" />
+              <div className="ml-3">
+                <p className="text-sm font-medium text-green-600">Total Income</p>
+                <p className="text-xl font-semibold text-green-900">
+                  {transactions
+                    .filter(t => t.amount > 0)
+                    .reduce((sum, t) => sum + t.amount, 0)
+                    .toLocaleString()} BDT
+                </p>
               </div>
             </div>
-          ))}
+          </div>
+          
+          <div className="bg-red-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <DollarSign className="h-8 w-8 text-red-600" />
+              <div className="ml-3">
+                <p className="text-sm font-medium text-red-600">Total Expenses</p>
+                <p className="text-xl font-semibold text-red-900">
+                  {Math.abs(transactions
+                    .filter(t => t.amount < 0)
+                    .reduce((sum, t) => sum + t.amount, 0))
+                    .toLocaleString()} BDT
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-blue-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <DollarSign className="h-8 w-8 text-blue-600" />
+              <div className="ml-3">
+                <p className="text-sm font-medium text-blue-600">Net Balance</p>
+                <p className="text-xl font-semibold text-blue-900">
+                  {transactions
+                    .reduce((sum, t) => sum + t.amount, 0)
+                    .toLocaleString()} BDT
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      ) : (
-        <p className="text-gray-500 text-center py-8">
-          No transactions found for this stakeholder.
-        </p>
+      </div>
+
+      {/* Transactions List */}
+      <div className="bg-white rounded-lg border border-gray-200">
+        {transactions.length > 0 ? (
+          <div className="divide-y divide-gray-200">
+            {transactions.map((transaction) => (
+              <div key={transaction.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h4 className="font-medium text-gray-900">{transaction.title}</h4>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        transaction.status === 'Complete' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {transaction.status}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <span>{transaction.from_source}</span>
+                      <span>•</span>
+                      <span>{new Date(transaction.transaction_date).toLocaleDateString()}</span>
+                      {transaction.method && (
+                        <>
+                          <span>•</span>
+                          <span>{transaction.method}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-lg font-semibold ${
+                      transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {transaction.amount >= 0 ? '+' : ''}{transaction.amount.toLocaleString()} {transaction.currency}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Added {new Date(transaction.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-12 text-center">
+            <DollarSign className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No transactions yet</h3>
+            <p className="text-gray-600 mb-4">
+              Start tracking financial transactions for this stakeholder.
+            </p>
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+            >
+              <DollarSign className="h-4 w-4 mr-2" />
+              Add First Transaction
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Transaction Form Modal */}
+      {showCreateForm && (
+        <StakeholderTransactionForm
+          isOpen={showCreateForm}
+          onClose={() => setShowCreateForm(false)}
+          onSubmit={handleCreateTransaction}
+          stakeholderId={stakeholderId}
+          assignedEmployees={assignedEmployees}
+          isSubmitting={creating}
+        />
       )}
     </div>
+  );
+}
+// Stakeholder Transaction Form Component
+interface StakeholderTransactionFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: any) => Promise<void>;
+  stakeholderId: number;
+  assignedEmployees: any[];
+  isSubmitting: boolean;
+}
+
+function StakeholderTransactionForm({
+  isOpen,
+  onClose,
+  onSubmit,
+  stakeholderId,
+  assignedEmployees,
+  isSubmitting
+}: StakeholderTransactionFormProps) {
+  const {
+    formValues,
+    errors,
+    touched,
+    handleChange,
+    resetForm,
+    isValid
+  } = useFormState({
+    initialData: {
+      title: '',
+      method: '',
+      status: 'Pending',
+      from_source: '',
+      transaction_date: new Date().toISOString().split('T')[0],
+      amount: '',
+      currency: 'BDT'
+    },
+    validateFn: (data) => {
+      const errors = [];
+      
+      if (!data.title.trim()) {
+        errors.push({ field: 'title', message: 'Title is required' });
+      }
+      
+      if (!data.from_source.trim()) {
+        errors.push({ field: 'from_source', message: 'Source is required' });
+      }
+      
+      if (!data.amount || isNaN(Number(data.amount))) {
+        errors.push({ field: 'amount', message: 'Valid amount is required' });
+      }
+      
+      if (!data.transaction_date) {
+        errors.push({ field: 'transaction_date', message: 'Transaction date is required' });
+      }
+      
+      return {
+        success: errors.length === 0,
+        errors
+      };
+    },
+    validationErrorsToObject: (errors: any[]) => {
+      return errors.reduce((acc, error) => {
+        acc[error.field] = error.message;
+        return acc;
+      }, {});
+    }
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isValid) return;
+    
+    const transactionData = {
+      ...formValues,
+      amount: Number(formValues.amount),
+      additional_data: {
+        stakeholder_id: stakeholderId,
+        assigned_employees: assignedEmployees.map(emp => emp.id)
+      }
+    };
+    
+    await onSubmit(transactionData);
+    resetForm();
+  };
+
+  const paymentMethods = [
+    { value: 'Cash', label: 'Cash' },
+    { value: 'Bank', label: 'Bank Transfer' },
+    { value: 'Check', label: 'Check' },
+    { value: 'Card', label: 'Card Payment' },
+    { value: 'Mobile Banking', label: 'Mobile Banking' },
+  ];
+
+  const statusOptions = [
+    { value: 'Pending', label: 'Pending' },
+    { value: 'Complete', label: 'Complete' },
+  ];
+
+  return (
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Add Transaction"
+      size="lg"
+    >
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-4">
+          <FormInputField
+            name="title"
+            label="Transaction Title"
+            icon={<FileText size={18} />}
+            value={formValues.title}
+            onChange={handleChange}
+            error={touched.title ? errors.title : undefined}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Payment Method
+              </label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <CreditCard size={18} />
+                </div>
+                <select
+                  name="method"
+                  value={formValues.method}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-[#EAF4FF] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Select payment method</option>
+                  {paymentMethods.map(method => (
+                    <option key={method.value} value={method.value}>
+                      {method.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Status
+              </label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <AlertTriangle size={18} />
+                </div>
+                <select
+                  name="status"
+                  value={formValues.status}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-[#EAF4FF] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  {statusOptions.map(status => (
+                    <option key={status.value} value={status.value}>
+                      {status.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <FormInputField
+            name="from_source"
+            label="Source/Description"
+            icon={<Building size={18} />}
+            value={formValues.from_source}
+            onChange={handleChange}
+            error={touched.from_source ? errors.from_source : undefined}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInputField
+              name="transaction_date"
+              label="Transaction Date"
+              icon={<Calendar size={18} />}
+              type="date"
+              value={formValues.transaction_date}
+              onChange={handleChange}
+              error={touched.transaction_date ? errors.transaction_date : undefined}
+            />
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Amount <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <DollarSign size={18} />
+                </div>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="amount"
+                  value={formValues.amount}
+                  onChange={handleChange}
+                  className={`w-full pl-10 pr-16 py-2 border rounded-lg bg-[#EAF4FF] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    touched.amount && errors.amount
+                      ? 'border-red-300'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="0.00"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <span className="text-gray-500 text-sm">{formValues.currency}</span>
+                </div>
+              </div>
+              {touched.amount && errors.amount && (
+                <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
+              )}
+              <p className="mt-1 text-xs text-gray-500">
+                Use negative values for expenses (e.g., -1000 for a payment made)
+              </p>
+            </div>
+          </div>
+
+          {assignedEmployees.length > 0 && (
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">
+                Notification Recipients
+              </h4>
+              <p className="text-sm text-gray-600 mb-3">
+                The following assigned employees will be notified about this transaction:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {assignedEmployees.map((employee) => (
+                  <span
+                    key={employee.id}
+                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                  >
+                    {employee.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={!isValid || isSubmitting}
+            className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${
+              !isValid || isSubmitting
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700'
+            }`}
+          >
+            {isSubmitting ? 'Adding...' : 'Add Transaction'}
+          </button>
+        </div>
+      </form>
+    </BaseModal>
   );
 }
