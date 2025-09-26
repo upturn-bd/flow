@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import BaseModal from '@/components/ui/modals/BaseModal';
 import { useFormState } from '@/hooks/useFormState';
 import { useStakeholders } from '@/hooks/useStakeholders';
+import { useEmployees } from '@/hooks/useEmployees';
+import SingleEmployeeSelector from '@/components/forms/SingleEmployeeSelector';
 import { Stakeholder, StakeholderIssueStatus, StakeholderIssuePriority } from '@/lib/types/schemas';
 import { 
   STAKEHOLDER_ISSUE_STATUS_OPTIONS, 
@@ -25,8 +27,16 @@ export default function StakeholderIssueForm({
   onSuccess 
 }: StakeholderIssueFormProps) {
   const { createStakeholderIssue } = useStakeholders();
+  const { employees, fetchEmployees } = useEmployees();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Load employees when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchEmployees();
+    }
+  }, [isOpen, fetchEmployees]);
 
   const {
     formValues,
@@ -52,7 +62,7 @@ export default function StakeholderIssueForm({
         ...data,
         stakeholder_id: data.stakeholder_id ? Number(data.stakeholder_id) : undefined,
         transaction_id: data.transaction_id ? Number(data.transaction_id) : undefined,
-        assigned_to: data.assigned_to ? Number(data.assigned_to) : undefined,
+        assigned_to: data.assigned_to || undefined,
       };
       
       const validationErrors = validateStakeholderIssue(formattedData);
@@ -77,7 +87,7 @@ export default function StakeholderIssueForm({
         description: formValues.description || undefined,
         status: formValues.status,
         priority: formValues.priority,
-        assigned_to: formValues.assigned_to ? Number(formValues.assigned_to) : undefined,
+        assigned_to: formValues.assigned_to || undefined,
       };
 
       const result = await createStakeholderIssue(formattedData);
@@ -266,30 +276,22 @@ export default function StakeholderIssueForm({
             </p>
           </div>
 
-          <div>
-            <label htmlFor="assigned_to" className="block text-sm font-medium text-gray-700 mb-1">
-              Assign To
-            </label>
-            <input
-              type="number"
-              id="assigned_to"
-              name="assigned_to"
-              value={formValues.assigned_to}
-              onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.assigned_to && touched.assigned_to
-                  ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                  : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
-              }`}
-              placeholder="Enter employee ID to assign this issue"
-            />
-            {errors.assigned_to && touched.assigned_to && (
-              <p className="mt-1 text-sm text-red-600">{errors.assigned_to}</p>
-            )}
-            <p className="mt-1 text-xs text-gray-500">
-              Optional: Employee ID responsible for resolving this issue
-            </p>
-          </div>
+          <SingleEmployeeSelector
+            value={formValues.assigned_to}
+            onChange={(employeeId) => {
+              const syntheticEvent = {
+                target: {
+                  name: 'assigned_to',
+                  value: employeeId
+                }
+              } as any;
+              handleChange(syntheticEvent);
+            }}
+            employees={employees}
+            label="Assign To"
+            error={errors.assigned_to && touched.assigned_to ? errors.assigned_to : undefined}
+            placeholder="Search and select employee to assign (optional)..."
+          />
         </div>
         </div>
 

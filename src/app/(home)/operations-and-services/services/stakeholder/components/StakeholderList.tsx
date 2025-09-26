@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Building2, Mail, Phone, MapPin, Users, Filter, Search } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -19,6 +20,7 @@ export default function StakeholderList({
   loading, 
   error 
 }: StakeholderListProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<number | null>(null);
 
@@ -173,7 +175,10 @@ export default function StakeholderList({
                   <span className="text-xs text-gray-500">
                     Added {new Date(stakeholder.created_at || '').toLocaleDateString()}
                   </span>
-                  <button className="text-purple-600 hover:text-purple-800 text-sm font-medium">
+                  <button 
+                    onClick={() => router.push(`/operations-and-services/services/stakeholder/${stakeholder.id}`)}
+                    className="text-purple-600 hover:text-purple-800 text-sm font-medium"
+                  >
                     View Details
                   </button>
                 </div>

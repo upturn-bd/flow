@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Plus, Trash2 } from 'lucide-react';
 import BaseModal from '@/components/ui/modals/BaseModal';
 import { useFormState } from '@/hooks/useFormState';
 import { useStakeholders } from '@/hooks/useStakeholders';
+import { useEmployees } from '@/hooks/useEmployees';
+import AssigneeField from '@/components/forms/AssigneeField';
+import SingleEmployeeSelector from '@/components/forms/SingleEmployeeSelector';
 import { StakeholderType } from '@/lib/types/schemas';
 import { validateStakeholder, validationErrorsToObject } from '@/lib/validation/schemas/stakeholders';
 
@@ -31,11 +34,19 @@ export default function StakeholderForm({
   onSuccess 
 }: StakeholderFormProps) {
   const { createStakeholder } = useStakeholders();
+  const { employees, fetchEmployees } = useEmployees();
   const [contacts, setContacts] = useState<ContactFormData[]>([
     { name: '', role: '', phone: '', email: '', address: '' }
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Load employees when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchEmployees();
+    }
+  }, [isOpen, fetchEmployees]);
 
   const {
     formValues,
@@ -58,7 +69,7 @@ export default function StakeholderForm({
       const formattedData = {
         ...data,
         stakeholder_type_id: data.stakeholder_type_id ? Number(data.stakeholder_type_id) : undefined,
-        manager_id: data.manager_id ? Number(data.manager_id) : undefined,
+        manager_id: data.manager_id || undefined, // Keep as string (UUID)
         contact_details: {
           contacts: contacts.filter(contact => 
             contact.name.trim() || contact.email.trim() || contact.phone.trim()
@@ -91,7 +102,7 @@ export default function StakeholderForm({
       const formattedData = {
         ...formValues,
         stakeholder_type_id: formValues.stakeholder_type_id ? Number(formValues.stakeholder_type_id) : undefined,
-        manager_id: formValues.manager_id ? Number(formValues.manager_id) : undefined,
+        manager_id: formValues.manager_id || undefined, // Keep as string (UUID)
         contact_details: {
           contacts: contacts.filter(contact => 
             contact.name.trim() || contact.email.trim() || contact.phone.trim()
@@ -110,17 +121,6 @@ export default function StakeholderForm({
     },
     [formValues, contacts, createStakeholder, onSuccess]
   );
-
-  const handleAssignedEmployeesChange = (value: string) => {
-    const employees = value.split(',').map(emp => emp.trim()).filter(emp => emp);
-    const syntheticEvent = {
-      target: {
-        name: 'assigned_employees',
-        value: employees
-      }
-    } as any; // Type assertion to bypass the type check
-    handleChange(syntheticEvent);
-  };
 
   const addContact = () => {
     setContacts([...contacts, { name: '', role: '', phone: '', email: '', address: '' }]);
@@ -206,6 +206,23 @@ export default function StakeholderForm({
             )}
           </div>
 
+          <SingleEmployeeSelector
+            value={formValues.manager_id}
+            onChange={(managerId) => {
+              const syntheticEvent = {
+                target: {
+                  name: 'manager_id',
+                  value: managerId
+                }
+              } as any;
+              handleChange(syntheticEvent);
+            }}
+            employees={employees}
+            label="Manager"
+            error={errors.manager_id && touched.manager_id ? errors.manager_id : undefined}
+            placeholder="Search and select manager (optional)..."
+          />
+
           <div>
             <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
               Address
@@ -228,23 +245,23 @@ export default function StakeholderForm({
             )}
           </div>
 
-          <div>
-            <label htmlFor="assigned_employees" className="block text-sm font-medium text-gray-700 mb-1">
-              Assigned Employees
-            </label>
-            <input
-              type="text"
-              id="assigned_employees"
-              name="assigned_employees"
-              value={formValues.assigned_employees.join(', ')}
-              onChange={(e) => handleAssignedEmployeesChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-              placeholder="Enter employee IDs separated by commas (e.g., EMP001, EMP002)"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Enter employee IDs separated by commas
-            </p>
-          </div>
+          {/* Assigned Employees */}
+          <AssigneeField
+            value={formValues.assigned_employees}
+            onChange={(assignees) => {
+              const syntheticEvent = {
+                target: {
+                  name: 'assigned_employees',
+                  value: assignees
+                }
+              } as any;
+              handleChange(syntheticEvent);
+            }}
+            employees={employees}
+            label="Assigned Employees"
+            error={errors.assigned_employees && touched.assigned_employees ? errors.assigned_employees : undefined}
+            placeholder="Search and select employees to assign..."
+          />
         </div>
 
         {/* Contact Information */}

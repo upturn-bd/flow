@@ -16,7 +16,7 @@ export interface StakeholderFormData {
   name: string;
   address?: string;
   stakeholder_type_id?: number;
-  manager_id?: number;
+  manager_id?: string; // Employee ID (UUID)
   contact_details?: {
     contacts: Array<{
       name: string;
@@ -36,7 +36,7 @@ export interface StakeholderIssueFormData {
   description?: string;
   status: StakeholderIssueStatus;
   priority: StakeholderIssuePriority;
-  assigned_to?: number;
+  assigned_to?: string; // Employee ID (UUID)
 }
 
 export function useStakeholders() {
@@ -90,7 +90,13 @@ export function useStakeholders() {
         .from("stakeholders")
         .select(`
           *,
-          stakeholder_type:stakeholder_types(*)
+          stakeholder_type:stakeholder_types(*),
+          manager:employees!stakeholders_manager_id_fkey(
+            id,
+            first_name,
+            last_name,
+            email
+          )
         `)
         .eq("company_id", company_id)
         .order("created_at", { ascending: false });
@@ -100,12 +106,79 @@ export function useStakeholders() {
         throw error;
       }
 
-      setStakeholders(data || []);
-      return data;
+      // Transform the data to match interface
+      const transformedData = data?.map(item => ({
+        ...item,
+        manager: item.manager ? {
+          id: item.manager.id,
+          name: `${item.manager.first_name} ${item.manager.last_name}`,
+          email: item.manager.email
+        } : undefined
+      })) || [];
+
+      setStakeholders(transformedData);
+      return transformedData;
     } catch (error) {
       console.error("Error fetching stakeholders:", error);
       setError("Failed to fetch stakeholders");
       return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Fetch single stakeholder by ID
+  const fetchStakeholderById = useCallback(async (stakeholderId: number) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("stakeholders")
+        .select(`
+          *,
+          stakeholder_type:stakeholder_types(*),
+          manager:employees!stakeholders_manager_id_fkey(
+            id,
+            first_name,
+            last_name,
+            email
+          )
+        `)
+        .eq("company_id", company_id)
+        .eq("id", stakeholderId)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          setError("Stakeholder not found");
+        } else {
+          setError("Failed to fetch stakeholder");
+        }
+        throw error;
+      }
+
+      // Transform the data to match interface
+      const transformedData = {
+        ...data,
+        manager: data.manager ? {
+          id: data.manager.id,
+          name: `${data.manager.first_name} ${data.manager.last_name}`,
+          email: data.manager.email
+        } : undefined
+      };
+
+      return transformedData;
+    } catch (error) {
+      console.error("Error fetching stakeholder:", error);
+      if (error instanceof Error && error.message.includes('PGRST116')) {
+        setError("Stakeholder not found");
+      } else {
+        setError("Failed to fetch stakeholder");
+      }
+      return null;
     } finally {
       setLoading(false);
     }
@@ -186,31 +259,29 @@ export function useStakeholders() {
       // Update local state
       setStakeholders(prev => [data, ...prev]);
       
-      // Send notification for stakeholder creation
-      try {
-        const user = await getEmployeeInfo();
-        const recipients = stakeholderData.assigned_employees || [];
-        if (stakeholderData.manager_id) {
-          recipients.push(stakeholderData.manager_id.toString());
-        }
+        // Send notification for stakeholder creation
+        try {
+          const user = await getEmployeeInfo();
+          const recipients = stakeholderData.assigned_employees || [];
+          if (stakeholderData.manager_id) {
+            recipients.push(stakeholderData.manager_id);
+          }
 
-        if (recipients.length > 0) {
-          await createNotification({
-            title: 'New Stakeholder Added',
-            message: `A new stakeholder "${data.name}" has been added to the system.`,
-            priority: 'normal',
-            type_id: 6,
-            recipient_id: recipients,
-            action_url: '/operations-and-services/services/stakeholder',
-            company_id: user.company_id,
-            department_id: user.department_id
-          });
-        }
-      } catch (notificationError) {
-        console.warn("Failed to send notification:", notificationError);
-      }
-
-      return { success: true, data };
+          if (recipients.length > 0) {
+            await createNotification({
+              title: 'New Stakeholder Added',
+              message: `A new stakeholder "${data.name}" has been added to the system.`,
+              priority: 'normal',
+              type_id: 6,
+              recipient_id: recipients,
+              action_url: '/operations-and-services/services/stakeholder',
+              company_id: user.company_id,
+              department_id: user.department_id
+            });
+          }
+        } catch (notificationError) {
+          console.warn("Failed to send notification:", notificationError);
+        }      return { success: true, data };
     } catch (error) {
       const errorMessage = "Failed to create stakeholder";
       setError(errorMessage);
@@ -405,6 +476,7 @@ export function useStakeholders() {
     
     // Actions
     fetchStakeholders,
+    fetchStakeholderById,
     fetchStakeholderTypes,
     fetchStakeholderIssues,
     createStakeholder,

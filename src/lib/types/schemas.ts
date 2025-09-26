@@ -470,7 +470,7 @@ export interface Stakeholder {
   name: string;
   address?: string;
   stakeholder_type_id?: number;
-  manager_id?: number; // Employee ID who manages this stakeholder
+  manager_id?: string; // Employee ID (UUID) who manages this stakeholder
   contact_details?: {
     contacts: StakeholderContact[];
   };
@@ -482,6 +482,11 @@ export interface Stakeholder {
   updated_by?: string;
   // Joined data
   stakeholder_type?: StakeholderType;
+  manager?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
 }
 
 export type StakeholderIssueStatus = 'Open' | 'In Progress' | 'Resolved' | 'Closed';
@@ -495,7 +500,7 @@ export interface StakeholderIssue {
   description?: string;
   status: StakeholderIssueStatus;
   priority: StakeholderIssuePriority;
-  assigned_to?: number; // Employee ID responsible for resolving
+  assigned_to?: string; // Employee ID (UUID) responsible for resolving
   company_id: number;
   created_at?: string;
   updated_at?: string;
