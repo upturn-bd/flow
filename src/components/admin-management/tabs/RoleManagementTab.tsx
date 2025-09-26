@@ -10,7 +10,7 @@ import {
   ChevronRight,
   AlertTriangle 
 } from "lucide-react";
-import { useEmployees, ExtendedEmployee, EmployeeSearchResult } from "@/hooks/useEmployees";
+import { useEmployees, ExtendedEmployee } from "@/hooks/useEmployees";
 import { USER_ROLES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import FormInputField from "@/components/ui/FormInputField";
