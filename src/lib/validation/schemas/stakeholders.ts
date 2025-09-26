@@ -149,8 +149,8 @@ export function validateStakeholderIssue(data: any): ValidationError[] {
     });
   }
 
-  // Assigned to validation (optional)
-  if (data.assigned_to && (!Number.isInteger(data.assigned_to) || data.assigned_to <= 0)) {
+  // Assigned to validation (optional) - should be a valid UUID string
+  if (data.assigned_to && (typeof data.assigned_to !== 'string' || data.assigned_to.trim().length === 0)) {
     errors.push({ field: 'assigned_to', message: 'Valid assignee is required' });
   }
 

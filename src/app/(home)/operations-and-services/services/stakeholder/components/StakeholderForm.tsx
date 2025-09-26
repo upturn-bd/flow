@@ -8,6 +8,7 @@ import { useFormState } from '@/hooks/useFormState';
 import { useStakeholders } from '@/hooks/useStakeholders';
 import { useEmployees } from '@/hooks/useEmployees';
 import AssigneeField from '@/components/forms/AssigneeField';
+import SingleEmployeeSelector from '@/components/forms/SingleEmployeeSelector';
 import { StakeholderType } from '@/lib/types/schemas';
 import { validateStakeholder, validationErrorsToObject } from '@/lib/validation/schemas/stakeholders';
 
@@ -68,7 +69,7 @@ export default function StakeholderForm({
       const formattedData = {
         ...data,
         stakeholder_type_id: data.stakeholder_type_id ? Number(data.stakeholder_type_id) : undefined,
-        manager_id: data.manager_id ? Number(data.manager_id) : undefined,
+        manager_id: data.manager_id || undefined, // Keep as string (UUID)
         contact_details: {
           contacts: contacts.filter(contact => 
             contact.name.trim() || contact.email.trim() || contact.phone.trim()
@@ -101,7 +102,7 @@ export default function StakeholderForm({
       const formattedData = {
         ...formValues,
         stakeholder_type_id: formValues.stakeholder_type_id ? Number(formValues.stakeholder_type_id) : undefined,
-        manager_id: formValues.manager_id ? Number(formValues.manager_id) : undefined,
+        manager_id: formValues.manager_id || undefined, // Keep as string (UUID)
         contact_details: {
           contacts: contacts.filter(contact => 
             contact.name.trim() || contact.email.trim() || contact.phone.trim()
@@ -204,6 +205,23 @@ export default function StakeholderForm({
               <p className="mt-1 text-sm text-red-600">{errors.stakeholder_type_id}</p>
             )}
           </div>
+
+          <SingleEmployeeSelector
+            value={formValues.manager_id}
+            onChange={(managerId) => {
+              const syntheticEvent = {
+                target: {
+                  name: 'manager_id',
+                  value: managerId
+                }
+              } as any;
+              handleChange(syntheticEvent);
+            }}
+            employees={employees}
+            label="Manager"
+            error={errors.manager_id && touched.manager_id ? errors.manager_id : undefined}
+            placeholder="Search and select manager (optional)..."
+          />
 
           <div>
             <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">

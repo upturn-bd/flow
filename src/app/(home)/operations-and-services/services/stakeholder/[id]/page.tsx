@@ -45,33 +45,43 @@ export default function StakeholderDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { fetchStakeholders, stakeholders } = useStakeholders();
+  const { fetchStakeholderById, error: stakeholderError } = useStakeholders();
   const { employees, fetchEmployees } = useEmployees();
   const { accounts, fetchAccounts } = useAccounts();
   const { user, employeeInfo } = useAuth();
 
-  // Find stakeholder from existing data or fetch if needed
+  // Fetch individual stakeholder
   useEffect(() => {
-    const existingStakeholder = stakeholders.find(s => s.id === stakeholderId);
-    if (existingStakeholder) {
-      setStakeholder(existingStakeholder);
-      setLoading(false);
-    } else {
-      // Need to fetch stakeholders if not already loaded
-      fetchStakeholders().then(() => {
-        const foundStakeholder = stakeholders.find(s => s.id === stakeholderId);
+    const loadStakeholder = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const foundStakeholder = await fetchStakeholderById(stakeholderId);
         if (foundStakeholder) {
           setStakeholder(foundStakeholder);
         } else {
           setError('Stakeholder not found');
         }
-        setLoading(false);
-      }).catch((err) => {
+      } catch (err) {
         setError('Failed to load stakeholder');
+        console.error('Error loading stakeholder:', err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    if (stakeholderId) {
+      loadStakeholder();
     }
-  }, [stakeholderId, stakeholders, fetchStakeholders]);
+  }, [stakeholderId, fetchStakeholderById]);
+
+  // Update error state from hook
+  useEffect(() => {
+    if (stakeholderError) {
+      setError(stakeholderError);
+    }
+  }, [stakeholderError]);
 
   // Load related data
   useEffect(() => {
@@ -265,6 +275,20 @@ function StakeholderInfoTab({
                 {stakeholder.stakeholder_type?.name || 'Not specified'}
               </p>
             </div>
+            {stakeholder.manager && (
+              <div>
+                <label className="text-sm font-medium text-gray-500">Manager</label>
+                <div className="flex items-center mt-1">
+                  <Users className="h-4 w-4 text-gray-400 mr-2" />
+                  <div>
+                    <p className="text-gray-900 font-medium">{stakeholder.manager.name}</p>
+                    {stakeholder.manager.email && (
+                      <p className="text-sm text-gray-600">{stakeholder.manager.email}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
