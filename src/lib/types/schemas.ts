@@ -348,7 +348,6 @@ export interface Position {
 export interface Grade {
   id?: number;
   name: string;
-  basic_salary?: number; // Deprecated - salary moved to employees table
   company_id?: number;
 }
 
