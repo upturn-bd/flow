@@ -281,7 +281,7 @@ function AdminManagementContent() {
           }`}
         >
           <CreditCard size={16} />
-          Accounts
+          Transactions
         </button>
         <button
           onClick={() => handleTabChange('salaries')}
@@ -292,7 +292,7 @@ function AdminManagementContent() {
           }`}
         >
           <DollarSign size={16} />
-          Salaries
+          Payroll
         </button>
         <button
           onClick={() => handleTabChange('roles')}
