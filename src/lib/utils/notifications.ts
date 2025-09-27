@@ -168,6 +168,12 @@ export const NotificationTemplates = {
       context: "account",
       priority: "normal" as const,
     }),
+    stakeholderTransaction: (title: string, amount: number, currency: string, stakeholderName: string) => ({
+      title: "Stakeholder Transaction Created",
+      message: `A new transaction "${title}" for ${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency} has been created for stakeholder "${stakeholderName}"`,
+      context: "stakeholder_account",
+      priority: "normal" as const,
+    }),
     payrollLogged: (employeeName: string, amount: number, date: string) => ({
       title: "Payroll Logged to Accounts",
       message: `Payroll payment for ${employeeName} (৳${Math.abs(amount).toLocaleString()}) has been automatically logged to accounts for ${date}`,
@@ -178,6 +184,12 @@ export const NotificationTemplates = {
       title: "Large Transaction Alert",
       message: `A large transaction "${title}" for ${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency} requires attention`,
       context: "account", 
+      priority: "high" as const,
+    }),
+    stakeholderLargeTransaction: (title: string, amount: number, currency: string, stakeholderName: string) => ({
+      title: "Large Stakeholder Transaction Alert",
+      message: `A large transaction "${title}" for ${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency} requires attention for stakeholder "${stakeholderName}"`,
+      context: "stakeholder_account",
       priority: "high" as const,
     }),
     statusChanged: (title: string, oldStatus: string, newStatus: string) => ({
@@ -413,7 +425,7 @@ export const createPayrollNotification = async (
 // Account notification helper
 export const createAccountNotification = async (
   recipientId: string,
-  type: 'transactionCreated' | 'payrollLogged' | 'largeTransaction' | 'statusChanged',
+  type: 'transactionCreated' | 'payrollLogged' | 'largeTransaction' | 'statusChanged' | 'stakeholderTransaction' | 'stakeholderLargeTransaction',
   data: any,
   options: { referenceId?: number; actionUrl?: string } = {}
 ) => {
@@ -423,11 +435,17 @@ export const createAccountNotification = async (
     case 'transactionCreated':
       template = NotificationTemplates.account.transactionCreated(data.title, data.amount, data.currency);
       break;
+    case 'stakeholderTransaction':
+      template = NotificationTemplates.account.stakeholderTransaction(data.title, data.amount, data.currency, data.stakeholderName);
+      break;
     case 'payrollLogged':
       template = NotificationTemplates.account.payrollLogged(data.employeeName, data.amount, data.date);
       break;
     case 'largeTransaction':
       template = NotificationTemplates.account.largeTransaction(data.title, data.amount, data.currency);
+      break;
+    case 'stakeholderLargeTransaction':
+      template = NotificationTemplates.account.stakeholderLargeTransaction(data.title, data.amount, data.currency, data.stakeholderName);
       break;
     case 'statusChanged':
       template = NotificationTemplates.account.statusChanged(data.title, data.oldStatus, data.newStatus);

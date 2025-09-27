@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building, Settings, ChevronRight, ChevronLeft, LoaderCircle, CheckCircle2, XCircle, CreditCard, DollarSign } from "lucide-react";
+import { Building, Settings, ChevronRight, ChevronLeft, LoaderCircle, CheckCircle2, XCircle, CreditCard, DollarSign, Shield } from "lucide-react";
 import { staggerContainer } from "@/components/ui/animations";
 
 // Import context
@@ -15,6 +15,7 @@ import SetupStep2 from "@/components/admin-management/setup/SetupStep2";
 import BasicTab from "@/components/admin-management/tabs/BasicTab";
 import AdvancedTab from "@/components/admin-management/tabs/AdvancedTab";
 import AccountsTab from "@/components/admin-management/tabs/AccountsTab";
+import RoleManagementTab from "@/components/admin-management/tabs/RoleManagementTab";
 import { EmployeeSalaryList } from "@/components/admin-management/salary/SalaryManagement";
 
 // Main content component that uses the context
@@ -281,18 +282,29 @@ function AdminManagementContent() {
           }`}
         >
           <CreditCard size={16} />
-          Accounts
+          Transactions
         </button>
         <button
           onClick={() => handleTabChange('salaries')}
-          className={`px-6 py-3 font-medium text-sm rounded-tr-xl transition-colors duration-200 flex items-center gap-2 ${
+          className={`px-6 py-3 font-medium text-sm transition-colors duration-200 flex items-center gap-2 ${
             currentTab === 'salaries'
               ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
           }`}
         >
           <DollarSign size={16} />
-          Salaries
+          Payroll
+        </button>
+        <button
+          onClick={() => handleTabChange('roles')}
+          className={`px-6 py-3 font-medium text-sm rounded-tr-xl transition-colors duration-200 flex items-center gap-2 ${
+            currentTab === 'roles'
+              ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+          }`}
+        >
+          <Shield size={16} />
+          Roles
         </button>
       </motion.div>
 
@@ -337,6 +349,16 @@ function AdminManagementContent() {
             transition={{ duration: 0.3 }}
           >
             <EmployeeSalaryList />
+          </motion.div>
+        ) : currentTab === 'roles' ? (
+          <motion.div
+            key="roles"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <RoleManagementTab />
           </motion.div>
         ) : null}
       </AnimatePresence>
