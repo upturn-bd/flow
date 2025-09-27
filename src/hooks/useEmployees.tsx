@@ -19,9 +19,23 @@ export interface ExtendedEmployee extends Employee {
   basic_salary?: number;
 }
 
+export interface EmployeeSearchOptions {
+  searchQuery?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface EmployeeSearchResult {
+  employees: ExtendedEmployee[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+}
+
 export function useEmployees() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [extendedEmployees, setExtendedEmployees] = useState<ExtendedEmployee[]>([]);
+  const [searchResult, setSearchResult] = useState<EmployeeSearchResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -93,12 +107,109 @@ export function useEmployees() {
     }
   }, []);
 
+  // New method for role management with pagination and search
+  const searchEmployeesForRoleManagement = useCallback(async (options: EmployeeSearchOptions = {}) => {
+    const { searchQuery = "", page = 1, pageSize = 25 } = options;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const company_id = await getCompanyId();
+      
+      // Build query
+      let query = supabase
+        .from("employees")
+        .select("id, first_name, last_name, email, role", { count: 'exact' })
+        .eq("company_id", company_id);
+      
+      // Add search filter if provided
+      if (searchQuery.trim()) {
+        const searchTerm = `%${searchQuery.trim()}%`;
+        query = query.or(`first_name.ilike.${searchTerm},last_name.ilike.${searchTerm},email.ilike.${searchTerm}`);
+      }
+      
+      // Add pagination
+      const startIndex = (page - 1) * pageSize;
+      query = query.range(startIndex, startIndex + pageSize - 1);
+      
+      // Order by name for consistent results
+      query = query.order('first_name').order('last_name');
+      
+      const { data, error, count } = await query;
+      
+      if (error) throw error;
+      
+      const employees: ExtendedEmployee[] = data?.map((employee) => ({
+        id: employee.id,
+        name: `${employee.first_name} ${employee.last_name}`,
+        email: employee.email,
+        role: employee.role,
+      })) || [];
+      
+      const totalCount = count || 0;
+      const totalPages = Math.ceil(totalCount / pageSize);
+      
+      const result: EmployeeSearchResult = {
+        employees,
+        totalCount,
+        totalPages,
+        currentPage: page,
+      };
+      
+      setSearchResult(result);
+      return result;
+    } catch (err) {
+      const errorObj = err instanceof Error ? err : new Error(String(err));
+      setError(errorObj);
+      console.error("Error searching employees for role management:", errorObj);
+      return {
+        employees: [],
+        totalCount: 0,
+        totalPages: 0,
+        currentPage: page,
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Method to update employee role
+  const updateEmployeeRole = useCallback(async (employeeId: string, newRole: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const company_id = await getCompanyId();
+      
+      const { error } = await supabase
+        .from("employees")
+        .update({ role: newRole })
+        .eq("id", employeeId)
+        .eq("company_id", company_id);
+      
+      if (error) throw error;
+      
+      return true;
+    } catch (err) {
+      const errorObj = err instanceof Error ? err : new Error(String(err));
+      setError(errorObj);
+      console.error("Error updating employee role:", errorObj);
+      throw errorObj;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return useMemo(() => ({
     employees,
     extendedEmployees,
+    searchResult,
     loading,
     error,
     fetchEmployees,
-    fetchExtendedEmployees
-  }), [employees, extendedEmployees, loading, error, fetchEmployees, fetchExtendedEmployees]);
+    fetchExtendedEmployees,
+    searchEmployeesForRoleManagement,
+    updateEmployeeRole
+  }), [employees, extendedEmployees, searchResult, loading, error, fetchEmployees, fetchExtendedEmployees, searchEmployeesForRoleManagement, updateEmployeeRole]);
 }
