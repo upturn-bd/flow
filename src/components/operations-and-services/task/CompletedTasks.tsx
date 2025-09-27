@@ -20,6 +20,7 @@ import {
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui";
+import { formatDate } from "@/lib/utils";
 
 function TaskCard({
   task,
@@ -35,7 +36,7 @@ function TaskCard({
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const { id, task_title, department_id, task_description, end_date } = task;
+  const { id, task_title, department_id, task_description, updated_at } = task;
 
   const handleDelete = async () => {
     if (!id) return;
@@ -90,11 +91,11 @@ function TaskCard({
           {department && (
             <StatusBadge status={department.name} variant="info" size="sm" />
           )}
-          {end_date && (
+          {updated_at && (
             <InfoRow
               icon={<Calendar size={16} />}
               label="Completed"
-              value={end_date}
+              value={formatDate(updated_at)}
               className="text-xs"
             />
           )}
@@ -110,10 +111,10 @@ interface CompletedTasksListProps {
   deleteTask: (taskId: number, projectId?: number, milestoneId?: number) => Promise<{ success: boolean; error?: any; }>;
 }
 
-const CompletedTasksList = memo(({ 
-  tasks, 
-  loading, 
-  deleteTask, 
+const CompletedTasksList = memo(({
+  tasks,
+  loading,
+  deleteTask,
 }: CompletedTasksListProps) => {
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);

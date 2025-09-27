@@ -70,7 +70,7 @@ interface AdminDataContextType {
   isSetupComplete: boolean;
   entityStatus: {
     departments: boolean;
-    divisions: boolean;
+    divisions?: boolean;
     grades: boolean;
     positions: boolean;
   };
@@ -141,17 +141,36 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
   const loading = departmentsLoading || divisionsLoading || gradesLoading || positionsLoading || companyLoading;
 
   // Computed properties
-  const isSetupComplete = departments.length > 0 && 
-                          divisions.length > 0 && 
-                          grades.length > 0 && 
-                          positions.length > 0;
+  const isSetupComplete =
+    departments.length > 0 &&
+    grades.length > 0 &&
+    positions.length > 0 &&
+    (companyInfo?.has_division ? divisions.length > 0 : true);
 
-  const entityStatus = {
-    departments: departments.length > 0,
-    divisions: divisions.length > 0,
-    grades: grades.length > 0,
-    positions: positions.length > 0,
+  let entityStatus: {
+    departments: boolean;
+    divisions?: boolean;
+    grades: boolean;
+    positions: boolean;
   };
+  
+  if (companyInfo?.has_division) {
+    entityStatus = {
+      divisions: divisions.length > 0,
+      departments: departments.length > 0,
+      grades: grades.length > 0,
+      positions: positions.length > 0,
+    };
+  } else {
+    entityStatus = {
+      departments: departments.length > 0,
+      grades: grades.length > 0,
+      positions: positions.length > 0,
+    };
+  }
+
+
+
 
   // Load all data on mount
   useEffect(() => {

@@ -49,28 +49,24 @@ export default function TasksPage() {
   // Centralized task management
   const { 
     tasks, 
+    ongoingTasks,
+    completedTasks,
     loading, 
     createTask, 
     updateTask, 
     deleteTask, 
-    getUserTasks,  
+    fetchOngoingTasks,  
+    fetchCompletedTasks
   } = useTasks();
 
-  // Filter tasks by status
-  const ongoingTasks = useMemo(() => 
-    tasks.filter(task => !task.status), 
-    [tasks]
-  );
-  
-  const completedTasks = useMemo(() => 
-    tasks.filter(task => task.status), 
-    [tasks]
-  );
+
+
 
   // Load all tasks on mount
   useEffect(() => {
-    getUserTasks(TaskStatus.ALL); // Load both ongoing and completed tasks
-  }, [getUserTasks]);
+    fetchOngoingTasks(); // Load both ongoing and completed tasks
+    fetchCompletedTasks()
+  }, []);
 
   useEffect(() => {
     console.log(tasks);
@@ -79,7 +75,7 @@ export default function TasksPage() {
   // Create stable component instances with centralized data
   const ongoingTaskPage = useMemo(() => (
     <OngoingTaskPage 
-      tasks={ongoingTasks}
+      ongoingTasks={ongoingTasks}
       loading={loading}
       updateTask={updateTask}
       deleteTask={deleteTask}
@@ -148,7 +144,7 @@ export default function TasksPage() {
       setShowCreateModal(false);
       setActiveTab("ongoing");
       // Refresh the task list to show the new task
-      await getUserTasks(TaskStatus.ALL);
+      await fetchOngoingTasks();
     } else {
       toast.error("Failed to create task");
       console.error("Error creating task:", error);

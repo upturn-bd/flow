@@ -65,7 +65,7 @@ export function extractFilenameFromUrl(url: string) {
   return name;
 }
 
-export function extractFileNameFromStoragePath (filePath: string) {
+export function extractFileNameFromStoragePath(filePath: string) {
   const parts = filePath.split("/");
   if (parts.length < 2) return filePath;
   else return parts.slice(1).join("/");
@@ -73,9 +73,13 @@ export function extractFileNameFromStoragePath (filePath: string) {
 
 
 
-export function formatDate(dateStr: string): string {
-  const [year, month, dayStr] = dateStr.split("-");
-  const day = parseInt(dayStr, 10);
+export function formatDate(date: string | Date): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+
+  const year = d.getFullYear();
+  const month = d.getMonth(); // 0-based index
+  const day = d.getDate();
+
   const months = [
     "January",
     "February",
@@ -90,14 +94,16 @@ export function formatDate(dateStr: string): string {
     "November",
     "December",
   ];
-  const monthName = months[parseInt(month, 10) - 1];
+
+  const monthName = months[month];
 
   return `${day} ${monthName}, ${year}`;
 }
 
+
 export function formatRelativeTime(dateStr: string): string {
   if (!dateStr) return '';
-  
+
   const date = new Date(dateStr);
   const now = new Date();
   const diffInMs = now.getTime() - date.getTime();
@@ -109,7 +115,7 @@ export function formatRelativeTime(dateStr: string): string {
   if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
   if (diffInHours < 24) return `${diffInHours}h ago`;
   if (diffInDays < 7) return `${diffInDays}d ago`;
-  
+
   // For older dates, show the formatted date
   return formatDate(dateStr.split('T')[0]);
 }

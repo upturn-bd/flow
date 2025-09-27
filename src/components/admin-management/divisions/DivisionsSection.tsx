@@ -9,6 +9,7 @@ import { Layers, Plus, Eye, X } from "lucide-react";
 import { fadeInUp } from "@/components/ui/animations";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { TrashSimple } from "@phosphor-icons/react";
+import { getCompanyInfo } from "@/lib/utils/auth";
 
 type DivisionsSectionProps = {
   showNotification: (message: string, isError?: boolean) => void;
@@ -28,6 +29,7 @@ export default function DivisionsSection({ showNotification }: DivisionsSectionP
   const [editDivision, setEditDivision] = useState<number | null>(null);
   const [isCreatingDivision, setIsCreatingDivision] = useState(false);
   const [divisionDeleteLoading, setDivisionDeleteLoading] = useState<number | null>(null);
+
 
   const handleCreateDivision = async (values: any) => {
     try {

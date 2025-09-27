@@ -1,6 +1,6 @@
 "use client";
 import { TaskUpdateModal } from "./shared/TaskModal";
-import { TaskFilters } from "@/hooks/useTasks";
+import { TaskFilters, useTasks } from "@/hooks/useTasks";
 import { Task } from "@/lib/types/schemas";
 import { useEffect, useState } from "react";
 import TaskDetails from "./shared/TaskDetails";
@@ -23,24 +23,35 @@ import {
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui";
+import { getEmployeeId } from "@/lib/utils/auth";
 
 interface OngoingTaskPageProps {
-  tasks: Task[];
+  ongoingTasks: Task[];
   loading: boolean;
   updateTask: (task: Task) => Promise<{ success: boolean; data?: any; error?: any; }>;
   deleteTask: (taskId: number, projectId?: number, milestoneId?: number) => Promise<{ success: boolean; error?: any; }>;
 }
 
-export default function OngoingTaskPage({ 
-  tasks, 
-  loading, 
-  updateTask, 
+export default function OngoingTaskPage({
+  ongoingTasks,
+  loading,
+  updateTask,
   deleteTask
 }: OngoingTaskPageProps) {
 
   const [editTask, setEditTask] = useState<Task | null>(null);
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
+  const [userId, setUserId] = useState<string>('')
+
+  const userIdInit = async () => {
+    const id = await getEmployeeId()
+    setUserId(id)
+  }
+
+  useEffect(() => {
+    userIdInit()
+  }, [])
 
   const handleUpdateTask = async (values: any) => {
     try {
@@ -72,11 +83,12 @@ export default function OngoingTaskPage({
         <LoadingSpinner text="Loading Tasks..." />
       ) : (
         <div className="grid grid-cols-1 gap-4">
-          {tasks.length > 0 ? (
+          {ongoingTasks.length > 0 ? (
 
-            tasks.map((task) => (
+            ongoingTasks.map((task) => (
               <div key={task.id}>
                 <TaskCard
+                userId={userId}
                   task={task}
                   onEdit={() => setEditTask(task)}
                   onDelete={() =>
@@ -135,12 +147,14 @@ export default function OngoingTaskPage({
 }
 
 function TaskCard({
+  userId,
   task,
   onEdit,
   onDelete,
   onDetails,
   isDeleting = false,
 }: {
+  userId: string;
   task: Task;
   onEdit: () => void;
   onDelete: () => void;
@@ -149,15 +163,18 @@ function TaskCard({
 }) {
   const actions = (
     <div className="flex items-center gap-2">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onEdit}
-        className="p-2 h-8 w-8 hover:bg-blue-50 hover:text-blue-600"
-      >
-        <Edit size={14} />
-      </Button>
-      <Button
+      {userId === task.created_by && (
+        <>
+                <Button
+          variant="ghost"
+          size="sm"
+          onClick={onEdit}
+          className="p-2 h-8 w-8 hover:bg-blue-50 hover:text-blue-600"
+        >
+          <Edit size={14} />
+        </Button>
+
+              <Button
         variant="ghost"
         size="sm"
         onClick={onDelete}
@@ -166,6 +183,11 @@ function TaskCard({
       >
         <Trash2 size={14} />
       </Button>
+        </>
+
+      )}
+
+
       <Button
         variant="ghost"
         size="sm"
@@ -188,7 +210,7 @@ function TaskCard({
       <CardContent>
         <div className="flex items-center justify-between">
           <PriorityBadge
-            priority={task.priority as "High" | "Medium" | "Low"}
+            priority={task.priority as "urgent" | "high" | "normal" | "low"}
           />
           {task.end_date && (
             <InfoRow

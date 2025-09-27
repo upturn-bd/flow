@@ -681,7 +681,7 @@ export function validateDivision(division: any): ValidationResult {
 /**
  * Validates a department object
  */
-export function validateDepartment(department: any): ValidationResult {
+export function validateDepartment(department: any, hasDept: boolean): ValidationResult {
   const errors: ValidationError[] = [];
 
   const nameError = validateStringLength(department.name, 'name', 1, 50);
@@ -698,7 +698,7 @@ export function validateDepartment(department: any): ValidationResult {
   }
 
   // division_id is required
-  if (!department.division_id || typeof department.division_id !== 'number' || department.division_id <= 0) {
+  if (hasDept && (!department.division_id || typeof department.division_id !== 'number' || department.division_id <= 0)) {
     errors.push({
       field: 'division_id',
       message: 'Division is required'

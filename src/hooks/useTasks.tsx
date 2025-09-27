@@ -47,6 +47,8 @@ export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false); // Start with loading true
   const [error, setError] = useState<Error | null>(null);
+  const [ongoingTasks, setOngoingTasks] = useState<Task[]>([])
+  const [completedTasks, setCompletedTasks] = useState<Task[]>([])
   const [stats, setStats] = useState<{
     total: number;
     completed: number;
@@ -157,6 +159,71 @@ export function useTasks() {
       setLoading(false);
     }
   }, []);
+
+
+  const fetchOngoingTasks = async () => {
+    try {
+      setLoading(true)
+
+      const user = await getEmployeeInfo();
+
+
+      const { data, error } = await supabase
+        .from("task_records")
+        .select("*")
+        .eq("status", false)
+        .or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`)
+        .order("end_date", { ascending: true });
+
+      if (error) throw error;
+
+      setOngoingTasks(data as Task[])
+
+      setLoading(false)
+
+
+      return data as Task[];
+
+    } catch (err) {
+      console.error("Error fetching tasks:", err);
+      const errorObj = err instanceof Error ? err : new Error(String(err));
+      setError(errorObj);
+
+    }
+  }
+
+  const fetchCompletedTasks = async () => {
+    try {
+      setLoading(true)
+
+      const user = await getEmployeeInfo();
+
+
+      const { data, error } = await supabase
+        .from("task_records")
+        .select("*")
+        .eq("status", true) // completed only
+        .or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`) // user filter
+        .order("updated_at", { ascending: false }); // newest first
+
+
+      if (error) throw error;
+
+      setCompletedTasks(data as Task[])
+
+      setLoading(false)
+
+
+      return data as Task[];
+
+    } catch (err) {
+      console.error("Error fetching tasks:", err);
+      const errorObj = err instanceof Error ? err : new Error(String(err));
+      setError(errorObj);
+
+    }
+  }
+
 
   // Convenience methods for common use cases
   const getUserTasks = useCallback((status: TaskStatus = TaskStatus.INCOMPLETE) => {
@@ -308,13 +375,15 @@ export function useTasks() {
         .from("task_records")
         .update(finalData)
         .eq("id", task.id)
-        .eq("company_id", company_id)
         .select()
-        .single();
+        .maybeSingle();
 
       console.log(data)
 
-      if (error) throw error;
+      if (error) {
+        console.log(error)
+        throw error
+      };
 
       // Refresh tasks after update
       // if (task.project_id) {
@@ -327,7 +396,8 @@ export function useTasks() {
       // }
 
       setTasks(prev => prev.map(t => t.id === data.id ? data : t));
-
+      fetchOngoingTasks()
+      fetchCompletedTasks()
       const recipients = task.assignees;
       if (user.supervisor_id) {
         recipients.push(user.supervisor_id);
@@ -375,6 +445,8 @@ export function useTasks() {
       }
 
       setTasks(prev => prev.filter(t => t.id !== taskId));
+      fetchOngoingTasks()
+      fetchCompletedTasks()
 
       return { success: true };
     } catch (err) {
@@ -480,12 +552,16 @@ export function useTasks() {
   return useMemo(() => ({
     // State
     tasks,
+    ongoingTasks,
+    completedTasks,
     loading,
     error,
     stats,
 
     // Main fetch function
     fetchTasks,
+    fetchOngoingTasks,
+    fetchCompletedTasks,
 
     // Convenience methods
     getUserTasks,
@@ -507,10 +583,14 @@ export function useTasks() {
     updateMilestone,
   }), [
     tasks,
+    ongoingTasks,
+    completedTasks,
     loading,
     error,
     stats,
     fetchTasks,
+    fetchOngoingTasks,
+    fetchCompletedTasks,
     getUserTasks,
     getProjectTasks,
     getMilestoneTasks,

@@ -14,6 +14,7 @@ interface CompanyInfo {
   payroll_generation_day?: number;
   fiscal_year_start?: string;
   live_payroll_enabled?: boolean;
+  has_division?: boolean;
 }
 
 interface Country {

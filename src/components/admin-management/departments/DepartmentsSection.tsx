@@ -9,6 +9,7 @@ import { Building, Plus, Eye, X } from "lucide-react";
 import { fadeInUp } from "@/components/ui/animations";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { TrashSimple } from "@phosphor-icons/react";
+import { getCompanyInfo } from "@/lib/utils/auth";
 
 type DepartmentsSectionProps = {
   showNotification: (message: string, isError?: boolean) => void;
@@ -33,6 +34,7 @@ export default function DepartmentsSection({
   const [departmentDeleteLoading, setDepartmentDeleteLoading] = useState<
     number | null
   >(null);
+
 
   const handleCreateDepartment = async (values: any) => {
     try {
@@ -132,11 +134,10 @@ export default function DepartmentsSection({
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleDeleteDepartment(dept.id ?? 0)}
                     disabled={departmentDeleteLoading === dept.id}
-                    className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-red-50 text-red-600 text-xs sm:text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${
-                      departmentDeleteLoading === dept.id
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
-                    }`}
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-red-50 text-red-600 text-xs sm:text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${departmentDeleteLoading === dept.id
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                      }`}
                   >
                     <TrashSimple size={14} />
                     <span className="hidden xs:inline">

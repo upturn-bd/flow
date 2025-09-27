@@ -3,10 +3,18 @@
 import { useEffect, useState } from "react";
 import { dirtyValuesChecker } from "@/lib/utils";
 import { Department } from "@/lib/types/schemas";
-import { validateDepartment, validationErrorsToObject } from "@/lib/utils/validation";
+import {
+  validateDepartment,
+  validationErrorsToObject,
+} from "@/lib/utils/validation";
 import { BaseModal } from "@/components/ui/modals";
-import { FormField, SelectField, TextAreaField } from "@/components/forms";
+import {
+  FormField,
+  SelectField,
+  TextAreaField,
+} from "@/components/forms";
 import { Button } from "@/components/ui/button";
+import { getCompanyInfo } from "@/lib/utils/auth";
 
 interface DepartmentModalProps {
   isOpen: boolean;
@@ -35,12 +43,24 @@ export default function DepartmentModal({
   });
 
   const [errors, setErrors] = useState<Partial<Department>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
+  const [hasDivision, setHasDivision] = useState<boolean>(false);
+
+  const initHasDivision = async () => {
+    const company = await getCompanyInfo();
+    setHasDivision(company.has_division || false);
+  };
+
   useEffect(() => {
-    const result = validateDepartment(formValues);
+    initHasDivision();
+  }, []);
+
+  useEffect(() => {
+    const result = validateDepartment(formValues, hasDivision);
     if (result.success) {
       setIsValid(true);
       setErrors({});
@@ -49,32 +69,42 @@ export default function DepartmentModal({
       const newErrors = validationErrorsToObject(result.errors);
       setErrors(newErrors);
     }
-  }, [formValues]);
+  }, [formValues, hasDivision]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
-    
-    // Handle division_id as number
-    if (name === 'division_id') {
-      setFormValues((prev) => ({ 
-        ...prev, 
-        [name]: value === '' ? 0 : Number(value)
+
+    if (name === "division_id") {
+      setFormValues((prev) => ({
+        ...prev,
+        [name]: value === "" ? 0 : Number(value),
       }));
     } else {
       setFormValues((prev) => ({ ...prev, [name]: value }));
     }
+
+    // mark the field as touched
+    setTouched((prev) => ({ ...prev, [name]: true }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = validateDepartment(formValues);
 
+    const result = validateDepartment(formValues, hasDivision);
     if (!result.success) {
       const fieldErrors = validationErrorsToObject(result.errors);
       setErrors(fieldErrors);
+      setTouched(
+        Object.keys(fieldErrors).reduce(
+          (acc, key) => ({ ...acc, [key]: true }),
+          {} as Record<string, boolean>
+        )
+      );
       setIsSubmitting(false);
       return;
     }
@@ -95,25 +125,18 @@ export default function DepartmentModal({
     }
   }, [initialData, formValues]);
 
-  const isDisabled = isSubmitting || 
-                    (initialData ? !isDirty : false) || 
-                    !isValid;
+  const isDisabled =
+    isSubmitting || (initialData ? !isDirty : false) || !isValid;
 
-  // Prepare options for employee select
-  const employeeOptions = [
-    ...employees.map(employee => ({
-      value: employee.id,
-      label: employee.name
-    }))
-  ];
+  const employeeOptions = employees.map((employee) => ({
+    value: employee.id,
+    label: employee.name,
+  }));
 
-  // Prepare options for division select
-  const divisionOptions = [
-    ...divisions.map(division => ({
-      value: division.id.toString(),
-      label: division.name
-    }))
-  ];
+  const divisionOptions = divisions.map((division) => ({
+    value: division.id.toString(),
+    label: division.name,
+  }));
 
   return (
     <BaseModal
@@ -130,7 +153,7 @@ export default function DepartmentModal({
           value={formValues.name}
           onChange={handleChange}
           placeholder="Enter Department Name"
-          error={errors.name as string}
+          error={touched.name ? (errors.name as string) : undefined}
           required
         />
 
@@ -141,7 +164,7 @@ export default function DepartmentModal({
           onChange={handleChange}
           options={employeeOptions}
           placeholder="Select Employee"
-          error={errors.head_id as string}
+          error={touched.head_id ? (errors.head_id as string) : undefined}
           required
         />
 
@@ -151,20 +174,24 @@ export default function DepartmentModal({
           value={formValues.description}
           onChange={handleChange}
           placeholder="Enter department description"
-          error={errors.description as string}
+          error={touched.description ? (errors.description as string) : undefined}
           rows={3}
         />
 
-        <SelectField
-          label="Division"
-          name="division_id"
-          value={formValues.division_id?.toString() ?? ""}
-          onChange={handleChange}
-          options={divisionOptions}
-          placeholder="Select Division"
-          error={errors.division_id ? String(errors.division_id) : undefined}
-          required
-        />
+        {hasDivision && (
+          <SelectField
+            label="Division"
+            name="division_id"
+            value={formValues.division_id?.toString() ?? ""}
+            onChange={handleChange}
+            options={divisionOptions}
+            placeholder="Select Division"
+            error={
+              touched.division_id ? String(errors.division_id) : undefined
+            }
+            required
+          />
+        )}
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4 pt-4 border-t border-gray-200">
@@ -177,7 +204,7 @@ export default function DepartmentModal({
           >
             Cancel
           </Button>
-          
+
           <Button
             type="submit"
             variant="primary"
@@ -185,7 +212,11 @@ export default function DepartmentModal({
             isLoading={isSubmitting}
             className="w-full sm:w-auto"
           >
-            {isSubmitting ? "Saving..." : (initialData ? "Update Department" : "Create Department")}
+            {isSubmitting
+              ? "Saving..."
+              : initialData
+              ? "Update Department"
+              : "Create Department"}
           </Button>
         </div>
       </form>

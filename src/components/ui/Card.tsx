@@ -37,7 +37,7 @@ interface StatusBadgeProps {
 }
 
 interface PriorityBadgeProps {
-  priority: "High" | "Medium" | "Low";
+  priority: "urgent" | "high" | "normal" | "low";
   size?: "sm" | "md";
 }
 
@@ -53,12 +53,12 @@ const variantClasses = {
   elevated: "bg-white border border-gray-200 shadow-lg",
 };
 
-export function Card({ 
-  children, 
-  className = "", 
-  hover = true, 
+export function Card({
+  children,
+  className = "",
+  hover = true,
   padding = "md",
-  variant = "default" 
+  variant = "default"
 }: CardProps) {
   return (
     <motion.div
@@ -173,9 +173,11 @@ export function StatusBadge({ status, variant, size = "sm" }: StatusBadgeProps) 
 
 export function PriorityBadge({ priority, size = "sm" }: PriorityBadgeProps) {
   const priorityClasses = {
-    High: "bg-red-100 text-red-800 border-red-200",
-    Medium: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    Low: "bg-green-100 text-green-800 border-green-200",
+    urgent: "bg-red-100 text-red-800 border-red-200",
+    high: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    normal: "bg-green-100 text-green-800 border-green-200",
+    low: "bg-green-100 text-green-800 border-green-200",
+
   };
 
   const sizeClasses = {
@@ -194,15 +196,15 @@ export function PriorityBadge({ priority, size = "sm" }: PriorityBadgeProps) {
   );
 }
 
-export function InfoRow({ 
-  icon, 
-  label, 
-  value, 
-  className = "" 
-}: { 
-  icon: ReactNode; 
-  label: string; 
-  value: ReactNode; 
+export function InfoRow({
+  icon,
+  label,
+  value,
+  className = ""
+}: {
+  icon: ReactNode;
+  label: string;
+  value: ReactNode;
   className?: string;
 }) {
   return (

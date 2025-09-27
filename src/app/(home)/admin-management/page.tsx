@@ -26,6 +26,7 @@ function AdminManagementContent() {
   const [currentStep, setCurrentStep] = useState(1);
   const [step1Complete, setStep1Complete] = useState(false);
   
+  
   // Use the admin data context
   const {
     departments,

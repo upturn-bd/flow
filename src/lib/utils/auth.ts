@@ -113,6 +113,7 @@ export async function getCompanyInfo(): Promise<{
   payroll_generation_day?: number;
   fiscal_year_start?: string;
   live_payroll_enabled?: boolean;
+  has_division?: boolean;
 }> {
   const companyId = await getCompanyId();
   
