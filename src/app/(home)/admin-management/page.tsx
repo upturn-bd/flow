@@ -73,7 +73,7 @@ function AdminManagementContent() {
     error,
   });
 
-  if (loading || departmentsLoading || divisionsLoading || gradesLoading || positionsLoading) {
+  if (loading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}

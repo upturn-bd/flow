@@ -33,7 +33,7 @@ const initialProjectDetails: ProjectDetails = {
   goal: "",
   end_date: "",
   project_lead_id: "",
-  department_id: undefined,
+  department_ids: [],
   status: "Ongoing",
   assignees: [],
 };
@@ -48,7 +48,7 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
   useEffect(() => {
     fetchDepartments();
     fetchEmployeeInfo();
-  }, [fetchDepartments, fetchEmployeeInfo]);
+  }, []);
 
   const handleSubmit = async (
     data: ProjectDetails,
@@ -57,7 +57,9 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
     setIsSubmitting(true);
 
     try {
+      console.log("Step 1", data)
       const projectResult = await createProject({ ...data });
+      console.log("Step 3", projectResult)
       if (!projectResult.success) {
         throw new Error("Failed to create project");
       }
@@ -134,7 +136,6 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
               name: string;
             }[]
           }
-          employees={employees}
           mode="create"
         />
       </motion.div>
@@ -216,7 +217,6 @@ export function UpdateProjectPage({
           onCancel={onClose}
           isSubmitting={isSubmitting}
           departments={departments.filter(d => d.id != null) as { id: number; name: string }[]}
-          employees={employees}
           mode="edit"
         />
       </motion.div>

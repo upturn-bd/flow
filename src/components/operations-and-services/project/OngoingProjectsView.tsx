@@ -14,6 +14,7 @@ import ProjectCard from "./ProjectCard";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { getEmployeeId } from "@/lib/utils/auth";
 
 const emptyProject: Project = {
   project_title: "",
@@ -30,6 +31,7 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
     useProjects();
   const [projectDetailsId, setProjectDetailsId] = useState<number | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [userId, setUserId] = useState<string>("")
   const {
     employees,
     fetchEmployees,
@@ -41,11 +43,20 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
     loading: departmentsLoading,
   } = useDepartments();
 
+    const initUserId = async () => {
+    const userId = await getEmployeeId()
+    setUserId(userId);
+  }
+
   useEffect(() => {
     fetchOngoingProjects();
     fetchEmployees();
     fetchDepartments();
+    initUserId()
   }, []);
+
+
+
 
   const handleUpdateProject = async (values: any) => {
     try {
@@ -130,8 +141,8 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
                         departments={
                           departments.filter((d) => d.id != null) as any
                         }
-                        showEdit={true}
-                        showDelete={true}
+                        showEdit={project.created_by === userId}
+                        showDelete={project.created_by === userId}
                         showDetails={true}
                       />
                     ) : null

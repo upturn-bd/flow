@@ -223,8 +223,8 @@ export function validateLineage(lineage: any): ValidationResult {
   const nameError = validateStringLength(lineage.name, 'name', 1, 50);
   if (nameError) errors.push(nameError);
 
-  if (!lineage.hierarchical_level || typeof lineage.hierarchical_level !== 'number' || 
-      !Number.isInteger(lineage.hierarchical_level) || lineage.hierarchical_level < 1) {
+  if (!lineage.hierarchical_level || typeof lineage.hierarchical_level !== 'number' ||
+    !Number.isInteger(lineage.hierarchical_level) || lineage.hierarchical_level < 1) {
     errors.push({ field: 'hierarchical_level', message: 'hierarchical_level must be a positive integer' });
   }
 
@@ -440,11 +440,18 @@ export function validateProject(project: any): ValidationResult {
     errors.push({ field: 'description', message: 'Please enter a project description' });
   }
 
-  if (!project.department_id || typeof project.department_id !== 'number' || project.department_id === 0) {
-    errors.push({ field: 'department_id', message: 'Please select a department' });
+  if (
+    !Array.isArray(project.department_ids) ||
+    project.department_ids.length === 0 ||
+    project.department_ids.some((id:number) => id === 0)
+  ) {
+    errors.push({
+      field: 'department_ids',
+      message: 'Please select at least one department',
+    });
   }
 
-  
+
   return {
     success: errors.length === 0,
     data: errors.length === 0 ? project : undefined,

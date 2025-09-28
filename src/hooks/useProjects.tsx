@@ -32,10 +32,13 @@ export function useProjects() {
 
       const { data, error } = await supabase
         .from("project_records")
-        .select('*')
+        .select("*")
         .eq("company_id", user.company_id)
-        .eq("department_id", user.department_id)
         .eq("status", "Ongoing")
+        .or(
+          `project_lead_id.eq.${user.id},assignees.cs.{${user.id}},created_by.eq.${user.id}`
+        );
+
 
       if (error) throw error;
 
@@ -56,15 +59,18 @@ export function useProjects() {
     try {
       const user = await getEmployeeInfo();
       const company_id = user.company_id;
-      const result = await baseResult.createItem(project);
-
+      const finalData = {
+        ...project,
+        created_by: user.id
+      }
+      console.log("Step 2", finalData)
+      const result = await baseResult.createItem(finalData);
       const recipients = [...(project.assignees || []), project.project_lead_id].filter(Boolean) as string[];
 
-      console.log(project.company_id, project.department_id, 'company and department');
 
 
 
-      createNotification({
+      void createNotification({
         title: "New Project Assigned",
         message: `A new project "${project.project_title}" has been assigned to you.`,
         priority: 'normal',
@@ -75,7 +81,7 @@ export function useProjects() {
         department_id: user.department_id
       });
 
-      createNotification({
+      void createNotification({
         title: "New Project Created",
         message: `A new project "${project.project_title}" has been created by ${user.name}.`,
         priority: 'normal',
@@ -115,7 +121,6 @@ export function useProjects() {
         recipient_id: recipients,
         action_url: '/operations-and-services/workflow/project',
         company_id: company_id,
-        department_id: project.department_id
       });
 
       return result;

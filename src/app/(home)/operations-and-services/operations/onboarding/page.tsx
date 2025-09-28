@@ -63,7 +63,7 @@ export default function OnboardingApprovalPage() {
     return () => {
       unsubscribe();
     };
-  }, [fetchPendingEmployees, fetchEmployees, fetchDepartments, subscribeToOnboardingUpdates]);
+  }, []);
 
   const handleInputChange = (id: string, value: string) => {
     setRejectionReasons((prev) => ({ ...prev, [id]: value }));

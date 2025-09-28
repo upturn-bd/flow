@@ -133,12 +133,13 @@ export interface Project {
   end_date: string;
   project_lead_id: string;
   remark?: string;
-  department_id?: number;
+  department_ids?: number[];
   goal?: string;
   progress?: number | null;
   status: string;
   company_id?: number;
   assignees?: string[];
+  created_by?: string;
 }
 
 export interface Milestone {

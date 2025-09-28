@@ -8,6 +8,7 @@ import { getCompanyId, DatabaseError } from "@/lib/utils/auth";
 export type EmployeeInfo = {
   id: string;
   name: string;
+  department_id: number;
 };
 
 export function useEmployeeInfo() {
@@ -23,7 +24,7 @@ export function useEmployeeInfo() {
 
       const { data, error } = await supabase
         .from("employees")
-        .select("id, first_name, last_name")
+        .select("id, first_name, last_name, department_id")
         .eq("company_id", company_id);
 
       if (error) {
@@ -33,6 +34,7 @@ export function useEmployeeInfo() {
       const employees = data?.map((employee) => ({
         id: employee.id,
         name: `${employee.first_name} ${employee.last_name}`,
+        department_id: employee.department_id
       })) || [];
 
       setEmployees(employees);

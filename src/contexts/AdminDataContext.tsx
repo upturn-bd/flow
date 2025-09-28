@@ -39,8 +39,8 @@ interface AdminDataContextType {
 
   // CRUD functions for departments
   createDepartment: (data: any) => Promise<any>;
-  updateDepartment: (id: string, data: any) => Promise<any>;
-  deleteDepartment: (id: string) => Promise<any>;
+  updateDepartment: (id: number, data: any) => Promise<any>;
+  deleteDepartment: (id: number) => Promise<any>;
 
   // CRUD functions for divisions
   createDivision: (data: any) => Promise<any>;
@@ -138,7 +138,7 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
   } = useCompanyInfo();
 
   // Overall loading state
-  const loading = departmentsLoading || divisionsLoading || gradesLoading || positionsLoading || companyLoading;
+  const loading = companyLoading;
 
   // Computed properties
   const isSetupComplete =
@@ -153,7 +153,7 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
     grades: boolean;
     positions: boolean;
   };
-  
+
   if (companyInfo?.has_division) {
     entityStatus = {
       divisions: divisions.length > 0,
@@ -190,7 +190,7 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
     };
 
     loadAllData();
-  }, [fetchDepartments, fetchDivisions, fetchGrades, fetchPositions, fetchCompanyInfo]);
+  }, []);
 
   // Refresh functions
   const refreshAll = useCallback(async () => {
@@ -219,7 +219,7 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
     }
   }, [createDept]);
 
-  const updateDepartment = useCallback(async (id: string, data: any) => {
+  const updateDepartment = useCallback(async (id: number, data: any) => {
     try {
       const result = await updateDept(id, data);
       return result;
@@ -229,7 +229,7 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
     }
   }, [updateDept]);
 
-  const deleteDepartment = useCallback(async (id: string) => {
+  const deleteDepartment = useCallback(async (id: number) => {
     try {
       const result = await deleteDept(id);
       return result;

@@ -47,7 +47,7 @@ export default function ProjectCard({
     id,
     project_title,
     project_lead_id,
-    department_id,
+    department_ids,
     end_date,
     progress,
     description,
@@ -106,14 +106,21 @@ export default function ProjectCard({
         icon={statusIcon}
         action={actions}
       />
-      
+
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <InfoRow
             icon={<Building2 size={16} />}
-            label="Department"
-            value={departments.find((d) => d.id === department_id)?.name || "N/A"}
+            label="Departments"
+            value={
+              project.department_ids && project.department_ids.length > 0
+                ? project.department_ids
+                  .map((id) => departments.find((d) => d.id === id)?.name || "N/A")
+                  .join(", ")
+                : "N/A"
+            }
           />
+
           <InfoRow
             icon={<User size={16} />}
             label="Lead"
@@ -123,7 +130,7 @@ export default function ProjectCard({
             icon={<Target size={16} />}
             label="Progress"
             value={
-              <StatusBadge 
+              <StatusBadge
                 status={typeof progress === "number" ? `${progress}%` : progress || "N/A"}
                 variant={getProgressVariant(progress || 0)}
               />
@@ -135,7 +142,7 @@ export default function ProjectCard({
             value={end_date || "Not set"}
           />
         </div>
-        
+
         {description && (
           <div className="mt-4 p-3 bg-gray-50 rounded-md">
             <p className="text-sm text-gray-700 line-clamp-3">{description}</p>

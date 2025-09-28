@@ -32,9 +32,9 @@ export default function Sidebar() {
   const { isApproved, getAuthorizedNavItems } = useAuth();
   const pathname = usePathname();
   const navItems = getAuthorizedNavItems();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false); // Mobile toggle
 
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(
     "operations-and-services"
   );
@@ -61,7 +61,6 @@ export default function Sidebar() {
     { label: "HRIS", href: "/operations-and-services/operations/hris", icon: Users },
   ];
 
-  // Hamburger button for mobile
   const HamburgerButton = () => (
     <button
       className="md:hidden fixed top-4 left-4 z-[1001] p-2 rounded-md bg-[#001731] text-white"
@@ -72,18 +71,7 @@ export default function Sidebar() {
   );
 
   const SidebarContent = (
-    <motion.aside
-      initial={{ x: -300, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -300, opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className={cn(
-        "sticky top-0 h-screen z-40 shadow-xl flex flex-col",
-        "bg-gradient-to-b from-[#001731] to-[#002363]",
-        isCollapsed ? "w-20" : "w-64",
-        "md:relative fixed left-0 top-0" // fixed for mobile
-      )}
-    >
+    <div className="flex flex-col h-full">
       {/* Logo Section */}
       <div className="flex items-center justify-between px-4 py-6">
         <Link href="/home" className="flex items-center space-x-3">
@@ -109,7 +97,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-col mt-4 space-y-2 px-2 flex-1 overflow-y-auto">
+      <nav className="flex flex-col mt-4 space-y-2 px-2 flex-1 overflow-y-auto sidebar-scrollbar">
         {navItems.map((item) => {
           let displayLabel;
           switch (item.label) {
@@ -146,7 +134,7 @@ export default function Sidebar() {
                   )}
                 >
                   <Link href={item.href} className="flex items-center gap-3 flex-1">
-                    <Icon size={22} weight={isActive ? "fill" : "regular"} />
+                    <Icon size={22} />
                     {!isCollapsed && <span>{displayLabel}</span>}
                   </Link>
 
@@ -222,7 +210,7 @@ export default function Sidebar() {
                 )}
                 title={displayLabel}
               >
-                <Icon size={22} weight={isActive ? "fill" : "regular"} />
+                <Icon size={22} />
                 {!isCollapsed && <span>{displayLabel}</span>}
               </Link>
             </motion.div>
@@ -244,27 +232,51 @@ export default function Sidebar() {
           </div>
         </Link>
       </div>
-    </motion.aside>
+    </div>
   );
 
   return (
     <>
       <HamburgerButton />
+
+      {/* Mobile sidebar with overlay */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            className="fixed inset-0 bg-black/30 md:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setMobileOpen(false)}
-          >
-            {SidebarContent}
-          </motion.div>
+          <>
+            <motion.div
+              className="fixed inset-0 bg-black/30 md:hidden z-40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: -300 }}
+              animate={{ x: 0 }}
+              exit={{ x: -300 }}
+              transition={{ duration: 0.3 }}
+              className={cn(
+                "fixed top-0 left-0 h-full z-50 shadow-xl",
+                "bg-gradient-to-b from-[#001731] to-[#002363]",
+                isCollapsed ? "w-20" : "w-64"
+              )}
+            >
+              {SidebarContent}
+            </motion.aside>
+          </>
         )}
       </AnimatePresence>
-      {/* Show sidebar normally on desktop */}
-      <div className="hidden md:flex">{SidebarContent}</div>
+
+      {/* Desktop sidebar */}
+      <aside
+        className={cn(
+          "hidden md:flex md:flex-col md:h-screen md:sticky md:top-0 shadow-xl",
+          "bg-gradient-to-b from-[#001731] to-[#002363]",
+          isCollapsed ? "w-20" : "w-64"
+        )}
+      >
+        {SidebarContent}
+      </aside>
     </>
   );
 }

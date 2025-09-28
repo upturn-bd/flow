@@ -49,7 +49,7 @@ export default function DepartmentsSection({
   const handleUpdateDepartment = async (values: any) => {
     try {
       if (editDepartment) {
-        await updateDepartment(editDepartment.toString(), values);
+        await updateDepartment(editDepartment, values);
         setEditDepartment(null);
         showNotification("Department updated successfully");
       }
@@ -61,7 +61,7 @@ export default function DepartmentsSection({
   const handleDeleteDepartment = async (id: number) => {
     try {
       setDepartmentDeleteLoading(id);
-      await deleteDepartment(id.toString());
+      await deleteDepartment(id);
       showNotification("Department deleted successfully");
     } catch {
       showNotification("Error deleting department", true);

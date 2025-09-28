@@ -12,7 +12,7 @@ type SelectOption = {
 
 type FormSelectFieldProps = {
   name: string;
-  label: string;
+  label?: string;
   icon: React.ReactNode;
   options: SelectOption[];
   placeholder: string;
