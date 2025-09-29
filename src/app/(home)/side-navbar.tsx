@@ -104,7 +104,7 @@ export default function Sidebar() {
             case "home":
               displayLabel = "Dashboard";
               break;
-            case "hris":
+            case "profile":
               displayLabel = "My Profile";
               break;
             case "operations-and-services":
@@ -220,7 +220,7 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="mt-auto mb-6 px-4">
-        <Link href={"/settings"}>
+        {/* <Link href={"/settings"}>
           <div
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
@@ -230,7 +230,7 @@ export default function Sidebar() {
             <Settings size={22} />
             {!isCollapsed && <span className="text-sm">Settings</span>}
           </div>
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

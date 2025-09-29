@@ -131,7 +131,7 @@ export default function TopBar() {
                 </div>
 
                 <Link 
-                  href="/account" 
+                  href="/profile" 
                   className=" px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                   onClick={() => setUserMenuOpen(false)}
                 >
@@ -139,14 +139,14 @@ export default function TopBar() {
                   My Account
                 </Link>
 
-                <Link 
+                {/* <Link 
                   href="/account/settings" 
                   className=" px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                   onClick={() => setUserMenuOpen(false)}
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   Settings
-                </Link>
+                </Link> */}
 
                 <div className="border-t border-gray-100 mt-1">
                   <button 

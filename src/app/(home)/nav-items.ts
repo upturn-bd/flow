@@ -26,8 +26,8 @@ export const navItems: NavItem[] = [
       roles: ["Employee", "Manager", "Admin"],
     },
     {
-      label: "hris",
-      href: "/hris",
+      label: "my profile",
+      href: "/profile",
       icon: UserCircleIcon,
       roles: ["Manager", "Admin", "Employee"],
     },
