@@ -5,7 +5,7 @@ import { useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { Clock, FileEdit, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function UpcomingPage() {
+export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:string) => void }) {
   const [upcoming, setUpcoming] = useState([]);
   const [isCreatingRequisition, setIsCreatingRequisition] = useState(false);
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
@@ -41,7 +41,7 @@ export default function UpcomingPage() {
   return (
     <div className="min-h-[60vh]">
       {!isCreatingRequisition && !displayDraftId && (
-        <motion.div 
+        <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeIn}
@@ -80,7 +80,7 @@ export default function UpcomingPage() {
                 const requisitionType = requisitionTypes.find(
                   (type) => type.id !== undefined && type.id === item.requisition_category_id
                 );
-                
+
                 return (
                   <motion.div
                     key={index}
@@ -118,11 +118,11 @@ export default function UpcomingPage() {
                           </button>
                         </div>
                       </div>
-                      
+
                       <div className="mt-3 text-gray-600 text-sm line-clamp-2">
                         {item.description || "No description provided."}
                       </div>
-                      
+
                       <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
                         <div className="text-sm text-gray-500">
                           {item.is_one_off ? "One-off request" : "Regular request"}
@@ -142,13 +142,14 @@ export default function UpcomingPage() {
           )}
         </motion.div>
       )}
-      
+
       {isCreatingRequisition && (
         <RequisitionCreatePage
           onClose={() => setIsCreatingRequisition(false)}
+          setActiveTab={setActiveTab}
         />
       )}
-      
+
       {displayDraftId && (
         <RequisitionDraftPage
           onClose={() => setDisplayDraftId(null)}

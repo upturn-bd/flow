@@ -8,7 +8,8 @@ import {
   FileText,
   User,
   AlertCircle,
-  Paperclip
+  Paperclip,
+  CheckCircle
 } from "lucide-react";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -26,7 +27,7 @@ import { uploadManyFiles } from "@/lib/utils/files";
 interface SettlementState {
   id?: number;
   settlement_type_id: number | undefined;
-  amount: number;
+  amount: number | null;
   event_date: string;
   requested_to: string;
   description: string;
@@ -41,7 +42,7 @@ interface SettlementState {
 // Initial state
 const initialSettlementState: SettlementState = {
   settlement_type_id: undefined,
-  amount: 0,
+  amount: null,
   event_date: "",
   requested_to: "",
   description: "",
@@ -55,9 +56,10 @@ const initialSettlementState: SettlementState = {
 interface SettlementCreatePageProps {
   onClose: () => void;
   draftId?: number;
+  setActiveTab: (tab: string) => void;
 }
 
-export default function SettlementCreatePage({ onClose }: SettlementCreatePageProps) {
+export default function SettlementCreatePage({ onClose, setActiveTab }: SettlementCreatePageProps) {
   const [isAdvance, setIsAdvance] = useState(false);
   const [selectedType, setSelectedType] = useState<number | null>(null);
   const [allowance, setAllowance] = useState<number | null>(null);
@@ -154,6 +156,8 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
       } else {
         throw new Error(result.error || "Failed to create settlement request");
       }
+
+      setActiveTab("history")
     } catch (error) {
       toast.error("Failed to create settlement request");
       console.error(error);
@@ -188,10 +192,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
       title="Create Settlement Request"
       subtitle="Submit a new settlement or claim request"
       onBack={onClose}
-      onSave={handleSubmit}
-      onCancel={onClose}
       isLoading={isSubmitting || submitting}
-      saveLabel="Submit Request"
     >
       <div className="space-y-8">
         {/* Basic Information */}
@@ -218,7 +219,7 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
               name="amount"
               label="Amount"
               icon={<DollarSign size={18} />}
-              value={settlementState.amount.toString()}
+              value={settlementState.amount !== null ? settlementState.amount.toString() : ""}
               onChange={handleInputChange}
               type="number"
               error={errors.amount}
@@ -362,7 +363,18 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
         </FormSection>
 
         {/* Action Buttons */}
-        <div className="flex justify-between pt-6 border-t border-gray-200">
+        {/* Allowance info
+        {allowance && (
+          <div className="text-sm text-gray-600 ml-4">
+            Maximum allowance:{" "}
+            <span className="font-semibold">
+              ${allowance.toLocaleString()}
+            </span>
+          </div>
+        )} */}
+
+        <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+          {/* Left side */}
           <Button
             variant="outline"
             onClick={handleSaveDraft}
@@ -373,12 +385,30 @@ export default function SettlementCreatePage({ onClose }: SettlementCreatePagePr
             Save as Draft
           </Button>
 
-          {allowance && (
-            <div className="text-sm text-gray-600">
-              Maximum allowance: <span className="font-semibold">${allowance.toLocaleString()}</span>
-            </div>
-          )}
+          {/* Right side */}
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting || submitting}
+              className="flex items-center gap-2"
+            >
+              <X size={16} />
+              Cancel
+            </Button>
+
+            <Button
+              variant="primary"
+              onClick={handleSubmit}
+              disabled={isSubmitting || submitting}
+              className="flex items-center gap-2"
+            >
+              <CheckCircle size={16} />
+              Submit
+            </Button>
+          </div>
         </div>
+
       </div>
     </FormLayout>
   );

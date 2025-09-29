@@ -35,7 +35,7 @@ interface RequisitionFormState {
   requisition_category_id: number | undefined;
   employee_id: string;
   item_id: number | undefined;
-  quantity: number;
+  quantity: number | null;
   status: "Pending" | "Approved" | "Rejected"; // Using the exact enum values
   is_one_off: boolean;
   from_time: string;
@@ -55,7 +55,7 @@ const initialRequisitionState: RequisitionFormState = {
   requisition_category_id: undefined,
   employee_id: "",
   item_id: undefined,
-  quantity: 0,
+  quantity: null,
   status: "Pending", // Using valid enum value
   is_one_off: false,
   from_time: "",
@@ -67,6 +67,7 @@ const initialRequisitionState: RequisitionFormState = {
 
 interface RequisitionCreatePageProps {
   onClose: () => void;
+  setActiveTab: (tab:string) => void;
 }
 
 interface RequisitionDraftPageProps {
@@ -115,7 +116,7 @@ function saveDraftToLocalStorage(
 }
 
 export default function RequisitionCreatePage({
-  onClose,
+  onClose, setActiveTab
 }: RequisitionCreatePageProps) {
   const [isOneOff, setIsOneOff] = useState(false);
   const [requisitionState, setRequisitionState] =
@@ -203,6 +204,8 @@ export default function RequisitionCreatePage({
       setRequisitionState(initialRequisitionState);
       setAttachments([]);
       setTouchedFields({});
+
+      setActiveTab("history")
 
       const recipients = [user.supervisor_id, formattedRequisitionState.asset_owner].filter(Boolean) as string[];
       createNotification({
@@ -419,7 +422,7 @@ export default function RequisitionCreatePage({
             <input
               type="number"
               name="quantity"
-              value={requisitionState.quantity}
+              value={requisitionState.quantity || ""}
               onChange={handleInputChange}
               onBlur={() => handleFieldBlur('quantity')}
               className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
@@ -967,7 +970,7 @@ export function RequisitionDraftPage({
           <input
             type="number"
             name="quantity"
-            value={requisitionState.quantity}
+            value={requisitionState.quantity || ""}
             onChange={handleInputChange}
             onBlur={() => handleFieldBlur('quantity')}
             className="w-full bg-[#EAF4FF] px-4 py-2 rounded-md"

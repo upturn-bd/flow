@@ -618,6 +618,7 @@ export default function ProjectDetails({
         <MilestoneDetails
           id={milestoneDetailsId}
           onClose={() => setMilestoneDetailsId(null)}
+          project_created_by={projectDetails.created_by || ""}
         />
       )}
 

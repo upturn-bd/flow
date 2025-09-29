@@ -77,8 +77,11 @@ export function useRequisitionRequests() {
       const { data, error } = await supabase
         .from("requisition_records")
         .select("*")
-        .eq("company_id", company_id);
+        .eq("company_id", company_id)
+        .eq("employee_id", user.id);
       // .eq("asset_owner", user.id);
+
+      console.log(data)
 
       if (error) {
         setError("Failed to fetch requisition history");

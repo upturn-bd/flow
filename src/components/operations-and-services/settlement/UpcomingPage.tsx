@@ -6,7 +6,7 @@ import SettlementDraftPage from "./SettlementDraftPage";
 import { Receipt, FileEdit, Trash2, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function UpcomingPage() {
+export default function UpcomingPage({setActiveTab} : {setActiveTab: (tab:string) => void}) {
   const [upcoming, setUpcoming] = useState([]);
   const [isCreatingSettlement, setIsCreatingSettlement] = useState(false);
   const { claimTypes, fetchClaimTypes } = useClaimTypes();
@@ -151,7 +151,10 @@ export default function UpcomingPage() {
       )}
       
       {isCreatingSettlement && (
-        <SettlementCreatePage onClose={() => setIsCreatingSettlement(false)} />
+        <SettlementCreatePage 
+          onClose={() => setIsCreatingSettlement(false)} 
+          setActiveTab={setActiveTab}
+          />
       )}
       
       {displayDraftId && (

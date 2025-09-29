@@ -39,9 +39,10 @@ export type ComplaintState = ComplaintRecord;
 
 interface ComplaintCreatePageProps {
   onClose: () => void;
+  setActiveTab: (tab: string) => void;
 }
 
-export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProps) {
+export default function ComplaintCreatePage({ onClose, setActiveTab }: ComplaintCreatePageProps) {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [complaintState, setComplaintState] = useState<ComplaintState>(initialComplaintRecord);
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -108,6 +109,8 @@ export default function ComplaintCreatePage({ onClose }: ComplaintCreatePageProp
       setAttachments([]);
       setTouched({});
       onClose();
+
+      setActiveTab("history")
 
       const recipients = [user.supervisor_id].filter(Boolean) as string[];
 

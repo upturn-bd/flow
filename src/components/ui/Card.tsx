@@ -146,7 +146,7 @@ export function StatusBadge({ status, variant, size = "sm" }: StatusBadgeProps) 
     if (statusLower.includes("pending") || statusLower.includes("draft")) {
       return "bg-yellow-100 text-yellow-800 border-yellow-200";
     }
-    if (statusLower.includes("rejected") || statusLower.includes("failed") || statusLower.includes("error")) {
+    if (statusLower.includes("rejected") || statusLower.includes("failed") || statusLower.includes("error") || statusLower.includes("not started")) {
       return "bg-red-100 text-red-800 border-red-200";
     }
     if (statusLower.includes("in progress") || statusLower.includes("ongoing")) {

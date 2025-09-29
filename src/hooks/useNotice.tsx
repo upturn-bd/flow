@@ -22,17 +22,21 @@ export function useNotices() {
 
   // local state for fetched notices
   const [notices, setNotices] = useState<Notice[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const createNotice = async (notice: Notice) => {
+    setLoading(true);
     try {
+      const user = await getEmployeeInfo();
+
       if (notice.department_id === undefined) notice.department_id = 0;
       notice.company_id = await getCompanyId();
+      notice.created_by = user.id;
 
       const result = await baseResult.createItem(notice);
 
       const recipients = await getDepartmentEmployeesIds(notice.department_id);
 
-      const user = await getEmployeeInfo();
       createNotification({
         title: "New Notice Published",
         message: `A new notice "${notice.title}" has been published.`,
@@ -48,14 +52,19 @@ export function useNotices() {
     } catch (error) {
       console.error("Error creating notice:", error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const updateNotice = async (noticeId: number, notice: Notice) => {
+    setLoading(true);
     try {
       const result = await baseResult.updateItem(noticeId, notice);
 
-      const recipients = await getDepartmentEmployeesIds(notice.department_id || 0);
+      const recipients = await getDepartmentEmployeesIds(
+        notice.department_id || 0
+      );
       const user = await getEmployeeInfo();
       createNotification({
         title: "Notice Updated",
@@ -72,10 +81,13 @@ export function useNotices() {
     } catch (error) {
       console.error("Error updating notice:", error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchNotices = async (): Promise<Notice[]> => {
+    setLoading(true);
     try {
       const companyId = await getCompanyId();
       const user = await getEmployeeInfo();
@@ -85,7 +97,9 @@ export function useNotices() {
         .from("notice_records")
         .select("*")
         .eq("company_id", companyId)
-        .or(`department_id.eq.${departmentId},department_id.eq.0`)
+        .or(
+          `department_id.eq.${departmentId},department_id.eq.0,created_by.eq.${user.id}`
+        )
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -99,18 +113,21 @@ export function useNotices() {
     } catch (error) {
       console.error("Error fetching notices:", error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   return {
     ...baseResult,
-    notices,                 // <-- updated state
+    notices, // updated state
     notice: baseResult.item,
-    fetchNotices,            // <-- custom function
+    fetchNotices, // custom function
     fetchNotice: baseResult.fetchItem,
     createNotice,
     deleteNotice: baseResult.deleteItem,
     updateNotice,
+    loading, // expose loading
   };
 }
 

@@ -235,6 +235,7 @@ export interface ComplaintRecord {
   anonymous?: boolean;
   against_whom: string;
   attachments?: string[];
+  attachment_download_urls?: string[];
   department_id?: number;
 }
 
@@ -248,6 +249,7 @@ export interface Notice {
   valid_till: string;
   company_id?: number;
   department_id?: number;
+  created_by?: string;
 }
 
 // Notification System Interfaces (separate from Notice system)

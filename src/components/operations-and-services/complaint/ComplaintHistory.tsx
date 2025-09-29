@@ -13,7 +13,7 @@ import {
   Clock,
   List
 } from "lucide-react";
-import { extractFilenameFromUrl } from "@/lib/utils";
+import { extractFileNameFromStoragePath, extractFilenameFromUrl } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import { useComplaints } from "@/hooks/useComplaints";
@@ -23,15 +23,15 @@ export default function ComplaintHistoryPage() {
   const { employees, fetchEmployees } = useEmployees();
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
   const { 
-    complaints, 
-    loading, 
+    complaintHistory: complaints, 
+    historyLoading: loading, 
     error, 
     fetchComplaintHistory
   } = useComplaints();
 
   useEffect(() => {
     fetchComplaintHistory();
-  }, [fetchComplaintHistory]);
+  }, []);
 
   useEffect(() => {
     fetchEmployees();
@@ -158,13 +158,13 @@ export default function ComplaintHistoryPage() {
                           {complaint.attachments.map((attachment, idx) => (
                             <a
                               key={idx}
-                              href={attachment}
+                              href={complaint.attachment_download_urls?.[idx]}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 text-xs px-2 py-1 rounded"
                             >
                               <FileText size={12} />
-                              <span>{extractFilenameFromUrl(attachment)}</span>
+                              <span>{extractFileNameFromStoragePath(attachment)}</span>
                             </a>
                           ))}
                         </div>

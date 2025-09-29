@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { 
+import {
   Calendar,
   Pencil,
   Trash2,
@@ -20,11 +20,14 @@ import TaskCreateModal from "../../task/shared/TaskCreateModal";
 import TaskUpdateModal from "../../task/shared/TaskUpdateModal";
 import TaskDetails from "../../task/shared/TaskDetails";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { getCompanyId } from "@/lib/utils/auth";
+import { getCompanyId, getEmployeeId } from "@/lib/utils/auth";
+import { toast } from "sonner";
+import { StatusBadge } from "@/components/ui/Card";
 
 interface MilestoneDetailsProps {
   id: number;
   onClose: () => void;
+  project_created_by: string;
 }
 
 function formatDate(dateStr: string): string {
@@ -52,6 +55,7 @@ function formatDate(dateStr: string): string {
 export default function MilestoneDetails({
   id,
   onClose,
+  project_created_by
 }: MilestoneDetailsProps) {
   const [milestoneId, setMilestoneId] = useState<number>(id);
   const [milestoneDetails, setMilestoneDetails] = useState<Milestone | null>(null);
@@ -66,6 +70,18 @@ export default function MilestoneDetails({
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const { createTask, updateTask, deleteTask } = useTasks();
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
+
+  const [userId, setUserId] = useState<string>("")
+
+  useEffect(() => {
+    const initUserId = async () => {
+      const userId = await getEmployeeId();
+
+      setUserId(userId)
+    }
+
+    initUserId()
+  }, [])
 
   const handleCreateTask = async (values: any) => {
     try {
@@ -82,6 +98,7 @@ export default function MilestoneDetails({
       await updateTask(values);
       setSelectedTask(null);
       fetchTasksByMilestoneId(milestoneId);
+      toast.success("Task updated successfully")
     } catch {
       alert("Error updating Task.");
     }
@@ -91,6 +108,7 @@ export default function MilestoneDetails({
     try {
       await deleteTask(id);
       fetchTasksByMilestoneId(milestoneId);
+      toast.success("Task deleted successfully")
     } catch {
       alert("Error deleting Task.");
     }
@@ -211,7 +229,7 @@ export default function MilestoneDetails({
             </motion.button>
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm space-y-4"
@@ -225,9 +243,13 @@ export default function MilestoneDetails({
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-medium text-gray-700">Status:</span>
-                <span className="px-2 py-1 rounded-full text-sm bg-gray-100 text-gray-700">
+                {/* <span className="px-2 py-1 rounded-full text-sm bg-gray-100 text-gray-700">
                   {milestoneDetails?.status || "N/A"}
-                </span>
+                </span> */}
+
+                <StatusBadge
+                  status={milestoneDetails?.status || "N/A"}
+                />
               </div>
               <div className="flex items-start gap-2">
                 <span className="font-medium text-gray-700">Assignees:</span>
@@ -272,7 +294,7 @@ export default function MilestoneDetails({
             )}
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -284,16 +306,19 @@ export default function MilestoneDetails({
                 <h3 className="text-lg font-semibold">Task List</h3>
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="button"
-                onClick={() => setIsCreatingTask(true)}
-                className="flex items-center gap-2 px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 transition-colors duration-150 shadow-sm"
-              >
-                <Plus size={16} strokeWidth={2.5} />
-                Add Task
-              </motion.button>
+              {project_created_by === userId && (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="button"
+                  onClick={() => setIsCreatingTask(true)}
+                  className="flex items-center gap-2 px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 transition-colors duration-150 shadow-sm"
+                >
+                  <Plus size={16} strokeWidth={2.5} />
+                  Add Task
+                </motion.button>
+
+              )}
             </div>
 
             <div className="grid md:grid-cols-3 gap-4">
@@ -310,22 +335,28 @@ export default function MilestoneDetails({
                       {task.task_title}
                     </div>
                     <div className="flex justify-end items-center gap-2">
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => task.id !== null && handleDisplayUpdateTaskModal(task.id!)}
-                        className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-150"
-                      >
-                        <Pencil size={15} strokeWidth={2} />
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => task.id !== null && handleDeleteTask(task.id!)}
-                        className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors duration-150"
-                      >
-                        <Trash2 size={15} strokeWidth={2} />
-                      </motion.button>
+                      {project_created_by === userId && (
+                        <>
+
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => task.id !== null && handleDisplayUpdateTaskModal(task.id!)}
+                            className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-150"
+                          >
+                            <Pencil size={15} strokeWidth={2} />
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => task.id !== null && handleDeleteTask(task.id!)}
+                            className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors duration-150"
+                          >
+                            <Trash2 size={15} strokeWidth={2} />
+                          </motion.button>
+                        </>
+                      )}
+
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
@@ -362,6 +393,7 @@ export default function MilestoneDetails({
           {selectedTask && (
             <TaskUpdateModal
               initialData={{
+                id: selectedTask.id,
                 task_title: selectedTask.task_title,
                 task_description: selectedTask.task_description,
                 start_date: selectedTask.start_date,

@@ -13,7 +13,7 @@ import {
   TagIcon, 
   FileText 
 } from "lucide-react";
-import { extractFilenameFromUrl } from "@/lib/utils";
+import { extractFileNameFromStoragePath, extractFilenameFromUrl } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
@@ -162,13 +162,13 @@ export default function RequisitionHistoryPage() {
                           {req.attachments.map((attachment, index) => (
                             <a
                               key={index}
-                              href={attachment}
+                              href={req.attachment_download_urls?.[index]}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 text-xs px-2 py-1 rounded"
                             >
                               <FileText size={12} />
-                              <span>{extractFilenameFromUrl(attachment)}</span>
+                              <span>{extractFileNameFromStoragePath(attachment)}</span>
                             </a>
                           ))}
                         </div>

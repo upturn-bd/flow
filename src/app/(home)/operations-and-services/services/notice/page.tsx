@@ -6,6 +6,7 @@ import { Bell, Pencil, Trash2, Plus, Clock, CalendarDays, Info } from "lucide-re
 import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { NoticeCreateModal, NoticeUpdateModal } from "@/components/operations-and-services/notice";
+import { getEmployeeId } from "@/lib/utils/auth";
 
 export default function NoticePage() {
   const {
@@ -19,7 +20,9 @@ export default function NoticePage() {
   const [isCreatingNotice, setIsCreatingNotice] = useState(false);
   const [isUpdatingNotice, setIsUpdatingNotice] = useState(false);
   const [editNotice, setEditNotice] = useState<Notice | null>(null);
-  const [isCreatingNoticeButtonLoading, setIsCreatingNoticeButtonLoading] = useState(false);  
+  const [isCreatingNoticeButtonLoading, setIsCreatingNoticeButtonLoading] = useState(false);
+  const [userId, setUserId] = useState<string>("")
+
   const handleCreateNotice = async (values: any) => {
     try {
       setIsCreatingNoticeButtonLoading(true);
@@ -53,7 +56,7 @@ export default function NoticePage() {
   const handleDeleteNotice = async (id: number) => {
     const confirmed = window.confirm("Are you sure you want to delete this notice?");
     if (!confirmed) return;
-    
+
     try {
       await deleteNotice(id);
       toast.success("Notice deleted successfully!");
@@ -66,22 +69,31 @@ export default function NoticePage() {
 
   useEffect(() => {
     fetchNotices();
-  }, [fetchNotices]);
+  }, []);
+
+  useEffect(() => {
+    const getUserId = async () => {
+      const id = await getEmployeeId()
+      setUserId(id)
+    }
+
+    getUserId()
+  }, [])
 
   const pageVariants = {
     hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1, 
-      transition: { 
+    visible: {
+      opacity: 1,
+      transition: {
         duration: 0.5,
         when: "beforeChildren"
-      } 
+      }
     },
-    exit: { 
-      opacity: 0, 
-      transition: { 
-        duration: 0.3 
-      } 
+    exit: {
+      opacity: 0,
+      transition: {
+        duration: 0.3
+      }
     }
   };
 
@@ -97,29 +109,29 @@ export default function NoticePage() {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { 
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
         stiffness: 260,
-        damping: 20 
-      } 
+        damping: 20
+      }
     },
-    exit: { 
-      opacity: 0, 
-      y: -20, 
-      transition: { 
-        duration: 0.2 
-      } 
+    exit: {
+      opacity: 0,
+      y: -20,
+      transition: {
+        duration: 0.2
+      }
     }
   };
 
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto p-4 sm:p-6 min-h-[70vh] flex items-center justify-center">
-        <LoadingSpinner 
-          text="Loading notices..." 
-          icon={Bell} 
+        <LoadingSpinner
+          text="Loading notices..."
+          icon={Bell}
           color="amber"
         />
       </div>
@@ -130,7 +142,7 @@ export default function NoticePage() {
     <div className="min-h-[70vh]">
       <AnimatePresence mode="wait">
         {!isCreatingNotice && !editNotice && (
-          <motion.div 
+          <motion.div
             key="notice-main"
             initial="hidden"
             animate="visible"
@@ -138,7 +150,7 @@ export default function NoticePage() {
             variants={pageVariants}
             className="max-w-6xl mx-auto p-4 sm:p-6"
           >
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
@@ -146,7 +158,7 @@ export default function NoticePage() {
             >
               <div>
                 <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-2">
-                  <motion.div 
+                  <motion.div
                     initial={{ scale: 0.9, opacity: 0.5 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.5 }}
@@ -173,7 +185,7 @@ export default function NoticePage() {
             </motion.div>
 
             {notices.length === 0 ? (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
@@ -201,7 +213,7 @@ export default function NoticePage() {
                 </motion.button>
               </motion.div>
             ) : (
-              <motion.div 
+              <motion.div
                 variants={containerVariants}
                 className="grid grid-cols-1 gap-5"
               >
@@ -209,9 +221,9 @@ export default function NoticePage() {
                   <motion.div
                     key={notice.id}
                     layout
-                    whileHover={{ 
+                    whileHover={{
                       y: -4,
-                      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)" 
+                      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)"
                     }}
                     transition={{ layout: { duration: 0.3 } }}
                     className="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-100"
@@ -219,26 +231,29 @@ export default function NoticePage() {
                     <div className="p-6">
                       <div className="flex justify-between items-start">
                         <h2 className="text-lg font-semibold text-gray-800 mb-3">{notice.title}</h2>
-                        <div className="flex space-x-1">
-                          <motion.button
-                            whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.1)" }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setEditNotice(notice)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-                            aria-label="Edit notice"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => handleDeleteNotice(notice.id!)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                            aria-label="Delete notice"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </motion.button>
-                        </div>
+                        {notice.created_by === userId && (
+                          <div className="flex space-x-1">
+                            <motion.button
+                              whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.1)" }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => setEditNotice(notice)}
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                              aria-label="Edit notice"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => handleDeleteNotice(notice.id!)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                              aria-label="Delete notice"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </motion.button>
+                          </div>
+
+                        )}
                       </div>
                       <p className="text-gray-700 mb-4">{notice.description}</p>
                       <div className="flex justify-between items-center pt-4 border-t border-gray-100">
@@ -266,15 +281,15 @@ export default function NoticePage() {
         )}
 
         {isCreatingNotice && (
-          <NoticeCreateModal 
+          <NoticeCreateModal
             onClose={() => setIsCreatingNotice(false)}
             onSubmit={handleCreateNotice}
-            isLoading={isCreatingNoticeButtonLoading} 
+            isLoading={isCreatingNoticeButtonLoading}
           />
         )}
 
         {editNotice && (
-          <NoticeUpdateModal 
+          <NoticeUpdateModal
             initialData={{
               ...editNotice,
               notice_type_id: editNotice.notice_type_id === null ? undefined : editNotice.notice_type_id

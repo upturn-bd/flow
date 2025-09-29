@@ -19,6 +19,7 @@ export interface ComplaintState {
   description: string;
   comment?: string;
   attachments?: string[];
+  attachment_download_urls?: string[];
   company_id?: number;
   approved_by_id?: string;
 }
@@ -43,11 +44,14 @@ export function useComplaints() {
   });
 
   const [complaintRequests, setComplaintRequests] = useState<ComplaintState[]>([]);
+  const [complaintHistory, setComplaintHistory] = useState<ComplaintState[]>([]);
+
   const [requestLoading, setRequestLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false)
 
   const { createNotification } = useNotifications()
 
-  const updateComplaint = async (complaintId: number, complaintData: any, againstName: string)  => {
+  const updateComplaint = async (complaintId: number, complaintData: any, againstName: string) => {
     try {
       const result = await baseResult.updateItem(complaintId, complaintData);
 
@@ -97,14 +101,37 @@ export function useComplaints() {
     }
   }
 
+  const fetchComplaintHistory = async () => {
+    try {
+      console.log("Fetching complaint history...");
+      setHistoryLoading(true);
+      const user = await getEmployeeInfo();
+      const { data, error } = await supabase
+        .from("complaint_records")
+        .select("*")
+        .eq("complainer_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      setComplaintHistory(data);
+      setHistoryLoading(false);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return {
     ...baseResult,
     complaintRequests,
+    complaintHistory,
     requestLoading,
+    historyLoading,
     complaints: baseResult.items,
     fetchComplaints: baseResult.fetchItems,
     fetchComplaintRequests,
-    fetchComplaintHistory: baseResult.fetchItems,
+    fetchComplaintHistory,
     updateComplaint,
     processingId: baseResult.updating,
   };
