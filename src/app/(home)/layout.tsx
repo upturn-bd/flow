@@ -11,9 +11,7 @@ export default function HomeLayout({
 }) {
   return (
     <AuthProvider>
-      <ApprovalLayout>
-        {children}
-      </ApprovalLayout>
+      <ApprovalLayout>{children}</ApprovalLayout>
     </AuthProvider>
   );
 }
@@ -21,13 +19,15 @@ export default function HomeLayout({
 function ApprovalLayout({ children }: { children: React.ReactNode }) {
   const { isApproved } = useAuth();
 
-  return <div className="flex h-dvh">
-  {isApproved && <Sidebar />}
-  <div className={`flex-1 flex flex-col h-full`}>
-    {isApproved && <TopBar />}
-    <main className="flex-1 overflow-y-auto pb-36 md:pb-0">
-      {children}
-    </main>
-  </div>
-</div>;
+  return (
+    <div className="flex h-dvh w-full overflow-x-hidden">
+      {isApproved && <Sidebar />}
+      <div className="flex-1 flex flex-col h-full w-full overflow-x-hidden">
+        {isApproved && <TopBar />}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden pb-36 md:pb-0 w-full">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
 }

@@ -64,7 +64,10 @@ export default function Sidebar() {
   const HamburgerButton = () => (
     <button
       className="md:hidden fixed top-4 left-4 z-[1001] p-2 rounded-md bg-[#001731] text-white"
-      onClick={() => setMobileOpen(!mobileOpen)}
+      onClick={() => {
+        setMobileOpen(!mobileOpen)
+        setIsCollapsed(false)
+      }}
     >
       {mobileOpen ? <X size={24} /> : <List size={24} />}
     </button>
