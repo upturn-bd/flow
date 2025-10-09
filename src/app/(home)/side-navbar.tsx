@@ -114,7 +114,7 @@ export default function Sidebar() {
               displayLabel = "Operations & Services";
               break;
             case "admin-management":
-              displayLabel = "Company Configuration";
+              displayLabel = "Admin Management";
               break;
             default:
               displayLabel =
