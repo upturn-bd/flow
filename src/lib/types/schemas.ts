@@ -140,6 +140,7 @@ export interface Project {
   company_id?: number;
   assignees?: string[];
   created_by?: string;
+  created_at?: string;
 }
 
 export interface Milestone {

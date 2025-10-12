@@ -23,16 +23,18 @@ import {
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui";
-import { getEmployeeId } from "@/lib/utils/auth";
+import { getEmployeeId, getEmployeeInfo } from "@/lib/utils/auth";
 
 interface OngoingTaskPageProps {
+  adminScoped: boolean;
   ongoingTasks: Task[];
   loading: boolean;
   updateTask: (task: Task) => Promise<{ success: boolean; data?: any; error?: any; }>;
-  deleteTask: (taskId: number, projectId?: number, milestoneId?: number) => Promise<{ success: boolean; error?: any; }>;
+  deleteTask: (taskId: number, projectId?: number, milestoneId?: number, adminScoped?: boolean) => Promise<{ success: boolean; error?: any; }>;
 }
 
 export default function OngoingTaskPage({
+  adminScoped=false,
   ongoingTasks,
   loading,
   updateTask,
@@ -43,10 +45,12 @@ export default function OngoingTaskPage({
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
   const [userId, setUserId] = useState<string>('')
+  const [userRole, setUserRole] = useState<string>("")
 
   const userIdInit = async () => {
-    const id = await getEmployeeId()
-    setUserId(id)
+    const user = await getEmployeeInfo()
+    setUserId(user.id)
+    setUserRole(user.role)
   }
 
   useEffect(() => {
@@ -67,7 +71,7 @@ export default function OngoingTaskPage({
   const handleDeleteTask = async (id: number) => {
     try {
       setDeletingTaskId(id);
-      await deleteTask(id);
+      await deleteTask(id, undefined, undefined, adminScoped);
       toast.success("Task deleted successfully");
     } catch (error) {
       toast.error("Error deleting task");
@@ -88,7 +92,9 @@ export default function OngoingTaskPage({
             ongoingTasks.map((task) => (
               <div key={task.id}>
                 <TaskCard
-                userId={userId}
+                  userId={userId}
+                  userRole={userRole}
+                  adminScoped={adminScoped}
                   task={task}
                   onEdit={() => setEditTask(task)}
                   onDelete={() =>
@@ -147,14 +153,18 @@ export default function OngoingTaskPage({
 }
 
 function TaskCard({
+  adminScoped,
   userId,
+  userRole,
   task,
   onEdit,
   onDelete,
   onDetails,
   isDeleting = false,
 }: {
+  adminScoped: boolean,
   userId: string;
+  userRole?: string;
   task: Task;
   onEdit: () => void;
   onDelete: () => void;
@@ -163,26 +173,26 @@ function TaskCard({
 }) {
   const actions = (
     <div className="flex items-center gap-2">
-      {userId === task.created_by && (
+      {(userId === task.created_by || (adminScoped && userRole === "Admin")) && (
         <>
-                <Button
-          variant="ghost"
-          size="sm"
-          onClick={onEdit}
-          className="p-2 h-8 w-8 hover:bg-blue-50 hover:text-blue-600"
-        >
-          <Edit size={14} />
-        </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onEdit}
+            className="p-2 h-8 w-8 hover:bg-blue-50 hover:text-blue-600"
+          >
+            <Edit size={14} />
+          </Button>
 
-              <Button
-        variant="ghost"
-        size="sm"
-        onClick={onDelete}
-        isLoading={isDeleting}
-        className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
-      >
-        <Trash2 size={14} />
-      </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onDelete}
+            isLoading={isDeleting}
+            className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
+          >
+            <Trash2 size={14} />
+          </Button>
         </>
 
       )}

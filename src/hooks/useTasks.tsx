@@ -161,68 +161,83 @@ export function useTasks() {
   }, []);
 
 
-  const fetchOngoingTasks = async () => {
+  const fetchOngoingTasks = useCallback(async (companyScopes = false) => {
     try {
-      setLoading(true)
+      setLoading(true);
 
+      // Get the current user's ID
       const user = await getEmployeeInfo();
 
-
-      const { data, error } = await supabase
+      // Start building the query
+      let query = supabase
         .from("task_records")
         .select("*")
-        .eq("status", false)
-        .or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`)
+        .eq("status", false); // Filter 1: Always filter for ongoing tasks
+
+      // Filter 2: Apply user-specific scope UNLESS companyScopes is true
+      if (!companyScopes) {
+        // If not company-scoped (i.e., user's personal view), filter by created_by OR assigned
+        query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+      }
+
+      // Filter 3: Apply sorting
+      const { data, error } = await query
         .order("end_date", { ascending: true });
 
       if (error) throw error;
 
-      setOngoingTasks(data as Task[])
-
-      setLoading(false)
-
+      setOngoingTasks(data as Task[]);
+      setLoading(false);
 
       return data as Task[];
 
     } catch (err) {
-      console.error("Error fetching tasks:", err);
+      console.error("Error fetching ongoing tasks:", err);
       const errorObj = err instanceof Error ? err : new Error(String(err));
       setError(errorObj);
-
+      setLoading(false); // Ensure loading state is reset on error
+      return [];
     }
-  }
+  }, []); // Ensure dependency array is correct based on your actual dependencies (e.g., supabase object)
 
-  const fetchCompletedTasks = async () => {
+  const fetchCompletedTasks = useCallback(async (companyScopes = false) => {
     try {
-      setLoading(true)
+      setLoading(true);
 
       const user = await getEmployeeInfo();
 
-
-      const { data, error } = await supabase
+      // Start query: always filter for completed tasks
+      let query = supabase
         .from("task_records")
         .select("*")
-        .eq("status", true) // completed only
-        .or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`) // user filter
-        .order("updated_at", { ascending: false }); // newest first
+        .eq("status", true); // Filter 1: Completed tasks
 
+      // Filter 2: Apply user-specific scope UNLESS companyScopes is true
+      if (!companyScopes) {
+        // If not company-scoped, filter by created_by OR assigned
+        query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+      }
+
+      // Filter 3: Apply sorting
+      const { data, error } = await query
+        .order("updated_at", { ascending: false }); // newest first
 
       if (error) throw error;
 
-      setCompletedTasks(data as Task[])
-
-      setLoading(false)
+      setCompletedTasks(data as Task[]);
+      setLoading(false);
 
 
       return data as Task[];
 
     } catch (err) {
-      console.error("Error fetching tasks:", err);
+      console.error("Error fetching completed tasks:", err);
       const errorObj = err instanceof Error ? err : new Error(String(err));
       setError(errorObj);
-
+      setLoading(false);
+      return [];
     }
-  }
+  }, []);
 
 
   // Convenience methods for common use cases
@@ -422,7 +437,7 @@ export function useTasks() {
   }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
   // Delete a task
-  const deleteTask = useCallback(async (taskId: number, projectId?: number, milestoneId?: number) => {
+  const deleteTask = useCallback(async (taskId: number, projectId?: number, milestoneId?: number, adminScoped?: boolean) => {
     try {
       const company_id = await getCompanyId();
 
@@ -445,8 +460,15 @@ export function useTasks() {
       }
 
       setTasks(prev => prev.filter(t => t.id !== taskId));
-      fetchOngoingTasks()
-      fetchCompletedTasks()
+
+      if (adminScoped) {
+        fetchOngoingTasks(true)
+        fetchCompletedTasks(true)
+
+      } else {
+        fetchOngoingTasks()
+        fetchCompletedTasks()
+      }
 
       return { success: true };
     } catch (err) {

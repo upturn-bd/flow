@@ -173,3 +173,14 @@ export async function getUser() {
 
   return user;
 }
+
+
+export async function getEmployeeName (id: string) {
+  const employeeName = await supabase
+    .from("employees")
+    .select("first_name, last_name")
+    .eq("id", id)
+    .single()
+
+  return employeeName.data?.first_name + " " + employeeName.data?.last_name
+}

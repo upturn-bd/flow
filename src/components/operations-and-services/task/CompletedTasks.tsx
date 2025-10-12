@@ -21,13 +21,20 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 
 function TaskCard({
+  adminScoped,
+  userId,
+  userRole,
   task,
   setTaskDetailsId,
   deleteTask,
   departments
 }: {
+  adminScoped: boolean,
+  userId?: string,
+  userRole?: string,
   task: Task;
   setTaskDetailsId: (id: number) => void;
   setSelectedTask: (Task: Task) => void;
@@ -57,15 +64,18 @@ function TaskCard({
 
   const actions = (
     <div className="flex items-center gap-2">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleDelete}
-        isLoading={isDeleting}
-        className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
-      >
-        <Trash2 size={14} />
-      </Button>
+      {(userId === task.created_by || (adminScoped && userRole === "Admin")) && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleDelete}
+          isLoading={isDeleting}
+          className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
+        >
+          <Trash2 size={14} />
+        </Button>
+      )}
+
       <Button
         variant="ghost"
         size="sm"
@@ -106,12 +116,14 @@ function TaskCard({
 }
 
 interface CompletedTasksListProps {
+  adminScoped: boolean;
   tasks: Task[];
   loading: boolean;
-  deleteTask: (taskId: number, projectId?: number, milestoneId?: number) => Promise<{ success: boolean; error?: any; }>;
+  deleteTask: (taskId: number, projectId?: number, milestoneId?: number, adminScoped?: boolean) => Promise<{ success: boolean; error?: any; }>;
 }
 
 const CompletedTasksList = memo(({
+  adminScoped=false,
   tasks,
   loading,
   deleteTask,
@@ -122,6 +134,18 @@ const CompletedTasksList = memo(({
   // Move employee and department fetching to parent level to avoid multiple API calls
   const { fetchEmployees, loading: employeeLoading } = useEmployees();
   const { departments, fetchDepartments, loading: departmentsLoading } = useDepartments();
+  const [userId, setUserId] = useState<string>('')
+  const [userRole, setUserRole] = useState<string>("")
+
+  const userIdInit = async () => {
+    const user = await getEmployeeInfo()
+    setUserId(user.id)
+    setUserRole(user.role)
+  }
+
+  useEffect(() => {
+    userIdInit()
+  }, [])
 
   useEffect(() => {
     fetchEmployees();
@@ -133,7 +157,7 @@ const CompletedTasksList = memo(({
 
   const handleDeleteTask = async (id: number) => {
     try {
-      await deleteTask(id);
+      await deleteTask(id, undefined, undefined, adminScoped);
       // getCompanyTasks(TaskStatus.COMPLETE); // Removed: useTasks hook handles state update automatically
     } catch (error) {
       console.error(error);
@@ -162,6 +186,9 @@ const CompletedTasksList = memo(({
             tasks.map((task) => (
               <div key={task.id}>
                 <TaskCard
+                adminScoped={adminScoped}
+                userId={userId}
+                userRole={userRole}
                   deleteTask={handleDeleteTask}
                   setSelectedTask={setSelectedTask}
                   task={task}

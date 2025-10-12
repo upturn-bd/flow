@@ -71,63 +71,63 @@ const sections = [
         items: [
             {
                 name: "Task",
-                path: "/admin-management/logs/task",
+                path: "/admin-management/company-logs/task",
                 icon: ClipboardList,
                 description: "View historical records for task management",
                 color: "bg-indigo-100 text-indigo-700 border-indigo-200"
             },
             {
                 name: "Project",
-                path: "/admin-management/logs/project",
+                path: "/admin-management/company-logs/project",
                 icon: BarChart,
                 description: "View historical records for project tracking",
                 color: "bg-blue-100 text-blue-700 border-blue-200"
             },
             {
                 name: "Attendance",
-                path: "/admin-management/logs/attendance",
+                path: "/admin-management/company-logs/attendance",
                 icon: LogIn,
                 description: "Review historical check-in and check-out data",
                 color: "bg-green-100 text-green-700 border-green-200"
             },
             {
                 name: "Leave",
-                path: "/admin-management/logs/leave",
+                path: "/admin-management/company-logs/leave",
                 icon: CalendarX,
                 description: "Review all past and pending leave requests",
                 color: "bg-blue-100 text-blue-700 border-blue-200"
             },
             {
                 name: "Notice",
-                path: "/admin-management/logs/notice",
+                path: "/admin-management/company-logs/notice",
                 icon: Bell,
                 description: "Archive and history of all published company notices",
                 color: "bg-amber-100 text-amber-700 border-amber-200"
             },
             {
                 name: "Requisition",
-                path: "/admin-management/logs/requisition",
+                path: "/admin-management/company-logs/requisition",
                 icon: Clipboard,
                 description: "History of all equipment/supply requisition requests",
                 color: "bg-cyan-100 text-cyan-700 border-cyan-200"
             },
             {
                 name: "Complaint",
-                path: "/admin-management/logs/complaint",
+                path: "/admin-management/company-logs/complaint",
                 icon: AlertCircle,
                 description: "Archive of all submitted workplace complaints",
                 color: "bg-red-100 text-red-700 border-red-200"
             },
             {
                 name: "Stakeholder",
-                path: "/admin-management/logs/stakeholder",
+                path: "/admin-management/company-logs/stakeholder",
                 icon: Building2,
                 description: "Records of all stakeholder interactions and issues",
                 color: "bg-purple-100 text-purple-700 border-purple-200"
             },
             {
                 name: "Onboarding",
-                path: "/admin-management/logs/onboarding",
+                path: "/admin-management/company-logs/onboarding",
                 icon: UserPlus,
                 description: "Archive of all employee onboarding processes",
                 color: "bg-purple-100 text-purple-700 border-purple-200"

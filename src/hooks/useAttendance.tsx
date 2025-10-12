@@ -128,6 +128,8 @@ export function useAttendances() {
     getTodaysAttendance,
     getAttendanceForDateRange,
     getAttendanceByTag,
+    deleteAttendance: baseAttendance.deleteItem,
+    updateAttendance: baseAttendance.updateItem
   };
 }
 
