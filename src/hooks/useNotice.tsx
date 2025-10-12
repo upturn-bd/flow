@@ -86,27 +86,31 @@ export function useNotices() {
     }
   };
 
-  const fetchNotices = async (): Promise<Notice[]> => {
+  const fetchNotices = async (isGlobal = false): Promise<Notice[]> => {
     setLoading(true);
     try {
       const companyId = await getCompanyId();
       const user = await getEmployeeInfo();
       const departmentId = user.department_id ?? 0;
 
-      const { data, error } = await supabase
+      let query = supabase
         .from("notice_records")
         .select("*")
         .eq("company_id", companyId)
-        .or(
-          `department_id.eq.${departmentId},department_id.eq.0,created_by.eq.${user.id}`
-        )
         .order("created_at", { ascending: false });
+
+      // If not global, apply department/user filters
+      if (!isGlobal) {
+        query = query.or(
+          `department_id.eq.${departmentId},department_id.eq.0,created_by.eq.${user.id}`
+        );
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
       const fetchedNotices = data as Notice[];
-
-      // update local notices state
       setNotices(fetchedNotices);
 
       return fetchedNotices;
@@ -117,6 +121,7 @@ export function useNotices() {
       setLoading(false);
     }
   };
+
 
   return {
     ...baseResult,

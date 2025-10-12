@@ -11,13 +11,13 @@ import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
 
 export default function AttendanceLogsPage() {
-  const { 
-    today, 
-    todayLoading, 
-    getTodaysAttendance, 
-    getAttendanceForDateRange, 
+  const {
+    today,
+    todayLoading,
+    getTodaysAttendance,
+    getAttendanceForDateRange,
     updateAttendance,
-    deleteAttendance 
+    deleteAttendance
   } = useAttendances();
   const { fetchEmployeeInfo } = useEmployeeInfo();
 
@@ -33,6 +33,16 @@ export default function AttendanceLogsPage() {
     check_in_time: "",
     check_out_time: "",
   });
+
+  // Enum options — match your database values
+  const attendanceStatusOptions = [
+    "Present",
+    "Absent",
+    "Late",
+    "Wrong_Location",
+    "Pending",
+    "On_Leave"
+  ];
 
   useEffect(() => {
     fetchEmployeeInfo();
@@ -81,8 +91,8 @@ export default function AttendanceLogsPage() {
     setSelectedAttendance(attendance);
     setEditData({
       tag: attendance.tag || "",
-      check_in_time: attendance.check_in_time ? new Date(attendance.check_in_time).toISOString().slice(0,16) : "",
-      check_out_time: attendance.check_out_time ? new Date(attendance.check_out_time).toISOString().slice(0,16) : "",
+      check_in_time: attendance.check_in_time ? new Date(attendance.check_in_time).toISOString().slice(0, 16) : "",
+      check_out_time: attendance.check_out_time ? new Date(attendance.check_out_time).toISOString().slice(0, 16) : "",
     });
   };
 
@@ -96,13 +106,26 @@ export default function AttendanceLogsPage() {
 
   const handleSave = async () => {
     try {
+      // Convert back to enum format (replace spaces with underscores if needed)
+      const formattedTag = editData.tag.replace(/\s+/g, "_");
+
+      console.log(
+        {
+          tag: formattedTag,
+          check_in_time: editData.check_in_time,
+          check_out_time: editData.check_out_time
+        }
+      )
+
       await updateAttendance(selectedAttendance.id, {
-        tag: editData.tag,
-        check_in_time: editData.check_in_time,
-        check_out_time: editData.check_out_time
+        tag: formattedTag,
+        check_in_time: editData.check_in_time === "" ? undefined : editData.check_in_time,
+        check_out_time: editData.check_out_time === "" ? undefined : editData.check_out_time
       });
 
-      setAllAttendance(prev => prev.map(att => att.id === selectedAttendance.id ? { ...att, ...editData } : att));
+      setAllAttendance(prev =>
+        prev.map(att => att.id === selectedAttendance.id ? { ...att, ...editData, tag: formattedTag } : att)
+      );
       toast.success("Attendance updated successfully!");
       setSelectedAttendance(null);
     } catch (err) {
@@ -115,6 +138,17 @@ export default function AttendanceLogsPage() {
     if (records.length === 0) {
       return <p className="text-gray-500 text-sm mt-2">No attendance records found.</p>;
     }
+
+    // Tag color styles
+    const tagStyles: Record<string, string> = {
+      Present: "bg-green-100 text-green-800",
+      Absent: "bg-red-100 text-red-800",
+      Late: "bg-yellow-100 text-yellow-800",
+      On_Leave: "bg-blue-100 text-blue-800",
+      Wrong_Location: "bg-purple-100 text-purple-800",
+      Pending: "bg-yellow-100 text-yellow-800",
+    };
+
 
     return (
       <div className="overflow-x-auto mt-3">
@@ -134,21 +168,33 @@ export default function AttendanceLogsPage() {
               <tr key={att.id} className={`transition-all hover:bg-gray-50 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
                 <td className="px-4 py-3 border-b font-medium text-gray-800">{employeeNames[att.employee_id] || "Unknown"}</td>
                 <td className="px-4 py-3 border-b text-gray-600">{att.attendance_date || "N/A"}</td>
-                <td className="px-4 py-3 border-b text-gray-600">{att.tag || "N/A"}</td>
+                <td className="px-4 py-3 border-b text-gray-600">
+                  {att.tag ? (
+                    <span
+                      className={`px-3 py-1 text-sm font-medium rounded-full ${tagStyles[att.tag] || "bg-gray-100 text-gray-700"
+                        }`}
+                    >
+                      {att.tag.replace(/_/g, " ")}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400">N/A</span>
+                  )}
+                </td>
+
                 <td className="px-4 py-3 border-b text-gray-600">{att.check_in_time ? new Date(att.check_in_time).toLocaleTimeString() : "N/A"}</td>
                 <td className="px-4 py-3 border-b text-gray-600">{att.check_out_time ? new Date(att.check_out_time).toLocaleTimeString() : "N/A"}</td>
                 <td className="px-4 py-3 border-b flex gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="secondary" 
+                  <Button
+                    size="sm"
+                    variant="secondary"
                     className="p-2 hover:bg-blue-100 transition-colors"
                     onClick={() => handleEdit(att)}
                   >
                     <Edit2 size={16} />
                   </Button>
-                  <Button 
-                    size="sm" 
-                    variant="danger" 
+                  <Button
+                    size="sm"
+                    variant="danger"
                     className="p-2 hover:bg-red-100 transition-colors"
                     onClick={() => handleDelete(att)}
                   >
@@ -213,7 +259,7 @@ export default function AttendanceLogsPage() {
       {selectedAttendance && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
-            <button 
+            <button
               className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
               onClick={() => setSelectedAttendance(null)}
             >
@@ -224,30 +270,34 @@ export default function AttendanceLogsPage() {
             <div className="flex flex-col gap-3">
               <label className="flex flex-col">
                 <span>Status</span>
-                <input 
-                  type="text" 
-                  value={editData.tag} 
-                  onChange={(e) => setEditData({...editData, tag: e.target.value})} 
+                <select
+                  value={editData.tag.replace(/_/g, " ")}
+                  onChange={(e) => setEditData({ ...editData, tag: e.target.value })}
                   className="px-3 py-2 border rounded-lg"
-                />
+                >
+                  <option value="">Select status</option>
+                  {attendanceStatusOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt.replace(/_/g, " ")}</option>
+                  ))}
+                </select>
               </label>
 
               <label className="flex flex-col">
                 <span>Check In</span>
-                <input 
-                  type="datetime-local" 
-                  value={editData.check_in_time} 
-                  onChange={(e) => setEditData({...editData, check_in_time: e.target.value})} 
+                <input
+                  type="datetime-local"
+                  value={editData.check_in_time}
+                  onChange={(e) => setEditData({ ...editData, check_in_time: e.target.value })}
                   className="px-3 py-2 border rounded-lg"
                 />
               </label>
 
               <label className="flex flex-col">
                 <span>Check Out</span>
-                <input 
-                  type="datetime-local" 
-                  value={editData.check_out_time} 
-                  onChange={(e) => setEditData({...editData, check_out_time: e.target.value})} 
+                <input
+                  type="datetime-local"
+                  value={editData.check_out_time}
+                  onChange={(e) => setEditData({ ...editData, check_out_time: e.target.value })}
                   className="px-3 py-2 border rounded-lg"
                 />
               </label>
