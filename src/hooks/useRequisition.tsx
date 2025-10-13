@@ -32,7 +32,7 @@ export function useRequisitionRequests() {
   const { createNotification } = useNotifications();
 
   const fetchRequisitionRequests = useCallback(
-    async (status: string = "Pending") => {
+    async (status: string = "Pending", isGlobal: boolean = false) => {
       setLoading(true);
       setError(null);
 
@@ -40,12 +40,17 @@ export function useRequisitionRequests() {
         const user = await getEmployeeInfo();
         const company_id = await getCompanyId();
 
-        const { data, error } = await supabase
+        let query = supabase
           .from("requisition_records")
-          .select("*") 
+          .select("*")
           .eq("company_id", company_id)
-          .eq("asset_owner", user.id)
           .eq("status", status);
+
+        if (!isGlobal) {
+          query = query.eq("asset_owner", user.id);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
           setError("Failed to fetch requisition requests");
@@ -65,7 +70,8 @@ export function useRequisitionRequests() {
     []
   );
 
-  const fetchRequisitionHistory = useCallback(async () => {
+
+  const fetchRequisitionHistory = useCallback(async (isGlobal: boolean = false) => {
     setLoading(true);
     setError(null);
 
@@ -73,15 +79,19 @@ export function useRequisitionRequests() {
       const user = await getEmployeeInfo();
       const company_id = await getCompanyId();
 
-      // Fetch both approved and rejected requests
-      const { data, error } = await supabase
+      let query = supabase
         .from("requisition_records")
         .select("*")
-        .eq("company_id", company_id)
-        .eq("employee_id", user.id);
-      // .eq("asset_owner", user.id);
+        .eq("company_id", company_id);
 
-      console.log(data)
+      // Only filter by employee_id if not global
+      if (!isGlobal) {
+        query = query.eq("employee_id", user.id);
+      }
+
+      const { data, error } = await query;
+
+      console.log(data);
 
       if (error) {
         setError("Failed to fetch requisition history");
@@ -98,6 +108,7 @@ export function useRequisitionRequests() {
       setLoading(false);
     }
   }, []);
+
 
   const updateRequisitionRequest = useCallback(
     async (action: string, id: number, comment: string, employee_id: string) => {

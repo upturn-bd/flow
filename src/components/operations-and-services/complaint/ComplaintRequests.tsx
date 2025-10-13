@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Loader2, 
-  XCircle, 
-  Flag, 
-  User, 
-  Clock, 
-  Check, 
+import {
+  Loader2,
+  XCircle,
+  Flag,
+  User,
+  Clock,
+  Check,
   X,
   MessageSquare,
   FileText,
@@ -24,6 +24,7 @@ import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/component
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import { ComplaintCard } from "./ComplaintCard";
 
 export default function ComplaintRequestsPage() {
   const [comment, setComment] = useState<string>("");
@@ -57,7 +58,7 @@ export default function ComplaintRequestsPage() {
   const handleUpdateRequest = async (action: string, id: number) => {
     setCurrentlyProcessingId(id);
     const updateData = {
-      status: action,
+      status: "Resolved",
       comment: comment
     };
 
@@ -80,19 +81,19 @@ export default function ComplaintRequestsPage() {
 
   return (
     <AnimatePresence mode="wait">
-      {requestLoading && <LoadingSection 
-          text="Loading complaint requests..."
-          icon={List}
-          color="blue"
-          />}
-      
+      {requestLoading && <LoadingSection
+        text="Loading complaint requests..."
+        icon={List}
+        color="blue"
+      />}
+
       {error && !requestLoading && (
         <div className="flex flex-col items-center justify-center py-16">
           <XCircle className="h-12 w-12 text-red-500 mb-4" />
           <p className="text-red-500 font-medium">{error}</p>
         </div>
       )}
-      
+
       {!requestLoading && !error && (
         <div className="space-y-6">
           {complaintRequests.length > 0 ? (
@@ -104,10 +105,10 @@ export default function ComplaintRequestsPage() {
                     complaint={complaint}
                     employees={employees}
                     complaintTypes={complaintTypes}
-                    comment={comment}
-                    setComment={setComment}
-                    onAccept={() => handleUpdateRequest("Resolved", complaint.id)}
-                    onReject={() => handleUpdateRequest("Resolved", complaint.id)}
+                    extractFileNameFromStoragePath={extractFileNameFromStoragePath}
+                    mode="request"
+                    onAccept={() => handleUpdateRequest("Accepted", complaint.id)}
+                    onReject={() => handleUpdateRequest("Rejected", complaint.id)}
                     isProcessing={currentlyProcessingId === complaint.id}
                   />
                 ))}
@@ -126,126 +127,3 @@ export default function ComplaintRequestsPage() {
   );
 }
 
-function ComplaintCard({
-  complaint,
-  employees,
-  complaintTypes,
-  comment,
-  setComment,
-  onAccept,
-  onReject,
-  isProcessing
-}: {
-  complaint: any;
-  employees: any[];
-  complaintTypes: any[];
-  comment: string;
-  setComment: (value: string) => void;
-  onAccept: () => void;
-  onReject: () => void;
-  isProcessing: boolean;
-}) {
-  const complainer = employees.find(emp => emp.id === complaint.complainer_id);
-  const against = employees.find(emp => emp.id === complaint.against_whom);
-  const type = complaintTypes.find(type => type.id === complaint.complaint_type_id);
-
-  const actions = (
-    <div className="flex items-center gap-2">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onReject}
-        disabled={isProcessing}
-        className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
-      >
-        <X size={14} />
-        Reject
-      </Button>
-      <Button
-        variant="primary"
-        size="sm"
-        onClick={onAccept}
-        disabled={isProcessing}
-        className="flex items-center gap-2"
-        isLoading={isProcessing}
-      >
-        <Check size={14} />
-        Accept
-      </Button>
-    </div>
-  );
-
-  return (
-    <Card>
-      <CardHeader
-        title={type?.name || "Unknown Complaint Type"}
-        subtitle={complaint.anonymous ? "Anonymous Complaint" : "Named Complaint"}
-        icon={<AlertTriangle size={20} className="text-red-500" />}
-        action={actions}
-      />
-      
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-          <InfoRow
-            icon={<User size={16} />}
-            label="Complainant"
-            value={complaint.anonymous ? "Anonymous" : (complainer?.name || "Unknown")}
-          />
-          <InfoRow
-            icon={<User size={16} />}
-            label="Against"
-            value={against?.name || "Unknown"}
-          />
-        </div>
-
-        <StatusBadge status="Pending" variant="warning" size="sm" />
-
-        {complaint.description && (
-          <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Description:</h4>
-            <p className="text-sm text-gray-600">{complaint.description}</p>
-          </div>
-        )}
-
-        <div className="mt-4 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <MessageSquare size={16} className="inline mr-2" />
-              Add Comment
-            </label>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Add your feedback here..."
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-
-          {complaint.attachments && complaint.attachments.length > 0 && (
-            <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                <FileText size={16} />
-                Attachments
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {complaint.attachments.map((attachment: string, idx: number) => (
-                  <a
-                    key={idx}
-                    href={complaint.attachment_download_urls ? complaint.attachment_download_urls[idx] : '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 text-xs px-3 py-2 rounded-md"
-                  >
-                    <FileText size={12} />
-                    {extractFileNameFromStoragePath(attachment)}
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}

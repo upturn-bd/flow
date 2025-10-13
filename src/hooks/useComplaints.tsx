@@ -79,48 +79,74 @@ export function useComplaints() {
   }
 
 
-  const fetchComplaintRequests = async () => {
+  const fetchComplaintRequests = async (isGlobal: boolean = false) => {
     try {
       console.log("Fetching complaint requests...");
       setRequestLoading(true);
       const user = await getEmployeeInfo();
-      const { data, error } = await supabase
+
+      // Start the query
+      let query = supabase
         .from("complaint_records")
         .select("*")
         .eq("status", "Submitted")
-        .eq("requested_to", user.id)
+        .eq("company_id", user.company_id)
         .order("created_at", { ascending: false });
+
+      // Apply filter only if not global
+      if (!isGlobal) {
+        query = query.eq("requested_to", user.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
-      setComplaintRequests(data);
-      setRequestLoading(false);
+      setComplaintRequests(data || []);
       return data;
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      setComplaintRequests([]);
+      return [];
+    } finally {
+      setRequestLoading(false);
     }
-  }
+  };
 
-  const fetchComplaintHistory = async () => {
+
+  const fetchComplaintHistory = async (isGlobal: boolean = false) => {
     try {
       console.log("Fetching complaint history...");
       setHistoryLoading(true);
       const user = await getEmployeeInfo();
-      const { data, error } = await supabase
+
+      // Start the query
+      let query = supabase
         .from("complaint_records")
         .select("*")
-        .eq("complainer_id", user.id)
+        .eq("company_id", user.company_id)
         .order("created_at", { ascending: false });
+
+      // Apply filter only if not global
+      if (!isGlobal) {
+        query = query.eq("complainer_id", user.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
-      setComplaintHistory(data);
-      setHistoryLoading(false);
+      setComplaintHistory(data || []);
       return data;
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      setComplaintHistory([]);
+      return [];
+    } finally {
+      setHistoryLoading(false);
     }
-  }
+  };
+
 
   return {
     ...baseResult,
