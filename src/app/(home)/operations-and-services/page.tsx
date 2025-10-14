@@ -16,7 +16,8 @@ import {
   BellDot, // Reports
   Users,
   CreditCard, // Payroll
-  Building2, // Stakeholder
+  Building2,
+  UserMinus, // Stakeholder
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -114,6 +115,13 @@ const sections = [
         icon: UserPlus,
         description: "Employee onboarding workflow and tasks",
         color: "bg-purple-100 text-purple-700 border-purple-200"
+      },
+      {
+        name: "Offboarding",
+        path: "/operations-and-services/operations/offboarding",
+        icon: UserMinus,
+        description: "Employee offboarding workflow and tasks",
+        color: "bg-red-100 text-red-700 border-red-200"
       },
       {
         name: "HRIS",
