@@ -26,12 +26,6 @@ export const navItems: NavItem[] = [
       roles: ["Employee", "Manager", "Admin"],
     },
     {
-      label: "my profile",
-      href: "/profile",
-      icon: UserCircleIcon,
-      roles: ["Manager", "Admin", "Employee"],
-    },
-    {
       label: "operations-and-services",
       href: "/operations-and-services",
       icon: EnvelopeIcon,
