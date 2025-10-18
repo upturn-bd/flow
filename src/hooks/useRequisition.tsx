@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
 import { useNotifications } from "./useNotifications";
+import { usePermissions } from "./usePermissions";
 
 export interface RequisitionState {
   id: number;
@@ -30,6 +31,7 @@ export function useRequisitionRequests() {
   const [error, setError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<number | null>(null);
   const { createNotification } = useNotifications();
+  const { canApprove, isSupervisorOf, getSubordinates } = usePermissions();
 
   const fetchRequisitionRequests = useCallback(
     async (status: string = "Pending", isGlobal: boolean = false) => {
@@ -47,7 +49,15 @@ export function useRequisitionRequests() {
           .eq("status", status);
 
         if (!isGlobal) {
-          query = query.eq("asset_owner", user.id);
+          // Get subordinate IDs if user is a supervisor
+          const subordinateIds = await getSubordinates();
+          
+          // User can see requests where they are asset_owner OR from their subordinates
+          if (subordinateIds.length > 0) {
+            query = query.or(`asset_owner.eq.${user.id},employee_id.in.(${subordinateIds.join(',')})`);
+          } else {
+            query = query.eq("asset_owner", user.id);
+          }
         }
 
         const { data, error } = await query;
@@ -67,7 +77,7 @@ export function useRequisitionRequests() {
         setLoading(false);
       }
     },
-    []
+    [getSubordinates]
   );
 
 
@@ -118,6 +128,15 @@ export function useRequisitionRequests() {
         const user = await getEmployeeInfo();
         const company_id = await getCompanyId();
 
+        // Check permission: user must have requisition approval permission OR be supervisor of employee
+        const hasTeamPermission = canApprove('requisition');
+        const isSupervisor = await isSupervisorOf(employee_id);
+        
+        if (!hasTeamPermission && !isSupervisor) {
+          setError("You do not have permission to update this requisition request");
+          throw new Error("Permission denied");
+        }
+
         const { data, error } = await supabase
           .from("requisition_records")
           .update({
@@ -157,7 +176,7 @@ export function useRequisitionRequests() {
         setProcessingId(null);
       }
     },
-    [fetchRequisitionRequests]
+    [fetchRequisitionRequests, canApprove, isSupervisorOf]
   );
 
   return {

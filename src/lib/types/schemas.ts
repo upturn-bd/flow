@@ -533,12 +533,89 @@ export interface SalaryChangeLog {
 
 // Enhanced Account Entry for Payroll Integration
 export interface PayrollAccountEntry {
+  id?: number;
+  account_id?: number;
   payroll_id: number;
   employee_id: string;
-  employee_name: string; // Added as requested
-  total_amount: number;
-  basic_salary: number;
-  adjustments: PayrollAdjustment[];
-  generation_date: string;
-  source: 'Adjusted' | 'Generated'; // Added source tracking
+  transaction_type: 'salary_payment' | 'deduction' | 'bonus';
+  amount: number;
+  description: string;
+  company_id: number;
+  created_at?: string;
+  created_by?: string;
+}
+
+// ==============================================================================
+}
+// Team-Based Permissions System
+// ==============================================================================
+
+export interface Team {
+  id?: number;
+  name: string;
+  description?: string;
+  company_id: number;
+  is_default?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+}
+
+export interface TeamMember {
+  id?: number;
+  team_id: number;
+  employee_id: string;
+  joined_at?: string;
+  added_by?: string;
+  // Populated fields for display
+  employee_name?: string;
+  employee_email?: string;
+  added_by_name?: string;
+}
+
+export type PermissionCategory = 'workflow' | 'services' | 'operations' | 'admin';
+
+export interface Permission {
+  id?: number;
+  module_name: string;
+  display_name: string;
+  description?: string;
+  category: PermissionCategory;
+  created_at?: string;
+}
+
+export interface TeamPermission {
+  id?: number;
+  team_id: number;
+  permission_id: number;
+  can_read: boolean;
+  can_write: boolean;
+  can_delete: boolean;
+  can_approve: boolean;
+  can_comment: boolean;
+  created_at?: string;
+  updated_at?: string;
+  // Populated fields for display
+  module_name?: string;
+  display_name?: string;
+  category?: PermissionCategory;
+}
+
+export interface UserPermissions {
+  [moduleName: string]: {
+    can_read: boolean;
+    can_write: boolean;
+    can_delete: boolean;
+    can_approve: boolean;
+    can_comment: boolean;
+  };
+}
+
+export interface TeamWithMembers extends Team {
+  member_count?: number;
+  members?: TeamMember[];
+}
+
+export interface TeamWithPermissions extends Team {
+  permissions?: TeamPermission[];
 }

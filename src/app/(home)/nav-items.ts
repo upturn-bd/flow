@@ -15,7 +15,8 @@ export type NavItem = {
   label: string;
   href: string;
   icon: any;
-  roles?: string[];  // Which roles can access this item
+  roles?: string[];  // Deprecated: kept for backward compatibility
+  requiredPermissions?: string[];  // New: permission-based access (format: "module:action")
 };
 
 export const navItems: NavItem[] = [
@@ -23,18 +24,21 @@ export const navItems: NavItem[] = [
       label: "home",
       href: "/home",
       icon: GridFourIcon, 
-      roles: ["Employee", "Manager", "Admin"],
+      roles: ["Employee", "Manager", "Admin"], // Backward compatibility
+      requiredPermissions: [], // Home accessible to all approved users
     },
     {
       label: "operations-and-services",
       href: "/operations-and-services",
       icon: EnvelopeIcon,
-      roles: ["Employee", "Manager", "Admin"],
+      roles: ["Employee", "Manager", "Admin"], // Backward compatibility
+      requiredPermissions: [], // Operations page accessible to all, subpages have their own checks
     },
     {
       label: "admin-management",
       href: "/admin-management",
       icon: UserGearIcon,
-      roles: ["Admin"],
+      roles: ["Admin"], // Backward compatibility
+      requiredPermissions: ["teams:can_write", "admin_config:can_write"], // Admins have team write access
     },
   ];

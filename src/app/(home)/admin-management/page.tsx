@@ -7,6 +7,7 @@ import {
     CreditCard, // Payroll
     DollarSign, // Transaction
     Users, // Roles
+    UsersRound, // Teams
     ClipboardList, // Task Log
     BarChart, // Project Log
     LogIn, // Attendance Log
@@ -62,6 +63,13 @@ const sections = [
                 icon: Users,
                 description: "Define user roles, permissions, and access levels",
                 color: "bg-purple-100 text-purple-700 border-purple-200"
+            },
+            {
+                name: "Teams",
+                path: "/admin-management/company-configurations/teams",
+                icon: UsersRound,
+                description: "Manage teams and assign granular permissions",
+                color: "bg-violet-100 text-violet-700 border-violet-200"
             },
         ],
     },

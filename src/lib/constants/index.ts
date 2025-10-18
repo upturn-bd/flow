@@ -443,3 +443,228 @@ export const SELECT_OPTIONS = {
 export type PaymentMethod = typeof PAYMENT_METHODS[number];
 export type Currency = typeof CURRENCIES[number];
 export type AccountCategory = typeof ACCOUNT_CATEGORIES[keyof typeof ACCOUNT_CATEGORIES];
+
+// ==============================================================================
+// Team-Based Permissions Constants
+// ==============================================================================
+
+export const PERMISSION_ACTIONS = {
+  READ: 'can_read',
+  WRITE: 'can_write',
+  DELETE: 'can_delete',
+  APPROVE: 'can_approve',
+  COMMENT: 'can_comment',
+} as const;
+
+export type PermissionAction = typeof PERMISSION_ACTIONS[keyof typeof PERMISSION_ACTIONS];
+
+export const PERMISSION_MODULES = {
+  // Workflow
+  TASKS: 'tasks',
+  PROJECTS: 'projects',
+  MILESTONES: 'milestones',
+  
+  // Services
+  ATTENDANCE: 'attendance',
+  LEAVE: 'leave',
+  NOTICE: 'notice',
+  REQUISITION: 'requisition',
+  SETTLEMENT: 'settlement',
+  COMPLAINTS: 'complaints',
+  PAYROLL: 'payroll',
+  STAKEHOLDERS: 'stakeholders',
+  
+  // Operations
+  ONBOARDING: 'onboarding',
+  OFFBOARDING: 'offboarding',
+  HRIS: 'hris',
+  
+  // Admin
+  ADMIN_CONFIG: 'admin_config',
+  DEPARTMENTS: 'departments',
+  DIVISIONS: 'divisions',
+  GRADES: 'grades',
+  POSITIONS: 'positions',
+  COMPANY_LOGS: 'company_logs',
+  TEAMS: 'teams',
+} as const;
+
+export type PermissionModule = typeof PERMISSION_MODULES[keyof typeof PERMISSION_MODULES];
+
+export const MODULE_CATEGORIES = {
+  WORKFLOW: 'workflow',
+  SERVICES: 'services',
+  OPERATIONS: 'operations',
+  ADMIN: 'admin',
+} as const;
+
+export type ModuleCategory = typeof MODULE_CATEGORIES[keyof typeof MODULE_CATEGORIES];
+
+// Module display names
+export const MODULE_DISPLAY_NAMES: Record<PermissionModule, string> = {
+  [PERMISSION_MODULES.TASKS]: 'Tasks',
+  [PERMISSION_MODULES.PROJECTS]: 'Projects',
+  [PERMISSION_MODULES.MILESTONES]: 'Milestones',
+  [PERMISSION_MODULES.ATTENDANCE]: 'Attendance',
+  [PERMISSION_MODULES.LEAVE]: 'Leave',
+  [PERMISSION_MODULES.NOTICE]: 'Notice',
+  [PERMISSION_MODULES.REQUISITION]: 'Requisition',
+  [PERMISSION_MODULES.SETTLEMENT]: 'Settlement',
+  [PERMISSION_MODULES.COMPLAINTS]: 'Complaints',
+  [PERMISSION_MODULES.PAYROLL]: 'Payroll',
+  [PERMISSION_MODULES.STAKEHOLDERS]: 'Stakeholders',
+  [PERMISSION_MODULES.ONBOARDING]: 'Onboarding',
+  [PERMISSION_MODULES.OFFBOARDING]: 'Offboarding',
+  [PERMISSION_MODULES.HRIS]: 'HRIS',
+  [PERMISSION_MODULES.ADMIN_CONFIG]: 'Admin Configuration',
+  [PERMISSION_MODULES.DEPARTMENTS]: 'Departments',
+  [PERMISSION_MODULES.DIVISIONS]: 'Divisions',
+  [PERMISSION_MODULES.GRADES]: 'Grades',
+  [PERMISSION_MODULES.POSITIONS]: 'Positions',
+  [PERMISSION_MODULES.COMPANY_LOGS]: 'Company Logs',
+  [PERMISSION_MODULES.TEAMS]: 'Team Management',
+};
+
+// Module information with categories
+export interface ModuleInfo {
+  name: PermissionModule;
+  displayName: string;
+  description?: string;
+  category: 'workflow' | 'services' | 'operations' | 'admin';
+}
+
+export const MODULE_INFO: Record<PermissionModule, ModuleInfo> = {
+  [PERMISSION_MODULES.TASKS]: {
+    name: PERMISSION_MODULES.TASKS,
+    displayName: 'Tasks',
+    description: 'Create and manage tasks',
+    category: 'workflow',
+  },
+  [PERMISSION_MODULES.PROJECTS]: {
+    name: PERMISSION_MODULES.PROJECTS,
+    displayName: 'Projects',
+    description: 'Manage projects',
+    category: 'workflow',
+  },
+  [PERMISSION_MODULES.MILESTONES]: {
+    name: PERMISSION_MODULES.MILESTONES,
+    displayName: 'Milestones',
+    description: 'Track project milestones',
+    category: 'workflow',
+  },
+  [PERMISSION_MODULES.ATTENDANCE]: {
+    name: PERMISSION_MODULES.ATTENDANCE,
+    displayName: 'Attendance',
+    description: 'Track employee attendance',
+    category: 'services',
+  },
+  [PERMISSION_MODULES.LEAVE]: {
+    name: PERMISSION_MODULES.LEAVE,
+    displayName: 'Leave',
+    description: 'Manage leave requests',
+    category: 'services',
+  },
+  [PERMISSION_MODULES.NOTICE]: {
+    name: PERMISSION_MODULES.NOTICE,
+    displayName: 'Notice',
+    description: 'Create and manage notices',
+    category: 'services',
+  },
+  [PERMISSION_MODULES.REQUISITION]: {
+    name: PERMISSION_MODULES.REQUISITION,
+    displayName: 'Requisition',
+    description: 'Handle requisition requests',
+    category: 'services',
+  },
+  [PERMISSION_MODULES.SETTLEMENT]: {
+    name: PERMISSION_MODULES.SETTLEMENT,
+    displayName: 'Settlement',
+    description: 'Manage settlements',
+    category: 'services',
+  },
+  [PERMISSION_MODULES.COMPLAINTS]: {
+    name: PERMISSION_MODULES.COMPLAINTS,
+    displayName: 'Complaints',
+    description: 'Handle employee complaints',
+    category: 'services',
+  },
+  [PERMISSION_MODULES.PAYROLL]: {
+    name: PERMISSION_MODULES.PAYROLL,
+    displayName: 'Payroll',
+    description: 'View payroll information',
+    category: 'services',
+  },
+  [PERMISSION_MODULES.STAKEHOLDERS]: {
+    name: PERMISSION_MODULES.STAKEHOLDERS,
+    displayName: 'Stakeholders',
+    description: 'Manage stakeholders',
+    category: 'services',
+  },
+  [PERMISSION_MODULES.ONBOARDING]: {
+    name: PERMISSION_MODULES.ONBOARDING,
+    displayName: 'Onboarding',
+    description: 'Handle employee onboarding',
+    category: 'operations',
+  },
+  [PERMISSION_MODULES.OFFBOARDING]: {
+    name: PERMISSION_MODULES.OFFBOARDING,
+    displayName: 'Offboarding',
+    description: 'Manage employee offboarding',
+    category: 'operations',
+  },
+  [PERMISSION_MODULES.HRIS]: {
+    name: PERMISSION_MODULES.HRIS,
+    displayName: 'HRIS',
+    description: 'Access HRIS data',
+    category: 'operations',
+  },
+  [PERMISSION_MODULES.ADMIN_CONFIG]: {
+    name: PERMISSION_MODULES.ADMIN_CONFIG,
+    displayName: 'Admin Configuration',
+    description: 'Configure system settings',
+    category: 'admin',
+  },
+  [PERMISSION_MODULES.DEPARTMENTS]: {
+    name: PERMISSION_MODULES.DEPARTMENTS,
+    displayName: 'Departments',
+    description: 'Manage departments',
+    category: 'admin',
+  },
+  [PERMISSION_MODULES.DIVISIONS]: {
+    name: PERMISSION_MODULES.DIVISIONS,
+    displayName: 'Divisions',
+    description: 'Manage divisions',
+    category: 'admin',
+  },
+  [PERMISSION_MODULES.GRADES]: {
+    name: PERMISSION_MODULES.GRADES,
+    displayName: 'Grades',
+    description: 'Manage employee grades',
+    category: 'admin',
+  },
+  [PERMISSION_MODULES.POSITIONS]: {
+    name: PERMISSION_MODULES.POSITIONS,
+    displayName: 'Positions',
+    description: 'Manage positions',
+    category: 'admin',
+  },
+  [PERMISSION_MODULES.COMPANY_LOGS]: {
+    name: PERMISSION_MODULES.COMPANY_LOGS,
+    displayName: 'Company Logs',
+    description: 'View company activity logs',
+    category: 'admin',
+  },
+  [PERMISSION_MODULES.TEAMS]: {
+    name: PERMISSION_MODULES.TEAMS,
+    displayName: 'Team Management',
+    description: 'Manage teams and permissions',
+    category: 'admin',
+  },
+};
+
+// Default team names
+export const DEFAULT_TEAMS = {
+  ADMINISTRATORS: 'Administrators',
+  MANAGERS: 'Managers',
+  EMPLOYEES: 'Employees',
+} as const;

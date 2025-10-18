@@ -2,9 +2,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getUserFromServer } from "./lib/auth/getUser";
 import { createClient } from "./lib/supabase/server";
-import { authRoutes, excludePaths, employeeRoutes, managerRoutes, adminRoutes } from "./lib/utils/path-utils";
+import { authRoutes, excludePaths } from "./lib/utils/path-utils";
 
-type Role = "Employee" | "Manager" | "Admin";
+// Permission-based route access mappings
+const ROUTE_PERMISSION_MAP: Record<string, { module: string; action: string }> = {
+  '/admin-management': { module: 'teams', action: 'can_write' },
+  '/finder': { module: 'hris', action: 'can_read' },
+  // Most other routes are accessible if user has any permission
+};
 
 
 
@@ -89,7 +94,7 @@ export async function middleware(request: NextRequest) {
   const dbClient = await createClient();
   const { data: employee, error } = await dbClient
     .from("employees")
-    .select("has_approval, role, rejection_reason")
+    .select("has_approval, rejection_reason")
     .eq("id", user.id)
     .single();
 
@@ -104,8 +109,7 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  const { has_approval, role: queriedRole, rejection_reason } = employee;
-  const role = queriedRole as Role;
+  const { has_approval, rejection_reason } = employee;
 
   // Handle pending approval state
   if (has_approval === "PENDING") {
@@ -163,18 +167,36 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Role-based access control
-  const rolePermissions: Record<Role, string[]> = {
-    Employee: employeeRoutes,
-    Manager: managerRoutes,
-    Admin: adminRoutes,
-  };
-
-  const isAllowed = rolePermissions[role]?.some((allowedPath) =>
-    currentPath === allowedPath || currentPath.startsWith(`${allowedPath}/`)
+  // Permission-based access control
+  // Check if route requires specific permissions
+  const matchedRoute = Object.keys(ROUTE_PERMISSION_MAP).find(route => 
+    currentPath === route || currentPath.startsWith(`${route}/`)
   );
 
-  if (!isAllowed) {
+  if (matchedRoute) {
+    const requiredPermission = ROUTE_PERMISSION_MAP[matchedRoute];
+    
+    // Check user permissions from database
+    const { data: hasAccess } = await dbClient
+      .rpc('has_permission', {
+        user_id: user.id,
+        module: requiredPermission.module,
+        action: requiredPermission.action
+      });
+
+    if (!hasAccess) {
+      url.pathname = "/unauthorized";
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // For all other routes, user must have at least some permissions
+  // (this ensures only active team members can access the app)
+  const { data: userPermissions } = await dbClient
+    .rpc('get_user_permissions', { user_id: user.id });
+
+  if (!userPermissions || userPermissions.length === 0) {
+    // User has no team memberships or permissions
     url.pathname = "/unauthorized";
     return NextResponse.redirect(url);
   }

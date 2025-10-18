@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase/client";
 import { useLeaveBalances } from "./useLeaveBalances";
 import { useNotifications } from "./useNotifications";
 import { HolidayConfig, LeaveType } from "@/lib/types";
+import { usePermissions } from "./usePermissions";
 
 
 export type { LeaveType, HolidayConfig };
@@ -58,6 +59,7 @@ export function useLeaveRequests() {
 
   const { reduceBalance } = useLeaveBalances();
   const { createNotification } = useNotifications();
+  const { canApprove, isSupervisorOf, getSubordinates } = usePermissions();
 
   // Create leave request (same as before)
   const createLeaveRequest = async (leaveData: any) => {
@@ -84,7 +86,7 @@ export function useLeaveRequests() {
     }
   };
 
-  // Update leave request (same as before)
+  // Update leave request (with permission check)
   const updateLeaveRequest = async (
     leaveId: number,
     leaveData: any,
@@ -95,9 +97,18 @@ export function useLeaveRequests() {
   ) => {
     try {
       const user = await getEmployeeInfo();
+      
+      // Check permission: user must have leave approval permission OR be supervisor of employee
+      const hasTeamPermission = canApprove('leave');
+      const isSupervisor = await isSupervisorOf(employeeId);
+      
+      if (!hasTeamPermission && !isSupervisor) {
+        throw new Error("You do not have permission to update this leave request");
+      }
+
       const result = await baseResult.updateItem(leaveId, leaveData);
 
-      const recipients = [user.id].filter(Boolean) as string[];
+      const recipients = [employeeId].filter(Boolean) as string[];
 
       if (leaveData.status === "Accepted") {
         const parseDate = (str: string) => new Date(str.replace(" ", "T"));
@@ -132,16 +143,29 @@ export function useLeaveRequests() {
     }
   };
 
-  // Fetch pending requests (default: only assigned to user)
+  // Fetch pending requests (user's assigned requests + subordinate requests if supervisor)
   const fetchLeaveRequests = async () => {
     try {
       setLoading(true);
       const user = await getEmployeeInfo();
-      const { data, error } = await supabase
+      
+      // Get subordinate IDs if user is a supervisor
+      const subordinateIds = await getSubordinates();
+      
+      // Build query for requests assigned to user OR from subordinates
+      let query = supabase
         .from("leave_records")
         .select("*")
-        .eq("requested_to", user.id)
         .eq("status", "Pending");
+
+      // User can see requests assigned to them OR from their subordinates
+      if (subordinateIds.length > 0) {
+        query = query.or(`requested_to.eq.${user.id},employee_id.in.(${subordinateIds.join(',')})`);
+      } else {
+        query = query.eq("requested_to", user.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -154,10 +178,19 @@ export function useLeaveRequests() {
     }
   };
 
-  // Fetch pending requests globally (admin only)
+  // Fetch pending requests globally (for users with leave approval permissions)
   const fetchGlobalLeaveRequests = async () => {
     try {
       setLoading(true);
+      
+      // Check if user has permission to see all leave requests
+      if (!canApprove('leave')) {
+        console.warn("User does not have permission to view global leave requests");
+        setLeaveRequests([]);
+        setLoading(false);
+        return;
+      }
+
       const companyId = await getCompanyId()
       const { data, error } = await supabase
         .from("leave_records")
