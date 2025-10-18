@@ -25,6 +25,13 @@ export default function TeamMembersModal({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
 
+  // Debug logging
+  console.log('TeamMembersModal - team:', team);
+  console.log('TeamMembersModal - team.members:', team.members);
+  console.log('TeamMembersModal - team.members[0]:', team.members?.[0]);
+  console.log('TeamMembersModal - employees:', employees);
+  console.log('TeamMembersModal - extendedEmployees:', extendedEmployees);
+
   // Get current member IDs
   const memberIds = useMemo(
     () => new Set(team.members?.map((m) => m.employee_id) || []),
@@ -47,23 +54,18 @@ export default function TeamMembersModal({
     );
   }, [availableEmployees, searchTerm]);
 
-  // Current team members with employee info
+  // Current team members - data is already populated in team.members
   const teamMembers = useMemo(() => {
-    if (!team.members || !employees) return [];
-    const employeeList = extendedEmployees.length > 0 ? extendedEmployees : employees;
-    return team.members
-      .map((member) => {
-        const employee = employeeList.find((emp) => emp.id === member.employee_id);
-        return employee ? { ...member, employee } : null;
-      })
-      .filter((m): m is typeof team.members[0] & { employee: ExtendedEmployee } => m !== null);
-  }, [team.members, employees, extendedEmployees]);
+    if (!team.members) return [];
+    // The members already have employee_name and employee_email from the query
+    return team.members;
+  }, [team.members]);
 
   const handleAddMember = async () => {
     if (!selectedEmployeeId || !team.id) return;
 
-    const success = await addTeamMember(team.id, selectedEmployeeId);
-    if (success) {
+    const result = await addTeamMember(team.id, selectedEmployeeId);
+    if (result.success) {
       setSelectedEmployeeId('');
       setSearchTerm('');
       onMembersUpdated();
@@ -74,8 +76,8 @@ export default function TeamMembersModal({
     if (!team.id) return;
     
     if (confirm('Are you sure you want to remove this member from the team?')) {
-      const success = await removeTeamMember(team.id, employeeId);
-      if (success) {
+      const result = await removeTeamMember(team.id, employeeId);
+      if (result.success) {
         onMembersUpdated();
       }
     }
@@ -209,11 +211,11 @@ export default function TeamMembersModal({
                         >
                           <div className="flex-1">
                             <div className="font-medium text-gray-900">
-                              {member.employee.name}
+                              {member.employee_name || 'Unknown Employee'}
                             </div>
-                            {member.employee.email && (
+                            {member.employee_email && (
                               <div className="text-sm text-gray-500">
-                                {member.employee.email}
+                                {member.employee_email}
                               </div>
                             )}
                             {member.joined_at && (

@@ -9,7 +9,7 @@ import {
     MagnifyingGlass as MagnifyingGlassIcon,
     User as UserIcon,
     Bell as BellIcon,
-  } from "@phosphor-icons/react/dist/ssr";
+  } from "@phosphor-icons/react";
 
 export type NavItem = {
   label: string;

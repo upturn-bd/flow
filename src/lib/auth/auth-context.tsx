@@ -84,17 +84,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Fetch employee data when user changes
   useEffect(() => {
     async function fetchEmployeeData() {
-      setEmployeeDataLoading(true);
       if (!user) {
         setEmployeeInfo(null);
+        setEmployeeDataLoading(false);
         return;
       }
+
+      setEmployeeDataLoading(true);
 
       try {
         const data = await getEmployeeInfo();
         setEmployeeInfo(data);
       } catch (error) {
-        console.error('Failed to fetch employee data:', error);
+        console.error('Failed to get employee info', error);
         setEmployeeInfo(null);
       } finally {
         setEmployeeDataLoading(false);

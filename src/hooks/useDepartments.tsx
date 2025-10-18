@@ -5,10 +5,12 @@ import { useBaseEntity } from "./core";
 import { Department } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export type { Department };
 
 export function useDepartments() {
+  const { user, isLoading: authLoading } = useAuth();
   const baseResult = useBaseEntity<Department>({
     tableName: "departments",
     entityName: "department",
@@ -20,6 +22,11 @@ export function useDepartments() {
 
   // Manual fetch all departments
   const fetchDepartments = async (company_id?: number | undefined) => {
+    // Don't fetch if auth is still loading or user isn't authenticated
+    if (authLoading || !user) {
+      return [];
+    }
+
     try {
       const supabase = await createClient();
       const companyId = company_id ? company_id : await getCompanyId()
@@ -43,6 +50,10 @@ export function useDepartments() {
   // Manual create department
   // Manual create department
   const createDepartment = async (dept: Department) => {
+    if (authLoading || !user) {
+      throw new Error('User not authenticated');
+    }
+
     try {
       setLoading(true);
       const supabase = await createClient();
@@ -83,6 +94,10 @@ export function useDepartments() {
 
   // Manual update department
   const updateDepartment = async (id: number, dept: Partial<Department>) => {
+    if (authLoading || !user) {
+      throw new Error('User not authenticated');
+    }
+
     try {
       setLoading(true)
 
@@ -117,6 +132,10 @@ export function useDepartments() {
 
   // Manual delete department
   const deleteDepartment = async (id: number) => {
+    if (authLoading || !user) {
+      throw new Error('User not authenticated');
+    }
+
     try {
       setLoading(true)
 

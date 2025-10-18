@@ -80,8 +80,12 @@ export function useTeams() {
       const { data: membersData, error: membersError } = await supabase
         .from("team_members")
         .select(`
-          *,
-          employee:employees!team_members_employee_id_fkey(
+          id,
+          team_id,
+          employee_id,
+          joined_at,
+          added_by,
+          employees!team_members_employee_id_fkey(
             id,
             first_name,
             last_name,
@@ -94,19 +98,25 @@ export function useTeams() {
         `)
         .eq("team_id", teamId);
 
-      if (membersError) throw membersError;
+      if (membersError) {
+        console.error("Error fetching team members:", membersError);
+        throw membersError;
+      }
 
       // Format members with populated fields
-      const members: TeamMember[] = (membersData || []).map((m: any) => ({
-        id: m.id,
-        team_id: m.team_id,
-        employee_id: m.employee_id,
-        joined_at: m.joined_at,
-        added_by: m.added_by,
-        employee_name: m.employee ? `${m.employee.first_name} ${m.employee.last_name}` : 'Unknown',
-        employee_email: m.employee?.email,
-        added_by_name: m.added_by_employee ? `${m.added_by_employee.first_name} ${m.added_by_employee.last_name}` : 'System',
-      }));
+      const members: TeamMember[] = (membersData || []).map((m: any) => {
+        const employee = m.employees;
+        return {
+          id: m.id,
+          team_id: m.team_id,
+          employee_id: m.employee_id,
+          joined_at: m.joined_at,
+          added_by: m.added_by,
+          employee_name: employee ? `${employee.first_name} ${employee.last_name}` : 'Unknown',
+          employee_email: employee?.email,
+          added_by_name: m.added_by_employee ? `${m.added_by_employee.first_name} ${m.added_by_employee.last_name}` : 'System',
+        };
+      });
 
       return {
         ...teamData,
@@ -143,14 +153,27 @@ export function useTeams() {
         .eq("company_id", companyId)
         .single();
 
-      if (teamError) throw teamError;
+      if (teamError) {
+        console.error("Error fetching team:", teamError);
+        throw teamError;
+      }
 
       // Fetch team permissions with permission details
+      // Note: If team has no permissions yet, this will return empty array (not an error)
       const { data: permissionsData, error: permissionsError } = await supabase
         .from("team_permissions")
         .select(`
-          *,
-          permission:permissions(
+          id,
+          team_id,
+          permission_id,
+          can_read,
+          can_write,
+          can_delete,
+          can_approve,
+          can_comment,
+          created_at,
+          updated_at,
+          permissions!team_permissions_permission_id_fkey(
             id,
             module_name,
             display_name,
@@ -159,9 +182,17 @@ export function useTeams() {
         `)
         .eq("team_id", teamId);
 
-      if (permissionsError) throw permissionsError;
+      // Only throw error if it's a real database error, not just empty results
+      if (permissionsError) {
+        console.error("Error fetching team permissions:", permissionsError);
+        console.error("Error code:", permissionsError.code);
+        console.error("Error details:", permissionsError.details);
+        console.error("Error hint:", permissionsError.hint);
+        throw permissionsError;
+      }
 
       // Format permissions with populated fields
+      // If no permissions exist yet, return empty array
       const permissions: TeamPermission[] = (permissionsData || []).map((p: any) => ({
         id: p.id,
         team_id: p.team_id,
@@ -173,9 +204,9 @@ export function useTeams() {
         can_comment: p.can_comment,
         created_at: p.created_at,
         updated_at: p.updated_at,
-        module_name: p.permission?.module_name,
-        display_name: p.permission?.display_name,
-        category: p.permission?.category,
+        module_name: p.permissions?.module_name,
+        display_name: p.permissions?.display_name,
+        category: p.permissions?.category,
       }));
 
       return {
@@ -183,9 +214,10 @@ export function useTeams() {
         permissions,
       };
     } catch (err: any) {
-      const errorMessage = err.message || "Failed to fetch team permissions";
+      const errorMessage = err.message || err.hint || "Failed to fetch team permissions";
       setError(errorMessage);
       console.error("Error fetching team with permissions:", err);
+      console.error("Error details:", JSON.stringify(err, null, 2));
       return null;
     } finally {
       setLoading(false);

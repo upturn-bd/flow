@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Users, Plus, Settings, Trash2, Edit, UserPlus, Shield } from "lucide-react";
 import { useTeams } from "@/hooks/useTeams";
 import { usePermissions } from "@/hooks/usePermissions";
-import type { Team, TeamWithMembers } from "@/lib/types/schemas";
+import type { Team, TeamWithMembers, TeamWithPermissions } from "@/lib/types/schemas";
 import { Button } from "@/components/ui/button";
 import BaseModal from "@/components/ui/modals/BaseModal";
 import toast from "react-hot-toast";
@@ -16,6 +16,8 @@ import TeamPermissionsModal from "./TeamPermissionsModal";
 export default function TeamManagement() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [selectedTeamWithMembers, setSelectedTeamWithMembers] = useState<TeamWithMembers | null>(null);
+  const [selectedTeamWithPermissions, setSelectedTeamWithPermissions] = useState<TeamWithPermissions | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showMembersModal, setShowMembersModal] = useState(false);
@@ -24,6 +26,8 @@ export default function TeamManagement() {
 
   const { 
     fetchTeams, 
+    fetchTeamWithMembers,
+    fetchTeamWithPermissions,
     createTeam, 
     updateTeam, 
     deleteTeam, 
@@ -82,14 +86,26 @@ export default function TeamManagement() {
     }
   };
 
-  const handleManageMembers = (team: Team) => {
-    setSelectedTeam(team);
-    setShowMembersModal(true);
+  const handleManageMembers = async (team: Team) => {
+    if (!team.id) return;
+    const teamWithMembers = await fetchTeamWithMembers(team.id);
+    if (teamWithMembers) {
+      setSelectedTeamWithMembers(teamWithMembers);
+      setShowMembersModal(true);
+    } else {
+      toast.error("Failed to load team members");
+    }
   };
 
-  const handleManagePermissions = (team: Team) => {
-    setSelectedTeam(team);
-    setShowPermissionsModal(true);
+  const handleManagePermissions = async (team: Team) => {
+    if (!team.id) return;
+    const teamWithPermissions = await fetchTeamWithPermissions(team.id);
+    if (teamWithPermissions) {
+      setSelectedTeamWithPermissions(teamWithPermissions);
+      setShowPermissionsModal(true);
+    } else {
+      toast.error("Failed to load team permissions");
+    }
   };
 
   const handleEditTeam = (team: Team) => {
@@ -245,28 +261,44 @@ export default function TeamManagement() {
       )}
 
       {/* Members Modal */}
-      {showMembersModal && selectedTeam && (
+      {showMembersModal && selectedTeamWithMembers && (
         <TeamMembersModal
           isOpen={showMembersModal}
-          team={selectedTeam}
+          team={selectedTeamWithMembers}
           onClose={() => {
             setShowMembersModal(false);
-            setSelectedTeam(null);
+            setSelectedTeamWithMembers(null);
           }}
-          onMembersUpdated={loadTeams}
+          onMembersUpdated={() => {
+            loadTeams();
+            // Refresh the team data in the modal
+            if (selectedTeamWithMembers.id) {
+              fetchTeamWithMembers(selectedTeamWithMembers.id).then(data => {
+                if (data) setSelectedTeamWithMembers(data);
+              });
+            }
+          }}
         />
       )}
 
       {/* Permissions Modal */}
-      {showPermissionsModal && selectedTeam && (
+      {showPermissionsModal && selectedTeamWithPermissions && (
         <TeamPermissionsModal
           isOpen={showPermissionsModal}
-          team={selectedTeam}
+          team={selectedTeamWithPermissions}
           onClose={() => {
             setShowPermissionsModal(false);
-            setSelectedTeam(null);
+            setSelectedTeamWithPermissions(null);
           }}
-          onPermissionsUpdated={loadTeams}
+          onPermissionsUpdated={() => {
+            loadTeams();
+            // Refresh the team data in the modal
+            if (selectedTeamWithPermissions.id) {
+              fetchTeamWithPermissions(selectedTeamWithPermissions.id).then(data => {
+                if (data) setSelectedTeamWithPermissions(data);
+              });
+            }
+          }}
         />
       )}
 

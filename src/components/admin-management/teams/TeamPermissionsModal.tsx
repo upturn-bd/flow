@@ -65,7 +65,7 @@ export default function TeamPermissionsModal({
 
   // Initialize permissions from team data
   useEffect(() => {
-    if (team.permissions) {
+    if (team.permissions && team.permissions.length > 0) {
       const initialPermissions: PermissionState = {};
       
       // Initialize all modules with false
@@ -154,9 +154,27 @@ export default function TeamPermissionsModal({
     setIsSaving(true);
 
     // Transform permissions state into array format expected by API
+    // Use team.permissions to get permission_id since it already has the data
     const permissionsArray = Object.entries(permissions).map(([moduleName, perms]) => {
+      // First try to find in team.permissions (already has permission_id)
+      const existingPerm = team.permissions?.find(p => p.module_name === moduleName);
+      if (existingPerm?.permission_id) {
+        return {
+          permission_id: existingPerm.permission_id,
+          can_read: perms.can_read,
+          can_write: perms.can_write,
+          can_delete: perms.can_delete,
+          can_approve: perms.can_approve,
+          can_comment: perms.can_comment,
+        };
+      }
+      
+      // Fallback to allPermissions if available
       const permission = allPermissions.find(p => p.module_name === moduleName);
-      if (!permission?.id) return null;
+      if (!permission?.id) {
+        console.warn(`No permission_id found for module: ${moduleName}`);
+        return null;
+      }
 
       return {
         permission_id: permission.id,
@@ -210,13 +228,17 @@ export default function TeamPermissionsModal({
               <div className="text-gray-500">Loading permissions...</div>
             </div>
           ) : (
-            <div className="space-y-8">{(Object.entries(MODULE_CATEGORIES) as [PermissionCategory, string][]).map(
-              ([categoryKey, categoryName]) => {
-                const modules = modulesByCategory[categoryKey];
-                if (modules.length === 0) return null;
+            <div className="space-y-8">
+              {/* Iterate over permission categories */}
+              {(Object.entries(modulesByCategory) as [PermissionCategory, ModuleInfo[]][]).map(
+                ([categoryKey, modules]) => {
+                  if (!modules || modules.length === 0) return null;
 
-                return (
-                  <div key={categoryKey} className="space-y-4">
+                  // Get category display name
+                  const categoryName = categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1);
+
+                  return (
+                    <div key={categoryKey} className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-semibold text-gray-900 capitalize">
                         {categoryName}
