@@ -249,27 +249,16 @@ export type MaritalStatus = typeof MARITAL_STATUS[keyof typeof MARITAL_STATUS];
 // Stakeholder Management Constants
 // ==============================================================================
 
-export const STAKEHOLDER_ISSUE_STATUS = {
-  OPEN: 'Open',
-  IN_PROGRESS: 'In Progress',
-  RESOLVED: 'Resolved',
-  CLOSED: 'Closed',
+export const FIELD_TYPES = {
+  TEXT: 'text',
+  BOOLEAN: 'boolean',
+  DATE: 'date',
+  FILE: 'file',
 } as const;
 
-export type StakeholderIssueStatus = typeof STAKEHOLDER_ISSUE_STATUS[keyof typeof STAKEHOLDER_ISSUE_STATUS];
+export type FieldType = typeof FIELD_TYPES[keyof typeof FIELD_TYPES];
 
-export const STAKEHOLDER_ISSUE_PRIORITY = {
-  LOW: 'Low',
-  MEDIUM: 'Medium',
-  HIGH: 'High',
-  CRITICAL: 'Critical',
-} as const;
-
-export type StakeholderIssuePriority = typeof STAKEHOLDER_ISSUE_PRIORITY[keyof typeof STAKEHOLDER_ISSUE_PRIORITY];
-
-// Options arrays for dropdowns
-export const STAKEHOLDER_ISSUE_STATUS_OPTIONS = Object.values(STAKEHOLDER_ISSUE_STATUS);
-export const STAKEHOLDER_ISSUE_PRIORITY_OPTIONS = Object.values(STAKEHOLDER_ISSUE_PRIORITY);
+export const FIELD_TYPE_OPTIONS = Object.values(FIELD_TYPES);
 
 // ==============================================================================
 // Blood Group Constants
@@ -473,6 +462,7 @@ export const PERMISSION_MODULES = {
   COMPLAINTS: 'complaints',
   PAYROLL: 'payroll',
   STAKEHOLDERS: 'stakeholders',
+  STAKEHOLDER_PROCESSES: 'stakeholder_processes',
   
   // Operations
   ONBOARDING: 'onboarding',
@@ -512,7 +502,8 @@ export const MODULE_DISPLAY_NAMES: Record<PermissionModule, string> = {
   [PERMISSION_MODULES.SETTLEMENT]: 'Settlement',
   [PERMISSION_MODULES.COMPLAINTS]: 'Complaints',
   [PERMISSION_MODULES.PAYROLL]: 'Payroll',
-  [PERMISSION_MODULES.STAKEHOLDERS]: 'Stakeholders',
+  [PERMISSION_MODULES.STAKEHOLDERS]: 'Stakeholders & Leads',
+  [PERMISSION_MODULES.STAKEHOLDER_PROCESSES]: 'Stakeholder Processes',
   [PERMISSION_MODULES.ONBOARDING]: 'Onboarding',
   [PERMISSION_MODULES.OFFBOARDING]: 'Offboarding',
   [PERMISSION_MODULES.HRIS]: 'HRIS',
@@ -596,9 +587,15 @@ export const MODULE_INFO: Record<PermissionModule, ModuleInfo> = {
   },
   [PERMISSION_MODULES.STAKEHOLDERS]: {
     name: PERMISSION_MODULES.STAKEHOLDERS,
-    displayName: 'Stakeholders',
-    description: 'Manage stakeholders',
+    displayName: 'Stakeholders & Leads',
+    description: 'Manage stakeholders and leads',
     category: 'services',
+  },
+  [PERMISSION_MODULES.STAKEHOLDER_PROCESSES]: {
+    name: PERMISSION_MODULES.STAKEHOLDER_PROCESSES,
+    displayName: 'Stakeholder Processes',
+    description: 'Manage stakeholder process definitions and steps',
+    category: 'admin',
   },
   [PERMISSION_MODULES.ONBOARDING]: {
     name: PERMISSION_MODULES.ONBOARDING,
