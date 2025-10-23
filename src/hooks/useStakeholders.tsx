@@ -3,53 +3,72 @@
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
-import { useNotifications } from "./useNotifications";
-import { 
-  Stakeholder, 
-  StakeholderIssue, 
-  StakeholderType,
-  StakeholderIssueStatus,
-  StakeholderIssuePriority 
+import {
+  Stakeholder,
+  StakeholderProcess,
+  StakeholderProcessStep,
+  StakeholderStepData,
+  ContactPerson,
+  FieldDefinitionsSchema,
 } from "@/lib/types/schemas";
+
+// ==============================================================================
+// Form Data Interfaces
+// ==============================================================================
+
+export interface StakeholderProcessFormData {
+  name: string;
+  description?: string;
+  is_active: boolean;
+  is_sequential: boolean;
+  allow_rollback: boolean;
+}
+
+export interface StakeholderProcessStepFormData {
+  process_id: number;
+  name: string;
+  description?: string;
+  step_order: number;
+  team_id: number;
+  field_definitions: FieldDefinitionsSchema;
+  use_date_range: boolean;
+  start_date?: string;
+  end_date?: string;
+}
 
 export interface StakeholderFormData {
   name: string;
   address?: string;
-  stakeholder_type_id?: number;
-  manager_id?: string; // Employee ID (UUID)
-  contact_details?: {
-    contacts: Array<{
-      name: string;
-      role: string;
-      phone: string;
-      email: string;
-      address: string;
-    }>;
-  };
-  assigned_employees?: string[];
+  contact_persons: ContactPerson[];
+  process_id: number;
+  is_active: boolean;
 }
 
-export interface StakeholderIssueFormData {
+export interface StakeholderStepDataFormData {
   stakeholder_id: number;
-  transaction_id?: number;
-  title: string;
-  description?: string;
-  status: StakeholderIssueStatus;
-  priority: StakeholderIssuePriority;
-  assigned_to?: string; // Employee ID (UUID)
+  step_id: number;
+  data: Record<string, any>;
+  is_completed?: boolean;
 }
+
+// ==============================================================================
+// Main Hook
+// ==============================================================================
 
 export function useStakeholders() {
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
-  const [stakeholderTypes, setStakeholderTypes] = useState<StakeholderType[]>([]);
-  const [stakeholderIssues, setStakeholderIssues] = useState<StakeholderIssue[]>([]);
+  const [processes, setProcesses] = useState<StakeholderProcess[]>([]);
+  const [processSteps, setProcessSteps] = useState<StakeholderProcessStep[]>([]);
+  const [stepData, setStepData] = useState<StakeholderStepData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<number | null>(null);
-  const { createNotification } = useNotifications();
 
-  // Fetch stakeholder types
-  const fetchStakeholderTypes = useCallback(async () => {
+  // ==========================================================================
+  // STAKEHOLDER PROCESSES
+  // ==========================================================================
+
+  const fetchProcesses = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -57,29 +76,36 @@ export function useStakeholders() {
       const company_id = await getCompanyId();
 
       const { data, error } = await supabase
-        .from("stakeholder_types")
-        .select("*")
+        .from("stakeholder_processes")
+        .select(`
+          *,
+          steps:stakeholder_process_steps(count)
+        `)
         .eq("company_id", company_id)
-        .order("name");
+        .order("created_at", { ascending: false });
 
       if (error) {
-        setError("Failed to fetch stakeholder types");
+        setError("Failed to fetch stakeholder processes");
         throw error;
       }
 
-      setStakeholderTypes(data || []);
-      return data;
+      const transformedData = data?.map((process) => ({
+        ...process,
+        step_count: process.steps?.[0]?.count || 0,
+      })) || [];
+
+      setProcesses(transformedData);
+      return transformedData;
     } catch (error) {
-      console.error("Error fetching stakeholder types:", error);
-      setError("Failed to fetch stakeholder types");
+      console.error("Error fetching stakeholder processes:", error);
+      setError("Failed to fetch stakeholder processes");
       return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Fetch stakeholders
-  const fetchStakeholders = useCallback(async () => {
+  const fetchProcessById = useCallback(async (processId: number) => {
     setLoading(true);
     setError(null);
 
@@ -87,37 +113,325 @@ export function useStakeholders() {
       const company_id = await getCompanyId();
 
       const { data, error } = await supabase
-        .from("stakeholders")
+        .from("stakeholder_processes")
         .select(`
           *,
-          stakeholder_type:stakeholder_types(*),
-          manager:employees!stakeholders_manager_id_fkey(
-            id,
-            first_name,
-            last_name,
-            email
+          steps:stakeholder_process_steps(
+            *,
+            team:teams(id, name)
           )
         `)
         .eq("company_id", company_id)
-        .order("created_at", { ascending: false });
+        .eq("id", processId)
+        .single();
+
+      if (error) {
+        setError("Failed to fetch process");
+        throw error;
+      }
+
+      if (data.steps) {
+        data.steps.sort((a: any, b: any) => a.step_order - b.step_order);
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error fetching process:", error);
+      setError("Failed to fetch process");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const createProcess = useCallback(
+    async (processData: StakeholderProcessFormData) => {
+      setError(null);
+      try {
+        const company_id = await getCompanyId();
+        const employeeInfo = await getEmployeeInfo();
+
+        const { data, error } = await supabase
+          .from("stakeholder_processes")
+          .insert([
+            {
+              ...processData,
+              company_id,
+              created_by: employeeInfo?.id,
+            },
+          ])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        await fetchProcesses();
+        return data;
+      } catch (error) {
+        console.error("Error creating process:", error);
+        setError("Failed to create process");
+        throw error;
+      }
+    },
+    [fetchProcesses]
+  );
+
+  const updateProcess = useCallback(
+    async (processId: number, processData: Partial<StakeholderProcessFormData>) => {
+      setError(null);
+      setProcessingId(processId);
+
+      try {
+        const employeeInfo = await getEmployeeInfo();
+
+        const { data, error } = await supabase
+          .from("stakeholder_processes")
+          .update({
+            ...processData,
+            updated_by: employeeInfo?.id,
+          })
+          .eq("id", processId)
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        await fetchProcesses();
+        return data;
+      } catch (error) {
+        console.error("Error updating process:", error);
+        setError("Failed to update process");
+        throw error;
+      } finally {
+        setProcessingId(null);
+      }
+    },
+    [fetchProcesses]
+  );
+
+  const deleteProcess = useCallback(
+    async (processId: number) => {
+      setError(null);
+      setProcessingId(processId);
+
+      try {
+        const { error } = await supabase
+          .from("stakeholder_processes")
+          .delete()
+          .eq("id", processId);
+
+        if (error) throw error;
+
+        await fetchProcesses();
+        return true;
+      } catch (error) {
+        console.error("Error deleting process:", error);
+        setError("Failed to delete process");
+        return false;
+      } finally {
+        setProcessingId(null);
+      }
+    },
+    [fetchProcesses]
+  );
+
+  // ==========================================================================
+  // PROCESS STEPS
+  // ==========================================================================
+
+  const fetchProcessSteps = useCallback(async (processId: number) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error } = await supabase
+        .from("stakeholder_process_steps")
+        .select(`
+          *,
+          team:teams(id, name)
+        `)
+        .eq("process_id", processId)
+        .order("step_order");
+
+      if (error) {
+        setError("Failed to fetch process steps");
+        throw error;
+      }
+
+      setProcessSteps(data || []);
+      return data;
+    } catch (error) {
+      console.error("Error fetching process steps:", error);
+      setError("Failed to fetch process steps");
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const createProcessStep = useCallback(
+    async (stepData: StakeholderProcessStepFormData) => {
+      setError(null);
+      try {
+        const employeeInfo = await getEmployeeInfo();
+
+        const { data, error } = await supabase
+          .from("stakeholder_process_steps")
+          .insert([
+            {
+              ...stepData,
+              created_by: employeeInfo?.id,
+            },
+          ])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        await fetchProcessSteps(stepData.process_id);
+        return data;
+      } catch (error) {
+        console.error("Error creating process step:", error);
+        setError("Failed to create process step");
+        throw error;
+      }
+    },
+    [fetchProcessSteps]
+  );
+
+  const updateProcessStep = useCallback(
+    async (stepId: number, stepData: Partial<StakeholderProcessStepFormData>) => {
+      setError(null);
+      setProcessingId(stepId);
+
+      try {
+        const employeeInfo = await getEmployeeInfo();
+
+        const updateData: any = {
+          ...stepData,
+          updated_by: employeeInfo?.id,
+        };
+
+        if (stepData.field_definitions) {
+          const { data: currentStep } = await supabase
+            .from("stakeholder_process_steps")
+            .select("version")
+            .eq("id", stepId)
+            .single();
+
+          updateData.version = (currentStep?.version || 1) + 1;
+        }
+
+        const { data, error } = await supabase
+          .from("stakeholder_process_steps")
+          .update(updateData)
+          .eq("id", stepId)
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        return data;
+      } catch (error) {
+        console.error("Error updating process step:", error);
+        setError("Failed to update process step");
+        throw error;
+      } finally {
+        setProcessingId(null);
+      }
+    },
+    []
+  );
+
+  const deleteProcessStep = useCallback(
+    async (stepId: number, processId: number) => {
+      setError(null);
+      setProcessingId(stepId);
+
+      try {
+        const { error } = await supabase
+          .from("stakeholder_process_steps")
+          .delete()
+          .eq("id", stepId);
+
+        if (error) throw error;
+
+        await fetchProcessSteps(processId);
+        return true;
+      } catch (error) {
+        console.error("Error deleting process step:", error);
+        setError("Failed to delete process step");
+        return false;
+      } finally {
+        setProcessingId(null);
+      }
+    },
+    [fetchProcessSteps]
+  );
+
+  const reorderProcessSteps = useCallback(
+    async (processId: number, stepIds: number[]) => {
+      setError(null);
+
+      try {
+        const employeeInfo = await getEmployeeInfo();
+
+        const updates = stepIds.map((stepId, index) =>
+          supabase
+            .from("stakeholder_process_steps")
+            .update({ 
+              step_order: index + 1,
+              updated_by: employeeInfo?.id,
+            })
+            .eq("id", stepId)
+        );
+
+        await Promise.all(updates);
+
+        await fetchProcessSteps(processId);
+        return true;
+      } catch (error) {
+        console.error("Error reordering steps:", error);
+        setError("Failed to reorder steps");
+        return false;
+      }
+    },
+    [fetchProcessSteps]
+  );
+
+  // ==========================================================================
+  // STAKEHOLDERS
+  // ==========================================================================
+
+  const fetchStakeholders = useCallback(async (includeCompleted = true) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const company_id = await getCompanyId();
+
+      let query = supabase
+        .from("stakeholders")
+        .select(`
+          *,
+          process:stakeholder_processes(id, name, is_sequential),
+          current_step:stakeholder_process_steps(id, name, step_order)
+        `)
+        .eq("company_id", company_id);
+
+      if (!includeCompleted) {
+        query = query.eq("is_completed", false);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false });
 
       if (error) {
         setError("Failed to fetch stakeholders");
         throw error;
       }
 
-      // Transform the data to match interface
-      const transformedData = data?.map(item => ({
-        ...item,
-        manager: item.manager ? {
-          id: item.manager.id,
-          name: `${item.manager.first_name} ${item.manager.last_name}`,
-          email: item.manager.email
-        } : undefined
-      })) || [];
-
-      setStakeholders(transformedData);
-      return transformedData;
+      setStakeholders(data || []);
+      return data;
     } catch (error) {
       console.error("Error fetching stakeholders:", error);
       setError("Failed to fetch stakeholders");
@@ -127,7 +441,6 @@ export function useStakeholders() {
     }
   }, []);
 
-  // Fetch single stakeholder by ID
   const fetchStakeholderById = useCallback(async (stakeholderId: number) => {
     setLoading(true);
     setError(null);
@@ -139,12 +452,17 @@ export function useStakeholders() {
         .from("stakeholders")
         .select(`
           *,
-          stakeholder_type:stakeholder_types(*),
-          manager:employees!stakeholders_manager_id_fkey(
-            id,
-            first_name,
-            last_name,
-            email
+          process:stakeholder_processes(
+            *,
+            steps:stakeholder_process_steps(
+              *,
+              team:teams(id, name)
+            )
+          ),
+          current_step:stakeholder_process_steps(id, name, step_order),
+          step_data:stakeholder_step_data(
+            *,
+            step:stakeholder_process_steps(id, name, step_order)
           )
         `)
         .eq("company_id", company_id)
@@ -152,336 +470,305 @@ export function useStakeholders() {
         .single();
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          setError("Stakeholder not found");
-        } else {
-          setError("Failed to fetch stakeholder");
-        }
+        setError("Failed to fetch stakeholder");
         throw error;
       }
 
-      // Transform the data to match interface
-      const transformedData = {
-        ...data,
-        manager: data.manager ? {
-          id: data.manager.id,
-          name: `${data.manager.first_name} ${data.manager.last_name}`,
-          email: data.manager.email
-        } : undefined
-      };
+      if (data.process?.steps) {
+        data.process.steps.sort((a: any, b: any) => a.step_order - b.step_order);
+      }
 
-      return transformedData;
+      return data;
     } catch (error) {
       console.error("Error fetching stakeholder:", error);
-      if (error instanceof Error && error.message.includes('PGRST116')) {
-        setError("Stakeholder not found");
-      } else {
-        setError("Failed to fetch stakeholder");
-      }
+      setError("Failed to fetch stakeholder");
       return null;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Fetch stakeholder issues
-  const fetchStakeholderIssues = useCallback(async (stakeholderId?: number, status?: string) => {
-    setLoading(true);
-    setError(null);
+  const createStakeholder = useCallback(
+    async (stakeholderData: StakeholderFormData) => {
+      setError(null);
+      try {
+        const company_id = await getCompanyId();
+        const employeeInfo = await getEmployeeInfo();
 
-    try {
-      const company_id = await getCompanyId();
+        const process = await fetchProcessById(stakeholderData.process_id);
+        if (!process) {
+          throw new Error("Selected process not found");
+        }
+        if (!process.steps || process.steps.length === 0) {
+          throw new Error("Selected process has no steps configured");
+        }
 
-      let query = supabase
-        .from("stakeholder_issues")
-        .select(`
-          *,
-          stakeholder:stakeholders(name, stakeholder_type:stakeholder_types(name))
-        `)
-        .eq("company_id", company_id);
+        const firstStep = process.steps.sort((a: any, b: any) => a.step_order - b.step_order)[0];
 
-      if (stakeholderId) {
-        query = query.eq("stakeholder_id", stakeholderId);
-      }
+        const { data, error } = await supabase
+          .from("stakeholders")
+          .insert([
+            {
+              ...stakeholderData,
+              company_id,
+              current_step_id: firstStep.id,
+              current_step_order: firstStep.step_order,
+              is_completed: false,
+              created_by: employeeInfo?.id,
+            },
+          ])
+          .select()
+          .single();
 
-      if (status) {
-        query = query.eq("status", status);
-      }
+        if (error) throw error;
 
-      const { data, error } = await query.order("created_at", { ascending: false });
-
-      if (error) {
-        setError("Failed to fetch stakeholder issues");
+        await fetchStakeholders();
+        return data;
+      } catch (error) {
+        console.error("Error creating stakeholder:", error);
+        setError(error instanceof Error ? error.message : "Failed to create lead");
         throw error;
       }
+    },
+    [fetchStakeholders, fetchProcessById]
+  );
 
-      setStakeholderIssues(data || []);
-      return data;
-    } catch (error) {
-      console.error("Error fetching stakeholder issues:", error);
-      setError("Failed to fetch stakeholder issues");
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const updateStakeholder = useCallback(
+    async (stakeholderId: number, stakeholderData: Partial<StakeholderFormData>) => {
+      setError(null);
+      setProcessingId(stakeholderId);
 
-  // Create stakeholder
-  const createStakeholder = useCallback(async (stakeholderData: StakeholderFormData, userId?: string) => {
-    setError(null);
-    try {
-      const company_id = await getCompanyId();
-      
-      // Get current user if userId not provided
-      if (!userId) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error("User not authenticated");
-        userId = user.id;
-      }
-
-      const { data, error } = await supabase
-        .from("stakeholders")
-        .insert([
-          {
-            ...stakeholderData,
-            company_id,
-            created_by: userId,
-          }
-        ])
-        .select(`
-          *,
-          stakeholder_type:stakeholder_types(*)
-        `)
-        .single();
-
-      if (error) throw error;
-
-      // Update local state
-      setStakeholders(prev => [data, ...prev]);
-      
-        // Send notification for stakeholder creation
-        try {
-          const user = await getEmployeeInfo();
-          const recipients = stakeholderData.assigned_employees || [];
-          if (stakeholderData.manager_id) {
-            recipients.push(stakeholderData.manager_id);
-          }
-
-          if (recipients.length > 0) {
-            await createNotification({
-              title: 'New Stakeholder Added',
-              message: `A new stakeholder "${data.name}" has been added to the system.`,
-              priority: 'normal',
-              type_id: 6,
-              recipient_id: recipients,
-              action_url: '/operations-and-services/services/stakeholder',
-              company_id: user.company_id,
-              department_id: user.department_id
-            });
-          }
-        } catch (notificationError) {
-          console.warn("Failed to send notification:", notificationError);
-        }      return { success: true, data };
-    } catch (error) {
-      const errorMessage = "Failed to create stakeholder";
-      setError(errorMessage);
-      console.error(error);
-      return { success: false, error: errorMessage };
-    }
-  }, [createNotification]);
-
-  // Update stakeholder
-  const updateStakeholder = useCallback(async (id: number, stakeholderData: Partial<StakeholderFormData>) => {
-    setProcessingId(id);
-    try {
-      const company_id = await getCompanyId();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
-      const { data, error } = await supabase
-        .from("stakeholders")
-        .update({
-          ...stakeholderData,
-          updated_by: user.id,
-        })
-        .eq("company_id", company_id)
-        .eq("id", id)
-        .select(`
-          *,
-          stakeholder_type:stakeholder_types(*)
-        `)
-        .single();
-
-      if (error) throw error;
-
-      // Update local state
-      setStakeholders(prev => prev.map(stakeholder => 
-        stakeholder.id === id ? data : stakeholder
-      ));
-
-      return { success: true, data };
-    } catch (error) {
-      const errorMessage = "Failed to update stakeholder";
-      setError(errorMessage);
-      console.error(error);
-      return { success: false, error: errorMessage };
-    } finally {
-      setProcessingId(null);
-    }
-  }, []);
-
-  // Create stakeholder issue
-  const createStakeholderIssue = useCallback(async (issueData: StakeholderIssueFormData) => {
-    setError(null);
-    try {
-      const company_id = await getCompanyId();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
-      const { data, error } = await supabase
-        .from("stakeholder_issues")
-        .insert([
-          {
-            ...issueData,
-            company_id,
-            created_by: user.id,
-          }
-        ])
-        .select(`
-          *,
-          stakeholder:stakeholders(name, stakeholder_type:stakeholder_types(name))
-        `)
-        .single();
-
-      if (error) throw error;
-
-      // Update local state
-      setStakeholderIssues(prev => [data, ...prev]);
-      
-      // Send notification for issue creation
       try {
-        const userInfo = await getEmployeeInfo();
-        const recipients = [];
-        
-        if (issueData.assigned_to) {
-          recipients.push(issueData.assigned_to.toString());
+        const employeeInfo = await getEmployeeInfo();
+
+        const { data, error } = await supabase
+          .from("stakeholders")
+          .update({
+            ...stakeholderData,
+            updated_by: employeeInfo?.id,
+          })
+          .eq("id", stakeholderId)
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        await fetchStakeholders();
+        return data;
+      } catch (error) {
+        console.error("Error updating stakeholder:", error);
+        setError("Failed to update record");
+        throw error;
+      } finally {
+        setProcessingId(null);
+      }
+    },
+    [fetchStakeholders]
+  );
+
+  const deleteStakeholder = useCallback(
+    async (stakeholderId: number) => {
+      setError(null);
+      setProcessingId(stakeholderId);
+
+      try {
+        const { error } = await supabase
+          .from("stakeholders")
+          .delete()
+          .eq("id", stakeholderId);
+
+        if (error) throw error;
+
+        await fetchStakeholders();
+        return true;
+      } catch (error) {
+        console.error("Error deleting stakeholder:", error);
+        setError("Failed to delete record");
+        return false;
+      } finally {
+        setProcessingId(null);
+      }
+    },
+    [fetchStakeholders]
+  );
+
+  // ==========================================================================
+  // STEP DATA
+  // ==========================================================================
+
+  const fetchStakeholderStepData = useCallback(
+    async (stakeholderId: number, stepId?: number) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        let query = supabase
+          .from("stakeholder_step_data")
+          .select(`
+            *,
+            step:stakeholder_process_steps(
+              *,
+              team:teams(id, name)
+            )
+          `)
+          .eq("stakeholder_id", stakeholderId);
+
+        if (stepId) {
+          query = query.eq("step_id", stepId);
         }
 
-        if (recipients.length > 0) {
-          await createNotification({
-            title: 'New Stakeholder Issue',
-            message: `A new issue "${data.title}" has been created for stakeholder.`,
-            priority: issueData.priority === 'Critical' || issueData.priority === 'High' ? 'high' : 'normal',
-            type_id: 6,
-            recipient_id: recipients,
-            action_url: '/operations-and-services/services/stakeholder',
-            company_id: userInfo.company_id,
-            department_id: userInfo.department_id
-          });
+        const { data, error } = await query;
+
+        if (error) {
+          setError("Failed to fetch step data");
+          throw error;
         }
-      } catch (notificationError) {
-        console.warn("Failed to send notification:", notificationError);
+
+        setStepData(data || []);
+        return data;
+      } catch (error) {
+        console.error("Error fetching step data:", error);
+        setError("Failed to fetch step data");
+        return [];
+      } finally {
+        setLoading(false);
       }
+    },
+    []
+  );
 
-      return { success: true, data };
-    } catch (error) {
-      const errorMessage = "Failed to create stakeholder issue";
-      setError(errorMessage);
-      console.error(error);
-      return { success: false, error: errorMessage };
-    }
-  }, [createNotification]);
+  const saveStepData = useCallback(
+    async (stepDataForm: StakeholderStepDataFormData) => {
+      setError(null);
 
-  // Update stakeholder issue
-  const updateStakeholderIssue = useCallback(async (id: number, issueData: Partial<StakeholderIssueFormData>) => {
-    setProcessingId(id);
-    try {
-      const company_id = await getCompanyId();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
+      try {
+        const employeeInfo = await getEmployeeInfo();
 
-      const updateData: any = {
-        ...issueData,
-      };
+        const { data: stepDef, error: stepError } = await supabase
+          .from("stakeholder_process_steps")
+          .select("field_definitions, version")
+          .eq("id", stepDataForm.step_id)
+          .single();
 
-      // If status is being changed to resolved, set resolved fields
-      if (issueData.status === 'Resolved') {
-        updateData.resolved_at = new Date().toISOString();
-        updateData.resolved_by = user.id;
+        if (stepError) throw stepError;
+
+        const dataToSave = {
+          stakeholder_id: stepDataForm.stakeholder_id,
+          step_id: stepDataForm.step_id,
+          data: stepDataForm.data,
+          field_definitions_snapshot: stepDef.field_definitions,
+          step_version: stepDef.version,
+          is_completed: stepDataForm.is_completed || false,
+          completed_at: stepDataForm.is_completed ? new Date().toISOString() : null,
+          completed_by: stepDataForm.is_completed ? employeeInfo?.id : null,
+          updated_by: employeeInfo?.id,
+        };
+
+        const { data, error } = await supabase
+          .from("stakeholder_step_data")
+          .upsert([dataToSave], {
+            onConflict: "stakeholder_id,step_id",
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        return data;
+      } catch (error) {
+        console.error("Error saving step data:", error);
+        setError("Failed to save step data");
+        throw error;
       }
+    },
+    []
+  );
 
-      const { data, error } = await supabase
-        .from("stakeholder_issues")
-        .update(updateData)
-        .eq("company_id", company_id)
-        .eq("id", id)
-        .select(`
-          *,
-          stakeholder:stakeholders(name, stakeholder_type:stakeholder_types(name))
-        `)
-        .single();
+  const completeStep = useCallback(
+    async (stakeholderId: number, stepId: number, data: Record<string, any>) => {
+      setError(null);
 
-      if (error) throw error;
+      try {
+        await saveStepData({
+          stakeholder_id: stakeholderId,
+          step_id: stepId,
+          data,
+          is_completed: true,
+        });
 
-      // Update local state
-      setStakeholderIssues(prev => prev.map(issue => 
-        issue.id === id ? data : issue
-      ));
+        await fetchStakeholderById(stakeholderId);
 
-      return { success: true, data };
-    } catch (error) {
-      const errorMessage = "Failed to update stakeholder issue";
-      setError(errorMessage);
-      console.error(error);
-      return { success: false, error: errorMessage };
-    } finally {
-      setProcessingId(null);
-    }
-  }, []);
-
-  // Memoized values
-  const stakeholdersByType = useMemo(() => {
-    return stakeholders.reduce((acc, stakeholder) => {
-      const typeName = stakeholder.stakeholder_type?.name || 'Unknown';
-      if (!acc[typeName]) {
-        acc[typeName] = [];
+        return true;
+      } catch (error) {
+        console.error("Error completing step:", error);
+        return false;
       }
-      acc[typeName].push(stakeholder);
-      return acc;
-    }, {} as Record<string, Stakeholder[]>);
-  }, [stakeholders]);
+    },
+    [saveStepData, fetchStakeholderById]
+  );
 
-  const issuesByStatus = useMemo(() => {
-    return stakeholderIssues.reduce((acc, issue) => {
-      if (!acc[issue.status]) {
-        acc[issue.status] = [];
-      }
-      acc[issue.status].push(issue);
-      return acc;
-    }, {} as Record<string, StakeholderIssue[]>);
-  }, [stakeholderIssues]);
+  // ==========================================================================
+  // COMPUTED VALUES
+  // ==========================================================================
+
+  const activeProcesses = useMemo(
+    () => processes.filter((p) => p.is_active),
+    [processes]
+  );
+
+  const leads = useMemo(
+    () => stakeholders.filter((s) => !s.is_completed),
+    [stakeholders]
+  );
+
+  const completedStakeholders = useMemo(
+    () => stakeholders.filter((s) => s.is_completed),
+    [stakeholders]
+  );
+
+  // ==========================================================================
+  // RETURN
+  // ==========================================================================
 
   return {
-    // Data
-    stakeholders,
-    stakeholderTypes,
-    stakeholderIssues,
-    stakeholdersByType,
-    issuesByStatus,
-    
     // State
+    stakeholders,
+    processes,
+    processSteps,
+    stepData,
     loading,
     error,
     processingId,
-    
-    // Actions
+
+    // Computed
+    activeProcesses,
+    leads,
+    completedStakeholders,
+
+    // Process operations
+    fetchProcesses,
+    fetchProcessById,
+    createProcess,
+    updateProcess,
+    deleteProcess,
+
+    // Step operations
+    fetchProcessSteps,
+    createProcessStep,
+    updateProcessStep,
+    deleteProcessStep,
+    reorderProcessSteps,
+
+    // Stakeholder operations
     fetchStakeholders,
     fetchStakeholderById,
-    fetchStakeholderTypes,
-    fetchStakeholderIssues,
     createStakeholder,
     updateStakeholder,
-    createStakeholderIssue,
-    updateStakeholderIssue,
+    deleteStakeholder,
+
+    // Step data operations
+    fetchStakeholderStepData,
+    saveStepData,
+    completeStep,
   };
 }
