@@ -78,16 +78,14 @@ export default function TasksPage() {
       ongoingTasks={ongoingTasks}
       loading={loading}
       updateTask={updateTask}
-      deleteTask={deleteTask}
-    />
+      deleteTask={deleteTask} adminScoped={false}    />
   ), [ongoingTasks, loading, updateTask, deleteTask]);
   
   const completedTasksList = useMemo(() => (
     <CompletedTasksList 
       tasks={completedTasks}
       loading={loading}
-      deleteTask={deleteTask}
-    />
+      deleteTask={deleteTask} adminScoped={false}    />
   ), [completedTasks, loading, deleteTask]);
   
   const archivedContent = useMemo(() => (
