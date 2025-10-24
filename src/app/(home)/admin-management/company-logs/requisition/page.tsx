@@ -12,6 +12,7 @@ import {
 import TabView from "@/components/ui/TabView";
 import { RequisitionCard } from "@/components/operations-and-services/requisition/RequisitionCard";
 import { RequisitionType, RequisitionInventory } from "@/lib/types";
+import { usePermissions } from "@/hooks/usePermissions";
 
 export default function RequisitionPage() {
   const {
@@ -22,6 +23,12 @@ export default function RequisitionPage() {
     loading,
     processingId,
   } = useRequisitionRequests();
+
+  const {
+    canApprove
+  } = usePermissions()
+
+  const MODULE = "Requisition";
 
   const [activeTab, setActiveTab] = useState("requests");
   const [requisitionTypes, setRequisitionTypes] = useState<RequisitionType[]>([]);
@@ -112,6 +119,7 @@ export default function RequisitionPage() {
                           mode="request"
                           handleUpdateRequest={handleUpdateRequest}
                           processingId={processingId?.toString()}
+                          canApprove={canApprove(MODULE)}
                         />
                       ))}
                   </div>

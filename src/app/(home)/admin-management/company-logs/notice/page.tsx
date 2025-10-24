@@ -15,6 +15,7 @@ import {
 import { motion } from "framer-motion";
 import NoticeUpdateModal from "@/components/operations-and-services/notice/NoticeUpdateModal";
 import { toast } from "sonner";
+import { usePermissions } from "@/hooks/usePermissions";
 
 function formatDate(dateStr?: string) {
   if (!dateStr) return "N/A";
@@ -47,6 +48,9 @@ function formatDateTime(dateStr?: string) {
 export default function NoticePage() {
   const { notices, fetchNotices, deleteNotice, updateNotice, loading } =
     useNotices();
+
+  const { canWrite, canDelete } = usePermissions();
+  const MODULE = "notice"
   const { fetchNoticeTypes } = useNoticeTypes();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -216,24 +220,32 @@ export default function NoticePage() {
 
                 {/* Action buttons (icons only) */}
                 <div className="flex items-center gap-2 mt-4 md:mt-0 md:ml-6 self-end md:self-center">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-gray-300 hover:bg-blue-50 hover:text-blue-600"
-                    title="Edit Notice"
-                    onClick={() => setEditingNotice(notice)}
-                  >
-                    <Pencil size={16} />
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    className="bg-red-500 hover:bg-red-600 text-white"
-                    title="Delete Notice"
-                    onClick={() => handleDelete(notice.id)}
-                  >
-                    <Trash2 size={16} />
-                  </Button>
+                  {canWrite(MODULE) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-gray-300 hover:bg-blue-50 hover:text-blue-600"
+                      title="Edit Notice"
+                      onClick={() => setEditingNotice(notice)}
+                    >
+                      <Pencil size={16} />
+                    </Button>
+
+                  )}
+
+
+                  {canDelete(MODULE) && (
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      className="bg-red-500 hover:bg-red-600 text-white"
+                      title="Delete Notice"
+                      onClick={() => handleDelete(notice.id)}
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  )}
+
                 </div>
               </Card>
             </motion.div>

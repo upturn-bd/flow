@@ -10,6 +10,7 @@ import { Loader2, Check, X as CloseIcon, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
 import TabView, { TabItem } from "@/components/ui/TabView";
+import { usePermissions } from "@/hooks/usePermissions";
 
 type LeaveRecord = {
    id: number;
@@ -31,6 +32,12 @@ export default function LeaveLogsPage() {
       updateLeaveRequest,
       loading,
    } = useLeaveRequests();
+
+   const {
+      canApprove
+   } = usePermissions();
+
+   const MODULE = "leave";
 
    const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
    const { fetchEmployeeInfo } = useEmployeeInfo();
@@ -160,23 +167,26 @@ export default function LeaveLogsPage() {
                               {leave.status}
                            </span>
                         </td>
-                        <td className="px-4 py-3 border-b flex gap-2">
-                           {!isHistory && leave.status === "Pending" && (
-                              <>
-                                 <Button size="sm" variant="complete" className="p-2 hover:bg-green-100 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Accepted"); }}>
-                                    <Check size={16} />
+
+                        {canApprove(MODULE) && (
+                           <td className="px-4 py-3 border-b flex gap-2">
+                              {!isHistory && leave.status === "Pending" && (
+                                 <>
+                                    <Button size="sm" variant="complete" className="p-2 hover:bg-green-100 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Accepted"); }}>
+                                       <Check size={16} />
+                                    </Button>
+                                    <Button size="sm" variant="danger" className="p-2 hover:bg-red-100 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Rejected"); }}>
+                                       <CloseIcon size={16} />
+                                    </Button>
+                                 </>
+                              )}
+                              {isHistory && leave.status !== "Pending" && (
+                                 <Button size="sm" variant="outline" className="p-2 hover:bg-yellow-100 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Pending"); }}>
+                                    <RotateCw size={16} />
                                  </Button>
-                                 <Button size="sm" variant="danger" className="p-2 hover:bg-red-100 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Rejected"); }}>
-                                    <CloseIcon size={16} />
-                                 </Button>
-                              </>
-                           )}
-                           {isHistory && leave.status !== "Pending" && (
-                              <Button size="sm" variant="outline" className="p-2 hover:bg-yellow-100 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Pending"); }}>
-                                 <RotateCw size={16} />
-                              </Button>
-                           )}
-                        </td>
+                              )}
+                           </td>
+                        )}
                      </tr>
                   ))}
                </tbody>

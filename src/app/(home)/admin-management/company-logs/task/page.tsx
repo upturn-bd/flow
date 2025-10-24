@@ -9,6 +9,7 @@ import { Loader2, Trash2, RotateCcw, CheckCircle, Edit3 } from "lucide-react";
 import { toast } from "sonner";
 import TaskUpdateModal from "@/components/operations-and-services/task/shared/TaskUpdateModal";
 import { getEmployeeName } from "@/lib/utils/auth";
+import { usePermissions } from "@/hooks/usePermissions";
 
 export default function CompanyTaskLogsPage() {
    const {
@@ -23,6 +24,17 @@ export default function CompanyTaskLogsPage() {
       loading,
       error,
    } = useTasks();
+
+   const {
+      canRead,
+      canWrite,
+      canDelete,
+      canApprove,
+      hasPermission,
+      loading: permLoading
+   } = usePermissions();
+
+   const MODULE = "tasks";
 
    const [activeTab, setActiveTab] = useState<"ongoing" | "completed">("ongoing");
    const [search, setSearch] = useState("");
@@ -142,43 +154,56 @@ export default function CompanyTaskLogsPage() {
 
                      {/* Action buttons */}
                      <div className="flex flex-wrap sm:flex-nowrap gap-2 mt-3 sm:mt-0 w-full sm:w-auto justify-start sm:justify-end">
-                        {!completed ? (
-                           <Button
-                              size="sm"
-                              variant="complete"
-                              onClick={() => handleComplete(task.id)}
-                              className="p-2"
-                           >
-                              <CheckCircle size={16} />
-                           </Button>
-                        ) : (
-                           <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleReopen(task.id)}
-                              className="p-2"
-                           >
-                              <RotateCcw size={16} />
-                           </Button>
+                        {canApprove(MODULE) && (
+                           <>
+                              {!completed ? (
+                                 <Button
+                                    size="sm"
+                                    variant="complete"
+                                    onClick={() => handleComplete(task.id)}
+                                    className="p-2"
+                                 >
+                                    <CheckCircle size={16} />
+                                 </Button>
+                              ) : (
+                                 <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleReopen(task.id)}
+                                    className="p-2"
+                                 >
+                                    <RotateCcw size={16} />
+                                 </Button>
+                              )}
+                           </>
+
+
                         )}
 
-                        <Button
-                           size="sm"
-                           variant="secondary"
-                           onClick={() => handleEdit(task)}
-                           className="p-2"
-                        >
-                           <Edit3 size={16} />
-                        </Button>
 
-                        <Button
-                           size="sm"
-                           variant="danger"
-                           onClick={() => handleDelete(task.id)}
-                           className="p-2"
-                        >
-                           <Trash2 size={16} />
-                        </Button>
+                        {canWrite(MODULE) &&
+                           (
+                              <Button
+                                 size="sm"
+                                 variant="secondary"
+                                 onClick={() => handleEdit(task)}
+                                 className="p-2"
+                              >
+                                 <Edit3 size={16} />
+                              </Button>
+                           )}
+
+
+                        {canDelete(MODULE) && (
+                           <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={() => handleDelete(task.id)}
+                              className="p-2"
+                           >
+                              <Trash2 size={16} />
+                           </Button>
+                        )}
                      </div>
                   </CardContent>
                </Card>

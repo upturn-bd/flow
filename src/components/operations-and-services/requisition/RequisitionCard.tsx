@@ -40,6 +40,7 @@ export interface RequisitionCardProps {
     comment?: string
   ) => void;
   processingId?: string | null;
+  canApprove?: boolean
 }
 
 export const RequisitionCard: React.FC<RequisitionCardProps> = ({
@@ -52,6 +53,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
   isGlobal = false,
   handleUpdateRequest,
   processingId,
+  canApprove = true
 }) => {
   const [comment, setComment] = useState("");
 
@@ -207,39 +209,47 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
 
           {/* Buttons */}
           <div className="flex flex-wrap justify-end gap-4 pt-4 border-t border-gray-100">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() =>
-                handleUpdateRequest?.("Rejected", req.id, req.employee_id, comment)
-              }
-              disabled={processingId === req.id}
-              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
-            >
-              {processingId === req.id ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <X size={16} />
-              )}
-              <span>Reject</span>
-            </motion.button>
+            {canApprove && (
+              <>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() =>
+                    handleUpdateRequest?.("Rejected", req.id, req.employee_id, comment)
+                  }
+                  disabled={processingId === req.id}
+                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {processingId === req.id ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <X size={16} />
+                  )}
+                  <span>Reject</span>
+                </motion.button>
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() =>
-                handleUpdateRequest?.("Approved", req.id, req.employee_id, comment)
-              }
-              disabled={processingId === req.id}
-              className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
-            >
-              {processingId === req.id ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Check size={16} />
-              )}
-              <span>Approve</span>
-            </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() =>
+                    handleUpdateRequest?.("Approved", req.id, req.employee_id, comment)
+                  }
+                  disabled={processingId === req.id}
+                  className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {processingId === req.id ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <Check size={16} />
+                  )}
+                  <span>Approve</span>
+                </motion.button>
+
+              </>
+            )}
+
+
           </div>
         </>
       )}

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
 import { UpdateProjectPage } from "@/components/operations-and-services/project/CreateNewProject";
 import { ProjectDetails } from "@/components/operations-and-services/project/ProjectForm";
+import { usePermissions } from "@/hooks/usePermissions";
 
 export default function CompanyProjectsPage() {
    const {
@@ -22,6 +23,13 @@ export default function CompanyProjectsPage() {
       updateProject,
       deleteProject,
    } = useProjects();
+
+   const {
+      canWrite,
+      canDelete
+   } = usePermissions();
+
+   const MODULE = "projects";
 
    const { employees, fetchEmployeeInfo } = useEmployeeInfo();
    const [employeeNames, setEmployeeNames] = useState<Record<string, string>>({});
@@ -147,23 +155,27 @@ export default function CompanyProjectsPage() {
 
                      {/* Action buttons */}
                      <div className="flex flex-wrap sm:flex-nowrap gap-2 mt-3 sm:mt-0 w-full sm:w-auto justify-start sm:justify-end">
-                        <Button
-                           size="sm"
-                           variant="secondary"
-                           onClick={() => handleEdit(project)}
-                           className="p-2"
-                        >
-                           <Edit3 size={16} />
-                        </Button>
+                        {canWrite(MODULE) && (
+                           <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => handleEdit(project)}
+                              className="p-2"
+                           >
+                              <Edit3 size={16} />
+                           </Button>
+                        )}
 
-                        <Button
-                           size="sm"
-                           variant="danger"
-                           onClick={() => handleDelete(project.id || 0)}
-                           className="p-2"
-                        >
-                           <Trash2 size={16} />
-                        </Button>
+                        {canDelete(MODULE) && (
+                           <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={() => handleDelete(project.id || 0)}
+                              className="p-2"
+                           >
+                              <Trash2 size={16} />
+                           </Button>
+                        )}
                      </div>
                   </CardContent>
                </Card>
