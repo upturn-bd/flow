@@ -16,6 +16,7 @@ import { useComplaints } from "@/hooks/useComplaints";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { usePermissions } from "@/hooks/usePermissions";
 
 export default function ComplaintLogsPage() {
   const [activeTab, setActiveTab] = useState<"requests" | "history">("requests");
@@ -36,6 +37,13 @@ export default function ComplaintLogsPage() {
     fetchComplaintHistory,
     updateComplaint
   } = useComplaints();
+
+  const {
+    canApprove,
+    canComment
+  } = usePermissions();
+
+  const MODULE = "complaints";
 
   // Load employees and complaint types
   useEffect(() => {
@@ -117,6 +125,8 @@ export default function ComplaintLogsPage() {
                           onAccept={() => handleUpdateRequest("Accepted", complaint.id)}
                           onReject={() => handleUpdateRequest("Rejected", complaint.id)}
                           isProcessing={currentlyProcessingId === complaint.id}
+                          canApprove={canApprove(MODULE)}
+                          canComment={canComment(MODULE)}
                         />
                       ))}
                     </AnimatePresence>

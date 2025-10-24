@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Flag,
   CheckCheck,
@@ -31,6 +31,8 @@ interface ComplaintCardProps {
   onAccept?: () => void;
   onReject?: () => void;
   isProcessing?: boolean;
+  canApprove?: boolean;
+  canComment?: boolean;
 }
 
 export const ComplaintCard: React.FC<ComplaintCardProps> = ({
@@ -42,8 +44,14 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
   onAccept,
   onReject,
   isProcessing = false,
+  canApprove = true,
+  canComment = true
 }) => {
   const [comment, setComment] = useState("");
+
+  useEffect(() => {
+    console.log(mode, canApprove, canComment)
+  })
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -163,40 +171,48 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
       {mode === "request" && (
         <>
           <div className="mt-4 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <MessageSquare size={16} className="inline mr-2" />
-                Add Comment
-              </label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Add your feedback here..."
-                rows={3}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
+            {canComment && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <MessageSquare size={16} className="inline mr-2" />
+                  Add Comment
+                </label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Add your feedback here..."
+                  rows={3}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            )}
+
 
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onReject?.()}
-                disabled={isProcessing}
-                className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
-              >
-                <X size={14} /> Reject
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => onAccept?.()}
-                disabled={isProcessing}
-                className="flex items-center gap-2"
-                isLoading={isProcessing}
-              >
-                <Check size={14} /> Accept
-              </Button>
+              {canApprove && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onReject?.()}
+                    disabled={isProcessing}
+                    className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                  >
+                    <X size={14} /> Reject
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => onAccept?.()}
+                    disabled={isProcessing}
+                    className="flex items-center gap-2"
+                    isLoading={isProcessing}
+                  >
+                    <Check size={14} /> Accept
+                  </Button>
+                </>
+              )}
+
             </div>
           </div>
         </>

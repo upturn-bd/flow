@@ -9,6 +9,7 @@ import TabView from "@/components/ui/TabView";
 import { Loader2, Trash2, Edit2, X } from "lucide-react";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
+import { usePermissions } from "@/hooks/usePermissions";
 
 export default function AttendanceLogsPage() {
   const {
@@ -19,6 +20,14 @@ export default function AttendanceLogsPage() {
     updateAttendance,
     deleteAttendance
   } = useAttendances();
+
+  const {
+    canWrite,
+    canDelete
+  } = usePermissions();
+
+  const MODULE = "Attendance";
+
   const { fetchEmployeeInfo } = useEmployeeInfo();
 
   const [allAttendance, setAllAttendance] = useState<any[]>([]);
@@ -184,22 +193,27 @@ export default function AttendanceLogsPage() {
                 <td className="px-4 py-3 border-b text-gray-600">{att.check_in_time ? new Date(att.check_in_time).toLocaleTimeString() : "N/A"}</td>
                 <td className="px-4 py-3 border-b text-gray-600">{att.check_out_time ? new Date(att.check_out_time).toLocaleTimeString() : "N/A"}</td>
                 <td className="px-4 py-3 border-b flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="p-2 hover:bg-blue-100 transition-colors"
-                    onClick={() => handleEdit(att)}
-                  >
-                    <Edit2 size={16} />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    className="p-2 hover:bg-red-100 transition-colors"
-                    onClick={() => handleDelete(att)}
-                  >
-                    <Trash2 size={16} />
-                  </Button>
+                  {canWrite(MODULE) && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="p-2 hover:bg-blue-100 transition-colors"
+                      onClick={() => handleEdit(att)}
+                    >
+                      <Edit2 size={16} />
+                    </Button>
+                  )}
+
+                  {canDelete(MODULE) && (
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      className="p-2 hover:bg-red-100 transition-colors"
+                      onClick={() => handleDelete(att)}
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  )}
                 </td>
               </tr>
             ))}
