@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
+import { uploadStakeholderStepFile } from "@/lib/utils/files";
 import {
   Stakeholder,
   StakeholderProcess,
@@ -572,6 +573,24 @@ export function useStakeholders() {
       setProcessingId(stakeholderId);
 
       try {
+        // Optional: Clean up uploaded files before deleting stakeholder
+        // This requires listing and deleting files from storage
+        try {
+          const { data: files } = await supabase.storage
+            .from('stakeholder-documents')
+            .list(`${stakeholderId}/`);
+          
+          if (files && files.length > 0) {
+            const filePaths = files.map(file => `${stakeholderId}/${file.name}`);
+            await supabase.storage
+              .from('stakeholder-documents')
+              .remove(filePaths);
+          }
+        } catch (storageError) {
+          // Log but don't fail the delete operation if file cleanup fails
+          console.warn("Warning: Could not clean up stakeholder files:", storageError);
+        }
+
         const { error } = await supabase
           .from("stakeholders")
           .delete()
@@ -652,10 +671,50 @@ export function useStakeholders() {
 
         if (stepError) throw stepError;
 
+        // Process the data to handle file uploads
+        const processedData: Record<string, any> = {};
+        const fields = stepDef.field_definitions?.fields || [];
+        
+        for (const field of fields) {
+          const value = stepDataForm.data[field.key];
+          
+          // Handle file type fields
+          if (field.type === "file" && value instanceof File) {
+            const uploadResult = await uploadStakeholderStepFile(
+              value,
+              stepDataForm.stakeholder_id,
+              stepDataForm.step_id,
+              field.key
+            );
+            
+            if (uploadResult.error) {
+              throw new Error(`Failed to upload ${field.label}: ${uploadResult.error}`);
+            }
+            
+            // Store both file path and original filename
+            processedData[field.key] = {
+              path: uploadResult.uploadedFilePath,
+              originalName: value.name,
+              size: value.size,
+              type: value.type,
+              uploadedAt: new Date().toISOString(),
+            };
+          } else if (field.type === "file" && typeof value === "string") {
+            // Legacy: Already uploaded file path (string only)
+            processedData[field.key] = value;
+          } else if (field.type === "file" && typeof value === "object" && value !== null) {
+            // Already uploaded file object with metadata
+            processedData[field.key] = value;
+          } else {
+            // Other field types
+            processedData[field.key] = value;
+          }
+        }
+
         const dataToSave = {
           stakeholder_id: stepDataForm.stakeholder_id,
           step_id: stepDataForm.step_id,
-          data: stepDataForm.data,
+          data: processedData,
           field_definitions_snapshot: stepDef.field_definitions,
           step_version: stepDef.version,
           is_completed: stepDataForm.is_completed || false,
@@ -689,6 +748,7 @@ export function useStakeholders() {
       setError(null);
 
       try {
+        // Save the step data as completed
         await saveStepData({
           stakeholder_id: stakeholderId,
           step_id: stepId,
@@ -696,6 +756,48 @@ export function useStakeholders() {
           is_completed: true,
         });
 
+        // Fetch the stakeholder to check if the process is sequential
+        const stakeholderData = await fetchStakeholderById(stakeholderId);
+        
+        if (stakeholderData?.process?.is_sequential) {
+          // Get the current step's order
+          const currentStep = stakeholderData.process.steps?.find(
+            (step: StakeholderProcessStep) => step.id === stepId
+          );
+
+          if (currentStep) {
+            // Find the next step
+            const nextStep = stakeholderData.process.steps
+              ?.sort((a: StakeholderProcessStep, b: StakeholderProcessStep) => 
+                a.step_order - b.step_order
+              )
+              .find((step: StakeholderProcessStep) => 
+                step.step_order === currentStep.step_order + 1
+              );
+
+            if (nextStep) {
+              // Update the stakeholder's current step
+              await supabase
+                .from("stakeholders")
+                .update({
+                  current_step_id: nextStep.id,
+                  current_step_order: nextStep.step_order,
+                })
+                .eq("id", stakeholderId);
+            } else {
+              // No more steps - mark stakeholder as completed
+              await supabase
+                .from("stakeholders")
+                .update({
+                  is_completed: true,
+                  completed_at: new Date().toISOString(),
+                })
+                .eq("id", stakeholderId);
+            }
+          }
+        }
+
+        // Refresh stakeholder data
         await fetchStakeholderById(stakeholderId);
 
         return true;

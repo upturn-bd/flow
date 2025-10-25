@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useStakeholders } from "@/hooks/useStakeholders";
+import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { StakeholderProcessStep, StakeholderStepData, FieldDefinition } from "@/lib/types/schemas";
-import { Upload, X, CheckCircle2 } from "lucide-react";
+import { Upload, X, CheckCircle2, File as FileIcon, Loader2 } from "lucide-react";
 
 interface StepDataFormProps {
   stakeholderId: number;
@@ -25,14 +26,49 @@ export default function StepDataForm({
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState<Set<string>>(new Set());
+  const [filesToDelete, setFilesToDelete] = useState<string[]>([]); // Track files to delete on save
+
+  // Safety check: ensure step has required properties
+  if (!step || !step.id) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg text-sm">
+        Invalid step configuration. Please refresh the page.
+      </div>
+    );
+  }
 
   useEffect(() => {
     // Initialize form with existing data or empty values
     const initialData: Record<string, any> = {};
     const fields = step.field_definitions?.fields || [];
+    
+    // Ensure fields is an array
+    if (!Array.isArray(fields)) {
+      console.error("Invalid fields in step:", { step, field_definitions: step.field_definitions, fields });
+      return;
+    }
+    
     fields.forEach((field) => {
-      if (existingData?.data?.[field.key]) {
-        initialData[field.key] = existingData.data[field.key];
+      const existingValue = existingData?.data?.[field.key];
+      
+      if (existingValue !== undefined && existingValue !== null) {
+        // Handle file type - preserve file metadata object or legacy string path
+        if (field.type === "file") {
+          // Check if it's the new format (object with path and metadata)
+          if (typeof existingValue === "object" && existingValue.path) {
+            initialData[field.key] = existingValue;
+          } else if (typeof existingValue === "string") {
+            // Legacy format: just a path string
+            initialData[field.key] = existingValue;
+          } else {
+            // Unknown format, reset
+            initialData[field.key] = null;
+          }
+        } else {
+          // For other types, use the existing value
+          initialData[field.key] = existingValue;
+        }
       } else {
         // Set default values based on type
         switch (field.type) {
@@ -56,6 +92,11 @@ export default function StepDataForm({
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
     const fields = step.field_definitions?.fields || [];
+
+    if (!Array.isArray(fields)) {
+      console.error("validateForm: fields is not an array", fields);
+      return false;
+    }
 
     fields.forEach((field) => {
       if (field.required) {
@@ -87,9 +128,36 @@ export default function StepDataForm({
     }
   };
 
+  const handleFileRemove = async (fieldName: string) => {
+    const currentValue = formData[fieldName];
+    
+    // If file was already uploaded (has path), mark it for deletion when form is saved
+    if (currentValue && typeof currentValue === 'object' && 'path' in currentValue) {
+      // Add to deletion queue
+      setFilesToDelete(prev => [...prev, currentValue.path]);
+    }
+    
+    // Remove from form data immediately (UI update)
+    handleFieldChange(fieldName, null);
+  };
+
   const handleSaveDraft = async () => {
     setSubmitting(true);
     try {
+      // Delete files that were marked for deletion
+      if (filesToDelete.length > 0) {
+        for (const filePath of filesToDelete) {
+          try {
+            await deleteFile(filePath);
+          } catch (error) {
+            console.error('Error deleting file:', filePath, error);
+            // Continue even if deletion fails
+          }
+        }
+        // Clear the deletion queue
+        setFilesToDelete([]);
+      }
+
       await saveStepData({
         stakeholder_id: stakeholderId,
         step_id: step.id!,
@@ -99,7 +167,8 @@ export default function StepDataForm({
       onComplete();
     } catch (error) {
       console.error("Error saving draft:", error);
-      setErrors({ submit: "Failed to save draft. Please try again." });
+      const errorMessage = error instanceof Error ? error.message : "Failed to save draft. Please try again.";
+      setErrors({ submit: errorMessage });
     } finally {
       setSubmitting(false);
     }
@@ -110,11 +179,26 @@ export default function StepDataForm({
 
     setSubmitting(true);
     try {
+      // Delete files that were marked for deletion
+      if (filesToDelete.length > 0) {
+        for (const filePath of filesToDelete) {
+          try {
+            await deleteFile(filePath);
+          } catch (error) {
+            console.error('Error deleting file:', filePath, error);
+            // Continue even if deletion fails
+          }
+        }
+        // Clear the deletion queue
+        setFilesToDelete([]);
+      }
+
       await completeStep(stakeholderId, step.id!, formData);
       onComplete();
     } catch (error) {
       console.error("Error completing step:", error);
-      setErrors({ submit: "Failed to complete step. Please try again." });
+      const errorMessage = error instanceof Error ? error.message : "Failed to complete step. Please try again.";
+      setErrors({ submit: errorMessage });
     } finally {
       setSubmitting(false);
     }
@@ -127,7 +211,7 @@ export default function StepDataForm({
     switch (field.type) {
       case "text":
         return (
-          <div key={field.key}>
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {field.label}
               {field.required && <span className="text-red-500 ml-1">*</span>}
@@ -147,7 +231,7 @@ export default function StepDataForm({
 
       case "boolean":
         return (
-          <div key={field.key} className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <input
               type="checkbox"
               checked={value || false}
@@ -164,7 +248,7 @@ export default function StepDataForm({
 
       case "date":
         return (
-          <div key={field.key}>
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {field.label}
               {field.required && <span className="text-red-500 ml-1">*</span>}
@@ -182,8 +266,33 @@ export default function StepDataForm({
         );
 
       case "file":
+        const isUploading = uploadingFiles.has(field.key);
+        const hasFile = value && (value instanceof File || typeof value === 'string' || (typeof value === 'object' && value !== null));
+        
+        // Helper to get display filename
+        const getFileName = () => {
+          if (value instanceof File) {
+            return (value as File).name;
+          } else if (typeof value === 'object' && value !== null && 'originalName' in value) {
+            return value.originalName;
+          } else if (typeof value === 'string') {
+            return value.split('/').pop() || 'Uploaded file';
+          }
+          return 'Uploaded file';
+        };
+
+        // Helper to get file URL for viewing
+        const getFileUrl = () => {
+          if (typeof value === 'object' && value !== null && 'path' in value) {
+            return getPublicFileUrl(value.path);
+          } else if (typeof value === 'string') {
+            return getPublicFileUrl(value);
+          }
+          return null;
+        };
+        
         return (
-          <div key={field.key}>
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {field.label}
               {field.required && <span className="text-red-500 ml-1">*</span>}
@@ -193,16 +302,35 @@ export default function StepDataForm({
                 hasError ? "border-red-500" : "border-gray-300"
               }`}
             >
-              {value ? (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">{value.name || value}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleFieldChange(field.key, null)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <X size={16} />
-                  </button>
+              {hasFile ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <FileIcon className="text-blue-600 flex-shrink-0" size={20} />
+                      <span className="text-sm text-gray-700 truncate">
+                        {getFileName()}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleFileRemove(field.key)}
+                      disabled={isUploading || submitting}
+                      className="text-red-600 hover:text-red-700 ml-2 disabled:opacity-50"
+                      title="Remove file"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                  {getFileUrl() && !(value instanceof File) && (
+                    <a
+                      href={getFileUrl() || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 hover:underline inline-flex items-center gap-1"
+                    >
+                      View file
+                    </a>
+                  )}
                 </div>
               ) : (
                 <label className="flex flex-col items-center cursor-pointer">
@@ -210,21 +338,32 @@ export default function StepDataForm({
                   <span className="text-sm text-gray-600 mt-2">
                     Click to upload or drag and drop
                   </span>
+                  <span className="text-xs text-gray-500 mt-1">
+                    {field.placeholder || 'PDF, DOC, DOCX, JPG, PNG (max 10MB)'}
+                  </span>
                   <input
                     type="file"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) handleFieldChange(field.key, file);
+                      if (file) {
+                        // Check file size (10MB limit)
+                        if (file.size > 10 * 1024 * 1024) {
+                          setErrors(prev => ({
+                            ...prev,
+                            [field.key]: 'File size must be less than 10MB'
+                          }));
+                          return;
+                        }
+                        handleFieldChange(field.key, file);
+                      }
                     }}
                     className="hidden"
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                   />
                 </label>
               )}
             </div>
             {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
-            <p className="text-xs text-gray-500 mt-1">
-              Note: File upload integration pending
-            </p>
           </div>
         );
 
@@ -235,11 +374,25 @@ export default function StepDataForm({
 
   const fields = step.field_definitions?.fields || [];
 
+  // Safety check: ensure fields is an array
+  if (!Array.isArray(fields)) {
+    console.error("Invalid field_definitions:", step.field_definitions);
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+        Error: Invalid field definitions for this step. Please contact support.
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="space-y-4">
         {fields.length > 0 ? (
-          fields.map((field) => renderField(field))
+          fields.map((field) => (
+            <div key={field.key}>
+              {renderField(field)}
+            </div>
+          ))
         ) : (
           <p className="text-sm text-gray-500">No fields defined for this step</p>
         )}
