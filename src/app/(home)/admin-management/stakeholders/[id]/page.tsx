@@ -3,6 +3,7 @@
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
+import { getPublicFileUrl } from "@/lib/utils/files";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -15,6 +16,8 @@ import {
   Edit,
   Trash2,
   AlertCircle,
+  FileText,
+  Download,
 } from "lucide-react";
 import { Stakeholder, StakeholderProcessStep, StakeholderStepData } from "@/lib/types/schemas";
 import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
@@ -40,18 +43,27 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
   useEffect(() => {
     const loadStakeholder = async () => {
-      const data = await fetchStakeholderById(stakeholderId);
-      if (data) {
-        setStakeholder(data);
-        loadStepData(stakeholderId);
+      try {
+        const data = await fetchStakeholderById(stakeholderId);
+        if (data) {
+          setStakeholder(data);
+          await loadStepData(stakeholderId);
+        }
+      } catch (err) {
+        console.error("Error loading stakeholder:", err);
       }
     };
     loadStakeholder();
   }, [stakeholderId, fetchStakeholderById]);
 
   const loadStepData = async (id: number) => {
-    const data = await fetchStakeholderStepData(id);
-    setStepData(data);
+    try {
+      const data = await fetchStakeholderStepData(id);
+      setStepData(data || []);
+    } catch (err) {
+      console.error("Error loading step data:", err);
+      setStepData([]);
+    }
   };
 
   const handleDelete = async () => {
@@ -321,7 +333,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         </div>
 
                         {/* Step Data Form */}
-                        {activeStepId === step.id && canEdit && (
+                        {activeStepId === step.id && canEdit && step.id && (
                           <div className="mt-4 pt-4 border-t border-gray-200">
                             <StepDataForm
                               stakeholderId={stakeholderId}
@@ -337,20 +349,69 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         {isCompleted && stepDataEntry && (
                           <div className="mt-4 pt-4 border-t border-gray-200">
                             <div className="grid grid-cols-2 gap-4">
-                              {Object.entries(stepDataEntry.data).map(([key, value]) => (
-                                <div key={key}>
-                                  <p className="text-xs font-medium text-gray-500 uppercase">
-                                    {key.replace(/_/g, " ")}
-                                  </p>
-                                  <p className="text-sm text-gray-900 mt-1">
-                                    {typeof value === "boolean"
-                                      ? value
-                                        ? "Yes"
-                                        : "No"
-                                      : String(value)}
-                                  </p>
-                                </div>
-                              ))}
+                              {Object.entries(stepDataEntry.data).map(([key, value]) => {
+                                // Check if this is a file field by looking at the field definitions
+                                const fieldDef = step.field_definitions?.fields?.find(
+                                  (f) => f.key === key
+                                );
+                                const isFileField = fieldDef?.type === 'file';
+                                
+                                // Helper to get file info
+                                const getFileInfo = () => {
+                                  if (typeof value === 'object' && value !== null && 'path' in value) {
+                                    return {
+                                      url: getPublicFileUrl(value.path),
+                                      name: value.originalName || value.path.split('/').pop(),
+                                      size: value.size,
+                                      uploadedAt: value.uploadedAt,
+                                    };
+                                  } else if (typeof value === 'string') {
+                                    // Legacy format
+                                    return {
+                                      url: getPublicFileUrl(value),
+                                      name: value.split('/').pop(),
+                                    };
+                                  }
+                                  return null;
+                                };
+
+                                const fileInfo = isFileField ? getFileInfo() : null;
+                                
+                                return (
+                                  <div key={key}>
+                                    <p className="text-xs font-medium text-gray-500 uppercase">
+                                      {key.replace(/_/g, " ")}
+                                    </p>
+                                    {isFileField && fileInfo ? (
+                                      <div className="mt-1">
+                                        <a
+                                          href={fileInfo.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+                                        >
+                                          <FileText size={16} />
+                                          <span className="truncate">{fileInfo.name}</span>
+                                          <Download size={14} />
+                                        </a>
+                                        {fileInfo.size && (
+                                          <p className="text-xs text-gray-500 mt-1">
+                                            {(fileInfo.size / 1024).toFixed(2)} KB
+                                          </p>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-gray-900 mt-1">
+                                        {typeof value === "boolean"
+                                          ? value
+                                            ? "Yes"
+                                            : "No"
+                                          : String(value)}
+                                      </p>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
                             {stepDataEntry.completed_at && (
                               <p className="text-xs text-gray-500 mt-4">
