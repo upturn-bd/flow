@@ -129,8 +129,17 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
           title={notice?.title || "Untitled Notice"}
           icon={<AlertCircle size={20} className="text-amber-500" />}
           action={
-            <PriorityBadge 
-              priority={notice?.urgency as "High" | "Medium" | "Low" || "Low"} 
+            <PriorityBadge
+              priority={
+                (() => {
+                  const u = notice?.urgency ?? "Low";
+                  const key = String(u).toLowerCase();
+                  if (key === "urgent") return "urgent";
+                  if (key === "high") return "high";
+                  if (key === "medium" || key === "normal") return "normal";
+                  return "low";
+                })()
+              }
             />
           }
         />

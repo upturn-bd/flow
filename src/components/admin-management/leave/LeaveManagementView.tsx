@@ -75,7 +75,7 @@ export default function LeaveManagementView() {
       // add holiday
       newHolidays = [...weeklyHolidays, dayIndex];
       // create in Supabase
-      await createWeeklyHolidayConfig({ day: dayIndex });
+      await createWeeklyHolidayConfig({ day: dayIndex } as any);
     }
 
     setWeeklyHolidays(newHolidays);

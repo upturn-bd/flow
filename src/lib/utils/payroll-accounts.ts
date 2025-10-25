@@ -51,7 +51,7 @@ export async function createAccountFromPayroll(
         status: 'Pending' as const, // Payroll entries are typically complete when logged
         from_source: `Payroll System - ${payrollData.source || 'Generated'}`,
         transaction_date: payrollData.generation_date,
-        amount: -Math.abs(payrollData.total_amount), // Negative because it's an expense for the company
+        amount: -Math.abs(payrollData.total_amount || 0), // Negative because it's an expense for the company
         currency: 'BDT',
         additional_data: {
           payroll_id: payrollData.payroll_id,

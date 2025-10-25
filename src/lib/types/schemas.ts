@@ -592,12 +592,18 @@ export interface PayrollAccountEntry {
   account_id?: number;
   payroll_id: number;
   employee_id: string;
-  transaction_type: 'salary_payment' | 'deduction' | 'bonus';
-  amount: number;
-  description: string;
-  company_id: number;
+  employee_name?: string;
+  transaction_type?: 'salary_payment' | 'deduction' | 'bonus';
+  amount?: number;
+  description?: string;
+  company_id?: number;
   created_at?: string;
   created_by?: string;
+  total_amount?: number;
+  basic_salary?: number;
+  adjustments?: any;
+  generation_date?: string;
+  source?: string;
 }
 
 // Team-Based Permissions System

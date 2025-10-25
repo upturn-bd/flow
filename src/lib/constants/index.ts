@@ -260,6 +260,30 @@ export type FieldType = typeof FIELD_TYPES[keyof typeof FIELD_TYPES];
 
 export const FIELD_TYPE_OPTIONS = Object.values(FIELD_TYPES);
 
+// Stakeholder Issue Status
+export const STAKEHOLDER_ISSUE_STATUS = {
+  OPEN: 'Open',
+  IN_PROGRESS: 'In Progress',
+  RESOLVED: 'Resolved',
+  CLOSED: 'Closed',
+} as const;
+
+export type StakeholderIssueStatus = typeof STAKEHOLDER_ISSUE_STATUS[keyof typeof STAKEHOLDER_ISSUE_STATUS];
+
+export const STAKEHOLDER_ISSUE_STATUS_OPTIONS = Object.values(STAKEHOLDER_ISSUE_STATUS);
+
+// Stakeholder Issue Priority
+export const STAKEHOLDER_ISSUE_PRIORITY = {
+  LOW: 'Low',
+  MEDIUM: 'Medium',
+  HIGH: 'High',
+  URGENT: 'Urgent',
+} as const;
+
+export type StakeholderIssuePriority = typeof STAKEHOLDER_ISSUE_PRIORITY[keyof typeof STAKEHOLDER_ISSUE_PRIORITY];
+
+export const STAKEHOLDER_ISSUE_PRIORITY_OPTIONS = Object.values(STAKEHOLDER_ISSUE_PRIORITY);
+
 // ==============================================================================
 // Blood Group Constants
 // ==============================================================================
