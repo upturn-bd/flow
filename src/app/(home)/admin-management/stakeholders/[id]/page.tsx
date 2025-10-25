@@ -25,10 +25,9 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
   const stakeholderId = parseInt(id);
 
   const {
-    stakeholders,
     loading,
     error,
-    fetchStakeholders,
+    fetchStakeholderById,
     fetchStakeholderStepData,
     deleteStakeholder,
   } = useStakeholders();
@@ -40,16 +39,15 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    fetchStakeholders();
-  }, [fetchStakeholders]);
-
-  useEffect(() => {
-    const found = stakeholders.find((s) => s.id === stakeholderId);
-    if (found) {
-      setStakeholder(found);
-      loadStepData(stakeholderId);
-    }
-  }, [stakeholders, stakeholderId]);
+    const loadStakeholder = async () => {
+      const data = await fetchStakeholderById(stakeholderId);
+      if (data) {
+        setStakeholder(data);
+        loadStepData(stakeholderId);
+      }
+    };
+    loadStakeholder();
+  }, [stakeholderId, fetchStakeholderById]);
 
   const loadStepData = async (id: number) => {
     const data = await fetchStakeholderStepData(id);
@@ -70,7 +68,10 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
   };
 
   const handleStepComplete = async () => {
-    await fetchStakeholders();
+    const data = await fetchStakeholderById(stakeholderId);
+    if (data) {
+      setStakeholder(data);
+    }
     await loadStepData(stakeholderId);
     setActiveStepId(null);
   };
