@@ -346,7 +346,7 @@ export function useTasks() {
         priority: task.priority,
         type_id: 3, // Assuming 3 is the type ID for task assignment
         recipient_id: assignees,
-        action_url: '/operations-and-services/workflow/task',
+        action_url: '/ops/task',
         company_id: company_id,
         department_id: task.department_id
       });
@@ -357,7 +357,7 @@ export function useTasks() {
         priority: task.priority,
         type_id: 3, // Assuming 3 is the type ID for task assignment
         recipient_id: [user.supervisor_id].filter(Boolean) as string[],
-        action_url: '/operations-and-services/workflow/task',
+        action_url: '/ops/task',
         company_id: company_id,
         department_id: task.department_id
       });
@@ -423,7 +423,7 @@ export function useTasks() {
         priority: 'normal',
         type_id: 3, // 3 is the type ID for task assignment
         recipient_id: recipients,
-        action_url: '/operations-and-services/workflow/task',
+        action_url: '/ops/task',
         company_id: company_id,
         department_id: task.department_id
       });

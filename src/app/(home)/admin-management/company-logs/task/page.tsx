@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
 import { Loader2, Trash2, RotateCcw, CheckCircle, Edit3 } from "lucide-react";
 import { toast } from "sonner";
-import TaskUpdateModal from "@/components/operations-and-services/task/shared/TaskUpdateModal";
+import TaskUpdateModal from "@/components/ops/task/shared/TaskUpdateModal";
 import { getEmployeeName } from "@/lib/utils/auth";
 import { usePermissions } from "@/hooks/usePermissions";
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import TaskDetails from "@/components/operations-and-services/task/shared/TaskDetails";
-import NoticeDetails from "@/components/operations-and-services/notice/NoticeDetails";
+import TaskDetails from "@/components/ops/task/shared/TaskDetails";
+import NoticeDetails from "@/components/ops/notice/NoticeDetails";
 
 interface DetailModalsProps {
   selectedNoticeId: number | null;

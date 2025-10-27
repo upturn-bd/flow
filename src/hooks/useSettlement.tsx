@@ -112,7 +112,7 @@ export function useSettlementRequests() {
           priority: 'normal',
           type_id: 6,
           recipient_id: recipients,
-          action_url: '/operations-and-services/services/settlement',
+          action_url: '/ops/settlement',
           company_id: user.company_id,
           department_id: user.department_id
         });
@@ -179,7 +179,7 @@ export function useSettlementRequests() {
           priority: 'normal',
           type_id: 6,
           recipient_id: recipients,
-          action_url: '/operations-and-services/services/settlement',
+          action_url: '/ops/settlement',
           company_id: user.company_id,
           department_id: settlementData.department_id
         });

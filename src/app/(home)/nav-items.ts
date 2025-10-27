@@ -29,7 +29,7 @@ export const navItems: NavItem[] = [
     },
     {
       label: "operations-and-services",
-      href: "/operations-and-services",
+      href: "/ops",
       icon: EnvelopeIcon,
       roles: ["Employee", "Manager", "Admin"], // Backward compatibility
       requiredPermissions: [], // Operations page accessible to all, subpages have their own checks

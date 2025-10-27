@@ -13,7 +13,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import NoticeUpdateModal from "@/components/operations-and-services/notice/NoticeUpdateModal";
+import NoticeUpdateModal from "@/components/ops/notice/NoticeUpdateModal";
 import { toast } from "sonner";
 import { usePermissions } from "@/hooks/usePermissions";
 

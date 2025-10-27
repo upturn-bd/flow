@@ -43,7 +43,7 @@ export function useNotices() {
         priority: notice.urgency || "normal",
         type_id: 6,
         recipient_id: recipients,
-        action_url: "/operations-and-services/services/notice",
+        action_url: "/ops/notice",
         company_id: user.company_id,
         department_id: notice.department_id,
       });
@@ -72,7 +72,7 @@ export function useNotices() {
         priority: notice.urgency || "normal",
         type_id: 6,
         recipient_id: recipients,
-        action_url: "/operations-and-services/workflow/notice",
+        action_url: "/ops/notice",
         company_id: user.company_id,
         department_id: notice.department_id,
       });

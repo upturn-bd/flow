@@ -274,7 +274,7 @@ export function useStakeholders() {
               priority: 'normal',
               type_id: 6,
               recipient_id: recipients,
-              action_url: '/operations-and-services/services/stakeholder',
+              action_url: '/ops/stakeholder',
               company_id: user.company_id,
               department_id: user.department_id
             });
@@ -374,7 +374,7 @@ export function useStakeholders() {
             priority: issueData.priority === 'Critical' || issueData.priority === 'High' ? 'high' : 'normal',
             type_id: 6,
             recipient_id: recipients,
-            action_url: '/operations-and-services/services/stakeholder',
+            action_url: '/ops/stakeholder',
             company_id: userInfo.company_id,
             department_id: userInfo.department_id
           });
