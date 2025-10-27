@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { useModalState } from "@/hooks/core/useModalState";
 import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIssueForm";
-import FormModal from "@/components/ui/modals/FormModal";
+import BaseModal from "@/components/ui/modals/BaseModal";
 import {
   AlertCircle,
   CheckCircle2,
@@ -35,7 +35,7 @@ export default function StakeholderIssuesPage() {
     getAttachmentUrl,
   } = useStakeholderIssues();
 
-  const { isOpen, openModal, closeModal } = useModalState();
+  const { modalState, openCreateModal, closeModal } = useModalState();
   const [selectedIssue, setSelectedIssue] = useState<StakeholderIssue | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "Pending" | "In Progress" | "Resolved">("all");
@@ -314,7 +314,7 @@ export default function StakeholderIssuesPage() {
                   <button
                     onClick={() => {
                       setSelectedIssue(issue);
-                      openModal();
+                      openCreateModal();
                     }}
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                     title="Edit issue"
@@ -336,8 +336,8 @@ export default function StakeholderIssuesPage() {
       )}
 
       {/* Edit Issue Modal */}
-      {isOpen && selectedIssue && (
-        <FormModal isOpen={isOpen} onClose={closeModal} title="Update Issue">
+      {modalState.isOpen && selectedIssue && (
+        <BaseModal isOpen={modalState.isOpen} onClose={closeModal} title="Update Issue">
           <StakeholderIssueForm
             stakeholderId={selectedIssue.stakeholder_id}
             initialData={{
@@ -350,7 +350,7 @@ export default function StakeholderIssuesPage() {
             onCancel={closeModal}
             submitLabel="Update Issue"
           />
-        </FormModal>
+        </BaseModal>
       )}
     </div>
   );

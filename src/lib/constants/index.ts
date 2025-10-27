@@ -67,7 +67,6 @@ export type TaskStatus = typeof STATUS.TODO | typeof STATUS.IN_PROGRESS | typeof
 export type AttendanceStatus = typeof STATUS.PRESENT | typeof STATUS.ABSENT | typeof STATUS.LATE | typeof STATUS.HALF_DAY;
 export type LeaveStatus = typeof STATUS.LEAVE_APPLIED | typeof STATUS.LEAVE_APPROVED | typeof STATUS.LEAVE_REJECTED | typeof STATUS.LEAVE_CANCELLED;
 export type ComplaintStatus = typeof STATUS.SUBMITTED | typeof STATUS.INVESTIGATING | typeof STATUS.RESOLVED | typeof STATUS.CLOSED;
-export type StakeholderIssueStatus = typeof STATUS.ISSUE_PENDING | typeof STATUS.ISSUE_IN_PROGRESS | typeof STATUS.ISSUE_RESOLVED;
 export type SettlementStatus = typeof STATUS.REQUESTED | typeof STATUS.PROCESSING | typeof STATUS.PROCESSED | typeof STATUS.PAID;
 export type AccountStatus = typeof STATUS.COMPLETE | typeof STATUS.PENDING;
 

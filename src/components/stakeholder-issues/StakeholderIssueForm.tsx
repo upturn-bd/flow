@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import BaseForm from "@/components/forms/BaseForm";
-import { useFormState } from "@/hooks/useFormState";
 import {
   validateStakeholderIssue,
   validationErrorsToObject,
@@ -27,29 +26,29 @@ export default function StakeholderIssueForm({
 }: StakeholderIssueFormProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [formData, setFormData] = useState<StakeholderIssueFormData>({
+    stakeholder_id: stakeholderId,
+    title: initialData?.title || "",
+    description: initialData?.description || "",
+    status: initialData?.status || "Pending",
+    priority: initialData?.priority || "Medium",
+    attachments: [],
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    formData,
-    errors,
-    isDirty,
-    isSubmitting,
-    handleChange,
-    handleSubmit,
-    setFieldError,
-  } = useFormState<StakeholderIssueFormData>(
-    {
-      stakeholder_id: stakeholderId,
-      title: initialData?.title || "",
-      description: initialData?.description || "",
-      status: initialData?.status || "Pending",
-      priority: initialData?.priority || "Medium",
-      attachments: [],
-    },
-    (data) => {
-      const validationErrors = validateStakeholderIssue(data);
-      return validationErrorsToObject(validationErrors);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error for this field when user types
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
     }
-  );
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFileError(null);
@@ -76,24 +75,32 @@ export default function StakeholderIssueForm({
     setFiles(files.filter((_, i) => i !== index));
   };
 
-  const handleFormSubmit = async () => {
-    const dataToSubmit = {
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const dataToValidate = {
       ...formData,
       attachments: files,
     };
 
-    await onSubmit(dataToSubmit);
+    const validationErrors = validateStakeholderIssue(dataToValidate);
+    if (validationErrors.length > 0) {
+      setErrors(validationErrorsToObject(validationErrors));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit(dataToValidate);
+    } catch (error) {
+      console.error("Form submission error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <BaseForm
-      title={initialData ? "Edit Issue" : "Create New Issue"}
-      onSubmit={handleSubmit(handleFormSubmit)}
-      onCancel={onCancel}
-      submitLabel={submitLabel}
-      isSubmitting={isSubmitting}
-      isDirty={isDirty}
-    >
+    <form onSubmit={handleFormSubmit} className="space-y-6">
       <div className="space-y-4">
         {/* Title */}
         <div>
@@ -238,6 +245,25 @@ export default function StakeholderIssueForm({
           </div>
         </div>
       </div>
-    </BaseForm>
+
+      {/* Submit Buttons */}
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        >
+          {isSubmitting ? "Saving..." : submitLabel}
+        </button>
+      </div>
+    </form>
   );
 }

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { useModalState } from "@/hooks/core/useModalState";
 import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIssueForm";
-import FormModal from "@/components/ui/modals/FormModal";
+import BaseModal from "@/components/ui/modals/BaseModal";
 import {
   Plus,
   AlertCircle,
@@ -32,7 +32,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
     getAttachmentUrl,
   } = useStakeholderIssues();
 
-  const { isOpen, openModal, closeModal } = useModalState();
+  const { modalState, openCreateModal, closeModal } = useModalState();
   const [selectedIssue, setSelectedIssue] = useState<StakeholderIssue | null>(null);
 
   useEffect(() => {
@@ -148,7 +148,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
         <button
           onClick={() => {
             setSelectedIssue(null);
-            openModal();
+            openCreateModal();
           }}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
@@ -174,7 +174,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
           <button
             onClick={() => {
               setSelectedIssue(null);
-              openModal();
+              openCreateModal();
             }}
             className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
@@ -240,7 +240,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                   <button
                     onClick={() => {
                       setSelectedIssue(issue);
-                      openModal();
+                      openCreateModal();
                     }}
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                     title="Edit issue"
@@ -262,8 +262,8 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
       )}
 
       {/* Create/Edit Issue Modal */}
-      {isOpen && (
-        <FormModal isOpen={isOpen} onClose={closeModal} title={selectedIssue ? "Update Issue" : "Create New Issue"}>
+      {modalState.isOpen && (
+        <BaseModal isOpen={modalState.isOpen} onClose={closeModal} title={selectedIssue ? "Update Issue" : "Create New Issue"}>
           <StakeholderIssueForm
             stakeholderId={stakeholderId}
             initialData={selectedIssue ? {
@@ -276,7 +276,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
             onCancel={closeModal}
             submitLabel={selectedIssue ? "Update Issue" : "Create Issue"}
           />
-        </FormModal>
+        </BaseModal>
       )}
     </div>
   );
