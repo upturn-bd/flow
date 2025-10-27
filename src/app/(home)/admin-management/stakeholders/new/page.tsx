@@ -3,17 +3,20 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
+import { useEmployees } from "@/hooks/useEmployees";
 import { ArrowLeft, AlertCircle, Plus, Trash2 } from "lucide-react";
 import { ContactPerson } from "@/lib/types/schemas";
 
 export default function NewStakeholderPage() {
   const router = useRouter();
   const { processes, activeProcesses, loading, createStakeholder, fetchProcesses } = useStakeholders();
+  const { employees, fetchEmployees } = useEmployees();
 
   const [formData, setFormData] = useState({
     name: "",
     address: "",
     process_id: "",
+    issue_handler_id: "",
   });
 
   const [contactPersons, setContactPersons] = useState<ContactPerson[]>([]);
@@ -22,7 +25,8 @@ export default function NewStakeholderPage() {
 
   useEffect(() => {
     fetchProcesses();
-  }, [fetchProcesses]);
+    fetchEmployees();
+  }, [fetchProcesses, fetchEmployees]);
 
   const handleAddContactPerson = () => {
     setContactPersons([
@@ -89,6 +93,7 @@ export default function NewStakeholderPage() {
         process_id: parseInt(formData.process_id),
         contact_persons: validContactPersons,
         is_active: true, // New leads are active by default
+        issue_handler_id: formData.issue_handler_id || undefined,
       });
 
       router.push("/admin-management/stakeholders");
@@ -209,6 +214,27 @@ export default function NewStakeholderPage() {
               )}
               <p className="text-gray-500 text-sm mt-1">
                 Select the workflow process this lead will follow
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Issue Handler
+              </label>
+              <select
+                value={formData.issue_handler_id}
+                onChange={(e) => setFormData({ ...formData, issue_handler_id: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              >
+                <option value="">None (No issue handler assigned)</option>
+                {employees.map((employee) => (
+                  <option key={employee.id} value={employee.id}>
+                    {employee.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-gray-500 text-sm mt-1">
+                Assign an employee responsible for handling issues for this stakeholder (optional)
               </p>
             </div>
           </div>

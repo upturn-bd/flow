@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Stakeholder, StakeholderProcessStep, StakeholderStepData } from "@/lib/types/schemas";
 import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
+import StakeholderIssuesTab from "@/components/stakeholder-issues/StakeholderIssuesTab";
 
 export default function StakeholderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -40,6 +41,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
   const [activeStepId, setActiveStepId] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [activeTab, setActiveTab] = useState<"process" | "issues">("process");
 
   useEffect(() => {
     const loadStakeholder = async () => {
@@ -265,89 +267,120 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
         {/* Right Column - Process Steps */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Process Steps</h2>
-
-            {sortedSteps.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                No steps configured for this process
+          {/* Tabs */}
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="border-b border-gray-200">
+              <div className="flex">
+                <button
+                  onClick={() => setActiveTab("process")}
+                  className={`px-6 py-3 text-sm font-medium transition-colors ${
+                    activeTab === "process"
+                      ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
+                >
+                  Process Steps
+                </button>
+                <button
+                  onClick={() => setActiveTab("issues")}
+                  className={`px-6 py-3 text-sm font-medium transition-colors ${
+                    activeTab === "issues"
+                      ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
+                >
+                  Issues
+                </button>
               </div>
-            ) : (
-              <div className="space-y-4">
-                {sortedSteps.map((step, index) => {
-                  const stepDataEntry = stepData.find((sd) => sd.step_id === step.id);
-                  const isCompleted = stepDataEntry?.is_completed || false;
-                  const isCurrent = stakeholder.current_step_id === step.id;
-                  const canEdit = isCurrent && !stakeholder.is_completed;
+            </div>
 
-                  return (
-                    <div
-                      key={step.id}
-                      className={`border rounded-lg ${
-                        isCurrent
-                          ? "border-blue-300 bg-blue-50"
-                          : isCompleted
-                          ? "border-green-300 bg-green-50"
-                          : "border-gray-200 bg-gray-50"
-                      }`}
-                    >
-                      <div className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start gap-3">
-                            <div
-                              className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-                                isCompleted
-                                  ? "bg-green-500 text-white"
-                                  : isCurrent
-                                  ? "bg-blue-500 text-white"
-                                  : "bg-gray-300 text-gray-600"
-                              }`}
-                            >
-                              {isCompleted ? (
-                                <CheckCircle2 size={18} />
-                              ) : (
-                                <span>{step.step_order}</span>
-                              )}
-                            </div>
-                            <div>
-                              <h3 className="font-semibold text-gray-900">{step.name}</h3>
-                              {step.description && (
-                                <p className="text-sm text-gray-600 mt-1">{step.description}</p>
-                              )}
-                              <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                                <span>Team: {step.team?.name || "N/A"}</span>
+            {/* Tab Content */}
+            <div className="p-6">
+              {activeTab === "process" ? (
+                // Process Steps Content
+                <>
+                  <h2 className="text-lg font-semibold text-gray-900 mb-6">Process Steps</h2>
+
+                  {sortedSteps.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500">
+                      No steps configured for this process
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {sortedSteps.map((step, index) => {
+                        const stepDataEntry = stepData.find((sd) => sd.step_id === step.id);
+                        const isCompleted = stepDataEntry?.is_completed || false;
+                        const isCurrent = stakeholder.current_step_id === step.id;
+                        const canEdit = isCurrent && !stakeholder.is_completed;
+
+                        return (
+                          <div
+                            key={step.id}
+                            className={`border rounded-lg ${
+                              isCurrent
+                                ? "border-blue-300 bg-blue-50"
+                                : isCompleted
+                                ? "border-green-300 bg-green-50"
+                                : "border-gray-200 bg-gray-50"
+                            }`}
+                          >
+                            <div className="p-4">
+                              <div className="flex items-start justify-between">
+                                <div className="flex items-start gap-3">
+                                  <div
+                                    className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
+                                      isCompleted
+                                        ? "bg-green-500 text-white"
+                                        : isCurrent
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-gray-300 text-gray-600"
+                                    }`}
+                                  >
+                                    {isCompleted ? (
+                                      <CheckCircle2 size={18} />
+                                    ) : (
+                                      <span>{step.step_order}</span>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <h3 className="font-semibold text-gray-900">{step.name}</h3>
+                                    {step.description && (
+                                      <p className="text-sm text-gray-600 mt-1">{step.description}</p>
+                                    )}
+                                    <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                                      <span>Team: {step.team?.name || "N/A"}</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {canEdit && (
+                                  <button
+                                    onClick={() =>
+                                      setActiveStepId(activeStepId === step.id ? null : (step.id || null))
+                                    }
+                                    className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                                  >
+                                    {activeStepId === step.id ? "Cancel" : "Work on Step"}
+                                  </button>
+                                )}
                               </div>
-                            </div>
-                          </div>
 
-                          {canEdit && (
-                            <button
-                              onClick={() =>
-                                setActiveStepId(activeStepId === step.id ? null : (step.id || null))
-                              }
-                              className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
-                            >
-                              {activeStepId === step.id ? "Cancel" : "Work on Step"}
-                            </button>
-                          )}
-                        </div>
+                              {/* Step Data Form */}
+                              {activeStepId === step.id && canEdit && step.id && (
+                                <div className="mt-4 pt-4 border-t border-gray-200">
+                                  <StepDataForm
+                                    stakeholderId={stakeholderId}
+                                    step={step}
+                                    existingData={stepDataEntry}
+                                    onComplete={handleStepComplete}
+                                    onCancel={() => setActiveStepId(null)}
+                                  />
+                                </div>
+                              )}
 
-                        {/* Step Data Form */}
-                        {activeStepId === step.id && canEdit && step.id && (
-                          <div className="mt-4 pt-4 border-t border-gray-200">
-                            <StepDataForm
-                              stakeholderId={stakeholderId}
-                              step={step}
-                              existingData={stepDataEntry}
-                              onComplete={handleStepComplete}
-                              onCancel={() => setActiveStepId(null)}
-                            />
-                          </div>
-                        )}
-
-                        {/* Display Completed Data */}
-                        {isCompleted && stepDataEntry && (
-                          <div className="mt-4 pt-4 border-t border-gray-200">
+                              {/* Display Completed Data */}
+                              {isCompleted && stepDataEntry && (
+                                <div className="mt-4 pt-4 border-t border-gray-200">
                             <div className="grid grid-cols-2 gap-4">
                               {Object.entries(stepDataEntry.data).map(([key, value]) => {
                                 // Check if this is a file field by looking at the field definitions
@@ -427,9 +460,15 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 })}
               </div>
             )}
-          </div>
-        </div>
+          </>
+        ) : (
+          // Issues Tab Content
+          <StakeholderIssuesTab stakeholderId={stakeholderId} />
+        )}
       </div>
+    </div>
+  </div>
+</div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
