@@ -13,6 +13,7 @@ export default function SettlementDraftPage({ onClose, draftId }: SettlementDraf
     <SettlementCreatePage 
       onClose={onClose}
       draftId={draftId}
+      setActiveTab={() => {}} // No-op function since drafts don't need tab switching
     />
   );
 } 

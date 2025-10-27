@@ -128,7 +128,7 @@ const sections = [
             },
             {
                 name: "Stakeholder",
-                path: "/admin-management/company-logs/stakeholder",
+                path: "/admin-management/stakeholders",
                 icon: Building2,
                 description: "Records of all stakeholder interactions and issues",
                 color: "bg-purple-100 text-purple-700 border-purple-200"

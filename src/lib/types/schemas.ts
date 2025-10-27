@@ -451,68 +451,123 @@ export interface Payroll {
   updated_at?: string;
 }
 
-// Stakeholder Management System Interfaces
-export interface StakeholderContact {
+// ==============================================================================
+// Stakeholder Management System (Process-Based)
+// ==============================================================================
+
+// Contact Person for Stakeholder
+export interface ContactPerson {
   name: string;
-  role: string;
   phone: string;
   email: string;
-  address: string;
 }
 
-export interface StakeholderType {
+// Field definition types for process steps
+export type FieldType = 'text' | 'boolean' | 'date' | 'file';
+
+export interface FieldValidation {
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  message?: string;
+}
+
+export interface FieldDefinition {
+  key: string;
+  label: string;
+  type: FieldType;
+  required: boolean;
+  validation?: FieldValidation;
+  placeholder?: string;
+  helpText?: string;
+}
+
+export interface FieldDefinitionsSchema {
+  fields: FieldDefinition[];
+}
+
+// Stakeholder Process - defines the workflow
+export interface StakeholderProcess {
   id?: number;
   name: string;
   description?: string;
   company_id: number;
+  is_active: boolean;
+  is_sequential: boolean; // If true, steps must be completed in order
+  allow_rollback: boolean; // If true, can go back to previous steps (only for sequential)
   created_at?: string;
   updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+  // Joined data
+  steps?: StakeholderProcessStep[];
+  step_count?: number;
 }
 
+// Process Step - individual step in a process
+export interface StakeholderProcessStep {
+  id?: number;
+  process_id: number;
+  name: string;
+  description?: string;
+  step_order: number;
+  team_id: number;
+  field_definitions: FieldDefinitionsSchema;
+  use_date_range: boolean;
+  start_date?: string; // ISO date string
+  end_date?: string; // ISO date string
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+  version?: number; // For backward compatibility
+  // Joined data
+  team?: {
+    id: number;
+    name: string;
+  };
+}
+
+// Stakeholder - main entity (called "Lead" until completed)
 export interface Stakeholder {
   id?: number;
   name: string;
   address?: string;
-  stakeholder_type_id?: number;
-  manager_id?: string; // Employee ID (UUID) who manages this stakeholder
-  contact_details?: {
-    contacts: StakeholderContact[];
-  };
-  assigned_employees?: string[]; // Array of employee IDs
+  contact_persons: ContactPerson[];
+  process_id: number;
+  current_step_id?: number;
+  current_step_order: number;
+  is_active: boolean;
+  is_completed: boolean;
+  completed_at?: string;
   company_id: number;
   created_at?: string;
   updated_at?: string;
   created_by?: string;
   updated_by?: string;
   // Joined data
-  stakeholder_type?: StakeholderType;
-  manager?: {
-    id: string;
-    name: string;
-    email?: string;
-  };
+  process?: StakeholderProcess;
+  current_step?: StakeholderProcessStep;
+  step_data?: StakeholderStepData[];
 }
 
-export type StakeholderIssueStatus = 'Open' | 'In Progress' | 'Resolved' | 'Closed';
-export type StakeholderIssuePriority = 'Low' | 'Medium' | 'High' | 'Critical';
-
-export interface StakeholderIssue {
+// Step Data - actual data for each step of each stakeholder
+export interface StakeholderStepData {
   id?: number;
   stakeholder_id: number;
-  transaction_id?: number; // Optional reference to accounts table
-  title: string;
-  description?: string;
-  status: StakeholderIssueStatus;
-  priority: StakeholderIssuePriority;
-  assigned_to?: string; // Employee ID (UUID) responsible for resolving
-  company_id: number;
+  step_id: number;
+  data: Record<string, any>; // Dynamic based on field_definitions
+  field_definitions_snapshot?: FieldDefinitionsSchema; // Snapshot for backward compatibility
+  step_version?: number;
+  is_completed: boolean;
+  completed_at?: string;
+  completed_by?: string;
   created_at?: string;
   updated_at?: string;
   created_by?: string;
-  resolved_at?: string;
-  resolved_by?: string;
+  updated_by?: string;
   // Joined data
-  stakeholder?: Stakeholder;
+  step?: StakeholderProcessStep;
 }
 
 // Salary Change Audit Trail
@@ -537,12 +592,18 @@ export interface PayrollAccountEntry {
   account_id?: number;
   payroll_id: number;
   employee_id: string;
-  transaction_type: 'salary_payment' | 'deduction' | 'bonus';
-  amount: number;
-  description: string;
-  company_id: number;
+  employee_name?: string;
+  transaction_type?: 'salary_payment' | 'deduction' | 'bonus';
+  amount?: number;
+  description?: string;
+  company_id?: number;
   created_at?: string;
   created_by?: string;
+  total_amount?: number;
+  basic_salary?: number;
+  adjustments?: any;
+  generation_date?: string;
+  source?: string;
 }
 
 // Team-Based Permissions System
