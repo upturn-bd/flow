@@ -524,47 +524,24 @@ export function useStakeholders() {
 
         if (error) throw error;
 
-      // Update local state
-      setStakeholders(prev => [data, ...prev]);
-      
-        // Send notification for stakeholder creation
-        try {
-          const user = await getEmployeeInfo();
-          const recipients = stakeholderData.assigned_employees || [];
-          if (stakeholderData.manager_id) {
-            recipients.push(stakeholderData.manager_id);
-          }
+        await fetchStakeholders();
+        return data;
+      } catch (error) {
+        console.error("Error creating stakeholder:", error);
+        setError("Failed to create stakeholder");
+        throw error;
+      }
+    },
+    [fetchStakeholders]
+  );
 
-          if (recipients.length > 0) {
-            await createNotification({
-              title: 'New Stakeholder Added',
-              message: `A new stakeholder "${data.name}" has been added to the system.`,
-              priority: 'normal',
-              type_id: 6,
-              recipient_id: recipients,
-              action_url: '/ops/stakeholder',
-              company_id: user.company_id,
-              department_id: user.department_id
-            });
-          }
-        } catch (notificationError) {
-          console.warn("Failed to send notification:", notificationError);
-        }      return { success: true, data };
-    } catch (error) {
-      const errorMessage = "Failed to create stakeholder";
-      setError(errorMessage);
-      console.error(error);
-      return { success: false, error: errorMessage };
-    }
-  }, [createNotification]);
+  const updateStakeholder = useCallback(
+    async (stakeholderId: number, stakeholderData: Partial<StakeholderFormData>) => {
+      setError(null);
+      setProcessingId(stakeholderId);
 
-  // Update stakeholder
-  const updateStakeholder = useCallback(async (id: number, stakeholderData: Partial<StakeholderFormData>) => {
-    setProcessingId(id);
-    try {
-      const company_id = await getCompanyId();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
+      try {
+        const employeeInfo = await getEmployeeInfo();
 
         const { data, error } = await supabase
           .from("stakeholders")
@@ -582,7 +559,7 @@ export function useStakeholders() {
         return data;
       } catch (error) {
         console.error("Error updating stakeholder:", error);
-        setError("Failed to update record");
+        setError("Failed to update stakeholder");
         throw error;
       } finally {
         setProcessingId(null);
@@ -622,36 +599,52 @@ export function useStakeholders() {
 
         if (error) throw error;
 
-      // Update local state
-      setStakeholderIssues(prev => [data, ...prev]);
-      
-      // Send notification for issue creation
-      try {
-        const userInfo = await getEmployeeInfo();
-        const recipients = [];
-        
-        if (issueData.assigned_to) {
-          recipients.push(issueData.assigned_to.toString());
-        }
-
-        if (recipients.length > 0) {
-          await createNotification({
-            title: 'New Stakeholder Issue',
-            message: `A new issue "${data.title}" has been created for stakeholder.`,
-            priority: issueData.priority === 'Critical' || issueData.priority === 'High' ? 'high' : 'normal',
-            type_id: 6,
-            recipient_id: recipients,
-            action_url: '/ops/stakeholder',
-            company_id: userInfo.company_id,
-            department_id: userInfo.department_id
-          });
-        }
-      } catch (notificationError) {
-        console.warn("Failed to send notification:", notificationError);
+        await fetchStakeholders();
+        return true;
+      } catch (error) {
+        console.error("Error deleting stakeholder:", error);
+        setError("Failed to delete stakeholder");
+        return false;
+      } finally {
+        setProcessingId(null);
       }
     },
-    []
+    [fetchStakeholders]
   );
+
+  // ==========================================================================
+  // STEP DATA
+  // ==========================================================================
+
+  const fetchStakeholderStepData = useCallback(async (stakeholderId: number) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error } = await supabase
+        .from("stakeholder_step_data")
+        .select(`
+          *,
+          step:stakeholder_process_steps(id, name, step_order)
+        `)
+        .eq("stakeholder_id", stakeholderId)
+        .order("step_id");
+
+      if (error) {
+        setError("Failed to fetch step data");
+        throw error;
+      }
+
+      setStepData(data || []);
+      return data;
+    } catch (error) {
+      console.error("Error fetching step data:", error);
+      setError("Failed to fetch step data");
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const saveStepData = useCallback(
     async (stepDataForm: StakeholderStepDataFormData) => {

@@ -48,16 +48,6 @@ export function useStakeholderIssues() {
             name,
             address,
             issue_handler_id
-          ),
-          creator:employees!stakeholder_issues_created_by_fkey(
-            id,
-            name,
-            email
-          ),
-          resolver:employees!stakeholder_issues_resolved_by_fkey(
-            id,
-            name,
-            email
           )
         `)
         .eq("company_id", company_id);
@@ -101,16 +91,6 @@ export function useStakeholderIssues() {
             address,
             issue_handler_id,
             contact_persons
-          ),
-          creator:employees!stakeholder_issues_created_by_fkey(
-            id,
-            name,
-            email
-          ),
-          resolver:employees!stakeholder_issues_resolved_by_fkey(
-            id,
-            name,
-            email
           )
         `)
         .eq("company_id", company_id)
