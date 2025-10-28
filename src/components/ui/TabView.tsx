@@ -56,17 +56,15 @@ export const TabView = ({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className={`relative px-4 py-2.5 text-sm font-medium transition-all duration-200 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 flex items-center gap-2
-              ${
-                activeTab === tab.key
-                  ? `bg-blue-50 ${tab.color} shadow-sm`
-                  : "text-gray-600 hover:text-blue-600 hover:bg-gray-50"
+              ${activeTab === tab.key
+                ? `bg-blue-50 ${tab.color} shadow-sm`
+                : "text-gray-600 hover:text-blue-600 hover:bg-gray-50"
               }
             `}
           >
             <span
-              className={`${
-                activeTab === tab.key ? tab.color : "text-gray-500"
-              }`}
+              className={`${activeTab === tab.key ? tab.color : "text-gray-500"
+                }`}
             >
               {tab.icon}
             </span>
@@ -97,12 +95,15 @@ export const TabView = ({
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        {(() => {
-          const activeTabData = tabs.find((tab) => tab.key === activeTab);
-          return activeTabData ? activeTabData.content : null;
-        })()}
-      </div>
+      {(tabs.find((tab) => tab.key === activeTab)?.content && (
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          {(() => {
+            const activeTabData = tabs.find((tab) => tab.key === activeTab);
+            return activeTabData ? activeTabData.content : null;
+          })()}
+        </div>
+
+      ))}
     </>
   );
 };

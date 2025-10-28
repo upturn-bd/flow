@@ -10,7 +10,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import TabView from "@/components/ui/TabView";
-import { RequisitionCard } from "@/components/operations-and-services/requisition/RequisitionCard";
+import { RequisitionCard } from "@/components/ops/requisition/RequisitionCard";
 import { RequisitionType, RequisitionInventory } from "@/lib/types";
 import { usePermissions } from "@/hooks/usePermissions";
 

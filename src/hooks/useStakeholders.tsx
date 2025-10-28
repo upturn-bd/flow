@@ -524,24 +524,47 @@ export function useStakeholders() {
 
         if (error) throw error;
 
-        await fetchStakeholders();
-        return data;
-      } catch (error) {
-        console.error("Error creating stakeholder:", error);
-        setError(error instanceof Error ? error.message : "Failed to create lead");
-        throw error;
-      }
-    },
-    [fetchStakeholders, fetchProcessById]
-  );
+      // Update local state
+      setStakeholders(prev => [data, ...prev]);
+      
+        // Send notification for stakeholder creation
+        try {
+          const user = await getEmployeeInfo();
+          const recipients = stakeholderData.assigned_employees || [];
+          if (stakeholderData.manager_id) {
+            recipients.push(stakeholderData.manager_id);
+          }
 
-  const updateStakeholder = useCallback(
-    async (stakeholderId: number, stakeholderData: Partial<StakeholderFormData>) => {
-      setError(null);
-      setProcessingId(stakeholderId);
+          if (recipients.length > 0) {
+            await createNotification({
+              title: 'New Stakeholder Added',
+              message: `A new stakeholder "${data.name}" has been added to the system.`,
+              priority: 'normal',
+              type_id: 6,
+              recipient_id: recipients,
+              action_url: '/ops/stakeholder',
+              company_id: user.company_id,
+              department_id: user.department_id
+            });
+          }
+        } catch (notificationError) {
+          console.warn("Failed to send notification:", notificationError);
+        }      return { success: true, data };
+    } catch (error) {
+      const errorMessage = "Failed to create stakeholder";
+      setError(errorMessage);
+      console.error(error);
+      return { success: false, error: errorMessage };
+    }
+  }, [createNotification]);
 
-      try {
-        const employeeInfo = await getEmployeeInfo();
+  // Update stakeholder
+  const updateStakeholder = useCallback(async (id: number, stakeholderData: Partial<StakeholderFormData>) => {
+    setProcessingId(id);
+    try {
+      const company_id = await getCompanyId();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
 
         const { data, error } = await supabase
           .from("stakeholders")
@@ -599,59 +622,32 @@ export function useStakeholders() {
 
         if (error) throw error;
 
-        await fetchStakeholders();
-        return true;
-      } catch (error) {
-        console.error("Error deleting stakeholder:", error);
-        setError("Failed to delete record");
-        return false;
-      } finally {
-        setProcessingId(null);
-      }
-    },
-    [fetchStakeholders]
-  );
-
-  // ==========================================================================
-  // STEP DATA
-  // ==========================================================================
-
-  const fetchStakeholderStepData = useCallback(
-    async (stakeholderId: number, stepId?: number) => {
-      setLoading(true);
-      setError(null);
-
+      // Update local state
+      setStakeholderIssues(prev => [data, ...prev]);
+      
+      // Send notification for issue creation
       try {
-        let query = supabase
-          .from("stakeholder_step_data")
-          .select(`
-            *,
-            step:stakeholder_process_steps(
-              *,
-              team:teams(id, name)
-            )
-          `)
-          .eq("stakeholder_id", stakeholderId);
-
-        if (stepId) {
-          query = query.eq("step_id", stepId);
+        const userInfo = await getEmployeeInfo();
+        const recipients = [];
+        
+        if (issueData.assigned_to) {
+          recipients.push(issueData.assigned_to.toString());
         }
 
-        const { data, error } = await query;
-
-        if (error) {
-          setError("Failed to fetch step data");
-          throw error;
+        if (recipients.length > 0) {
+          await createNotification({
+            title: 'New Stakeholder Issue',
+            message: `A new issue "${data.title}" has been created for stakeholder.`,
+            priority: issueData.priority === 'Critical' || issueData.priority === 'High' ? 'high' : 'normal',
+            type_id: 6,
+            recipient_id: recipients,
+            action_url: '/ops/stakeholder',
+            company_id: userInfo.company_id,
+            department_id: userInfo.department_id
+          });
         }
-
-        setStepData(data || []);
-        return data;
-      } catch (error) {
-        console.error("Error fetching step data:", error);
-        setError("Failed to fetch step data");
-        return [];
-      } finally {
-        setLoading(false);
+      } catch (notificationError) {
+        console.warn("Failed to send notification:", notificationError);
       }
     },
     []

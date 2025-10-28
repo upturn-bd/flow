@@ -6,7 +6,7 @@ import { useNotifications } from "./useNotifications";
 import { getEmployeeInfo, getUser, getUserId } from "@/lib/utils/auth";
 import { useCallback, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { ProjectDetails } from "@/components/operations-and-services/project/ProjectForm";
+import { ProjectDetails } from "@/components/ops/project/ProjectForm";
 
 export type { Project };
 
@@ -76,7 +76,7 @@ export function useProjects() {
         priority: 'normal',
         type_id: 3, // Assuming 3 is the type ID for task assignment
         recipient_id: recipients,
-        action_url: '/operations-and-services/workflow/project',
+        action_url: '/ops/project',
         company_id: company_id,
         department_id: user.department_id
       });
@@ -87,7 +87,7 @@ export function useProjects() {
         priority: 'normal',
         type_id: 3, // Assuming 3 is the type ID for task assignment
         recipient_id: [user.supervisor_id].filter(Boolean) as string[],
-        action_url: '/operations-and-services/workflow/project',
+        action_url: '/ops/project',
         company_id: company_id,
         department_id: user.department_id
       });
@@ -119,7 +119,7 @@ export function useProjects() {
         priority: 'normal',
         type_id: 3, // Assuming 3 is the type ID for task assignment
         recipient_id: recipients,
-        action_url: '/operations-and-services/workflow/project',
+        action_url: '/ops/project',
         company_id: company_id,
       });
 

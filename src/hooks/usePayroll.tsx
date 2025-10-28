@@ -181,7 +181,7 @@ export function usePayroll() {
               },
               {
                 referenceId: payrollId,
-                actionUrl: '/operations-and-services/services/payroll'
+                actionUrl: '/ops/payroll'
               }
             );
           } else if (status === 'Paid') {
@@ -195,7 +195,7 @@ export function usePayroll() {
               },
               {
                 referenceId: payrollId,
-                actionUrl: '/operations-and-services/services/payroll'
+                actionUrl: '/ops/payroll'
               }
             );
           }
@@ -406,7 +406,7 @@ export function usePayroll() {
               },
               {
                 referenceId: payroll.id,
-                actionUrl: '/operations-and-services/services/payroll'
+                actionUrl: '/ops/payroll'
               }
             );
           }

@@ -149,7 +149,7 @@ export const ROUTES = {
   EMPLOYEE: {
     HOME: '/home',
     HRIS: '/hris',
-    OPERATIONS: '/operations-and-services',
+    OPERATIONS: '/ops',
     NOTIFICATIONS: '/notifications',
     ACCOUNT: '/account',
     PROFILE: '/profile',

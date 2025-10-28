@@ -9,8 +9,8 @@ import TabView from "@/components/ui/TabView";
 import { Loader2, Trash2, Edit3 } from "lucide-react";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
-import { UpdateProjectPage } from "@/components/operations-and-services/project/CreateNewProject";
-import { ProjectDetails } from "@/components/operations-and-services/project/ProjectForm";
+import { UpdateProjectPage } from "@/components/ops/project/CreateNewProject";
+import { ProjectDetails } from "@/components/ops/project/ProjectForm";
 import { usePermissions } from "@/hooks/usePermissions";
 
 export default function CompanyProjectsPage() {

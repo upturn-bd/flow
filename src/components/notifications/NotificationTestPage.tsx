@@ -42,7 +42,7 @@ export default function NotificationTestPage() {
               endDate: '2024-03-20'
             },
             {
-              actionUrl: '/operations-and-services/services/leave',
+              actionUrl: '/ops/leave',
               referenceId: 123
             }
           );
@@ -57,7 +57,7 @@ export default function NotificationTestPage() {
               role: 'Lead Developer'
             },
             {
-              actionUrl: '/operations-and-services/projects',
+              actionUrl: '/ops/projects',
               referenceId: 456
             }
           );

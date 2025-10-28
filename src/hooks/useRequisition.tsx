@@ -162,7 +162,7 @@ export function useRequisitionRequests() {
           priority: 'normal',
           type_id: 6,
           recipient_id: recipients,
-          action_url: '/operations-and-services/services/requisition',
+          action_url: '/ops/requisition',
           company_id: user.company_id,
           department_id: user.department_id
         })

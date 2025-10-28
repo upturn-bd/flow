@@ -10,7 +10,7 @@ import {
   Flag 
 } from "lucide-react";
 import TabView from "@/components/ui/TabView";
-import { ComplaintCard } from "@/components/operations-and-services/complaint/ComplaintCard";
+import { ComplaintCard } from "@/components/ops/complaint/ComplaintCard";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaints } from "@/hooks/useComplaints";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";

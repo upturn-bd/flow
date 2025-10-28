@@ -40,7 +40,7 @@ export default function Sidebar() {
   );
 
   useEffect(() => {
-    if (pathname.startsWith("/operations-and-services")) {
+    if (pathname.startsWith("/ops")) {
       setOpenSubmenu("operations-and-services");
     }
   }, [pathname]);
@@ -48,17 +48,17 @@ export default function Sidebar() {
   if (!isApproved) return null;
 
   const operationsSubmenu = [
-    { label: "Task", href: "/operations-and-services/workflow/task", icon: ClipboardList },
-    { label: "Project", href: "/operations-and-services/workflow/project", icon: BarChart },
-    { label: "Attendance", href: "/operations-and-services/services/attendance", icon: LogIn },
-    { label: "Leave", href: "/operations-and-services/services/leave", icon: CalendarX },
-    { label: "Notice", href: "/operations-and-services/services/notice", icon: Bell },
-    { label: "Requisition", href: "/operations-and-services/services/requisition", icon: Clipboard },
-    { label: "Settlement", href: "/operations-and-services/services/settlement", icon: DollarSign },
-    { label: "Complaint", href: "/operations-and-services/services/complaint", icon: AlertCircle },
-    { label: "Payroll", href: "/operations-and-services/services/payroll", icon: CreditCard },
-    { label: "Onboarding", href: "/operations-and-services/operations/onboarding", icon: UserPlus },
-    { label: "HRIS", href: "/operations-and-services/operations/hris", icon: Users },
+    { label: "Task", href: "/ops/tasks", icon: ClipboardList },
+    { label: "Project", href: "/ops/project", icon: BarChart },
+    { label: "Attendance", href: "/ops/attendance", icon: LogIn },
+    { label: "Leave", href: "/ops/leave", icon: CalendarX },
+    { label: "Notice", href: "/ops/notice", icon: Bell },
+    { label: "Requisition", href: "/ops/requisition", icon: Clipboard },
+    { label: "Settlement", href: "/ops/settlement", icon: DollarSign },
+    { label: "Complaint", href: "/ops/complaint", icon: AlertCircle },
+    { label: "Payroll", href: "/ops/payroll", icon: CreditCard },
+    { label: "Onboarding", href: "/ops/onboarding", icon: UserPlus },
+    { label: "HRIS", href: "/ops/hris", icon: Users },
   ];
 
   const HamburgerButton = () => (

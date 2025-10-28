@@ -12,7 +12,7 @@ import { isOnTime, getCurrentTime24HourFormat, checkLateStatus, checkEarlyCheckO
 import { Attendance } from '@/lib/types/schemas';
 import { getEmployeeInfo } from '@/lib/utils/auth';
 import { supabase } from '@/lib/supabase/client';
-import ClickableStatusCell from '@/components/operations-and-services/attendance/ClickableStatusCell';
+import ClickableStatusCell from '@/components/ops/attendance/ClickableStatusCell';
 
 interface Site {
   id?: number;

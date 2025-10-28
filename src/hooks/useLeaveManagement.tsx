@@ -74,7 +74,7 @@ export function useLeaveRequests() {
         priority: "normal",
         type_id: 2,
         recipient_id: recipients,
-        action_url: "/operations-and-services/services/leave",
+        action_url: "/ops/leave",
         company_id: user.company_id,
         department_id: user.department_id,
       });
@@ -131,7 +131,7 @@ export function useLeaveRequests() {
         priority: "normal",
         type_id: 2,
         recipient_id: recipients,
-        action_url: "/operations-and-services/services/leave",
+        action_url: "/ops/leave",
         company_id: user.company_id,
         department_id: user.department_id,
       });
