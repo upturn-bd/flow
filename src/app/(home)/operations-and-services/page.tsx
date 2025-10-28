@@ -97,8 +97,8 @@ const sections = [
         color: "bg-indigo-100 text-indigo-700 border-indigo-200"
       },
       {
-        name: "Stakeholder",
-        path: "/operations-and-services/services/stakeholder",
+        name: "Stakeholder Issues",
+        path: "/operations-and-services/services/stakeholder-issues",
         icon: Building2,
         description: "Manage stakeholder relationships and track issues",
         color: "bg-purple-100 text-purple-700 border-purple-200"
