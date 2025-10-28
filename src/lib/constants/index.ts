@@ -45,6 +45,11 @@ export const STATUS = {
   RESOLVED: 'Resolved',
   CLOSED: 'Closed',
   
+  // Stakeholder Issue Status
+  ISSUE_PENDING: 'Pending',
+  ISSUE_IN_PROGRESS: 'In Progress',
+  ISSUE_RESOLVED: 'Resolved',
+  
   // Settlement Status
   REQUESTED: 'Requested',
   PROCESSING: 'Processing',

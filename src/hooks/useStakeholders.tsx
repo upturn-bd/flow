@@ -43,6 +43,7 @@ export interface StakeholderFormData {
   contact_persons: ContactPerson[];
   process_id: number;
   is_active: boolean;
+  issue_handler_id?: string;
 }
 
 export interface StakeholderStepDataFormData {

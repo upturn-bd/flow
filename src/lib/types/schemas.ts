@@ -540,6 +540,7 @@ export interface Stakeholder {
   is_active: boolean;
   is_completed: boolean;
   completed_at?: string;
+  issue_handler_id?: string; // Employee ID assigned as issue handler
   company_id: number;
   created_at?: string;
   updated_at?: string;
@@ -549,6 +550,11 @@ export interface Stakeholder {
   process?: StakeholderProcess;
   current_step?: StakeholderProcessStep;
   step_data?: StakeholderStepData[];
+  issue_handler?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
 }
 
 // Step Data - actual data for each step of each stakeholder
@@ -568,6 +574,45 @@ export interface StakeholderStepData {
   updated_by?: string;
   // Joined data
   step?: StakeholderProcessStep;
+}
+
+// Stakeholder Issue - issue tracking/ticketing for stakeholders
+export interface StakeholderIssue {
+  id?: number;
+  stakeholder_id: number;
+  title: string;
+  description?: string;
+  status: 'Pending' | 'In Progress' | 'Resolved';
+  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
+  attachments: StakeholderIssueAttachment[];
+  company_id: number;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+  resolved_at?: string;
+  resolved_by?: string;
+  // Joined data
+  stakeholder?: Stakeholder;
+  creator?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
+  resolver?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
+}
+
+// File attachment for stakeholder issues
+export interface StakeholderIssueAttachment {
+  path: string;
+  originalName: string;
+  size: number;
+  type: string;
+  uploadedAt: string;
 }
 
 // Salary Change Audit Trail
