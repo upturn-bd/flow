@@ -48,7 +48,7 @@ export default function Sidebar() {
   if (!isApproved) return null;
 
   const operationsSubmenu = [
-    { label: "Task", href: "/ops/task", icon: ClipboardList },
+    { label: "Task", href: "/ops/tasks", icon: ClipboardList },
     { label: "Project", href: "/ops/project", icon: BarChart },
     { label: "Attendance", href: "/ops/attendance", icon: LogIn },
     { label: "Leave", href: "/ops/leave", icon: CalendarX },

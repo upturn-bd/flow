@@ -1,105 +1,124 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import OngoingTaskPage from "@/components/ops/task/OngoingTasks";
-import CompletedTasksList from "@/components/ops/task/CompletedTasks";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ClipboardList,
   CheckSquare,
-  PlusSquare,
-  ArchiveIcon
+  ArchiveIcon,
+  PlusSquare
 } from "lucide-react";
 import TabView, { TabItem } from "@/components/ui/TabView";
-import TaskCreateModal from "@/components/ops/task/shared/TaskModal";
-import { Task, TaskScope, TaskStatus, useTasks } from "@/hooks/useTasks";
+import OngoingTaskPage from "@/components/ops/tasks/OngoingTasks";
+import CompletedTasksList from "@/components/ops/tasks/CompletedTasks";
+import TaskCreateModal from "@/components/ops/tasks/shared/TaskModal";
+import { useTasks, Task } from "@/hooks/useTasks";
 import { TaskData } from "@/lib/validation/schemas/advanced";
+
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth/auth-context";
+import TaskDetails from "@/components/ops/tasks/shared/TaskDetails";
+import { useRouter } from "next/navigation";
 
 const TABS = [
   {
     key: "ongoing",
     label: "Ongoing",
     icon: <ClipboardList className="h-5 w-5" />,
-    color: "text-indigo-600"
+    color: "text-indigo-600",
   },
   {
     key: "completed",
     label: "Completed",
     icon: <CheckSquare className="h-5 w-5" />,
-    color: "text-green-600"
+    color: "text-green-600",
   },
   {
     key: "archived",
     label: "Archived",
     icon: <ArchiveIcon className="h-5 w-5" />,
-    color: "text-gray-600"
-  }
+    color: "text-gray-600",
+  },
 ];
 
-export default function TasksPage() {
+export default function TaskLayout({
+  selectedTaskId,
+  activeTab,
+  initialActiveTab = "ongoing",
+  setActiveTab: setParentActiveTab,
+}: {
+  selectedTaskId?: number | null;
+  activeTab?: string;
+  initialActiveTab?: string;
+  setActiveTab?: (tab: string) => void;
+}) {
+  const router = useRouter()
+  const handleTabChange = (tab: string) => {
+    router.push(`/ops/tasks?tab=${tab}`);
+  };
 
-  const [activeTab, setActiveTab] = useState("ongoing");
   const [tabs, setTabs] = useState<TabItem[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { employeeInfo } = useAuth();
-  
-  // Centralized task management
-  const { 
-    tasks, 
+
+  const {
     ongoingTasks,
     completedTasks,
-    loading, 
-    createTask, 
-    updateTask, 
-    deleteTask, 
-    fetchOngoingTasks,  
-    fetchCompletedTasks
+    loading,
+    createTask,
+    updateTask,
+    deleteTask,
+    fetchOngoingTasks,
+    fetchCompletedTasks,
   } = useTasks();
 
-
-
-
-  // Load all tasks on mount
+  // Load tasks
   useEffect(() => {
-    fetchOngoingTasks(); // Load both ongoing and completed tasks
-    fetchCompletedTasks()
+    fetchOngoingTasks();
+    fetchCompletedTasks();
   }, []);
 
-  useEffect(() => {
-    console.log(tasks);
-  },[tasks])
+  // Tab content
+  const ongoingTaskPage = useMemo(
+    () => (
+      <OngoingTaskPage
+        ongoingTasks={ongoingTasks}
+        loading={loading}
+        updateTask={updateTask}
+        deleteTask={deleteTask}
+        adminScoped={false}
+      />
+    ),
+    [ongoingTasks, loading, updateTask, deleteTask]
+  );
 
-  // Create stable component instances with centralized data
-  const ongoingTaskPage = useMemo(() => (
-    <OngoingTaskPage 
-      ongoingTasks={ongoingTasks}
-      loading={loading}
-      updateTask={updateTask}
-      deleteTask={deleteTask} adminScoped={false}    />
-  ), [ongoingTasks, loading, updateTask, deleteTask]);
-  
-  const completedTasksList = useMemo(() => (
-    <CompletedTasksList 
-      tasks={completedTasks}
-      loading={loading}
-      deleteTask={deleteTask} adminScoped={false}    />
-  ), [completedTasks, loading, deleteTask]);
-  
-  const archivedContent = useMemo(() => (
-    <div className="flex flex-col items-center justify-center p-12 bg-gray-50/50 rounded-xl border border-gray-200 text-center">
-      <ArchiveIcon className="h-16 w-16 text-gray-300 mb-4" />
-      <h3 className="text-xl font-semibold text-gray-700 mb-2">Archived Tasks</h3>
-      <p className="text-gray-500 max-w-md mb-6">
-        This section will store your archived tasks that are no longer active but you want to keep for reference.
-      </p>
-      <p className="text-gray-400 text-sm">
-        Feature coming soon...
-      </p>
-    </div>
-  ), []);
+  const completedTasksList = useMemo(
+    () => (
+      <CompletedTasksList
+        tasks={completedTasks}
+        loading={loading}
+        deleteTask={deleteTask}
+        adminScoped={false}
+      />
+    ),
+    [completedTasks, loading, deleteTask]
+  );
+
+  const archivedContent = useMemo(
+    () => (
+      <div className="flex flex-col items-center justify-center p-12 bg-gray-50/50 rounded-xl border border-gray-200 text-center">
+        <ArchiveIcon className="h-16 w-16 text-gray-300 mb-4" />
+        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          Archived Tasks
+        </h3>
+        <p className="text-gray-500 max-w-md mb-6">
+          This section will store your archived tasks that are no longer active but you want to keep for reference.
+        </p>
+        <p className="text-gray-400 text-sm">Feature coming soon...</p>
+      </div>
+    ),
+    []
+  );
 
   const getTabContent = useMemo(() => {
     return (key: string) => {
@@ -113,21 +132,19 @@ export default function TasksPage() {
         default:
           return ongoingTaskPage;
       }
-    }
+    };
   }, [ongoingTaskPage, completedTasksList, archivedContent]);
 
-  // Update tabs content whenever task data changes
   useEffect(() => {
     setTabs(TABS.map(tab => ({ ...tab, content: getTabContent(tab.key) })));
   }, [getTabContent]);
 
   const handleCreateTask = async (taskData: TaskData) => {
-    // Convert TaskData to Task format
     const task: Task = {
       task_title: taskData.task_title,
-      task_description: taskData.task_description || '',
-      start_date: taskData.start_date || new Date().toLocaleDateString('sv-SE'),
-      end_date: taskData.end_date || new Date().toLocaleDateString('sv-SE'),
+      task_description: taskData.task_description || "",
+      start_date: taskData.start_date || new Date().toLocaleDateString("sv-SE"),
+      end_date: taskData.end_date || new Date().toLocaleDateString("sv-SE"),
       priority: taskData.priority,
       project_id: taskData.project_id,
       milestone_id: taskData.milestone_id,
@@ -140,8 +157,6 @@ export default function TasksPage() {
     if (success) {
       toast.success("Task created successfully");
       setShowCreateModal(false);
-      setActiveTab("ongoing");
-      // Refresh the task list to show the new task
       await fetchOngoingTasks();
     } else {
       toast.error("Failed to create task");
@@ -175,13 +190,30 @@ export default function TasksPage() {
         </button>
       </motion.div>
 
-      {tabs.length > 0 && (
-        <TabView
-          tabs={tabs}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
+      <TabView
+        tabs={tabs}
+        activeTab={selectedTaskId ? "" : activeTab || ""} // no tab active if viewing task
+        setActiveTab={handleTabChange}
+      
+      />
+
+      {/* Only show tab content when no task is selected
+      {!selectedTaskId && tabs.length > 0 && activeTab && (
+        <div className="mt-4">
+          {tabs.find((t) => t.key === activeTab)?.content}
+        </div>
+      )} */}
+
+
+      {/* Task Details */}
+      {selectedTaskId && (
+        <TaskDetails
+          id={selectedTaskId}
+          onClose={() => window.history.back()}
+          onTaskStatusUpdate={() => { }}
         />
       )}
+
 
       {showCreateModal && (
         <TaskCreateModal

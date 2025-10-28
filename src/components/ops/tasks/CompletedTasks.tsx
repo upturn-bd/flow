@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
 import { getEmployeeInfo } from "@/lib/utils/auth";
+import { useRouter } from "next/navigation";
 
 function TaskCard({
   adminScoped,
@@ -30,16 +31,18 @@ function TaskCard({
   task,
   setTaskDetailsId,
   deleteTask,
-  departments
+  departments,
+  onDetails
 }: {
   adminScoped: boolean,
   userId?: string,
   userRole?: string,
   task: Task;
-  setTaskDetailsId: (id: number) => void;
-  setSelectedTask: (Task: Task) => void;
+  setTaskDetailsId?: (id: number) => void;
+  setSelectedTask?: (Task: Task) => void;
   deleteTask: (id: number) => void;
   departments: Department[];
+  onDetails: () => void
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -79,7 +82,7 @@ function TaskCard({
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => id !== undefined && setTaskDetailsId(id)}
+        onClick={onDetails}
         className="p-2 h-8 w-8 hover:bg-gray-50 hover:text-gray-700"
       >
         <ExternalLink size={14} />
@@ -123,19 +126,20 @@ interface CompletedTasksListProps {
 }
 
 const CompletedTasksList = memo(({
-  adminScoped=false,
+  adminScoped = false,
   tasks,
   loading,
   deleteTask,
 }: CompletedTasksListProps) => {
   const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Move employee and department fetching to parent level to avoid multiple API calls
   const { fetchEmployees, loading: employeeLoading } = useEmployees();
   const { departments, fetchDepartments, loading: departmentsLoading } = useDepartments();
   const [userId, setUserId] = useState<string>('')
   const [userRole, setUserRole] = useState<string>("")
+
+  const router = useRouter()
 
   const userIdInit = async () => {
     const user = await getEmployeeInfo()
@@ -174,7 +178,6 @@ const CompletedTasksList = memo(({
 
   return (
     <div>
-      {!selectedTask && (
         <motion.div
           key="content"
           initial={{ opacity: 0 }}
@@ -186,14 +189,15 @@ const CompletedTasksList = memo(({
             tasks.map((task) => (
               <div key={task.id}>
                 <TaskCard
-                adminScoped={adminScoped}
-                userId={userId}
-                userRole={userRole}
+                  adminScoped={adminScoped}
+                  userId={userId}
+                  userRole={userRole}
                   deleteTask={handleDeleteTask}
-                  setSelectedTask={setSelectedTask}
                   task={task}
-                  setTaskDetailsId={setTaskDetailsId}
                   departments={departments}
+                  onDetails={() =>
+                    router.push(`/ops/tasks/${task.id}`)
+                  }
                 />
 
                 {/* Show TaskDetails right below the clicked TaskCard */}
@@ -216,7 +220,6 @@ const CompletedTasksList = memo(({
             />
           )}
         </motion.div>
-      )}
     </div>
   );
 });

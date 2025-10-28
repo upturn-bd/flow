@@ -24,6 +24,8 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui";
 import { getEmployeeId, getEmployeeInfo } from "@/lib/utils/auth";
+import { useRouter } from "next/navigation";
+
 
 interface OngoingTaskPageProps {
   adminScoped: boolean;
@@ -40,9 +42,11 @@ export default function OngoingTaskPage({
   updateTask,
   deleteTask
 }: OngoingTaskPageProps) {
+  const router = useRouter()
+
 
   const [editTask, setEditTask] = useState<Task | null>(null);
-  const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
+  // const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
   const [userId, setUserId] = useState<string>('')
   const [userRole, setUserRole] = useState<string>("")
@@ -83,7 +87,7 @@ export default function OngoingTaskPage({
 
   return (
     <div>
-      {!editTask && taskDetailsId === null && loading ? (
+      {!editTask && loading ? (
         <LoadingSpinner text="Loading Tasks..." />
       ) : (
         <div className="grid grid-cols-1 gap-4">
@@ -101,21 +105,10 @@ export default function OngoingTaskPage({
                     task.id !== undefined && handleDeleteTask(task.id)
                   }
                   onDetails={() =>
-                    task.id !== undefined && setTaskDetailsId(task.id)
+                    router.push(`/ops/tasks/${task.id}`)
                   }
                   isDeleting={deletingTaskId === task.id}
                 />
-
-                {/* Show details immediately after the clicked card */}
-                <AnimatePresence>
-                  {taskDetailsId === task.id && (
-                    <TaskDetails
-                      onClose={() => setTaskDetailsId(null)}
-                      id={taskDetailsId}
-                      onTaskStatusUpdate={() => { }}
-                    />
-                  )}
-                </AnimatePresence>
               </div>
             ))
           ) : (

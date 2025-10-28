@@ -212,6 +212,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
             onClick={onClose}
             variant="outline"
             size="sm"
+            className="flex"
           >
             <ChevronLeft size={16} className="mr-2" />
             Back

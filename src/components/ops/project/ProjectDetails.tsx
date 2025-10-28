@@ -29,8 +29,8 @@ import {
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import TaskCreateModal from "../task/shared/TaskCreateModal";
-import TaskUpdateModal from "../task/shared/TaskUpdateModal";
+import TaskCreateModal from "../tasks/shared/TaskCreateModal";
+import TaskUpdateModal from "../tasks/shared/TaskUpdateModal";
 import { motion } from "framer-motion";
 import MilestoneForm from "./milestone/MilestoneForm";
 import { Department, Milestone, Project, Task } from "@/lib/types/schemas";

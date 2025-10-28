@@ -29,7 +29,7 @@ const sections = [
     items: [
       {
         name: "Task",
-        path: "/ops/task",
+        path: "/ops/tasks",
         icon: ClipboardList,
         description: "Assign, track and manage day-to-day tasks",
         color: "bg-indigo-100 text-indigo-700 border-indigo-200"

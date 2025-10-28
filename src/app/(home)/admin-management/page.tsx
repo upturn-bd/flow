@@ -79,7 +79,7 @@ const sections = [
         items: [
             {
                 name: "Task",
-                path: "/admin-management/company-logs/task",
+                path: "/admin-management/company-logs/tasks",
                 icon: ClipboardList,
                 description: "View historical records for task management",
                 color: "bg-indigo-100 text-indigo-700 border-indigo-200"

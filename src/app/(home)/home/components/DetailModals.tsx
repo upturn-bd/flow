@@ -1,5 +1,5 @@
 import React from 'react';
-import TaskDetails from "@/components/ops/task/shared/TaskDetails";
+import TaskDetails from "@/components/ops/tasks/shared/TaskDetails";
 import NoticeDetails from "@/components/ops/notice/NoticeDetails";
 
 interface DetailModalsProps {

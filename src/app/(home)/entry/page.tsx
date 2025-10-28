@@ -14,7 +14,7 @@ const navItems = [
   {
     category: "Create your Workflow",
     items: [
-      { label: "Task", icon: NoteIcon, href: "/task" },
+      { label: "Task", icon: NoteIcon, href: "/tasks" },
       { label: "Project", icon: ChartBarIcon, href: "/project" },
       { label: "Process", icon: ArrowsClockwiseIcon, href: "/process" },
       { label: "Stakeholder", icon: UsersIcon, href: "/stakeholder" },
