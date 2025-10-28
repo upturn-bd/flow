@@ -161,83 +161,98 @@ export function useTasks() {
   }, []);
 
 
-  const fetchOngoingTasks = useCallback(async (companyScopes = false) => {
-    try {
-      setLoading(true);
+  const [hasMoreOngoingTasks, setHasMoreOngoingTasks] = useState(true);
+  const [lastFetchedOngoingTaskId, setLastFetchedOngoingTaskId] = useState<number | null>(null);
+  const fetchOngoingTasks = useCallback(
+    async (companyScopes = false, limit = 10) => {
+      try {
+        setLoading(true);
+        const user = await getEmployeeInfo();
 
-      // Get the current user's ID
-      const user = await getEmployeeInfo();
+        let query = supabase
+          .from("task_records")
+          .select("*")
+          .eq("status", false)
+          .order("id", { ascending: true }) // pagination cursor
+          .limit(limit);
 
-      // Start building the query
-      let query = supabase
-        .from("task_records")
-        .select("*")
-        .eq("status", false); // Filter 1: Always filter for ongoing tasks
+        if (!companyScopes) {
+          query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+        }
 
-      // Filter 2: Apply user-specific scope UNLESS companyScopes is true
-      if (!companyScopes) {
-        // If not company-scoped (i.e., user's personal view), filter by created_by OR assigned
-        query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+        if (lastFetchedOngoingTaskId) {
+          // fetch tasks with id greater than last fetched
+          query = query.gt("id", lastFetchedOngoingTaskId);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        if (data) {
+          setOngoingTasks(prev => [...prev, ...data]);
+          setLastFetchedOngoingTaskId(data[data.length - 1].id);
+          setHasMoreOngoingTasks(data.length === limit); // if less than limit, no more tasks
+        }
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching ongoing tasks:", err);
+        setLoading(false);
       }
+    },
+    [lastFetchedOngoingTaskId]
+  );
 
-      // Filter 3: Apply sorting
-      const { data, error } = await query
-        .order("end_date", { ascending: true });
 
-      if (error) throw error;
 
-      setOngoingTasks(data as Task[]);
-      setLoading(false);
+  const [hasMoreCompletedTasks, setHasMoreCompletedTasks] = useState(true);
+  const [lastFetchedCompletedTaskId, setLastFetchedCompletedTaskId] = useState<number | null>(null);
 
-      return data as Task[];
+  const fetchCompletedTasks = useCallback(
+    async (companyScopes = false, limit = 10) => {
+      try {
+        setLoading(true);
+        const user = await getEmployeeInfo();
 
-    } catch (err) {
-      console.error("Error fetching ongoing tasks:", err);
-      const errorObj = err instanceof Error ? err : new Error(String(err));
-      setError(errorObj);
-      setLoading(false); // Ensure loading state is reset on error
-      return [];
-    }
-  }, []); // Ensure dependency array is correct based on your actual dependencies (e.g., supabase object)
+        // Base query: Completed tasks only
+        let query = supabase
+          .from("task_records")
+          .select("*")
+          .eq("status", true)
+          .order("id", { ascending: true }) // Order by ID for cursor pagination
+          .limit(limit);
 
-  const fetchCompletedTasks = useCallback(async (companyScopes = false) => {
-    try {
-      setLoading(true);
+        // Apply user-specific filtering unless company scope is true
+        if (!companyScopes) {
+          query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+        }
 
-      const user = await getEmployeeInfo();
+        // Apply cursor (fetch tasks with id greater than last fetched)
+        if (lastFetchedCompletedTaskId) {
+          query = query.gt("id", lastFetchedCompletedTaskId);
+        }
 
-      // Start query: always filter for completed tasks
-      let query = supabase
-        .from("task_records")
-        .select("*")
-        .eq("status", true); // Filter 1: Completed tasks
+        const { data, error } = await query;
 
-      // Filter 2: Apply user-specific scope UNLESS companyScopes is true
-      if (!companyScopes) {
-        // If not company-scoped, filter by created_by OR assigned
-        query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setCompletedTasks(prev => [...prev, ...data]);
+          setLastFetchedCompletedTaskId(data[data.length - 1].id);
+          setHasMoreCompletedTasks(data.length === limit); // if less than limit → no more tasks
+        } else {
+          setHasMoreCompletedTasks(false);
+        }
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching completed tasks:", err);
+        setLoading(false);
       }
-
-      // Filter 3: Apply sorting
-      const { data, error } = await query
-        .order("updated_at", { ascending: false }); // newest first
-
-      if (error) throw error;
-
-      setCompletedTasks(data as Task[]);
-      setLoading(false);
-
-
-      return data as Task[];
-
-    } catch (err) {
-      console.error("Error fetching completed tasks:", err);
-      const errorObj = err instanceof Error ? err : new Error(String(err));
-      setError(errorObj);
-      setLoading(false);
-      return [];
-    }
-  }, []);
+    },
+    [lastFetchedCompletedTaskId]
+  );
 
 
   // Convenience methods for common use cases
@@ -580,6 +595,12 @@ export function useTasks() {
     error,
     stats,
 
+    hasMoreOngoingTasks,
+    lastFetchedOngoingTaskId,
+
+    hasMoreCompletedTasks,
+    lastFetchedCompletedTaskId,
+
     // Main fetch function
     fetchTasks,
     fetchOngoingTasks,
@@ -610,6 +631,15 @@ export function useTasks() {
     loading,
     error,
     stats,
+
+    hasMoreOngoingTasks,
+    lastFetchedOngoingTaskId,
+
+    hasMoreCompletedTasks,
+    lastFetchedCompletedTaskId,
+
+
+
     fetchTasks,
     fetchOngoingTasks,
     fetchCompletedTasks,

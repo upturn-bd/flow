@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui";
 import { getEmployeeId, getEmployeeInfo } from "@/lib/utils/auth";
 import { useRouter } from "next/navigation";
+import LoadMore from "@/components/ui/LoadMore";
 
 
 interface OngoingTaskPageProps {
@@ -33,6 +34,8 @@ interface OngoingTaskPageProps {
   loading: boolean;
   updateTask: (task: Task) => Promise<{ success: boolean; data?: any; error?: any; }>;
   deleteTask: (taskId: number, projectId?: number, milestoneId?: number, adminScoped?: boolean) => Promise<{ success: boolean; error?: any; }>;
+  hasMoreOngoingTasks: boolean;
+  onLoadMore: () => void
 }
 
 export default function OngoingTaskPage({
@@ -40,7 +43,9 @@ export default function OngoingTaskPage({
   ongoingTasks,
   loading,
   updateTask,
-  deleteTask
+  deleteTask,
+  hasMoreOngoingTasks,
+  onLoadMore
 }: OngoingTaskPageProps) {
   const router = useRouter()
 
@@ -92,7 +97,6 @@ export default function OngoingTaskPage({
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {ongoingTasks.length > 0 ? (
-
             ongoingTasks.map((task) => (
               <div key={task.id}>
                 <TaskCard
@@ -118,6 +122,11 @@ export default function OngoingTaskPage({
               description="Create a new task to get started with your project management."
             />
           )}
+
+          <LoadMore
+            onLoadMore={onLoadMore}
+            hasMore={hasMoreOngoingTasks}
+          />
         </div>
       )}
       <AnimatePresence>

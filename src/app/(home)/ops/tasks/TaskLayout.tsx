@@ -62,6 +62,9 @@ export default function TaskLayout({
   const { employeeInfo } = useAuth();
 
   const {
+    hasMoreOngoingTasks,
+    hasMoreCompletedTasks,
+
     ongoingTasks,
     completedTasks,
     loading,
@@ -82,11 +85,16 @@ export default function TaskLayout({
   const ongoingTaskPage = useMemo(
     () => (
       <OngoingTaskPage
+      hasMoreOngoingTasks={hasMoreOngoingTasks}
+      onLoadMore={() => {
+        fetchOngoingTasks(true, 10)
+      }}
         ongoingTasks={ongoingTasks}
         loading={loading}
         updateTask={updateTask}
         deleteTask={deleteTask}
         adminScoped={false}
+
       />
     ),
     [ongoingTasks, loading, updateTask, deleteTask]
@@ -99,6 +107,10 @@ export default function TaskLayout({
         loading={loading}
         deleteTask={deleteTask}
         adminScoped={false}
+        hasMoreCompletedTasks={hasMoreCompletedTasks}
+        onLoadMore={() => {
+          fetchCompletedTasks(true, 10)
+        }}
       />
     ),
     [completedTasks, loading, deleteTask]
