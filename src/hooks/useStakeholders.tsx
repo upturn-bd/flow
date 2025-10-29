@@ -53,6 +53,20 @@ export interface StakeholderStepDataFormData {
   is_completed?: boolean;
 }
 
+export interface StakeholderSearchOptions {
+  searchQuery?: string;
+  page?: number;
+  pageSize?: number;
+  filterStatus?: "all" | "leads" | "completed";
+}
+
+export interface StakeholderSearchResult {
+  stakeholders: Stakeholder[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+}
+
 // ==============================================================================
 // Main Hook
 // ==============================================================================
@@ -438,6 +452,75 @@ export function useStakeholders() {
       console.error("Error fetching stakeholders:", error);
       setError("Failed to fetch stakeholders");
       return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const searchStakeholders = useCallback(async (options: StakeholderSearchOptions = {}) => {
+    const { searchQuery = "", page = 1, pageSize = 25, filterStatus = "all" } = options;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const company_id = await getCompanyId();
+      
+      // Build query
+      let query = supabase
+        .from("stakeholders")
+        .select(`
+          *,
+          process:stakeholder_processes(id, name, is_sequential),
+          current_step:stakeholder_process_steps(id, name, step_order)
+        `, { count: 'exact' })
+        .eq("company_id", company_id);
+      
+      // Add search filter if provided
+      if (searchQuery.trim()) {
+        const searchTerm = `%${searchQuery.trim()}%`;
+        query = query.or(`name.ilike.${searchTerm},address.ilike.${searchTerm}`);
+      }
+      
+      // Add status filter
+      if (filterStatus === "leads") {
+        query = query.eq("is_completed", false);
+      } else if (filterStatus === "completed") {
+        query = query.eq("is_completed", true);
+      }
+      
+      // Add pagination
+      const startIndex = (page - 1) * pageSize;
+      query = query.range(startIndex, startIndex + pageSize - 1);
+      
+      // Order by created_at for consistent results
+      query = query.order('created_at', { ascending: false });
+      
+      const { data, error, count } = await query;
+      
+      if (error) throw error;
+      
+      const totalCount = count || 0;
+      const totalPages = Math.ceil(totalCount / pageSize);
+      
+      const result: StakeholderSearchResult = {
+        stakeholders: data || [],
+        totalCount,
+        totalPages,
+        currentPage: page,
+      };
+      
+      setStakeholders(data || []);
+      return result;
+    } catch (error) {
+      console.error("Error searching stakeholders:", error);
+      setError("Failed to search stakeholders");
+      return {
+        stakeholders: [],
+        totalCount: 0,
+        totalPages: 0,
+        currentPage: page,
+      };
     } finally {
       setLoading(false);
     }
@@ -853,6 +936,7 @@ export function useStakeholders() {
 
     // Stakeholder operations
     fetchStakeholders,
+    searchStakeholders,
     fetchStakeholderById,
     createStakeholder,
     updateStakeholder,

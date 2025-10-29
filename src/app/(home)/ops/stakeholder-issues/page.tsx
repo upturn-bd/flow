@@ -6,6 +6,7 @@ import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { useModalState } from "@/hooks/core/useModalState";
 import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIssueForm";
 import BaseModal from "@/components/ui/modals/BaseModal";
+import Pagination from "@/components/ui/Pagination";
 import {
   AlertCircle,
   CheckCircle2,
@@ -29,7 +30,7 @@ export default function StakeholderIssuesPage() {
     inProgressIssues,
     resolvedIssues,
     highPriorityIssues,
-    fetchIssuesByHandler,
+    searchIssues,
     updateIssue,
     deleteIssue,
     getAttachmentUrl,
@@ -40,22 +41,48 @@ export default function StakeholderIssuesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "Pending" | "In Progress" | "Resolved">("all");
   const [filterPriority, setFilterPriority] = useState<"all" | "Low" | "Medium" | "High" | "Urgent">("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchResult, setSearchResult] = useState<{
+    totalCount: number;
+    totalPages: number;
+    currentPage: number;
+  } | null>(null);
+
+  const pageSize = 25;
 
   useEffect(() => {
-    fetchIssuesByHandler();
-  }, [fetchIssuesByHandler]);
+    const loadIssues = async () => {
+      const result = await searchIssues({
+        searchQuery: searchTerm,
+        page: currentPage,
+        pageSize,
+        filterStatus,
+        filterPriority,
+      });
+      setSearchResult(result);
+    };
+    
+    loadIssues();
+  }, [searchTerm, currentPage, filterStatus, filterPriority, searchIssues]);
 
-  const filteredIssues = issues.filter((issue) => {
-    const matchesSearch =
-      issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      issue.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      issue.stakeholder?.name.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = filterStatus === "all" || issue.status === filterStatus;
-    const matchesPriority = filterPriority === "all" || issue.priority === filterPriority;
-    
-    return matchesSearch && matchesStatus && matchesPriority;
-  });
+  const handleSearch = (query: string) => {
+    setSearchTerm(query);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  const handleStatusFilterChange = (status: "all" | "Pending" | "In Progress" | "Resolved") => {
+    setFilterStatus(status);
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  const handlePriorityFilterChange = (priority: "all" | "Low" | "Medium" | "High" | "Urgent") => {
+    setFilterPriority(priority);
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const handleUpdateIssue = async (data: any) => {
     if (!selectedIssue?.id) return;
@@ -64,6 +91,15 @@ export default function StakeholderIssuesPage() {
       await updateIssue(selectedIssue.id, data);
       closeModal();
       setSelectedIssue(null);
+      // Refresh the list
+      const result = await searchIssues({
+        searchQuery: searchTerm,
+        page: currentPage,
+        pageSize,
+        filterStatus,
+        filterPriority,
+      });
+      setSearchResult(result);
     } catch (error) {
       console.error("Error updating issue:", error);
     }
@@ -74,6 +110,15 @@ export default function StakeholderIssuesPage() {
     
     try {
       await deleteIssue(issueId);
+      // Refresh the list
+      const result = await searchIssues({
+        searchQuery: searchTerm,
+        page: currentPage,
+        pageSize,
+        filterStatus,
+        filterPriority,
+      });
+      setSearchResult(result);
     } catch (error) {
       console.error("Error deleting issue:", error);
     }
@@ -196,7 +241,7 @@ export default function StakeholderIssuesPage() {
               type="text"
               placeholder="Search issues..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
@@ -204,7 +249,7 @@ export default function StakeholderIssuesPage() {
           {/* Status Filter */}
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
+            onChange={(e) => handleStatusFilterChange(e.target.value as any)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
           >
             <option value="all">All Statuses</option>
@@ -216,7 +261,7 @@ export default function StakeholderIssuesPage() {
           {/* Priority Filter */}
           <select
             value={filterPriority}
-            onChange={(e) => setFilterPriority(e.target.value as any)}
+            onChange={(e) => handlePriorityFilterChange(e.target.value as any)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
           >
             <option value="all">All Priorities</option>
@@ -243,7 +288,7 @@ export default function StakeholderIssuesPage() {
       )}
 
       {/* Empty State */}
-      {!loading && filteredIssues.length === 0 && (
+      {!loading && issues.length === 0 && (
         <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
           <h3 className="text-lg font-semibold text-gray-900">No issues found</h3>
           <p className="text-sm text-gray-500 mt-1">
@@ -255,9 +300,9 @@ export default function StakeholderIssuesPage() {
       )}
 
       {/* Issues List */}
-      {!loading && filteredIssues.length > 0 && (
+      {!loading && issues.length > 0 && (
         <div className="space-y-4">
-          {filteredIssues.map((issue) => (
+          {issues.map((issue) => (
             <div
               key={issue.id}
               className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
@@ -332,6 +377,17 @@ export default function StakeholderIssuesPage() {
               </div>
             </div>
           ))}
+          
+          {/* Pagination */}
+          {searchResult && (
+            <Pagination
+              currentPage={searchResult.currentPage}
+              totalPages={searchResult.totalPages}
+              totalCount={searchResult.totalCount}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
+            />
+          )}
         </div>
       )}
 
