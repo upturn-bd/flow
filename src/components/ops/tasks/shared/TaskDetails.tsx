@@ -13,7 +13,7 @@ import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { getCompanyId } from "@/lib/utils/auth";
 
 interface TaskDetailsProps {
-  id: number;
+  id: string;
   onTaskStatusUpdate: () => void;
   onClose: () => void;
 }
@@ -51,7 +51,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
   const { completeTask, reopenTask } = useTasks();
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
 
-  async function fetchTaskDetails(id: number) {
+  async function fetchTaskDetails(id: string) {
     setLoading(true);
     const client = createClient();
     const company_id = await getCompanyId();

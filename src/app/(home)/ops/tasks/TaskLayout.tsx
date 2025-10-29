@@ -47,7 +47,7 @@ export default function TaskLayout({
   initialActiveTab = "ongoing",
   setActiveTab: setParentActiveTab,
 }: {
-  selectedTaskId?: number | null;
+  selectedTaskId?: string | null;
   activeTab?: string;
   initialActiveTab?: string;
   setActiveTab?: (tab: string) => void;

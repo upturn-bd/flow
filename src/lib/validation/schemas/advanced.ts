@@ -238,7 +238,7 @@ export function validateMilestone(data: MilestoneData): ValidationResult<Milesto
 
 // Task validation
 export interface TaskData {
-  id?: number;
+  id?: string;
   task_title: string;
   task_description: string;
   start_date: string;

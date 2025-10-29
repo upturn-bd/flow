@@ -210,3 +210,27 @@ export function getLatitude(pointString: string | null): number | null {
     return null;
   }
 }
+
+function randomSuffix(length = 6) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+export function slugify(title: string) {
+  let slugifiedTitle = title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '') // remove non-word chars
+    .replace(/\s+/g, '-') // replace spaces with -
+    .replace(/--+/g, '-'); // replace multiple - with single -
+
+  slugifiedTitle = slugifiedTitle + '-' + randomSuffix();
+
+  return slugifiedTitle;
+}
+
+// Helper: generate random 6-character alphanumeric string

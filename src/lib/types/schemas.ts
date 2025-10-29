@@ -167,7 +167,7 @@ export interface Comment {
 }
 
 export interface Task {
-  id?: number;
+  id?: string;
   task_title: string;
   task_description: string;
   start_date: string;

@@ -5,7 +5,7 @@ import TaskLayout from "../TaskLayout";
 
 export default function TaskDetailsPage() {
   const { id } = useParams();
-  const taskId = id ? Number(id) : null;
+  const taskId = id ? String(id) : null;
 
   return <TaskLayout selectedTaskId={taskId} />;
 }

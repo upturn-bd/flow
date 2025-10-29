@@ -5,6 +5,7 @@ import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
 import { Task } from "@/lib/types/schemas";
 import { useState, useCallback, useMemo, useRef } from "react";
 import { useNotifications } from "./useNotifications";
+import { slugify } from "@/lib/utils";
 
 // Task status variants
 export enum TaskStatus {
@@ -161,8 +162,11 @@ export function useTasks() {
   }, []);
 
 
+
+
+
   const [hasMoreOngoingTasks, setHasMoreOngoingTasks] = useState(true);
-  const [lastFetchedOngoingTaskId, setLastFetchedOngoingTaskId] = useState<number | null>(null);
+  const [lastFetchedOngoingTaskId, setLastFetchedOngoingTaskId] = useState<string | null>(null);
   const fetchOngoingTasks = useCallback(
     async (companyScopes = false, limit = 10) => {
       try {
@@ -176,7 +180,7 @@ export function useTasks() {
           .order("id", { ascending: true }) // pagination cursor
           .limit(limit);
 
-        if (!companyScopes) {
+        if (!companyScopes) { 
           query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
         }
 
@@ -187,12 +191,21 @@ export function useTasks() {
 
         const { data, error } = await query;
 
+
         if (error) throw error;
 
-        if (data) {
-          setOngoingTasks(prev => [...prev, ...data]);
+        if (data.length > 0) {
+          setOngoingTasks(prev => {
+            const existingIds = new Set(prev.map(t => t.id));
+            const uniqueNewTasks = data.filter(t => !existingIds.has(t.id));
+            return [...prev, ...uniqueNewTasks];
+          });;
           setLastFetchedOngoingTaskId(data[data.length - 1].id);
           setHasMoreOngoingTasks(data.length === limit); // if less than limit, no more tasks
+        } 
+
+        if (data.length === 0) {
+          setHasMoreOngoingTasks(false);
         }
 
         setLoading(false);
@@ -204,10 +217,70 @@ export function useTasks() {
     [lastFetchedOngoingTaskId]
   );
 
+  // Search ongoing tasks by a search term (task_title or description) using fuzzy search
+  const searchOngoingTasks = useCallback(
+    async (searchTerm: string, limit = 10, companyScopes = false) => {
+      try {
+        setLoading(true);
+        const user = await getEmployeeInfo();
+
+        // Base query: ongoing tasks
+        let query = supabase
+          .from("task_records")
+          .select("*")
+          .eq("status", false)
+          .order("id", { ascending: true })
+          .limit(limit);
+
+        // Apply company/user scope
+        if (!companyScopes) {
+          query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+        }
+
+        // Apply search filter (fuzzy search using ilike)
+        if (searchTerm.trim() !== "") {
+          query = query.or(
+            `task_title.ilike.%${searchTerm}%,task_description.ilike.%${searchTerm}%`
+          );
+        }
+
+        // Cursor pagination
+        if (lastFetchedOngoingTaskId) {
+          query = query.gt("id", lastFetchedOngoingTaskId);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setOngoingTasks(prev => {
+            const existingIds = new Set(prev.map(t => t.id));
+            const uniqueNewTasks = data.filter(t => !existingIds.has(t.id));
+            return [...prev, ...uniqueNewTasks];
+          });;
+          setLastFetchedOngoingTaskId(data[data.length - 1].id);
+          setHasMoreOngoingTasks(data.length === limit);
+        } else {
+          setHasMoreOngoingTasks(false);
+        }
+
+        setLoading(false);
+        return data || [];
+      } catch (err) {
+        console.error("Error searching ongoing tasks:", err);
+        setLoading(false);
+        return [];
+      }
+    },
+    [lastFetchedOngoingTaskId]
+  );
+
+
 
 
   const [hasMoreCompletedTasks, setHasMoreCompletedTasks] = useState(true);
-  const [lastFetchedCompletedTaskId, setLastFetchedCompletedTaskId] = useState<number | null>(null);
+  const [lastFetchedCompletedTaskId, setLastFetchedCompletedTaskId] = useState<string | null>(null);
 
   const fetchCompletedTasks = useCallback(
     async (companyScopes = false, limit = 10) => {
@@ -238,7 +311,11 @@ export function useTasks() {
         if (error) throw error;
 
         if (data && data.length > 0) {
-          setCompletedTasks(prev => [...prev, ...data]);
+          setCompletedTasks(prev => {
+            const existingIds = new Set(prev.map(t => t.id));
+            const uniqueNewTasks = data.filter(t => !existingIds.has(t.id));
+            return [...prev, ...uniqueNewTasks];
+          });;
           setLastFetchedCompletedTaskId(data[data.length - 1].id);
           setHasMoreCompletedTasks(data.length === limit); // if less than limit → no more tasks
         } else {
@@ -253,6 +330,66 @@ export function useTasks() {
     },
     [lastFetchedCompletedTaskId]
   );
+
+  // Search completed tasks by a search term (task_title or description) using fuzzy search
+  const searchCompletedTasks = useCallback(
+    async (searchTerm: string, limit = 10, companyScopes = false) => {
+      try {
+        setLoading(true);
+        const user = await getEmployeeInfo();
+
+        // Base query: completed tasks
+        let query = supabase
+          .from("task_records")
+          .select("*")
+          .eq("status", true) // completed tasks only
+          .order("id", { ascending: true })
+          .limit(limit);
+
+        // Apply company/user scope
+        if (!companyScopes) {
+          query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+        }
+
+        // Apply search filter (fuzzy search using ilike)
+        if (searchTerm.trim() !== "") {
+          query = query.or(
+            `task_title.ilike.%${searchTerm}%,task_description.ilike.%${searchTerm}%`
+          );
+        }
+
+        // Cursor pagination
+        if (lastFetchedCompletedTaskId) {
+          query = query.gt("id", lastFetchedCompletedTaskId);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setCompletedTasks(prev => {
+            const existingIds = new Set(prev.map(t => t.id));
+            const uniqueNewTasks = data.filter(t => !existingIds.has(t.id));
+            return [...prev, ...uniqueNewTasks];
+          });;
+          setLastFetchedCompletedTaskId(data[data.length - 1].id);
+          setHasMoreCompletedTasks(data.length === limit);
+        } else {
+          setHasMoreCompletedTasks(false);
+        }
+
+        setLoading(false);
+        return data || [];
+      } catch (err) {
+        console.error("Error searching completed tasks:", err);
+        setLoading(false);
+        return [];
+      }
+    },
+    [lastFetchedCompletedTaskId]
+  );
+
 
 
   // Convenience methods for common use cases
@@ -297,7 +434,7 @@ export function useTasks() {
   }, [fetchTasks]);
 
   // Get a single task by ID
-  const getTaskById = useCallback(async (taskId: number) => {
+  const getTaskById = useCallback(async (taskId: string) => {
     try {
       const company_id = await getCompanyId();
 
@@ -324,8 +461,11 @@ export function useTasks() {
       const company_id = await getCompanyId();
       const user = await getEmployeeInfo();
 
+      const taskId = slugify(task.task_title);
+
       const finalData = {
         ...task,
+        id: taskId,
         created_by: user.id,
         company_id
       };
@@ -452,7 +592,7 @@ export function useTasks() {
   }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
   // Delete a task
-  const deleteTask = useCallback(async (taskId: number, projectId?: number, milestoneId?: number, adminScoped?: boolean) => {
+  const deleteTask = useCallback(async (taskId: string, projectId?: number, milestoneId?: number, adminScoped?: boolean) => {
     try {
       const company_id = await getCompanyId();
 
@@ -493,7 +633,7 @@ export function useTasks() {
   }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
   // Mark a task as complete
-  const completeTask = useCallback(async (taskId: number, projectId?: number, milestoneId?: number) => {
+  const completeTask = useCallback(async (taskId: string, projectId?: number, milestoneId?: number) => {
     try {
       const company_id = await getCompanyId();
 
@@ -525,7 +665,7 @@ export function useTasks() {
   }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
   // Reopen a completed task
-  const reopenTask = useCallback(async (taskId: number, projectId?: number, milestoneId?: number) => {
+  const reopenTask = useCallback(async (taskId: string, projectId?: number, milestoneId?: number) => {
     try {
       const company_id = await getCompanyId();
 
@@ -557,7 +697,7 @@ export function useTasks() {
   }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
   // Bulk update task milestone
-  const updateMilestone = useCallback(async (taskIds: number[], milestoneId: number | null, projectId: number) => {
+  const updateMilestone = useCallback(async (taskIds: string[], milestoneId: number | null, projectId: number) => {
     try {
       const company_id = await getCompanyId();
       const user = await getEmployeeInfo();
@@ -597,9 +737,11 @@ export function useTasks() {
 
     hasMoreOngoingTasks,
     lastFetchedOngoingTaskId,
+    searchOngoingTasks,
 
     hasMoreCompletedTasks,
     lastFetchedCompletedTaskId,
+    searchCompletedTasks,
 
     // Main fetch function
     fetchTasks,
@@ -634,9 +776,11 @@ export function useTasks() {
 
     hasMoreOngoingTasks,
     lastFetchedOngoingTaskId,
+    searchOngoingTasks,
 
     hasMoreCompletedTasks,
     lastFetchedCompletedTaskId,
+    searchCompletedTasks,
 
 
 

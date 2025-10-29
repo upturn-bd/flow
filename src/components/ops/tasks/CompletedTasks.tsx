@@ -2,9 +2,8 @@
 
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
-import { TaskFilters } from "@/hooks/useTasks";
-import { useEffect, useState, memo, useRef } from "react";
-import { Task } from "@/lib/types/schemas";
+import { Task, TaskStatus, useTasks } from "@/hooks/useTasks";
+import { useEffect, useState, memo, useCallback } from "react";
 import { Department } from "@/lib/types/schemas";
 import TaskDetails from "./shared/TaskDetails";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,6 +23,7 @@ import { formatDate } from "@/lib/utils";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useRouter } from "next/navigation";
 import LoadMore from "@/components/ui/LoadMore";
+import { debounce } from "lodash"; // For debouncing search
 
 function TaskCard({
   adminScoped,
@@ -39,9 +39,8 @@ function TaskCard({
   userId?: string,
   userRole?: string,
   task: Task;
-  setTaskDetailsId?: (id: number) => void;
-  setSelectedTask?: (Task: Task) => void;
-  deleteTask: (id: number) => void;
+  setTaskDetailsId?: (id: string) => void;
+  deleteTask: (id: string) => void;
   departments: Department[];
   onDetails: () => void
 }) {
@@ -123,7 +122,7 @@ interface CompletedTasksListProps {
   adminScoped: boolean;
   tasks: Task[];
   loading: boolean;
-  deleteTask: (taskId: number, projectId?: number, milestoneId?: number, adminScoped?: boolean) => Promise<{ success: boolean; error?: any; }>;
+  deleteTask: (taskId: string, projectId?: number, milestoneId?: number, adminScoped?: boolean) => Promise<{ success: boolean; error?: any; }>;
   hasMoreCompletedTasks: boolean;
   onLoadMore: () => void;
 }
@@ -136,42 +135,74 @@ const CompletedTasksList = memo(({
   hasMoreCompletedTasks,
   onLoadMore
 }: CompletedTasksListProps) => {
-  const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
+  const [taskDetailsId, setTaskDetailsId] = useState<string | null>(null);
 
-  // Move employee and department fetching to parent level to avoid multiple API calls
   const { fetchEmployees, loading: employeeLoading } = useEmployees();
   const { departments, fetchDepartments, loading: departmentsLoading } = useDepartments();
-  const [userId, setUserId] = useState<string>('')
-  const [userRole, setUserRole] = useState<string>("")
+  const { searchCompletedTasks } = useTasks();
 
-  const router = useRouter()
+  const [userId, setUserId] = useState<string>('');
+  const [userRole, setUserRole] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<Task[]>([]);
+  const [searching, setSearching] = useState(false);
+
+  const router = useRouter();
 
   const userIdInit = async () => {
-    const user = await getEmployeeInfo()
-    setUserId(user.id)
-    setUserRole(user.role)
+    const user = await getEmployeeInfo();
+    setUserId(user.id);
+    setUserRole(user.role);
   }
 
   useEffect(() => {
-    userIdInit()
-  }, [])
-
-  useEffect(() => {
+    userIdInit();
     fetchEmployees();
-  }, []); // Empty dependency array
-
-  useEffect(() => {
     fetchDepartments();
-  }, []); // Empty dependency array
+  }, []);
 
-  const handleDeleteTask = async (id: number) => {
+  const handleDeleteTask = async (id: string) => {
     try {
       await deleteTask(id, undefined, undefined, adminScoped);
-      // getCompanyTasks(TaskStatus.COMPLETE); // Removed: useTasks hook handles state update automatically
     } catch (error) {
       console.error(error);
     }
   };
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    debounce(async (term: string) => {
+      if (!term.trim()) {
+        setSearchResults([]);
+        setSearching(false);
+        return;
+      }
+      setSearching(true);
+      const results = await searchCompletedTasks(term, 20, adminScoped);
+      setSearchResults(results);
+      setSearching(false);
+    }, 300),
+    [adminScoped]
+  );
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    debouncedSearch(term);
+  };
+
+  const displayTasks = searchTerm ? searchResults : tasks;
+  const [showEmpty, setShowEmpty] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (displayTasks.length === 0 && !loading && !searching) {
+      timer = setTimeout(() => setShowEmpty(true), 1000);
+    } else {
+      setShowEmpty(false);
+    }
+    return () => clearTimeout(timer);
+  }, [displayTasks.length, loading, searching]);
 
   if (loading || employeeLoading || departmentsLoading) {
     return (
@@ -183,6 +214,17 @@ const CompletedTasksList = memo(({
 
   return (
     <div>
+      {/* Search bar */}
+      <div className="mb-4">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          placeholder="Search completed tasks..."
+          className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+        />
+      </div>
+
       <motion.div
         key="content"
         initial={{ opacity: 0 }}
@@ -190,8 +232,8 @@ const CompletedTasksList = memo(({
         exit={{ opacity: 0 }}
         className="space-y-4"
       >
-        {tasks.length > 0 ? (
-          tasks.map((task) => (
+        {displayTasks.length > 0 ? (
+          displayTasks.map((task) => (
             <div key={task.id}>
               <TaskCard
                 adminScoped={adminScoped}
@@ -200,14 +242,11 @@ const CompletedTasksList = memo(({
                 deleteTask={handleDeleteTask}
                 task={task}
                 departments={departments}
-                onDetails={() =>
-                  router.push(`/ops/tasks/${task.id}`)
-                }
+                onDetails={() => router.push(`/ops/tasks/${task.id}`)}
               />
 
-              {/* Show TaskDetails right below the clicked TaskCard */}
               <AnimatePresence>
-                {taskDetailsId === task.id && taskDetailsId !== null && (
+                {taskDetailsId === task.id && (
                   <TaskDetails
                     onClose={() => setTaskDetailsId(null)}
                     id={taskDetailsId}
@@ -218,18 +257,21 @@ const CompletedTasksList = memo(({
             </div>
           ))
         ) : (
-          <EmptyState
-            icon={<CheckCircle className="w-12 h-12" />}
-            title="No completed tasks"
-            description="Tasks will appear here once they're marked as complete"
-          />
+          showEmpty && (
+            <EmptyState
+              icon={<CheckCircle className="w-12 h-12" />}
+              title="No completed tasks"
+              description="Tasks will appear here once they're marked as complete"
+            />
+          )
         )}
 
-
-        <LoadMore
-          onLoadMore={onLoadMore}
-          hasMore={hasMoreCompletedTasks}
-        />
+        {!searchTerm && (
+          <LoadMore
+            onLoadMore={onLoadMore}
+            hasMore={hasMoreCompletedTasks}
+          />
+        )}
       </motion.div>
     </div>
   );
