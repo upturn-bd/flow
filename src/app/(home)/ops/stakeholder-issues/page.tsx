@@ -63,7 +63,7 @@ export default function StakeholderIssuesPage() {
     };
     
     loadIssues();
-  }, [searchTerm, currentPage, filterStatus, filterPriority, searchIssues]);
+  }, [searchTerm, currentPage, filterStatus, filterPriority]);
 
   const handleSearch = (query: string) => {
     setSearchTerm(query);
