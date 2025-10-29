@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { Plus, Search, Filter, Eye, CheckCircle2, Clock } from "lucide-react";
+import Pagination from "@/components/ui/Pagination";
 
 export default function StakeholdersPage() {
   const router = useRouter();
@@ -13,24 +14,47 @@ export default function StakeholdersPage() {
     completedStakeholders,
     loading,
     error,
-    fetchStakeholders,
+    searchStakeholders,
   } = useStakeholders();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "leads" | "completed">("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchResult, setSearchResult] = useState<{
+    totalCount: number;
+    totalPages: number;
+    currentPage: number;
+  } | null>(null);
+
+  const pageSize = 25;
 
   useEffect(() => {
-    fetchStakeholders();
-  }, [fetchStakeholders]);
+    const loadStakeholders = async () => {
+      const result = await searchStakeholders({
+        searchQuery: searchTerm,
+        page: currentPage,
+        pageSize,
+        filterStatus,
+      });
+      setSearchResult(result);
+    };
+    
+    loadStakeholders();
+  }, [searchTerm, currentPage, filterStatus]);
 
-  const filteredStakeholders = stakeholders.filter((stakeholder) => {
-    const matchesSearch = stakeholder.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter =
-      filterStatus === "all" ||
-      (filterStatus === "leads" && !stakeholder.is_completed) ||
-      (filterStatus === "completed" && stakeholder.is_completed);
-    return matchesSearch && matchesFilter;
-  });
+  const handleSearch = (query: string) => {
+    setSearchTerm(query);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  const handleFilterChange = (status: "all" | "leads" | "completed") => {
+    setFilterStatus(status);
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const getStepStatusColor = (stakeholder: any) => {
     if (stakeholder.is_completed) return "bg-green-100 text-green-800";
@@ -89,7 +113,7 @@ export default function StakeholdersPage() {
             <div>
               <p className="text-sm text-gray-600">Total Records</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
-                {stakeholders.length}
+                {searchResult?.totalCount || 0}
               </p>
             </div>
             <div className="p-3 bg-purple-100 rounded-lg">
@@ -109,7 +133,7 @@ export default function StakeholdersPage() {
               type="text"
               placeholder="Search stakeholders..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
@@ -117,17 +141,17 @@ export default function StakeholdersPage() {
           {/* Status Filter */}
           <div className="flex gap-2">
             <button
-              onClick={() => setFilterStatus("all")}
+              onClick={() => handleFilterChange("all")}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filterStatus === "all"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              All ({stakeholders.length})
+              All ({searchResult?.totalCount || 0})
             </button>
             <button
-              onClick={() => setFilterStatus("leads")}
+              onClick={() => handleFilterChange("leads")}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filterStatus === "leads"
                   ? "bg-blue-600 text-white"
@@ -137,7 +161,7 @@ export default function StakeholdersPage() {
               Leads ({leads.length})
             </button>
             <button
-              onClick={() => setFilterStatus("completed")}
+              onClick={() => handleFilterChange("completed")}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filterStatus === "completed"
                   ? "bg-blue-600 text-white"
@@ -165,7 +189,7 @@ export default function StakeholdersPage() {
       )}
 
       {/* Empty State */}
-      {!loading && filteredStakeholders.length === 0 && (
+      {!loading && stakeholders.length === 0 && (
         <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
           <h3 className="text-lg font-semibold text-gray-900">No stakeholders found</h3>
           <p className="text-sm text-gray-500 mt-1">
@@ -186,7 +210,7 @@ export default function StakeholdersPage() {
       )}
 
       {/* Stakeholder List */}
-      {!loading && filteredStakeholders.length > 0 && (
+      {!loading && stakeholders.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -212,7 +236,7 @@ export default function StakeholdersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredStakeholders.map((stakeholder) => (
+              {stakeholders.map((stakeholder) => (
                 <tr
                   key={stakeholder.id}
                   className="hover:bg-gray-50 transition-colors cursor-pointer"
@@ -280,6 +304,17 @@ export default function StakeholdersPage() {
               ))}
             </tbody>
           </table>
+          
+          {/* Pagination */}
+          {searchResult && (
+            <Pagination
+              currentPage={searchResult.currentPage}
+              totalPages={searchResult.totalPages}
+              totalCount={searchResult.totalCount}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
+            />
+          )}
         </div>
       )}
     </div>

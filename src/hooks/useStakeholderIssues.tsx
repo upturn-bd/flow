@@ -18,6 +18,22 @@ export interface StakeholderIssueFormData {
   attachments?: File[];
 }
 
+export interface StakeholderIssueSearchOptions {
+  searchQuery?: string;
+  page?: number;
+  pageSize?: number;
+  filterStatus?: "all" | "Pending" | "In Progress" | "Resolved";
+  filterPriority?: "all" | "Low" | "Medium" | "High" | "Urgent";
+  handlerId?: string;
+}
+
+export interface StakeholderIssueSearchResult {
+  issues: StakeholderIssue[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+}
+
 // ==============================================================================
 // Main Hook
 // ==============================================================================
@@ -151,6 +167,96 @@ export function useStakeholderIssues() {
       console.error("Error fetching issues by handler:", error);
       setError("Failed to fetch issues");
       return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const searchIssues = useCallback(async (options: StakeholderIssueSearchOptions = {}) => {
+    const { 
+      searchQuery = "", 
+      page = 1, 
+      pageSize = 25, 
+      filterStatus = "all",
+      filterPriority = "all",
+      handlerId
+    } = options;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const company_id = await getCompanyId();
+      const employeeInfo = await getEmployeeInfo();
+      const targetHandlerId = handlerId || employeeInfo?.id;
+
+      if (!targetHandlerId) {
+        throw new Error("No handler ID provided");
+      }
+      
+      // Build query
+      let query = supabase
+        .from("stakeholder_issues")
+        .select(`
+          *,
+          stakeholder:stakeholders!inner(
+            id,
+            name,
+            address,
+            issue_handler_id
+          )
+        `, { count: 'exact' })
+        .eq("company_id", company_id)
+        .eq("stakeholder.issue_handler_id", targetHandlerId);
+      
+      // Add search filter if provided
+      if (searchQuery.trim()) {
+        const searchTerm = `%${searchQuery.trim()}%`;
+        query = query.or(`title.ilike.${searchTerm},description.ilike.${searchTerm}`);
+      }
+      
+      // Add status filter
+      if (filterStatus !== "all") {
+        query = query.eq("status", filterStatus);
+      }
+      
+      // Add priority filter
+      if (filterPriority !== "all") {
+        query = query.eq("priority", filterPriority);
+      }
+      
+      // Add pagination
+      const startIndex = (page - 1) * pageSize;
+      query = query.range(startIndex, startIndex + pageSize - 1);
+      
+      // Order by created_at for consistent results
+      query = query.order('created_at', { ascending: false });
+      
+      const { data, error, count } = await query;
+      
+      if (error) throw error;
+      
+      const totalCount = count || 0;
+      const totalPages = Math.ceil(totalCount / pageSize);
+      
+      const result: StakeholderIssueSearchResult = {
+        issues: data || [],
+        totalCount,
+        totalPages,
+        currentPage: page,
+      };
+      
+      setIssues(data || []);
+      return result;
+    } catch (error) {
+      console.error("Error searching issues:", error);
+      setError("Failed to search issues");
+      return {
+        issues: [],
+        totalCount: 0,
+        totalPages: 0,
+        currentPage: page,
+      };
     } finally {
       setLoading(false);
     }
@@ -445,6 +551,7 @@ export function useStakeholderIssues() {
     fetchIssues,
     fetchIssueById,
     fetchIssuesByHandler,
+    searchIssues,
     createIssue,
     updateIssue,
     deleteIssue,
