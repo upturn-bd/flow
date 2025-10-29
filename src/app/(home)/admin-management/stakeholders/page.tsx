@@ -40,7 +40,7 @@ export default function StakeholdersPage() {
     };
     
     loadStakeholders();
-  }, [searchTerm, currentPage, filterStatus, searchStakeholders]);
+  }, [searchTerm, currentPage, filterStatus]);
 
   const handleSearch = (query: string) => {
     setSearchTerm(query);
