@@ -18,10 +18,12 @@ import {
   AlertCircle,
   FileText,
   Download,
+  DollarSign,
 } from "lucide-react";
 import { Stakeholder, StakeholderProcessStep, StakeholderStepData } from "@/lib/types/schemas";
 import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
 import StakeholderIssuesTab from "@/components/stakeholder-issues/StakeholderIssuesTab";
+import StakeholderTransactions from "@/components/stakeholders/StakeholderTransactions";
 
 export default function StakeholderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -41,7 +43,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
   const [activeStepId, setActiveStepId] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [activeTab, setActiveTab] = useState<"process" | "issues">("process");
+  const [activeTab, setActiveTab] = useState<"process" | "issues" | "transactions">("process");
 
   useEffect(() => {
     const loadStakeholder = async () => {
@@ -291,6 +293,17 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 >
                   Issues
                 </button>
+                <button
+                  onClick={() => setActiveTab("transactions")}
+                  className={`px-6 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${
+                    activeTab === "transactions"
+                      ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
+                >
+                  <DollarSign size={16} />
+                  Transactions
+                </button>
               </div>
             </div>
 
@@ -461,9 +474,15 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               </div>
             )}
           </>
-        ) : (
+        ) : activeTab === "issues" ? (
           // Issues Tab Content
           <StakeholderIssuesTab stakeholderId={stakeholderId} />
+        ) : (
+          // Transactions Tab Content
+          <StakeholderTransactions 
+            stakeholderId={stakeholderId} 
+            stakeholderName={stakeholder.name}
+          />
         )}
       </div>
     </div>

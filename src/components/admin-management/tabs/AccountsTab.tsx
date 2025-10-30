@@ -17,10 +17,12 @@ import {
   CheckCircle,
   Clock,
   X,
-  Minus
+  Minus,
+  Users
 } from "lucide-react";
 import { staggerContainer, fadeInUp } from "@/components/ui/animations";
 import { useAccounts } from "@/hooks/useAccounts";
+import { useStakeholders } from "@/hooks/useStakeholders";
 import { Account } from "@/lib/types/schemas";
 import { PAYMENT_METHODS, CURRENCIES, STATUS } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
@@ -37,6 +39,7 @@ interface AccountFormData {
   amount: string;
   currency: string;
   additional_data: string; // We'll keep this as string for form compatibility
+  stakeholder_id: string; // Add stakeholder reference (as string for form, will be converted to number)
 }
 
 // KeyValueEditor component for managing additional data
@@ -138,6 +141,11 @@ export default function AccountsTab() {
     deleteAccount,
     clearError,
   } = useAccounts();
+
+  const {
+    stakeholders,
+    fetchStakeholders,
+  } = useStakeholders();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<'All' | 'Complete' | 'Pending'>('All');
@@ -247,6 +255,7 @@ export default function AccountsTab() {
       amount: parseFloat(data.amount),
       currency: data.currency.trim(),
       additional_data: parseAdditionalData(data.additional_data),
+      stakeholder_id: data.stakeholder_id ? parseInt(data.stakeholder_id) : null,
     };
 
     await createAccount(accountData);
@@ -265,6 +274,7 @@ export default function AccountsTab() {
       amount: parseFloat(data.amount),
       currency: data.currency.trim(),
       additional_data: parseAdditionalData(data.additional_data),
+      stakeholder_id: data.stakeholder_id ? parseInt(data.stakeholder_id) : null,
     };
 
     await updateAccount(selectedAccount.id!, accountData);
@@ -274,7 +284,8 @@ export default function AccountsTab() {
 
   useEffect(() => {
     fetchAccounts();
-  }, [fetchAccounts]);
+    fetchStakeholders(true); // Fetch all stakeholders including completed ones
+  }, [fetchAccounts, fetchStakeholders]);
 
   const filteredAccounts = accounts.filter(account => {
     const matchesSearch = account.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -436,6 +447,7 @@ export default function AccountsTab() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stakeholder</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
@@ -450,6 +462,16 @@ export default function AccountsTab() {
                     <tr key={account.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="font-medium text-gray-900">{account.title}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {account.stakeholder ? (
+                          <div className="flex items-center gap-1">
+                            <Users size={14} className="text-blue-500" />
+                            <span className="text-sm text-gray-900">{account.stakeholder.name}</span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-xs italic">No stakeholder</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -526,7 +548,8 @@ export default function AccountsTab() {
           transaction_date: new Date().toISOString().split('T')[0],
           amount: '',
           currency: 'BDT',
-          additional_data: ''
+          additional_data: '',
+          stakeholder_id: ''
         }}
         validationFn={(values) => {
           const errors = [];
@@ -584,6 +607,25 @@ export default function AccountsTab() {
               />
 
               <FormSelectField
+                icon={<Users size={18} />}
+                label="Stakeholder (Optional)"
+                name="stakeholder_id"
+                value={values.stakeholder_id}
+                onChange={handleChange}
+                error={errors.stakeholder_id}
+                options={[
+                  { value: '', label: 'No Stakeholder' },
+                  ...stakeholders.map(s => ({ 
+                    value: String(s.id), 
+                    label: `${s.name}${s.is_completed ? ' (Completed)' : ' (Active)'}` 
+                  }))
+                ]}
+                placeholder="Select stakeholder (optional)"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormSelectField
                 icon={<CheckCircle size={18} />}
                 label="Status"
                 name="status"
@@ -596,9 +638,7 @@ export default function AccountsTab() {
                 ]}
                 placeholder="Select status"
               />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
               <FormInputField
                 icon={<Calendar size={18} />}
                 label="Transaction Date"
@@ -608,7 +648,9 @@ export default function AccountsTab() {
                 onChange={handleChange}
                 error={errors.transaction_date}
               />
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInputField
                 icon={<DollarSign size={18} />}
                 label="Amount"
@@ -663,7 +705,8 @@ export default function AccountsTab() {
             transaction_date: selectedAccount.transaction_date,
             amount: selectedAccount.amount.toString(),
             currency: selectedAccount.currency,
-            additional_data: stringifyAdditionalData(formatDataForEdit(selectedAccount.additional_data))
+            additional_data: stringifyAdditionalData(formatDataForEdit(selectedAccount.additional_data)),
+            stakeholder_id: selectedAccount.stakeholder_id ? String(selectedAccount.stakeholder_id) : ''
           }}
           validationFn={(values) => {
             const errors = [];
@@ -724,6 +767,25 @@ export default function AccountsTab() {
                 />
 
                 <FormSelectField
+                  icon={<Users size={18} />}
+                  label="Stakeholder (Optional)"
+                  name="stakeholder_id"
+                  value={values.stakeholder_id}
+                  onChange={handleChange}
+                  error={errors.stakeholder_id}
+                  options={[
+                    { value: '', label: 'No Stakeholder' },
+                    ...stakeholders.map(s => ({ 
+                      value: String(s.id), 
+                      label: `${s.name}${s.is_completed ? ' (Completed)' : ' (Active)'}` 
+                    }))
+                  ]}
+                  placeholder="Select stakeholder (optional)"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormSelectField
                   icon={<CheckCircle size={18} />}
                   label="Status"
                   name="status"
@@ -736,9 +798,7 @@ export default function AccountsTab() {
                   ]}
                   placeholder="Select status"
                 />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
                 <FormInputField
                   icon={<Calendar size={18} />}
                   label="Transaction Date"
