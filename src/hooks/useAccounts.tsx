@@ -15,6 +15,7 @@ export interface AccountFormData {
   amount: number;
   currency: string;
   additional_data?: Record<string, any>;
+  stakeholder_id?: number | null; // Add stakeholder reference
 }
 
 export function useAccounts() {
@@ -32,7 +33,10 @@ export function useAccounts() {
 
       const { data, error } = await supabase
         .from("accounts")
-        .select("*")
+        .select(`
+          *,
+          stakeholder:stakeholders(id, name, address, is_completed)
+        `)
         .eq("company_id", company_id)
         .order("transaction_date", { ascending: false }) // Newest first
         .order("created_at", { ascending: false }); // Secondary sort by creation time
@@ -178,6 +182,36 @@ export function useAccounts() {
     }
   }, []);
 
+  // Fetch accounts by stakeholder ID
+  const fetchAccountsByStakeholder = useCallback(async (stakeholderId: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("accounts")
+        .select(`
+          *,
+          stakeholder:stakeholders(id, name, address, is_completed)
+        `)
+        .eq("company_id", company_id)
+        .eq("stakeholder_id", stakeholderId)
+        .order("transaction_date", { ascending: false })
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      return data || [];
+    } catch (err) {
+      const errorObj = err instanceof Error ? err : new Error(String(err));
+      setError(errorObj);
+      throw errorObj;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // Get accounts by status
   const getAccountsByStatus = useCallback((status: 'Complete' | 'Pending') => {
     return accounts.filter(account => account.status === status);
@@ -191,6 +225,38 @@ export function useAccounts() {
     
     return filteredAccounts.reduce((total, account) => total + account.amount, 0);
   }, [accounts]);
+
+  // Get stakeholder transaction summary
+  const getStakeholderTransactionSummary = useCallback(async (stakeholderId: number) => {
+    try {
+      const transactions = await fetchAccountsByStakeholder(stakeholderId);
+      
+      const totalIncome = transactions.reduce((sum, t) => t.amount > 0 ? sum + t.amount : sum, 0);
+      const totalExpense = transactions.reduce((sum, t) => t.amount < 0 ? sum + Math.abs(t.amount) : sum, 0);
+      const netAmount = transactions.reduce((sum, t) => sum + t.amount, 0);
+      const pendingTransactions = transactions.filter(t => t.status === 'Pending').length;
+      const completedTransactions = transactions.filter(t => t.status === 'Complete').length;
+
+      return {
+        totalTransactions: transactions.length,
+        totalIncome,
+        totalExpense,
+        netAmount,
+        pendingTransactions,
+        completedTransactions,
+      };
+    } catch (err) {
+      console.error('Error getting stakeholder transaction summary:', err);
+      return {
+        totalTransactions: 0,
+        totalIncome: 0,
+        totalExpense: 0,
+        netAmount: 0,
+        pendingTransactions: 0,
+        completedTransactions: 0,
+      };
+    }
+  }, [fetchAccountsByStakeholder]);
 
   // Memoized summary data
   const summary = useMemo(() => {
@@ -220,11 +286,13 @@ export function useAccounts() {
     
     // Actions
     fetchAccounts,
+    fetchAccountsByStakeholder,
     createAccount,
     updateAccount,
     deleteAccount,
     getAccountsByStatus,
     getTotalAmount,
+    getStakeholderTransactionSummary,
     clearError,
   };
 }

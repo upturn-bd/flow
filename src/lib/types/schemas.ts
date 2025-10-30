@@ -425,10 +425,18 @@ export interface Account {
   amount: number; // Supports negative values for expenses
   currency: string; // Default BDT, but allows free text
   additional_data?: Record<string, any>; // JSONB data
+  stakeholder_id?: number | null; // Reference to stakeholder for tracking activities
   created_at?: string;
   updated_at?: string;
   created_by?: string;
   updated_by?: string;
+  // Joined data from stakeholder
+  stakeholder?: {
+    id: number;
+    name: string;
+    address?: string;
+    is_completed?: boolean;
+  };
 }
 
 // Payroll System Interfaces
@@ -550,6 +558,7 @@ export interface Stakeholder {
   process?: StakeholderProcess;
   current_step?: StakeholderProcessStep;
   step_data?: StakeholderStepData[];
+  transactions?: Account[]; // Financial transactions associated with this stakeholder
   issue_handler?: {
     id: string;
     name: string;
