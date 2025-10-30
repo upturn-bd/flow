@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { 
   DollarSign, 
@@ -10,12 +10,15 @@ import {
   TrendingUp,
   TrendingDown,
   Wallet,
-  Activity
+  Activity,
+  Search,
+  Filter
 } from "lucide-react";
 import { useAccounts } from "@/hooks/useAccounts";
 import { Account } from "@/lib/types/schemas";
 import { formatDate } from "@/lib/utils";
 import { fadeInUp } from "@/components/ui/animations";
+import Pagination from "@/components/ui/Pagination";
 
 interface StakeholderTransactionsProps {
   stakeholderId: number;
@@ -28,6 +31,10 @@ export default function StakeholderTransactions({
 }: StakeholderTransactionsProps) {
   const { fetchAccountsByStakeholder, getStakeholderTransactionSummary, loading } = useAccounts();
   const [transactions, setTransactions] = useState<Account[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<'All' | 'Complete' | 'Pending'>('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const [summary, setSummary] = useState({
     totalTransactions: 0,
     totalIncome: 0,
@@ -52,6 +59,35 @@ export default function StakeholderTransactions({
     
     loadData();
   }, [stakeholderId, fetchAccountsByStakeholder, getStakeholderTransactionSummary]);
+
+  // Filter and search transactions
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter(txn => {
+      const matchesSearch = 
+        txn.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        txn.from_source.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        txn.method?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        txn.amount.toString().includes(searchTerm);
+      
+      const matchesStatus = statusFilter === 'All' || txn.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    });
+  }, [transactions, searchTerm, statusFilter]);
+
+  // Paginate filtered transactions
+  const paginatedTransactions = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredTransactions.slice(startIndex, endIndex);
+  }, [filteredTransactions, currentPage]);
+
+  const totalPages = Math.ceil(filteredTransactions.length / pageSize);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
 
   const formatAmount = (amount: number, currency: string) => {
     const sign = amount >= 0 ? '+' : '';
@@ -150,16 +186,63 @@ export default function StakeholderTransactions({
           </p>
         </div>
 
-        {transactions.length === 0 ? (
+        {/* Search and Filter */}
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div className="relative flex-1 max-w-md w-full">
+              <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by title, method, source, or amount..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Filter size={16} className="text-gray-500" />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as any)}
+                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="All">All Status</option>
+                <option value="Complete">Complete</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </div>
+          </div>
+          
+          {/* Results count */}
+          {(searchTerm || statusFilter !== 'All') && (
+            <div className="mt-3 text-sm text-gray-600">
+              Found {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''}
+              {searchTerm && ` matching "${searchTerm}"`}
+              {statusFilter !== 'All' && ` with status "${statusFilter}"`}
+            </div>
+          )}
+        </div>
+
+        {filteredTransactions.length === 0 ? (
           <div className="px-6 py-12 text-center">
             <DollarSign size={48} className="mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500 text-sm">No transactions found</p>
+            <p className="text-gray-500 text-sm">
+              {transactions.length === 0 
+                ? 'No transactions found' 
+                : 'No transactions match your search criteria'
+              }
+            </p>
             <p className="text-gray-400 text-xs mt-1">
-              Transactions will appear here once created
+              {transactions.length === 0
+                ? 'Transactions will appear here once created'
+                : 'Try adjusting your search or filter'
+              }
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -184,7 +267,7 @@ export default function StakeholderTransactions({
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {transactions.map((txn) => (
+                {paginatedTransactions.map((txn) => (
                   <motion.tr 
                     key={txn.id} 
                     variants={fadeInUp}
@@ -230,6 +313,18 @@ export default function StakeholderTransactions({
               </tbody>
             </table>
           </div>
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalCount={filteredTransactions.length}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+            />
+          )}
+          </>
         )}
       </div>
     </div>
