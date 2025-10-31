@@ -548,7 +548,8 @@ export function useStakeholders() {
           step_data:stakeholder_step_data(
             *,
             step:stakeholder_process_steps(id, name, step_order)
-          )
+          ),
+          transactions:accounts(*)
         `)
         .eq("company_id", company_id)
         .eq("id", stakeholderId)
