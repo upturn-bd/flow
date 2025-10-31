@@ -41,12 +41,10 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
   const [showEmpty, setShowEmpty] = useState(false);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
-  // Prevent duplicate fetches
   const hasFetched = useRef(false);
 
   /** Initialize user ID and fetch data */
   useEffect(() => {
-    // Prevent duplicate calls
     if (hasFetched.current) return;
     hasFetched.current = true;
 
@@ -70,42 +68,45 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
         setShowEmpty(false);
         return;
       }
-      setSearching(true);
-      setShowEmpty(false);
+      // setSearching(true) is handled in handleSearchChange, but we ensure it's still true here
       const results = await searchCompletedProjects(term, 20, false);
       setSearchResults(results);
       setSearching(false);
+      // The empty state logic is now primarily handled by the useEffect below and the JSX structure
     }, 400),
     [searchCompletedProjects]
   );
 
   useEffect(() => {
-    return () => {
-      debouncedSearch.cancel();
-    };
+    return () => debouncedSearch.cancel();
   }, [debouncedSearch]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
     setSearchTerm(term);
+    if (term) {
+      setSearching(true); // Start searching immediately on input change
+    }
     debouncedSearch(term);
   };
 
   const displayProjects = searchTerm ? searchResults : completedProjects;
 
-  /** Empty state only after initial load is complete */
+  /** Empty state only after initial load is complete and no search is active */
   useEffect(() => {
     let timer: NodeJS.Timeout;
+    // Condition to show empty state for initial load (no search term, no projects)
+    const isInitialEmpty = initialLoadComplete && !completedLoading && !searchTerm && completedProjects.length === 0;
+    // Condition to show empty state for search (search completed, no results)
+    const isSearchEmpty = !!searchTerm && !searching && searchResults.length === 0;
 
-    // Only show empty state after initial load is complete
-    if (initialLoadComplete && !completedLoading && !searching && displayProjects.length === 0) {
+    if (isInitialEmpty || isSearchEmpty) {
       timer = setTimeout(() => setShowEmpty(true), 300);
     } else {
       setShowEmpty(false);
     }
-
     return () => clearTimeout(timer);
-  }, [displayProjects.length, completedLoading, searching, initialLoadComplete]);
+  }, [completedProjects.length, completedLoading, searching, initialLoadComplete, searchTerm, searchResults.length]);
 
   /** Update Project */
   const handleUpdateProject = async (values: Project) => {
@@ -139,11 +140,6 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
     await fetchCompletedProjects(10, false);
   };
 
-  /** Loading on first load only */
-  if (!initialLoadComplete && completedLoading && completedProjects.length === 0) {
-    return <LoadingSection icon={CheckCircle} text="Loading completed projects..." color="blue" />;
-  }
-
   return (
     <AnimatePresence mode="wait">
       {!selectedProject && !projectDetailsId && (
@@ -169,39 +165,46 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
             />
           </motion.div>
 
-          {/* Project Cards */}
+          {/* Conditional Rendering of Content */}
           <motion.div variants={fadeInUp}>
-            <AnimatePresence>
-              {searching ? (
-                <LoadingSection icon={CheckCircle} text="Searching completed projects..." color="blue" />
-              ) : displayProjects.length > 0 ? (
-                <>
-                  <div className="space-y-4">
-                    {displayProjects.map(
-                      (project) =>
-                        project.id && (
-                          <ProjectCard
-                            key={project.id}
-                            project={project}
-                            employees={employees}
-                            departments={departments.filter((d) => d.id != null) as any}
-                            onEdit={undefined}
-                            onDelete={() => handleDeleteProject(project.id!)}
-                            onDetails={() => setProjectDetailsId(project.id!)}
-                            showEdit={false}
-                            showDelete={project.created_by === userId}
-                            showDetails={true}
-                            statusIcon={
-                              <CheckCircle
-                                size={18}
-                                className="text-green-500 mt-1 flex-shrink-0"
-                              />
-                            }
-                            progressColor="bg-green-100 text-green-800"
-                          />
-                        )
-                    )}
-                  </div>
+            <AnimatePresence mode="wait">
+              {/* 1. Initial Load State */}
+              {(completedLoading && !searchTerm && completedProjects.length === 0) && (
+                <LoadingSection key="initial-load" icon={CheckCircle} text="Loading completed projects..." color="blue" />
+              )}
+
+              {/* 2. Searching State */}
+              {(searching && searchTerm) && (
+                <LoadingSection key="searching" icon={CheckCircle} text="Searching completed projects..." color="blue" />
+              )}
+
+              {/* 3. Projects List (Show if not loading and projects exist) */}
+              {(!completedLoading || searchTerm) && displayProjects.length > 0 && (
+                <motion.div key="project-list" className="space-y-4">
+                  {displayProjects.map(
+                    (project) =>
+                      project.id && (
+                        <ProjectCard
+                          key={project.id}
+                          project={project}
+                          employees={employees}
+                          departments={departments.filter((d) => d.id != null) as any}
+                          onEdit={undefined}
+                          onDelete={() => handleDeleteProject(project.id!)}
+                          onDetails={() => setProjectDetailsId(project.id!)}
+                          showEdit={false}
+                          showDelete={project.created_by === userId}
+                          showDetails={true}
+                          statusIcon={
+                            <CheckCircle
+                              size={18}
+                              className="text-green-500 mt-1 flex-shrink-0"
+                            />
+                          }
+                          progressColor="bg-green-100 text-green-800"
+                        />
+                      )
+                  )}
 
                   {!searchTerm && (
                     <LoadMore
@@ -210,19 +213,21 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
                       onLoadMore={handleLoadMore}
                     />
                   )}
-                </>
-              ) : (
-                showEmpty && (
-                  <EmptyState
-                    icon={<CheckCircle className="h-12 w-12" />}
-                    title={searchTerm ? "No matching projects" : "No completed projects yet"}
-                    description={
-                      searchTerm
-                        ? "Try a different keyword."
-                        : "Projects will appear here once they're marked as complete."
-                    }
-                  />
-                )
+                </motion.div>
+              )}
+
+              {/* 4. Empty State (Show if initial load/search is complete and no projects) */}
+              {showEmpty && (
+                <EmptyState
+                  key="empty-state"
+                  icon={<CheckCircle className="h-12 w-12" />}
+                  title={searchTerm ? "No matching projects" : "No completed projects yet"}
+                  description={
+                    searchTerm
+                      ? "Try a different keyword."
+                      : "Projects will appear here once they're marked as complete."
+                  }
+                />
               )}
             </AnimatePresence>
           </motion.div>

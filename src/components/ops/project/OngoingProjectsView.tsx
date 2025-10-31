@@ -43,13 +43,11 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
   const [searching, setSearching] = useState(false);
   const [showEmpty, setShowEmpty] = useState(false);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
-  
-  // Prevent duplicate fetches
+
   const hasFetched = useRef(false);
 
   /** Initialize user ID and fetch data */
   useEffect(() => {
-    // Prevent duplicate calls
     if (hasFetched.current) return;
     hasFetched.current = true;
 
@@ -78,37 +76,62 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
       const results = await searchOngoingProjects(term, 20, false);
       setSearchResults(results);
       setSearching(false);
+      
+      // Show empty state after search completes if no results
+      if (results.length === 0) {
+        setTimeout(() => setShowEmpty(true), 100);
+      }
     }, 400),
     [searchOngoingProjects]
   );
 
   useEffect(() => {
-    return () => {
-      debouncedSearch.cancel();
-    };
+    return () => debouncedSearch.cancel();
   }, [debouncedSearch]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
     setSearchTerm(term);
-    debouncedSearch(term);
+    
+    // Hide empty state immediately when typing
+    setShowEmpty(false);
+    
+    // If clearing search, reset immediately
+    if (!term.trim()) {
+      setSearchResults([]);
+      setSearching(false);
+      debouncedSearch.cancel();
+    } else {
+      debouncedSearch(term);
+    }
   };
 
   const displayProjects = searchTerm ? searchResults : ongoingProjects;
 
-  /** Empty state only after initial load is complete */
+  /** Empty state only after initial load is complete and not searching */
   useEffect(() => {
     let timer: NodeJS.Timeout;
     
-    // Only show empty state after initial load is complete
-    if (initialLoadComplete && !ongoingLoading && !searching && displayProjects.length === 0) {
+    // Only show empty if:
+    // 1. Not currently searching
+    // 2. Not loading
+    // 3. Initial load complete
+    // 4. No projects to display
+    // 5. Not in the middle of typing (handled by handleSearchChange)
+    if (
+      initialLoadComplete && 
+      !ongoingLoading && 
+      !searching && 
+      displayProjects.length === 0 &&
+      (!searchTerm || searchResults.length === 0)
+    ) {
       timer = setTimeout(() => setShowEmpty(true), 300);
     } else {
       setShowEmpty(false);
     }
     
     return () => clearTimeout(timer);
-  }, [displayProjects.length, ongoingLoading, searching, initialLoadComplete]);
+  }, [displayProjects.length, ongoingLoading, searching, initialLoadComplete, searchTerm, searchResults.length]);
 
   /** Update Project */
   const handleUpdateProject = async (values: Project) => {
@@ -147,11 +170,6 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
     await fetchOngoingProjects(10, false);
   };
 
-  /** Loading on first load only */
-  if (!initialLoadComplete && ongoingLoading && ongoingProjects.length === 0) {
-    return <LoadingSection icon={Building2} text="Loading projects..." color="blue" />;
-  }
-
   return (
     <AnimatePresence mode="wait">
       {!selectedProject && !projectDetailsId && (
@@ -176,6 +194,11 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
               className="w-full border rounded pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring focus:border-blue-300"
             />
           </motion.div>
+
+          {/* Loading below search bar */}
+          {(ongoingLoading && !searchTerm && !searching && ongoingProjects.length === 0) && (
+            <LoadingSection icon={Building2} text="Loading projects..." color="blue" />
+          )}
 
           {/* Project Cards */}
           <motion.div variants={fadeInUp}>
@@ -217,7 +240,11 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
                   <EmptyState
                     icon={<Building2 className="h-12 w-12" />}
                     title="No projects found"
-                    description="Try a different keyword or create a new project."
+                    description={
+                      searchTerm 
+                        ? "Try a different keyword or create a new project."
+                        : "No ongoing projects available. Create one to get started."
+                    }
                     action={{
                       label: "Create Project",
                       onClick: handleCreateProject,
