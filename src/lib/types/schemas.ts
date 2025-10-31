@@ -126,7 +126,7 @@ export interface ClaimType {
 }
 
 export interface Project {
-  id?: number;
+  id?: string;
   project_title: string;
   description?: string;
   start_date: string;
@@ -151,7 +151,7 @@ export interface Milestone {
   end_date: string;
   status: string;
   weightage: number;
-  project_id?: number;
+  project_id?: string;
   company_id?: number;
   assignees?: string[];
 }
@@ -160,7 +160,7 @@ export interface Comment {
   id?: number;
   comment: string;
   commenter_id: string;
-  project_id?: number;
+  project_id?: string;
   company_id?: number;
   created_at?: Date;
   updated_at?: Date;
@@ -173,7 +173,7 @@ export interface Task {
   start_date: string;
   end_date: string;
   priority: "low" | "normal" | "high" | "urgent";
-  project_id?: number;
+  project_id?: string;
   milestone_id?: number;
   assignees: string[];
   department_id?: number;

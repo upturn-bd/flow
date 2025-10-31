@@ -180,7 +180,7 @@ export interface MilestoneData {
   end_date: string;
   status: string;
   weightage: number | undefined;
-  project_id?: number;
+  project_id?: string;
   company_id?: number;
   assignees?: string[];
 }
@@ -244,7 +244,7 @@ export interface TaskData {
   start_date: string;
   end_date: string;
   priority: "low" | "normal" | "high" | "urgent";
-  project_id?: number;
+  project_id?: string;
   milestone_id?: number;
   assignees: string[];
   department_id?: number;
@@ -541,7 +541,7 @@ export interface CommentData {
   id?: number;
   comment: string;
   commenter_id: string;
-  project_id?: number;
+  project_id?: string;
   company_id?: number;
   created_at?: Date;
   updated_at?: Date;

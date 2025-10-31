@@ -22,7 +22,7 @@ const initialMilestone: Milestone = {
   end_date: "",
   weightage: 0,
   status: "",
-  project_id: 1,
+  project_id: "",
   assignees: [],
 };
 
@@ -64,7 +64,7 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
         throw new Error("Failed to create project");
       }
 
-      let projectId: number | undefined;
+      let projectId: string | undefined;
       if (projectResult.data) {
         if (
           Array.isArray(projectResult.data) &&

@@ -122,7 +122,7 @@ interface CompletedTasksListProps {
   adminScoped: boolean;
   tasks: Task[];
   loading: boolean;
-  deleteTask: (taskId: string, projectId?: number, milestoneId?: number, adminScoped?: boolean) => Promise<{ success: boolean; error?: any; }>;
+  deleteTask: (taskId: string, projectId?: string, milestoneId?: number, adminScoped?: boolean) => Promise<{ success: boolean; error?: any; }>;
   hasMoreCompletedTasks: boolean;
   onLoadMore: () => void;
 }

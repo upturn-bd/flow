@@ -12,11 +12,13 @@ import {
 import TabView, { TabItem } from "@/components/ui/TabView";
 import { fadeInUp } from "@/components/ui/animations";
 import { getEmployeeInfo } from "@/lib/utils/auth";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import CompletedProjectsList from "@/components/ops/project/CompletedProjectsList";
 import CreateNewProjectPage from "@/components/ops/project/CreateNewProject";
 import ProjectsList from "@/components/ops/project/OngoingProjectsView";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+
 
 const TABS = [
     {
@@ -32,7 +34,7 @@ const TABS = [
         color: "text-green-600",
     },
     {
-        key: "create-new",
+        key: "create",
         label: "Create New",
         icon: <FolderPlus size={16} />,
         color: "text-indigo-600",
@@ -52,11 +54,31 @@ export default function ProjectLayout({
     activeTab?: string;
     overrideContent?: React.ReactNode;
 }) {
-    const router = useRouter()
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
     const [activeTab, setActiveTab] = useState(initialActiveTab);
     const [user, setUser] = useState<{ id: string; name: string; role: string }>();
     const [tabs, setTabs] = useState<TabItem[]>([]);
 
+    // 🔹 Sync tab from URL
+    const pathname = usePathname();
+
+    useEffect(() => {
+        // Only run on the main /ops/project route
+        if (pathname === "/ops/project") {
+            const urlTab = searchParams.get("tab");
+            if (urlTab) {
+                setActiveTab(urlTab);
+            } else {
+                router.replace(`/ops/project?tab=${initialActiveTab}`);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathname, searchParams]);
+
+
+    // 🔹 Fetch user and set visible tabs
     useEffect(() => {
         async function fetchUserData() {
             try {
@@ -66,7 +88,7 @@ export default function ProjectLayout({
                 const visibleTabs =
                     retrievedUser.role === "Admin"
                         ? TABS
-                        : TABS.filter((tab) => tab.key !== "create-new");
+                        : TABS.filter((tab) => tab.key !== "create");
 
                 setTabs(
                     visibleTabs.map((tab) => ({
@@ -79,12 +101,12 @@ export default function ProjectLayout({
             }
         }
         fetchUserData();
-        // eslint-disable-next-line
     }, []);
 
+    // 🔹 Tab content mapper
     function getTabContent(key: string) {
         switch (key) {
-            case "create-new":
+            case "create":
                 return <CreateNewProjectPage setActiveTab={setActiveTab} />;
             case "ongoing":
                 return <ProjectsList setActiveTab={setActiveTab} />;
@@ -115,14 +137,14 @@ export default function ProjectLayout({
             animate="visible"
             exit="exit"
             variants={fadeInUp}
-            className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm max-w-6xl mx-auto"
+            className="bg-white p-4 sm:p-6 rounded-lg max-w-6xl mx-auto"
         >
             <div className="border-b border-gray-200 pb-4 mb-4">
-                <h1 className="text-lg font-semibold text-gray-800 flex items-center mb-1">
+                <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-1">
                     <Folder className="mr-2 h-6 w-6 text-blue-500" />
                     Project Management
                 </h1>
-                <p className="text-sm text-gray-600">
+                <p className="max-w-3xl text-gray-600">
                     Efficiently manage your projects from start to finish. Create, assign,
                     and track progress to ensure successful completion of all project
                     milestones.
@@ -131,16 +153,25 @@ export default function ProjectLayout({
 
             {overrideContent ? (
                 <>
-                    <TabView tabs={tabs} activeTab="" setActiveTab={tab => {
-                        router.push(`/ops/project`)
-                        setActiveTab(tab);
-                    }} />
+                    <TabView
+                        tabs={tabs}
+                        activeTab=""
+                        setActiveTab={(tab) => {
+                            router.push(`/ops/project?tab=${tab}`);
+                            setActiveTab(tab);
+                        }}
+                    />
                     <div className="p-4">{overrideContent}</div>
-
                 </>
             ) : (
-                // default tabbed layout
-                <TabView tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+                <TabView
+                    tabs={tabs}
+                    activeTab={activeTab}
+                    setActiveTab={(tab) => {
+                        router.push(`/ops/project?tab=${tab}`);
+                        setActiveTab(tab);
+                    }}
+                />
             )}
         </motion.section>
     );

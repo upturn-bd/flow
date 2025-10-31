@@ -10,7 +10,7 @@ import { useTasks } from '@/hooks/useTasks';
 
 interface TaskCreateModalProps {
   milestoneId?: number;
-  projectId?: number;
+  projectId?: string;
   departmentId?: number;
   onSubmit: (data: TaskData) => void;
   onClose: () => void;

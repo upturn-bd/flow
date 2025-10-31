@@ -1,182 +1,237 @@
 "use client";
 
+import { useEffect, useState, useCallback, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { debounce } from "lodash";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Building2, Plus, Search } from "lucide-react";
+
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Project, useProjects } from "@/hooks/useProjects";
-import { useEffect, useState } from "react";
-import ProjectDetails from "./ProjectDetails";
-import CreateNewProjectPage, { UpdateProjectPage } from "./CreateNewProject";
-import { motion, AnimatePresence } from "framer-motion";
-import { Building2, Plus } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import ProjectCard from "./ProjectCard";
-import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
-import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { getEmployeeId } from "@/lib/utils/auth";
 
-const emptyProject: Project = {
-  project_title: "",
-  start_date: "",
-  end_date: "",
-  project_lead_id: "",
-  status: "Ongoing",
-  description: "",
-  assignees: [],
-};
+import ProjectDetails from "./ProjectDetails";
+import { UpdateProjectPage } from "./CreateNewProject";
+import ProjectCard from "./ProjectCard";
+import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import { EmptyState } from "@/components/ui/EmptyState";
+import LoadMore from "@/components/ui/LoadMore";
+import { fadeInUp, staggerContainer } from "@/components/ui/animations";
 
 function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void }) {
-  const { loading, ongoingProjects, fetchOngoingProjects, projects, ongoingLoading, fetchProjects, updateProject, deleteProject } =
-    useProjects();
-  const [projectDetailsId, setProjectDetailsId] = useState<number | null>(null);
+  const {
+    ongoingProjects,
+    fetchOngoingProjects,
+    updateProject,
+    deleteProject,
+    hasMoreOngoingProjects,
+    ongoingLoading,
+    searchOngoingProjects,
+  } = useProjects();
+
+  const { employees, fetchEmployees } = useEmployees();
+  const { departments, fetchDepartments } = useDepartments();
+  const router = useRouter();
+
+  const [projectDetailsId, setProjectDetailsId] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [userId, setUserId] = useState<string>("")
-  const {
-    employees,
-    fetchEmployees,
-    loading: employeesLoading,
-  } = useEmployees();
-  const {
-    departments,
-    fetchDepartments,
-    loading: departmentsLoading,
-  } = useDepartments();
+  const [userId, setUserId] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<Project[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [showEmpty, setShowEmpty] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  
+  // Prevent duplicate fetches
+  const hasFetched = useRef(false);
 
-    const initUserId = async () => {
-    const userId = await getEmployeeId()
-    setUserId(userId);
-  }
-
+  /** Initialize user ID and fetch data */
   useEffect(() => {
-    fetchOngoingProjects();
-    fetchEmployees();
-    fetchDepartments();
-    initUserId()
+    // Prevent duplicate calls
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
+    const initData = async () => {
+      const id = await getEmployeeId();
+      setUserId(id);
+      await fetchOngoingProjects(10, true);
+      fetchEmployees();
+      fetchDepartments();
+      setInitialLoadComplete(true);
+    };
+    initData();
   }, []);
 
-
-
-
-  const handleUpdateProject = async (values: any) => {
-    try {
-      if (values?.id) {
-        const result = await updateProject(values.id, values);
-        console.log(result)
-        toast.success("Project updated successfully");
-        setSelectedProject(null);
-        if (values.status === 'Completed') setActiveTab('completed')
-        fetchOngoingProjects()
+  /** Debounced Search */
+  const debouncedSearch = useCallback(
+    debounce(async (term: string) => {
+      if (!term.trim()) {
+        setSearchResults([]);
+        setSearching(false);
+        setShowEmpty(false);
+        return;
       }
+      setSearching(true);
+      setShowEmpty(false);
+      const results = await searchOngoingProjects(term, 20, false);
+      setSearchResults(results);
+      setSearching(false);
+    }, 400),
+    [searchOngoingProjects]
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    debouncedSearch(term);
+  };
+
+  const displayProjects = searchTerm ? searchResults : ongoingProjects;
+
+  /** Empty state only after initial load is complete */
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    
+    // Only show empty state after initial load is complete
+    if (initialLoadComplete && !ongoingLoading && !searching && displayProjects.length === 0) {
+      timer = setTimeout(() => setShowEmpty(true), 300);
+    } else {
+      setShowEmpty(false);
+    }
+    
+    return () => clearTimeout(timer);
+  }, [displayProjects.length, ongoingLoading, searching, initialLoadComplete]);
+
+  /** Update Project */
+  const handleUpdateProject = async (values: Project) => {
+    try {
+      if (!values?.id) return;
+      await updateProject(values.id, values);
+      toast.success("Project updated successfully");
+      setSelectedProject(null);
+      if (values.status === "Completed") setActiveTab("completed");
+      await fetchOngoingProjects(10, true);
     } catch (error) {
       toast.error("Error updating project");
       console.error(error);
     }
   };
 
+  /** Create New Project */
   const handleCreateProject = () => {
-    setActiveTab("create-new");
-  }
+    router.push("/ops/project?tab=create");
+  };
 
-  const handleDeleteProject = async (id: number) => {
+  /** Delete Project */
+  const handleDeleteProject = async (id: string) => {
     try {
       await deleteProject(id);
       toast.success("Project deleted successfully");
-      fetchOngoingProjects()
-      // fetchProjects(); // Removed: useProjects hook handles state update automatically
+      await fetchOngoingProjects(10, true);
     } catch (error) {
       toast.error("Error deleting project");
       console.error(error);
     }
   };
 
+  /** Pagination: Load More */
+  const handleLoadMore = async () => {
+    await fetchOngoingProjects(10, false);
+  };
 
-  if (ongoingLoading || loading) {
-    return (
-      <LoadingSection
-        icon={Building2}
-        text="Loading projects..."
-        color="blue"
-      />
-    );
+  /** Loading on first load only */
+  if (!initialLoadComplete && ongoingLoading && ongoingProjects.length === 0) {
+    return <LoadingSection icon={Building2} text="Loading projects..." color="blue" />;
   }
 
   return (
     <AnimatePresence mode="wait">
       {!selectedProject && !projectDetailsId && (
         <motion.div
-          key="content"
+          key="project-list"
           initial="hidden"
           animate="visible"
           variants={staggerContainer}
-          className="px-4 space-y-6 py-4"
+          className="px-4 py-4 space-y-6"
         >
-          <motion.div
-            variants={fadeInUp}
-            className="flex items-center gap-3 mb-4"
-          >
-            <Building2 size={24} className="text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">
-              Ongoing Projects
-            </h1>
+          {/* Search Bar */}
+          <motion.div variants={fadeInUp} className="relative mb-4">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              placeholder="Search projects..."
+              className="w-full border rounded pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring focus:border-blue-300"
+            />
           </motion.div>
 
+          {/* Project Cards */}
           <motion.div variants={fadeInUp}>
             <AnimatePresence>
-              {ongoingProjects.length > 0 ? (
-                <div className="space-y-4">
-                  {ongoingProjects.map((project, idx) =>
-                    typeof project.id !== "undefined" ? (
-                      <ProjectCard
-                        key={project.id}
-                        project={project}
-                        onEdit={() => setSelectedProject(project)}
-                        onDelete={() =>
-                          handleDeleteProject(project.id as number)
-                        }
-                        onDetails={() =>
-                          setProjectDetailsId(project.id as number)
-                        }
-                        employees={employees}
-                        departments={
-                          departments.filter((d) => d.id != null) as any
-                        }
-                        showEdit={project.created_by === userId}
-                        showDelete={project.created_by === userId}
-                        showDetails={true}
-                      />
-                    ) : null
+              {searching ? (
+                <LoadingSection icon={Building2} text="Searching projects..." color="blue" />
+              ) : displayProjects.length > 0 ? (
+                <>
+                  <div className="space-y-4">
+                    {displayProjects.map(
+                      (project) =>
+                        project.id && (
+                          <ProjectCard
+                            key={project.id}
+                            project={project}
+                            employees={employees}
+                            departments={departments.filter((d) => d.id != null) as any}
+                            onEdit={() => setSelectedProject(project)}
+                            onDelete={() => handleDeleteProject(project.id!)}
+                            onDetails={() => setProjectDetailsId(project.id!)}
+                            showEdit={project.created_by === userId}
+                            showDelete={project.created_by === userId}
+                            showDetails={true}
+                          />
+                        )
+                    )}
+                  </div>
+
+                  {!searchTerm && (
+                    <LoadMore
+                      isLoading={ongoingLoading}
+                      hasMore={hasMoreOngoingProjects}
+                      onLoadMore={handleLoadMore}
+                    />
                   )}
-                </div>
+                </>
               ) : (
-                <EmptyState
-                  icon={<Building2 className="h-12 w-12" />}
-                  title="No ongoing projects found"
-                  description="Create new projects to get started and track your work"
-                  action={{
-                    label: "Create Project",
-                    onClick: handleCreateProject,
-                    icon: <Plus size={16} />,
-                  }}
-                />
+                showEmpty && (
+                  <EmptyState
+                    icon={<Building2 className="h-12 w-12" />}
+                    title="No projects found"
+                    description="Try a different keyword or create a new project."
+                    action={{
+                      label: "Create Project",
+                      onClick: handleCreateProject,
+                      icon: <Plus size={16} />,
+                    }}
+                  />
+                )
               )}
             </AnimatePresence>
           </motion.div>
-
-          {/* {projects.length > 0 && (
-            <motion.div variants={fadeIn} className="flex justify-end mt-4">
-              <Button
-                onClick={() => setSelectedProject(emptyProject)}
-                className="flex items-center gap-2"
-              >
-                <Plus size={16} />
-                Add Project
-              </Button>
-            </motion.div>
-          )} */}
         </motion.div>
       )}
 
+      {/* Details View */}
       {!selectedProject && projectDetailsId && (
         <ProjectDetails
           id={projectDetailsId}
@@ -188,6 +243,7 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
         />
       )}
 
+      {/* Update Form */}
       {!projectDetailsId && selectedProject && (
         <UpdateProjectPage
           initialData={selectedProject}

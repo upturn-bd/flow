@@ -1,148 +1,236 @@
 "use client";
 
+import { useEffect, useState, useCallback, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { debounce } from "lodash";
+import { toast } from "sonner";
+import { CheckCircle, Search } from "lucide-react";
+
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Project, useProjects } from "@/hooks/useProjects";
-import { useEffect, useState } from "react";
+import { getEmployeeId } from "@/lib/utils/auth";
+
 import ProjectDetails from "./ProjectDetails";
-import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle } from "lucide-react";
-import { toast } from "sonner";
-import { createClient } from '@/lib/supabase/client';
 import ProjectCard from "./ProjectCard";
-import { EmptyState } from "@/components/ui/EmptyState";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { getCompanyId } from "@/lib/utils/auth";
+import { EmptyState } from "@/components/ui/EmptyState";
+import LoadMore from "@/components/ui/LoadMore";
+import { fadeInUp, staggerContainer } from "@/components/ui/animations";
 
-function CompletedProjectsList({setActiveTab}: {setActiveTab: (key:string) => void}) {
-  const { deleteProject, updateProject } = useProjects();
-  const [projectDetailsId, setProjectDetailsId] = useState<number | null>(null);
+function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void }) {
+  const {
+    completedProjects,
+    fetchCompletedProjects,
+    updateProject,
+    deleteProject,
+    hasMoreCompletedProjects,
+    completedLoading,
+    searchCompletedProjects,
+  } = useProjects();
+
+  const { employees, fetchEmployees } = useEmployees();
+  const { departments, fetchDepartments } = useDepartments();
+
+  const [projectDetailsId, setProjectDetailsId] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { employees, fetchEmployees, loading: employeesLoading } = useEmployees();
-  const { departments, fetchDepartments, loading: departmentsLoading } = useDepartments();
+  const [userId, setUserId] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<Project[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [showEmpty, setShowEmpty] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
-  async function fetchCompletedProjects() {
-    setLoading(true);
-    const client = createClient();
-    const company_id = await getCompanyId();
+  // Prevent duplicate fetches
+  const hasFetched = useRef(false);
 
-    try {
-      const { data, error } = await client
-        .from("project_records")
-        .select("*")
-        .eq("company_id", company_id)
-        .eq("status", "Completed");
-
-      if (error) {
-        setError("Error fetching Projects");
-        console.error(error);
-        return;
-      }
-
-      // Format project data
-      const formatData = data?.map((item: any) => {
-        const { created_at, updated_at, ...rest } = item;
-        return {
-          ...rest,
-        };
-      });
-
-      setProjects(formatData || []);
-    } catch (error) {
-      setError("Error fetching Projects");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
+  /** Initialize user ID and fetch data */
   useEffect(() => {
-    fetchCompletedProjects();
-    fetchEmployees();
-    fetchDepartments();
+    // Prevent duplicate calls
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
+    const initData = async () => {
+      const id = await getEmployeeId();
+      setUserId(id);
+      await fetchCompletedProjects(10, true);
+      fetchEmployees();
+      fetchDepartments();
+      setInitialLoadComplete(true);
+    };
+    initData();
   }, []);
 
-  const handleDeleteProject = async (id: number) => {
-    try {
-      await deleteProject(id);
-      toast.success("Project deleted successfully");
-      fetchCompletedProjects();
-    } catch (error) {
-      toast.error("Error deleting project");
-      console.error(error);
-    }
+  /** Debounced Search */
+  const debouncedSearch = useCallback(
+    debounce(async (term: string) => {
+      if (!term.trim()) {
+        setSearchResults([]);
+        setSearching(false);
+        setShowEmpty(false);
+        return;
+      }
+      setSearching(true);
+      setShowEmpty(false);
+      const results = await searchCompletedProjects(term, 20, false);
+      setSearchResults(results);
+      setSearching(false);
+    }, 400),
+    [searchCompletedProjects]
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    debouncedSearch(term);
   };
 
-  const handleUpdateProject = async (values: any) => {
+  const displayProjects = searchTerm ? searchResults : completedProjects;
+
+  /** Empty state only after initial load is complete */
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    // Only show empty state after initial load is complete
+    if (initialLoadComplete && !completedLoading && !searching && displayProjects.length === 0) {
+      timer = setTimeout(() => setShowEmpty(true), 300);
+    } else {
+      setShowEmpty(false);
+    }
+
+    return () => clearTimeout(timer);
+  }, [displayProjects.length, completedLoading, searching, initialLoadComplete]);
+
+  /** Update Project */
+  const handleUpdateProject = async (values: Project) => {
     try {
-      if (selectedProject?.id) {
-        await updateProject(selectedProject.id, values);
-        toast.success("Project updated successfully");
-        setSelectedProject(null);
-        fetchCompletedProjects();
-      }
+      if (!values?.id) return;
+      await updateProject(values.id, values);
+      toast.success("Project updated successfully");
+      setSelectedProject(null);
+      if (values.status === "Ongoing") setActiveTab("ongoing");
+      await fetchCompletedProjects(10, true);
     } catch (error) {
       toast.error("Error updating project");
       console.error(error);
     }
   };
 
+  /** Delete Project */
+  const handleDeleteProject = async (id: string) => {
+    try {
+      await deleteProject(id);
+      toast.success("Project deleted successfully");
+      await fetchCompletedProjects(10, true);
+    } catch (error) {
+      toast.error("Error deleting project");
+      console.error(error);
+    }
+  };
+
+  /** Pagination: Load More */
+  const handleLoadMore = async () => {
+    await fetchCompletedProjects(10, false);
+  };
+
+  /** Loading on first load only */
+  if (!initialLoadComplete && completedLoading && completedProjects.length === 0) {
+    return <LoadingSection icon={CheckCircle} text="Loading completed projects..." color="blue" />;
+  }
+
   return (
     <AnimatePresence mode="wait">
-      {loading && (
-        <LoadingSection 
-          text="Loading completed projects..."
-          icon={CheckCircle}
-          color="blue"
-        />
-      )}
-      {!selectedProject && !projectDetailsId && !loading && (
+      {!selectedProject && !projectDetailsId && (
         <motion.div
-          key="content"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="px-2 py-4 md:p-6"
+          key="completed-project-list"
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+          className="px-4 py-4 space-y-6"
         >
-          <h1 className="text-xl font-bold text-blue-700 mb-6">
-            Completed Projects
-          </h1>
-          <div className="space-y-4">
+          {/* Search Bar */}
+          <motion.div variants={fadeInUp} className="relative mb-4">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              placeholder="Search completed projects..."
+              className="w-full border rounded pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring focus:border-blue-300"
+            />
+          </motion.div>
+
+          {/* Project Cards */}
+          <motion.div variants={fadeInUp}>
             <AnimatePresence>
-              {projects.length > 0 ? (
-                projects.map((project, idx) => (
-                  typeof project.id !== "undefined" ? (
-                    <ProjectCard
-                      key={project.id}
-                      project={project}
-                      onEdit={undefined}
-                      onDelete={() => handleDeleteProject(project.id as number)}
-                      onDetails={() => setProjectDetailsId(project.id as number)}
-                      employees={employees}
-                      departments={departments.filter(d => d.id != null) as any}
-                      showEdit={false}
-                      showDelete={true}
-                      showDetails={true}
-                      statusIcon={<CheckCircle size={18} className="text-green-500 mt-1 flex-shrink-0" />}
-                      progressColor="bg-green-100 text-green-800"
+              {searching ? (
+                <LoadingSection icon={CheckCircle} text="Searching completed projects..." color="blue" />
+              ) : displayProjects.length > 0 ? (
+                <>
+                  <div className="space-y-4">
+                    {displayProjects.map(
+                      (project) =>
+                        project.id && (
+                          <ProjectCard
+                            key={project.id}
+                            project={project}
+                            employees={employees}
+                            departments={departments.filter((d) => d.id != null) as any}
+                            onEdit={undefined}
+                            onDelete={() => handleDeleteProject(project.id!)}
+                            onDetails={() => setProjectDetailsId(project.id!)}
+                            showEdit={false}
+                            showDelete={project.created_by === userId}
+                            showDetails={true}
+                            statusIcon={
+                              <CheckCircle
+                                size={18}
+                                className="text-green-500 mt-1 flex-shrink-0"
+                              />
+                            }
+                            progressColor="bg-green-100 text-green-800"
+                          />
+                        )
+                    )}
+                  </div>
+
+                  {!searchTerm && (
+                    <LoadMore
+                      isLoading={completedLoading}
+                      hasMore={hasMoreCompletedProjects}
+                      onLoadMore={handleLoadMore}
                     />
-                  ) : null
-                ))
+                  )}
+                </>
               ) : (
-                <EmptyState 
-                  icon={<CheckCircle className="h-12 w-12" />}
-                  title="No completed projects"
-                  description="Projects will appear here once they're marked as complete"
-                />
+                showEmpty && (
+                  <EmptyState
+                    icon={<CheckCircle className="h-12 w-12" />}
+                    title={searchTerm ? "No matching projects" : "No completed projects yet"}
+                    description={
+                      searchTerm
+                        ? "Try a different keyword."
+                        : "Projects will appear here once they're marked as complete."
+                    }
+                  />
+                )
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
         </motion.div>
       )}
-      {projectDetailsId && (
+
+      {/* Details View */}
+      {!selectedProject && projectDetailsId && (
         <ProjectDetails
           id={projectDetailsId}
           employees={employees}

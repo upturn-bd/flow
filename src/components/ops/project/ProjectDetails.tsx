@@ -43,13 +43,15 @@ import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { getCompanyId, getEmployeeId } from "@/lib/utils/auth";
 import { MilestoneUpdateModal } from "./milestone";
 import MilestoneListItem from "./milestone/MilestoneListItem";
+import { useProjects } from "@/hooks/useProjects";
+import { useRouter } from "next/navigation";
 
 interface ProjectDetailsProps {
-  id: number;
+  id: string;
   employees: { id: string; name: string }[];
   departments: Department[];
   onClose: () => void;
-  onSubmit: (data: Project) => void;
+  onSubmit?: (data: Project) => void;
   setActiveTab: (key: string) => void;
 }
 
@@ -104,6 +106,8 @@ export default function ProjectDetails({
 
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
+  const {updateProject} = useProjects()
+
   useEffect(() => {
     async function fetchUserId() {
       const id = await getEmployeeId();
@@ -138,6 +142,8 @@ export default function ProjectDetails({
     getProjectTasks(projectId, TaskStatus.INCOMPLETE);
   }, [projectId, getProjectTasks]);
 
+  const router = useRouter()
+
   const submitProject = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -152,9 +158,14 @@ export default function ProjectDetails({
         (error as any).issues = validation.errors;
         throw error;
       }
-      onSubmit(validation.data);
+      
+      await updateProject(projectDetails?.id || "", validation.data);
+
       console.log(validation.data)
       setDisplaySubmissionModal(false);
+
+      toast.success("Project submitted successfully!");
+      router.push("/ops/project?tab=completed");
     } catch (error) {
       console.error("Error updating project:", error);
     } finally {
@@ -250,7 +261,7 @@ export default function ProjectDetails({
     }
   };
 
-  const handleDeleteTask = async (id: number) => {
+  const handleDeleteTask = async (id: string) => {
     try {
       await deleteTask(id);
       toast.success("Task deleted!");
@@ -263,7 +274,7 @@ export default function ProjectDetails({
   // Comments functionality
   const { comments, loading: loadingComments } = useComments();
 
-  async function fetchProjectDetails(id: number) {
+  async function fetchProjectDetails(id: string) {
     setLoading(true);
     const client = createClient();
     const company_id = await getCompanyId();
@@ -290,7 +301,7 @@ export default function ProjectDetails({
     }
   }
 
-  async function fetchMilestonesByProjectId(id: number) {
+  async function fetchMilestonesByProjectId(id: string) {
     setLoadingMilestones(true);
     const client = createClient();
     const company_id = await getCompanyId();
@@ -632,7 +643,7 @@ export default function ProjectDetails({
             end_date: "",
             weightage: 100 - getTotalMilestoneWeightage(),
             status: "Not Started",
-            project_id: projectDetails.id || 0,
+            project_id: projectDetails.id || "",
             assignees: [],
           }}
           isSubmitting={isSubmittingMilestone}

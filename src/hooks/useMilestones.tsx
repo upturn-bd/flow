@@ -42,7 +42,7 @@ export function useMilestones() {
   };
 
 
-  const fetchProjectMilestones = async (projectId: number) => {
+  const fetchProjectMilestones = async (projectId: string) => {
     try {
       const { data, error } = await supabase
         .from("milestone_records")

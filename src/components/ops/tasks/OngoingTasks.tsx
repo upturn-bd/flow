@@ -34,7 +34,7 @@ interface OngoingTaskPageProps {
   ongoingTasks: Task[];
   loading: boolean;
   updateTask: (task: Task) => Promise<{ success: boolean; data?: any; error?: any; }>;
-  deleteTask: (taskId: string, projectId?: number, milestoneId?: number, adminScoped?: boolean) => Promise<{ success: boolean; error?: any; }>;
+  deleteTask: (taskId: string, projectId?: string, milestoneId?: number, adminScoped?: boolean) => Promise<{ success: boolean; error?: any; }>;
   hasMoreOngoingTasks: boolean;
   onLoadMore: () => void;
 }

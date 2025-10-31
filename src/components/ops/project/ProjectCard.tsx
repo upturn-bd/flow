@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { ExternalLink, Trash2, Edit, Clock, Calendar, Building2, User, Target } from "lucide-react";
 import { Project } from "@/hooks/useProjects";
+import Link from "next/link";
 
 interface Employee {
   id: number | string;
@@ -87,14 +88,16 @@ export default function ProjectCard({
         </Button>
       )}
       {showDetails && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onDetails}
-          className="p-2 h-8 w-8 hover:bg-gray-50 hover:text-gray-700"
-        >
-          <ExternalLink size={14} />
-        </Button>
+        <Link href={`/ops/project/${id}`}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="p-2 h-8 w-8 hover:bg-gray-50 hover:text-gray-700"
+          >
+            <ExternalLink size={14} />
+          </Button>
+
+        </Link>
       )}
     </div>
   );

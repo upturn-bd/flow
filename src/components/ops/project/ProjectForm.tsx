@@ -96,7 +96,7 @@ export default function ProjectForm({
     end_date: "",
     weightage: 100 - getTotalMilestoneWeightage(),
     status: "Not Started",
-    project_id: initialData.id || 0,
+    project_id: initialData.id || "",
     assignees: [],
   };
 
@@ -123,7 +123,7 @@ export default function ProjectForm({
 
   useEffect(() => {
     const fetchMilestones = async () => {
-      const projectMilestones = await fetchProjectMilestones(initialData.id || 0);
+      const projectMilestones = await fetchProjectMilestones(initialData.id || "");
       console.log(projectMilestones)
       if (projectMilestones) {
         setMilestones(projectMilestones);
@@ -142,7 +142,7 @@ export default function ProjectForm({
       end_date: "",
       weightage: Math.max(1, 100 - getTotalMilestoneWeightage()),
       status: "Not Started",
-      project_id: initialData.id || 0,
+      project_id: initialData.id || "",
       assignees: [],
     });
     setIsCreatingMilestone(true);
@@ -259,7 +259,7 @@ export default function ProjectForm({
 
 
   const handleAddMilestone = (newMilestone: Milestone) => {
-    const projectId = initialData.id || 0; // use existing project ID if editing
+    const projectId = initialData.id || ""; // use existing project ID if editing
     setMilestones((prev) => [
       ...prev,
       { ...newMilestone, project_id: projectId },

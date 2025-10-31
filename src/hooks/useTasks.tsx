@@ -27,7 +27,7 @@ export enum TaskScope {
 export interface TaskFilters {
   scope: TaskScope;
   status: TaskStatus;
-  projectId?: number;
+  projectId?: string;
   milestoneId?: number;
   departmentId?: number;
   assigneeId?: string;
@@ -397,7 +397,7 @@ export function useTasks() {
     return fetchTasks({ scope: TaskScope.USER_TASKS, status });
   }, [fetchTasks]);
 
-  const getProjectTasks = useCallback((projectId: number, status: TaskStatus = TaskStatus.INCOMPLETE) => {
+  const getProjectTasks = useCallback((projectId: string, status: TaskStatus = TaskStatus.INCOMPLETE) => {
     return fetchTasks({ scope: TaskScope.PROJECT_TASKS, projectId, status });
   }, [fetchTasks]);
 
@@ -414,7 +414,7 @@ export function useTasks() {
   }, [fetchTasks]);
 
   // Get task statistics for a project
-  const fetchTaskStats = useCallback(async (projectId: number) => {
+  const fetchTaskStats = useCallback(async (projectId: string) => {
     try {
       const result = await fetchTasks({ scope: TaskScope.PROJECT_TASKS, projectId, status: TaskStatus.ALL });
 
@@ -592,7 +592,7 @@ export function useTasks() {
   }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
   // Delete a task
-  const deleteTask = useCallback(async (taskId: string, projectId?: number, milestoneId?: number, adminScoped?: boolean) => {
+  const deleteTask = useCallback(async (taskId: string, projectId?: string, milestoneId?: number, adminScoped?: boolean) => {
     try {
       const company_id = await getCompanyId();
 
@@ -633,7 +633,7 @@ export function useTasks() {
   }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
   // Mark a task as complete
-  const completeTask = useCallback(async (taskId: string, projectId?: number, milestoneId?: number) => {
+  const completeTask = useCallback(async (taskId: string, projectId?: string, milestoneId?: number) => {
     try {
       const company_id = await getCompanyId();
 
@@ -665,7 +665,7 @@ export function useTasks() {
   }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
   // Reopen a completed task
-  const reopenTask = useCallback(async (taskId: string, projectId?: number, milestoneId?: number) => {
+  const reopenTask = useCallback(async (taskId: string, projectId?: string, milestoneId?: number) => {
     try {
       const company_id = await getCompanyId();
 
@@ -697,7 +697,7 @@ export function useTasks() {
   }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
 
   // Bulk update task milestone
-  const updateMilestone = useCallback(async (taskIds: string[], milestoneId: number | null, projectId: number) => {
+  const updateMilestone = useCallback(async (taskIds: string[], milestoneId: number | null, projectId: string) => {
     try {
       const company_id = await getCompanyId();
       const user = await getEmployeeInfo();

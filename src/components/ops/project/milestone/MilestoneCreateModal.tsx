@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 
 interface MilestoneCreateModalProps {
   currentTotalWeightage: number;
-  projectId: number;
+  projectId: string;
   onSubmit: (data: MilestoneData) => void;
   onClose: () => void;
   isLoading?: boolean;
