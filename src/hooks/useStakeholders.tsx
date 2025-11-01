@@ -42,6 +42,7 @@ export interface StakeholderFormData {
   address?: string;
   contact_persons: ContactPerson[];
   process_id: number;
+  stakeholder_type_id?: number;
   is_active: boolean;
   issue_handler_id?: string;
 }
@@ -431,7 +432,8 @@ export function useStakeholders() {
         .select(`
           *,
           process:stakeholder_processes(id, name, is_sequential),
-          current_step:stakeholder_process_steps(id, name, step_order)
+          current_step:stakeholder_process_steps(id, name, step_order),
+          stakeholder_type:stakeholder_types(id, name, description)
         `)
         .eq("company_id", company_id);
 
@@ -472,7 +474,8 @@ export function useStakeholders() {
         .select(`
           *,
           process:stakeholder_processes(id, name, is_sequential),
-          current_step:stakeholder_process_steps(id, name, step_order)
+          current_step:stakeholder_process_steps(id, name, step_order),
+          stakeholder_type:stakeholder_types(id, name, description)
         `, { count: 'exact' })
         .eq("company_id", company_id);
       
@@ -545,6 +548,7 @@ export function useStakeholders() {
             )
           ),
           current_step:stakeholder_process_steps(id, name, step_order),
+          stakeholder_type:stakeholder_types(id, name, description),
           step_data:stakeholder_step_data(
             *,
             step:stakeholder_process_steps(id, name, step_order)
