@@ -189,6 +189,25 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
           <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
             <h2 className="text-lg font-semibold text-gray-900">Information</h2>
 
+            {stakeholder.stakeholder_type && (
+              <div className="flex items-start gap-3">
+                <FileText className="text-gray-400 mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Type</p>
+                  <p className="text-sm text-gray-600 mt-0.5">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      {stakeholder.stakeholder_type.name}
+                    </span>
+                  </p>
+                  {stakeholder.stakeholder_type.description && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      {stakeholder.stakeholder_type.description}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             {stakeholder.address && (
               <div className="flex items-start gap-3">
                 <MapPin className="text-gray-400 mt-0.5" size={18} />

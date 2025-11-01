@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useEmployees } from "@/hooks/useEmployees";
+import { useStakeholderTypes } from "@/hooks/useStakeholderTypes";
 import { ArrowLeft, AlertCircle, Plus, Trash2 } from "lucide-react";
 import { ContactPerson } from "@/lib/types/schemas";
 
@@ -11,11 +12,13 @@ export default function NewStakeholderPage() {
   const router = useRouter();
   const { processes, activeProcesses, loading, createStakeholder, fetchProcesses } = useStakeholders();
   const { employees, fetchEmployees } = useEmployees();
+  const { activeStakeholderTypes, fetchStakeholderTypes } = useStakeholderTypes();
 
   const [formData, setFormData] = useState({
     name: "",
     address: "",
     process_id: "",
+    stakeholder_type_id: "",
     issue_handler_id: "",
   });
 
@@ -26,7 +29,8 @@ export default function NewStakeholderPage() {
   useEffect(() => {
     fetchProcesses();
     fetchEmployees();
-  }, [fetchProcesses, fetchEmployees]);
+    fetchStakeholderTypes();
+  }, [fetchProcesses, fetchEmployees, fetchStakeholderTypes]);
 
   const handleAddContactPerson = () => {
     setContactPersons([
@@ -91,6 +95,7 @@ export default function NewStakeholderPage() {
         name: formData.name.trim(),
         address: formData.address.trim() || undefined,
         process_id: parseInt(formData.process_id),
+        stakeholder_type_id: formData.stakeholder_type_id ? parseInt(formData.stakeholder_type_id) : undefined,
         contact_persons: validContactPersons,
         is_active: true, // New leads are active by default
         issue_handler_id: formData.issue_handler_id || undefined,
@@ -189,6 +194,27 @@ export default function NewStakeholderPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                 placeholder="Enter full address (optional)"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Stakeholder Type
+              </label>
+              <select
+                value={formData.stakeholder_type_id}
+                onChange={(e) => setFormData({ ...formData, stakeholder_type_id: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              >
+                <option value="">None (No type selected)</option>
+                {activeStakeholderTypes.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-gray-500 text-sm mt-1">
+                Optional categorization (e.g., Client, Vendor, Partner)
+              </p>
             </div>
 
             <div>
