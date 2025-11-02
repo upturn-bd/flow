@@ -463,6 +463,19 @@ export interface Payroll {
 // Stakeholder Management System (Process-Based)
 // ==============================================================================
 
+// Stakeholder Type - categorization of stakeholders
+export interface StakeholderType {
+  id?: number;
+  name: string;
+  description?: string;
+  company_id: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+}
+
 // Contact Person for Stakeholder
 export interface ContactPerson {
   name: string;
@@ -545,6 +558,7 @@ export interface Stakeholder {
   process_id: number;
   current_step_id?: number;
   current_step_order: number;
+  stakeholder_type_id?: number; // Optional categorization
   is_active: boolean;
   is_completed: boolean;
   completed_at?: string;
@@ -559,6 +573,7 @@ export interface Stakeholder {
   current_step?: StakeholderProcessStep;
   step_data?: StakeholderStepData[];
   transactions?: Account[]; // Financial transactions associated with this stakeholder
+  stakeholder_type?: StakeholderType; // Type information
   issue_handler?: {
     id: string;
     name: string;
