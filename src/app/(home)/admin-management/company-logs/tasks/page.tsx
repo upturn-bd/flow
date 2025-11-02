@@ -71,21 +71,21 @@ export default function CompanyTaskLogsPage() {
       task.task_title.toLowerCase().includes(search.toLowerCase())
    );
 
-   const handleComplete = async (id: number) => {
+   const handleComplete = async (id: string) => {
       await completeTask(id);
       toast.success("Task Completed Successfully");
       await fetchOngoingTasks(true);
       await fetchCompletedTasks(true);
    };
 
-   const handleReopen = async (id: number) => {
+   const handleReopen = async (id: string) => {
       await reopenTask(id);
       toast.success("Task Reopened Successfully");
       await fetchOngoingTasks(true);
       await fetchCompletedTasks(true);
    };
 
-   const handleDelete = async (id: number) => {
+   const handleDelete = async (id: string) => {
       if (confirm("Are you sure you want to delete this task?")) {
          await deleteTask(id, undefined, undefined, true);
          await fetchOngoingTasks(true);
@@ -160,7 +160,7 @@ export default function CompanyTaskLogsPage() {
                                  <Button
                                     size="sm"
                                     variant="complete"
-                                    onClick={() => handleComplete(task.id)}
+                                    onClick={() => task.id && handleComplete(task.id)}
                                     className="p-2"
                                  >
                                     <CheckCircle size={16} />
@@ -169,7 +169,7 @@ export default function CompanyTaskLogsPage() {
                                  <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => handleReopen(task.id)}
+                                    onClick={() => task.id && handleReopen(task.id)}
                                     className="p-2"
                                  >
                                     <RotateCcw size={16} />
@@ -198,7 +198,7 @@ export default function CompanyTaskLogsPage() {
                            <Button
                               size="sm"
                               variant="danger"
-                              onClick={() => handleDelete(task.id)}
+                              onClick={() => task.id && handleDelete(task.id)}
                               className="p-2"
                            >
                               <Trash2 size={16} />

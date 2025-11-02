@@ -18,8 +18,8 @@ export default function CompanyProjectsPage() {
       ongoingProjects,
       ongoingLoading,
       fetchOngoingProjects,
-      projects,
-      fetchProjects,
+      completedProjects,
+      fetchCompletedProjects,
       updateProject,
       deleteProject,
    } = useProjects();
@@ -43,14 +43,14 @@ export default function CompanyProjectsPage() {
    // Fetch projects and employees on mount
    useEffect(() => {
       fetchOngoingProjects();
-      fetchProjects();
+      fetchCompletedProjects();
       fetchEmployeeInfo();
    }, []);
 
    // Fetch employee names for "Created by"
    useEffect(() => {
       const fetchEmployeeNames = async () => {
-         const allProjects = [...ongoingProjects, ...projects];
+         const allProjects = [...ongoingProjects, ...completedProjects];
          const namesMap: Record<string, string> = {};
          await Promise.all(
             allProjects.map(async (project) => {
@@ -62,24 +62,22 @@ export default function CompanyProjectsPage() {
          setEmployeeNames(namesMap);
       };
       fetchEmployeeNames();
-   }, [ongoingProjects, projects]);
+   }, [ongoingProjects, completedProjects]);
 
    const filteredOngoing = ongoingProjects.filter((project) =>
       project.project_title.toLowerCase().includes(search.toLowerCase())
    );
 
-   const filteredCompleted = projects
-      .filter(p => p.status === "Completed")
-      .filter((project) =>
-         project.project_title.toLowerCase().includes(search.toLowerCase())
-      );
+   const filteredCompleted = completedProjects.filter((project) =>
+      project.project_title.toLowerCase().includes(search.toLowerCase())
+   );
 
-   const handleDelete = async (id: number) => {
+   const handleDelete = async (id: string) => {
       if (confirm("Are you sure you want to delete this project?")) {
          await deleteProject(id);
          toast.success("Project Deleted Successfully");
          fetchOngoingProjects();
-         fetchProjects();
+         fetchCompletedProjects();
       }
    };
 
@@ -91,12 +89,16 @@ export default function CompanyProjectsPage() {
    const handleUpdate = async (data: ProjectDetails) => {
       try {
          setIsSubmitting(true);
-         await updateProject(data.id || 0, data);
+         if (!data.id) {
+            toast.error("Project ID is missing");
+            return;
+         }
+         await updateProject(data.id, data);
          toast.success("Project Updated Successfully");
          setIsEditing(false);
          setSelectedProject(null);
          fetchOngoingProjects();
-         fetchProjects();
+         fetchCompletedProjects();
       } catch (error) {
          console.error(error);
          toast.error("Failed to update project");
@@ -170,7 +172,7 @@ export default function CompanyProjectsPage() {
                            <Button
                               size="sm"
                               variant="danger"
-                              onClick={() => handleDelete(project.id || 0)}
+                              onClick={() => project.id && handleDelete(project.id)}
                               className="p-2"
                            >
                               <Trash2 size={16} />

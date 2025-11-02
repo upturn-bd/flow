@@ -4,7 +4,7 @@ import NoticeDetails from "@/components/ops/notice/NoticeDetails";
 
 interface DetailModalsProps {
   selectedNoticeId: number | null;
-  selectedTaskId: number | null;
+  selectedTaskId: string | null;
   onCloseNotice: () => void;
   onCloseTask: () => void;
   onTaskStatusUpdate: () => void;
