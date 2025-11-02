@@ -36,7 +36,7 @@ interface AccountFormData {
   status: 'Complete' | 'Pending';
   from_source: string;
   transaction_date: string;
-  amount: string;
+  amount: number;
   currency: string;
   additional_data: string; // We'll keep this as string for form compatibility
   stakeholder_id: string; // Add stakeholder reference (as string for form, will be converted to number)
@@ -252,7 +252,7 @@ export default function AccountsTab() {
       status: data.status,
       from_source: data.from_source.trim(),
       transaction_date: data.transaction_date,
-      amount: parseFloat(data.amount),
+      amount: data.amount,
       currency: data.currency.trim(),
       additional_data: parseAdditionalData(data.additional_data),
       stakeholder_id: data.stakeholder_id ? parseInt(data.stakeholder_id) : null,
@@ -271,7 +271,7 @@ export default function AccountsTab() {
       status: data.status,
       from_source: data.from_source.trim(),
       transaction_date: data.transaction_date,
-      amount: parseFloat(data.amount),
+      amount: data.amount,
       currency: data.currency.trim(),
       additional_data: parseAdditionalData(data.additional_data),
       stakeholder_id: data.stakeholder_id ? parseInt(data.stakeholder_id) : null,
@@ -539,7 +539,7 @@ export default function AccountsTab() {
           status: 'Pending',
           from_source: '',
           transaction_date: new Date().toISOString().split('T')[0],
-          amount: '',
+          amount: 0,
           currency: 'BDT',
           additional_data: '',
           stakeholder_id: ''
@@ -549,12 +549,12 @@ export default function AccountsTab() {
           if (!values.title.trim()) errors.push({ field: 'title', message: 'Title is required' });
           if (!values.from_source.trim()) errors.push({ field: 'from_source', message: 'From source is required' });
           if (!values.transaction_date) errors.push({ field: 'transaction_date', message: 'Transaction date is required' });
-          if (!values.amount.trim()) errors.push({ field: 'amount', message: 'Amount is required' });
+          if (!values.amount) errors.push({ field: 'amount', message: 'Amount is required' });
           if (!values.currency.trim()) errors.push({ field: 'currency', message: 'Currency is required' });
           if (!values.status) errors.push({ field: 'status', message: 'Status is required' });
 
           // Validate amount is a number
-          if (values.amount.trim() && isNaN(parseFloat(values.amount))) {
+          if (values.amount && isNaN(values.amount)) {
             errors.push({ field: 'amount', message: 'Amount must be a valid number' });
           }
 
@@ -649,7 +649,7 @@ export default function AccountsTab() {
                 label="Amount"
                 name="amount"
                 type="number"
-                value={values.amount}
+                value={values.amount.toString()}
                 onChange={handleChange}
                 error={errors.amount}
               />
@@ -696,7 +696,7 @@ export default function AccountsTab() {
             status: selectedAccount.status,
             from_source: selectedAccount.from_source,
             transaction_date: selectedAccount.transaction_date,
-            amount: selectedAccount.amount.toString(),
+            amount: selectedAccount.amount,
             currency: selectedAccount.currency,
             additional_data: stringifyAdditionalData(formatDataForEdit(selectedAccount.additional_data)),
             stakeholder_id: selectedAccount.stakeholder_id ? String(selectedAccount.stakeholder_id) : ''
@@ -706,12 +706,12 @@ export default function AccountsTab() {
             if (!values.title.trim()) errors.push({ field: 'title', message: 'Title is required' });
             if (!values.from_source.trim()) errors.push({ field: 'from_source', message: 'From source is required' });
             if (!values.transaction_date) errors.push({ field: 'transaction_date', message: 'Transaction date is required' });
-            if (!values.amount.trim()) errors.push({ field: 'amount', message: 'Amount is required' });
+            if (!values.amount) errors.push({ field: 'amount', message: 'Amount is required' });
             if (!values.currency.trim()) errors.push({ field: 'currency', message: 'Currency is required' });
             if (!values.status) errors.push({ field: 'status', message: 'Status is required' });
 
             // Validate amount is a number
-            if (values.amount.trim() && isNaN(parseFloat(values.amount))) {
+            if (values.amount && isNaN(values.amount)) {
               errors.push({ field: 'amount', message: 'Amount must be a valid number' });
             }
 
@@ -807,7 +807,7 @@ export default function AccountsTab() {
                   label="Amount"
                   name="amount"
                   type="number"
-                  value={values.amount}
+                  value={values.amount.toString()}
                   onChange={handleChange}
                   error={errors.amount}
                 />
