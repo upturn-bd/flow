@@ -4,13 +4,13 @@ import { useState } from 'react';
 
 export function useModalState() {
   const [selectedNoticeId, setSelectedNoticeId] = useState<number | null>(null);
-  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   const handleNoticeClick = (noticeId: number) => {
     setSelectedNoticeId(noticeId);
   };
 
-  const handleTaskClick = (taskId: number) => {
+  const handleTaskClick = (taskId: string) => {
     setSelectedTaskId(taskId);
   };
 

@@ -1,10 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import TaskLayout from "./TaskLayout";
 
-export default function TasksPage() {
+function TasksPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -37,5 +38,13 @@ export default function TasksPage() {
       initialActiveTab={activeTab} // Pass current active tab
       setActiveTab={handleTabChange} // Pass setter to allow tab switching
     />
+  );
+}
+
+export default function TasksPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TasksPageContent />
+    </Suspense>
   );
 }

@@ -69,7 +69,7 @@ export default function MilestoneDetails({
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const { createTask, updateTask, deleteTask } = useTasks();
-  const [taskDetailsId, setTaskDetailsId] = useState<number | null>(null);
+  const [taskDetailsId, setTaskDetailsId] = useState<string | null>(null);
 
   const [userId, setUserId] = useState<string>("")
 
@@ -104,7 +104,7 @@ export default function MilestoneDetails({
     }
   };
 
-  const handleDeleteTask = async (id: number) => {
+  const handleDeleteTask = async (id: string) => {
     try {
       await deleteTask(id);
       fetchTasksByMilestoneId(milestoneId);
@@ -114,7 +114,7 @@ export default function MilestoneDetails({
     }
   };
 
-  const handleDisplayUpdateTaskModal = (id: number) => {
+  const handleDisplayUpdateTaskModal = (id: string) => {
     const selectedTask = tasks.find((task: Task) => task.id === id);
     if (selectedTask) setSelectedTask(selectedTask);
   };
@@ -383,7 +383,7 @@ export default function MilestoneDetails({
 
           {isCreatingTask && (
             <TaskCreateModal
-              projectId={milestoneDetails?.project_id ?? 0}
+              projectId={milestoneDetails?.project_id ?? ""}
               milestoneId={milestoneId}
               onClose={() => setIsCreatingTask(false)}
               onSubmit={handleCreateTask}

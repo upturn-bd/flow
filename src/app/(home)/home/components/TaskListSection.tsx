@@ -11,7 +11,7 @@ import LoadingSection from './LoadingSection';
 import EmptyState from './EmptyState';
 
 interface Task {
-  id?: number;
+  id?: string;
   task_title: string;
   end_date: string;
 }
@@ -19,7 +19,7 @@ interface Task {
 interface TaskListSectionProps {
   tasks: Task[];
   loading: boolean;
-  onTaskClick: (taskId: number) => void;
+  onTaskClick: (taskId: string) => void;
 }
 
 export default function TaskListSection({
