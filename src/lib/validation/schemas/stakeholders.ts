@@ -6,6 +6,7 @@ import {
   STAKEHOLDER_ISSUE_STATUS_OPTIONS, 
   STAKEHOLDER_ISSUE_PRIORITY_OPTIONS 
 } from '@/lib/constants';
+import { ValidationResult } from '@/lib/utils/validation';
 
 export interface ValidationError {
   field: string;
@@ -163,7 +164,7 @@ export function validateStakeholderIssue(data: any): ValidationError[] {
 }
 
 // Stakeholder type validation
-export function validateStakeholderType(data: any): ValidationError[] {
+export function validateStakeholderType(data: any): ValidationResult {
   const errors: ValidationError[] = [];
 
   // Name validation
@@ -178,7 +179,11 @@ export function validateStakeholderType(data: any): ValidationError[] {
     errors.push({ field: 'description', message: 'Description must be a string with maximum 500 characters' });
   }
 
-  return errors;
+  return {
+    success: errors.length === 0,
+    data: errors.length === 0 ? data : undefined,
+    errors
+  };
 }
 
 // Helper function to convert validation errors to object format

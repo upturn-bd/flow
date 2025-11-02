@@ -1,8 +1,8 @@
 'use client';
 
 import { CaretDown } from '@phosphor-icons/react';
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface CollapsibleProps {
   title: string;
@@ -10,33 +10,14 @@ interface CollapsibleProps {
 }
 
 export default function Collapsible({ title, children }: CollapsibleProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  // Animation variants
-  const contentVariants = {
-    hidden: { opacity: 0, height: 0 },
-    visible: { 
-      opacity: 1, 
-      height: 'auto',
-      transition: {
-        duration: 0.3,
-        ease: [0.04, 0.62, 0.23, 0.98]
-      }
-    },
-    exit: { 
-      opacity: 0,
-      height: 0,
-      transition: { 
-        duration: 0.3,
-        ease: [0.04, 0.62, 0.23, 0.98]
-      }
-    }
-  };
+  const [isOpen, setIsOpen] = useState(true); // Start open so data is immediately visible
 
   return (
     <div className="w-full rounded-xl border border-gray-200 bg-gray-200 shadow-sm overflow-hidden">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+        }}
         className="flex w-full items-center justify-between p-4 text-left text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-inset"
         aria-expanded={isOpen}
         aria-controls="collapsible-content"
@@ -52,19 +33,13 @@ export default function Collapsible({ title, children }: CollapsibleProps) {
         </motion.div>
       </button>
 
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            key="content"
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="overflow-hidden bg-gray-200 border-t border-gray-200"
-          >
-            <div className="p-4">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <motion.div
+        initial={false}
+        animate={isOpen ? "visible" : "hidden"}
+        className="overflow-hidden bg-gray-200 border-t border-gray-200"
+      >
+        <div className="p-4">{children}</div>
+      </motion.div>
     </div>
   );
 }

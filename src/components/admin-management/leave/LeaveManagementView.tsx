@@ -13,8 +13,8 @@ import { TrashSimple, Tag, CalendarCheck, CalendarBlank, Plus, Clock, Eye } from
 import { useHolidayConfigs, useWeeklyHolidayConfigs } from "@/hooks/useLeaveManagement";
 import { HolidayConfig, LeaveType } from "@/hooks/useLeaveManagement";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
-import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
+import { AnimatePresence } from "framer-motion";
+
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function LeaveManagementView() {
@@ -149,7 +149,6 @@ export default function LeaveManagementView() {
 
 
 
-  console.log(holidayConfigs)
 
   const [editHolidayConfig, setEditHolidayConfig] = useState<number | null>(
     null
@@ -229,20 +228,20 @@ export default function LeaveManagementView() {
 
   return (
     <Collapsible title="Holiday & Leave Calendar">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={staggerContainer}
+      <div
+        
+        
+        
         className="px-4 space-y-6 py-4"
       >
         {/* Weekly Holidays Section */}
         <section className="mt-8">
-          <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-4">
             <CalendarBlank size={22} weight="duotone" className="text-gray-600" />
             <h3 className="text-lg font-semibold text-gray-800">Weekly Holidays</h3>
-          </motion.div>
+          </div>
 
-          <motion.div variants={fadeInUp} className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
             {weekdays.map((day, idx) => {
               const isSelected = weeklyHolidays.includes(idx);
               return (
@@ -258,7 +257,7 @@ export default function LeaveManagementView() {
                 </div>
               );
             })}
-          </motion.div>
+          </div>
 
 
           {weeklyHolidays.length > 0 && (
@@ -270,10 +269,10 @@ export default function LeaveManagementView() {
 
         {/* Holidays Section */}
         <section>
-          <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-4">
             <CalendarCheck size={22} weight="duotone" className="text-gray-600" />
             <h3 className="text-lg font-semibold text-gray-800">Other Holidays</h3>
-          </motion.div>
+          </div>
 
           {holidaysLoading ? (
             <LoadingSpinner
@@ -283,17 +282,13 @@ export default function LeaveManagementView() {
               color="gray"
             />
           ) : (
-            <motion.div variants={fadeInUp}>
+            <div>
               <AnimatePresence>
                 {holidayConfigs.length > 0 ? (
-                  <motion.div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     {holidayConfigs.map((holiday: HolidayConfig, idx) => (
-                      <motion.div
+                      <div
                         key={holiday.id || idx}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        transition={{ delay: idx * 0.05 }}
                         className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all"
                       >
                         <div className="flex items-start justify-between">
@@ -331,31 +326,28 @@ export default function LeaveManagementView() {
                             View Details
                           </Button>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
-                  </motion.div>
+                  </div>
                 ) : (
-                  <motion.div
-                    variants={fadeIn}
+                  <div
+                    
                     className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200"
                   >
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
+                    <div
                       className="flex justify-center mb-3"
                     >
                       <CalendarCheck size={40} weight="duotone" className="text-gray-400" />
-                    </motion.div>
+                    </div>
                     <p className="text-gray-500 mb-1">No holidays found</p>
                     <p className="text-gray-400 text-sm mb-4">Add holidays to the calendar</p>
-                  </motion.div>
+                  </div>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </div>
           )}
 
-          <motion.div variants={fadeIn} className="flex justify-end mt-4">
+          <div className="flex justify-end mt-4">
             <Button
               variant="primary"
               onClick={() => setIsCreatingHolidayConfig(true)}
@@ -364,15 +356,15 @@ export default function LeaveManagementView() {
               <Plus size={16} weight="bold" />
               Add Holiday
             </Button>
-          </motion.div>
+          </div>
         </section>
 
         {/* Leave Types Section */}
         <section className="mt-8">
-          <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-4">
             <Tag size={22} weight="duotone" className="text-gray-600" />
             <h3 className="text-lg font-semibold text-gray-800">Leave Types</h3>
-          </motion.div>
+          </div>
 
           {typesLoading ? (
             <LoadingSpinner
@@ -382,17 +374,13 @@ export default function LeaveManagementView() {
               color="gray"
             />
           ) : (
-            <motion.div variants={fadeInUp}>
+            <div>
               <AnimatePresence>
                 {leaveTypes.length > 0 ? (
-                  <motion.div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     {leaveTypes.map((type: LeaveType, idx) => (
-                      <motion.div
+                      <div
                         key={type.id || idx}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        transition={{ delay: idx * 0.05 }}
                         className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all"
                       >
                         <div className="flex items-start justify-between">
@@ -430,31 +418,28 @@ export default function LeaveManagementView() {
                             View Details
                           </Button>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
-                  </motion.div>
+                  </div>
                 ) : (
-                  <motion.div
-                    variants={fadeIn}
+                  <div
+                    
                     className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200"
                   >
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
+                    <div
                       className="flex justify-center mb-3"
                     >
                       <Tag size={40} weight="duotone" className="text-gray-400" />
-                    </motion.div>
+                    </div>
                     <p className="text-gray-500 mb-1">No leave types found</p>
                     <p className="text-gray-400 text-sm mb-4">Add leave types to configure the leave system</p>
-                  </motion.div>
+                  </div>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </div>
           )}
 
-          <motion.div variants={fadeIn} className="flex justify-end mt-4">
+          <div className="flex justify-end mt-4">
             <Button
               variant="primary"
               onClick={() => setIsCreatingLeaveType(true)}
@@ -463,7 +448,7 @@ export default function LeaveManagementView() {
               <Plus size={16} weight="bold" />
               Add Leave Type
             </Button>
-          </motion.div>
+          </div>
         </section>
 
         <AnimatePresence>
@@ -517,7 +502,7 @@ export default function LeaveManagementView() {
             />
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </Collapsible>
   );
 }
