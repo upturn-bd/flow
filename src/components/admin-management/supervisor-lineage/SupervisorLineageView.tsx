@@ -9,7 +9,7 @@ import LineageCreateModal, {
 } from "./SupervisorLineageModal";
 import { TrashSimple, Plus, Eye, UsersThree } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import {
   fadeIn,
   fadeInUp,
@@ -108,16 +108,11 @@ export default function SupervisorLineageView() {
 
   return (
     <Collapsible title="Supervisor Lineage">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={staggerContainer}
-        className="px-4 space-y-6 py-4"
-      >
-        <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-4">
+      <div className="px-4 space-y-6 py-4">
+        <div className="flex items-center gap-3 mb-4">
           <UsersThree size={22} weight="duotone" className="text-gray-600" />
           <h3 className="text-lg font-semibold text-gray-800">Supervision Hierarchy</h3>
-        </motion.div>
+        </div>
 
         {loading ? (
           <LoadingSpinner
@@ -127,29 +122,16 @@ export default function SupervisorLineageView() {
             color="gray"
           />
         ) : (
-          <motion.div variants={fadeInUp}>
+          <div>
             <AnimatePresence mode="wait">
               {groupedLineages.length > 0 ? (
-                <motion.div
+                <div
                   key="lineage-list"
-                  variants={fadeIn}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
                   className="grid gap-4 grid-cols-1 md:grid-cols-2"
                 >
                   {groupedLineages.map((lineage: any, index: number) => (
-                    <motion.div
+                    <div
                       key={lineage.name}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ 
-                        opacity: 1, 
-                        y: 0,
-                        transition: {
-                          delay: index * 0.05,
-                          duration: 0.4
-                        }
-                      }}
                       className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
                     >
                       <div className="flex items-start justify-between">
@@ -192,39 +174,30 @@ export default function SupervisorLineageView() {
                           View Details
                         </Button>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
-                </motion.div>
+                </div>
               ) : (
-                <motion.div
+                <div
                   key="empty-state"
-                  variants={scaleIn}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
                   className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200"
                 >
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.2, duration: 0.5 }}
-                    className="flex justify-center mb-3"
-                  >
+                  <div className="flex justify-center mb-3">
                     <UsersThree
                       size={40}
                       weight="duotone"
                       className="text-gray-400"
                     />
-                  </motion.div>
+                  </div>
                   <p className="text-gray-500 mb-1">No supervision lineages found</p>
                   <p className="text-gray-400 text-sm mb-4">Define reporting structures for your organization</p>
-                </motion.div>
+                </div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </div>
         )}
         
-        <motion.div variants={fadeIn} className="flex justify-end mt-4">
+        <div className="flex justify-end mt-4">
           <Button
             variant="primary"
             onClick={() => setIsCreatingLineage(true)}
@@ -233,7 +206,7 @@ export default function SupervisorLineageView() {
             <Plus size={16} weight="bold" />
             Add Lineage
           </Button>
-        </motion.div>
+        </div>
 
         <AnimatePresence>
           {isCreatingLineage && (
@@ -255,7 +228,7 @@ export default function SupervisorLineageView() {
             />
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </Collapsible>
   );
 }

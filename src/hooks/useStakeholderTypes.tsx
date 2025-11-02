@@ -48,6 +48,7 @@ export function useStakeholderTypes() {
       const { data, error } = await query.order("name");
 
       if (error) {
+        console.error('[useStakeholderTypes] Query error:', error);
         setError("Failed to fetch stakeholder types");
         throw error;
       }
@@ -55,7 +56,7 @@ export function useStakeholderTypes() {
       setStakeholderTypes(data || []);
       return data;
     } catch (error) {
-      console.error("Error fetching stakeholder types:", error);
+      console.error("[useStakeholderTypes] Error fetching stakeholder types:", error);
       setError("Failed to fetch stakeholder types");
       return [];
     } finally {
@@ -117,7 +118,6 @@ export function useStakeholderTypes() {
 
         if (error) throw error;
 
-        await fetchStakeholderTypes();
         return data;
       } catch (error) {
         console.error("Error creating stakeholder type:", error);
@@ -125,7 +125,7 @@ export function useStakeholderTypes() {
         throw error;
       }
     },
-    [fetchStakeholderTypes]
+    []
   );
 
   // ==========================================================================
@@ -152,7 +152,6 @@ export function useStakeholderTypes() {
 
         if (error) throw error;
 
-        await fetchStakeholderTypes();
         return data;
       } catch (error) {
         console.error("Error updating stakeholder type:", error);
@@ -162,7 +161,7 @@ export function useStakeholderTypes() {
         setProcessingId(null);
       }
     },
-    [fetchStakeholderTypes]
+    []
   );
 
   // ==========================================================================
@@ -182,7 +181,6 @@ export function useStakeholderTypes() {
 
         if (error) throw error;
 
-        await fetchStakeholderTypes();
         return true;
       } catch (error) {
         console.error("Error deleting stakeholder type:", error);
@@ -192,7 +190,7 @@ export function useStakeholderTypes() {
         setProcessingId(null);
       }
     },
-    [fetchStakeholderTypes]
+    []
   );
 
   // ==========================================================================

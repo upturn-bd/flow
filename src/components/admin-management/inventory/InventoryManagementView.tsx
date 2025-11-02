@@ -11,8 +11,8 @@ import { RequisitionInventory, useRequisitionTypes } from "@/hooks/useConfigType
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { TrashSimple, Package, Tag, Plus, Eye } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
-import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
+import { AnimatePresence } from "framer-motion";
+
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function InventoryManagementView() {
@@ -133,18 +133,13 @@ export default function InventoryManagementView() {
 
   return (
     <Collapsible title="Inventory/Equipment/Supplies">
-      <motion.div 
-        initial="hidden"
-        animate="visible"
-        variants={staggerContainer}
-        className="px-4 space-y-6 py-4"
-      >
+      <div className="px-4 space-y-6 py-4">
         {/* Categories Section */}
         <section>
-          <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-4">
             <Tag size={22} weight="duotone" className="text-gray-600" />
             <h3 className="text-lg font-semibold text-gray-800">Categories</h3>
-          </motion.div>
+          </div>
 
           {typesLoading ? (
             <LoadingSpinner
@@ -154,17 +149,13 @@ export default function InventoryManagementView() {
               color="gray"
             />
           ) : (
-            <motion.div variants={fadeInUp}>
+            <div>
               <AnimatePresence>
                 {requisitionTypes.length > 0 ? (
-                  <motion.div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {requisitionTypes.map((type, idx) => (
-                      <motion.div
+                      <div
                         key={type.id || idx}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ delay: idx * 0.05 }}
                         className="flex items-center bg-gray-100 rounded-lg px-3 py-2 border border-gray-200 shadow-sm"
                       >
                         <span className="text-gray-800 font-medium">{type.name}</span>
@@ -178,31 +169,23 @@ export default function InventoryManagementView() {
                         >
                           <TrashSimple size={16} weight="bold" />
                         </Button>
-                      </motion.div>
+                      </div>
                     ))}
-                  </motion.div>
+                  </div>
                 ) : (
-                  <motion.div 
-                    variants={fadeIn}
-                    className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200"
-                  >
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
-                      className="flex justify-center mb-3"
-                    >
+                  <div className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
+                    <div className="flex justify-center mb-3">
                       <Tag size={40} weight="duotone" className="text-gray-400" />
-                    </motion.div>
+                    </div>
                     <p className="text-gray-500 mb-1">No categories found</p>
                     <p className="text-gray-400 text-sm mb-4">Create categories to organize your inventory items</p>
-                  </motion.div>
+                  </div>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </div>
           )}
 
-          <motion.div variants={fadeIn} className="flex justify-end mt-4">
+          <div className="flex justify-end mt-4">
             <Button
               variant="primary" 
               onClick={() => setIsCreatingRequisitionType(true)}
@@ -211,7 +194,7 @@ export default function InventoryManagementView() {
               <Plus size={16} weight="bold" />
               Add Category
             </Button>
-          </motion.div>
+          </div>
 
           <AnimatePresence>
             {isCreatingRequisitionType && (
@@ -227,10 +210,10 @@ export default function InventoryManagementView() {
 
         {/* Inventory Items Section */}
         <section className="mt-8">
-          <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-4">
             <Package size={22} weight="duotone" className="text-gray-600" />
             <h3 className="text-lg font-semibold text-gray-800">Inventory Items</h3>
-          </motion.div>
+          </div>
 
           {inventoriesLoading ? (
             <LoadingSpinner
@@ -240,17 +223,13 @@ export default function InventoryManagementView() {
               color="gray"
             />
           ) : (
-            <motion.div variants={fadeInUp}>
+            <div>
               <AnimatePresence>
                 {requisitionInventories.length > 0 ? (
-                  <motion.div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     {requisitionInventories.map((item: RequisitionInventory, idx) => (
-                      <motion.div
+                      <div
                         key={item.id || idx}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        transition={{ delay: idx * 0.05 }}
                         className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all"
                       >
                         <div className="flex items-start justify-between">
@@ -288,31 +267,23 @@ export default function InventoryManagementView() {
                             View Details
                           </Button>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
-                  </motion.div>
+                  </div>
                 ) : (
-                  <motion.div 
-                    variants={fadeIn}
-                    className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200"
-                  >
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
-                      className="flex justify-center mb-3"
-                    >
+                  <div className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
+                    <div className="flex justify-center mb-3">
                       <Package size={40} weight="duotone" className="text-gray-400" />
-                    </motion.div>
+                    </div>
                     <p className="text-gray-500 mb-1">No inventory items found</p>
                     <p className="text-gray-400 text-sm mb-4">Add items to your inventory to keep track of your supplies</p>
-                  </motion.div>
+                  </div>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </div>
           )}
 
-          <motion.div variants={fadeIn} className="flex justify-end mt-4">
+          <div className="flex justify-end mt-4">
             <Button
               variant="primary" 
               onClick={() => setIsCreatingRequisitionInventory(true)}
@@ -321,7 +292,7 @@ export default function InventoryManagementView() {
               <Plus size={16} weight="bold" />
               Add Inventory Item
             </Button>
-          </motion.div>
+          </div>
         </section>
 
         <AnimatePresence>
@@ -351,7 +322,7 @@ export default function InventoryManagementView() {
             />
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </Collapsible>
   );
 }

@@ -6,7 +6,6 @@ import {
     Settings2, // Advanced settings
     CreditCard, // Payroll
     DollarSign, // Transaction
-    Users, // Roles
     UsersRound, // Teams
     ClipboardList, // Task Log
     BarChart, // Project Log
@@ -17,6 +16,7 @@ import {
     AlertCircle, // Complaint Log
     Building2, // Stakeholder Log
     UserPlus, // Onboarding Log
+    GitBranch, // Stakeholder Processes (workflow/branching)
     File,
     Search,
 } from "lucide-react";
@@ -58,18 +58,18 @@ const sections = [
                 color: "bg-emerald-100 text-emerald-700 border-emerald-200"
             },
             {
-                name: "Roles",
-                path: "/admin-management/company-configurations/roles",
-                icon: Users,
-                description: "Define user roles, permissions, and access levels",
-                color: "bg-purple-100 text-purple-700 border-purple-200"
-            },
-            {
                 name: "Teams",
                 path: "/admin-management/company-configurations/teams",
                 icon: UsersRound,
                 description: "Manage teams and assign granular permissions",
                 color: "bg-violet-100 text-violet-700 border-violet-200"
+            },
+            {
+                name: "Stakeholder Processes",
+                path: "/admin-management/company-configurations/stakeholder-processes",
+                icon: GitBranch,
+                description: "Manage workflow processes for stakeholders and leads",
+                color: "bg-teal-100 text-teal-700 border-teal-200"
             },
         ],
     },

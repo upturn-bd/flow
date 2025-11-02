@@ -50,14 +50,12 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
         throw new DatabaseError(`Failed to create ${tableName}: ${error.message}`);
       }
       
-      // Refetch the items to update the list
-      await fetchItems();
       return data;
     } catch (error) {
       console.error(error);
       throw error;
     }
-  }, [tableName, fetchItems]);
+  }, [tableName]);
 
   const updateItem = useCallback(async (values: T) => {
     try {
@@ -74,14 +72,12 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
         throw new DatabaseError(`Failed to update ${tableName}: ${error.message}`);
       }
       
-      // Refetch the items to update the list
-      await fetchItems();
       return data;
     } catch (error) {
       console.error(error);
       throw error;
     }
-  }, [tableName, fetchItems]);
+  }, [tableName]);
 
   const deleteItem = useCallback(async (id: number) => {
     try {
@@ -94,14 +90,12 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
         throw new DatabaseError(`Failed to delete ${tableName}: ${error.message}`);
       }
       
-      // Refetch the items to update the list
-      await fetchItems();
       return data;
     } catch (error) {
       console.error(error);
       throw error;
     }
-  }, [tableName, fetchItems]);
+  }, [tableName]);
 
   return {
     items,

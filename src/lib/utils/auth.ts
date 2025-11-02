@@ -26,6 +26,7 @@ export async function getCompanyId(): Promise<number> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   
   if (userError || !user) {
+    console.error('[auth.ts] User not authenticated');
     throw new DatabaseError('User not authenticated');
   }
 
@@ -36,7 +37,13 @@ export async function getCompanyId(): Promise<number> {
     .single();
 
   if (error) {
+    console.error('[auth.ts] Failed to get company ID:', error);
     throw new DatabaseError('Failed to get company ID', error.code);
+  }
+
+  if (!data || data.company_id == null) {
+    console.error('[auth.ts] No company ID found for user');
+    throw new DatabaseError('No company ID found for user');
   }
 
   return data.company_id;
