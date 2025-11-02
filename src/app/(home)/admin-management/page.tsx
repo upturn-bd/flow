@@ -14,8 +14,9 @@ import {
     Bell, // Notice Log
     Clipboard, // Requisition Log
     AlertCircle, // Complaint Log
-    Building2, // Stakeholder Log and Stakeholder Processes
+    Building2, // Stakeholder Log
     UserPlus, // Onboarding Log
+    GitBranch, // Stakeholder Processes (workflow/branching)
     File,
     Search,
 } from "lucide-react";
@@ -66,9 +67,9 @@ const sections = [
             {
                 name: "Stakeholder Processes",
                 path: "/admin-management/company-configurations/stakeholder-processes",
-                icon: Building2,
+                icon: GitBranch,
                 description: "Manage workflow processes for stakeholders and leads",
-                color: "bg-purple-100 text-purple-700 border-purple-200"
+                color: "bg-teal-100 text-teal-700 border-teal-200"
             },
         ],
     },
