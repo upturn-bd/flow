@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  CreditCard, 
-  Plus, 
-  Search, 
+import {
+  CreditCard,
+  Plus,
+  Search,
   Filter,
   Eye,
   Edit,
@@ -84,7 +84,7 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
           Add Field
         </button>
       </div>
-      
+
       {pairs.length === 0 ? (
         <div className="text-center py-4 border-2 border-dashed border-gray-200 rounded-lg">
           <p className="text-sm text-gray-500 italic">No additional data fields</p>
@@ -121,7 +121,7 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
           ))}
         </div>
       )}
-      
+
       {error && (
         <p className="text-red-600 text-xs mt-1">{error}</p>
       )}
@@ -177,7 +177,7 @@ export default function AccountsTab() {
           </span>
         ))}
         {entries.length > displayCount && (
-          <span 
+          <span
             className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 cursor-help"
             title={`Additional fields: ${entries.slice(displayCount).map(([k, v]) => `${k}: ${v}`).join(', ')}`}
           >
@@ -202,7 +202,7 @@ export default function AccountsTab() {
   // Helper function to parse key-value pairs from string to object
   const parseAdditionalData = (text: string) => {
     if (!text.trim()) return {};
-    
+
     try {
       // Try to parse as JSON first (for backward compatibility)
       return JSON.parse(text);
@@ -210,7 +210,7 @@ export default function AccountsTab() {
       // If not JSON, treat as key:value pairs separated by newlines
       const data: Record<string, string> = {};
       const lines = text.split('\n').filter(line => line.trim());
-      
+
       lines.forEach(line => {
         const colonIndex = line.indexOf(':');
         if (colonIndex > 0) {
@@ -230,7 +230,7 @@ export default function AccountsTab() {
     if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
       return [];
     }
-    
+
     return Object.entries(data).map(([key, value]) => ({
       key,
       value: String(value)
@@ -284,13 +284,14 @@ export default function AccountsTab() {
 
   useEffect(() => {
     fetchAccounts();
-    fetchStakeholders(true); // Fetch all stakeholders including completed ones
-  }, [fetchAccounts, fetchStakeholders]);
+    fetchStakeholders(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   const filteredAccounts = accounts.filter(account => {
     const matchesSearch = account.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         account.from_source.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         account.method?.toLowerCase().includes(searchTerm.toLowerCase());
+      account.from_source.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      account.method?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'All' || account.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -315,9 +316,9 @@ export default function AccountsTab() {
   };
 
   const formatAmount = (amount: number, currency: string) => {
-    const formatted = Math.abs(amount).toLocaleString('en-US', { 
-      minimumFractionDigits: 2, 
-      maximumFractionDigits: 2 
+    const formatted = Math.abs(amount).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     });
     const sign = amount >= 0 ? '+' : '-';
     return `${sign}${formatted} ${currency}`;
@@ -338,12 +339,6 @@ export default function AccountsTab() {
 
   return (
     <>
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={staggerContainer}
-        className="space-y-6"
-      >
         {/* Header with Summary */}
         <motion.div
           variants={fadeInUp}
@@ -362,7 +357,7 @@ export default function AccountsTab() {
               Add Transaction
             </button>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white/10 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-1">
@@ -391,7 +386,7 @@ export default function AccountsTab() {
                 <span className="text-sm opacity-90">Net Amount (Status-wise)</span>
               </div>
               <span className="text-xl font-bold">
-                {filteredSummary.totalAmount.toLocaleString('en-US', { 
+                {filteredSummary.totalAmount.toLocaleString('en-US', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
                 })} BDT
@@ -415,7 +410,7 @@ export default function AccountsTab() {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Filter size={16} className="text-gray-500" />
             <select
@@ -493,11 +488,10 @@ export default function AccountsTab() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          account.status === 'Complete' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${account.status === 'Complete'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                          }`}>
                           {account.status === 'Complete' ? (
                             <><CheckCircle size={12} className="mr-1" />Complete</>
                           ) : (
@@ -533,7 +527,6 @@ export default function AccountsTab() {
             </div>
           )}
         </motion.div>
-      </motion.div>
 
       {/* Create Account Modal */}
       <FormModal<AccountFormData>
@@ -583,7 +576,7 @@ export default function AccountsTab() {
                 onChange={handleChange}
                 error={errors.title}
               />
-              
+
               <FormSelectField
                 icon={<CreditCard size={18} />}
                 label="Payment Method"
@@ -615,9 +608,9 @@ export default function AccountsTab() {
                 error={errors.stakeholder_id}
                 options={[
                   { value: '', label: 'No Stakeholder' },
-                  ...stakeholders.map(s => ({ 
-                    value: String(s.id), 
-                    label: `${s.name}${s.is_completed ? ' (Completed)' : ' (Active)'}` 
+                  ...stakeholders.map(s => ({
+                    value: String(s.id),
+                    label: `${s.name}${s.is_completed ? ' (Completed)' : ' (Active)'}`
                   }))
                 ]}
                 placeholder="Select stakeholder (optional)"
@@ -638,7 +631,7 @@ export default function AccountsTab() {
                 ]}
                 placeholder="Select status"
               />
-              
+
               <FormInputField
                 icon={<Calendar size={18} />}
                 label="Transaction Date"
@@ -743,7 +736,7 @@ export default function AccountsTab() {
                   onChange={handleChange}
                   error={errors.title}
                 />
-                
+
                 <FormSelectField
                   icon={<CreditCard size={18} />}
                   label="Payment Method"
@@ -775,9 +768,9 @@ export default function AccountsTab() {
                   error={errors.stakeholder_id}
                   options={[
                     { value: '', label: 'No Stakeholder' },
-                    ...stakeholders.map(s => ({ 
-                      value: String(s.id), 
-                      label: `${s.name}${s.is_completed ? ' (Completed)' : ' (Active)'}` 
+                    ...stakeholders.map(s => ({
+                      value: String(s.id),
+                      label: `${s.name}${s.is_completed ? ' (Completed)' : ' (Active)'}`
                     }))
                   ]}
                   placeholder="Select stakeholder (optional)"
@@ -798,7 +791,7 @@ export default function AccountsTab() {
                   ]}
                   placeholder="Select status"
                 />
-                
+
                 <FormInputField
                   icon={<Calendar size={18} />}
                   label="Transaction Date"
