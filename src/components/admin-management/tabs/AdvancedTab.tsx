@@ -11,6 +11,7 @@ import InventoryManagementView from "../inventory/InventoryManagementView";
 import SettlementView from "../settlement/SettlementView";
 import NoticeManagementView from "../notice/NoticeManagementView";
 import ComplaintsManagementView from "../complaints/ComplaintsManagementView";
+import StakeholderTypeManagementView from "../stakeholder-types/StakeholderTypeManagementView";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function AdvancedTab() {
@@ -40,6 +41,8 @@ export default function AdvancedTab() {
             <NoticeManagementView />
 
             <ComplaintsManagementView />
+
+            <StakeholderTypeManagementView />
         </motion.div>
       </Suspense>
     </motion.div>
