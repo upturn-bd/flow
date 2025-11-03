@@ -557,7 +557,9 @@ export default function StepDataForm({
                 onClick={() => {
                   setShowRejectionDialog(false);
                   setRejectionReason("");
-                  setErrors({ ...errors, rejection: undefined });
+                  const newErrors = { ...errors };
+                  delete newErrors.rejection;
+                  setErrors(newErrors);
                 }}
                 disabled={rejecting}
                 className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
