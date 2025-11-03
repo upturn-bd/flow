@@ -4,7 +4,10 @@ import { useState, useEffect } from "react";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { StakeholderProcessStep, StakeholderStepData, FieldDefinition } from "@/lib/types/schemas";
-import { Upload, X, CheckCircle2, File as FileIcon, Loader2 } from "lucide-react";
+import { Upload, X, CheckCircle2, File as FileIcon, Loader2, XCircle } from "lucide-react";
+import GeolocationPicker, { GeolocationValue } from "@/components/ui/GeolocationPicker";
+import DropdownField from "@/components/ui/DropdownField";
+import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 
 interface StepDataFormProps {
   stakeholderId: number;
@@ -21,11 +24,14 @@ export default function StepDataForm({
   onComplete,
   onCancel,
 }: StepDataFormProps) {
-  const { saveStepData, completeStep } = useStakeholders();
+  const { saveStepData, completeStep, updateStakeholder } = useStakeholders();
 
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
+  const [showRejectionDialog, setShowRejectionDialog] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
   const [uploadingFiles, setUploadingFiles] = useState<Set<string>>(new Set());
   const [filesToDelete, setFilesToDelete] = useState<string[]>([]); // Track files to delete on save
 
@@ -80,6 +86,15 @@ export default function StepDataForm({
             break;
           case "file":
             initialData[field.key] = null;
+            break;
+          case "geolocation":
+            initialData[field.key] = null;
+            break;
+          case "dropdown":
+            initialData[field.key] = "";
+            break;
+          case "multi_select":
+            initialData[field.key] = [];
             break;
           default:
             initialData[field.key] = "";
@@ -367,6 +382,49 @@ export default function StepDataForm({
           </div>
         );
 
+      case "geolocation":
+        return (
+          <div>
+            <GeolocationPicker
+              label={field.label}
+              value={value || null}
+              onChange={(coords) => handleFieldChange(field.key, coords)}
+              required={field.required}
+              error={errors[field.key]}
+            />
+          </div>
+        );
+
+      case "dropdown":
+        return (
+          <div>
+            <DropdownField
+              label={field.label}
+              value={value || ""}
+              onChange={(val) => handleFieldChange(field.key, val)}
+              options={field.options || []}
+              placeholder={field.placeholder || "Select an option"}
+              required={field.required}
+              error={errors[field.key]}
+            />
+          </div>
+        );
+
+      case "multi_select":
+        return (
+          <div>
+            <MultiSelectDropdown
+              label={field.label}
+              value={Array.isArray(value) ? value : []}
+              onChange={(val) => handleFieldChange(field.key, val)}
+              options={field.options || []}
+              placeholder={field.placeholder || "Select options"}
+              required={field.required}
+              error={errors[field.key]}
+            />
+          </div>
+        );
+
       default:
         return null;
     }
@@ -384,53 +442,140 @@ export default function StepDataForm({
     );
   }
 
+  const handleReject = async () => {
+    if (!rejectionReason.trim()) {
+      setErrors({ ...errors, rejection: "Please provide a reason for rejection" });
+      return;
+    }
+
+    setRejecting(true);
+    try {
+      // Reject the stakeholder
+      await updateStakeholder(stakeholderId, {
+        status: "Rejected",
+        rejected_at: new Date().toISOString(),
+        rejection_reason: rejectionReason,
+        is_active: false,
+      } as any);
+
+      setShowRejectionDialog(false);
+      onComplete();
+    } catch (error) {
+      console.error("Error rejecting stakeholder:", error);
+      setErrors({ ...errors, rejection: "Failed to reject stakeholder" });
+    } finally {
+      setRejecting(false);
+    }
+  };
+
   return (
-    <div className="space-y-4">
+    <>
       <div className="space-y-4">
-        {fields.length > 0 ? (
-          fields.map((field) => (
-            <div key={field.key}>
-              {renderField(field)}
-            </div>
-          ))
-        ) : (
-          <p className="text-sm text-gray-500">No fields defined for this step</p>
+        <div className="space-y-4">
+          {fields.length > 0 ? (
+            fields.map((field) => (
+              <div key={field.key}>
+                {renderField(field)}
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">No fields defined for this step</p>
+          )}
+        </div>
+
+        {errors.submit && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            {errors.submit}
+          </div>
         )}
+
+        <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-200">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={submitting || rejecting}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            {step.can_reject && (
+              <button
+                type="button"
+                onClick={() => setShowRejectionDialog(true)}
+                disabled={submitting || rejecting}
+                className="flex items-center gap-2 px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50"
+              >
+                <XCircle size={16} />
+                Reject
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleSaveDraft}
+              disabled={submitting || rejecting}
+              className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50"
+            >
+              Save Draft
+            </button>
+            <button
+              type="button"
+              onClick={handleCompleteStep}
+              disabled={submitting || rejecting}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            >
+              <CheckCircle2 size={16} />
+              {submitting ? "Completing..." : "Complete Step"}
+            </button>
+          </div>
+        </div>
       </div>
 
-      {errors.submit && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-          {errors.submit}
+      {/* Rejection Dialog */}
+      {showRejectionDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Reject Stakeholder</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Please provide a reason for rejecting this stakeholder. This action will mark the stakeholder as rejected and make it inactive.
+            </p>
+            <textarea
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Enter rejection reason..."
+              rows={4}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+            />
+            {errors.rejection && (
+              <p className="text-red-500 text-sm mt-2">{errors.rejection}</p>
+            )}
+            <div className="flex items-center justify-end gap-3 mt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowRejectionDialog(false);
+                  setRejectionReason("");
+                  setErrors({ ...errors, rejection: undefined });
+                }}
+                disabled={rejecting}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleReject}
+                disabled={rejecting}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {rejecting ? "Rejecting..." : "Confirm Rejection"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
-
-      <div className="flex items-center justify-end gap-3 pt-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={submitting}
-          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={handleSaveDraft}
-          disabled={submitting}
-          className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50"
-        >
-          Save Draft
-        </button>
-        <button
-          type="button"
-          onClick={handleCompleteStep}
-          disabled={submitting}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-        >
-          <CheckCircle2 size={16} />
-          {submitting ? "Completing..." : "Complete Step"}
-        </button>
-      </div>
-    </div>
+    </>
   );
 }
