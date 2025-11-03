@@ -103,8 +103,6 @@ export default function NewStakeholderPage() {
         is_active: true, // New leads are active by default
         kam_id: formData.kam_id || undefined, // Changed from issue_handler_id
       });
-        issue_handler_id: formData.issue_handler_id || undefined,
-      });
 
       router.push("/admin-management/stakeholders");
     } catch (error) {

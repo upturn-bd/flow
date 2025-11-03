@@ -15,10 +15,12 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
   const {
     processes,
     activeProcesses,
+    stakeholders,
     loading,
     updateStakeholder,
     fetchProcesses,
     fetchStakeholderById,
+    fetchStakeholders,
   } = useStakeholders();
   const { employees, fetchEmployees } = useEmployees();
 
@@ -27,7 +29,8 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
     name: "",
     address: "",
     process_id: "",
-    issue_handler_id: "",
+    parent_stakeholder_id: "",
+    kam_id: "", // Changed from issue_handler_id
     is_active: true,
   });
 
@@ -42,6 +45,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
         setLoadingStakeholder(true);
         await fetchProcesses();
         await fetchEmployees();
+        await fetchStakeholders(); // Fetch stakeholders for parent selection
         
         const data = await fetchStakeholderById(stakeholderId);
         if (data) {
@@ -50,7 +54,8 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
             name: data.name || "",
             address: data.address || "",
             process_id: data.process_id?.toString() || "",
-            issue_handler_id: data.issue_handler_id?.toString() || "",
+            parent_stakeholder_id: data.parent_stakeholder_id?.toString() || "",
+            kam_id: data.kam_id || "", // Changed from issue_handler_id
             is_active: data.is_active ?? true,
           });
           setContactPersons(data.contact_persons || []);
@@ -129,9 +134,10 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
         name: formData.name.trim(),
         address: formData.address.trim() || undefined,
         process_id: parseInt(formData.process_id),
+        parent_stakeholder_id: formData.parent_stakeholder_id ? parseInt(formData.parent_stakeholder_id) : undefined,
         contact_persons: validContactPersons,
         is_active: formData.is_active,
-        issue_handler_id: formData.issue_handler_id || undefined,
+        kam_id: formData.kam_id || undefined, // Changed from issue_handler_id
       });
 
       router.push(`/admin-management/stakeholders/${stakeholderId}`);
@@ -284,14 +290,35 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Issue Handler
+                Parent Stakeholder
               </label>
               <select
-                value={formData.issue_handler_id}
-                onChange={(e) => setFormData({ ...formData, issue_handler_id: e.target.value })}
+                value={formData.parent_stakeholder_id}
+                onChange={(e) => setFormData({ ...formData, parent_stakeholder_id: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               >
-                <option value="">None (No issue handler assigned)</option>
+                <option value="">None (No parent stakeholder)</option>
+                {stakeholders.filter(s => s.id !== stakeholderId && s.status !== 'Rejected').map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} ({s.status})
+                  </option>
+                ))}
+              </select>
+              <p className="text-gray-500 text-sm mt-1">
+                Optional parent stakeholder for hierarchical relationships
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Key Accounts Manager (KAM)
+              </label>
+              <select
+                value={formData.kam_id}
+                onChange={(e) => setFormData({ ...formData, kam_id: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              >
+                <option value="">None (No KAM assigned)</option>
                 {employees.map((employee) => (
                   <option key={employee.id} value={employee.id}>
                     {employee.name}
@@ -299,7 +326,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                 ))}
               </select>
               <p className="text-gray-500 text-sm mt-1">
-                Assign an employee responsible for handling issues for this stakeholder (optional)
+                Assign a Key Accounts Manager who will receive notifications for any changes
               </p>
             </div>
 
