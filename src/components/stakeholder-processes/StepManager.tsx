@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { StakeholderProcessStep, FieldDefinitionsSchema, FieldType } from "@/lib/types/schemas";
+import { StakeholderProcessStep, FieldDefinitionsSchema, FieldType, FieldDefinition, DropdownOption } from "@/lib/types/schemas";
 import { useTeams } from "@/hooks/useTeams";
-import { Plus, Trash2, GripVertical, Calendar } from "lucide-react";
+import { Plus, Trash2, GripVertical, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 import { FIELD_TYPES } from "@/lib/constants";
 
 interface StepManagerProps {
@@ -181,9 +181,11 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
     use_date_range: step?.use_date_range || false,
     start_date: step?.start_date || "",
     end_date: step?.end_date || "",
+    can_reject: step?.can_reject || false,
   });
 
   const [loading, setLoading] = useState(false);
+  const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(null);
 
   const addField = () => {
     const newField = {
@@ -351,46 +353,35 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
 
             <div className="space-y-3">
               {formData.field_definitions.fields.map((field, index) => (
-                <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-1 grid grid-cols-2 gap-3">
-                    <input
-                      type="text"
-                      value={field.label}
-                      onChange={(e) => updateField(index, { label: e.target.value })}
-                      placeholder="Field Label"
-                      className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                    />
-                    <select
-                      value={field.type}
-                      onChange={(e) => updateField(index, { type: e.target.value as FieldType })}
-                      className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                    >
-                      {Object.values(FIELD_TYPES).map((type) => (
-                        <option key={type} value={type}>
-                          {type.charAt(0).toUpperCase() + type.slice(1)}
-                        </option>
-                      ))}
-                    </select>
-                    <label className="flex items-center gap-2 col-span-2">
-                      <input
-                        type="checkbox"
-                        checked={field.required}
-                        onChange={(e) => updateField(index, { required: e.target.checked })}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded"
-                      />
-                      <span className="text-sm text-gray-700">Required field</span>
-                    </label>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeField(index)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
+                <FieldEditor
+                  key={index}
+                  field={field}
+                  index={index}
+                  onUpdate={updateField}
+                  onRemove={removeField}
+                  isEditing={editingFieldIndex === index}
+                  onEditToggle={() => setEditingFieldIndex(editingFieldIndex === index ? null : index)}
+                />
               ))}
             </div>
+          </div>
+
+          {/* Rejection Option */}
+          <div className="border-t border-gray-200 pt-6">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.can_reject}
+                onChange={(e) => setFormData({ ...formData, can_reject: e.target.checked })}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+              />
+              <div>
+                <span className="text-sm font-medium text-gray-700">Allow Rejection</span>
+                <p className="text-xs text-gray-500">
+                  Team members can reject stakeholders at this step
+                </p>
+              </div>
+            </label>
           </div>
 
           {/* Actions */}
@@ -412,6 +403,168 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
           </div>
         </form>
       </div>
+    </div>
+  );
+}
+
+// Field Editor Component for handling different field types including dropdown options
+interface FieldEditorProps {
+  field: FieldDefinition;
+  index: number;
+  onUpdate: (index: number, updates: any) => void;
+  onRemove: (index: number) => void;
+  isEditing: boolean;
+  onEditToggle: () => void;
+}
+
+function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle }: FieldEditorProps) {
+  const [optionInput, setOptionInput] = useState("");
+  
+  const isDropdownType = field.type === 'dropdown' || field.type === 'multi_select';
+
+  const addOption = () => {
+    if (!optionInput.trim()) return;
+    
+    const newOption: DropdownOption = {
+      label: optionInput.trim(),
+      value: optionInput.trim().toLowerCase().replace(/\s+/g, '_'),
+    };
+    
+    const currentOptions = field.options || [];
+    onUpdate(index, { options: [...currentOptions, newOption] });
+    setOptionInput("");
+  };
+
+  const removeOption = (optionIndex: number) => {
+    const currentOptions = field.options || [];
+    onUpdate(index, { options: currentOptions.filter((_, i) => i !== optionIndex) });
+  };
+
+  const getFieldTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      text: 'Text',
+      boolean: 'Boolean',
+      date: 'Date',
+      file: 'File',
+      geolocation: 'Geolocation',
+      dropdown: 'Dropdown',
+      multi_select: 'Multi-Select',
+    };
+    return labels[type] || type;
+  };
+
+  return (
+    <div className="bg-gray-50 rounded-lg border border-gray-200">
+      {/* Field Header */}
+      <div className="flex items-start gap-3 p-3">
+        <div className="flex-1 grid grid-cols-2 gap-3">
+          <input
+            type="text"
+            value={field.label}
+            onChange={(e) => onUpdate(index, { label: e.target.value })}
+            placeholder="Field Label"
+            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+          />
+          <select
+            value={field.type}
+            onChange={(e) => {
+              const newType = e.target.value as FieldType;
+              onUpdate(index, { type: newType, options: newType === 'dropdown' || newType === 'multi_select' ? [] : undefined });
+            }}
+            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+          >
+            {Object.values(FIELD_TYPES).map((type) => (
+              <option key={type} value={type}>
+                {getFieldTypeLabel(type)}
+              </option>
+            ))}
+          </select>
+          <label className="flex items-center gap-2 col-span-2">
+            <input
+              type="checkbox"
+              checked={field.required}
+              onChange={(e) => onUpdate(index, { required: e.target.checked })}
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+            />
+            <span className="text-sm text-gray-700">Required field</span>
+          </label>
+        </div>
+        <div className="flex items-center gap-1">
+          {isDropdownType && (
+            <button
+              type="button"
+              onClick={onEditToggle}
+              className="p-2 text-gray-600 hover:bg-gray-200 rounded transition-colors"
+              title={isEditing ? "Collapse options" : "Edit options"}
+            >
+              {isEditing ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => onRemove(index)}
+            className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* Dropdown Options Editor */}
+      {isDropdownType && isEditing && (
+        <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3">
+          <label className="block text-xs font-medium text-gray-700 mb-2">
+            {field.type === 'multi_select' ? 'Multi-Select Options' : 'Dropdown Options'}
+          </label>
+          
+          {/* Add Option Input */}
+          <div className="flex gap-2 mb-3">
+            <input
+              type="text"
+              value={optionInput}
+              onChange={(e) => setOptionInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addOption();
+                }
+              }}
+              placeholder="Enter option label"
+              className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+            />
+            <button
+              type="button"
+              onClick={addOption}
+              className="px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Add
+            </button>
+          </div>
+
+          {/* Options List */}
+          <div className="space-y-2">
+            {(field.options || []).length > 0 ? (
+              (field.options || []).map((option, optIndex) => (
+                <div
+                  key={optIndex}
+                  className="flex items-center justify-between p-2 bg-white border border-gray-200 rounded text-sm"
+                >
+                  <span className="text-gray-700">{option.label}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeOption(optIndex)}
+                    className="text-red-600 hover:text-red-700 text-xs"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p className="text-xs text-gray-500 italic">No options added yet</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
