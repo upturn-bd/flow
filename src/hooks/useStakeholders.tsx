@@ -35,6 +35,7 @@ export interface StakeholderProcessStepFormData {
   use_date_range: boolean;
   start_date?: string;
   end_date?: string;
+  can_reject?: boolean;
 }
 
 export interface StakeholderFormData {
@@ -43,8 +44,10 @@ export interface StakeholderFormData {
   contact_persons: ContactPerson[];
   process_id: number;
   stakeholder_type_id?: number;
+  parent_stakeholder_id?: number;
   is_active: boolean;
-  issue_handler_id?: string;
+  kam_id?: string;
+  status?: 'Lead' | 'Permanent' | 'Rejected';
 }
 
 export interface StakeholderStepDataFormData {
@@ -58,7 +61,7 @@ export interface StakeholderSearchOptions {
   searchQuery?: string;
   page?: number;
   pageSize?: number;
-  filterStatus?: "all" | "leads" | "completed";
+  filterStatus?: "all" | "Lead" | "Permanent" | "Rejected";
 }
 
 export interface StakeholderSearchResult {
@@ -433,7 +436,9 @@ export function useStakeholders() {
           *,
           process:stakeholder_processes(id, name, is_sequential),
           current_step:stakeholder_process_steps(id, name, step_order),
-          stakeholder_type:stakeholder_types(id, name, description)
+          stakeholder_type:stakeholder_types(id, name, description),
+          parent_stakeholder:stakeholders!parent_stakeholder_id(id, name, status),
+          kam:employees!kam_id(id, first_name, last_name, email)
         `)
         .eq("company_id", company_id);
 
@@ -448,8 +453,18 @@ export function useStakeholders() {
         throw error;
       }
 
-      setStakeholders(data || []);
-      return data;
+      // Transform kam data to match expected structure
+      const transformedData = data?.map((stakeholder) => ({
+        ...stakeholder,
+        kam: stakeholder.kam ? {
+          id: stakeholder.kam.id,
+          name: `${stakeholder.kam.first_name} ${stakeholder.kam.last_name}`,
+          email: stakeholder.kam.email,
+        } : undefined,
+      })) || [];
+
+      setStakeholders(transformedData);
+      return transformedData;
     } catch (error) {
       console.error("Error fetching stakeholders:", error);
       setError("Failed to fetch stakeholders");
@@ -475,7 +490,9 @@ export function useStakeholders() {
           *,
           process:stakeholder_processes(id, name, is_sequential),
           current_step:stakeholder_process_steps(id, name, step_order),
-          stakeholder_type:stakeholder_types(id, name, description)
+          stakeholder_type:stakeholder_types(id, name, description),
+          parent_stakeholder:stakeholders!parent_stakeholder_id(id, name, status),
+          kam:employees!kam_id(id, first_name, last_name, email)
         `, { count: 'exact' })
         .eq("company_id", company_id);
       
@@ -486,10 +503,8 @@ export function useStakeholders() {
       }
       
       // Add status filter
-      if (filterStatus === "leads") {
-        query = query.eq("is_completed", false);
-      } else if (filterStatus === "completed") {
-        query = query.eq("is_completed", true);
+      if (filterStatus !== "all") {
+        query = query.eq("status", filterStatus);
       }
       
       // Add pagination
@@ -503,17 +518,27 @@ export function useStakeholders() {
       
       if (error) throw error;
       
+      // Transform kam data to match expected structure
+      const transformedData = data?.map((stakeholder) => ({
+        ...stakeholder,
+        kam: stakeholder.kam ? {
+          id: stakeholder.kam.id,
+          name: `${stakeholder.kam.first_name} ${stakeholder.kam.last_name}`,
+          email: stakeholder.kam.email,
+        } : undefined,
+      })) || [];
+      
       const totalCount = count || 0;
       const totalPages = Math.ceil(totalCount / pageSize);
       
       const result: StakeholderSearchResult = {
-        stakeholders: data || [],
+        stakeholders: transformedData,
         totalCount,
         totalPages,
         currentPage: page,
       };
       
-      setStakeholders(data || []);
+      setStakeholders(transformedData);
       return result;
     } catch (error) {
       console.error("Error searching stakeholders:", error);
@@ -603,6 +628,7 @@ export function useStakeholders() {
               current_step_id: firstStep.id,
               current_step_order: firstStep.step_order,
               is_completed: false,
+              status: 'Lead', // Always start as Lead
               created_by: employeeInfo?.id,
             },
           ])
@@ -619,7 +645,7 @@ export function useStakeholders() {
         throw error;
       }
     },
-    [fetchStakeholders]
+    [fetchStakeholders, fetchProcessById]
   );
 
   const updateStakeholder = useCallback(
@@ -896,14 +922,22 @@ export function useStakeholders() {
   );
 
   const leads = useMemo(
-    () => stakeholders.filter((s) => !s.is_completed),
+    () => stakeholders.filter((s) => s.status === 'Lead'),
     [stakeholders]
   );
 
-  const completedStakeholders = useMemo(
-    () => stakeholders.filter((s) => s.is_completed),
+  const permanentStakeholders = useMemo(
+    () => stakeholders.filter((s) => s.status === 'Permanent'),
     [stakeholders]
   );
+
+  const rejectedStakeholders = useMemo(
+    () => stakeholders.filter((s) => s.status === 'Rejected'),
+    [stakeholders]
+  );
+
+  // Backward compatibility
+  const completedStakeholders = permanentStakeholders;
 
   // ==========================================================================
   // RETURN
@@ -922,7 +956,9 @@ export function useStakeholders() {
     // Computed
     activeProcesses,
     leads,
-    completedStakeholders,
+    permanentStakeholders,
+    rejectedStakeholders,
+    completedStakeholders, // Backward compatibility
 
     // Process operations
     fetchProcesses,

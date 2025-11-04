@@ -259,11 +259,25 @@ export const FIELD_TYPES = {
   BOOLEAN: 'boolean',
   DATE: 'date',
   FILE: 'file',
+  GEOLOCATION: 'geolocation',
+  DROPDOWN: 'dropdown',
+  MULTI_SELECT: 'multi_select',
 } as const;
 
 export type FieldType = typeof FIELD_TYPES[keyof typeof FIELD_TYPES];
 
 export const FIELD_TYPE_OPTIONS = Object.values(FIELD_TYPES);
+
+// Stakeholder Status
+export const STAKEHOLDER_STATUS = {
+  LEAD: 'Lead',
+  PERMANENT: 'Permanent',
+  REJECTED: 'Rejected',
+} as const;
+
+export type StakeholderStatus = typeof STAKEHOLDER_STATUS[keyof typeof STAKEHOLDER_STATUS];
+
+export const STAKEHOLDER_STATUS_OPTIONS = Object.values(STAKEHOLDER_STATUS);
 
 // Stakeholder Issue Status
 export const STAKEHOLDER_ISSUE_STATUS = {

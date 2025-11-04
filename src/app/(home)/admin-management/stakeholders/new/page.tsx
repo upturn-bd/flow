@@ -10,7 +10,7 @@ import { ContactPerson } from "@/lib/types/schemas";
 
 export default function NewStakeholderPage() {
   const router = useRouter();
-  const { processes, activeProcesses, loading, createStakeholder, fetchProcesses } = useStakeholders();
+  const { processes, activeProcesses, stakeholders, loading, createStakeholder, fetchProcesses, fetchStakeholders } = useStakeholders();
   const { employees, fetchEmployees } = useEmployees();
   const { activeStakeholderTypes, fetchStakeholderTypes } = useStakeholderTypes();
 
@@ -19,7 +19,8 @@ export default function NewStakeholderPage() {
     address: "",
     process_id: "",
     stakeholder_type_id: "",
-    issue_handler_id: "",
+    kam_id: "", // Changed from issue_handler_id
+    parent_stakeholder_id: "",
   });
 
   const [contactPersons, setContactPersons] = useState<ContactPerson[]>([]);
@@ -30,7 +31,8 @@ export default function NewStakeholderPage() {
     fetchProcesses();
     fetchEmployees();
     fetchStakeholderTypes();
-  }, [fetchProcesses, fetchEmployees, fetchStakeholderTypes]);
+    fetchStakeholders(); // Fetch stakeholders for parent selection
+  }, [fetchProcesses, fetchEmployees, fetchStakeholderTypes, fetchStakeholders]);
 
   const handleAddContactPerson = () => {
     setContactPersons([
@@ -96,9 +98,10 @@ export default function NewStakeholderPage() {
         address: formData.address.trim() || undefined,
         process_id: parseInt(formData.process_id),
         stakeholder_type_id: formData.stakeholder_type_id ? parseInt(formData.stakeholder_type_id) : undefined,
+        parent_stakeholder_id: formData.parent_stakeholder_id ? parseInt(formData.parent_stakeholder_id) : undefined,
         contact_persons: validContactPersons,
         is_active: true, // New leads are active by default
-        issue_handler_id: formData.issue_handler_id || undefined,
+        kam_id: formData.kam_id || undefined, // Changed from issue_handler_id
       });
 
       router.push("/admin-management/stakeholders");
@@ -245,14 +248,35 @@ export default function NewStakeholderPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Issue Handler
+                Parent Stakeholder
               </label>
               <select
-                value={formData.issue_handler_id}
-                onChange={(e) => setFormData({ ...formData, issue_handler_id: e.target.value })}
+                value={formData.parent_stakeholder_id}
+                onChange={(e) => setFormData({ ...formData, parent_stakeholder_id: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               >
-                <option value="">None (No issue handler assigned)</option>
+                <option value="">None (No parent stakeholder)</option>
+                {stakeholders.filter(s => s.status !== 'Rejected').map((stakeholder) => (
+                  <option key={stakeholder.id} value={stakeholder.id}>
+                    {stakeholder.name} ({stakeholder.status})
+                  </option>
+                ))}
+              </select>
+              <p className="text-gray-500 text-sm mt-1">
+                Optional parent stakeholder for hierarchical relationships (e.g., subsidiary companies)
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Key Accounts Manager (KAM)
+              </label>
+              <select
+                value={formData.kam_id}
+                onChange={(e) => setFormData({ ...formData, kam_id: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              >
+                <option value="">None (No KAM assigned)</option>
                 {employees.map((employee) => (
                   <option key={employee.id} value={employee.id}>
                     {employee.name}
@@ -260,7 +284,7 @@ export default function NewStakeholderPage() {
                 ))}
               </select>
               <p className="text-gray-500 text-sm mt-1">
-                Assign an employee responsible for handling issues for this stakeholder (optional)
+                Assign a Key Accounts Manager who will receive notifications for any changes (optional)
               </p>
             </div>
           </div>

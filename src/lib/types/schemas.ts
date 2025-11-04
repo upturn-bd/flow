@@ -484,13 +484,19 @@ export interface ContactPerson {
 }
 
 // Field definition types for process steps
-export type FieldType = 'text' | 'boolean' | 'date' | 'file';
+export type FieldType = 'text' | 'boolean' | 'date' | 'file' | 'geolocation' | 'dropdown' | 'multi_select';
 
 export interface FieldValidation {
   minLength?: number;
   maxLength?: number;
   pattern?: string;
   message?: string;
+}
+
+// Dropdown option for dropdown and multi_select field types
+export interface DropdownOption {
+  label: string;
+  value: string;
 }
 
 export interface FieldDefinition {
@@ -501,6 +507,8 @@ export interface FieldDefinition {
   validation?: FieldValidation;
   placeholder?: string;
   helpText?: string;
+  // For dropdown and multi_select field types
+  options?: DropdownOption[];
 }
 
 export interface FieldDefinitionsSchema {
@@ -537,6 +545,7 @@ export interface StakeholderProcessStep {
   use_date_range: boolean;
   start_date?: string; // ISO date string
   end_date?: string; // ISO date string
+  can_reject: boolean; // Whether team members can reject stakeholders at this step
   created_at?: string;
   updated_at?: string;
   created_by?: string;
@@ -549,6 +558,9 @@ export interface StakeholderProcessStep {
   };
 }
 
+// Stakeholder Status Type
+export type StakeholderStatus = 'Lead' | 'Permanent' | 'Rejected';
+
 // Stakeholder - main entity (called "Lead" until completed)
 export interface Stakeholder {
   id?: number;
@@ -559,10 +571,15 @@ export interface Stakeholder {
   current_step_id?: number;
   current_step_order: number;
   stakeholder_type_id?: number; // Optional categorization
+  parent_stakeholder_id?: number; // Reference to parent stakeholder for hierarchical relationships
   is_active: boolean;
   is_completed: boolean;
   completed_at?: string;
-  kam_id?: string; // Key Account Manager - Employee ID for overall stakeholder management
+  kam_id?: string; // Key Accounts Manager - Employee ID assigned to handle stakeholder
+  status: StakeholderStatus; // Lead, Permanent, or Rejected
+  rejected_at?: string;
+  rejected_by?: string;
+  rejection_reason?: string;
   company_id: number;
   created_at?: string;
   updated_at?: string;
@@ -574,6 +591,11 @@ export interface Stakeholder {
   step_data?: StakeholderStepData[];
   transactions?: Account[]; // Financial transactions associated with this stakeholder
   stakeholder_type?: StakeholderType; // Type information
+  parent_stakeholder?: {
+    id: number;
+    name: string;
+    status?: StakeholderStatus;
+  };
   kam?: {
     id: string;
     name: string;

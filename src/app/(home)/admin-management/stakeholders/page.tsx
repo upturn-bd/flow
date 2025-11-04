@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { Plus, Search, Filter, Eye, CheckCircle2, Clock } from "lucide-react";
+import { Plus, Search, Filter, Eye, CheckCircle2, Clock, XCircle } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
 
 export default function StakeholdersPage() {
@@ -18,7 +18,7 @@ export default function StakeholdersPage() {
   } = useStakeholders();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "leads" | "completed">("all");
+  const [filterStatus, setFilterStatus] = useState<"all" | "Lead" | "Permanent" | "Rejected">("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchResult, setSearchResult] = useState<{
     totalCount: number;
@@ -47,7 +47,7 @@ export default function StakeholdersPage() {
     setCurrentPage(1); // Reset to first page when searching
   };
 
-  const handleFilterChange = (status: "all" | "leads" | "completed") => {
+  const handleFilterChange = (status: "all" | "Lead" | "Permanent" | "Rejected") => {
     setFilterStatus(status);
     setCurrentPage(1); // Reset to first page when filtering
   };
@@ -56,9 +56,17 @@ export default function StakeholdersPage() {
     setCurrentPage(page);
   };
 
-  const getStepStatusColor = (stakeholder: any) => {
-    if (stakeholder.is_completed) return "bg-green-100 text-green-800";
-    return "bg-blue-100 text-blue-800";
+  const getStepStatusColor = (status: string) => {
+    switch (status) {
+      case "Lead":
+        return "bg-yellow-100 text-yellow-800";
+      case "Permanent":
+        return "bg-green-100 text-green-800";
+      case "Rejected":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-blue-100 text-blue-800";
+    }
   };
 
   return (
@@ -151,9 +159,9 @@ export default function StakeholdersPage() {
               All ({searchResult?.totalCount || 0})
             </button>
             <button
-              onClick={() => handleFilterChange("leads")}
+              onClick={() => handleFilterChange("Lead")}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filterStatus === "leads"
+                filterStatus === "Lead"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
@@ -161,14 +169,24 @@ export default function StakeholdersPage() {
               Leads ({leads.length})
             </button>
             <button
-              onClick={() => handleFilterChange("completed")}
+              onClick={() => handleFilterChange("Permanent")}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filterStatus === "completed"
+                filterStatus === "Permanent"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Stakeholders ({completedStakeholders.length})
+              Permanent ({completedStakeholders.length})
+            </button>
+            <button
+              onClick={() => handleFilterChange("Rejected")}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                filterStatus === "Rejected"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              Rejected
             </button>
           </div>
         </div>
@@ -271,11 +289,7 @@ export default function StakeholdersPage() {
                   </td>
                   <td className="px-6 py-4">
                     {stakeholder.current_step ? (
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStepStatusColor(
-                          stakeholder
-                        )}`}
-                      >
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}
                       </span>
                     ) : (
@@ -283,17 +297,15 @@ export default function StakeholdersPage() {
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    {stakeholder.is_completed ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        <CheckCircle2 size={14} />
-                        Stakeholder
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        <Clock size={14} />
-                        Lead
-                      </span>
-                    )}
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStepStatusColor(
+                        stakeholder.status
+                      )}`}
+                    >
+                      {stakeholder.status === 'Lead' && <Clock size={14} />}
+                      {stakeholder.status === 'Permanent' && <CheckCircle2 size={14} />}
+                      {stakeholder.status}
+                    </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {stakeholder.created_at
