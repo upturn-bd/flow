@@ -562,7 +562,7 @@ export interface Stakeholder {
   is_active: boolean;
   is_completed: boolean;
   completed_at?: string;
-  issue_handler_id?: string; // Employee ID assigned as issue handler
+  kam_id?: string; // Key Account Manager - Employee ID for overall stakeholder management
   company_id: number;
   created_at?: string;
   updated_at?: string;
@@ -574,7 +574,7 @@ export interface Stakeholder {
   step_data?: StakeholderStepData[];
   transactions?: Account[]; // Financial transactions associated with this stakeholder
   stakeholder_type?: StakeholderType; // Type information
-  issue_handler?: {
+  kam?: {
     id: string;
     name: string;
     email?: string;
@@ -609,6 +609,7 @@ export interface StakeholderIssue {
   status: 'Pending' | 'In Progress' | 'Resolved';
   priority: 'Low' | 'Medium' | 'High' | 'Urgent';
   attachments: StakeholderIssueAttachment[];
+  assigned_to?: string; // Employee ID assigned to handle this specific issue
   company_id: number;
   created_at?: string;
   updated_at?: string;
@@ -618,6 +619,11 @@ export interface StakeholderIssue {
   resolved_by?: string;
   // Joined data
   stakeholder?: Stakeholder;
+  assigned_employee?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
   creator?: {
     id: string;
     name: string;

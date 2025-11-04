@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BaseForm from "@/components/forms/BaseForm";
 import {
   validateStakeholderIssue,
   validationErrorsToObject,
 } from "@/lib/validation/schemas/stakeholder-issues";
 import { StakeholderIssueFormData } from "@/hooks/useStakeholderIssues";
+import { useEmployees } from "@/hooks/useEmployees";
 import { X, Upload, Trash2 } from "lucide-react";
 
 interface StakeholderIssueFormProps {
@@ -24,6 +25,7 @@ export default function StakeholderIssueForm({
   onCancel,
   submitLabel = "Create Issue",
 }: StakeholderIssueFormProps) {
+  const { employees, fetchEmployees, loading: loadingEmployees } = useEmployees();
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
   const [formData, setFormData] = useState<StakeholderIssueFormData>({
@@ -32,10 +34,15 @@ export default function StakeholderIssueForm({
     description: initialData?.description || "",
     status: initialData?.status || "Pending",
     priority: initialData?.priority || "Medium",
+    assigned_to: initialData?.assigned_to || "",
     attachments: [],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -143,6 +150,35 @@ export default function StakeholderIssueForm({
           {errors.priority && (
             <p className="mt-1 text-sm text-red-600">{errors.priority}</p>
           )}
+        </div>
+
+        {/* Assigned To */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Assign To Employee
+          </label>
+          <select
+            name="assigned_to"
+            value={formData.assigned_to}
+            onChange={handleChange}
+            disabled={loadingEmployees}
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
+              errors.assigned_to ? "border-red-500" : "border-gray-300"
+            } ${loadingEmployees ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            <option value="">-- Select an employee --</option>
+            {employees.map((employee) => (
+              <option key={employee.id} value={employee.id}>
+                {employee.name}
+              </option>
+            ))}
+          </select>
+          {errors.assigned_to && (
+            <p className="mt-1 text-sm text-red-600">{errors.assigned_to}</p>
+          )}
+          <p className="mt-1 text-xs text-gray-500">
+            Optional: Assign this issue to a specific employee
+          </p>
         </div>
 
         {/* Status */}

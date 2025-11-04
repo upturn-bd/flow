@@ -15,6 +15,7 @@ export interface StakeholderIssueFormData {
   description?: string;
   status: 'Pending' | 'In Progress' | 'Resolved';
   priority: 'Low' | 'Medium' | 'High' | 'Urgent';
+  assigned_to?: string; // Employee ID assigned to handle this issue
   attachments?: File[];
 }
 
@@ -24,7 +25,7 @@ export interface StakeholderIssueSearchOptions {
   pageSize?: number;
   filterStatus?: "all" | "Pending" | "In Progress" | "Resolved";
   filterPriority?: "all" | "Low" | "Medium" | "High" | "Urgent";
-  handlerId?: string;
+  assignedToId?: string; // Filter by assigned employee
 }
 
 export interface StakeholderIssueSearchResult {
@@ -63,7 +64,12 @@ export function useStakeholderIssues() {
             id,
             name,
             address,
-            issue_handler_id
+            kam_id
+          ),
+          assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
+            id,
+            name,
+            email
           )
         `)
         .eq("company_id", company_id);
@@ -105,8 +111,13 @@ export function useStakeholderIssues() {
             id,
             name,
             address,
-            issue_handler_id,
+            kam_id,
             contact_persons
+          ),
+          assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
+            id,
+            name,
+            email
           )
         `)
         .eq("company_id", company_id)
@@ -128,32 +139,37 @@ export function useStakeholderIssues() {
     }
   }, []);
 
-  const fetchIssuesByHandler = useCallback(async (handlerId?: string) => {
+  const fetchIssuesByAssignedEmployee = useCallback(async (assignedToId?: string) => {
     setLoading(true);
     setError(null);
 
     try {
       const company_id = await getCompanyId();
       const employeeInfo = await getEmployeeInfo();
-      const targetHandlerId = handlerId || employeeInfo?.id;
+      const targetAssignedToId = assignedToId || employeeInfo?.id;
 
-      if (!targetHandlerId) {
-        throw new Error("No handler ID provided");
+      if (!targetAssignedToId) {
+        throw new Error("No assigned employee ID provided");
       }
 
       const { data, error } = await supabase
         .from("stakeholder_issues")
         .select(`
           *,
-          stakeholder:stakeholders!inner(
+          stakeholder:stakeholders(
             id,
             name,
             address,
-            issue_handler_id
+            kam_id
+          ),
+          assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
+            id,
+            name,
+            email
           )
         `)
         .eq("company_id", company_id)
-        .eq("stakeholder.issue_handler_id", targetHandlerId)
+        .eq("assigned_to", targetAssignedToId)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -164,7 +180,7 @@ export function useStakeholderIssues() {
       setIssues(data || []);
       return data;
     } catch (error) {
-      console.error("Error fetching issues by handler:", error);
+      console.error("Error fetching issues by assigned employee:", error);
       setError("Failed to fetch issues");
       return [];
     } finally {
@@ -179,7 +195,7 @@ export function useStakeholderIssues() {
       pageSize = 25, 
       filterStatus = "all",
       filterPriority = "all",
-      handlerId
+      assignedToId
     } = options;
     
     setLoading(true);
@@ -188,10 +204,10 @@ export function useStakeholderIssues() {
     try {
       const company_id = await getCompanyId();
       const employeeInfo = await getEmployeeInfo();
-      const targetHandlerId = handlerId || employeeInfo?.id;
+      const targetAssignedToId = assignedToId || employeeInfo?.id;
 
-      if (!targetHandlerId) {
-        throw new Error("No handler ID provided");
+      if (!targetAssignedToId) {
+        throw new Error("No assigned employee ID provided");
       }
       
       // Build query
@@ -199,15 +215,20 @@ export function useStakeholderIssues() {
         .from("stakeholder_issues")
         .select(`
           *,
-          stakeholder:stakeholders!inner(
+          stakeholder:stakeholders(
             id,
             name,
             address,
-            issue_handler_id
+            kam_id
+          ),
+          assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
+            id,
+            name,
+            email
           )
         `, { count: 'exact' })
         .eq("company_id", company_id)
-        .eq("stakeholder.issue_handler_id", targetHandlerId);
+        .eq("assigned_to", targetAssignedToId);
       
       // Add search filter if provided
       if (searchQuery.trim()) {
@@ -304,6 +325,7 @@ export function useStakeholderIssues() {
               description: issueData.description,
               status: issueData.status,
               priority: issueData.priority,
+              assigned_to: issueData.assigned_to,
               attachments,
               company_id,
               created_by: employeeInfo?.id,
@@ -550,7 +572,7 @@ export function useStakeholderIssues() {
     // Operations
     fetchIssues,
     fetchIssueById,
-    fetchIssuesByHandler,
+    fetchIssuesByAssignedEmployee,
     searchIssues,
     createIssue,
     updateIssue,
