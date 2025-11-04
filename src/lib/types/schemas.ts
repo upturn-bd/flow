@@ -631,6 +631,7 @@ export interface StakeholderIssue {
   status: 'Pending' | 'In Progress' | 'Resolved';
   priority: 'Low' | 'Medium' | 'High' | 'Urgent';
   attachments: StakeholderIssueAttachment[];
+  assigned_to?: string; // Employee ID assigned to handle this specific issue
   company_id: number;
   created_at?: string;
   updated_at?: string;
@@ -640,6 +641,11 @@ export interface StakeholderIssue {
   resolved_by?: string;
   // Joined data
   stakeholder?: Stakeholder;
+  assigned_employee?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
   creator?: {
     id: string;
     name: string;
