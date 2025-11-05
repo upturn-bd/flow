@@ -16,6 +16,7 @@ interface ServicePageProps {
   actionButtonLabel?: string;
   actionButtonIcon?: ReactNode;
   actionButtonOnClick?: () => void;
+  isLinked?: boolean;
 }
 
 export default function ServicePageTemplate({
@@ -28,7 +29,8 @@ export default function ServicePageTemplate({
   setActiveTab,
   actionButtonLabel,
   actionButtonIcon,
-  actionButtonOnClick
+  actionButtonOnClick,
+  isLinked
 }: ServicePageProps) {
   
   // Animation variants
@@ -117,6 +119,7 @@ export default function ServicePageTemplate({
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         contentVariants={contentVariants}
+        isLinked={isLinked}
       />
     </motion.div>
   );

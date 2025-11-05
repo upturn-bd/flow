@@ -22,6 +22,7 @@ import FormSelectField from "@/components/ui/FormSelectField";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
 import { uploadManyFiles } from "@/lib/utils/files";
+import { useRouter } from "next/navigation";
 
 // Define the settlement state type
 interface SettlementState {
@@ -71,6 +72,8 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const router = useRouter()
 
   useEffect(() => {
     fetchClaimTypes();
@@ -157,7 +160,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
         throw new Error(result.error || "Failed to create settlement request");
       }
 
-      setActiveTab("history")
+      router.push("/ops/settlement?tab=history");
     } catch (error) {
       toast.error("Failed to create settlement request");
       console.error(error);

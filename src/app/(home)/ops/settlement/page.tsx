@@ -16,31 +16,40 @@ import { TabItem } from "@/components/ui/TabView";
 import SettlementHistoryPage from "@/components/ops/settlement/SettlementHistory";
 import SettlementRequestsPage from "@/components/ops/settlement/SettlementRequestsPage";
 import UpcomingPage from "@/components/ops/settlement/UpcomingPage";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 
 export default function SettlementPage() {
-  const [activeTab, setActiveTab] = useState("upcoming");
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const tab = searchParams.get("tab");
+
+  const [activeTab, setActiveTab] = useState( tab || "create");
   const tabs: TabItem[] = [
     {
-      key: "upcoming",
+      key: "create",
       label: "Create New",
       icon: <FilePlus className="h-5 w-5" />,
       color: "text-emerald-600",
-      content: <UpcomingPage setActiveTab={setActiveTab} />
+      content: <UpcomingPage setActiveTab={setActiveTab} />,
+      link: "/ops/settlement?tab=create",
     },
     {
       key: "history",
       label: "History",
       icon: <History className="h-5 w-5" />,
       color: "text-blue-600",
-      content: <SettlementHistoryPage />
+      content: <SettlementHistoryPage />,
+      link: "/ops/settlement?tab=history",
     },
     {
       key: "requests",
       label: "Requests",
       icon: <ClipboardCheck className="h-5 w-5" />,
       color: "text-amber-600",
-      content: <SettlementRequestsPage />
+      content: <SettlementRequestsPage />,
+      link: "/ops/settlement?tab=requests",
     },
     {
       key: "policy",
@@ -72,7 +81,8 @@ export default function SettlementPage() {
             </div>
           </div>
         </div>
-      )
+      ),
+      link: "/ops/settlement?tab=policy",
     },
   ];
 
@@ -85,7 +95,10 @@ export default function SettlementPage() {
       tabs={tabs}
       activeTab={activeTab}
       setActiveTab={setActiveTab}
-      actionButtonOnClick={() => setActiveTab("upcoming")}
+      actionButtonOnClick={() => {
+        router.push("/ops/settlement?tab=create");
+      }}
+      isLinked={true}
     />
   );
 }

@@ -12,6 +12,7 @@ import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
 import { useLeaveBalances } from "@/hooks/useLeaveBalances";
 import { LoadingSpinner } from "@/components/ui";
+import { useRouter } from "next/navigation";
 
 const initialLeaveRecord = {
   type_id: undefined,
@@ -35,6 +36,8 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
 
   const { leaveTypes, fetchLeaveTypes, loading: isLoading } = useLeaveTypes();
   const { createLeaveRequest } = useLeaveRequests();
+
+  const router = useRouter()
 
   // Fetch leave types
   useEffect(() => {
@@ -127,7 +130,8 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
       toast.success("Leave application submitted successfully!");
       setLeaveRecord(initialLeaveRecord);
       setTouched({});
-      setActiveTab('history');
+      
+      router.push("/ops/leave?tab=history");
     } catch (error) {
       console.error("Error creating Leave:", error);
       toast.error("Failed to submit leave application. Please try again.");

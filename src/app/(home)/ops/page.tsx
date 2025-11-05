@@ -49,14 +49,14 @@ const sections = [
     items: [
       {
         name: "Attendance",
-        path: "/ops/attendance",
+        path: "/ops/attendance?tab=records",
         icon: LogIn,
         description: "Track and manage your daily attendance",
         color: "bg-green-100 text-green-700 border-green-200"
       },
       {
         name: "Leave",
-        path: "/ops/leave",
+        path: "/ops/leave?tab=apply",
         icon: CalendarX,
         description: "Apply and manage time off and leaves",
         color: "bg-blue-100 text-blue-700 border-blue-200"
@@ -70,14 +70,14 @@ const sections = [
       },
       {
         name: "Requisition",
-        path: "/ops/requisition",
+        path: "/ops/requisition?tab=create",
         icon: Clipboard,
         description: "Request equipment, supplies and services",
         color: "bg-cyan-100 text-cyan-700 border-cyan-200"
       },
       {
         name: "Settlement",
-        path: "/ops/settlement",
+        path: "/ops/settlement?tab=create",
         icon: DollarSign,
         description: "Manage and track expense reimbursements",
         color: "bg-emerald-100 text-emerald-700 border-emerald-200"

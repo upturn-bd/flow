@@ -14,6 +14,8 @@ import {
   Clock, 
   ClipboardCheck 
 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+
 import { useState } from "react";
 
 const tabs: TabItem[] = [
@@ -22,40 +24,49 @@ const tabs: TabItem[] = [
     label: "Records",
     icon: <Calendar className="h-5 w-5" />,
     color: "text-gray-600",
-    content: <AttendanceRecordsPage />
+    content: <AttendanceRecordsPage />,
+    link: "/ops/attendance?tab=records",
   },
   { 
     key: "present", 
     label: "Present",
     icon: <UserCheck className="h-5 w-5" />,
     color: "text-green-600",
-    content: <AttendancePresentPage />
+    content: <AttendancePresentPage />,
+    link: "/ops/attendance?tab=present",
   },
   { 
     key: "absent", 
     label: "Absent",
     icon: <UserX className="h-5 w-5" />,
     color: "text-red-600",
-    content: <AttendanceAbsentPage />
+    content: <AttendanceAbsentPage />,
+    link: "/ops/attendance?tab=absent",
   },
   { 
     key: "late_wrong", 
     label: "Late / Wrong Location",
     icon: <Clock className="h-5 w-5" />,
     color: "text-amber-600",
-    content: <AttendanceLatePage />
+    content: <AttendanceLatePage />,
+    link: "/ops/attendance?tab=late_wrong",
   },
   { 
     key: "request", 
     label: "Request",
     icon: <ClipboardCheck className="h-5 w-5" />,
     color: "text-blue-600",
-    content: <AttendanceRequestsPage />
+    content: <AttendanceRequestsPage />,
+    link: "/ops/attendance?tab=request",
   },
 ];
 
 export default function AttendancePage() {
-  const [activeTab, setActiveTab] = useState("records");
+  const searchParams = useSearchParams()
+  const tab = searchParams.get("tab");
+
+  const [activeTab, setActiveTab] = useState(tab || "records");
+
 
   return (
     <ServicePageTemplate
@@ -66,9 +77,7 @@ export default function AttendancePage() {
       tabs={tabs}
       activeTab={activeTab}
       setActiveTab={setActiveTab}
-      actionButtonLabel="View Present"
-      actionButtonIcon={<UserCheck className="h-4 w-4" />}
-      actionButtonOnClick={() => setActiveTab("present")}
+      isLinked={true}
     />
   );
 }

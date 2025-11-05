@@ -14,32 +14,40 @@ import {
   AlertTriangle,
   ScrollText
 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 
 export default function RequisitionPage() {
-  const [activeTab, setActiveTab] = useState("upcoming");
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const tab = searchParams.get("tab");
+
+  const [activeTab, setActiveTab] = useState(tab || "create");
 
   const tabs: TabItem[] = [
     {
-      key: "upcoming",
+      key: "create",
       label: "Create New",
       icon: <FilePlus className="h-5 w-5" />,
       color: "text-cyan-600",
-      content: <UpcomingPage setActiveTab={setActiveTab} />
+      content: <UpcomingPage setActiveTab={setActiveTab} />,
+      link: "/ops/requisition?tab=create",
     },
     {
       key: "history",
       label: "History",
       icon: <History className="h-5 w-5" />,
       color: "text-indigo-600",
-      content: <RequisitionHistoryPage />
+      content: <RequisitionHistoryPage />,
+      link: "/ops/requisition?tab=history",
     },
     {
       key: "requests",
       label: "Requests",
       icon: <ClipboardCheck className="h-5 w-5" />,
       color: "text-green-600",
-      content: <RequisitionRequestsPage />
+      content: <RequisitionRequestsPage />,
+      link: "/ops/requisition?tab=requests",
     },
     {
       key: "policy",
@@ -71,7 +79,8 @@ export default function RequisitionPage() {
             </div>
           </div>
         </div>
-      )
+      ),
+      link: "/ops/requisition?tab=policy",
     },
   ];
 
@@ -87,7 +96,10 @@ export default function RequisitionPage() {
       setActiveTab={setActiveTab}
       actionButtonLabel="Create Requisition"
       actionButtonIcon={<FilePlus className="h-4 w-4" />}
-      actionButtonOnClick={() => setActiveTab("upcoming")}
+      actionButtonOnClick={() => {
+        router.push("/ops/requisition?tab=create");
+      }}
+      isLinked={true}
     />
   );
 }

@@ -4,7 +4,7 @@ import LeaveHistoryPage from "@/components/ops/leave/LeaveHistory";
 import LeaveRequestsPage from "@/components/ops/leave/LeaveRequests";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Clock,
@@ -14,30 +14,38 @@ import {
   AlertCircle,
   Calendar
 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LeavePage() {
-  const [activeTab, setActiveTab] = useState("home");
+  const router = useRouter()
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
+
+  const [activeTab, setActiveTab] = useState(tab || "apply");
   const tabs: TabItem[] = [
     {
-      key: "home",
+      key: "apply",
       label: "Apply Leave",
       icon: <PlusCircle className="h-5 w-5" />,
       color: "text-blue-600",
-      content: <LeaveCreatePage setActiveTab={setActiveTab} />
-    },
-    {
-      key: "requests",
-      label: "Requests",
-      icon: <Clock className="h-5 w-5" />,
-      color: "text-amber-600",
-      content: <LeaveRequestsPage />
+      content: <LeaveCreatePage setActiveTab={setActiveTab} />,
+      link: "/ops/leave?tab=apply",
     },
     {
       key: "history",
       label: "History",
       icon: <FileCheck className="h-5 w-5" />,
       color: "text-green-600",
-      content: <LeaveHistoryPage />
+      content: <LeaveHistoryPage />,
+      link: "/ops/leave?tab=history",
+    },
+    {
+      key: "requests",
+      label: "Requests",
+      icon: <Clock className="h-5 w-5" />,
+      color: "text-amber-600",
+      content: <LeaveRequestsPage />,
+      link: "/ops/leave?tab=requests",
     },
     {
       key: "policy",
@@ -69,9 +77,14 @@ export default function LeavePage() {
             </div>
           </div>
         </div>
-      )
+      ),
+      link: "/ops/leave?tab=policy",
     },
   ];
+
+  useEffect(() => {
+    setActiveTab(tab || "apply");
+  }, [tab])
 
 
   return (
@@ -85,7 +98,10 @@ export default function LeavePage() {
       setActiveTab={setActiveTab}
       actionButtonLabel="Apply for Leave"
       actionButtonIcon={<PlusCircle className="h-4 w-4" />}
-      actionButtonOnClick={() => setActiveTab("home")}
+      actionButtonOnClick={() => 
+        router.push("/ops/leave?tab=apply")
+      }
+      isLinked={true}
     />
   );
 }
