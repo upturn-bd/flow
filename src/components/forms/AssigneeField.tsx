@@ -2,12 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MagnifyingGlass as Search, X, Check } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { matchesEmployeeSearch } from '@/lib/utils/user-search';
 
 interface Employee {
   id: string | number;
   name: string;
   email?: string;
   position?: string;
+  designation?: string;
   avatar?: string;
 }
 
@@ -39,8 +41,7 @@ export default function AssigneeField({
 
   // Filter employees based on search term and exclude already selected
   const filteredEmployees = employees.filter(employee => {
-    const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (employee.email && employee.email.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = matchesEmployeeSearch(employee, searchTerm);
     const notSelected = !assignees.includes(employee.id.toString());
     return matchesSearch && notSelected;
   });

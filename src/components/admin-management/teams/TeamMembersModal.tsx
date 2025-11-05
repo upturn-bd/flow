@@ -6,6 +6,7 @@ import { X, MagnifyingGlass, UserPlus, Trash } from '@phosphor-icons/react';
 import { TeamWithMembers } from '@/lib/types';
 import { useEmployees, ExtendedEmployee } from '@/hooks/useEmployees';
 import { useTeams } from '@/hooks/useTeams';
+import { matchesEmployeeSearch } from '@/lib/utils/user-search';
 
 interface TeamMembersModalProps {
   isOpen: boolean;
@@ -48,9 +49,8 @@ export default function TeamMembersModal({
   // Filter employees by search term
   const filteredEmployees = useMemo(() => {
     if (!searchTerm) return availableEmployees;
-    const term = searchTerm.toLowerCase();
-    return availableEmployees.filter(
-      (emp) => emp.name?.toLowerCase().includes(term)
+    return availableEmployees.filter(emp => 
+      matchesEmployeeSearch(emp, searchTerm)
     );
   }, [availableEmployees, searchTerm]);
 
