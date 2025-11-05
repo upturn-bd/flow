@@ -86,9 +86,8 @@ export function matchesEmployeeSearch(
 
   return (
     employee.name?.toLowerCase().includes(searchLower) ||
-    (employee.email?.toLowerCase().includes(searchLower)) ||
-    (employee.designation?.toLowerCase().includes(searchLower)) ||
-    false
+    employee.email?.toLowerCase().includes(searchLower) ||
+    employee.designation?.toLowerCase().includes(searchLower)
   );
 }
 
