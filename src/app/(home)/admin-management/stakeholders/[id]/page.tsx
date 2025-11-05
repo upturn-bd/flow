@@ -79,6 +79,17 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
     loadStakeholder();
   }, [stakeholderId, fetchStakeholderById]);
 
+  // Change active tab when stakeholder loads if permanent stakeholder
+  useEffect(() => {
+    if (stakeholder) {
+      if (stakeholder.status === "Permanent") {
+        setActiveTab("transactions");
+      } else {
+        setActiveTab("process");
+      }
+    }
+  }, [stakeholder]);
+
   const loadStepData = async (id: number) => {
     try {
       const data = await fetchStakeholderStepData(id);
