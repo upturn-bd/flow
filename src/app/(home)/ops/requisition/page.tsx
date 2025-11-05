@@ -4,7 +4,7 @@ import RequisitionRequestsPage from "@/components/ops/requisition/RequisitionReq
 import UpcomingPage from "@/components/ops/requisition/UpcomingPage";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import {
   FilePlus,
@@ -16,10 +16,9 @@ import {
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-
-export default function RequisitionPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+function RequisitionPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
 
   const [activeTab, setActiveTab] = useState(tab || "create");
@@ -84,7 +83,6 @@ export default function RequisitionPage() {
     },
   ];
 
-
   return (
     <ServicePageTemplate
       title="Requisition Management"
@@ -103,3 +101,19 @@ export default function RequisitionPage() {
     />
   );
 }
+
+export default function RequisitionPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <ScrollText className="h-8 w-8 text-cyan-600 animate-pulse" />
+          <p className="text-sm text-gray-600">Loading requisition...</p>
+        </div>
+      </div>
+    }>
+      <RequisitionPageContent />
+    </Suspense>
+  );
+}
+

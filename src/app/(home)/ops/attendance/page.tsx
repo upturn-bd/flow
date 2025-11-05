@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 
 const tabs: TabItem[] = [
   {
@@ -61,12 +61,11 @@ const tabs: TabItem[] = [
   },
 ];
 
-export default function AttendancePage() {
-  const searchParams = useSearchParams()
+function AttendancePageContent() {
+  const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
 
   const [activeTab, setActiveTab] = useState(tab || "records");
-
 
   return (
     <ServicePageTemplate
@@ -79,5 +78,20 @@ export default function AttendancePage() {
       setActiveTab={setActiveTab}
       isLinked={true}
     />
+  );
+}
+
+export default function AttendancePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <Calendar className="h-8 w-8 text-blue-600 animate-pulse" />
+          <p className="text-sm text-gray-600">Loading attendance...</p>
+        </div>
+      </div>
+    }>
+      <AttendancePageContent />
+    </Suspense>
   );
 }

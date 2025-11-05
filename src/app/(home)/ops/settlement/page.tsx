@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import {
   Receipt,
@@ -19,13 +19,12 @@ import UpcomingPage from "@/components/ops/settlement/UpcomingPage";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
-
-export default function SettlementPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+function SettlementPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
 
-  const [activeTab, setActiveTab] = useState( tab || "create");
+  const [activeTab, setActiveTab] = useState(tab || "create");
   const tabs: TabItem[] = [
     {
       key: "create",
@@ -100,5 +99,20 @@ export default function SettlementPage() {
       }}
       isLinked={true}
     />
+  );
+}
+
+export default function SettlementPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <DollarSign className="h-8 w-8 text-emerald-600 animate-pulse" />
+          <p className="text-sm text-gray-600">Loading settlement...</p>
+        </div>
+      </div>
+    }>
+      <SettlementPageContent />
+    </Suspense>
   );
 }

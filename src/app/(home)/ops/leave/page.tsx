@@ -4,7 +4,7 @@ import LeaveHistoryPage from "@/components/ops/leave/LeaveHistory";
 import LeaveRequestsPage from "@/components/ops/leave/LeaveRequests";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import {
   Clock,
@@ -16,8 +16,8 @@ import {
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function LeavePage() {
-  const router = useRouter()
+function LeavePageContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
 
@@ -84,8 +84,7 @@ export default function LeavePage() {
 
   useEffect(() => {
     setActiveTab(tab || "apply");
-  }, [tab])
-
+  }, [tab]);
 
   return (
     <ServicePageTemplate
@@ -98,10 +97,23 @@ export default function LeavePage() {
       setActiveTab={setActiveTab}
       actionButtonLabel="Apply for Leave"
       actionButtonIcon={<PlusCircle className="h-4 w-4" />}
-      actionButtonOnClick={() => 
-        router.push("/ops/leave?tab=apply")
-      }
+      actionButtonOnClick={() => router.push("/ops/leave?tab=apply")}
       isLinked={true}
     />
+  );
+}
+
+export default function LeavePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <Calendar className="h-8 w-8 text-blue-600 animate-pulse" />
+          <p className="text-sm text-gray-600">Loading leave management...</p>
+        </div>
+      </div>
+    }>
+      <LeavePageContent />
+    </Suspense>
   );
 }
