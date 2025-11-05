@@ -577,7 +577,8 @@ export function useStakeholders() {
           step_data:stakeholder_step_data(
             *,
             step:stakeholder_process_steps(id, name, step_order)
-          )
+          ),
+          kam:employees!kam_id(id, first_name, last_name, email)
         `)
         .eq("company_id", company_id)
         .eq("id", stakeholderId)
@@ -590,6 +591,10 @@ export function useStakeholders() {
 
       if (data.process?.steps) {
         data.process.steps.sort((a: any, b: any) => a.step_order - b.step_order);
+      }
+
+      if(data.kam) {
+        data.kam.name = `${data.kam.first_name} ${data.kam.last_name}`;
       }
 
       return data;

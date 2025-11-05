@@ -271,6 +271,18 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 </div>
               </div>
             )}
+
+            {/* KAM Information */}
+            {stakeholder.kam && (
+              <div className="flex items-start gap-3">
+                <User className="text-gray-400 mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm font-medium text-gray-700">KAM</p>
+                  <p className="text-sm text-gray-600 mt-0.5">{stakeholder.kam.name}</p>
+                </div>
+              </div>
+            )}
+
           </div>
 
           {/* Contact Persons */}
@@ -324,31 +336,28 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               <div className="flex">
                 <button
                   onClick={() => setActiveTab("process")}
-                  className={`px-6 py-3 text-sm font-medium transition-colors ${
-                    activeTab === "process"
+                  className={`px-6 py-3 text-sm font-medium transition-colors ${activeTab === "process"
                       ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   Process Steps
                 </button>
                 <button
                   onClick={() => setActiveTab("issues")}
-                  className={`px-6 py-3 text-sm font-medium transition-colors ${
-                    activeTab === "issues"
+                  className={`px-6 py-3 text-sm font-medium transition-colors ${activeTab === "issues"
                       ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   Issues
                 </button>
                 <button
                   onClick={() => setActiveTab("transactions")}
-                  className={`px-6 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${
-                    activeTab === "transactions"
+                  className={`px-6 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "transactions"
                       ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   <DollarSign size={16} />
                   Transactions
@@ -374,7 +383,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         const isCompleted = stepDataEntry?.is_completed || false;
                         const isCurrent = stakeholder.current_step_id === step.id;
                         const isSequential = stakeholder.process?.is_sequential || false;
-                        
+
                         // Check if user can edit this step:
                         // For sequential processes: only current step can be edited
                         // For independent processes: any incomplete step can be edited
@@ -382,36 +391,34 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         const isTeamMember = step.team_id ? userTeamIds.includes(step.team_id) : false;
                         const hasFullWritePermission = hasPermission('stakeholders', 'can_write');
                         const hasTeamAccess = isTeamMember || hasFullWritePermission;
-                        
-                        const canEdit = !stakeholder.is_completed && 
-                                       !isCompleted &&
-                                       hasTeamAccess &&
-                                       (isSequential ? isCurrent : true);
+
+                        const canEdit = !stakeholder.is_completed &&
+                          !isCompleted &&
+                          hasTeamAccess &&
+                          (isSequential ? isCurrent : true);
 
                         return (
                           <div
                             key={step.id}
-                            className={`border rounded-lg ${
-                              isCurrent
+                            className={`border rounded-lg ${isCurrent
                                 ? "border-blue-300 bg-blue-50"
                                 : isCompleted
-                                ? "border-green-300 bg-green-50"
-                                : canEdit && !isSequential
-                                ? "border-blue-200 bg-blue-25"
-                                : "border-gray-200 bg-gray-50"
-                            }`}
+                                  ? "border-green-300 bg-green-50"
+                                  : canEdit && !isSequential
+                                    ? "border-blue-200 bg-blue-25"
+                                    : "border-gray-200 bg-gray-50"
+                              }`}
                           >
                             <div className="p-4">
                               <div className="flex items-start justify-between">
                                 <div className="flex items-start gap-3">
                                   <div
-                                    className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-                                      isCompleted
+                                    className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${isCompleted
                                         ? "bg-green-500 text-white"
                                         : isCurrent
-                                        ? "bg-blue-500 text-white"
-                                        : "bg-gray-300 text-gray-600"
-                                    }`}
+                                          ? "bg-blue-500 text-white"
+                                          : "bg-gray-300 text-gray-600"
+                                      }`}
                                   >
                                     {isCompleted ? (
                                       <CheckCircle2 size={18} />
@@ -469,100 +476,100 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                               {/* Display Completed Data */}
                               {isCompleted && stepDataEntry && (
                                 <div className="mt-4 pt-4 border-t border-gray-200">
-                            <div className="grid grid-cols-2 gap-4">
-                              {Object.entries(stepDataEntry.data).map(([key, value]) => {
-                                // Check if this is a file field by looking at the field definitions
-                                const fieldDef = step.field_definitions?.fields?.find(
-                                  (f) => f.key === key
-                                );
-                                const isFileField = fieldDef?.type === 'file';
-                                
-                                // Helper to get file info
-                                const getFileInfo = () => {
-                                  if (typeof value === 'object' && value !== null && 'path' in value) {
-                                    return {
-                                      url: getPublicFileUrl(value.path),
-                                      name: value.originalName || value.path.split('/').pop(),
-                                      size: value.size,
-                                      uploadedAt: value.uploadedAt,
-                                    };
-                                  } else if (typeof value === 'string') {
-                                    // Legacy format
-                                    return {
-                                      url: getPublicFileUrl(value),
-                                      name: value.split('/').pop(),
-                                    };
-                                  }
-                                  return null;
-                                };
+                                  <div className="grid grid-cols-2 gap-4">
+                                    {Object.entries(stepDataEntry.data).map(([key, value]) => {
+                                      // Check if this is a file field by looking at the field definitions
+                                      const fieldDef = step.field_definitions?.fields?.find(
+                                        (f) => f.key === key
+                                      );
+                                      const isFileField = fieldDef?.type === 'file';
 
-                                const fileInfo = isFileField ? getFileInfo() : null;
-                                
-                                return (
-                                  <div key={key}>
-                                    <p className="text-xs font-medium text-gray-500 uppercase">
-                                      {key.replace(/_/g, " ")}
-                                    </p>
-                                    {isFileField && fileInfo ? (
-                                      <div className="mt-1">
-                                        <a
-                                          href={fileInfo.url}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
-                                        >
-                                          <FileText size={16} />
-                                          <span className="truncate">{fileInfo.name}</span>
-                                          <Download size={14} />
-                                        </a>
-                                        {fileInfo.size && (
-                                          <p className="text-xs text-gray-500 mt-1">
-                                            {(fileInfo.size / 1024).toFixed(2)} KB
+                                      // Helper to get file info
+                                      const getFileInfo = () => {
+                                        if (typeof value === 'object' && value !== null && 'path' in value) {
+                                          return {
+                                            url: getPublicFileUrl(value.path),
+                                            name: value.originalName || value.path.split('/').pop(),
+                                            size: value.size,
+                                            uploadedAt: value.uploadedAt,
+                                          };
+                                        } else if (typeof value === 'string') {
+                                          // Legacy format
+                                          return {
+                                            url: getPublicFileUrl(value),
+                                            name: value.split('/').pop(),
+                                          };
+                                        }
+                                        return null;
+                                      };
+
+                                      const fileInfo = isFileField ? getFileInfo() : null;
+
+                                      return (
+                                        <div key={key}>
+                                          <p className="text-xs font-medium text-gray-500 uppercase">
+                                            {key.replace(/_/g, " ")}
                                           </p>
-                                        )}
-                                      </div>
-                                    ) : (
-                                      <p className="text-sm text-gray-900 mt-1">
-                                        {typeof value === "boolean"
-                                          ? value
-                                            ? "Yes"
-                                            : "No"
-                                          : String(value)}
-                                      </p>
-                                    )}
+                                          {isFileField && fileInfo ? (
+                                            <div className="mt-1">
+                                              <a
+                                                href={fileInfo.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+                                              >
+                                                <FileText size={16} />
+                                                <span className="truncate">{fileInfo.name}</span>
+                                                <Download size={14} />
+                                              </a>
+                                              {fileInfo.size && (
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                  {(fileInfo.size / 1024).toFixed(2)} KB
+                                                </p>
+                                              )}
+                                            </div>
+                                          ) : (
+                                            <p className="text-sm text-gray-900 mt-1">
+                                              {typeof value === "boolean"
+                                                ? value
+                                                  ? "Yes"
+                                                  : "No"
+                                                : String(value)}
+                                            </p>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
                                   </div>
-                                );
-                              })}
+                                  {stepDataEntry.completed_at && (
+                                    <p className="text-xs text-gray-500 mt-4">
+                                      Completed on{" "}
+                                      {new Date(stepDataEntry.completed_at).toLocaleDateString()}
+                                    </p>
+                                  )}
+                                </div>
+                              )}
                             </div>
-                            {stepDataEntry.completed_at && (
-                              <p className="text-xs text-gray-500 mt-4">
-                                Completed on{" "}
-                                {new Date(stepDataEntry.completed_at).toLocaleDateString()}
-                              </p>
-                            )}
                           </div>
-                        )}
-                      </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </>
-        ) : activeTab === "issues" ? (
-          // Issues Tab Content
-          <StakeholderIssuesTab stakeholderId={stakeholderId} />
-        ) : (
-          // Transactions Tab Content
-          <StakeholderTransactions 
-            stakeholderId={stakeholderId} 
-            stakeholderName={stakeholder.name}
-          />
-        )}
+                  )}
+                </>
+              ) : activeTab === "issues" ? (
+                // Issues Tab Content
+                <StakeholderIssuesTab stakeholderId={stakeholderId} />
+              ) : (
+                // Transactions Tab Content
+                <StakeholderTransactions
+                  stakeholderId={stakeholderId}
+                  stakeholderName={stakeholder.name}
+                />
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
