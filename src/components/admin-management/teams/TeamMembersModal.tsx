@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MagnifyingGlass, UserPlus, Trash } from '@phosphor-icons/react';
 import { TeamWithMembers } from '@/lib/types';
@@ -20,17 +20,17 @@ export default function TeamMembersModal({
   team,
   onMembersUpdated,
 }: TeamMembersModalProps) {
-  const { employees, extendedEmployees, loading: employeesLoading } = useEmployees();
+  const { employees, extendedEmployees, fetchEmployees, fetchExtendedEmployees, loading: employeesLoading } = useEmployees();
   const { addTeamMember, removeTeamMember, loading: teamLoading } = useTeams();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
 
-  // Debug logging
-  console.log('TeamMembersModal - team:', team);
-  console.log('TeamMembersModal - team.members:', team.members);
-  console.log('TeamMembersModal - team.members[0]:', team.members?.[0]);
-  console.log('TeamMembersModal - employees:', employees);
-  console.log('TeamMembersModal - extendedEmployees:', extendedEmployees);
+  // Fetch employees when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchExtendedEmployees();
+    }
+  }, [isOpen, fetchExtendedEmployees]);
 
   // Get current member IDs
   const memberIds = useMemo(

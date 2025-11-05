@@ -852,6 +852,7 @@ export function useStakeholders() {
 
       try {
         // Save the step data as completed
+        // The database trigger will automatically update current_step_id for sequential processes
         await saveStepData({
           stakeholder_id: stakeholderId,
           step_id: stepId,
@@ -859,54 +860,38 @@ export function useStakeholders() {
           is_completed: true,
         });
 
-        // Fetch the stakeholder to check if the process is sequential
+        // Check if all steps are completed to mark stakeholder as completed
         const stakeholderData = await fetchStakeholderById(stakeholderId);
         
-        if (stakeholderData?.process?.is_sequential) {
-          // Get the current step's order
-          const currentStep = stakeholderData.process.steps?.find(
-            (step: StakeholderProcessStep) => step.id === stepId
-          );
+        if (stakeholderData?.process?.steps) {
+          const allSteps = stakeholderData.process.steps;
+          const completedSteps = stakeholderData.step_data?.filter(
+            (sd: StakeholderStepData) => sd.is_completed
+          ) || [];
+          
+          // If all steps are completed, mark stakeholder as completed
+          if (allSteps.length > 0 && completedSteps.length >= allSteps.length) {
+            const { error: completeError } = await supabase
+              .from("stakeholders")
+              .update({
+                is_completed: true,
+                completed_at: new Date().toISOString(),
+                status: 'Permanent', // Stakeholder becomes permanent when all steps completed
+              })
+              .eq("id", stakeholderId);
 
-          if (currentStep) {
-            // Find the next step
-            const nextStep = stakeholderData.process.steps
-              ?.sort((a: StakeholderProcessStep, b: StakeholderProcessStep) => 
-                a.step_order - b.step_order
-              )
-              .find((step: StakeholderProcessStep) => 
-                step.step_order === currentStep.step_order + 1
-              );
-
-            if (nextStep) {
-              // Update the stakeholder's current step
-              await supabase
-                .from("stakeholders")
-                .update({
-                  current_step_id: nextStep.id,
-                  current_step_order: nextStep.step_order,
-                })
-                .eq("id", stakeholderId);
-            } else {
-              // No more steps - mark stakeholder as completed
-              await supabase
-                .from("stakeholders")
-                .update({
-                  is_completed: true,
-                  completed_at: new Date().toISOString(),
-                })
-                .eq("id", stakeholderId);
+            if (completeError) {
+              console.error("Error marking stakeholder as completed:", completeError);
+              throw completeError;
             }
           }
         }
 
-        // Refresh stakeholder data
-        await fetchStakeholderById(stakeholderId);
-
         return true;
       } catch (error) {
         console.error("Error completing step:", error);
-        return false;
+        setError("Failed to complete step");
+        throw error;
       }
     },
     [saveStepData, fetchStakeholderById]

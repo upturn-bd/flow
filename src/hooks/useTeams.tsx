@@ -559,6 +559,62 @@ export function useTeams() {
   }, []);
 
   // ==============================================================================
+  // Utility Functions
+  // ==============================================================================
+
+  /**
+   * Check if an employee is a member of a specific team
+   */
+  const isTeamMember = useCallback(async (
+    teamId: number,
+    employeeId?: string
+  ): Promise<boolean> => {
+    try {
+      const empId = employeeId || await getEmployeeId();
+
+      const { data, error: fetchError } = await supabase
+        .from("team_members")
+        .select("id")
+        .eq("team_id", teamId)
+        .eq("employee_id", empId)
+        .single();
+
+      if (fetchError && fetchError.code !== 'PGRST116') { // Ignore "not found" errors
+        console.error("Error checking team membership:", fetchError);
+        return false;
+      }
+
+      return !!data;
+    } catch (err: any) {
+      console.error("Error checking team membership:", err);
+      return false;
+    }
+  }, []);
+
+  /**
+   * Get all team IDs for a specific employee
+   */
+  const getEmployeeTeamIds = useCallback(async (
+    employeeId?: string
+  ): Promise<number[]> => {
+    try {
+      const empId = employeeId || await getEmployeeId();
+
+      const { data, error: fetchError } = await supabase
+        .from("team_members")
+        .select("team_id")
+        .eq("employee_id", empId);
+
+      if (fetchError) throw fetchError;
+
+      return (data || []).map((item: any) => item.team_id);
+    } catch (err: any) {
+      console.error("Error fetching employee team IDs:", err);
+      return [];
+    }
+  }, []);
+
+  // ==============================================================================
   // Return hook interface
   // ==============================================================================
 
@@ -584,6 +640,10 @@ export function useTeams() {
     removeTeamMember,
     addTeamMembers,
 
+    // Utility functions
+    isTeamMember,
+    getEmployeeTeamIds,
+
     // Permission management
     updateTeamPermission,
     updateTeamPermissions,
@@ -601,6 +661,8 @@ export function useTeams() {
     addTeamMember,
     removeTeamMember,
     addTeamMembers,
+    isTeamMember,
+    getEmployeeTeamIds,
     updateTeamPermission,
     updateTeamPermissions,
   ]);

@@ -3,6 +3,8 @@
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
+import { useTeams } from "@/hooks/useTeams";
+import { usePermissions } from "@/hooks/usePermissions";
 import { getPublicFileUrl } from "@/lib/utils/files";
 import {
   ArrowLeft,
@@ -38,12 +40,29 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
     deleteStakeholder,
   } = useStakeholders();
 
+  const { getEmployeeTeamIds } = useTeams();
+  const { hasPermission } = usePermissions();
+
   const [stakeholder, setStakeholder] = useState<Stakeholder | null>(null);
   const [stepData, setStepData] = useState<StakeholderStepData[]>([]);
   const [activeStepId, setActiveStepId] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [activeTab, setActiveTab] = useState<"process" | "issues" | "transactions">("process");
+  const [userTeamIds, setUserTeamIds] = useState<number[]>([]);
+
+  // Load user's team memberships on mount
+  useEffect(() => {
+    const loadUserTeams = async () => {
+      try {
+        const teamIds = await getEmployeeTeamIds();
+        setUserTeamIds(teamIds);
+      } catch (err) {
+        console.error("Error loading user teams:", err);
+      }
+    };
+    loadUserTeams();
+  }, [getEmployeeTeamIds]);
 
   useEffect(() => {
     const loadStakeholder = async () => {
@@ -343,7 +362,20 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         const stepDataEntry = stepData.find((sd) => sd.step_id === step.id);
                         const isCompleted = stepDataEntry?.is_completed || false;
                         const isCurrent = stakeholder.current_step_id === step.id;
-                        const canEdit = isCurrent && !stakeholder.is_completed;
+                        const isSequential = stakeholder.process?.is_sequential || false;
+                        
+                        // Check if user can edit this step:
+                        // For sequential processes: only current step can be edited
+                        // For independent processes: any incomplete step can be edited
+                        // In both cases: stakeholder must not be completed AND user must have team access
+                        const isTeamMember = step.team_id ? userTeamIds.includes(step.team_id) : false;
+                        const hasFullWritePermission = hasPermission('stakeholders', 'can_write');
+                        const hasTeamAccess = isTeamMember || hasFullWritePermission;
+                        
+                        const canEdit = !stakeholder.is_completed && 
+                                       !isCompleted &&
+                                       hasTeamAccess &&
+                                       (isSequential ? isCurrent : true);
 
                         return (
                           <div
@@ -353,6 +385,8 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                 ? "border-blue-300 bg-blue-50"
                                 : isCompleted
                                 ? "border-green-300 bg-green-50"
+                                : canEdit && !isSequential
+                                ? "border-blue-200 bg-blue-25"
                                 : "border-gray-200 bg-gray-50"
                             }`}
                           >
@@ -382,6 +416,17 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                                       <span>Team: {step.team?.name || "N/A"}</span>
                                     </div>
+                                    {/* Show permission/access warnings */}
+                                    {!stakeholder.is_completed && !isCompleted && !hasTeamAccess && (
+                                      <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
+                                        You must be a member of the {step.team?.name || "assigned team"} to work on this step
+                                      </div>
+                                    )}
+                                    {!stakeholder.is_completed && !isCompleted && hasTeamAccess && isSequential && !isCurrent && (
+                                      <div className="mt-2 text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded">
+                                        This step will become available after completing the previous steps (sequential process)
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
 
