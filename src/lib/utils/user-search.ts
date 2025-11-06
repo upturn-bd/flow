@@ -84,7 +84,7 @@ export function matchesEmployeeSearch(
 
   const searchLower = searchTerm.toLowerCase().trim();
 
-  return (
+  return !!(
     employee.name?.toLowerCase().includes(searchLower) ||
     employee.email?.toLowerCase().includes(searchLower) ||
     employee.designation?.toLowerCase().includes(searchLower)
