@@ -16,6 +16,7 @@ import {
 import FormInputField from "@/components/ui/FormInputField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
+import { matchesEmployeeSearch } from "@/lib/utils/user-search";
 
 // Filter options
 type FilterOptions = {
@@ -44,12 +45,11 @@ useEffect(() => {
   if (extendedEmployees.length === 0) return;
 
   const filtered = extendedEmployees.filter((employee) => {
-    // Search query (case-insensitive)
+    // Search query using unified search (includes name, email, designation)
+    // Note: department is not part of the unified search fields but kept here for backward compatibility
     const matchesSearch =
       searchQuery === "" ||
-      employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      employee.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      employee.designation?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      matchesEmployeeSearch(employee, searchQuery) ||
       employee.department?.toLowerCase().includes(searchQuery.toLowerCase());
 
     if (!matchesSearch) return false;

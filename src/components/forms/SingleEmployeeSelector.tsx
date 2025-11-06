@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MagnifyingGlass as Search, X, CaretDown, User } from '@phosphor-icons/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { matchesEmployeeSearch } from '@/lib/utils/user-search';
 
 interface Employee {
   id: string | number;
@@ -37,11 +38,9 @@ export default function SingleEmployeeSelector({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Filter employees based on search term
-  const filteredEmployees = employees.filter(employee => {
-    const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (employee.email && employee.email.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesSearch;
-  });
+  const filteredEmployees = employees.filter(employee => 
+    matchesEmployeeSearch(employee, searchTerm)
+  );
 
   const getSelectedEmployee = () => {
     return employees.find(employee => employee.id.toString() === selectedEmployeeId);

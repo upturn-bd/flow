@@ -3,9 +3,10 @@
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Users } from "lucide-react";
+import { matchesEmployeeSearch } from "@/lib/utils/user-search";
 
 interface AssigneeSelectProps {
-  employees: { id: string; name: string }[];
+  employees: { id: string; name: string; email?: string; designation?: string }[];
   selectedAssignees: string[];
   onAddAssignee: (id: string) => void;
   onRemoveAssignee: (id: string) => void;
@@ -26,7 +27,7 @@ export default function AssigneeSelect({
 
   const filteredEmployees = employees.filter(
     (emp) =>
-      emp.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      matchesEmployeeSearch(emp, searchTerm) &&
       !selectedAssignees.includes(emp.id) &&
       !excludeIds.includes(emp.id)
   );
