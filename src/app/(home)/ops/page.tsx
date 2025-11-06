@@ -336,7 +336,7 @@ export default function ServicesPage() {
                     >
                       <Link
                         href={item.path}
-                        className={`group flex items-start p-4 bg-white rounded-lg border ${item.color.includes('border') ? item.color.split(' ').find(c => c.startsWith('border-')) : 'border-gray-200'} shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 block`}
+                        className={`group flex items-center p-4 bg-white rounded-lg border ${item.color.includes('border') ? item.color.split(' ').find(c => c.startsWith('border-')) : 'border-gray-200'} shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 block h-28`}
                       >
                         <motion.div 
                           whileHover={{ scale: 1.1 }}
