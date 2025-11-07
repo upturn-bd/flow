@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["@ducanh2912/next-pwa/workbox"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/lib/types/asdtsasdas.bak"],
   "exclude": ["node_modules","supabase"]

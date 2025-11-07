@@ -198,6 +198,11 @@ export const EXCLUDE_PATHS = [
   '/unauthorized',
   '/test-notifications',
   ROUTES.API.BASE,
+  '/sw.js',
+  '/workbox-',
+  '/swe-worker',
+  '/manifest.json',
+  '/icons',
 ];
 
 export const EMPLOYEE_ROUTES = [
