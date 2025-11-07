@@ -4,6 +4,7 @@
 import "./globals.css";
 import 'leaflet/dist/leaflet.css';
 import { Toaster } from "sonner";
+import PWARegistration from "@/components/PWARegistration";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -14,12 +15,18 @@ export const metadata = {
   title: "Flow",
   description: "Your all in one business solution",
   manifest: "/manifest.json",
-  themeColor: "#1e3a8a",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Flow",
   },
+};
+
+export const viewport = {
+  themeColor: "#1e3a8a",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -40,7 +47,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Upturn" />
       </head>
-      <body className="antialiased">{children}
+      <body className="antialiased">
+        <PWARegistration />
+        {children}
 
         <Toaster position="bottom-right" richColors />
       </body>
