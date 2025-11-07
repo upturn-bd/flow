@@ -19,6 +19,7 @@ import {
     GitBranch, // Stakeholder Processes (workflow/branching)
     File,
     Search,
+    Download, // Data Export
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -63,6 +64,13 @@ const sections = [
                 icon: GitBranch,
                 description: "Manage workflow processes for stakeholders and leads",
                 color: "bg-teal-100 text-teal-700 border-teal-200"
+            },
+            {
+                name: "Data Export",
+                path: "/admin-management/data-export",
+                icon: Download,
+                description: "Export HRIS and stakeholder data to CSV format",
+                color: "bg-emerald-100 text-emerald-700 border-emerald-200"
             },
         ],
     },

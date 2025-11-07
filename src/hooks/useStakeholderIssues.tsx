@@ -68,7 +68,8 @@ export function useStakeholderIssues() {
           ),
           assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
             id,
-            name,
+            first_name,
+            last_name,
             email
           )
         `)
@@ -85,8 +86,18 @@ export function useStakeholderIssues() {
         throw error;
       }
 
-      setIssues(data || []);
-      return data;
+      // Transform employee data to combine first_name and last_name
+      const transformedData = data?.map((issue) => ({
+        ...issue,
+        assigned_employee: issue.assigned_employee ? {
+          id: issue.assigned_employee.id,
+          name: `${issue.assigned_employee.first_name} ${issue.assigned_employee.last_name}`,
+          email: issue.assigned_employee.email,
+        } : undefined,
+      })) || [];
+
+      setIssues(transformedData);
+      return transformedData;
     } catch (error) {
       console.error("Error fetching stakeholder issues:", error);
       setError("Failed to fetch issues");
@@ -116,7 +127,8 @@ export function useStakeholderIssues() {
           ),
           assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
             id,
-            name,
+            first_name,
+            last_name,
             email
           )
         `)
@@ -129,7 +141,17 @@ export function useStakeholderIssues() {
         throw error;
       }
 
-      return data;
+      // Transform employee data to combine first_name and last_name
+      const transformedData = data ? {
+        ...data,
+        assigned_employee: data.assigned_employee ? {
+          id: data.assigned_employee.id,
+          name: `${data.assigned_employee.first_name} ${data.assigned_employee.last_name}`,
+          email: data.assigned_employee.email,
+        } : undefined,
+      } : null;
+
+      return transformedData;
     } catch (error) {
       console.error("Error fetching issue:", error);
       setError("Failed to fetch issue");
@@ -164,7 +186,8 @@ export function useStakeholderIssues() {
           ),
           assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
             id,
-            name,
+            first_name,
+            last_name,
             email
           )
         `)
@@ -177,8 +200,18 @@ export function useStakeholderIssues() {
         throw error;
       }
 
-      setIssues(data || []);
-      return data;
+      // Transform employee data to combine first_name and last_name
+      const transformedData = data?.map((issue) => ({
+        ...issue,
+        assigned_employee: issue.assigned_employee ? {
+          id: issue.assigned_employee.id,
+          name: `${issue.assigned_employee.first_name} ${issue.assigned_employee.last_name}`,
+          email: issue.assigned_employee.email,
+        } : undefined,
+      })) || [];
+
+      setIssues(transformedData);
+      return transformedData;
     } catch (error) {
       console.error("Error fetching issues by assigned employee:", error);
       setError("Failed to fetch issues");
@@ -223,7 +256,8 @@ export function useStakeholderIssues() {
           ),
           assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
             id,
-            name,
+            first_name,
+            last_name,
             email
           )
         `, { count: 'exact' })
@@ -257,17 +291,27 @@ export function useStakeholderIssues() {
       
       if (error) throw error;
       
+      // Transform employee data to combine first_name and last_name
+      const transformedData = data?.map((issue) => ({
+        ...issue,
+        assigned_employee: issue.assigned_employee ? {
+          id: issue.assigned_employee.id,
+          name: `${issue.assigned_employee.first_name} ${issue.assigned_employee.last_name}`,
+          email: issue.assigned_employee.email,
+        } : undefined,
+      })) || [];
+      
       const totalCount = count || 0;
       const totalPages = Math.ceil(totalCount / pageSize);
       
       const result: StakeholderIssueSearchResult = {
-        issues: data || [],
+        issues: transformedData,
         totalCount,
         totalPages,
         currentPage: page,
       };
       
-      setIssues(data || []);
+      setIssues(transformedData);
       return result;
     } catch (error) {
       console.error("Error searching issues:", error);

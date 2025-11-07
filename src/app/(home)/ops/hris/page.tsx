@@ -12,11 +12,14 @@ import {
   Calendar,
   Filter,
   LoaderCircle,
+  Download,
 } from "lucide-react";
 import FormInputField from "@/components/ui/FormInputField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
 import { matchesEmployeeSearch } from "@/lib/utils/user-search";
+import { exportEmployeesToCSV } from "@/lib/utils/csv-export";
+import { toast } from "sonner";
 
 // Filter options
 type FilterOptions = {
@@ -84,6 +87,28 @@ useEffect(() => {
     }
   };
 
+  const handleExportCSV = () => {
+    if (filteredEmployees.length === 0) {
+      toast.error("No employees to export");
+      return;
+    }
+
+    try {
+      exportEmployeesToCSV(filteredEmployees, {
+        includeEmail: true,
+        includePhone: true,
+        includeDepartment: true,
+        includeDesignation: true,
+        includeJoinDate: true,
+        includeSalary: false, // Don't include salary by default
+      });
+      toast.success(`Exported ${filteredEmployees.length} employee(s) to CSV`);
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      toast.error("Failed to export data");
+    }
+  };
+
   return (
     <motion.div
       initial="hidden"
@@ -92,21 +117,33 @@ useEffect(() => {
       className="max-w-6xl mx-auto p-4 sm:p-6 pb-12"
     >
       {/* Header */}
-      <motion.div variants={fadeInUp} className="flex items-center mb-8">
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0.5 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="p-2 rounded-lg bg-indigo-100 text-indigo-700 mr-3"
-        >
-          <Users size={24} />
-        </motion.div>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Employee Finder</h1>
-          <p className="text-gray-600">
-            Search and find detailed information about employees
-          </p>
+      <motion.div variants={fadeInUp} className="flex items-center justify-between mb-8">
+        <div className="flex items-center">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0.5 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="p-2 rounded-lg bg-indigo-100 text-indigo-700 mr-3"
+          >
+            <Users size={24} />
+          </motion.div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Employee Finder</h1>
+            <p className="text-gray-600">
+              Search and find detailed information about employees
+            </p>
+          </div>
         </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleExportCSV}
+          disabled={loading || filteredEmployees.length === 0}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Download size={18} />
+          Export CSV
+        </motion.button>
       </motion.div>
 
       {/* Search and Filters */}
