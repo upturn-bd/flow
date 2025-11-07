@@ -10,6 +10,13 @@
   - Fixed all circular dependency issues
   - This is the ONLY file you need to run on a fresh database
 
+### 🆕 Auto-Assign Trigger (CRITICAL FOR NEW USERS)
+- **`auto_assign_new_employees_to_team.sql`** ⚡ **RUN THIS AFTER MAIN SETUP**
+  - Automatically adds new employees to default teams
+  - Fixes "User has no permissions - no team membership" error
+  - Backfills existing approved employees without teams
+  - **MUST RUN THIS** or new users won't be able to access the app!
+
 ### Utility Files (Keep for reference/debugging)
 - **`check_team_data.sql`**
   - Useful for verifying data after setup
@@ -42,10 +49,11 @@
 
 ```
 sql/
-├── setup_team_permissions_system.sql    ← Main setup (RUN THIS)
-├── check_team_data.sql                  ← Verify data
-├── verify_team_permissions_schema.sql   ← Verify schema
-├── accounts_table.sql                   ← Other features
+├── setup_team_permissions_system.sql           ← 1. Main setup (RUN FIRST)
+├── auto_assign_new_employees_to_team.sql      ← 2. Auto-assign trigger (RUN SECOND) ⚡
+├── check_team_data.sql                         ← 3. Verify data
+├── verify_team_permissions_schema.sql          ← 4. Verify schema
+├── accounts_table.sql                          ← Other features
 ├── notifications_table.sql
 ├── payroll_system.sql
 └── stakeholder_system.sql
@@ -55,15 +63,41 @@ sql/
 
 ### For Fresh Database Setup:
 1. Run `setup_team_permissions_system.sql`
-2. Verify with `check_team_data.sql`
-3. Done! ✅
+2. **Run `auto_assign_new_employees_to_team.sql`** ⚡ (Critical!)
+3. Verify with `check_team_data.sql`
+4. Done! ✅
 
-### For Existing Database:
-The main setup script uses `CREATE TABLE IF NOT EXISTS` and `ON CONFLICT` clauses, so it's safe to run on existing databases. It will:
-- Create missing tables
-- Preserve existing teams and data
-- Update RLS policies to fixed versions
-- Ensure all companies have default teams
+### For Existing Database (IMPORTANT - READ THIS):
+If you see the error **"User has no permissions - no team membership"** when new users sign up:
+
+**Quick Fix:**
+1. Open your Supabase Dashboard
+2. Go to SQL Editor → New Query
+3. Copy and paste the entire contents of `auto_assign_new_employees_to_team.sql`
+4. Run the query
+5. This will:
+   - Create an automatic trigger for new employees
+   - Backfill any existing approved employees who aren't in teams yet
+   - Fix the "unauthorized" redirect issue
+
+### Running SQL Files:
+
+**Option 1: Supabase Dashboard (Recommended)**
+1. Go to your Supabase project → SQL Editor
+2. Click "New Query"
+3. Copy and paste the SQL file contents
+4. Click "Run"
+
+**Option 2: Supabase CLI**
+```bash
+supabase db execute -f sql/setup_team_permissions_system.sql
+supabase db execute -f sql/auto_assign_new_employees_to_team.sql
+```
+
+**Option 3: Shell Script**
+```bash
+./sql/run_auto_assign_setup.sh
+```
 
 ## 📝 What Changed
 

@@ -149,6 +149,22 @@ export function useOnboarding() {
         throw new Error("Not authenticated");
       }
 
+      // Check if email already exists for a different user
+      const { data: existingEmployee, error: checkError } = await supabase
+        .from("employees")
+        .select("id, email")
+        .eq("email", data.email)
+        .neq("id", user.id)
+        .maybeSingle();
+
+      if (checkError) {
+        throw new Error(checkError.message);
+      }
+
+      if (existingEmployee) {
+        throw new Error("This email is already associated with another employee account. Please use a different email address.");
+      }
+
       const { error } = await supabase.from("employees").upsert([
         {
           id: user.id,
