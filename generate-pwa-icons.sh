@@ -9,7 +9,7 @@
 #
 # Usage: ./generate-pwa-icons.sh path/to/your/logo.png
 
-SOURCE_IMAGE=${1:-"public/nav-logo.png"}
+SOURCE_IMAGE=${1:-"public/logo.png"}
 
 if [ ! -f "$SOURCE_IMAGE" ]; then
     echo "Error: Source image not found: $SOURCE_IMAGE"
