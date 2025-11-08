@@ -342,13 +342,21 @@ export function useStakeholderIssues() {
             const fileName = `${Date.now()}_${file.name}`;
             const filePath = `${company_id}/stakeholder-issues/${issueData.stakeholder_id}/${fileName}`;
 
-            const { error: uploadError } = await supabase.storage
+            console.log('Uploading file to path:', filePath);
+
+            const { data: uploadData, error: uploadError } = await supabase.storage
               .from('stakeholder-documents')
-              .upload(filePath, file);
+              .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: false
+              });
 
             if (uploadError) {
+              console.error('Upload error:', uploadError);
               throw new Error(`Failed to upload ${file.name}: ${uploadError.message}`);
             }
+
+            console.log('Upload successful:', uploadData);
 
             attachments.push({
               path: filePath,
@@ -379,6 +387,8 @@ export function useStakeholderIssues() {
           .single();
 
         if (error) throw error;
+
+        console.log('Issue created with attachments:', data);
 
         await fetchIssues(issueData.stakeholder_id);
         return data;
@@ -416,13 +426,21 @@ export function useStakeholderIssues() {
             const fileName = `${Date.now()}_${file.name}`;
             const filePath = `${company_id}/stakeholder-issues/${currentIssue?.stakeholder_id}/${fileName}`;
 
-            const { error: uploadError } = await supabase.storage
+            console.log('Uploading file to path:', filePath);
+
+            const { data: uploadData, error: uploadError } = await supabase.storage
               .from('stakeholder-documents')
-              .upload(filePath, file);
+              .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: false
+              });
 
             if (uploadError) {
+              console.error('Upload error:', uploadError);
               throw new Error(`Failed to upload ${file.name}: ${uploadError.message}`);
             }
+
+            console.log('Upload successful:', uploadData);
 
             attachments.push({
               path: filePath,
@@ -559,14 +577,62 @@ export function useStakeholderIssues() {
   const getAttachmentUrl = useCallback(
     async (filePath: string) => {
       try {
-        const { data } = await supabase.storage
-          .from('stakeholder-documents')
-          .createSignedUrl(filePath, 3600); // 1 hour expiry
+        console.log('Getting URL for file path:', filePath);
 
-        return data?.signedUrl || null;
+        // Since the bucket is public, use public URLs directly
+        // Public URLs work even if the file was just uploaded
+        const { data: publicData } = supabase.storage
+          .from('stakeholder-documents')
+          .getPublicUrl(filePath);
+        
+        if (publicData?.publicUrl) {
+          console.log('Using public URL:', publicData.publicUrl);
+          return publicData.publicUrl;
+        }
+
+        return null;
       } catch (error) {
         console.error("Error getting attachment URL:", error);
         return null;
+      }
+    },
+    []
+  );
+
+  const downloadAttachment = useCallback(
+    async (filePath: string, originalName: string) => {
+      try {
+        console.log('Downloading file:', filePath, 'as', originalName);
+
+        // Download the file as a blob
+        const { data, error } = await supabase.storage
+          .from('stakeholder-documents')
+          .download(filePath);
+
+        if (error) {
+          console.error('Download error:', error);
+          throw error;
+        }
+
+        if (!data) {
+          throw new Error('No data received');
+        }
+
+        // Create a blob URL and trigger download with correct filename
+        const blob = new Blob([data]);
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = originalName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        return true;
+      } catch (error) {
+        console.error("Error downloading attachment:", error);
+        throw error;
       }
     },
     []
@@ -623,5 +689,6 @@ export function useStakeholderIssues() {
     deleteIssue,
     deleteAttachment,
     getAttachmentUrl,
+    downloadAttachment,
   };
 }
