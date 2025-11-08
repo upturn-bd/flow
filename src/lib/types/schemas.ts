@@ -601,6 +601,11 @@ export interface Stakeholder {
     name: string;
     email?: string;
   };
+  rejected_by_employee?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
 }
 
 // Step Data - actual data for each step of each stakeholder

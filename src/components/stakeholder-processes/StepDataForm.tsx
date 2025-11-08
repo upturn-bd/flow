@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 import { StakeholderProcessStep, StakeholderStepData, FieldDefinition } from "@/lib/types/schemas";
 import { Upload, X, CheckCircle2, File as FileIcon, Loader2, XCircle } from "lucide-react";
 import GeolocationPicker, { GeolocationValue } from "@/components/ui/GeolocationPicker";
@@ -450,10 +451,14 @@ export default function StepDataForm({
 
     setRejecting(true);
     try {
+      // Get current employee info for rejected_by
+      const employeeInfo = await getEmployeeInfo();
+      
       // Reject the stakeholder
       await updateStakeholder(stakeholderId, {
         status: "Rejected",
         rejected_at: new Date().toISOString(),
+        rejected_by: employeeInfo?.id,
         rejection_reason: rejectionReason,
         is_active: false,
       } as any);

@@ -578,7 +578,8 @@ export function useStakeholders() {
             *,
             step:stakeholder_process_steps(id, name, step_order)
           ),
-          kam:employees!kam_id(id, first_name, last_name, email)
+          kam:employees!kam_id(id, first_name, last_name, email),
+          rejected_by_employee:employees!rejected_by(id, first_name, last_name, email)
         `)
         .eq("company_id", company_id)
         .eq("id", stakeholderId)
@@ -595,6 +596,10 @@ export function useStakeholders() {
 
       if(data.kam) {
         data.kam.name = `${data.kam.first_name} ${data.kam.last_name}`;
+      }
+
+      if(data.rejected_by_employee) {
+        data.rejected_by_employee.name = `${data.rejected_by_employee.first_name} ${data.rejected_by_employee.last_name}`;
       }
 
       return data;
@@ -856,8 +861,16 @@ export function useStakeholders() {
       setError(null);
 
       try {
+        // Get stakeholder data to check process type
+        const stakeholderData = await fetchStakeholderById(stakeholderId);
+        if (!stakeholderData) {
+          throw new Error("Stakeholder not found");
+        }
+
+        const isSequential = stakeholderData.process?.is_sequential || false;
+        const allSteps = stakeholderData.process?.steps || [];
+
         // Save the step data as completed
-        // The database trigger will automatically update current_step_id for sequential processes
         await saveStepData({
           stakeholder_id: stakeholderId,
           step_id: stepId,
@@ -865,17 +878,40 @@ export function useStakeholders() {
           is_completed: true,
         });
 
-        // Check if all steps are completed to mark stakeholder as completed
-        const stakeholderData = await fetchStakeholderById(stakeholderId);
+        // For sequential processes, manually update current_step_id to next step
+        if (isSequential && allSteps.length > 0) {
+          // Find the current step being completed
+          const currentStep = allSteps.find((s: StakeholderProcessStep) => s.id === stepId);
+          if (currentStep) {
+            // Find the next step by step_order
+            const nextStep = allSteps
+              .filter((s: StakeholderProcessStep) => s.step_order > currentStep.step_order)
+              .sort((a: StakeholderProcessStep, b: StakeholderProcessStep) => a.step_order - b.step_order)[0];
+
+            if (nextStep && nextStep.id) {
+              // Update to next step
+              await supabase
+                .from("stakeholders")
+                .update({
+                  current_step_id: nextStep.id,
+                  current_step_order: nextStep.step_order,
+                })
+                .eq("id", stakeholderId);
+            }
+          }
+        }
+
+        // Re-fetch to get updated data
+        const updatedStakeholderData = await fetchStakeholderById(stakeholderId);
         
-        if (stakeholderData?.process?.steps) {
-          const allSteps = stakeholderData.process.steps;
-          const completedSteps = stakeholderData.step_data?.filter(
+        if (updatedStakeholderData?.process?.steps) {
+          const allStepsCount = updatedStakeholderData.process.steps.length;
+          const completedSteps = updatedStakeholderData.step_data?.filter(
             (sd: StakeholderStepData) => sd.is_completed
           ) || [];
           
           // If all steps are completed, mark stakeholder as completed
-          if (allSteps.length > 0 && completedSteps.length >= allSteps.length) {
+          if (allStepsCount > 0 && completedSteps.length >= allStepsCount) {
             const { error: completeError } = await supabase
               .from("stakeholders")
               .update({
@@ -900,6 +936,102 @@ export function useStakeholders() {
       }
     },
     [saveStepData, fetchStakeholderById]
+  );
+
+  const uncompleteStep = useCallback(
+    async (stakeholderId: number, stepId: number) => {
+      setError(null);
+
+      try {
+        const employeeInfo = await getEmployeeInfo();
+
+        // Get stakeholder info to check if it's sequential
+        const stakeholderData = await fetchStakeholderById(stakeholderId);
+        if (!stakeholderData) {
+          throw new Error("Stakeholder not found");
+        }
+
+        const isSequential = stakeholderData.process?.is_sequential || false;
+
+        // For sequential processes, we need to uncomplete this step AND all steps after it
+        if (isSequential && stakeholderData.process?.steps) {
+          // Find the step_order of the step being rolled back
+          const stepBeingRolledBack = stakeholderData.process.steps.find((s: StakeholderProcessStep) => s.id === stepId);
+          if (!stepBeingRolledBack) {
+            throw new Error("Step not found in process");
+          }
+
+          // Get all steps that come at or after this step
+          const stepsToUncomplete = stakeholderData.process.steps
+            .filter((s: StakeholderProcessStep) => s.step_order >= stepBeingRolledBack.step_order)
+            .map((s: StakeholderProcessStep) => s.id)
+            .filter((id: number | undefined): id is number => id !== undefined);
+
+          // Uncomplete all these steps
+          const { error: updateError } = await supabase
+            .from("stakeholder_step_data")
+            .update({
+              is_completed: false,
+              completed_at: null,
+              completed_by: null,
+              updated_by: employeeInfo?.id,
+            })
+            .eq("stakeholder_id", stakeholderId)
+            .in("step_id", stepsToUncomplete);
+
+          if (updateError) throw updateError;
+
+          // Update stakeholder to set current_step_id to the rolled back step
+          // Also update current_step_order to match
+          const { error: updateStakeholderError } = await supabase
+            .from("stakeholders")
+            .update({
+              current_step_id: stepId,
+              current_step_order: stepBeingRolledBack.step_order,
+              is_completed: false,
+              completed_at: null,
+              status: 'Lead',
+            })
+            .eq("id", stakeholderId);
+
+          if (updateStakeholderError) throw updateStakeholderError;
+        } else {
+          // For non-sequential processes, just uncomplete the specific step
+          const { error: updateError } = await supabase
+            .from("stakeholder_step_data")
+            .update({
+              is_completed: false,
+              completed_at: null,
+              completed_by: null,
+              updated_by: employeeInfo?.id,
+            })
+            .eq("stakeholder_id", stakeholderId)
+            .eq("step_id", stepId);
+
+          if (updateError) throw updateError;
+
+          // Just revert completion status if stakeholder was marked complete
+          const { error: revertError } = await supabase
+            .from("stakeholders")
+            .update({
+              is_completed: false,
+              completed_at: null,
+              status: 'Lead',
+            })
+            .eq("id", stakeholderId)
+            .eq("is_completed", true);
+
+          if (revertError) throw revertError;
+        }
+
+        return true;
+      } catch (error) {
+        console.error("Error uncompleting step:", error);
+        setError("Failed to rollback step");
+        throw error;
+      }
+    },
+    [fetchStakeholderById]
   );
 
   // ==========================================================================
@@ -976,5 +1108,6 @@ export function useStakeholders() {
     fetchStakeholderStepData,
     saveStepData,
     completeStep,
+    uncompleteStep,
   };
 }
