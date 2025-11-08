@@ -12,6 +12,10 @@ import {
   ContactPerson,
   FieldDefinitionsSchema,
 } from "@/lib/types/schemas";
+import { 
+  createStakeholderNotification, 
+  createAccountNotification 
+} from "@/lib/utils/notifications";
 
 // ==============================================================================
 // Form Data Interfaces
@@ -647,6 +651,55 @@ export function useStakeholders() {
 
         if (error) throw error;
 
+        // Send notifications
+        try {
+          // Notify KAM if assigned
+          if (stakeholderData.kam_id) {
+            await createStakeholderNotification(
+              stakeholderData.kam_id,
+              'created',
+              {
+                stakeholderName: stakeholderData.name,
+                processName: process.name,
+              },
+              {
+                referenceId: data.id,
+                actionUrl: `/stakeholders/${data.id}`,
+              }
+            );
+          }
+
+          // Notify team members of the first step
+          if (firstStep.team_id) {
+            const { data: teamMembers } = await supabase
+              .from('team_members')
+              .select('employee_id')
+              .eq('team_id', firstStep.team_id);
+
+            if (teamMembers && teamMembers.length > 0) {
+              await Promise.all(
+                teamMembers.map((member) =>
+                  createStakeholderNotification(
+                    member.employee_id,
+                    'assignedToTeam',
+                    {
+                      stakeholderName: stakeholderData.name,
+                      stepName: firstStep.name,
+                      teamName: firstStep.team?.name || 'Team',
+                    },
+                    {
+                      referenceId: data.id,
+                      actionUrl: `/stakeholders/${data.id}`,
+                    }
+                  )
+                )
+              );
+            }
+          }
+        } catch (notificationError) {
+          console.warn('Failed to send stakeholder creation notifications:', notificationError);
+        }
+
         await fetchStakeholders();
         return data;
       } catch (error) {
@@ -666,6 +719,15 @@ export function useStakeholders() {
       try {
         const employeeInfo = await getEmployeeInfo();
 
+        // Get current stakeholder data to compare changes
+        const { data: currentStakeholder, error: fetchError } = await supabase
+          .from("stakeholders")
+          .select('*, kam:employees!kam_id(id, first_name, last_name)')
+          .eq("id", stakeholderId)
+          .single();
+
+        if (fetchError) throw fetchError;
+
         const { data, error } = await supabase
           .from("stakeholders")
           .update({
@@ -677,6 +739,46 @@ export function useStakeholders() {
           .single();
 
         if (error) throw error;
+
+        // Send notifications
+        try {
+          const kamId = stakeholderData.kam_id || currentStakeholder?.kam_id;
+          
+          // Notify KAM about updates
+          if (kamId) {
+            // Check if status changed
+            if (stakeholderData.status && stakeholderData.status !== currentStakeholder?.status) {
+              await createStakeholderNotification(
+                kamId,
+                'statusChanged',
+                {
+                  stakeholderName: currentStakeholder?.name || data.name,
+                  oldStatus: currentStakeholder?.status || 'Unknown',
+                  newStatus: stakeholderData.status,
+                },
+                {
+                  referenceId: stakeholderId,
+                  actionUrl: `/stakeholders/${stakeholderId}`,
+                }
+              );
+            } else {
+              // General update notification
+              await createStakeholderNotification(
+                kamId,
+                'updated',
+                {
+                  stakeholderName: currentStakeholder?.name || data.name,
+                },
+                {
+                  referenceId: stakeholderId,
+                  actionUrl: `/stakeholders/${stakeholderId}`,
+                }
+              );
+            }
+          }
+        } catch (notificationError) {
+          console.warn('Failed to send stakeholder update notifications:', notificationError);
+        }
 
         await fetchStakeholders();
         return data;
@@ -778,11 +880,20 @@ export function useStakeholders() {
 
         const { data: stepDef, error: stepError } = await supabase
           .from("stakeholder_process_steps")
-          .select("field_definitions, version")
+          .select("field_definitions, version, name, team_id")
           .eq("id", stepDataForm.step_id)
           .single();
 
         if (stepError) throw stepError;
+
+        // Get stakeholder data for notifications
+        const { data: stakeholderData, error: stakeholderError } = await supabase
+          .from("stakeholders")
+          .select("id, name, kam_id")
+          .eq("id", stepDataForm.stakeholder_id)
+          .single();
+
+        if (stakeholderError) throw stakeholderError;
 
         // Process the data to handle file uploads
         const processedData: Record<string, any> = {};
@@ -846,6 +957,56 @@ export function useStakeholders() {
 
         if (error) throw error;
 
+        // Send notifications for step data update (only if not completed - completion is handled separately)
+        if (!stepDataForm.is_completed) {
+          try {
+            // Notify KAM about step update
+            if (stakeholderData.kam_id) {
+              await createStakeholderNotification(
+                stakeholderData.kam_id,
+                'stepUpdated',
+                {
+                  stakeholderName: stakeholderData.name,
+                  stepName: stepDef.name || 'Step',
+                },
+                {
+                  referenceId: stepDataForm.stakeholder_id,
+                  actionUrl: `/stakeholders/${stepDataForm.stakeholder_id}`,
+                }
+              );
+            }
+
+            // Notify team members about step update
+            if (stepDef.team_id) {
+              const { data: teamMembers } = await supabase
+                .from('team_members')
+                .select('employee_id')
+                .eq('team_id', stepDef.team_id);
+
+              if (teamMembers && teamMembers.length > 0) {
+                await Promise.all(
+                  teamMembers.map((member) =>
+                    createStakeholderNotification(
+                      member.employee_id,
+                      'stepUpdated',
+                      {
+                        stakeholderName: stakeholderData.name,
+                        stepName: stepDef.name || 'Step',
+                      },
+                      {
+                        referenceId: stepDataForm.stakeholder_id,
+                        actionUrl: `/stakeholders/${stepDataForm.stakeholder_id}`,
+                      }
+                    )
+                  )
+                );
+              }
+            }
+          } catch (notificationError) {
+            console.warn('Failed to send step update notifications:', notificationError);
+          }
+        }
+
         return data;
       } catch (error) {
         console.error("Error saving step data:", error);
@@ -878,13 +1039,18 @@ export function useStakeholders() {
           is_completed: true,
         });
 
+        // Get the step name for notifications
+        const completedStep = allSteps.find((s: StakeholderProcessStep) => s.id === stepId);
+        const stepName = completedStep?.name || 'Step';
+
         // For sequential processes, manually update current_step_id to next step
+        let nextStep: StakeholderProcessStep | undefined;
         if (isSequential && allSteps.length > 0) {
           // Find the current step being completed
           const currentStep = allSteps.find((s: StakeholderProcessStep) => s.id === stepId);
           if (currentStep) {
             // Find the next step by step_order
-            const nextStep = allSteps
+            nextStep = allSteps
               .filter((s: StakeholderProcessStep) => s.step_order > currentStep.step_order)
               .sort((a: StakeholderProcessStep, b: StakeholderProcessStep) => a.step_order - b.step_order)[0];
 
@@ -925,7 +1091,102 @@ export function useStakeholders() {
               console.error("Error marking stakeholder as completed:", completeError);
               throw completeError;
             }
+
+            // Send completion notification to KAM
+            try {
+              if (stakeholderData.kam_id) {
+                await createStakeholderNotification(
+                  stakeholderData.kam_id,
+                  'completed',
+                  {
+                    stakeholderName: stakeholderData.name,
+                  },
+                  {
+                    referenceId: stakeholderId,
+                    actionUrl: `/stakeholders/${stakeholderId}`,
+                  }
+                );
+              }
+            } catch (notificationError) {
+              console.warn('Failed to send stakeholder completion notification:', notificationError);
+            }
           }
+        }
+
+        // Send notifications for step completion
+        try {
+          // Notify KAM about step completion
+          if (stakeholderData.kam_id) {
+            await createStakeholderNotification(
+              stakeholderData.kam_id,
+              'stepCompleted',
+              {
+                stakeholderName: stakeholderData.name,
+                stepName: stepName,
+              },
+              {
+                referenceId: stakeholderId,
+                actionUrl: `/stakeholders/${stakeholderId}`,
+              }
+            );
+          }
+
+          // Notify current step team members about completion
+          if (completedStep?.team_id) {
+            const { data: teamMembers } = await supabase
+              .from('team_members')
+              .select('employee_id')
+              .eq('team_id', completedStep.team_id);
+
+            if (teamMembers && teamMembers.length > 0) {
+              await Promise.all(
+                teamMembers.map((member) =>
+                  createStakeholderNotification(
+                    member.employee_id,
+                    'stepCompleted',
+                    {
+                      stakeholderName: stakeholderData.name,
+                      stepName: stepName,
+                    },
+                    {
+                      referenceId: stakeholderId,
+                      actionUrl: `/stakeholders/${stakeholderId}`,
+                    }
+                  )
+                )
+              );
+            }
+          }
+
+          // Notify next step team members if sequential
+          if (nextStep && nextStep.team_id) {
+            const { data: nextTeamMembers } = await supabase
+              .from('team_members')
+              .select('employee_id')
+              .eq('team_id', nextStep.team_id);
+
+            if (nextTeamMembers && nextTeamMembers.length > 0) {
+              await Promise.all(
+                nextTeamMembers.map((member) =>
+                  createStakeholderNotification(
+                    member.employee_id,
+                    'assignedToTeam',
+                    {
+                      stakeholderName: stakeholderData.name,
+                      stepName: nextStep.name,
+                      teamName: nextStep.team?.name || 'Team',
+                    },
+                    {
+                      referenceId: stakeholderId,
+                      actionUrl: `/stakeholders/${stakeholderId}`,
+                    }
+                  )
+                )
+              );
+            }
+          }
+        } catch (notificationError) {
+          console.warn('Failed to send step completion notifications:', notificationError);
         }
 
         return true;
@@ -953,10 +1214,13 @@ export function useStakeholders() {
 
         const isSequential = stakeholderData.process?.is_sequential || false;
 
+        // Get the step name for notifications
+        const stepBeingRolledBack = stakeholderData.process?.steps?.find((s: StakeholderProcessStep) => s.id === stepId);
+        const stepName = stepBeingRolledBack?.name || 'Step';
+
         // For sequential processes, we need to uncomplete this step AND all steps after it
         if (isSequential && stakeholderData.process?.steps) {
           // Find the step_order of the step being rolled back
-          const stepBeingRolledBack = stakeholderData.process.steps.find((s: StakeholderProcessStep) => s.id === stepId);
           if (!stepBeingRolledBack) {
             throw new Error("Step not found in process");
           }
@@ -1022,6 +1286,54 @@ export function useStakeholders() {
             .eq("is_completed", true);
 
           if (revertError) throw revertError;
+        }
+
+        // Send notifications for rollback
+        try {
+          // Notify KAM about rollback
+          if (stakeholderData.kam_id) {
+            await createStakeholderNotification(
+              stakeholderData.kam_id,
+              'stepRolledBack',
+              {
+                stakeholderName: stakeholderData.name,
+                stepName: stepName,
+              },
+              {
+                referenceId: stakeholderId,
+                actionUrl: `/stakeholders/${stakeholderId}`,
+              }
+            );
+          }
+
+          // Notify team members of the rolled back step
+          if (stepBeingRolledBack?.team_id) {
+            const { data: teamMembers } = await supabase
+              .from('team_members')
+              .select('employee_id')
+              .eq('team_id', stepBeingRolledBack.team_id);
+
+            if (teamMembers && teamMembers.length > 0) {
+              await Promise.all(
+                teamMembers.map((member) =>
+                  createStakeholderNotification(
+                    member.employee_id,
+                    'stepRolledBack',
+                    {
+                      stakeholderName: stakeholderData.name,
+                      stepName: stepName,
+                    },
+                    {
+                      referenceId: stakeholderId,
+                      actionUrl: `/stakeholders/${stakeholderId}`,
+                    }
+                  )
+                )
+              );
+            }
+          }
+        } catch (notificationError) {
+          console.warn('Failed to send rollback notifications:', notificationError);
         }
 
         return true;

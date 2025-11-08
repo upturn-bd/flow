@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
 import { StakeholderIssue, StakeholderIssueAttachment } from "@/lib/types/schemas";
+import { createStakeholderIssueNotification } from "@/lib/utils/notifications";
 
 // ==============================================================================
 // Form Data Interfaces
@@ -334,6 +335,15 @@ export function useStakeholderIssues() {
         const company_id = await getCompanyId();
         const employeeInfo = await getEmployeeInfo();
 
+        // Get stakeholder data for notifications
+        const { data: stakeholderData, error: stakeholderError } = await supabase
+          .from("stakeholders")
+          .select("id, name, kam_id")
+          .eq("id", issueData.stakeholder_id)
+          .single();
+
+        if (stakeholderError) throw stakeholderError;
+
         // Process file attachments if any
         const attachments: StakeholderIssueAttachment[] = [];
         
@@ -390,6 +400,44 @@ export function useStakeholderIssues() {
 
         console.log('Issue created with attachments:', data);
 
+        // Send notifications
+        try {
+          // Notify KAM about new issue
+          if (stakeholderData.kam_id) {
+            await createStakeholderIssueNotification(
+              stakeholderData.kam_id,
+              'created',
+              {
+                stakeholderName: stakeholderData.name,
+                issueTitle: issueData.title,
+                priority: issueData.priority,
+              },
+              {
+                referenceId: data.id,
+                actionUrl: `/stakeholder-issues/${data.id}`,
+              }
+            );
+          }
+
+          // Notify assigned employee if different from KAM
+          if (issueData.assigned_to && issueData.assigned_to !== stakeholderData.kam_id) {
+            await createStakeholderIssueNotification(
+              issueData.assigned_to,
+              'assigned',
+              {
+                stakeholderName: stakeholderData.name,
+                issueTitle: issueData.title,
+              },
+              {
+                referenceId: data.id,
+                actionUrl: `/stakeholder-issues/${data.id}`,
+              }
+            );
+          }
+        } catch (notificationError) {
+          console.warn('Failed to send issue creation notifications:', notificationError);
+        }
+
         await fetchIssues(issueData.stakeholder_id);
         return data;
       } catch (error) {
@@ -412,7 +460,14 @@ export function useStakeholderIssues() {
         // Get current issue data
         const { data: currentIssue } = await supabase
           .from("stakeholder_issues")
-          .select("attachments, stakeholder_id")
+          .select(`
+            attachments, 
+            stakeholder_id,
+            status,
+            assigned_to,
+            title,
+            stakeholder:stakeholders(id, name, kam_id)
+          `)
           .eq("id", issueId)
           .single();
 
@@ -476,6 +531,102 @@ export function useStakeholderIssues() {
           .single();
 
         if (error) throw error;
+
+        // Send notifications based on what changed
+        try {
+          const stakeholder = Array.isArray(currentIssue?.stakeholder) 
+            ? currentIssue?.stakeholder[0] 
+            : currentIssue?.stakeholder;
+          const stakeholderName = stakeholder?.name || 'Stakeholder';
+          const issueTitle = currentIssue?.title || 'Issue';
+          const kamId = stakeholder?.kam_id;
+
+          // Notify about status change
+          if (issueData.status && issueData.status !== currentIssue?.status) {
+            // Notify KAM
+            if (kamId) {
+              if (issueData.status === 'Resolved') {
+                await createStakeholderIssueNotification(
+                  kamId,
+                  'resolved',
+                  {
+                    stakeholderName,
+                    issueTitle,
+                  },
+                  {
+                    referenceId: issueId,
+                    actionUrl: `/stakeholder-issues/${issueId}`,
+                  }
+                );
+              } else {
+                await createStakeholderIssueNotification(
+                  kamId,
+                  'statusChanged',
+                  {
+                    stakeholderName,
+                    issueTitle,
+                    newStatus: issueData.status,
+                  },
+                  {
+                    referenceId: issueId,
+                    actionUrl: `/stakeholder-issues/${issueId}`,
+                  }
+                );
+              }
+            }
+
+            // Notify assigned employee if different from KAM
+            const assignedTo = issueData.assigned_to || currentIssue?.assigned_to;
+            if (assignedTo && assignedTo !== kamId) {
+              if (issueData.status === 'Resolved') {
+                await createStakeholderIssueNotification(
+                  assignedTo,
+                  'resolved',
+                  {
+                    stakeholderName,
+                    issueTitle,
+                  },
+                  {
+                    referenceId: issueId,
+                    actionUrl: `/stakeholder-issues/${issueId}`,
+                  }
+                );
+              } else {
+                await createStakeholderIssueNotification(
+                  assignedTo,
+                  'statusChanged',
+                  {
+                    stakeholderName,
+                    issueTitle,
+                    newStatus: issueData.status,
+                  },
+                  {
+                    referenceId: issueId,
+                    actionUrl: `/stakeholder-issues/${issueId}`,
+                  }
+                );
+              }
+            }
+          }
+
+          // Notify about assignment change
+          if (issueData.assigned_to && issueData.assigned_to !== currentIssue?.assigned_to) {
+            await createStakeholderIssueNotification(
+              issueData.assigned_to,
+              'assigned',
+              {
+                stakeholderName,
+                issueTitle,
+              },
+              {
+                referenceId: issueId,
+                actionUrl: `/stakeholder-issues/${issueId}`,
+              }
+            );
+          }
+        } catch (notificationError) {
+          console.warn('Failed to send issue update notifications:', notificationError);
+        }
 
         await fetchIssues(currentIssue?.stakeholder_id);
         return data;

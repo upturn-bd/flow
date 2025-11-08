@@ -199,6 +199,95 @@ export const NotificationTemplates = {
       priority: "normal" as const,
     }),
   },
+
+  // Stakeholder-related notifications
+  stakeholder: {
+    created: (stakeholderName: string, processName: string) => ({
+      title: "New Stakeholder Added",
+      message: `New stakeholder "${stakeholderName}" has been added with process "${processName}"`,
+      context: "stakeholder",
+      priority: "normal" as const,
+    }),
+    updated: (stakeholderName: string) => ({
+      title: "Stakeholder Updated",
+      message: `Stakeholder "${stakeholderName}" information has been updated`,
+      context: "stakeholder",
+      priority: "normal" as const,
+    }),
+    statusChanged: (stakeholderName: string, oldStatus: string, newStatus: string) => ({
+      title: "Stakeholder Status Changed",
+      message: `Stakeholder "${stakeholderName}" status changed from ${oldStatus} to ${newStatus}`,
+      context: "stakeholder",
+      priority: "high" as const,
+    }),
+    rejected: (stakeholderName: string, reason: string) => ({
+      title: "Stakeholder Rejected",
+      message: `Stakeholder "${stakeholderName}" has been rejected. Reason: ${reason}`,
+      context: "stakeholder",
+      priority: "high" as const,
+    }),
+    completed: (stakeholderName: string) => ({
+      title: "Stakeholder Process Completed",
+      message: `All process steps for stakeholder "${stakeholderName}" have been completed`,
+      context: "stakeholder",
+      priority: "high" as const,
+    }),
+    stepCompleted: (stakeholderName: string, stepName: string) => ({
+      title: "Process Step Completed",
+      message: `Step "${stepName}" has been completed for stakeholder "${stakeholderName}"`,
+      context: "stakeholder_step",
+      priority: "normal" as const,
+    }),
+    stepUpdated: (stakeholderName: string, stepName: string) => ({
+      title: "Process Step Updated",
+      message: `Step "${stepName}" has been updated for stakeholder "${stakeholderName}"`,
+      context: "stakeholder_step",
+      priority: "normal" as const,
+    }),
+    stepRolledBack: (stakeholderName: string, stepName: string) => ({
+      title: "Process Step Rolled Back",
+      message: `Step "${stepName}" has been rolled back for stakeholder "${stakeholderName}"`,
+      context: "stakeholder_step",
+      priority: "high" as const,
+    }),
+    assignedToTeam: (stakeholderName: string, stepName: string, teamName: string) => ({
+      title: "New Stakeholder Assignment",
+      message: `Stakeholder "${stakeholderName}" is now at step "${stepName}" assigned to your team "${teamName}"`,
+      context: "stakeholder_step",
+      priority: "normal" as const,
+    }),
+  },
+
+  // Stakeholder issue notifications
+  stakeholderIssue: {
+    created: (stakeholderName: string, issueTitle: string, priority: string) => {
+      const notificationPriority = (priority === 'High' || priority === 'Urgent' ? "high" : "normal") as 'high' | 'normal';
+      return {
+        title: "New Stakeholder Issue",
+        message: `New ${priority} priority issue "${issueTitle}" reported for stakeholder "${stakeholderName}"`,
+        context: "stakeholder_issue",
+        priority: notificationPriority,
+      };
+    },
+    assigned: (stakeholderName: string, issueTitle: string) => ({
+      title: "Issue Assigned to You",
+      message: `Issue "${issueTitle}" for stakeholder "${stakeholderName}" has been assigned to you`,
+      context: "stakeholder_issue",
+      priority: "high" as const,
+    }),
+    statusChanged: (stakeholderName: string, issueTitle: string, newStatus: string) => ({
+      title: "Issue Status Updated",
+      message: `Issue "${issueTitle}" for stakeholder "${stakeholderName}" is now ${newStatus}`,
+      context: "stakeholder_issue",
+      priority: "normal" as const,
+    }),
+    resolved: (stakeholderName: string, issueTitle: string) => ({
+      title: "Issue Resolved",
+      message: `Issue "${issueTitle}" for stakeholder "${stakeholderName}" has been resolved`,
+      context: "stakeholder_issue",
+      priority: "normal" as const,
+    }),
+  },
 };
 
 // Helper functions to create notifications
@@ -452,6 +541,99 @@ export const createAccountNotification = async (
       break;
     default:
       throw new Error('Invalid account notification type');
+  }
+
+  return await createSystemNotification(
+    recipientId,
+    template.title,
+    template.message,
+    {
+      priority: template.priority,
+      context: template.context,
+      referenceId: options.referenceId,
+      actionUrl: options.actionUrl,
+    }
+  );
+};
+
+// Stakeholder notification helper
+export const createStakeholderNotification = async (
+  recipientId: string,
+  type: 'created' | 'updated' | 'statusChanged' | 'rejected' | 'completed' | 'stepCompleted' | 'stepUpdated' | 'stepRolledBack' | 'assignedToTeam',
+  data: any,
+  options: { referenceId?: number; actionUrl?: string } = {}
+) => {
+  let template;
+  
+  switch (type) {
+    case 'created':
+      template = NotificationTemplates.stakeholder.created(data.stakeholderName, data.processName);
+      break;
+    case 'updated':
+      template = NotificationTemplates.stakeholder.updated(data.stakeholderName);
+      break;
+    case 'statusChanged':
+      template = NotificationTemplates.stakeholder.statusChanged(data.stakeholderName, data.oldStatus, data.newStatus);
+      break;
+    case 'rejected':
+      template = NotificationTemplates.stakeholder.rejected(data.stakeholderName, data.reason);
+      break;
+    case 'completed':
+      template = NotificationTemplates.stakeholder.completed(data.stakeholderName);
+      break;
+    case 'stepCompleted':
+      template = NotificationTemplates.stakeholder.stepCompleted(data.stakeholderName, data.stepName);
+      break;
+    case 'stepUpdated':
+      template = NotificationTemplates.stakeholder.stepUpdated(data.stakeholderName, data.stepName);
+      break;
+    case 'stepRolledBack':
+      template = NotificationTemplates.stakeholder.stepRolledBack(data.stakeholderName, data.stepName);
+      break;
+    case 'assignedToTeam':
+      template = NotificationTemplates.stakeholder.assignedToTeam(data.stakeholderName, data.stepName, data.teamName);
+      break;
+    default:
+      throw new Error('Invalid stakeholder notification type');
+  }
+
+  return await createSystemNotification(
+    recipientId,
+    template.title,
+    template.message,
+    {
+      priority: template.priority,
+      context: template.context,
+      referenceId: options.referenceId,
+      actionUrl: options.actionUrl,
+    }
+  );
+};
+
+// Stakeholder issue notification helper
+export const createStakeholderIssueNotification = async (
+  recipientId: string,
+  type: 'created' | 'assigned' | 'statusChanged' | 'resolved',
+  data: any,
+  options: { referenceId?: number; actionUrl?: string } = {}
+) => {
+  let template;
+  
+  switch (type) {
+    case 'created':
+      template = NotificationTemplates.stakeholderIssue.created(data.stakeholderName, data.issueTitle, data.priority);
+      break;
+    case 'assigned':
+      template = NotificationTemplates.stakeholderIssue.assigned(data.stakeholderName, data.issueTitle);
+      break;
+    case 'statusChanged':
+      template = NotificationTemplates.stakeholderIssue.statusChanged(data.stakeholderName, data.issueTitle, data.newStatus);
+      break;
+    case 'resolved':
+      template = NotificationTemplates.stakeholderIssue.resolved(data.stakeholderName, data.issueTitle);
+      break;
+    default:
+      throw new Error('Invalid stakeholder issue notification type');
   }
 
   return await createSystemNotification(
