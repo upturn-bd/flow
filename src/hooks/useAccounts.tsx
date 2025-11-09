@@ -66,6 +66,17 @@ export function useAccounts() {
         userId = user.id;
       }
 
+      // Get stakeholder data if this is a stakeholder transaction
+      let stakeholder = null;
+      if (accountData.stakeholder_id) {
+        const { data: stakeholderData } = await supabase
+          .from('stakeholders')
+          .select('id, name, kam_id')
+          .eq('id', accountData.stakeholder_id)
+          .single();
+        stakeholder = stakeholderData;
+      }
+
       const { data, error } = await supabase
         .from("accounts")
         .insert([
@@ -85,25 +96,45 @@ export function useAccounts() {
       
       // Send notification for transaction creation
       try {
-        await createAccountNotification(
-          userId!,
-          'transactionCreated',
-          {
-            title: data.title,
-            amount: data.amount,
-            currency: data.currency,
-          },
-          {
-            referenceId: data.id,
-            actionUrl: '/admin-management?tab=accounts',
-          }
-        );
+        if (stakeholder && stakeholder.kam_id) {
+          // Notify KAM about stakeholder transaction
+          await createAccountNotification(
+            stakeholder.kam_id,
+            'stakeholderTransaction',
+            {
+              title: data.title,
+              amount: data.amount,
+              currency: data.currency,
+              stakeholderName: stakeholder.name,
+            },
+            {
+              referenceId: data.id,
+              actionUrl: '/admin-management?tab=accounts',
+            }
+          );
 
-        // Send alert for large transactions (over 50,000 BDT or equivalent)
-        if (Math.abs(data.amount) > 50000) {
+          // Send alert for large transactions (over 50,000 BDT or equivalent)
+          if (Math.abs(data.amount) > 50000) {
+            await createAccountNotification(
+              stakeholder.kam_id,
+              'stakeholderLargeTransaction',
+              {
+                title: data.title,
+                amount: data.amount,
+                currency: data.currency,
+                stakeholderName: stakeholder.name,
+              },
+              {
+                referenceId: data.id,
+                actionUrl: '/admin-management?tab=accounts',
+              }
+            );
+          }
+        } else {
+          // Regular transaction notification
           await createAccountNotification(
             userId!,
-            'largeTransaction',
+            'transactionCreated',
             {
               title: data.title,
               amount: data.amount,
@@ -114,6 +145,23 @@ export function useAccounts() {
               actionUrl: '/admin-management?tab=accounts',
             }
           );
+
+          // Send alert for large transactions (over 50,000 BDT or equivalent)
+          if (Math.abs(data.amount) > 50000) {
+            await createAccountNotification(
+              userId!,
+              'largeTransaction',
+              {
+                title: data.title,
+                amount: data.amount,
+                currency: data.currency,
+              },
+              {
+                referenceId: data.id,
+                actionUrl: '/admin-management?tab=accounts',
+              }
+            );
+          }
         }
       } catch (notificationError) {
         // Don't fail the transaction creation if notification fails

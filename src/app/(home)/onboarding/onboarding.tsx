@@ -203,7 +203,16 @@ export default function EmployeeOnboarding() {
         const errorMap = validationErrorsToObject(err.errors);
         setErrors(errorMap);
       } else {
-        setErrors({ submit: err.message || "Something went wrong. Please try again later." });
+        // Check if it's a duplicate email error
+        const errorMessage = err.message || "Something went wrong. Please try again later.";
+        if (errorMessage.includes("email") && errorMessage.includes("already")) {
+          setErrors({ 
+            email: errorMessage,
+            submit: "Please correct the errors above and try again." 
+          });
+        } else {
+          setErrors({ submit: errorMessage });
+        }
       }
     } finally {
       setLoading(false);

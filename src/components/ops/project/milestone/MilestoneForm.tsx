@@ -15,6 +15,7 @@ import { Milestone } from "@/lib/types/schemas";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { matchesEmployeeSearch } from "@/lib/utils/user-search";
 
 export type { Milestone };
 
@@ -23,7 +24,7 @@ interface MilestoneFormProps {
   isSubmitting: boolean;
   onSubmit: (milestone: Milestone) => void;
   onCancel: () => void;
-  employees: { id: string; name: string }[];
+  employees: { id: string; name: string; email?: string; designation?: string }[];
   currentMilestones: Milestone[];
   mode: "create" | "edit";
   currentWeightage: number;
@@ -105,7 +106,7 @@ export default function MilestoneForm({
 
   const filteredEmployees = employees.filter(
     (emp) =>
-      emp.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      matchesEmployeeSearch(emp, searchTerm) &&
       !milestoneAssignees.includes(emp.id)
   );
 

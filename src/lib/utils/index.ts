@@ -3,9 +3,10 @@
  * Core utility functions for the application
  */
 
-// Re-export utility functions from ./validation and ./path-utils
+// Re-export utility functions from ./validation, ./path-utils, and ./user-search
 export * from './validation';
 export * from './path-utils';
+export * from './user-search';
 
 // ====================================================================
 // Helper Functions

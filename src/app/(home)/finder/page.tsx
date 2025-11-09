@@ -19,6 +19,7 @@ import {
 import FormInputField from "@/components/ui/FormInputField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
+import { matchesEmployeeSearch } from "@/lib/utils/user-search";
 
 // Filter options
 type FilterOptions = {
@@ -48,11 +49,8 @@ export default function FinderPage() {
     if (extendedEmployees.length === 0) return;
 
     const filtered = extendedEmployees.filter(employee => {
-      // First check search query (case insensitive)
-      const matchesSearch = searchQuery === "" || 
-        employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        employee.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        employee.designation?.toLowerCase().includes(searchQuery.toLowerCase());
+      // First check search query using unified search
+      const matchesSearch = searchQuery === "" || matchesEmployeeSearch(employee, searchQuery);
       
       if (!matchesSearch) return false;
       

@@ -29,7 +29,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
     createIssue,
     updateIssue,
     deleteIssue,
-    getAttachmentUrl,
+    downloadAttachment,
   } = useStakeholderIssues();
 
   const { modalState, openCreateModal, closeModal } = useModalState();
@@ -72,17 +72,10 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
 
   const handleDownloadAttachment = async (filePath: string, originalName: string) => {
     try {
-      const url = await getAttachmentUrl(filePath);
-      if (url) {
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = originalName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+      await downloadAttachment(filePath, originalName);
     } catch (error) {
       console.error("Error downloading attachment:", error);
+      alert("Failed to download attachment. The file may not exist or you may not have permission.");
     }
   };
 
@@ -266,11 +259,14 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
         <BaseModal isOpen={modalState.isOpen} onClose={closeModal} title={selectedIssue ? "Update Issue" : "Create New Issue"}>
           <StakeholderIssueForm
             stakeholderId={stakeholderId}
+            issueId={selectedIssue?.id}
             initialData={selectedIssue ? {
               title: selectedIssue.title,
               description: selectedIssue.description,
               status: selectedIssue.status,
               priority: selectedIssue.priority,
+              assigned_to: selectedIssue.assigned_to,
+              attachments: selectedIssue.attachments || [],
             } : undefined}
             onSubmit={selectedIssue ? handleUpdateIssue : handleCreateIssue}
             onCancel={closeModal}

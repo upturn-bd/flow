@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
 import { StakeholderIssue, StakeholderIssueAttachment } from "@/lib/types/schemas";
+import { createStakeholderIssueNotification } from "@/lib/utils/notifications";
 
 // ==============================================================================
 // Form Data Interfaces
@@ -68,7 +69,8 @@ export function useStakeholderIssues() {
           ),
           assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
             id,
-            name,
+            first_name,
+            last_name,
             email
           )
         `)
@@ -85,8 +87,18 @@ export function useStakeholderIssues() {
         throw error;
       }
 
-      setIssues(data || []);
-      return data;
+      // Transform employee data to combine first_name and last_name
+      const transformedData = data?.map((issue) => ({
+        ...issue,
+        assigned_employee: issue.assigned_employee ? {
+          id: issue.assigned_employee.id,
+          name: `${issue.assigned_employee.first_name} ${issue.assigned_employee.last_name}`,
+          email: issue.assigned_employee.email,
+        } : undefined,
+      })) || [];
+
+      setIssues(transformedData);
+      return transformedData;
     } catch (error) {
       console.error("Error fetching stakeholder issues:", error);
       setError("Failed to fetch issues");
@@ -116,7 +128,8 @@ export function useStakeholderIssues() {
           ),
           assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
             id,
-            name,
+            first_name,
+            last_name,
             email
           )
         `)
@@ -129,7 +142,17 @@ export function useStakeholderIssues() {
         throw error;
       }
 
-      return data;
+      // Transform employee data to combine first_name and last_name
+      const transformedData = data ? {
+        ...data,
+        assigned_employee: data.assigned_employee ? {
+          id: data.assigned_employee.id,
+          name: `${data.assigned_employee.first_name} ${data.assigned_employee.last_name}`,
+          email: data.assigned_employee.email,
+        } : undefined,
+      } : null;
+
+      return transformedData;
     } catch (error) {
       console.error("Error fetching issue:", error);
       setError("Failed to fetch issue");
@@ -164,7 +187,8 @@ export function useStakeholderIssues() {
           ),
           assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
             id,
-            name,
+            first_name,
+            last_name,
             email
           )
         `)
@@ -177,8 +201,18 @@ export function useStakeholderIssues() {
         throw error;
       }
 
-      setIssues(data || []);
-      return data;
+      // Transform employee data to combine first_name and last_name
+      const transformedData = data?.map((issue) => ({
+        ...issue,
+        assigned_employee: issue.assigned_employee ? {
+          id: issue.assigned_employee.id,
+          name: `${issue.assigned_employee.first_name} ${issue.assigned_employee.last_name}`,
+          email: issue.assigned_employee.email,
+        } : undefined,
+      })) || [];
+
+      setIssues(transformedData);
+      return transformedData;
     } catch (error) {
       console.error("Error fetching issues by assigned employee:", error);
       setError("Failed to fetch issues");
@@ -223,7 +257,8 @@ export function useStakeholderIssues() {
           ),
           assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
             id,
-            name,
+            first_name,
+            last_name,
             email
           )
         `, { count: 'exact' })
@@ -257,17 +292,27 @@ export function useStakeholderIssues() {
       
       if (error) throw error;
       
+      // Transform employee data to combine first_name and last_name
+      const transformedData = data?.map((issue) => ({
+        ...issue,
+        assigned_employee: issue.assigned_employee ? {
+          id: issue.assigned_employee.id,
+          name: `${issue.assigned_employee.first_name} ${issue.assigned_employee.last_name}`,
+          email: issue.assigned_employee.email,
+        } : undefined,
+      })) || [];
+      
       const totalCount = count || 0;
       const totalPages = Math.ceil(totalCount / pageSize);
       
       const result: StakeholderIssueSearchResult = {
-        issues: data || [],
+        issues: transformedData,
         totalCount,
         totalPages,
         currentPage: page,
       };
       
-      setIssues(data || []);
+      setIssues(transformedData);
       return result;
     } catch (error) {
       console.error("Error searching issues:", error);
@@ -290,6 +335,15 @@ export function useStakeholderIssues() {
         const company_id = await getCompanyId();
         const employeeInfo = await getEmployeeInfo();
 
+        // Get stakeholder data for notifications
+        const { data: stakeholderData, error: stakeholderError } = await supabase
+          .from("stakeholders")
+          .select("id, name, kam_id")
+          .eq("id", issueData.stakeholder_id)
+          .single();
+
+        if (stakeholderError) throw stakeholderError;
+
         // Process file attachments if any
         const attachments: StakeholderIssueAttachment[] = [];
         
@@ -298,13 +352,21 @@ export function useStakeholderIssues() {
             const fileName = `${Date.now()}_${file.name}`;
             const filePath = `${company_id}/stakeholder-issues/${issueData.stakeholder_id}/${fileName}`;
 
-            const { error: uploadError } = await supabase.storage
+            console.log('Uploading file to path:', filePath);
+
+            const { data: uploadData, error: uploadError } = await supabase.storage
               .from('stakeholder-documents')
-              .upload(filePath, file);
+              .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: false
+              });
 
             if (uploadError) {
+              console.error('Upload error:', uploadError);
               throw new Error(`Failed to upload ${file.name}: ${uploadError.message}`);
             }
+
+            console.log('Upload successful:', uploadData);
 
             attachments.push({
               path: filePath,
@@ -336,6 +398,46 @@ export function useStakeholderIssues() {
 
         if (error) throw error;
 
+        console.log('Issue created with attachments:', data);
+
+        // Send notifications
+        try {
+          // Notify KAM about new issue
+          if (stakeholderData.kam_id) {
+            await createStakeholderIssueNotification(
+              stakeholderData.kam_id,
+              'created',
+              {
+                stakeholderName: stakeholderData.name,
+                issueTitle: issueData.title,
+                priority: issueData.priority,
+              },
+              {
+                referenceId: data.id,
+                actionUrl: `/stakeholder-issues/${data.id}`,
+              }
+            );
+          }
+
+          // Notify assigned employee if different from KAM
+          if (issueData.assigned_to && issueData.assigned_to !== stakeholderData.kam_id) {
+            await createStakeholderIssueNotification(
+              issueData.assigned_to,
+              'assigned',
+              {
+                stakeholderName: stakeholderData.name,
+                issueTitle: issueData.title,
+              },
+              {
+                referenceId: data.id,
+                actionUrl: `/stakeholder-issues/${data.id}`,
+              }
+            );
+          }
+        } catch (notificationError) {
+          console.warn('Failed to send issue creation notifications:', notificationError);
+        }
+
         await fetchIssues(issueData.stakeholder_id);
         return data;
       } catch (error) {
@@ -358,7 +460,14 @@ export function useStakeholderIssues() {
         // Get current issue data
         const { data: currentIssue } = await supabase
           .from("stakeholder_issues")
-          .select("attachments, stakeholder_id")
+          .select(`
+            attachments, 
+            stakeholder_id,
+            status,
+            assigned_to,
+            title,
+            stakeholder:stakeholders(id, name, kam_id)
+          `)
           .eq("id", issueId)
           .single();
 
@@ -372,13 +481,21 @@ export function useStakeholderIssues() {
             const fileName = `${Date.now()}_${file.name}`;
             const filePath = `${company_id}/stakeholder-issues/${currentIssue?.stakeholder_id}/${fileName}`;
 
-            const { error: uploadError } = await supabase.storage
+            console.log('Uploading file to path:', filePath);
+
+            const { data: uploadData, error: uploadError } = await supabase.storage
               .from('stakeholder-documents')
-              .upload(filePath, file);
+              .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: false
+              });
 
             if (uploadError) {
+              console.error('Upload error:', uploadError);
               throw new Error(`Failed to upload ${file.name}: ${uploadError.message}`);
             }
+
+            console.log('Upload successful:', uploadData);
 
             attachments.push({
               path: filePath,
@@ -414,6 +531,102 @@ export function useStakeholderIssues() {
           .single();
 
         if (error) throw error;
+
+        // Send notifications based on what changed
+        try {
+          const stakeholder = Array.isArray(currentIssue?.stakeholder) 
+            ? currentIssue?.stakeholder[0] 
+            : currentIssue?.stakeholder;
+          const stakeholderName = stakeholder?.name || 'Stakeholder';
+          const issueTitle = currentIssue?.title || 'Issue';
+          const kamId = stakeholder?.kam_id;
+
+          // Notify about status change
+          if (issueData.status && issueData.status !== currentIssue?.status) {
+            // Notify KAM
+            if (kamId) {
+              if (issueData.status === 'Resolved') {
+                await createStakeholderIssueNotification(
+                  kamId,
+                  'resolved',
+                  {
+                    stakeholderName,
+                    issueTitle,
+                  },
+                  {
+                    referenceId: issueId,
+                    actionUrl: `/stakeholder-issues/${issueId}`,
+                  }
+                );
+              } else {
+                await createStakeholderIssueNotification(
+                  kamId,
+                  'statusChanged',
+                  {
+                    stakeholderName,
+                    issueTitle,
+                    newStatus: issueData.status,
+                  },
+                  {
+                    referenceId: issueId,
+                    actionUrl: `/stakeholder-issues/${issueId}`,
+                  }
+                );
+              }
+            }
+
+            // Notify assigned employee if different from KAM
+            const assignedTo = issueData.assigned_to || currentIssue?.assigned_to;
+            if (assignedTo && assignedTo !== kamId) {
+              if (issueData.status === 'Resolved') {
+                await createStakeholderIssueNotification(
+                  assignedTo,
+                  'resolved',
+                  {
+                    stakeholderName,
+                    issueTitle,
+                  },
+                  {
+                    referenceId: issueId,
+                    actionUrl: `/stakeholder-issues/${issueId}`,
+                  }
+                );
+              } else {
+                await createStakeholderIssueNotification(
+                  assignedTo,
+                  'statusChanged',
+                  {
+                    stakeholderName,
+                    issueTitle,
+                    newStatus: issueData.status,
+                  },
+                  {
+                    referenceId: issueId,
+                    actionUrl: `/stakeholder-issues/${issueId}`,
+                  }
+                );
+              }
+            }
+          }
+
+          // Notify about assignment change
+          if (issueData.assigned_to && issueData.assigned_to !== currentIssue?.assigned_to) {
+            await createStakeholderIssueNotification(
+              issueData.assigned_to,
+              'assigned',
+              {
+                stakeholderName,
+                issueTitle,
+              },
+              {
+                referenceId: issueId,
+                actionUrl: `/stakeholder-issues/${issueId}`,
+              }
+            );
+          }
+        } catch (notificationError) {
+          console.warn('Failed to send issue update notifications:', notificationError);
+        }
 
         await fetchIssues(currentIssue?.stakeholder_id);
         return data;
@@ -515,14 +728,62 @@ export function useStakeholderIssues() {
   const getAttachmentUrl = useCallback(
     async (filePath: string) => {
       try {
-        const { data } = await supabase.storage
-          .from('stakeholder-documents')
-          .createSignedUrl(filePath, 3600); // 1 hour expiry
+        console.log('Getting URL for file path:', filePath);
 
-        return data?.signedUrl || null;
+        // Since the bucket is public, use public URLs directly
+        // Public URLs work even if the file was just uploaded
+        const { data: publicData } = supabase.storage
+          .from('stakeholder-documents')
+          .getPublicUrl(filePath);
+        
+        if (publicData?.publicUrl) {
+          console.log('Using public URL:', publicData.publicUrl);
+          return publicData.publicUrl;
+        }
+
+        return null;
       } catch (error) {
         console.error("Error getting attachment URL:", error);
         return null;
+      }
+    },
+    []
+  );
+
+  const downloadAttachment = useCallback(
+    async (filePath: string, originalName: string) => {
+      try {
+        console.log('Downloading file:', filePath, 'as', originalName);
+
+        // Download the file as a blob
+        const { data, error } = await supabase.storage
+          .from('stakeholder-documents')
+          .download(filePath);
+
+        if (error) {
+          console.error('Download error:', error);
+          throw error;
+        }
+
+        if (!data) {
+          throw new Error('No data received');
+        }
+
+        // Create a blob URL and trigger download with correct filename
+        const blob = new Blob([data]);
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = originalName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        return true;
+      } catch (error) {
+        console.error("Error downloading attachment:", error);
+        throw error;
       }
     },
     []
@@ -579,5 +840,6 @@ export function useStakeholderIssues() {
     deleteIssue,
     deleteAttachment,
     getAttachmentUrl,
+    downloadAttachment,
   };
 }

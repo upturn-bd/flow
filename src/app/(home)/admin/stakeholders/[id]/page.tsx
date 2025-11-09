@@ -38,6 +38,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
     fetchStakeholderById,
     fetchStakeholderStepData,
     deleteStakeholder,
+    uncompleteStep,
   } = useStakeholders();
 
   const { getEmployeeTeamIds } = useTeams();
@@ -114,12 +115,41 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
   };
 
   const handleStepComplete = async () => {
+    // Force a fresh reload by clearing state first
+    setStakeholder(null);
+    setStepData([]);
+    
+    // Reload step data and stakeholder data with fresh queries
+    await loadStepData(stakeholderId);
     const data = await fetchStakeholderById(stakeholderId);
     if (data) {
+      console.log('After completion - Stakeholder data:', {
+        current_step_id: data.current_step_id,
+        current_step_order: data.current_step_order,
+        is_completed: data.is_completed,
+        is_sequential: data.process?.is_sequential,
+        total_steps: data.process?.steps?.length,
+        completed_steps_count: data.step_data?.filter((sd: any) => sd.is_completed).length
+      });
       setStakeholder(data);
     }
-    await loadStepData(stakeholderId);
     setActiveStepId(null);
+  };
+
+  const handleStepRollback = async (stepId: number) => {
+    if (!stepId) return;
+    
+    try {
+      await uncompleteStep(stakeholderId, stepId);
+      // Reload fresh stakeholder data to update current_step_id
+      await loadStepData(stakeholderId);
+      const data = await fetchStakeholderById(stakeholderId);
+      if (data) {
+        setStakeholder(data);
+      }
+    } catch (error) {
+      console.error("Error rolling back step:", error);
+    }
   };
 
   if (loading && !stakeholder) {
@@ -169,7 +199,12 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-gray-900">{stakeholder.name}</h1>
-              {stakeholder.is_completed ? (
+              {stakeholder.status === "Rejected" ? (
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                  <AlertCircle size={16} />
+                  Rejected
+                </span>
+              ) : stakeholder.is_completed || stakeholder.status === "Permanent" ? (
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                   <CheckCircle2 size={16} />
                   Stakeholder
@@ -209,6 +244,28 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           {error}
+        </div>
+      )}
+
+      {/* Rejection Warning Banner */}
+      {stakeholder.status === "Rejected" && (
+        <div className="bg-red-50 border-l-4 border-red-500 px-4 py-3 rounded-lg">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="text-red-500 mt-0.5" size={20} />
+            <div>
+              <p className="font-medium text-red-800">This stakeholder has been rejected</p>
+              {stakeholder.rejection_reason && (
+                <p className="text-sm text-red-700 mt-1">
+                  Reason: {stakeholder.rejection_reason}
+                </p>
+              )}
+              {stakeholder.rejected_at && (
+                <p className="text-xs text-red-600 mt-1">
+                  Rejected on {new Date(stakeholder.rejected_at).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -270,6 +327,45 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   </p>
                 </div>
               </div>
+            )}
+
+            {/* Rejection Information */}
+            {stakeholder.status === "Rejected" && (
+              <>
+                {stakeholder.rejected_at && (
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="text-red-500 mt-0.5" size={18} />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Rejected On</p>
+                      <p className="text-sm text-gray-600 mt-0.5">
+                        {new Date(stakeholder.rejected_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {stakeholder.rejected_by_employee && (
+                  <div className="flex items-start gap-3">
+                    <User className="text-red-400 mt-0.5" size={18} />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Rejected By</p>
+                      <p className="text-sm text-gray-600 mt-0.5">
+                        {stakeholder.rejected_by_employee.name}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {stakeholder.rejection_reason && (
+                  <div className="flex items-start gap-3">
+                    <FileText className="text-red-400 mt-0.5" size={18} />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Rejection Reason</p>
+                      <p className="text-sm text-gray-600 mt-0.5">
+                        {stakeholder.rejection_reason}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
             {/* KAM Information */}
@@ -385,25 +481,38 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         const isSequential = stakeholder.process?.is_sequential || false;
 
                         // Check if user can edit this step:
-                        // For sequential processes: only current step can be edited
-                        // For independent processes: any incomplete step can be edited
-                        // In both cases: stakeholder must not be completed AND user must have team access
+                        // Both sequential and independent processes: allow editing incomplete steps
+                        // Sequential: only current step
+                        // Independent: any incomplete step
                         const isTeamMember = step.team_id ? userTeamIds.includes(step.team_id) : false;
                         const hasFullWritePermission = hasPermission('stakeholders', 'can_write');
                         const hasTeamAccess = isTeamMember || hasFullWritePermission;
 
-                        const canEdit = !stakeholder.is_completed &&
-                          !isCompleted &&
+                        // Determine if step can be edited based on completion status and access
+                        const canEdit = !isCompleted &&
                           hasTeamAccess &&
                           (isSequential ? isCurrent : true);
+
+                        // Determine if this step can be rolled back
+                        // Allow rollback of any completed step when rollback is enabled
+                        const canRollback = (() => {
+                          if (!isCompleted || !stakeholder.process?.allow_rollback || !hasTeamAccess || !step.id) {
+                            return false;
+                          }
+
+                          // For both sequential and non-sequential processes,
+                          // allow rollback of any completed step
+                          return true;
+                        })();
 
                         return (
                           <div
                             key={step.id}
-                            className={`border rounded-lg ${isCurrent
-                                ? "border-blue-300 bg-blue-50"
-                                : isCompleted
-                                  ? "border-green-300 bg-green-50"
+                            className={`border rounded-lg ${
+                              isCompleted
+                                ? "border-green-300 bg-green-50"
+                                : isCurrent
+                                  ? "border-blue-300 bg-blue-50"
                                   : canEdit && !isSequential
                                     ? "border-blue-200 bg-blue-25"
                                     : "border-gray-200 bg-gray-50"
@@ -435,12 +544,12 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       <span>Team: {step.team?.name || "N/A"}</span>
                                     </div>
                                     {/* Show permission/access warnings */}
-                                    {!stakeholder.is_completed && !isCompleted && !hasTeamAccess && (
+                                    {!isCompleted && !hasTeamAccess && (
                                       <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
                                         You must be a member of the {step.team?.name || "assigned team"} to work on this step
                                       </div>
                                     )}
-                                    {!stakeholder.is_completed && !isCompleted && hasTeamAccess && isSequential && !isCurrent && (
+                                    {!isCompleted && hasTeamAccess && isSequential && !isCurrent && (
                                       <div className="mt-2 text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded">
                                         This step will become available after completing the previous steps (sequential process)
                                       </div>
@@ -448,16 +557,50 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                   </div>
                                 </div>
 
-                                {canEdit && (
-                                  <button
-                                    onClick={() =>
-                                      setActiveStepId(activeStepId === step.id ? null : (step.id || null))
-                                    }
-                                    className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
-                                  >
-                                    {activeStepId === step.id ? "Cancel" : "Work on Step"}
-                                  </button>
-                                )}
+                                <div className="flex items-center gap-2">
+                                  {canEdit && (
+                                    <button
+                                      onClick={() =>
+                                        setActiveStepId(activeStepId === step.id ? null : (step.id || null))
+                                      }
+                                      className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                                    >
+                                      {activeStepId === step.id ? "Cancel" : "Work on Step"}
+                                    </button>
+                                  )}
+                                  {canRollback && (
+                                    <button
+                                      onClick={() => {
+                                        // For sequential processes, calculate how many steps will be affected
+                                        let message = '';
+                                        if (isSequential) {
+                                          const subsequentSteps = sortedSteps.filter(s => s.step_order > step.step_order);
+                                          const completedSubsequentSteps = subsequentSteps.filter(s => {
+                                            const sd = stepData.find(d => d.step_id === s.id);
+                                            return sd?.is_completed;
+                                          });
+                                          
+                                          if (completedSubsequentSteps.length > 0) {
+                                            message = `Are you sure you want to rollback to "${step.name}"? This will also uncomplete ${completedSubsequentSteps.length} subsequent step(s): ${completedSubsequentSteps.map(s => s.name).join(', ')}`;
+                                          } else {
+                                            message = `Are you sure you want to rollback "${step.name}"?`;
+                                          }
+                                        } else {
+                                          message = `Are you sure you want to rollback "${step.name}"? This will mark it as incomplete.`;
+                                        }
+                                        
+                                        if (window.confirm(message)) {
+                                          handleStepRollback(step.id!);
+                                        }
+                                      }}
+                                      className="px-4 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 flex items-center gap-2"
+                                      title="Rollback this step"
+                                    >
+                                      <ArrowLeft size={16} />
+                                      Rollback
+                                    </button>
+                                  )}
+                                </div>
                               </div>
 
                               {/* Step Data Form */}
@@ -483,6 +626,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                         (f) => f.key === key
                                       );
                                       const isFileField = fieldDef?.type === 'file';
+                                      const fieldLabel = fieldDef?.label || key.replace(/_/g, " ");
 
                                       // Helper to get file info
                                       const getFileInfo = () => {
@@ -508,7 +652,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       return (
                                         <div key={key}>
                                           <p className="text-xs font-medium text-gray-500 uppercase">
-                                            {key.replace(/_/g, " ")}
+                                            {fieldLabel}
                                           </p>
                                           {isFileField && fileInfo ? (
                                             <div className="mt-1">

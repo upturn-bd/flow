@@ -19,6 +19,7 @@ import {
     GitBranch, // Stakeholder Processes (workflow/branching)
     File,
     Search,
+    Download, // Data Export
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -51,13 +52,6 @@ const sections = [
                 color: "bg-green-100 text-green-700 border-green-200"
             },
             {
-                name: "Transaction",
-                path: "/admin-management/company-configurations/transaction",
-                icon: DollarSign,
-                description: "Define and manage financial transaction types and flows",
-                color: "bg-emerald-100 text-emerald-700 border-emerald-200"
-            },
-            {
                 name: "Teams",
                 path: "/admin-management/company-configurations/teams",
                 icon: UsersRound,
@@ -70,6 +64,13 @@ const sections = [
                 icon: GitBranch,
                 description: "Manage workflow processes for stakeholders and leads",
                 color: "bg-teal-100 text-teal-700 border-teal-200"
+            },
+            {
+                name: "Data Export",
+                path: "/admin-management/data-export",
+                icon: Download,
+                description: "Export HRIS and stakeholder data to CSV format",
+                color: "bg-emerald-100 text-emerald-700 border-emerald-200"
             },
         ],
     },
@@ -132,6 +133,13 @@ const sections = [
                 icon: Building2,
                 description: "Records of all stakeholder interactions and issues",
                 color: "bg-purple-100 text-purple-700 border-purple-200"
+            },
+            {
+                name: "Transaction",
+                path: "/admin-management/company-logs/transaction",
+                icon: DollarSign,
+                description: "Define and manage financial transaction types and flows",
+                color: "bg-emerald-100 text-emerald-700 border-emerald-200"
             },
             {
                 name: "Onboarding",
@@ -346,8 +354,7 @@ export default function AdminManagementPage() {
                                         >
                                             <Link
                                                 href={item.path}
-                                                // FIX: Changed 'items-start' to 'items-center' for vertical centering.
-                                                className={`group flex items-center p-4 bg-white rounded-lg border ${item.color.includes('border') ? item.color.split(' ').find(c => c.startsWith('border-')) : 'border-gray-200'} shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 block h-full`}
+                                                className={`group flex items-center p-4 bg-white rounded-lg border ${item.color.includes('border') ? item.color.split(' ').find(c => c.startsWith('border-')) : 'border-gray-200'} shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 block h-28`}
                                             >
                                                 <motion.div
                                                     whileHover={{ scale: 1.1 }}

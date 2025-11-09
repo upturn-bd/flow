@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { Plus, Search, Filter, Eye, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { Plus, Search, Filter, Eye, CheckCircle2, Clock, XCircle, Download } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
+import { exportStakeholdersToCSV } from "@/lib/utils/csv-export";
+import { toast } from "sonner";
 
 export default function StakeholdersPage() {
   const router = useRouter();
@@ -69,6 +71,28 @@ export default function StakeholdersPage() {
     }
   };
 
+  const handleExportCSV = () => {
+    if (stakeholders.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+    
+    try {
+      exportStakeholdersToCSV(stakeholders, {
+        includeAddress: true,
+        includeContactPersons: true,
+        includeStatus: true,
+        includeProcess: true,
+        includeKAM: true,
+        includeType: true,
+      });
+      toast.success(`Exported ${stakeholders.length} stakeholder(s) to CSV`);
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      toast.error("Failed to export data");
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -79,13 +103,23 @@ export default function StakeholdersPage() {
             Manage your stakeholder pipeline and track progress
           </p>
         </div>
-        <button
-          onClick={() => router.push("/admin-management/stakeholders/new")}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus size={20} />
-          Add New Lead
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportCSV}
+            disabled={loading || stakeholders.length === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download size={20} />
+            Export CSV
+          </button>
+          <button
+            onClick={() => router.push("/admin-management/stakeholders/new")}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus size={20} />
+            Add New Lead
+          </button>
+        </div>
       </div>
 
       {/* Stats */}

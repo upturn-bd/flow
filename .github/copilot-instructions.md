@@ -42,6 +42,18 @@ This is a **Next.js 15 + Supabase HRIS (Human Resource Information System)** wit
 - **Authentication**: `AuthProvider` context manages user session and role-based permissions
 - **Company Context**: Most data operations require company_id from `getCompanyId()` utility
 
+### User/Employee Search Pattern (CRITICAL)
+- **ALWAYS** use unified search utilities from `src/lib/utils/user-search.ts` for user/employee selection
+- **Searchable Fields** (in priority order):
+  1. `name` - Employee's full name (required)
+  2. `email` - Employee's email address (optional)
+  3. `designation` - Employee's job title/position (optional)
+- **Standard Functions**:
+  - `matchesEmployeeSearch(employee, searchTerm)` - Returns boolean if employee matches search
+  - `filterEmployeesBySearch(employees, searchTerm)` - Filters array of employees by search term
+- **Implementation**: All user selection components (AssigneeField, SingleEmployeeSelector, AssigneeSelect, etc.) use these utilities
+- **Rule**: Users must ALWAYS be searchable by name, email, and designation across the entire application
+
 ### Type System & Constants
 - **Single Source of Truth**: All types exported from `src/lib/types/index.ts` → `schemas.ts`
 - **No Runtime Validation**: Uses pure TypeScript interfaces instead of Zod schemas
