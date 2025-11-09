@@ -45,6 +45,7 @@ export default function AttendanceRequestsPage() {
     setLoading(true);
 
     const user = await getEmployeeInfo();
+    console.log(user.supervisor_id)
     try {
       const { data, error } = await supabase
         .from("attendance_records")
@@ -60,7 +61,7 @@ export default function AttendanceRequestsPage() {
 
       setAttendanceData(data ?? []);
     } catch (error) {
-      console.error("Error fetching attendance data:", error);
+      console.log("Error fetching attendance data:", error);
       toast.error("Failed to load attendance requests");
     } finally {
       setLoading(false);

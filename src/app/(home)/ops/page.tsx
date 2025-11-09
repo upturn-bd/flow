@@ -49,7 +49,7 @@ const sections = [
     items: [
       {
         name: "Attendance",
-        path: "/ops/attendance?tab=records",
+        path: "/ops/attendance?tab=today",
         icon: LogIn,
         description: "Track and manage your daily attendance",
         color: "bg-green-100 text-green-700 border-green-200"

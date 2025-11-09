@@ -49,7 +49,6 @@ interface AttendanceSectionProps {
 
 export default function AttendanceSection({
   loading,
-  attendanceLoading,
   attendanceStatus,
   attendanceRecord,
   sites,
@@ -64,6 +63,7 @@ export default function AttendanceSection({
   const [locationLoading, setLocationLoading] = useState(false);
   const [checkInCompleted, setCheckInCompleted] = useState(false)
   const [checkOutCompleted, setCheckOutCompleted] = useState(false)
+  const [attendanceLoading, setAttendanceLoading] = useState(false);
 
   // Get user's current location
   const getCurrentLocation = () => {
@@ -133,6 +133,7 @@ export default function AttendanceSection({
   };
 
   async function fetchAttendanceDataToday() {
+    setAttendanceLoading(true);
     const user = await getEmployeeInfo();
     try {
       const { data, error } = await supabase
@@ -161,6 +162,8 @@ export default function AttendanceSection({
         }
 
       }
+
+      setAttendanceLoading(false);
 
     } catch (error) {
       console.error("Error fetching attendance data:", error);
