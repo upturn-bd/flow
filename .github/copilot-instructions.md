@@ -73,7 +73,7 @@ This is a **Next.js 15 + Supabase HRIS (Human Resource Information System)** wit
 Navigation and features are controlled by user roles defined in `src/app/(home)/nav-items.ts`:
 - **Employee**: Basic HRIS features (home, hris, operations-and-services)
 - **Manager**: Employee features + finder access
-- **Admin**: Full access including admin-management panel
+- **Admin**: Full access including admin panel
 
 Role validation happens at:
 1. **Middleware level**: `src/middleware.ts` with route arrays from `src/lib/utils/path-utils.ts`
@@ -112,7 +112,7 @@ npm run lint         # ESLint checking
 3. **New Admin Feature**:
    - Add route to `ROUTES.ADMIN` in constants
    - Update role arrays in `path-utils.ts`
-   - Use `CollapsibleComponent` pattern in admin-management
+   - Use `CollapsibleComponent` pattern in admin
    - Follow modal patterns with `useModalState` hook
 
 4. **New Page Route**:
@@ -123,7 +123,7 @@ npm run lint         # ESLint checking
 ### File Organization Patterns
 - `src/lib/validation/schemas/` - Validation functions organized by domain
 - `src/hooks/core/` - Reusable hook abstractions (useModalState, useFormValidation)
-- `src/components/admin-management/` - Admin-specific components with collapsible patterns
+- `src/components/admin/` - Admin-specific components with collapsible patterns
 - `src/components/ui/modals/` - Reusable modal components (BaseModal, FormModal)
 
 When working with this codebase, always consider company-scoped data, role-based permissions, and use the established form validation patterns. The architecture strongly favors composition and reusable patterns over large monolithic components.

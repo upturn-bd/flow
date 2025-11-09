@@ -23,9 +23,9 @@ const LogsBreadcrumbs = () => {
     // The complete base path for logs
     const baseBreadcrumbs = [
         // 1. Admin Management root
-        { href: "/admin-management", label: "Admin Management" },
+        { href: "/admin", label: "Admin Management" },
         // 2. Company Logs section (which is the parent layout)
-        { href: "/admin-management", label: "Company Logs" }, 
+        { href: "/admin", label: "Company Logs" }, 
     ];
     
     // The current page is the last segment of the path

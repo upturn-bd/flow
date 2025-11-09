@@ -113,7 +113,7 @@ export default function Sidebar() {
             case "operations-and-services":
               displayLabel = "Operations & Services";
               break;
-            case "admin-management":
+            case "admin":
               displayLabel = "Admin Management";
               break;
             default:

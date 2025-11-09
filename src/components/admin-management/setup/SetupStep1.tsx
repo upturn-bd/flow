@@ -8,8 +8,8 @@ import FormSelectField from "@/components/ui/FormSelectField";
 import { staggerContainer } from "@/components/ui/animations";
 import { validateCompanyBasics, validationErrorsToObject } from "@/lib/utils/validation";
 import { CompanyBasics } from "@/lib/types/schemas";
-import CompanyBasicsConfigView from "@/components/admin-management/CompanyBasicsConfigView";
-import CompanySettingsConfigView from "@/components/admin-management/CompanySettingsConfigView";
+import CompanyBasicsConfigView from "@/components/admin/CompanyBasicsConfigView";
+import CompanySettingsConfigView from "@/components/admin/CompanySettingsConfigView";
 
 import { useAdminData } from "@/contexts/AdminDataContext";
 

@@ -109,7 +109,7 @@ export function useAccounts() {
             },
             {
               referenceId: data.id,
-              actionUrl: '/admin-management?tab=accounts',
+              actionUrl: '/admin?tab=accounts',
             }
           );
 
@@ -126,7 +126,7 @@ export function useAccounts() {
               },
               {
                 referenceId: data.id,
-                actionUrl: '/admin-management?tab=accounts',
+                actionUrl: '/admin?tab=accounts',
               }
             );
           }
@@ -142,7 +142,7 @@ export function useAccounts() {
             },
             {
               referenceId: data.id,
-              actionUrl: '/admin-management?tab=accounts',
+              actionUrl: '/admin?tab=accounts',
             }
           );
 
@@ -158,7 +158,7 @@ export function useAccounts() {
               },
               {
                 referenceId: data.id,
-                actionUrl: '/admin-management?tab=accounts',
+                actionUrl: '/admin?tab=accounts',
               }
             );
           }

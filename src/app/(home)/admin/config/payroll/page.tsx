@@ -1,6 +1,6 @@
 "use client";
 
-import { EmployeeSalaryList } from "@/components/admin-management/salary/SalaryManagement"
+import { EmployeeSalaryList } from "@/components/admin/salary/SalaryManagement"
 
 export default function PayrollSettingsPage() {
   return (

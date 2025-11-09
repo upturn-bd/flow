@@ -9,9 +9,9 @@ import type { Team, TeamWithMembers, TeamWithPermissions } from "@/lib/types/sch
 import { Button } from "@/components/ui/button";
 import BaseModal from "@/components/ui/modals/BaseModal";
 import toast from "react-hot-toast";
-import TeamForm from "@/components/admin-management/teams/TeamForm";
-import TeamMembersModal from "@/components/admin-management/teams/TeamMembersModal";
-import TeamPermissionsModal from "@/components/admin-management/teams/TeamPermissionsModal";
+import TeamForm from "@/components/admin/teams/TeamForm";
+import TeamMembersModal from "@/components/admin/teams/TeamMembersModal";
+import TeamPermissionsModal from "@/components/admin/teams/TeamPermissionsModal";
 
 export default function TeamsPage() {
   const [teams, setTeams] = useState<Team[]>([]);

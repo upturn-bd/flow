@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { MapPin } from '@phosphor-icons/react';
 
 // Dynamically import the ClientMap to avoid SSR issues
-const ClientMap = dynamic(() => import('@/components/admin-management/attendance/ClientMap'), { 
+const ClientMap = dynamic(() => import('@/components/admin/attendance/ClientMap'), { 
   ssr: false 
 });
 

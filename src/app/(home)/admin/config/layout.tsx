@@ -1,4 +1,4 @@
-// /app/admin-management/company-configurations/layout.tsx
+// /app/admin/company-configurations/layout.tsx
 "use client";
 
 import { AdminDataProvider } from "@/contexts/AdminDataContext";
@@ -24,9 +24,9 @@ const ConfigurationBreadcrumbs = () => {
     // The complete base path for configurations, including Home
     const baseBreadcrumbs = [
         // Added Home back for the start of the trail
-        { href: "/admin-management", label: "Admin Management" },
+        { href: "/admin", label: "Admin Management" },
         // This is the item that was being excluded by the old logic:
-        { href: "/admin-management", label: "Company Configurations" }, 
+        { href: "/admin", label: "Company Configurations" }, 
     ];
     
     // The current page is the last segment of the path

@@ -142,7 +142,7 @@ export default function StakeholderProcessesPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
-                      router.push(`/admin-management/company-configurations/stakeholder-processes/${process.id}`);
+                      router.push(`/admin/company-configurations/stakeholder-processes/${process.id}`);
                     }}
                     className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                     title="Edit process"

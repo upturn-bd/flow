@@ -6,7 +6,7 @@ import { authRoutes, excludePaths } from "./lib/utils/path-utils";
 
 // Permission-based route access mappings
 const ROUTE_PERMISSION_MAP: Record<string, { module: string; action: string }> = {
-  '/admin-management': { module: 'teams', action: 'can_write' },
+  '/admin': { module: 'teams', action: 'can_write' },
   '/finder': { module: 'hris', action: 'can_read' },
   // Most other routes are accessible if user has any permission
 };

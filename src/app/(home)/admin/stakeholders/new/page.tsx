@@ -104,7 +104,7 @@ export default function NewStakeholderPage() {
         kam_id: formData.kam_id || undefined, // Changed from issue_handler_id
       });
 
-      router.push("/admin-management/stakeholders");
+      router.push("/admin/stakeholders");
     } catch (error) {
       console.error("Error creating stakeholder:", error);
       setErrors({ submit: "Failed to create stakeholder. Please try again." });
@@ -138,7 +138,7 @@ export default function NewStakeholderPage() {
               Processes define the workflow and steps for converting leads into stakeholders.
             </p>
             <button
-              onClick={() => router.push("/admin-management/company-configurations/stakeholder-processes")}
+              onClick={() => router.push("/admin/company-configurations/stakeholder-processes")}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
             >
               Go to Process Management

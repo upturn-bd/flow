@@ -6,13 +6,13 @@ import { fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { Settings } from "lucide-react";
 
 // Import all the admin management components
-import SupervisorLineageView from "@/components/admin-management/supervisor-lineage/SupervisorLineageView";
-import AttendanceManagementView from "@/components/admin-management/attendance/AttendanceManagementView";
-import LeaveManagementView from "@/components/admin-management/leave/LeaveManagementView";
-import InventoryManagementView from "@/components/admin-management/inventory/InventoryManagementView";
-import SettlementView from "@/components/admin-management/settlement/SettlementView";
-import NoticeManagementView from "@/components/admin-management/notice/NoticeManagementView";
-import ComplaintsManagementView from "@/components/admin-management/complaints/ComplaintsManagementView";
+import SupervisorLineageView from "@/components/admin/supervisor-lineage/SupervisorLineageView";
+import AttendanceManagementView from "@/components/admin/attendance/AttendanceManagementView";
+import LeaveManagementView from "@/components/admin/leave/LeaveManagementView";
+import InventoryManagementView from "@/components/admin/inventory/InventoryManagementView";
+import SettlementView from "@/components/admin/settlement/SettlementView";
+import NoticeManagementView from "@/components/admin/notice/NoticeManagementView";
+import ComplaintsManagementView from "@/components/admin/complaints/ComplaintsManagementView";
 
 // Simple component to show while loading or when components can't be found
 function PlaceholderCard({ title, message }: { title: string; message: string }) {

@@ -1,6 +1,6 @@
 "use client";
 
-import TransactionTab from "@/components/admin-management/tabs/AccountsTab";
+import TransactionTab from "@/components/admin/tabs/AccountsTab";
 
 export default function TransactionSettingsPage() {
   return (

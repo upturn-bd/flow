@@ -1,6 +1,6 @@
 "use client";
 
-import AdvancedTab from "@/components/admin-management/tabs/AdvancedTab";
+import AdvancedTab from "@/components/admin/tabs/AdvancedTab";
 
 export default function AdvancedSettingsPage() {
   return (

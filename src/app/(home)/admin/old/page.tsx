@@ -10,13 +10,13 @@ import { staggerContainer } from "@/components/ui/animations";
 import { AdminDataProvider, useAdminData } from "@/contexts/AdminDataContext";
 
 // Import components
-import SetupStep1 from "@/components/admin-management/setup/SetupStep1";
-import SetupStep2 from "@/components/admin-management/setup/SetupStep2";
-import BasicTab from "@/components/admin-management/tabs/BasicTab";
-import AdvancedTab from "@/components/admin-management/tabs/AdvancedTab";
-import AccountsTab from "@/components/admin-management/tabs/AccountsTab";
-import RoleManagementTab from "@/components/admin-management/tabs/RoleManagementTab";
-import { EmployeeSalaryList } from "@/components/admin-management/salary/SalaryManagement";
+import SetupStep1 from "@/components/admin/setup/SetupStep1";
+import SetupStep2 from "@/components/admin/setup/SetupStep2";
+import BasicTab from "@/components/admin/tabs/BasicTab";
+import AdvancedTab from "@/components/admin/tabs/AdvancedTab";
+import AccountsTab from "@/components/admin/tabs/AccountsTab";
+import RoleManagementTab from "@/components/admin/tabs/RoleManagementTab";
+import { EmployeeSalaryList } from "@/components/admin/salary/SalaryManagement";
 
 // Main content component that uses the context
 function AdminManagementContent() {
@@ -45,7 +45,7 @@ function AdminManagementContent() {
   } = useAdminData();
 
   const handleTabChange = (tab: string) => {
-    router.push(`/admin-management?tab=${tab}`);
+    router.push(`/admin?tab=${tab}`);
   };
 
   const handleNextStep = () => {

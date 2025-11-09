@@ -113,7 +113,7 @@ export default function StakeholdersPage() {
             Export CSV
           </button>
           <button
-            onClick={() => router.push("/admin-management/stakeholders/new")}
+            onClick={() => router.push("/admin/stakeholders/new")}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus size={20} />
@@ -251,7 +251,7 @@ export default function StakeholdersPage() {
           </p>
           {!searchTerm && (
             <button
-              onClick={() => router.push("/admin-management/stakeholders/new")}
+              onClick={() => router.push("/admin/stakeholders/new")}
               className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Plus size={20} />
@@ -295,7 +295,7 @@ export default function StakeholdersPage() {
                 <tr
                   key={stakeholder.id}
                   className="hover:bg-gray-50 transition-colors cursor-pointer"
-                  onClick={() => router.push(`/admin-management/stakeholders/${stakeholder.id}`)}
+                  onClick={() => router.push(`/admin/stakeholders/${stakeholder.id}`)}
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center">
@@ -350,7 +350,7 @@ export default function StakeholdersPage() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        router.push(`/admin-management/stakeholders/${stakeholder.id}`);
+                        router.push(`/admin/stakeholders/${stakeholder.id}`);
                       }}
                       className="inline-flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded transition-colors"
                     >

@@ -157,19 +157,19 @@ export const ROUTES = {
   
   // Admin Routes
   ADMIN: {
-    MANAGEMENT: '/admin-management',
-    CONFIG: '/admin-management/config',
-    DEPARTMENTS: '/admin-management/departments',
-    DIVISIONS: '/admin-management/divisions',
-    GRADES: '/admin-management/grades',
-    POSITIONS: '/admin-management/positions',
-    LEAVE: '/admin-management/leave',
-    ATTENDANCE: '/admin-management/attendance',
-    COMPLAINTS: '/admin-management/complaints',
-    INVENTORY: '/admin-management/inventory',
-    NEWS: '/admin-management/news-and-notice',
-    SETTLEMENT: '/admin-management/settlement',
-    SUPERVISOR: '/admin-management/supervisor-lineage',
+    MANAGEMENT: '/admin',
+    CONFIG: '/admin/config',
+    DEPARTMENTS: '/admin/departments',
+    DIVISIONS: '/admin/divisions',
+    GRADES: '/admin/grades',
+    POSITIONS: '/admin/positions',
+    LEAVE: '/admin/leave',
+    ATTENDANCE: '/admin/attendance',
+    COMPLAINTS: '/admin/complaints',
+    INVENTORY: '/admin/inventory',
+    NEWS: '/admin/news-and-notice',
+    SETTLEMENT: '/admin/settlement',
+    SUPERVISOR: '/admin/supervisor-lineage',
   },
   
   // API Routes

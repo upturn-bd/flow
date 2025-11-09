@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 import { staggerContainer } from "@/components/ui/animations";
 
 // Import the section components directly
-import DivisionsSection from "@/components/admin-management/divisions/DivisionsSection";
-import DepartmentsSection from "@/components/admin-management/departments/DepartmentsSection";
-import GradesSection from "@/components/admin-management/grades/GradesSection";
-import PositionsSection from "@/components/admin-management/positions/PositionsSection";
+import DivisionsSection from "@/components/admin/divisions/DivisionsSection";
+import DepartmentsSection from "@/components/admin/departments/DepartmentsSection";
+import GradesSection from "@/components/admin/grades/GradesSection";
+import PositionsSection from "@/components/admin/positions/PositionsSection";
 import { getCompanyInfo } from "@/lib/utils/auth";
 
 export default function CompanyBasicsConfigView() {

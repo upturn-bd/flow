@@ -105,7 +105,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
     setDeleting(true);
     try {
       await deleteStakeholder(stakeholderId);
-      router.push("/admin-management/stakeholders");
+      router.push("/admin/stakeholders");
     } catch (error) {
       console.error("Error deleting stakeholder:", error);
     } finally {
@@ -170,7 +170,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
             The stakeholder you're looking for doesn't exist or has been deleted.
           </p>
           <button
-            onClick={() => router.push("/admin-management/stakeholders")}
+            onClick={() => router.push("/admin/stakeholders")}
             className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Back to Stakeholders
@@ -223,7 +223,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => router.push(`/admin-management/stakeholders/${stakeholder.id}/edit`)}
+              onClick={() => router.push(`/admin/stakeholders/${stakeholder.id}/edit`)}
               className="flex items-center gap-2 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               <Edit size={16} />

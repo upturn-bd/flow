@@ -140,7 +140,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
         kam_id: formData.kam_id || undefined, // Changed from issue_handler_id
       });
 
-      router.push(`/admin-management/stakeholders/${stakeholderId}`);
+      router.push(`/admin/stakeholders/${stakeholderId}`);
     } catch (error) {
       console.error("Error updating stakeholder:", error);
       setErrors({ submit: "Failed to update stakeholder. Please try again." });
@@ -167,7 +167,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
             The stakeholder you're trying to edit doesn't exist or has been deleted.
           </p>
           <button
-            onClick={() => router.push("/admin-management/stakeholders")}
+            onClick={() => router.push("/admin/stakeholders")}
             className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Back to Stakeholders
@@ -201,7 +201,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
               You need to have at least one active stakeholder process to edit this stakeholder.
             </p>
             <button
-              onClick={() => router.push("/admin-management/company-configurations/stakeholder-processes")}
+              onClick={() => router.push("/admin/company-configurations/stakeholder-processes")}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
             >
               Go to Process Management

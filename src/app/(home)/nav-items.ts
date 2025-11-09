@@ -35,8 +35,8 @@ export const navItems: NavItem[] = [
       requiredPermissions: [], // Operations page accessible to all, subpages have their own checks
     },
     {
-      label: "admin-management",
-      href: "/admin-management",
+      label: "admin",
+      href: "/admin",
       icon: UserGearIcon,
       roles: ["Admin"], // Backward compatibility
       requiredPermissions: ["teams:can_write", "admin_config:can_write"], // Admins have team write access

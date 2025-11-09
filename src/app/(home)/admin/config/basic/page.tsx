@@ -1,8 +1,8 @@
-// /app/admin-management/company-configurations/basic/page.tsx
+// /app/admin/company-configurations/basic/page.tsx
 "use client";
 
 // No need to import AdminDataProvider, motion, or breadcrumb components here
-import BasicTab from "@/components/admin-management/tabs/BasicTab";
+import BasicTab from "@/components/admin/tabs/BasicTab";
 
 export default function BasicSettingsPage() {
   // The layout.tsx now provides the wrapper elements (motion.div, Breadcrumbs, AdminDataProvider)

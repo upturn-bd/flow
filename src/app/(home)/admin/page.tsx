@@ -32,42 +32,42 @@ const sections = [
         items: [
             {
                 name: "Basic Settings",
-                path: "/admin-management/company-configurations/basic",
+                path: "/admin/company-configurations/basic",
                 icon: Settings,
                 description: "General company information and essential settings",
                 color: "bg-blue-100 text-blue-700 border-blue-200"
             },
             {
                 name: "Advanced Settings",
-                path: "/admin-management/company-configurations/advanced",
+                path: "/admin/company-configurations/advanced",
                 icon: Settings2,
                 description: "Configure system-wide and granular settings",
                 color: "bg-indigo-100 text-indigo-700 border-indigo-200"
             },
             {
                 name: "Payroll",
-                path: "/admin-management/company-configurations/payroll",
+                path: "/admin/company-configurations/payroll",
                 icon: CreditCard,
                 description: "Manage salary structures, deductions, and payment rules",
                 color: "bg-green-100 text-green-700 border-green-200"
             },
             {
                 name: "Teams",
-                path: "/admin-management/company-configurations/teams",
+                path: "/admin/company-configurations/teams",
                 icon: UsersRound,
                 description: "Manage teams and assign granular permissions",
                 color: "bg-violet-100 text-violet-700 border-violet-200"
             },
             {
                 name: "Stakeholder Processes",
-                path: "/admin-management/company-configurations/stakeholder-processes",
+                path: "/admin/company-configurations/stakeholder-processes",
                 icon: GitBranch,
                 description: "Manage workflow processes for stakeholders and leads",
                 color: "bg-teal-100 text-teal-700 border-teal-200"
             },
             {
                 name: "Data Export",
-                path: "/admin-management/data-export",
+                path: "/admin/data-export",
                 icon: Download,
                 description: "Export HRIS and stakeholder data to CSV format",
                 color: "bg-emerald-100 text-emerald-700 border-emerald-200"
@@ -80,70 +80,70 @@ const sections = [
         items: [
             {
                 name: "Task",
-                path: "/admin-management/company-logs/tasks",
+                path: "/admin/logs/tasks",
                 icon: ClipboardList,
                 description: "View historical records for task management",
                 color: "bg-indigo-100 text-indigo-700 border-indigo-200"
             },
             {
                 name: "Project",
-                path: "/admin-management/company-logs/project",
+                path: "/admin/logs/project",
                 icon: BarChart,
                 description: "View historical records for project tracking",
                 color: "bg-blue-100 text-blue-700 border-blue-200"
             },
             {
                 name: "Attendance",
-                path: "/admin-management/company-logs/attendance",
+                path: "/admin/logs/attendance",
                 icon: LogIn,
                 description: "Review historical check-in and check-out data",
                 color: "bg-green-100 text-green-700 border-green-200"
             },
             {
                 name: "Leave",
-                path: "/admin-management/company-logs/leave",
+                path: "/admin/logs/leave",
                 icon: CalendarX,
                 description: "Review all past and pending leave requests",
                 color: "bg-blue-100 text-blue-700 border-blue-200"
             },
             {
                 name: "Notice",
-                path: "/admin-management/company-logs/notice",
+                path: "/admin/logs/notice",
                 icon: Bell,
                 description: "Archive and history of all published company notices",
                 color: "bg-amber-100 text-amber-700 border-amber-200"
             },
             {
                 name: "Requisition",
-                path: "/admin-management/company-logs/requisition",
+                path: "/admin/logs/requisition",
                 icon: Clipboard,
                 description: "History of all equipment/supply requisition requests",
                 color: "bg-cyan-100 text-cyan-700 border-cyan-200"
             },
             {
                 name: "Complaint",
-                path: "/admin-management/company-logs/complaint",
+                path: "/admin/logs/complaint",
                 icon: AlertCircle,
                 description: "Archive of all submitted workplace complaints",
                 color: "bg-red-100 text-red-700 border-red-200"
             },
             {
                 name: "Stakeholder",
-                path: "/admin-management/stakeholders",
+                path: "/admin/stakeholders",
                 icon: Building2,
                 description: "Records of all stakeholder interactions and issues",
                 color: "bg-purple-100 text-purple-700 border-purple-200"
             },
             {
                 name: "Transaction",
-                path: "/admin-management/company-logs/transaction",
+                path: "/admin/logs/transaction",
                 icon: DollarSign,
                 description: "Define and manage financial transaction types and flows",
                 color: "bg-emerald-100 text-emerald-700 border-emerald-200"
             },
             {
                 name: "Onboarding",
-                path: "/admin-management/company-logs/onboarding",
+                path: "/admin/logs/onboarding",
                 icon: UserPlus,
                 description: "Archive of all employee onboarding processes",
                 color: "bg-purple-100 text-purple-700 border-purple-200"

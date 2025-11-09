@@ -87,7 +87,7 @@ export async function createAccountFromPayroll(
           },
           {
             referenceId: data.id,
-            actionUrl: '/admin-management?tab=accounts',
+            actionUrl: '/admin?tab=accounts',
           }
         );
       } catch (notificationError) {
@@ -210,7 +210,7 @@ export async function markPayrollAccountComplete(payrollId: number): Promise<Acc
           },
           {
             referenceId: existingAccount.id,
-            actionUrl: '/admin-management?tab=accounts',
+            actionUrl: '/admin?tab=accounts',
           }
         );
       }
