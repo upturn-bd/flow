@@ -8,7 +8,7 @@ import { ClaimType } from "@/lib/types/schemas";
 import {
   ClaimTypeCreateModal,
   ClaimTypeUpdateModal,
-} from "./";
+} from ".";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 

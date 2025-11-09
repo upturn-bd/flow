@@ -32,35 +32,35 @@ const sections = [
         items: [
             {
                 name: "Basic Settings",
-                path: "/admin/company-configurations/basic",
+                path: "/admin/config/basic",
                 icon: Settings,
                 description: "General company information and essential settings",
                 color: "bg-blue-100 text-blue-700 border-blue-200"
             },
             {
                 name: "Advanced Settings",
-                path: "/admin/company-configurations/advanced",
+                path: "/admin/config/advanced",
                 icon: Settings2,
                 description: "Configure system-wide and granular settings",
                 color: "bg-indigo-100 text-indigo-700 border-indigo-200"
             },
             {
                 name: "Payroll",
-                path: "/admin/company-configurations/payroll",
+                path: "/admin/config/payroll",
                 icon: CreditCard,
                 description: "Manage salary structures, deductions, and payment rules",
                 color: "bg-green-100 text-green-700 border-green-200"
             },
             {
                 name: "Teams",
-                path: "/admin/company-configurations/teams",
+                path: "/admin/config/teams",
                 icon: UsersRound,
                 description: "Manage teams and assign granular permissions",
                 color: "bg-violet-100 text-violet-700 border-violet-200"
             },
             {
                 name: "Stakeholder Processes",
-                path: "/admin/company-configurations/stakeholder-processes",
+                path: "/admin/config/stakeholder-processes",
                 icon: GitBranch,
                 description: "Manage workflow processes for stakeholders and leads",
                 color: "bg-teal-100 text-teal-700 border-teal-200"

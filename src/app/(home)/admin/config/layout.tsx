@@ -1,4 +1,4 @@
-// /app/admin/company-configurations/layout.tsx
+// /app/admin/config/layout.tsx
 "use client";
 
 import { AdminDataProvider } from "@/contexts/AdminDataContext";

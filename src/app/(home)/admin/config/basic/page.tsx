@@ -1,4 +1,4 @@
-// /app/admin/company-configurations/basic/page.tsx
+// /app/admin/config/basic/page.tsx
 "use client";
 
 // No need to import AdminDataProvider, motion, or breadcrumb components here

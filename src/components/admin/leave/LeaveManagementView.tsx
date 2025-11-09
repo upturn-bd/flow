@@ -7,7 +7,7 @@ import {
   LeaveHolidayCreateModal,
   LeaveHolidayUpdateModal,
   LeaveTypeUpdateModal,
-} from "./";
+} from ".";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { TrashSimple, Tag, CalendarCheck, CalendarBlank, Plus, Clock, Eye } from "@phosphor-icons/react";
 import { useHolidayConfigs, useWeeklyHolidayConfigs } from "@/hooks/useLeaveManagement";
