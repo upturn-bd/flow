@@ -400,7 +400,22 @@ export function useStakeholders() {
       try {
         const employeeInfo = await getEmployeeInfo();
 
-        const updates = stepIds.map((stepId, index) =>
+        // First, set all step_orders to temporary negative values to avoid conflicts
+        // This prevents unique constraint violations during the reordering process
+        const tempUpdates = stepIds.map((stepId, index) =>
+          supabase
+            .from("stakeholder_process_steps")
+            .update({ 
+              step_order: -(index + 1000), // Use negative values as temporary placeholders
+              updated_by: employeeInfo?.id,
+            })
+            .eq("id", stepId)
+        );
+
+        await Promise.all(tempUpdates);
+
+        // Then update to the actual final values
+        const finalUpdates = stepIds.map((stepId, index) =>
           supabase
             .from("stakeholder_process_steps")
             .update({ 
@@ -410,7 +425,7 @@ export function useStakeholders() {
             .eq("id", stepId)
         );
 
-        await Promise.all(updates);
+        await Promise.all(finalUpdates);
 
         await fetchProcessSteps(processId);
         return true;
@@ -1346,6 +1361,35 @@ export function useStakeholders() {
     [fetchStakeholderById]
   );
 
+  // Update additional data for a stakeholder
+  const updateAdditionalData = useCallback(
+    async (stakeholderId: number, additionalData: Record<string, any>) => {
+      setError(null);
+
+      try {
+        const employeeInfo = await getEmployeeInfo();
+
+        const { error } = await supabase
+          .from("stakeholders")
+          .update({
+            additional_data: additionalData,
+            updated_by: employeeInfo?.id,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", stakeholderId);
+
+        if (error) throw error;
+
+        return true;
+      } catch (error) {
+        console.error("Error updating additional data:", error);
+        setError("Failed to update additional data");
+        return false;
+      }
+    },
+    []
+  );
+
   // ==========================================================================
   // COMPUTED VALUES
   // ==========================================================================
@@ -1421,5 +1465,6 @@ export function useStakeholders() {
     saveStepData,
     completeStep,
     uncompleteStep,
+    updateAdditionalData,
   };
 }
