@@ -8,14 +8,13 @@ import {
   Building2,
   CheckCircle,
   FileSpreadsheet,
-  Settings,
   AlertCircle,
   FolderKanban,
   ListTodo,
   Calendar,
   ClipboardCheck,
 } from "lucide-react";
-import { useEmployees, ExtendedEmployee } from "@/hooks/useEmployees";
+import { useEmployees } from "@/hooks/useEmployees";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useProjects } from "@/hooks/useProjects";
 import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
@@ -151,13 +150,62 @@ export default function DataExportPage() {
 
   useEffect(() => {
     // Preload all datasets for faster exports
-    fetchExtendedEmployees();
-    fetchStakeholders();
-    fetchOngoingProjects(50, true);
-    fetchCompletedProjects(50, true);
-    fetchTasks({ scope: TaskScope.COMPANY_TASKS, status: TaskStatus.ALL });
-    fetchLeaveRequests();
-    fetchAttendance();
+    const loadData = async () => {
+      await fetchExtendedEmployees();
+      await fetchStakeholders();
+      await fetchOngoingProjects(50, true);
+      await fetchCompletedProjects(50, true);
+      await fetchTasks({ scope: TaskScope.COMPANY_TASKS, status: TaskStatus.ALL });
+      await fetchLeaveRequests();
+      await fetchAttendance();
+    };
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fetch stakeholders with step data when selected
+  const fetchStakeholdersWithStepData = useCallback(async () => {
+    try {
+      const { supabase } = await import("@/lib/supabase/client");
+      const { getCompanyId } = await import("@/lib/utils/auth");
+      
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("stakeholders")
+        .select(`
+          *,
+          process:stakeholder_processes(id, name, is_sequential),
+          current_step:stakeholder_process_steps(id, name, step_order),
+          stakeholder_type:stakeholder_types(id, name, description),
+          parent_stakeholder:stakeholders!parent_stakeholder_id(id, name, status),
+          kam:employees!kam_id(id, first_name, last_name, email),
+          step_data:stakeholder_step_data(
+            *,
+            step:stakeholder_process_steps(id, name, step_order)
+          )
+        `)
+        .eq("company_id", company_id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Transform kam data to match expected structure
+      const transformedData = data?.map((stakeholder) => ({
+        ...stakeholder,
+        kam: stakeholder.kam ? {
+          id: stakeholder.kam.id,
+          name: `${stakeholder.kam.first_name} ${stakeholder.kam.last_name}`,
+          email: stakeholder.kam.email,
+        } : undefined,
+      })) || [];
+
+      return transformedData;
+    } catch (error) {
+      console.error("Error fetching stakeholders with step data:", error);
+      toast.error("Failed to fetch stakeholder step data");
+      return [];
+    }
   }, []);
 
   const handleExportEmployees = () => {
@@ -175,15 +223,25 @@ export default function DataExportPage() {
     }
   };
 
-  const handleExportStakeholders = () => {
+  const handleExportStakeholders = async () => {
     if (stakeholders.length === 0) {
       toast.error("No stakeholder data available to export");
       return;
     }
 
     try {
-      exportStakeholdersToCSV(stakeholders, stakeholderConfig);
-      toast.success(`Exported ${stakeholders.length} stakeholder(s) to CSV`);
+      // Fetch stakeholders with step data if step data is included in config
+      let dataToExport = stakeholders;
+      if (stakeholderConfig.includeStepData) {
+        toast.info("Fetching stakeholder step data...");
+        dataToExport = await fetchStakeholdersWithStepData();
+        if (dataToExport.length === 0) {
+          dataToExport = stakeholders; // Fallback to stakeholders without step data
+        }
+      }
+      
+      exportStakeholdersToCSV(dataToExport, stakeholderConfig);
+      toast.success(`Exported ${dataToExport.length} stakeholder(s) to CSV`);
     } catch (error) {
       console.error("Error exporting stakeholders:", error);
       toast.error("Failed to export stakeholder data");

@@ -187,7 +187,7 @@ export function exportStakeholdersToCSV(
       // Handle both direct object and nested structure
       const typeName = stakeholder.stakeholder_type 
         ? (typeof stakeholder.stakeholder_type === 'object' 
-          ? (stakeholder.stakeholder_type as any)?.name || ""
+          ? (stakeholder.stakeholder_type as Record<string, unknown>)?.name as string || ""
           : "")
         : "";
       row.push(typeName);
@@ -196,7 +196,7 @@ export function exportStakeholdersToCSV(
       // Handle both direct object and nested structure
       const processName = stakeholder.process
         ? (typeof stakeholder.process === 'object'
-          ? (stakeholder.process as any)?.name || ""
+          ? (stakeholder.process as Record<string, unknown>)?.name as string || ""
           : "")
         : "";
       row.push(processName);
@@ -205,7 +205,7 @@ export function exportStakeholdersToCSV(
       // Handle KAM which is transformed to have a name property
       const kamName = stakeholder.kam
         ? (typeof stakeholder.kam === 'object'
-          ? (stakeholder.kam as any)?.name || ""
+          ? (stakeholder.kam as Record<string, unknown>)?.name as string || ""
           : "")
         : "";
       row.push(kamName);
@@ -234,15 +234,17 @@ export function exportStakeholdersToCSV(
 /**
  * Format step data for CSV export as a single column
  */
-function formatStepDataForCSV(stepData?: any[]): string {
+function formatStepDataForCSV(stepData?: Record<string, unknown>[]): string {
   if (!stepData || stepData.length === 0) return "";
   
   try {
     // Create a structured representation of step data
     const formattedSteps = stepData.map((step) => {
-      const stepName = step.step?.name || `Step ${step.step_order || "Unknown"}`;
-      const stepDataObj = step.data || {};
-      const isCompleted = step.is_completed ? "Completed" : "Pending";
+      const stepRecord = step as Record<string, unknown>;
+      const stepInfo = stepRecord.step as Record<string, unknown> | undefined;
+      const stepName = stepInfo?.name as string || `Step ${stepRecord.step_order || "Unknown"}`;
+      const stepDataObj = (stepRecord.data as Record<string, unknown>) || {};
+      const isCompleted = stepRecord.is_completed ? "Completed" : "Pending";
       
       // Format the data object as key-value pairs
       const dataEntries = Object.entries(stepDataObj)
@@ -265,10 +267,12 @@ function formatStepDataForCSV(stepData?: any[]): string {
 
 export interface GenericExportColumn {
   header: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   accessor: string | ((item: any) => string);
 }
 
 export function exportGenericDataToCSV(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any[],
   columns: GenericExportColumn[],
   filename: string
