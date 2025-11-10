@@ -84,6 +84,9 @@ interface AttendanceExportConfig {
   includeTag: boolean;
   includeSite: boolean;
   includeCoordinates: boolean;
+  includeSiteTimings: boolean;
+  includeLateIndicator: boolean;
+  includeLocationStatus: boolean;
 }
 
 export default function DataExportPage() {
@@ -139,6 +142,9 @@ export default function DataExportPage() {
     includeTag: true,
     includeSite: true,
     includeCoordinates: false,
+    includeSiteTimings: true,
+    includeLateIndicator: true,
+    includeLocationStatus: true,
   });
 
   const { extendedEmployees, fetchExtendedEmployees, loading: employeesLoading } = useEmployees();
@@ -163,6 +169,33 @@ export default function DataExportPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Fetch attendance records with site information for enhanced export
+  const fetchAttendanceWithSiteData = useCallback(async () => {
+    try {
+      const { supabase } = await import("@/lib/supabase/client");
+      const { getCompanyId } = await import("@/lib/utils/auth");
+      
+      const company_id = await getCompanyId();
+
+      const { data, error } = await supabase
+        .from("attendance_records")
+        .select(`
+          *,
+          site:sites(id, name, check_in, check_out, latitude, longitude)
+        `)
+        .eq("company_id", company_id)
+        .order("attendance_date", { ascending: false });
+
+      if (error) throw error;
+
+      return data || [];
+    } catch (error) {
+      console.error("Error fetching attendance with site data:", error);
+      toast.error("Failed to fetch attendance site data");
+      return [];
+    }
+  }, []);
+
   // Fetch stakeholders with step data when selected
   const fetchStakeholdersWithStepData = useCallback(async () => {
     try {
@@ -182,7 +215,7 @@ export default function DataExportPage() {
           kam:employees!kam_id(id, first_name, last_name, email),
           step_data:stakeholder_step_data(
             *,
-            step:stakeholder_process_steps(id, name, step_order)
+            step:stakeholder_process_steps(id, name, step_order, field_definitions)
           )
         `)
         .eq("company_id", company_id)
@@ -295,15 +328,20 @@ export default function DataExportPage() {
     }
   };
 
-  const handleExportAttendance = () => {
+  const handleExportAttendance = async () => {
     if (attendanceRecords.length === 0) {
       toast.error("No attendance data available to export");
       return;
     }
 
     try {
-      exportAttendanceToCSV(attendanceRecords, attendanceConfig);
-      toast.success(`Exported ${attendanceRecords.length} attendance record(s) to CSV`);
+      // Fetch attendance with site data for enhanced export
+      toast.info("Fetching attendance details with site information...");
+      const attendanceWithSiteData = await fetchAttendanceWithSiteData();
+      const dataToExport = attendanceWithSiteData.length > 0 ? attendanceWithSiteData : attendanceRecords;
+      
+      exportAttendanceToCSV(dataToExport, attendanceConfig);
+      toast.success(`Exported ${dataToExport.length} attendance record(s) to CSV`);
     } catch (error) {
       console.error("Error exporting attendance:", error);
       toast.error("Failed to export attendance data");
@@ -1120,7 +1158,52 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Site ID</span>
+                        <span className="text-sm font-medium text-gray-900">Site Name</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={attendanceConfig.includeSiteTimings}
+                          onChange={(e) =>
+                            setAttendanceConfig({
+                              ...attendanceConfig,
+                              includeSiteTimings: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Site Timings</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-green-200 rounded-lg hover:bg-green-50 cursor-pointer bg-green-50/50">
+                        <input
+                          type="checkbox"
+                          checked={attendanceConfig.includeLateIndicator}
+                          onChange={(e) =>
+                            setAttendanceConfig({
+                              ...attendanceConfig,
+                              includeLateIndicator: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-green-600 rounded focus:ring-2 focus:ring-green-500"
+                        />
+                        <span className="text-sm font-medium text-green-900">Late Status Indicator</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-green-200 rounded-lg hover:bg-green-50 cursor-pointer bg-green-50/50">
+                        <input
+                          type="checkbox"
+                          checked={attendanceConfig.includeLocationStatus}
+                          onChange={(e) =>
+                            setAttendanceConfig({
+                              ...attendanceConfig,
+                              includeLocationStatus: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-green-600 rounded focus:ring-2 focus:ring-green-500"
+                        />
+                        <span className="text-sm font-medium text-green-900">Location Status (Wrong Location)</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">

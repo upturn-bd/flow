@@ -232,32 +232,52 @@ export function exportStakeholdersToCSV(
 }
 
 /**
- * Format step data for CSV export as a single column
+ * Format step data for CSV export as a single column - returns JSON format
+ * Each step contains only the field labels and their values for human readability
  */
 function formatStepDataForCSV(stepData?: Record<string, unknown>[]): string {
   if (!stepData || stepData.length === 0) return "";
   
   try {
-    // Create a structured representation of step data
+    // Create array of step objects with only label: value pairs
     const formattedSteps = stepData.map((step) => {
       const stepRecord = step as Record<string, unknown>;
       const stepInfo = stepRecord.step as Record<string, unknown> | undefined;
       const stepName = stepInfo?.name as string || `Step ${stepRecord.step_order || "Unknown"}`;
       const stepDataObj = (stepRecord.data as Record<string, unknown>) || {};
-      const isCompleted = stepRecord.is_completed ? "Completed" : "Pending";
+      const fieldDefinitions = stepRecord.field_definitions_snapshot as Record<string, unknown> | undefined;
       
-      // Format the data object as key-value pairs
-      const dataEntries = Object.entries(stepDataObj)
-        .map(([key, value]) => `${key}: ${value}`)
-        .join("; ");
+      // Get field definitions to map keys to labels
+      const fields = (fieldDefinitions?.fields as Array<Record<string, unknown>>) || [];
+      const fieldLabelMap: Record<string, string> = {};
       
-      return `[${stepName}] Status: ${isCompleted}${dataEntries ? ` | Data: ${dataEntries}` : ""}`;
+      fields.forEach((field) => {
+        const key = field.key as string;
+        const label = field.label as string;
+        if (key && label) {
+          fieldLabelMap[key] = label;
+        }
+      });
+      
+      // Create object with field labels as keys and data as values
+      const stepObject: Record<string, unknown> = {
+        "Step Name": stepName,
+      };
+      
+      // Add each field using its label as the key
+      Object.entries(stepDataObj).forEach(([key, value]) => {
+        const label = fieldLabelMap[key] || key;
+        stepObject[label] = value;
+      });
+      
+      return stepObject;
     });
     
-    return formattedSteps.join(" || ");
+    // Return as formatted JSON string
+    return JSON.stringify(formattedSteps, null, 2);
   } catch (error) {
     console.error("Error formatting step data:", error);
-    return "Error formatting step data";
+    return "[]";
   }
 }
 
@@ -506,6 +526,9 @@ export interface AttendanceExportOptions {
   includeTag?: boolean;
   includeSite?: boolean;
   includeCoordinates?: boolean;
+  includeSiteTimings?: boolean;
+  includeLateIndicator?: boolean;
+  includeLocationStatus?: boolean;
 }
 
 export function exportAttendanceToCSV(
@@ -518,22 +541,34 @@ export function exportAttendanceToCSV(
     includeTag = true,
     includeSite = true,
     includeCoordinates = false,
+    includeSiteTimings = true,
+    includeLateIndicator = true,
+    includeLocationStatus = true,
   } = options;
 
   // Build headers
   const headers: string[] = ["Attendance ID", "Employee ID", "Attendance Date"];
   
   if (includeTag) headers.push("Tag");
-  if (includeSite) headers.push("Site ID");
-  if (includeCheckInTime) headers.push("Check In Time");
-  if (includeCheckOutTime) headers.push("Check Out Time");
+  if (includeSite) headers.push("Site Name");
+  if (includeSiteTimings) {
+    headers.push("Site Check-In Time");
+    headers.push("Site Check-Out Time");
+  }
+  if (includeCheckInTime) headers.push("Actual Check-In Time");
+  if (includeCheckOutTime) headers.push("Actual Check-Out Time");
+  if (includeLateIndicator) headers.push("Late Status");
+  if (includeLocationStatus) headers.push("Location Status");
   if (includeCoordinates) {
-    headers.push("Check In Coordinates");
-    headers.push("Check Out Coordinates");
+    headers.push("Check-In Coordinates");
+    headers.push("Check-Out Coordinates");
   }
 
   // Build rows
   const rows = attendance.map((record) => {
+    const recordWithSite = record as Attendance & { site?: Record<string, unknown> };
+    const siteInfo = recordWithSite.site;
+    
     const row: string[] = [
       record.id?.toString() || "",
       record.employee_id || "",
@@ -541,9 +576,58 @@ export function exportAttendanceToCSV(
     ];
     
     if (includeTag) row.push(record.tag || "");
-    if (includeSite) row.push(record.site_id?.toString() || "");
+    
+    if (includeSite) {
+      const siteName = siteInfo?.name as string || "";
+      row.push(siteName);
+    }
+    
+    if (includeSiteTimings) {
+      const siteCheckIn = siteInfo?.check_in as string || "";
+      const siteCheckOut = siteInfo?.check_out as string || "";
+      row.push(siteCheckIn);
+      row.push(siteCheckOut);
+    }
+    
     if (includeCheckInTime) row.push(record.check_in_time || "");
     if (includeCheckOutTime) row.push(record.check_out_time || "");
+    
+    if (includeLateIndicator) {
+      // Calculate if employee was late
+      let lateStatus = "N/A";
+      if (siteInfo && record.check_in_time) {
+        const siteCheckIn = siteInfo.check_in as string;
+        if (siteCheckIn && record.check_in_time > siteCheckIn) {
+          lateStatus = "Late";
+        } else if (siteCheckIn) {
+          lateStatus = "On Time";
+        }
+      }
+      row.push(lateStatus);
+    }
+    
+    if (includeLocationStatus) {
+      // Calculate if employee checked in from wrong location (distance > 100m threshold)
+      let locationStatus = "N/A";
+      if (siteInfo && record.check_in_coordinates) {
+        const siteLat = siteInfo.latitude as number;
+        const siteLng = siteInfo.longitude as number;
+        const checkInLat = record.check_in_coordinates.y;
+        const checkInLng = record.check_in_coordinates.x;
+        
+        if (siteLat && siteLng && checkInLat && checkInLng) {
+          const distance = calculateDistance(siteLat, siteLng, checkInLat, checkInLng);
+          // Threshold of 100 meters
+          if (distance > 0.1) {
+            locationStatus = `Wrong Location (${distance.toFixed(2)}km away)`;
+          } else {
+            locationStatus = "Correct Location";
+          }
+        }
+      }
+      row.push(locationStatus);
+    }
+    
     if (includeCoordinates) {
       const checkInCoords = record.check_in_coordinates 
         ? `${record.check_in_coordinates.x}, ${record.check_in_coordinates.y}`
@@ -561,4 +645,20 @@ export function exportAttendanceToCSV(
   const csvContent = convertToCSV(headers, rows);
   const filename = `attendance_${getTimestamp()}.csv`;
   downloadCSV(csvContent, filename);
+}
+
+/**
+ * Calculate distance between two coordinates using Haversine formula
+ * Returns distance in kilometers
+ */
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
 }
