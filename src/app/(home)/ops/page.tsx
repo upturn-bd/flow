@@ -190,19 +190,19 @@ export default function ServicesPage() {
 
   return (
     <motion.div 
-      className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8"
+      className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6"
       initial="hidden"
       animate="visible"
       variants={pageVariants}
     >
       <motion.div 
-        className="mb-8"
+        className="mb-6"
         variants={itemVariants}
       >
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">
           Operations & Services
         </h1>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Access all operational tools and employee services
         </p>
       </motion.div>
@@ -211,17 +211,17 @@ export default function ServicesPage() {
         className="mb-6"
         variants={itemVariants}
       >
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col gap-3">
           <div className="relative flex-grow">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search size={20} className="text-gray-500" />
+              <Search size={18} className="text-gray-500" />
             </div>
             <input
               type="text"
-              placeholder="Search for services, tools or keywords..."
+              placeholder="Search services..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-gray-300 rounded-lg pl-10 pr-4 py-2.5 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-300 transition-all outline-none"
+              className="w-full bg-white border border-gray-300 rounded-lg pl-10 pr-10 py-2.5 text-sm sm:text-base text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-300 transition-all outline-none"
             />
             {searchQuery && (
               <motion.button 
@@ -236,38 +236,38 @@ export default function ServicesPage() {
               </motion.button>
             )}
           </div>
-        </div>
 
-        {/* Section filters */}
-        <div className="flex flex-wrap gap-2 mt-4">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setSelectedSection(null)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors
-              ${!selectedSection 
-                ? 'bg-blue-100 text-blue-700 shadow-sm' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
-            }
-          >
-            All
-          </motion.button>
-          
-          {sections.map((section) => (
+          {/* Section filters */}
+          <div className="flex flex-wrap gap-2">
             <motion.button
-              key={section.title}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setSelectedSection(section.title)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors
-                ${selectedSection === section.title 
-                  ? 'bg-blue-100 text-blue-700 shadow-sm' 
+              onClick={() => setSelectedSection(null)}
+              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
+                ${!selectedSection 
+                  ? 'bg-blue-600 text-white shadow-sm' 
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
               }
             >
-              {section.title}
+              All
             </motion.button>
-          ))}
+            
+            {sections.map((section) => (
+              <motion.button
+                key={section.title}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSelectedSection(section.title)}
+                className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
+                  ${selectedSection === section.title 
+                    ? 'bg-blue-600 text-white shadow-sm' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                }
+              >
+                {section.title}
+              </motion.button>
+            ))}
+          </div>
         </div>
       </motion.div>
 
@@ -275,11 +275,11 @@ export default function ServicesPage() {
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center p-12 bg-gray-50 rounded-lg border border-gray-200 mt-8"
+          className="flex flex-col items-center justify-center p-8 sm:p-12 bg-gray-50 rounded-lg border border-gray-200 mt-8"
         >
-          <File size={48} className="text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-700 mb-2">No services found</h3>
-          <p className="text-gray-600 text-center max-w-md mb-5">
+          <File size={40} className="text-gray-400 mb-3" />
+          <h3 className="text-base sm:text-lg font-medium text-gray-700 mb-2">No services found</h3>
+          <p className="text-sm sm:text-base text-gray-600 text-center max-w-md mb-4">
             Try searching with different keywords or browse all services
           </p>
           <motion.button
@@ -289,7 +289,7 @@ export default function ServicesPage() {
               setSearchQuery("");
               setSelectedSection(null);
             }}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg shadow-sm hover:bg-blue-700 transition-colors"
           >
             View all services
           </motion.button>
@@ -299,7 +299,7 @@ export default function ServicesPage() {
           {filteredSections.map((section) => (
             <motion.div 
               key={section.title} 
-              className="mb-10"
+              className="mb-8"
               variants={sectionVariants}
               initial="hidden"
               animate="visible"
@@ -307,23 +307,23 @@ export default function ServicesPage() {
               layout
             >
               <motion.div 
-                className="flex items-center mb-4"
+                className="flex items-center mb-3"
                 variants={itemVariants}
               >
-                <h2 className="text-xl font-bold text-gray-800 mr-2">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-800 mr-2">
                   {section.title}
                 </h2>
                 <div className="h-[1px] flex-grow bg-gray-200"></div>
               </motion.div>
               <motion.p 
-                className="text-gray-600 mb-6"
+                className="text-sm sm:text-base text-gray-600 mb-4"
                 variants={itemVariants}
               >
                 {section.description}
               </motion.p>
               
               <motion.div 
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4"
                 variants={sectionVariants}
               >
                 {section.items.map((item) => {
@@ -336,24 +336,24 @@ export default function ServicesPage() {
                     >
                       <Link
                         href={item.path}
-                        className={`group flex items-center p-4 bg-white rounded-lg border ${item.color.includes('border') ? item.color.split(' ').find(c => c.startsWith('border-')) : 'border-gray-200'} shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 block h-28`}
+                        className={`group flex flex-col sm:flex-row items-start sm:items-center p-3 sm:p-4 bg-white rounded-lg border ${item.color.includes('border') ? item.color.split(' ').find(c => c.startsWith('border-')) : 'border-gray-200'} shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 block min-h-[100px] sm:h-24`}
                       >
                         <motion.div 
                           whileHover={{ scale: 1.1 }}
-                          className={`flex-shrink-0 w-12 h-12 rounded-md ${item.color.split(' ').filter(c => !c.startsWith('border-')).join(' ')} flex items-center justify-center mr-4 transition-transform`}
+                          className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-md ${item.color.split(' ').filter(c => !c.startsWith('border-')).join(' ')} flex items-center justify-center mb-2 sm:mb-0 sm:mr-3 transition-transform`}
                         >
-                          <Icon size={28} className="text-current" />
+                          <Icon size={24} className="text-current sm:w-7 sm:h-7" />
                         </motion.div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <h3 className="text-base font-semibold text-gray-800 group-hover:text-blue-700 transition-colors truncate">
+                          <div className="flex items-start sm:items-center justify-between">
+                            <h3 className="text-sm sm:text-base font-semibold text-gray-800 group-hover:text-blue-700 transition-colors line-clamp-1">
                               {item.name}
                             </h3>
                             <motion.svg 
                               initial={{ x: 0 }}
                               whileHover={{ x: 3 }}
                               xmlns="http://www.w3.org/2000/svg" 
-                              className="h-4 w-4 text-blue-600 ml-2 transition-all flex-shrink-0" 
+                              className="hidden sm:block h-4 w-4 text-blue-600 ml-2 transition-all flex-shrink-0" 
                               fill="none" 
                               viewBox="0 0 24 24" 
                               stroke="currentColor"
@@ -361,7 +361,7 @@ export default function ServicesPage() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </motion.svg>
                           </div>
-                          <p className="text-sm text-gray-600 mt-0.5 line-clamp-2">
+                          <p className="text-xs sm:text-sm text-gray-600 mt-0.5 line-clamp-2">
                             {item.description}
                           </p>
                         </div>
