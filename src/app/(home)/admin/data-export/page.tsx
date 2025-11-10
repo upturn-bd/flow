@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Download,
@@ -154,20 +154,51 @@ export default function DataExportPage() {
   const { leaveRequests, fetchLeaveRequests, loading: leavesLoading } = useLeaveRequests();
   const { items: attendanceRecords, fetchItems: fetchAttendance, loading: attendanceLoading } = useAttendances();
 
+  const [dataLoadedFor, setDataLoadedFor] = useState<Set<ExportType>>(new Set());
+  const [isLoadingData, setIsLoadingData] = useState(false);
+
+  // Lazy load data only when export type is selected
   useEffect(() => {
-    // Preload all datasets for faster exports
-    const loadData = async () => {
-      await fetchExtendedEmployees();
-      await fetchStakeholders();
-      await fetchOngoingProjects(50, true);
-      await fetchCompletedProjects(50, true);
-      await fetchTasks({ scope: TaskScope.COMPANY_TASKS, status: TaskStatus.ALL });
-      await fetchLeaveRequests();
-      await fetchAttendance();
+    if (!selectedExport || dataLoadedFor.has(selectedExport)) return;
+
+    const loadDataForExport = async () => {
+      setIsLoadingData(true);
+      try {
+        switch (selectedExport) {
+          case "employees":
+            await fetchExtendedEmployees();
+            break;
+          case "stakeholders":
+            await fetchStakeholders();
+            break;
+          case "projects":
+            await Promise.all([
+              fetchOngoingProjects(50, true),
+              fetchCompletedProjects(50, true)
+            ]);
+            break;
+          case "tasks":
+            await fetchTasks({ scope: TaskScope.COMPANY_TASKS, status: TaskStatus.ALL });
+            break;
+          case "leaves":
+            await fetchLeaveRequests();
+            break;
+          case "attendance":
+            await fetchAttendance();
+            break;
+        }
+        setDataLoadedFor(prev => new Set(prev).add(selectedExport));
+      } catch (error) {
+        console.error(`Error loading ${selectedExport} data:`, error);
+        toast.error(`Failed to load ${selectedExport} data`);
+      } finally {
+        setIsLoadingData(false);
+      }
     };
-    loadData();
+
+    loadDataForExport();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selectedExport]);
 
   // Fetch attendance records with site information for enhanced export
   const fetchAttendanceWithSiteData = useCallback(async () => {
@@ -348,11 +379,12 @@ export default function DataExportPage() {
     }
   };
 
-  const exportOptions = [
+  // Memoize export options to avoid unnecessary recalculations
+  const exportOptions = useMemo(() => [
     {
       type: "employees" as ExportType,
       title: "HRIS Employee Data",
-      description: "Export all employee information including personal details, job info, and salary data",
+      description: "Export employee information including personal details and job info",
       icon: Users,
       color: "bg-blue-100 text-blue-700 border-blue-200",
       count: extendedEmployees.length,
@@ -361,7 +393,7 @@ export default function DataExportPage() {
     {
       type: "stakeholders" as ExportType,
       title: "Stakeholder Data",
-      description: "Export stakeholder and lead information with contact details, process status, and step data",
+      description: "Export stakeholder and lead information with contact details and process status",
       icon: Building2,
       color: "bg-purple-100 text-purple-700 border-purple-200",
       count: stakeholders.length,
@@ -370,7 +402,7 @@ export default function DataExportPage() {
     {
       type: "projects" as ExportType,
       title: "Project Data",
-      description: "Export project records including title, status, progress, and assignee information",
+      description: "Export project records including status, progress, and assignees",
       icon: FolderKanban,
       color: "bg-green-100 text-green-700 border-green-200",
       count: ongoingProjects.length + completedProjects.length,
@@ -379,7 +411,7 @@ export default function DataExportPage() {
     {
       type: "tasks" as ExportType,
       title: "Task Data",
-      description: "Export task records with descriptions, priority, status, and assignment details",
+      description: "Export task records with priority, status, and assignment details",
       icon: ListTodo,
       color: "bg-orange-100 text-orange-700 border-orange-200",
       count: ongoingTasks.length + completedTasks.length,
@@ -388,7 +420,7 @@ export default function DataExportPage() {
     {
       type: "leaves" as ExportType,
       title: "Leave Management Data",
-      description: "Export leave records including dates, status, type, and approval information",
+      description: "Export leave records including dates, status, and type",
       icon: Calendar,
       color: "bg-red-100 text-red-700 border-red-200",
       count: leaveRequests.length,
@@ -397,13 +429,20 @@ export default function DataExportPage() {
     {
       type: "attendance" as ExportType,
       title: "Attendance Data",
-      description: "Export attendance records with check-in/out times, tags, and location data",
+      description: "Export attendance records with check-in/out times and locations",
       icon: ClipboardCheck,
       color: "bg-indigo-100 text-indigo-700 border-indigo-200",
       count: attendanceRecords.length,
       loading: attendanceLoading,
     },
-  ];
+  ], [
+    extendedEmployees.length, employeesLoading,
+    stakeholders.length, stakeholdersLoading,
+    ongoingProjects.length, completedProjects.length,
+    ongoingTasks.length, completedTasks.length,
+    leaveRequests.length, leavesLoading,
+    attendanceRecords.length, attendanceLoading
+  ]);
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -475,18 +514,20 @@ export default function DataExportPage() {
               variants={fadeInUp}
               className={`
                 bg-white rounded-lg border-2 transition-all cursor-pointer
-                ${isSelected ? "border-blue-500 shadow-lg" : "border-gray-200 hover:border-gray-300"}
+                ${isSelected ? "border-blue-500 shadow-lg ring-2 ring-blue-100" : "border-gray-200 hover:border-gray-300 hover:shadow-md"}
               `}
               onClick={() => setSelectedExport(option.type)}
             >
-              <div className="p-6">
+              <div className="p-6 flex flex-col h-full min-h-[200px]">
                 <div className="flex items-start justify-between mb-4">
                   <div className={`p-3 rounded-lg ${option.color}`}>
                     <Icon size={24} />
                   </div>
-                  {isSelected && (
-                    <CheckCircle className="text-blue-600" size={24} />
-                  )}
+                  <div className="flex items-center gap-2">
+                    {isSelected && (
+                      <CheckCircle className="text-blue-600" size={24} />
+                    )}
+                  </div>
                 </div>
 
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -496,25 +537,24 @@ export default function DataExportPage() {
                   {option.description}
                 </p>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mt-auto">
                   <div className="text-sm">
-                    {option.loading ? (
-                      <span className="text-gray-500">Loading...</span>
+                    {option.loading || (isSelected && isLoadingData) ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+                        <span className="text-gray-500">Loading...</span>
+                      </div>
                     ) : (
                       <span className="font-semibold text-gray-900">
                         {option.count} records
                       </span>
                     )}
                   </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedExport(option.type);
-                    }}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    Configure →
-                  </button>
+                  {isSelected && (
+                    <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                      Selected
+                    </span>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -644,13 +684,10 @@ export default function DataExportPage() {
                       </label>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                      <div className="text-sm text-gray-600">
-                        Exporting <span className="font-semibold">{extendedEmployees.length}</span> employee records
-                      </div>
+                    <div className="flex justify-end pt-4 border-t border-gray-200">
                       <button
                         onClick={handleExportEmployees}
-                        disabled={employeesLoading}
+                        disabled={employeesLoading || isLoadingData}
                         className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Download size={20} />
@@ -769,13 +806,10 @@ export default function DataExportPage() {
                       </label>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                      <div className="text-sm text-gray-600">
-                        Exporting <span className="font-semibold">{stakeholders.length}</span> stakeholder records
-                      </div>
+                    <div className="flex justify-end pt-4 border-t border-gray-200">
                       <button
                         onClick={handleExportStakeholders}
-                        disabled={stakeholdersLoading}
+                        disabled={stakeholdersLoading || isLoadingData}
                         className="flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Download size={20} />
@@ -879,12 +913,10 @@ export default function DataExportPage() {
                       </label>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                      <div className="text-sm text-gray-600">
-                        Exporting <span className="font-semibold">{ongoingProjects.length + completedProjects.length}</span> project records
-                      </div>
+                    <div className="flex justify-end pt-4 border-t border-gray-200">
                       <button
                         onClick={handleExportProjects}
+                        disabled={isLoadingData}
                         className="flex items-center gap-2 px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Download size={20} />
@@ -988,12 +1020,10 @@ export default function DataExportPage() {
                       </label>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                      <div className="text-sm text-gray-600">
-                        Exporting <span className="font-semibold">{ongoingTasks.length + completedTasks.length}</span> task records
-                      </div>
+                    <div className="flex justify-end pt-4 border-t border-gray-200">
                       <button
                         onClick={handleExportTasks}
+                        disabled={isLoadingData}
                         className="flex items-center gap-2 px-6 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Download size={20} />
@@ -1082,13 +1112,10 @@ export default function DataExportPage() {
                       </label>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                      <div className="text-sm text-gray-600">
-                        Exporting <span className="font-semibold">{leaveRequests.length}</span> leave records
-                      </div>
+                    <div className="flex justify-end pt-4 border-t border-gray-200">
                       <button
                         onClick={handleExportLeaves}
-                        disabled={leavesLoading}
+                        disabled={leavesLoading || isLoadingData}
                         className="flex items-center gap-2 px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Download size={20} />
@@ -1222,13 +1249,10 @@ export default function DataExportPage() {
                       </label>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                      <div className="text-sm text-gray-600">
-                        Exporting <span className="font-semibold">{attendanceRecords.length}</span> attendance records
-                      </div>
+                    <div className="flex justify-end pt-4 border-t border-gray-200">
                       <button
                         onClick={handleExportAttendance}
-                        disabled={attendanceLoading}
+                        disabled={attendanceLoading || isLoadingData}
                         className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Download size={20} />
