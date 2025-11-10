@@ -116,30 +116,30 @@ export default function NewStakeholderPage() {
   // Show error if no processes exist
   if (!loading && activeProcesses.length === 0) {
     return (
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 text-sm sm:text-base"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={18} />
           Back
         </button>
 
         <div className="max-w-2xl mx-auto">
-          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-8 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
-              <AlertCircle className="text-yellow-600" size={32} />
+          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 sm:p-8 text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-yellow-100 rounded-full mb-3 sm:mb-4">
+              <AlertCircle className="text-yellow-600" size={24} />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
               No Stakeholder Processes Found
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
               You need to create at least one active stakeholder process before adding leads.
               Processes define the workflow and steps for converting leads into stakeholders.
             </p>
             <button
               onClick={() => router.push("/admin/config/stakeholder-processes")}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
             >
               Go to Process Management
             </button>
@@ -150,51 +150,51 @@ export default function NewStakeholderPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {/* Header */}
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 text-sm sm:text-base"
       >
-        <ArrowLeft size={20} />
+        <ArrowLeft size={18} />
         Back
       </button>
 
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Add New Lead</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Add New Lead</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Basic Information */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">Basic Information</h2>
+          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 space-y-3 sm:space-y-4">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Basic Information</h2>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
+                className={`w-full px-3 sm:px-4 py-2 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
                   errors.name ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Enter stakeholder/company name"
               />
               {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.name}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 Address
               </label>
               <textarea
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                 placeholder="Enter full address (optional)"
               />
             </div>

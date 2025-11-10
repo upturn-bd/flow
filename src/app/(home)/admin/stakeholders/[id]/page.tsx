@@ -552,18 +552,18 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
             </div>
 
             {/* Tab Content */}
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {activeTab === "process" ? (
                 // Process Steps Content
                 <>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-6">Process Steps</h2>
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Process Steps</h2>
 
                   {sortedSteps.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">
+                    <div className="text-center py-8 sm:py-12 text-sm sm:text-base text-gray-500">
                       No steps configured for this process
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       {sortedSteps.map((step, index) => {
                         const stepDataEntry = stepData.find((sd) => sd.step_id === step.id);
                         const isCompleted = stepDataEntry?.is_completed || false;
@@ -608,11 +608,11 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                     : "border-gray-200 bg-gray-50"
                               }`}
                           >
-                            <div className="p-4">
-                              <div className="flex items-start justify-between">
-                                <div className="flex items-start gap-3">
+                            <div className="p-3 sm:p-4">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                                <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
                                   <div
-                                    className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${isCompleted
+                                    className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-medium flex-shrink-0 ${isCompleted
                                         ? "bg-green-500 text-white"
                                         : isCurrent
                                           ? "bg-blue-500 text-white"
@@ -620,40 +620,40 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       }`}
                                   >
                                     {isCompleted ? (
-                                      <CheckCircle2 size={18} />
+                                      <CheckCircle2 size={16} />
                                     ) : (
                                       <span>{step.step_order}</span>
                                     )}
                                   </div>
-                                  <div>
-                                    <h3 className="font-semibold text-gray-900">{step.name}</h3>
+                                  <div className="flex-1 min-w-0">
+                                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">{step.name}</h3>
                                     {step.description && (
-                                      <p className="text-sm text-gray-600 mt-1">{step.description}</p>
+                                      <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words">{step.description}</p>
                                     )}
-                                    <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                                    <div className="flex items-center flex-wrap gap-2 sm:gap-4 mt-2 text-xs text-gray-500">
                                       <span>Team: {step.team?.name || "N/A"}</span>
                                     </div>
                                     {/* Show permission/access warnings */}
                                     {!isCompleted && !hasTeamAccess && (
-                                      <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
+                                      <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded break-words">
                                         You must be a member of the {step.team?.name || "assigned team"} to work on this step
                                       </div>
                                     )}
                                     {!isCompleted && hasTeamAccess && isSequential && !isCurrent && (
-                                      <div className="mt-2 text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded">
+                                      <div className="mt-2 text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded break-words">
                                         This step will become available after completing the previous steps (sequential process)
                                       </div>
                                     )}
                                   </div>
                                 </div>
 
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 flex-shrink-0 sm:flex-col sm:items-end">
                                   {canEdit && (
                                     <button
                                       onClick={() =>
                                         setActiveStepId(activeStepId === step.id ? null : (step.id || null))
                                       }
-                                      className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white text-xs sm:text-sm rounded-lg hover:bg-blue-700 whitespace-nowrap"
                                     >
                                       {activeStepId === step.id ? "Cancel" : "Work on Step"}
                                     </button>
@@ -683,11 +683,12 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                           handleStepRollback(step.id!);
                                         }
                                       }}
-                                      className="px-4 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 flex items-center gap-2"
+                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-amber-600 text-white text-xs sm:text-sm rounded-lg hover:bg-amber-700 flex items-center gap-1 sm:gap-2 whitespace-nowrap"
                                       title="Rollback this step"
                                     >
-                                      <ArrowLeft size={16} />
-                                      Rollback
+                                      <ArrowLeft size={14} />
+                                      <span className="hidden sm:inline">Rollback</span>
+                                      <span className="sm:hidden">Back</span>
                                     </button>
                                   )}
                                 </div>
@@ -695,7 +696,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
                               {/* Step Data Form */}
                               {activeStepId === step.id && canEdit && step.id && (
-                                <div className="mt-4 pt-4 border-t border-gray-200">
+                                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
                                   <StepDataForm
                                     stakeholderId={stakeholderId}
                                     step={step}
