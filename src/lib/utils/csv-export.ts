@@ -187,7 +187,7 @@ export function exportStakeholdersToCSV(
       // Handle both direct object and nested structure
       const typeName = stakeholder.stakeholder_type 
         ? (typeof stakeholder.stakeholder_type === 'object' 
-          ? (stakeholder.stakeholder_type as Record<string, unknown>)?.name as string || ""
+          ? (stakeholder.stakeholder_type as unknown as Record<string, unknown>)?.name as string || ""
           : "")
         : "";
       row.push(typeName);
@@ -196,7 +196,7 @@ export function exportStakeholdersToCSV(
       // Handle both direct object and nested structure
       const processName = stakeholder.process
         ? (typeof stakeholder.process === 'object'
-          ? (stakeholder.process as Record<string, unknown>)?.name as string || ""
+          ? (stakeholder.process as unknown as Record<string, unknown>)?.name as string || ""
           : "")
         : "";
       row.push(processName);
@@ -218,7 +218,7 @@ export function exportStakeholdersToCSV(
     }
     if (includeStepData) {
       // Format step data as JSON string for single column
-      const stepDataStr = formatStepDataForCSV(stakeholder.step_data);
+      const stepDataStr = formatStepDataForCSV(stakeholder.step_data as unknown as Record<string, unknown>[]);
       row.push(stepDataStr);
     }
     row.push(formatDateForCSV(stakeholder.created_at));
