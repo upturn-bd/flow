@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { StakeholderProcessStep, FieldDefinitionsSchema, FieldType, FieldDefinition, DropdownOption } from "@/lib/types/schemas";
 import { useTeams } from "@/hooks/useTeams";
-import { Plus, Trash2, GripVertical, Calendar, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, GripVertical, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown } from "lucide-react";
 import { FIELD_TYPES } from "@/lib/constants";
 
 interface StepManagerProps {
@@ -50,6 +50,34 @@ export default function StepManager({
     }
   };
 
+  const handleMoveUp = async (index: number) => {
+    if (index === 0) return; // Already at the top
+    
+    const newSteps = [...steps];
+    [newSteps[index - 1], newSteps[index]] = [newSteps[index], newSteps[index - 1]];
+    
+    const stepIds = newSteps.map(step => step.id!);
+    const success = await onReorderSteps(processId, stepIds);
+    
+    if (success) {
+      onStepsChange();
+    }
+  };
+
+  const handleMoveDown = async (index: number) => {
+    if (index === steps.length - 1) return; // Already at the bottom
+    
+    const newSteps = [...steps];
+    [newSteps[index], newSteps[index + 1]] = [newSteps[index + 1], newSteps[index]];
+    
+    const stepIds = newSteps.map(step => step.id!);
+    const success = await onReorderSteps(processId, stepIds);
+    
+    if (success) {
+      onStepsChange();
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -77,9 +105,32 @@ export default function StepManager({
               key={step.id}
               className="flex items-start gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
             >
-              {/* Drag Handle */}
-              <div className="pt-1 cursor-move text-gray-400 hover:text-gray-600">
-                <GripVertical size={20} />
+              {/* Reorder Buttons */}
+              <div className="flex flex-col gap-1 pt-1">
+                <button
+                  onClick={() => handleMoveUp(index)}
+                  disabled={index === 0}
+                  className={`p-1 rounded transition-colors ${
+                    index === 0
+                      ? "text-gray-300 cursor-not-allowed"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+                  title="Move up"
+                >
+                  <ArrowUp size={16} />
+                </button>
+                <button
+                  onClick={() => handleMoveDown(index)}
+                  disabled={index === steps.length - 1}
+                  className={`p-1 rounded transition-colors ${
+                    index === steps.length - 1
+                      ? "text-gray-300 cursor-not-allowed"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+                  title="Move down"
+                >
+                  <ArrowDown size={16} />
+                </button>
               </div>
 
               {/* Step Number */}
