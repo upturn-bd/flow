@@ -4,7 +4,13 @@
  */
 
 import { ExtendedEmployee } from "@/hooks/useEmployees";
-import { Stakeholder } from "@/lib/types/schemas";
+import { 
+  Stakeholder, 
+  Project, 
+  Task, 
+  Leave, 
+  Attendance 
+} from "@/lib/types/schemas";
 
 /**
  * Convert data to CSV format
@@ -135,6 +141,7 @@ export interface StakeholderExportOptions {
   includeProcess?: boolean;
   includeKAM?: boolean;
   includeType?: boolean;
+  includeStepData?: boolean;
 }
 
 export function exportStakeholdersToCSV(
@@ -148,6 +155,7 @@ export function exportStakeholdersToCSV(
     includeProcess = true,
     includeKAM = true,
     includeType = true,
+    includeStepData = false,
   } = options;
 
   // Build headers
@@ -163,6 +171,7 @@ export function exportStakeholdersToCSV(
     headers.push("Contact Person 1 - Email");
     headers.push("Contact Person 1 - Phone");
   }
+  if (includeStepData) headers.push("Step Data");
   headers.push("Created At");
 
   // Build rows
@@ -207,6 +216,11 @@ export function exportStakeholdersToCSV(
       row.push(firstContact?.email || "");
       row.push(firstContact?.phone || "");
     }
+    if (includeStepData) {
+      // Format step data as JSON string for single column
+      const stepDataStr = formatStepDataForCSV(stakeholder.step_data);
+      row.push(stepDataStr);
+    }
     row.push(formatDateForCSV(stakeholder.created_at));
     
     return row;
@@ -215,6 +229,34 @@ export function exportStakeholdersToCSV(
   const csvContent = convertToCSV(headers, rows);
   const filename = `stakeholders_${getTimestamp()}.csv`;
   downloadCSV(csvContent, filename);
+}
+
+/**
+ * Format step data for CSV export as a single column
+ */
+function formatStepDataForCSV(stepData?: any[]): string {
+  if (!stepData || stepData.length === 0) return "";
+  
+  try {
+    // Create a structured representation of step data
+    const formattedSteps = stepData.map((step) => {
+      const stepName = step.step?.name || `Step ${step.step_order || "Unknown"}`;
+      const stepDataObj = step.data || {};
+      const isCompleted = step.is_completed ? "Completed" : "Pending";
+      
+      // Format the data object as key-value pairs
+      const dataEntries = Object.entries(stepDataObj)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join("; ");
+      
+      return `[${stepName}] Status: ${isCompleted}${dataEntries ? ` | Data: ${dataEntries}` : ""}`;
+    });
+    
+    return formattedSteps.join(" || ");
+  } catch (error) {
+    console.error("Error formatting step data:", error);
+    return "Error formatting step data";
+  }
 }
 
 // ==============================================================================
@@ -245,4 +287,274 @@ export function exportGenericDataToCSV(
   const csvContent = convertToCSV(headers, rows);
   const filenameWithTimestamp = `${filename}_${getTimestamp()}.csv`;
   downloadCSV(csvContent, filenameWithTimestamp);
+}
+
+// ==============================================================================
+// PROJECT DATA EXPORT
+// ==============================================================================
+
+export interface ProjectExportOptions {
+  includeDescription?: boolean;
+  includeDates?: boolean;
+  includeStatus?: boolean;
+  includeProgress?: boolean;
+  includeGoal?: boolean;
+  includeAssignees?: boolean;
+}
+
+export function exportProjectsToCSV(
+  projects: Project[],
+  options: ProjectExportOptions = {}
+): void {
+  const {
+    includeDescription = true,
+    includeDates = true,
+    includeStatus = true,
+    includeProgress = true,
+    includeGoal = false,
+    includeAssignees = true,
+  } = options;
+
+  // Build headers
+  const headers: string[] = ["Project ID", "Project Title"];
+  
+  if (includeDescription) headers.push("Description");
+  if (includeDates) {
+    headers.push("Start Date");
+    headers.push("End Date");
+  }
+  if (includeStatus) headers.push("Status");
+  if (includeProgress) headers.push("Progress (%)");
+  if (includeGoal) headers.push("Goal");
+  if (includeAssignees) headers.push("Assignees");
+  headers.push("Project Lead ID");
+  headers.push("Created At");
+
+  // Build rows
+  const rows = projects.map((project) => {
+    const row: string[] = [
+      project.id?.toString() || "",
+      project.project_title,
+    ];
+    
+    if (includeDescription) row.push(project.description || "");
+    if (includeDates) {
+      row.push(formatDateForCSV(project.start_date));
+      row.push(formatDateForCSV(project.end_date));
+    }
+    if (includeStatus) row.push(project.status || "");
+    if (includeProgress) row.push(project.progress?.toString() || "0");
+    if (includeGoal) row.push(project.goal || "");
+    if (includeAssignees) {
+      const assigneesList = Array.isArray(project.assignees) 
+        ? project.assignees.join("; ") 
+        : "";
+      row.push(assigneesList);
+    }
+    row.push(project.project_lead_id || "");
+    row.push(formatDateForCSV(project.created_at));
+    
+    return row;
+  });
+
+  const csvContent = convertToCSV(headers, rows);
+  const filename = `projects_${getTimestamp()}.csv`;
+  downloadCSV(csvContent, filename);
+}
+
+// ==============================================================================
+// TASK DATA EXPORT
+// ==============================================================================
+
+export interface TaskExportOptions {
+  includeDescription?: boolean;
+  includeDates?: boolean;
+  includePriority?: boolean;
+  includeStatus?: boolean;
+  includeProject?: boolean;
+  includeAssignees?: boolean;
+}
+
+export function exportTasksToCSV(
+  tasks: Task[],
+  options: TaskExportOptions = {}
+): void {
+  const {
+    includeDescription = true,
+    includeDates = true,
+    includePriority = true,
+    includeStatus = true,
+    includeProject = true,
+    includeAssignees = true,
+  } = options;
+
+  // Build headers
+  const headers: string[] = ["Task ID", "Task Title"];
+  
+  if (includeDescription) headers.push("Description");
+  if (includeDates) {
+    headers.push("Start Date");
+    headers.push("End Date");
+  }
+  if (includePriority) headers.push("Priority");
+  if (includeStatus) headers.push("Status");
+  if (includeProject) headers.push("Project ID");
+  if (includeAssignees) headers.push("Assignees");
+  headers.push("Created At");
+
+  // Build rows
+  const rows = tasks.map((task) => {
+    const row: string[] = [
+      task.id?.toString() || "",
+      task.task_title,
+    ];
+    
+    if (includeDescription) row.push(task.task_description || "");
+    if (includeDates) {
+      row.push(formatDateForCSV(task.start_date));
+      row.push(formatDateForCSV(task.end_date));
+    }
+    if (includePriority) row.push(task.priority || "normal");
+    if (includeStatus) row.push(task.status ? "Completed" : "Pending");
+    if (includeProject) row.push(task.project_id || "");
+    if (includeAssignees) {
+      const assigneesList = Array.isArray(task.assignees) 
+        ? task.assignees.join("; ") 
+        : "";
+      row.push(assigneesList);
+    }
+    row.push(formatDateForCSV(task.created_at?.toString()));
+    
+    return row;
+  });
+
+  const csvContent = convertToCSV(headers, rows);
+  const filename = `tasks_${getTimestamp()}.csv`;
+  downloadCSV(csvContent, filename);
+}
+
+// ==============================================================================
+// LEAVE DATA EXPORT
+// ==============================================================================
+
+export interface LeaveExportOptions {
+  includeDates?: boolean;
+  includeStatus?: boolean;
+  includeType?: boolean;
+  includeRemarks?: boolean;
+  includeEmployee?: boolean;
+}
+
+export function exportLeavesToCSV(
+  leaves: Leave[],
+  options: LeaveExportOptions = {}
+): void {
+  const {
+    includeDates = true,
+    includeStatus = true,
+    includeType = true,
+    includeRemarks = true,
+    includeEmployee = true,
+  } = options;
+
+  // Build headers
+  const headers: string[] = ["Leave ID"];
+  
+  if (includeEmployee) headers.push("Employee ID");
+  if (includeType) headers.push("Leave Type ID");
+  if (includeDates) {
+    headers.push("Start Date");
+    headers.push("End Date");
+  }
+  if (includeStatus) headers.push("Status");
+  if (includeRemarks) headers.push("Remarks");
+  headers.push("Approved By");
+
+  // Build rows
+  const rows = leaves.map((leave) => {
+    const row: string[] = [leave.id?.toString() || ""];
+    
+    if (includeEmployee) row.push(leave.employee_id || "");
+    if (includeType) row.push(leave.type_id?.toString() || "");
+    if (includeDates) {
+      row.push(formatDateForCSV(leave.start_date));
+      row.push(formatDateForCSV(leave.end_date));
+    }
+    if (includeStatus) row.push(leave.status || "");
+    if (includeRemarks) row.push(leave.remarks || "");
+    row.push(leave.approved_by_id || "");
+    
+    return row;
+  });
+
+  const csvContent = convertToCSV(headers, rows);
+  const filename = `leaves_${getTimestamp()}.csv`;
+  downloadCSV(csvContent, filename);
+}
+
+// ==============================================================================
+// ATTENDANCE DATA EXPORT
+// ==============================================================================
+
+export interface AttendanceExportOptions {
+  includeCheckInTime?: boolean;
+  includeCheckOutTime?: boolean;
+  includeTag?: boolean;
+  includeSite?: boolean;
+  includeCoordinates?: boolean;
+}
+
+export function exportAttendanceToCSV(
+  attendance: Attendance[],
+  options: AttendanceExportOptions = {}
+): void {
+  const {
+    includeCheckInTime = true,
+    includeCheckOutTime = true,
+    includeTag = true,
+    includeSite = true,
+    includeCoordinates = false,
+  } = options;
+
+  // Build headers
+  const headers: string[] = ["Attendance ID", "Employee ID", "Attendance Date"];
+  
+  if (includeTag) headers.push("Tag");
+  if (includeSite) headers.push("Site ID");
+  if (includeCheckInTime) headers.push("Check In Time");
+  if (includeCheckOutTime) headers.push("Check Out Time");
+  if (includeCoordinates) {
+    headers.push("Check In Coordinates");
+    headers.push("Check Out Coordinates");
+  }
+
+  // Build rows
+  const rows = attendance.map((record) => {
+    const row: string[] = [
+      record.id?.toString() || "",
+      record.employee_id || "",
+      formatDateForCSV(record.attendance_date),
+    ];
+    
+    if (includeTag) row.push(record.tag || "");
+    if (includeSite) row.push(record.site_id?.toString() || "");
+    if (includeCheckInTime) row.push(record.check_in_time || "");
+    if (includeCheckOutTime) row.push(record.check_out_time || "");
+    if (includeCoordinates) {
+      const checkInCoords = record.check_in_coordinates 
+        ? `${record.check_in_coordinates.x}, ${record.check_in_coordinates.y}`
+        : "";
+      const checkOutCoords = record.check_out_coordinates 
+        ? `${record.check_out_coordinates.x}, ${record.check_out_coordinates.y}`
+        : "";
+      row.push(checkInCoords);
+      row.push(checkOutCoords);
+    }
+    
+    return row;
+  });
+
+  const csvContent = convertToCSV(headers, rows);
+  const filename = `attendance_${getTimestamp()}.csv`;
+  downloadCSV(csvContent, filename);
 }

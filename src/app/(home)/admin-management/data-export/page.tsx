@@ -10,14 +10,29 @@ import {
   FileSpreadsheet,
   Settings,
   AlertCircle,
+  FolderKanban,
+  ListTodo,
+  Calendar,
+  ClipboardCheck,
 } from "lucide-react";
 import { useEmployees, ExtendedEmployee } from "@/hooks/useEmployees";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { exportEmployeesToCSV, exportStakeholdersToCSV } from "@/lib/utils/csv-export";
+import { useProjects } from "@/hooks/useProjects";
+import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
+import { useLeaveRequests } from "@/hooks/useLeaveManagement";
+import { useAttendances } from "@/hooks/useAttendance";
+import { 
+  exportEmployeesToCSV, 
+  exportStakeholdersToCSV,
+  exportProjectsToCSV,
+  exportTasksToCSV,
+  exportLeavesToCSV,
+  exportAttendanceToCSV,
+} from "@/lib/utils/csv-export";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 
-type ExportType = "employees" | "stakeholders";
+type ExportType = "employees" | "stakeholders" | "projects" | "tasks" | "leaves" | "attendance";
 
 interface EmployeeExportConfig {
   includeEmail: boolean;
@@ -35,6 +50,41 @@ interface StakeholderExportConfig {
   includeProcess: boolean;
   includeKAM: boolean;
   includeType: boolean;
+  includeStepData: boolean;
+}
+
+interface ProjectExportConfig {
+  includeDescription: boolean;
+  includeDates: boolean;
+  includeStatus: boolean;
+  includeProgress: boolean;
+  includeGoal: boolean;
+  includeAssignees: boolean;
+}
+
+interface TaskExportConfig {
+  includeDescription: boolean;
+  includeDates: boolean;
+  includePriority: boolean;
+  includeStatus: boolean;
+  includeProject: boolean;
+  includeAssignees: boolean;
+}
+
+interface LeaveExportConfig {
+  includeDates: boolean;
+  includeStatus: boolean;
+  includeType: boolean;
+  includeRemarks: boolean;
+  includeEmployee: boolean;
+}
+
+interface AttendanceExportConfig {
+  includeCheckInTime: boolean;
+  includeCheckOutTime: boolean;
+  includeTag: boolean;
+  includeSite: boolean;
+  includeCoordinates: boolean;
 }
 
 export default function DataExportPage() {
@@ -55,16 +105,60 @@ export default function DataExportPage() {
     includeProcess: true,
     includeKAM: true,
     includeType: true,
+    includeStepData: true,
+  });
+
+  const [projectConfig, setProjectConfig] = useState<ProjectExportConfig>({
+    includeDescription: true,
+    includeDates: true,
+    includeStatus: true,
+    includeProgress: true,
+    includeGoal: false,
+    includeAssignees: true,
+  });
+
+  const [taskConfig, setTaskConfig] = useState<TaskExportConfig>({
+    includeDescription: true,
+    includeDates: true,
+    includePriority: true,
+    includeStatus: true,
+    includeProject: true,
+    includeAssignees: true,
+  });
+
+  const [leaveConfig, setLeaveConfig] = useState<LeaveExportConfig>({
+    includeDates: true,
+    includeStatus: true,
+    includeType: true,
+    includeRemarks: true,
+    includeEmployee: true,
+  });
+
+  const [attendanceConfig, setAttendanceConfig] = useState<AttendanceExportConfig>({
+    includeCheckInTime: true,
+    includeCheckOutTime: true,
+    includeTag: true,
+    includeSite: true,
+    includeCoordinates: false,
   });
 
   const { extendedEmployees, fetchExtendedEmployees, loading: employeesLoading } = useEmployees();
   const { stakeholders, fetchStakeholders, loading: stakeholdersLoading } = useStakeholders();
+  const { ongoingProjects, completedProjects, fetchOngoingProjects, fetchCompletedProjects } = useProjects();
+  const { ongoingTasks, completedTasks, fetchTasks } = useTasks();
+  const { leaveRequests, fetchLeaveRequests, loading: leavesLoading } = useLeaveRequests();
+  const { items: attendanceRecords, fetchItems: fetchAttendance, loading: attendanceLoading } = useAttendances();
 
   useEffect(() => {
-    // Preload both datasets for faster exports
+    // Preload all datasets for faster exports
     fetchExtendedEmployees();
     fetchStakeholders();
-  }, [fetchExtendedEmployees, fetchStakeholders]);
+    fetchOngoingProjects(50, true);
+    fetchCompletedProjects(50, true);
+    fetchTasks({ scope: TaskScope.COMPANY_TASKS, status: TaskStatus.ALL });
+    fetchLeaveRequests();
+    fetchAttendance();
+  }, []);
 
   const handleExportEmployees = () => {
     if (extendedEmployees.length === 0) {
@@ -96,6 +190,68 @@ export default function DataExportPage() {
     }
   };
 
+  const handleExportProjects = () => {
+    const allProjects = [...ongoingProjects, ...completedProjects];
+    if (allProjects.length === 0) {
+      toast.error("No project data available to export");
+      return;
+    }
+
+    try {
+      exportProjectsToCSV(allProjects, projectConfig);
+      toast.success(`Exported ${allProjects.length} project(s) to CSV`);
+    } catch (error) {
+      console.error("Error exporting projects:", error);
+      toast.error("Failed to export project data");
+    }
+  };
+
+  const handleExportTasks = () => {
+    const allTasks = [...ongoingTasks, ...completedTasks];
+    if (allTasks.length === 0) {
+      toast.error("No task data available to export");
+      return;
+    }
+
+    try {
+      exportTasksToCSV(allTasks, taskConfig);
+      toast.success(`Exported ${allTasks.length} task(s) to CSV`);
+    } catch (error) {
+      console.error("Error exporting tasks:", error);
+      toast.error("Failed to export task data");
+    }
+  };
+
+  const handleExportLeaves = () => {
+    if (leaveRequests.length === 0) {
+      toast.error("No leave data available to export");
+      return;
+    }
+
+    try {
+      exportLeavesToCSV(leaveRequests, leaveConfig);
+      toast.success(`Exported ${leaveRequests.length} leave record(s) to CSV`);
+    } catch (error) {
+      console.error("Error exporting leaves:", error);
+      toast.error("Failed to export leave data");
+    }
+  };
+
+  const handleExportAttendance = () => {
+    if (attendanceRecords.length === 0) {
+      toast.error("No attendance data available to export");
+      return;
+    }
+
+    try {
+      exportAttendanceToCSV(attendanceRecords, attendanceConfig);
+      toast.success(`Exported ${attendanceRecords.length} attendance record(s) to CSV`);
+    } catch (error) {
+      console.error("Error exporting attendance:", error);
+      toast.error("Failed to export attendance data");
+    }
+  };
+
   const exportOptions = [
     {
       type: "employees" as ExportType,
@@ -109,11 +265,47 @@ export default function DataExportPage() {
     {
       type: "stakeholders" as ExportType,
       title: "Stakeholder Data",
-      description: "Export stakeholder and lead information with contact details and process status",
+      description: "Export stakeholder and lead information with contact details, process status, and step data",
       icon: Building2,
       color: "bg-purple-100 text-purple-700 border-purple-200",
       count: stakeholders.length,
       loading: stakeholdersLoading,
+    },
+    {
+      type: "projects" as ExportType,
+      title: "Project Data",
+      description: "Export project records including title, status, progress, and assignee information",
+      icon: FolderKanban,
+      color: "bg-green-100 text-green-700 border-green-200",
+      count: ongoingProjects.length + completedProjects.length,
+      loading: false,
+    },
+    {
+      type: "tasks" as ExportType,
+      title: "Task Data",
+      description: "Export task records with descriptions, priority, status, and assignment details",
+      icon: ListTodo,
+      color: "bg-orange-100 text-orange-700 border-orange-200",
+      count: ongoingTasks.length + completedTasks.length,
+      loading: false,
+    },
+    {
+      type: "leaves" as ExportType,
+      title: "Leave Management Data",
+      description: "Export leave records including dates, status, type, and approval information",
+      icon: Calendar,
+      color: "bg-red-100 text-red-700 border-red-200",
+      count: leaveRequests.length,
+      loading: leavesLoading,
+    },
+    {
+      type: "attendance" as ExportType,
+      title: "Attendance Data",
+      description: "Export attendance records with check-in/out times, tags, and location data",
+      icon: ClipboardCheck,
+      color: "bg-indigo-100 text-indigo-700 border-indigo-200",
+      count: attendanceRecords.length,
+      loading: attendanceLoading,
     },
   ];
 
@@ -246,7 +438,15 @@ export default function DataExportPage() {
               title={
                 selectedExport === "employees"
                   ? "Employee Export Configuration"
-                  : "Stakeholder Export Configuration"
+                  : selectedExport === "stakeholders"
+                  ? "Stakeholder Export Configuration"
+                  : selectedExport === "projects"
+                  ? "Project Export Configuration"
+                  : selectedExport === "tasks"
+                  ? "Task Export Configuration"
+                  : selectedExport === "leaves"
+                  ? "Leave Export Configuration"
+                  : "Attendance Export Configuration"
               }
               subtitle="Select the fields to include in your export"
             />
@@ -456,6 +656,21 @@ export default function DataExportPage() {
                         />
                         <span className="text-sm font-medium text-gray-900">Stakeholder Type</span>
                       </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-green-200 rounded-lg hover:bg-green-50 cursor-pointer bg-green-50/50">
+                        <input
+                          type="checkbox"
+                          checked={stakeholderConfig.includeStepData}
+                          onChange={(e) =>
+                            setStakeholderConfig({
+                              ...stakeholderConfig,
+                              includeStepData: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-green-600 rounded focus:ring-2 focus:ring-green-500"
+                        />
+                        <span className="text-sm font-medium text-green-900">Step Data (Process Steps)</span>
+                      </label>
                     </div>
 
                     <div className="flex items-center justify-between pt-4 border-t border-gray-200">
@@ -469,6 +684,414 @@ export default function DataExportPage() {
                       >
                         <Download size={20} />
                         Export Stakeholder Data
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {selectedExport === "projects" && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={projectConfig.includeDescription}
+                          onChange={(e) =>
+                            setProjectConfig({
+                              ...projectConfig,
+                              includeDescription: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Description</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={projectConfig.includeDates}
+                          onChange={(e) =>
+                            setProjectConfig({
+                              ...projectConfig,
+                              includeDates: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Start & End Dates</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={projectConfig.includeStatus}
+                          onChange={(e) =>
+                            setProjectConfig({
+                              ...projectConfig,
+                              includeStatus: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Status</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={projectConfig.includeProgress}
+                          onChange={(e) =>
+                            setProjectConfig({
+                              ...projectConfig,
+                              includeProgress: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Progress</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={projectConfig.includeGoal}
+                          onChange={(e) =>
+                            setProjectConfig({
+                              ...projectConfig,
+                              includeGoal: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Goal</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={projectConfig.includeAssignees}
+                          onChange={(e) =>
+                            setProjectConfig({
+                              ...projectConfig,
+                              includeAssignees: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Assignees</span>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                      <div className="text-sm text-gray-600">
+                        Exporting <span className="font-semibold">{ongoingProjects.length + completedProjects.length}</span> project records
+                      </div>
+                      <button
+                        onClick={handleExportProjects}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Download size={20} />
+                        Export Project Data
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {selectedExport === "tasks" && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={taskConfig.includeDescription}
+                          onChange={(e) =>
+                            setTaskConfig({
+                              ...taskConfig,
+                              includeDescription: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Description</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={taskConfig.includeDates}
+                          onChange={(e) =>
+                            setTaskConfig({
+                              ...taskConfig,
+                              includeDates: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Start & End Dates</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={taskConfig.includePriority}
+                          onChange={(e) =>
+                            setTaskConfig({
+                              ...taskConfig,
+                              includePriority: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Priority</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={taskConfig.includeStatus}
+                          onChange={(e) =>
+                            setTaskConfig({
+                              ...taskConfig,
+                              includeStatus: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Status</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={taskConfig.includeProject}
+                          onChange={(e) =>
+                            setTaskConfig({
+                              ...taskConfig,
+                              includeProject: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Project ID</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={taskConfig.includeAssignees}
+                          onChange={(e) =>
+                            setTaskConfig({
+                              ...taskConfig,
+                              includeAssignees: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Assignees</span>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                      <div className="text-sm text-gray-600">
+                        Exporting <span className="font-semibold">{ongoingTasks.length + completedTasks.length}</span> task records
+                      </div>
+                      <button
+                        onClick={handleExportTasks}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Download size={20} />
+                        Export Task Data
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {selectedExport === "leaves" && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={leaveConfig.includeDates}
+                          onChange={(e) =>
+                            setLeaveConfig({
+                              ...leaveConfig,
+                              includeDates: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Start & End Dates</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={leaveConfig.includeStatus}
+                          onChange={(e) =>
+                            setLeaveConfig({
+                              ...leaveConfig,
+                              includeStatus: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Status</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={leaveConfig.includeType}
+                          onChange={(e) =>
+                            setLeaveConfig({
+                              ...leaveConfig,
+                              includeType: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Leave Type</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={leaveConfig.includeRemarks}
+                          onChange={(e) =>
+                            setLeaveConfig({
+                              ...leaveConfig,
+                              includeRemarks: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Remarks</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={leaveConfig.includeEmployee}
+                          onChange={(e) =>
+                            setLeaveConfig({
+                              ...leaveConfig,
+                              includeEmployee: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Employee ID</span>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                      <div className="text-sm text-gray-600">
+                        Exporting <span className="font-semibold">{leaveRequests.length}</span> leave records
+                      </div>
+                      <button
+                        onClick={handleExportLeaves}
+                        disabled={leavesLoading}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Download size={20} />
+                        Export Leave Data
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {selectedExport === "attendance" && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={attendanceConfig.includeCheckInTime}
+                          onChange={(e) =>
+                            setAttendanceConfig({
+                              ...attendanceConfig,
+                              includeCheckInTime: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Check In Time</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={attendanceConfig.includeCheckOutTime}
+                          onChange={(e) =>
+                            setAttendanceConfig({
+                              ...attendanceConfig,
+                              includeCheckOutTime: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Check Out Time</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={attendanceConfig.includeTag}
+                          onChange={(e) =>
+                            setAttendanceConfig({
+                              ...attendanceConfig,
+                              includeTag: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Tag/Status</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={attendanceConfig.includeSite}
+                          onChange={(e) =>
+                            setAttendanceConfig({
+                              ...attendanceConfig,
+                              includeSite: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">Site ID</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={attendanceConfig.includeCoordinates}
+                          onChange={(e) =>
+                            setAttendanceConfig({
+                              ...attendanceConfig,
+                              includeCoordinates: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-900">GPS Coordinates</span>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                      <div className="text-sm text-gray-600">
+                        Exporting <span className="font-semibold">{attendanceRecords.length}</span> attendance records
+                      </div>
+                      <button
+                        onClick={handleExportAttendance}
+                        disabled={attendanceLoading}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Download size={20} />
+                        Export Attendance Data
                       </button>
                     </div>
                   </>
