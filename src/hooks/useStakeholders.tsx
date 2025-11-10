@@ -1346,6 +1346,35 @@ export function useStakeholders() {
     [fetchStakeholderById]
   );
 
+  // Update additional data for a stakeholder
+  const updateAdditionalData = useCallback(
+    async (stakeholderId: number, additionalData: Record<string, any>) => {
+      setError(null);
+
+      try {
+        const employeeInfo = await getEmployeeInfo();
+
+        const { error } = await supabase
+          .from("stakeholders")
+          .update({
+            additional_data: additionalData,
+            updated_by: employeeInfo?.id,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", stakeholderId);
+
+        if (error) throw error;
+
+        return true;
+      } catch (error) {
+        console.error("Error updating additional data:", error);
+        setError("Failed to update additional data");
+        return false;
+      }
+    },
+    []
+  );
+
   // ==========================================================================
   // COMPUTED VALUES
   // ==========================================================================
@@ -1421,5 +1450,6 @@ export function useStakeholders() {
     saveStepData,
     completeStep,
     uncompleteStep,
+    updateAdditionalData,
   };
 }

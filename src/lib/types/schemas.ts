@@ -580,6 +580,7 @@ export interface Stakeholder {
   rejected_at?: string;
   rejected_by?: string;
   rejection_reason?: string;
+  additional_data?: Record<string, any>; // Additional key-value data for permanent stakeholders
   company_id: number;
   created_at?: string;
   updated_at?: string;
