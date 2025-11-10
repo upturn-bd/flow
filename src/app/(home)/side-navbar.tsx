@@ -4,7 +4,7 @@ import { cn } from "@/components/ui/class";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
 import {
