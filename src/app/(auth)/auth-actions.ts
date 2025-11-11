@@ -55,7 +55,7 @@ export async function signup({
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
+  redirect("/verify");
 }
 
 function getSiteUrl(){

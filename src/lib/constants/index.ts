@@ -203,6 +203,7 @@ export const EXCLUDE_PATHS = [
   '/swe-worker',
   '/manifest.json',
   '/icons',
+  '/verify'
 ];
 
 export const EMPLOYEE_ROUTES = [
