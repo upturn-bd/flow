@@ -324,6 +324,16 @@ export default function StakeholderIssuesPage() {
                     <span className="font-medium">Stakeholder:</span> {issue.stakeholder?.name}
                   </div>
 
+                  {/* Assigned Employee Info */}
+                  {issue.assigned_employee && (
+                    <div className="text-sm text-gray-600 mb-2">
+                      <span className="font-medium">Assigned to:</span> {issue.assigned_employee.name}
+                      {issue.assigned_employee.email && (
+                        <span className="text-gray-500"> ({issue.assigned_employee.email})</span>
+                      )}
+                    </div>
+                  )}
+
                   {/* Description */}
                   {issue.description && (
                     <p className="text-sm text-gray-600 mt-2 line-clamp-2">{issue.description}</p>
@@ -396,11 +406,14 @@ export default function StakeholderIssuesPage() {
         <BaseModal isOpen={modalState.isOpen} onClose={closeModal} title="Update Issue">
           <StakeholderIssueForm
             stakeholderId={selectedIssue.stakeholder_id}
+            issueId={selectedIssue.id}
             initialData={{
               title: selectedIssue.title,
               description: selectedIssue.description,
               status: selectedIssue.status,
               priority: selectedIssue.priority,
+              assigned_to: selectedIssue.assigned_to,
+              attachments: selectedIssue.attachments,
             }}
             onSubmit={handleUpdateIssue}
             onCancel={closeModal}
