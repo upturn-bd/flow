@@ -10,7 +10,7 @@ import {
   QueryOptions,
   ApiCallOptions,
 } from "./types";
-import { getCompanyId, getEmployeeInfo, getUserId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 
 interface BaseEntityHookConfig<T> {
@@ -24,6 +24,7 @@ interface BaseEntityHookConfig<T> {
 export function useBaseEntity<T extends BaseEntity>(
   config: BaseEntityHookConfig<T>
 ): CrudHookResult<T> {
+  const { employeeInfo } = useAuth();
   const [items, setItems] = useState<T[]>([]);
   const [item, setItem] = useState<T | null>(null);
   const [loading, setLoading] = useState(false); // Changed from true to false
@@ -207,14 +208,16 @@ export function useBaseEntity<T extends BaseEntity>(
 
           // Add company scoping if enabled
           if (config.companyScoped) {
-            const companyId = await getCompanyId();
+            const companyId = employeeInfo?.company_id;
+            if (!companyId) throw new Error('Company ID not available');
             if (!scopingFilters.eq) scopingFilters.eq = {};
             scopingFilters.eq.company_id = companyId;
           }
 
           // Add user scoping if enabled
           if (config.userScoped) {
-            const userId = await getUserId();
+            const userId = employeeInfo?.id;
+            if (!userId) throw new Error('User ID not available');
             if (!scopingFilters.eq) scopingFilters.eq = {};
             scopingFilters.eq.user_id = userId;
           }
@@ -250,7 +253,7 @@ export function useBaseEntity<T extends BaseEntity>(
 
       return [];
     },
-    [callApi, config, buildQuery, applyQueryOptions]
+    [callApi, config, buildQuery, applyQueryOptions, employeeInfo?.company_id, employeeInfo?.id]
   );
 
   // Enhanced method to fetch a single item with custom query
@@ -267,14 +270,16 @@ export function useBaseEntity<T extends BaseEntity>(
 
           // Add company scoping if enabled
           if (config.companyScoped) {
-            const companyId = await getCompanyId();
+            const companyId = employeeInfo?.company_id;
+            if (!companyId) throw new Error('Company ID not available');
             if (!scopingFilters.eq) scopingFilters.eq = {};
             scopingFilters.eq.company_id = companyId;
           }
 
           // Add user scoping if enabled
           if (config.userScoped) {
-            const userId = await getUserId();
+            const userId = employeeInfo?.id;
+            if (!userId) throw new Error('User ID not available');
             if (!scopingFilters.eq) scopingFilters.eq = {};
             scopingFilters.eq.user_id = userId;
           }
@@ -319,7 +324,7 @@ export function useBaseEntity<T extends BaseEntity>(
 
       return result;
     },
-    [callApi, config, buildQuery, applyQueryOptions]
+    [callApi, config, buildQuery, applyQueryOptions, employeeInfo?.company_id, employeeInfo?.id]
   );
 
   const fetchItems = useCallback(
@@ -333,20 +338,23 @@ export function useBaseEntity<T extends BaseEntity>(
         if (company_id !== undefined) {
           filters.company_id = company_id;
         } else {
-          // If no company_id provided, fetch from API
-          // This allows the hook to be used without passing company_id explicitly
-          filters.company_id = await getCompanyId();
+          // If no company_id provided, get from employee info
+          const companyId = employeeInfo?.company_id;
+          if (!companyId) throw new Error('Company ID not available');
+          filters.company_id = companyId;
         }
       }
 
       // Add user scoping if enabled
       if (config.userScoped) {
-        filters.user_id = await getUserId();
+        const userId = employeeInfo?.id;
+        if (!userId) throw new Error('User ID not available');
+        filters.user_id = userId;
       }
 
       // Handle department scoping with direct Supabase query
       if (config.departmentScoped) {
-        const employeeInfo = await getEmployeeInfo();
+        if (!employeeInfo) throw new Error('Employee info not available');
 
         
         // For department scoped items, we want items that are either:
@@ -415,6 +423,9 @@ export function useBaseEntity<T extends BaseEntity>(
       config.companyScoped,
       config.userScoped,
       config.departmentScoped,
+      employeeInfo?.company_id,
+      employeeInfo?.id,
+      employeeInfo?.department_id,
     ]
   );
 
@@ -447,12 +458,16 @@ export function useBaseEntity<T extends BaseEntity>(
 
         // Add company scoping if enabled
         if (config.companyScoped) {
-          (createData as any).company_id = await getCompanyId();
+          const companyId = employeeInfo?.company_id;
+          if (!companyId) throw new Error('Company ID not available');
+          (createData as any).company_id = companyId;
         }
 
         // Add user scoping if enabled
         if (config.userScoped) {
-          (createData as any).user_id = await getUserId();
+          const userId = employeeInfo?.id;
+          if (!userId) throw new Error('User ID not available');
+          (createData as any).user_id = userId;
         }
 
         const result = await callApi(
@@ -486,7 +501,7 @@ export function useBaseEntity<T extends BaseEntity>(
         return { success: false, error: errorMessage };
       }
     },
-    [callApi, config.tableName, config.companyScoped, config.userScoped]
+    [callApi, config.tableName, config.companyScoped, config.userScoped, employeeInfo?.company_id, employeeInfo?.id]
   );
 
   const updateItem = useCallback(

@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId, DatabaseError } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
+import { DatabaseError } from "@/lib/utils/auth";
 
 // Define type for employee info
 export type EmployeeInfo = {
@@ -12,6 +13,7 @@ export type EmployeeInfo = {
 };
 
 export function useEmployeeInfo() {
+  const { employeeInfo } = useAuth();
   const [employees, setEmployees] = useState<EmployeeInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,12 +22,15 @@ export function useEmployeeInfo() {
     setLoading(true);
     setError(null);
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new DatabaseError('Company ID not available');
+      }
 
       const { data, error } = await supabase
         .from("employees")
         .select("id, first_name, last_name, department_id")
-        .eq("company_id", company_id);
+        .eq("company_id", companyId);
 
       if (error) {
         throw new DatabaseError(`Failed to fetch employee info: ${error.message}`);
@@ -45,7 +50,7 @@ export function useEmployeeInfo() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.company_id]);
 
   return {
     employees,
