@@ -7,7 +7,7 @@ import { useTasks, TaskStatus } from "@/hooks/useTasks";
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import SectionContainer from "@/app/(home)/home/components/SectionContainer";
-import NewsReminderSection from "@/app/(home)/home/components/NewsReminderSection";
+import NoticesSection from "@/app/(home)/home/components/NoticesSection";
 import AttendanceSection from "@/app/(home)/home/components/AttendanceSection";
 import TaskListSection from "@/app/(home)/home/components/TaskListSection";
 import DetailModals from "@/app/(home)/home/components/DetailModals";
@@ -103,7 +103,7 @@ export default function HomePage() {
         >
           {/* News & Reminder */}
           <SectionContainer variants={sectionVariants}>
-            <NewsReminderSection
+            <NoticesSection
               notices={notices}
               loading={noticesLoading}
               onNoticeClick={handleNoticeClick}

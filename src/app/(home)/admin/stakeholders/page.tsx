@@ -7,9 +7,13 @@ import { Plus, Search, Filter, Eye, CheckCircle2, Clock, XCircle, Download } fro
 import Pagination from "@/components/ui/Pagination";
 import { exportStakeholdersToCSV } from "@/lib/utils/csv-export";
 import { toast } from "sonner";
+import { usePermissions } from "@/hooks/usePermissions";
+import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 export default function StakeholdersPage() {
   const router = useRouter();
+  const { canWrite } = usePermissions();
   const {
     stakeholders,
     leads,
@@ -113,16 +117,32 @@ export default function StakeholdersPage() {
             <span className="hidden sm:inline">Export CSV</span>
             <span className="sm:hidden">Export</span>
           </button>
-          <button
-            onClick={() => router.push("/admin/stakeholders/new")}
-            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus size={18} />
-            <span className="hidden sm:inline">Add New Lead</span>
-            <span className="sm:hidden">Add</span>
-          </button>
+          {canWrite(PERMISSION_MODULES.STAKEHOLDERS) ? (
+            <button
+              onClick={() => router.push("/admin/stakeholders/new")}
+              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus size={18} />
+              <span className="hidden sm:inline">Add New Lead</span>
+              <span className="sm:hidden">Add</span>
+            </button>
+          ) : (
+            <PermissionTooltip message="You don't have permission to create stakeholders">
+              <button
+                disabled
+                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-sm bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed opacity-60"
+              >
+                <Plus size={18} />
+                <span className="hidden sm:inline">Add New Lead</span>
+                <span className="sm:hidden">Add</span>
+              </button>
+            </PermissionTooltip>
+          )}
         </div>
       </div>
+
+      {/* Permission Banner */}
+      <ModulePermissionsBanner module={PERMISSION_MODULES.STAKEHOLDERS} title="Stakeholders" compact />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">

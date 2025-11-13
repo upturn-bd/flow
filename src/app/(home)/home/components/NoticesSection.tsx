@@ -25,7 +25,7 @@ interface NewsReminderSectionProps {
 
 type TabType = 'all' | 'unread' | 'urgent';
 
-export default function NewsReminderSection({
+export default function NoticesSection({
   notices,
   loading,
   onNoticeClick,
@@ -37,8 +37,6 @@ export default function NewsReminderSection({
   // Load read notices from localStorage on component mount
   useEffect(() => {
     const savedReadNotices = localStorage.getItem('readNotices');
-    console.log('savedReadNotices:', savedReadNotices);
-    
     if (savedReadNotices) {
       try {
         const parsedReadNotices = JSON.parse(savedReadNotices);
@@ -71,6 +69,10 @@ export default function NewsReminderSection({
         return notices;
     }
   }, [notices, activeTab, readNotices]);
+
+  useEffect(() => {
+    console.log("filtered notices", filteredNotices);
+  }, [filteredNotices, activeTab]);
 
   const getTabCount = (tab: TabType): number => {
     switch (tab) {
@@ -140,6 +142,8 @@ export default function NewsReminderSection({
         ) : (
           <motion.ul 
             variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
             className="space-y-3 mt-6"
           >
             {filteredNotices.length > 0 ? (

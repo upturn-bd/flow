@@ -28,6 +28,9 @@ import {
 } from "@/hooks/useOffboarding";
 import { useDepartments } from "@/hooks/useDepartments";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
+import { usePermissions } from "@/hooks/usePermissions";
+import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 const Button = ({
   children,
@@ -80,6 +83,7 @@ export default function OffboardingPage() {
     notes: "",
   });
 
+  const { canWrite, canApprove } = usePermissions();
   const {
     loading,
     error,
@@ -233,6 +237,9 @@ export default function OffboardingPage() {
           Employee Offboarding
         </h1>
       </motion.div>
+
+      {/* Permission Banner */}
+      <ModulePermissionsBanner module={PERMISSION_MODULES.OFFBOARDING} title="Offboarding" compact />
 
       {/* Search and Tabs */}
       <motion.div variants={fadeIn} className="bg-white rounded-xl shadow-sm mb-6">

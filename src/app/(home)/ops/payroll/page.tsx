@@ -14,6 +14,7 @@ import PendingPayrolls from "@/components/ops/payroll/PendingPayrolls";
 import PublishedPayrolls from "@/components/ops/payroll/PublishedPayrolls";
 import PaidPayrolls from "@/components/ops/payroll/PaidPayrolls";
 import PayrollGenerationModal from "@/components/ops/payroll/PayrollGenerationModal";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 const tabs: TabItem[] = [
   { 
@@ -61,6 +62,8 @@ export default function PayrollPage() {
         actionButtonLabel="Generate Payroll"
         actionButtonIcon={<Users className="h-4 w-4" />}
         actionButtonOnClick={() => setShowGenerationModal(true)}
+        module={PERMISSION_MODULES.PAYROLL}
+        showPermissionBanner={true}
       />
       
       <PayrollGenerationModal

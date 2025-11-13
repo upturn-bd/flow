@@ -295,12 +295,9 @@ export function useBaseEntity<T extends BaseEntity>(
           };
           query = applyQueryOptions(query, singleOptions);
 
-          // Use single() for single record
-          const { data, error } = await query.single();
+          // Use maybeSingle() to handle 0 or 1 rows gracefully (returns null if not found)
+          const { data, error } = await query.maybeSingle();
           if (error) {
-            if (error.code === "PGRST116") {
-              return null; // No rows found
-            }
             throw error;
           }
 
