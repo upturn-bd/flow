@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 import { JOB_STATUS } from "@/lib/constants";
 
 export interface OffboardingEmployee {
@@ -29,6 +29,7 @@ export interface OffboardingData {
 }
 
 export function useOffboarding() {
+  const { employeeInfo } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeEmployees, setActiveEmployees] = useState<OffboardingEmployee[]>([]);
@@ -45,7 +46,10 @@ export function useOffboarding() {
     setError(null);
 
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       const { data, error: fetchError } = await supabase
         .from("employees")
@@ -100,7 +104,7 @@ export function useOffboarding() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.company_id]);
 
   // Fetch offboarded employees
   const fetchOffboardedEmployees = useCallback(async () => {
@@ -108,7 +112,10 @@ export function useOffboarding() {
     setError(null);
 
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       const { data, error: fetchError } = await supabase
         .from("employees")
@@ -163,7 +170,7 @@ export function useOffboarding() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.company_id]);
 
   // Process offboarding
   const processOffboarding = useCallback(
