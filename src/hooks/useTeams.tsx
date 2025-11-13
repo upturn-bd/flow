@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId, getEmployeeId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 import type { 
   Team, 
   TeamMember, 
@@ -16,6 +16,7 @@ import type {
  * Follows the same pattern as useEmployees for consistency
  */
 export function useTeams() {
+  const { employeeInfo } = useAuth();
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +33,10 @@ export function useTeams() {
     setError(null);
 
     try {
-      const companyId = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       const { data, error: fetchError } = await supabase
         .from("teams")
@@ -52,7 +56,7 @@ export function useTeams() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.company_id]);
 
   /**
    * Fetch a single team by ID with members
@@ -64,7 +68,10 @@ export function useTeams() {
     setError(null);
 
     try {
-      const companyId = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       // Fetch team details
       const { data: teamData, error: teamError } = await supabase
@@ -131,7 +138,7 @@ export function useTeams() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.company_id]);
 
   /**
    * Fetch a team with its permissions
@@ -143,7 +150,10 @@ export function useTeams() {
     setError(null);
 
     try {
-      const companyId = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       // Fetch team details
       const { data: teamData, error: teamError } = await supabase
@@ -234,7 +244,10 @@ export function useTeams() {
     setError(null);
 
     try {
-      const empId = employeeId || await getEmployeeId();
+      const empId = employeeId ?? employeeInfo?.id;
+      if (!empId) {
+        throw new Error('Employee ID not available');
+      }
 
       const { data, error: fetchError } = await supabase
         .from("team_members")
@@ -271,8 +284,11 @@ export function useTeams() {
     setError(null);
 
     try {
-      const companyId = await getCompanyId();
-      const createdBy = await getEmployeeId();
+      const companyId = employeeInfo?.company_id;
+      const createdBy = employeeInfo?.id;
+      if (!companyId || !createdBy) {
+        throw new Error('Company ID or User ID not available');
+      }
 
       const { data, error: createError } = await supabase
         .from("teams")
@@ -347,7 +363,10 @@ export function useTeams() {
     setError(null);
 
     try {
-      const companyId = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       const { error: deleteError } = await supabase
         .from("teams")
@@ -386,7 +405,10 @@ export function useTeams() {
     setError(null);
 
     try {
-      const addedBy = await getEmployeeId();
+      const addedBy = employeeInfo?.id;
+      if (!addedBy) {
+        throw new Error('User ID not available');
+      }
 
       const { data, error: addError } = await supabase
         .from("team_members")
@@ -452,7 +474,10 @@ export function useTeams() {
     setError(null);
 
     try {
-      const addedBy = await getEmployeeId();
+      const addedBy = employeeInfo?.id;
+      if (!addedBy) {
+        throw new Error('User ID not available');
+      }
 
       const members = employeeIds.map(employeeId => ({
         team_id: teamId,
@@ -475,7 +500,7 @@ export function useTeams() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.id]);
 
   // ==============================================================================
   // Team Permission Management
@@ -570,7 +595,10 @@ export function useTeams() {
     employeeId?: string
   ): Promise<boolean> => {
     try {
-      const empId = employeeId || await getEmployeeId();
+      const empId = employeeId ?? employeeInfo?.id;
+      if (!empId) {
+        throw new Error('Employee ID not available');
+      }
 
       const { data, error: fetchError } = await supabase
         .from("team_members")
@@ -589,7 +617,7 @@ export function useTeams() {
       console.error("Error checking team membership:", err);
       return false;
     }
-  }, []);
+  }, [employeeInfo?.id]);
 
   /**
    * Get all team IDs for a specific employee
@@ -598,7 +626,10 @@ export function useTeams() {
     employeeId?: string
   ): Promise<number[]> => {
     try {
-      const empId = employeeId || await getEmployeeId();
+      const empId = employeeId ?? employeeInfo?.id;
+      if (!empId) {
+        throw new Error('Employee ID not available');
+      }
 
       const { data, error: fetchError } = await supabase
         .from("team_members")
@@ -612,7 +643,7 @@ export function useTeams() {
       console.error("Error fetching employee team IDs:", err);
       return [];
     }
-  }, []);
+  }, [employeeInfo?.id]);
 
   // ==============================================================================
   // Return hook interface
