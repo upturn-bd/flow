@@ -20,6 +20,8 @@ import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
 import { matchesEmployeeSearch } from "@/lib/utils/user-search";
 import { exportEmployeesToCSV } from "@/lib/utils/csv-export";
 import { toast } from "sonner";
+import { ModulePermissionsBanner } from "@/components/permissions";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 // Filter options
 type FilterOptions = {
@@ -145,6 +147,9 @@ useEffect(() => {
           Export CSV
         </motion.button>
       </motion.div>
+
+      {/* Permission Banner */}
+      <ModulePermissionsBanner module={PERMISSION_MODULES.HRIS} title="HRIS" compact />
 
       {/* Search and Filters */}
       <motion.div variants={fadeIn} className="bg-white rounded-xl shadow-sm mb-8">
