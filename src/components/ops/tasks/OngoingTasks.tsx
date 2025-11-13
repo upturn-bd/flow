@@ -28,6 +28,9 @@ import { useRouter } from "next/navigation";
 import LoadMore from "@/components/ui/LoadMore";
 import Link from "next/link";
 import { debounce } from "lodash"; // for debouncing search
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSION_MODULES } from "@/lib/constants";
+import { PermissionTooltip } from "@/components/permissions";
 
 interface OngoingTaskPageProps {
   adminScoped: boolean;
@@ -228,29 +231,61 @@ function TaskCard({
   onDetails?: () => void;
   isDeleting?: boolean;
 }) {
+  const { canWrite, canDelete } = usePermissions();
+  
+  // Check if user can edit based on permissions OR ownership
+  const canEditTask = canWrite(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && userRole === "Admin");
+  const canDeleteTask = canDelete(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && userRole === "Admin");
+  
   const actions = (
     <div className="flex items-center gap-2">
-      {(userId === task.created_by || (adminScoped && userRole === "Admin")) && (
-        <>
+      {canEditTask && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onEdit}
+          className="p-2 h-8 w-8 hover:bg-blue-50 hover:text-blue-600"
+        >
+          <Edit size={14} />
+        </Button>
+      )}
+      
+      {!canEditTask && (userId === task.created_by || (adminScoped && userRole === "Admin")) && (
+        <PermissionTooltip message="You don't have permission to edit tasks">
           <Button
             variant="ghost"
             size="sm"
-            onClick={onEdit}
-            className="p-2 h-8 w-8 hover:bg-blue-50 hover:text-blue-600"
+            disabled
+            className="p-2 h-8 w-8 opacity-50 cursor-not-allowed"
           >
             <Edit size={14} />
           </Button>
+        </PermissionTooltip>
+      )}
 
+      {canDeleteTask && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onDelete}
+          isLoading={isDeleting}
+          className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
+        >
+          <Trash2 size={14} />
+        </Button>
+      )}
+      
+      {!canDeleteTask && (userId === task.created_by || (adminScoped && userRole === "Admin")) && (
+        <PermissionTooltip message="You don't have permission to delete tasks">
           <Button
             variant="ghost"
             size="sm"
-            onClick={onDelete}
-            isLoading={isDeleting}
-            className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
+            disabled
+            className="p-2 h-8 w-8 opacity-50 cursor-not-allowed"
           >
             <Trash2 size={14} />
           </Button>
-        </>
+        </PermissionTooltip>
       )}
 
       <Link href={`/ops/tasks/${task.id}`}>
