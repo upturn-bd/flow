@@ -15,6 +15,7 @@ import {
   ScrollText
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 function RequisitionPageContent() {
   const router = useRouter();
@@ -98,6 +99,8 @@ function RequisitionPageContent() {
         router.push("/ops/requisition?tab=create");
       }}
       isLinked={true}
+      module={PERMISSION_MODULES.REQUISITION}
+      showPermissionBanner={true}
     />
   );
 }
