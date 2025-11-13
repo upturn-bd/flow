@@ -3,7 +3,7 @@
 import { useBaseEntity } from "./core";
 import { Notice, NoticeType } from "@/lib/types/schemas";
 import { useNotifications } from "./useNotifications";
-import { getCompanyId, getEmployeeInfo } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 import { getDepartmentEmployeesIds } from "@/lib/utils/company";
 import { supabase } from "@/lib/supabase/client";
 import { useState } from "react";
@@ -11,6 +11,7 @@ import { useState } from "react";
 export type { Notice };
 
 export function useNotices() {
+  const { employeeInfo } = useAuth();
   const baseResult = useBaseEntity<Notice>({
     tableName: "notice_records",
     entityName: "notice",
@@ -27,11 +28,13 @@ export function useNotices() {
   const createNotice = async (notice: Notice) => {
     setLoading(true);
     try {
-      const user = await getEmployeeInfo();
+      if (!employeeInfo) {
+        throw new Error('Employee info not available');
+      }
 
       if (notice.department_id === undefined) notice.department_id = 0;
-      notice.company_id = await getCompanyId();
-      notice.created_by = user.id;
+      notice.company_id = employeeInfo.company_id!;
+      notice.created_by = employeeInfo.id;
 
       const result = await baseResult.createItem(notice);
 
@@ -44,7 +47,7 @@ export function useNotices() {
         type_id: 6,
         recipient_id: recipients,
         action_url: "/ops/notice",
-        company_id: user.company_id,
+        company_id: employeeInfo.company_id!,
         department_id: notice.department_id,
       });
 
@@ -60,12 +63,15 @@ export function useNotices() {
   const updateNotice = async (noticeId: number, notice: Notice) => {
     setLoading(true);
     try {
+      if (!employeeInfo) {
+        throw new Error('Employee info not available');
+      }
+
       const result = await baseResult.updateItem(noticeId, notice);
 
       const recipients = await getDepartmentEmployeesIds(
         notice.department_id || 0
       );
-      const user = await getEmployeeInfo();
       createNotification({
         title: "Notice Updated",
         message: `The notice "${notice.title}" has been updated.`,
@@ -73,7 +79,7 @@ export function useNotices() {
         type_id: 6,
         recipient_id: recipients,
         action_url: "/ops/notice",
-        company_id: user.company_id,
+        company_id: employeeInfo.company_id!,
         department_id: notice.department_id,
       });
 
@@ -89,9 +95,12 @@ export function useNotices() {
   const fetchNotices = async (isGlobal = false): Promise<Notice[]> => {
     setLoading(true);
     try {
-      const companyId = await getCompanyId();
-      const user = await getEmployeeInfo();
-      const departmentId = user.department_id ?? 0;
+      if (!employeeInfo) {
+        throw new Error('Employee info not available');
+      }
+
+      const companyId = employeeInfo.company_id;
+      const departmentId = employeeInfo.department_id ?? 0;
 
       let query = supabase
         .from("notice_records")
@@ -102,7 +111,7 @@ export function useNotices() {
       // If not global, apply department/user filters
       if (!isGlobal) {
         query = query.or(
-          `department_id.eq.${departmentId},department_id.eq.0,created_by.eq.${user.id}`
+          `department_id.eq.${departmentId},department_id.eq.0,created_by.eq.${employeeInfo.id}`
         );
       }
 

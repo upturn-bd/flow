@@ -327,7 +327,10 @@ export function useTeams() {
     setError(null);
 
     try {
-      const companyId = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       const { data, error: updateError } = await supabase
         .from("teams")
@@ -351,7 +354,7 @@ export function useTeams() {
     } finally {
       setLoading(false);
     }
-  }, [fetchTeams]);
+  }, [fetchTeams, employeeInfo?.company_id]);
 
   /**
    * Delete a team

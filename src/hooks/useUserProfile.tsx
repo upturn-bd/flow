@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { getUserId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 
 export interface UserInfo {
@@ -12,6 +12,7 @@ export interface UserInfo {
 }
 
 export function useUserProfile() {
+  const { employeeInfo } = useAuth();
   const [isCurrentUser, setIsCurrentUser] = useState(true);
   const [loading, setLoading] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
@@ -23,7 +24,7 @@ export function useUserProfile() {
     }
 
     try {
-      const currentUserId = await getUserId();
+      const currentUserId = employeeInfo?.id;
       const result = currentUserId === uid;
       setIsCurrentUser(result);
       return result;
@@ -31,7 +32,7 @@ export function useUserProfile() {
       console.error("Error checking if current user", err);
       return false;
     }
-  }, []);
+  }, [employeeInfo?.id]);
 
   const fetchUserName = useCallback(async (uid: string) => {
     setLoading(true);
