@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 function AttendancePageContent() {
   const searchParams = useSearchParams();
@@ -97,6 +98,8 @@ function AttendancePageContent() {
       activeTab={activeTab}
       setActiveTab={setActiveTab}
       isLinked={true}
+      module={PERMISSION_MODULES.ATTENDANCE}
+      showPermissionBanner={true}
     />
   );
 }

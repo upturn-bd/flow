@@ -3,6 +3,8 @@
 
 // No need to import AdminDataProvider, motion, or breadcrumb components here
 import BasicTab from "@/components/admin/tabs/BasicTab";
+import { ModulePermissionsBanner } from "@/components/permissions";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 export default function BasicSettingsPage() {
   // The layout.tsx now provides the wrapper elements (motion.div, Breadcrumbs, AdminDataProvider)
@@ -12,6 +14,9 @@ export default function BasicSettingsPage() {
       <h1 className="text-3xl font-bold text-gray-800 mb-8">
           Basic Settings Configuration
       </h1>
+      
+      {/* Permission Banner */}
+      <ModulePermissionsBanner module={PERMISSION_MODULES.ADMIN_CONFIG} title="Admin Configuration" compact />
       
       {/* BasicTab can safely call useAdminData because it's wrapped by layout.tsx */}
       <BasicTab />

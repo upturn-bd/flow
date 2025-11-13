@@ -7,6 +7,9 @@ import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { NoticeCreateModal, NoticeUpdateModal } from "@/components/ops/notice";
 import { getEmployeeId } from "@/lib/utils/auth";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSION_MODULES } from "@/lib/constants";
+import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from "@/components/permissions";
 
 export default function NoticePage() {
   const {
@@ -17,6 +20,7 @@ export default function NoticePage() {
     updateNotice,
     deleteNotice,
   } = useNotices();
+  const { canWrite, canDelete } = usePermissions();
   const [isCreatingNotice, setIsCreatingNotice] = useState(false);
   const [isUpdatingNotice, setIsUpdatingNotice] = useState(false);
   const [editNotice, setEditNotice] = useState<Notice | null>(null);
@@ -172,17 +176,32 @@ export default function NoticePage() {
                   View and manage company-wide notices and important announcements.
                 </p>
               </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                type="button"
-                onClick={() => setIsCreatingNotice(true)}
-                className="flex items-center justify-center gap-2 bg-amber-500 hover:brightness-110 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Create Notice</span>
-              </motion.button>
+              {canWrite(PERMISSION_MODULES.NOTICE) ? (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="button"
+                  onClick={() => setIsCreatingNotice(true)}
+                  className="flex items-center justify-center gap-2 bg-amber-500 hover:brightness-110 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Create Notice</span>
+                </motion.button>
+              ) : (
+                <PermissionTooltip message="You don't have permission to create notices">
+                  <button
+                    disabled
+                    className="flex items-center justify-center gap-2 bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-60"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Create Notice</span>
+                  </button>
+                </PermissionTooltip>
+              )}
             </motion.div>
+
+            {/* Permission Banner */}
+            <ModulePermissionsBanner module={PERMISSION_MODULES.NOTICE} title="Notices" compact />
 
             {notices.length === 0 ? (
               <motion.div
@@ -233,24 +252,48 @@ export default function NoticePage() {
                         <h2 className="text-lg font-semibold text-gray-800 mb-3">{notice.title}</h2>
                         {notice.created_by === userId && (
                           <div className="flex space-x-1">
-                            <motion.button
-                              whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.1)" }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => setEditNotice(notice)}
-                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-                              aria-label="Edit notice"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </motion.button>
-                            <motion.button
-                              whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => handleDeleteNotice(notice.id!)}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                              aria-label="Delete notice"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </motion.button>
+                            {canWrite(PERMISSION_MODULES.NOTICE) ? (
+                              <motion.button
+                                whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.1)" }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => setEditNotice(notice)}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                                aria-label="Edit notice"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </motion.button>
+                            ) : (
+                              <PermissionTooltip message="You don't have permission to edit notices">
+                                <button
+                                  disabled
+                                  className="p-2 text-gray-400 rounded-full cursor-not-allowed opacity-50"
+                                  aria-label="Edit notice (disabled)"
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </button>
+                              </PermissionTooltip>
+                            )}
+                            {canDelete(PERMISSION_MODULES.NOTICE) ? (
+                              <motion.button
+                                whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => handleDeleteNotice(notice.id!)}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                                aria-label="Delete notice"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </motion.button>
+                            ) : (
+                              <PermissionTooltip message="You don't have permission to delete notices">
+                                <button
+                                  disabled
+                                  className="p-2 text-gray-400 rounded-full cursor-not-allowed opacity-50"
+                                  aria-label="Delete notice (disabled)"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </PermissionTooltip>
+                            )}
                           </div>
 
                         )}

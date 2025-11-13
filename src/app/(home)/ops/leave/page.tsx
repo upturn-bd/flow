@@ -15,6 +15,7 @@ import {
   Calendar
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 function LeavePageContent() {
   const router = useRouter();
@@ -99,6 +100,8 @@ function LeavePageContent() {
       actionButtonIcon={<PlusCircle className="h-4 w-4" />}
       actionButtonOnClick={() => router.push("/ops/leave?tab=apply")}
       isLinked={true}
+      module={PERMISSION_MODULES.LEAVE}
+      showPermissionBanner={true}
     />
   );
 }

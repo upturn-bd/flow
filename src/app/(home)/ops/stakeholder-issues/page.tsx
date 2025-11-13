@@ -19,9 +19,13 @@ import {
   Trash2,
 } from "lucide-react";
 import { StakeholderIssue } from "@/lib/types/schemas";
+import { usePermissions } from "@/hooks/usePermissions";
+import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 export default function StakeholderIssuesPage() {
   const router = useRouter();
+  const { canWrite, canDelete } = usePermissions();
   const {
     issues,
     loading,
@@ -179,6 +183,9 @@ export default function StakeholderIssuesPage() {
           </p>
         </div>
       </div>
+
+      {/* Permission Banner */}
+      <ModulePermissionsBanner module={PERMISSION_MODULES.STAKEHOLDER_ISSUES} title="Stakeholder Issues" compact />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -366,23 +373,48 @@ export default function StakeholderIssuesPage() {
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 ml-4">
-                  <button
-                    onClick={() => {
-                      setSelectedIssue(issue);
-                      openCreateModal();
-                    }}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                    title="Edit issue"
-                  >
-                    <Eye size={18} />
-                  </button>
-                  <button
-                    onClick={() => issue.id && handleDeleteIssue(issue.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
-                    title="Delete issue"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  {canWrite(PERMISSION_MODULES.STAKEHOLDER_ISSUES) ? (
+                    <button
+                      onClick={() => {
+                        setSelectedIssue(issue);
+                        openCreateModal();
+                      }}
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      title="Edit issue"
+                    >
+                      <Eye size={18} />
+                    </button>
+                  ) : (
+                    <PermissionTooltip message="You don't have permission to edit issues">
+                      <button
+                        disabled
+                        className="p-2 text-gray-400 rounded cursor-not-allowed opacity-50"
+                        title="Edit issue (no permission)"
+                      >
+                        <Eye size={18} />
+                      </button>
+                    </PermissionTooltip>
+                  )}
+                  
+                  {canDelete(PERMISSION_MODULES.STAKEHOLDER_ISSUES) ? (
+                    <button
+                      onClick={() => issue.id && handleDeleteIssue(issue.id)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                      title="Delete issue"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  ) : (
+                    <PermissionTooltip message="You don't have permission to delete issues">
+                      <button
+                        disabled
+                        className="p-2 text-gray-400 rounded cursor-not-allowed opacity-50"
+                        title="Delete issue (no permission)"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </PermissionTooltip>
+                  )}
                 </div>
               </div>
             </div>
