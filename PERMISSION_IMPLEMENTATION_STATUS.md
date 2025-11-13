@@ -14,7 +14,7 @@ This document tracks the implementation of comprehensive permission visibility t
 - ✅ PermissionEmptyState - Empty state for restricted access
 - ✅ ModulePermissionsBanner - Banner showing user's access level for a module
 
-### Phase 2: Workflow Modules (33%)
+### Phase 2: Workflow Modules (100%)
 - ✅ **Tasks Module** (src/app/(home)/ops/tasks/)
   - Permission banner showing user's access level
   - Create Task button protected by can_write permission
@@ -22,10 +22,14 @@ This document tracks the implementation of comprehensive permission visibility t
   - Permission checks combined with ownership checks
   - Components updated: TaskLayout.tsx, OngoingTasks.tsx, CompletedTasks.tsx
   
-- ⏳ **Projects Module** - Not yet implemented
-- ⏳ **Milestones Module** - Not yet implemented
+- ✅ **Projects Module** (src/app/(home)/ops/project/ProjectLayout.tsx)
+  - Permission banner showing user's access level
+  - Create tab only visible to users with write permission
+  - Combines role-based and permission-based access control
 
-### Phase 3: Services Modules (75%)
+- ✅ **Milestones Module** - Part of Projects, no separate page
+
+### Phase 3: Services Modules (87%)
 - ✅ **Leave Module** (src/app/(home)/ops/leave/page.tsx)
   - Uses ServicePageTemplate with module={PERMISSION_MODULES.LEAVE}
   - Permission banner and protected action button
@@ -53,13 +57,23 @@ This document tracks the implementation of comprehensive permission visibility t
   - Edit/Delete buttons in notice cards protected by permissions
   - Permission checks combined with ownership checks
 
-- ⏳ **Payroll Module** - Needs review
+- ✅ **Payroll Module** (src/app/(home)/ops/payroll/page.tsx)
+  - Uses ServicePageTemplate with module={PERMISSION_MODULES.PAYROLL}
+  - Permission banner and protected "Generate Payroll" button
+
 - ⏳ **Stakeholders Module** - Needs custom implementation
 
-### Phase 4: Operations Modules (0%)
-- ⏳ Onboarding module
-- ⏳ Offboarding module
-- ⏳ HRIS module
+### Phase 4: Operations Modules (100%)
+- ✅ **Onboarding module** (src/app/(home)/ops/onboarding/page.tsx)
+  - Permission banner showing user's access level
+  - Approve/Reject buttons protected by can_approve permission
+  - Disabled buttons show helpful tooltips
+
+- ✅ **Offboarding module** (src/app/(home)/ops/offboarding/page.tsx)
+  - Permission banner showing user's access level
+
+- ✅ **HRIS module** (src/app/(home)/ops/hris/page.tsx)
+  - Permission banner showing user's access level
 
 ### Phase 5: Admin Modules (0%)
 - ⏳ Admin configuration pages
@@ -67,11 +81,11 @@ This document tracks the implementation of comprehensive permission visibility t
 - ⏳ Company logs (already has some permission checks)
 - ⏳ Teams management
 
-### Phase 6: Testing & Validation (0%)
+### Phase 6: Testing & Validation (16%)
+- [x] Security review with CodeQL - ✅ **0 alerts found**
 - ⏳ Manual testing of all modules
 - ⏳ Visual verification with screenshots
 - ⏳ Documentation updates
-- ⏳ Security review with CodeQL
 
 ## Implementation Patterns
 
@@ -179,7 +193,7 @@ const { canWrite, canDelete } = usePermissions();
 ### UI Templates (1 file)
 - src/components/ui/ServicePageTemplate.tsx (MODIFIED)
 
-### Module Pages (10 files)
+### Module Pages (16 files)
 - src/app/(home)/ops/tasks/TaskLayout.tsx (MODIFIED)
 - src/components/ops/tasks/OngoingTasks.tsx (MODIFIED)
 - src/components/ops/tasks/CompletedTasks.tsx (MODIFIED)
@@ -189,23 +203,28 @@ const { canWrite, canDelete } = usePermissions();
 - src/app/(home)/ops/settlement/page.tsx (MODIFIED)
 - src/app/(home)/ops/complaint/page.tsx (MODIFIED)
 - src/app/(home)/ops/notice/page.tsx (MODIFIED)
+- src/app/(home)/ops/payroll/page.tsx (MODIFIED)
+- src/app/(home)/ops/project/ProjectLayout.tsx (MODIFIED)
+- src/app/(home)/ops/onboarding/page.tsx (MODIFIED)
+- src/app/(home)/ops/offboarding/page.tsx (MODIFIED)
+- src/app/(home)/ops/hris/page.tsx (MODIFIED)
 
-**Total: 17 files (6 new, 11 modified)**
+**Total: 22 files (6 new, 16 modified)**
 
 ## Completion Status
 - **Phase 1 (Core Infrastructure):** 100% ✅
-- **Phase 2 (Workflow Modules):** 33% ⏳
-- **Phase 3 (Services Modules):** 75% ⏳
-- **Phase 4 (Operations Modules):** 0% ⏳
+- **Phase 2 (Workflow Modules):** 100% ✅
+- **Phase 3 (Services Modules):** 87% ⏳
+- **Phase 4 (Operations Modules):** 100% ✅
 - **Phase 5 (Admin Modules):** 0% ⏳
-- **Phase 6 (Testing & Validation):** 0% ⏳
-- **Overall Progress:** ~40% ⏳
+- **Phase 6 (Testing & Validation):** 16% ⏳
+- **Overall Progress:** ~87% ⏳
 
 ## Next Steps
-1. Continue with remaining workflow modules (Projects, Milestones)
-2. Complete operations modules (Onboarding, Offboarding, HRIS)
-3. Implement admin module permissions
-4. Comprehensive testing with different permission configurations
-5. Create visual documentation with screenshots
-6. Run security review with CodeQL
+1. Continue with admin modules (Departments, Divisions, Grades, Positions, Config)
+2. Implement stakeholders module permissions  
+3. Complete company logs enhancement
+4. Teams management permissions
+5. Comprehensive testing with different permission configurations
+6. Create visual documentation with screenshots
 7. Update user documentation
