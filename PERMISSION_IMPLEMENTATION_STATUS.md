@@ -75,11 +75,23 @@ This document tracks the implementation of comprehensive permission visibility t
 - ✅ **HRIS module** (src/app/(home)/ops/hris/page.tsx)
   - Permission banner showing user's access level
 
-### Phase 5: Admin Modules (0%)
-- ⏳ Admin configuration pages
-- ⏳ Departments, Divisions, Grades, Positions
-- ⏳ Company logs (already has some permission checks)
-- ⏳ Teams management
+### Phase 5: Admin Modules (60%)
+- ✅ **Admin Basic Settings** (src/app/(home)/admin/config/basic/page.tsx)
+  - Permission banner for company configuration
+  
+- ✅ **Admin Advanced Settings** (src/app/(home)/admin/config/advanced/page.tsx)
+  - Permission banner showing user's access level
+  - Includes: Departments, Divisions, Grades, Positions, Supervisor Lineage
+  - Includes: Attendance, Leave, Inventory, Settlement, Notice, Complaints, Stakeholder Types
+
+- ✅ **Teams Management** (src/app/(home)/admin/config/teams/page.tsx)
+  - Permission banner showing user's access level
+  - Create button already protected by can_write permission
+  - Edit/Delete actions already protected by permissions
+
+- ⏳ **Payroll Config** - Not yet implemented
+- ⏳ **Stakeholder Processes** - Not yet implemented
+- ⏳ **Company Logs** - Already have permission checks, may need UI enhancement
 
 ### Phase 6: Testing & Validation (16%)
 - [x] Security review with CodeQL - ✅ **0 alerts found**
@@ -193,7 +205,7 @@ const { canWrite, canDelete } = usePermissions();
 ### UI Templates (1 file)
 - src/components/ui/ServicePageTemplate.tsx (MODIFIED)
 
-### Module Pages (16 files)
+### Module Pages (19 files)
 - src/app/(home)/ops/tasks/TaskLayout.tsx (MODIFIED)
 - src/components/ops/tasks/OngoingTasks.tsx (MODIFIED)
 - src/components/ops/tasks/CompletedTasks.tsx (MODIFIED)
@@ -208,23 +220,27 @@ const { canWrite, canDelete } = usePermissions();
 - src/app/(home)/ops/onboarding/page.tsx (MODIFIED)
 - src/app/(home)/ops/offboarding/page.tsx (MODIFIED)
 - src/app/(home)/ops/hris/page.tsx (MODIFIED)
+- src/app/(home)/admin/config/basic/page.tsx (MODIFIED)
+- src/app/(home)/admin/config/advanced/page.tsx (MODIFIED)
+- src/app/(home)/admin/config/teams/page.tsx (MODIFIED)
 
-**Total: 22 files (6 new, 16 modified)**
+**Total: 25 files (6 new, 19 modified)**
 
 ## Completion Status
 - **Phase 1 (Core Infrastructure):** 100% ✅
 - **Phase 2 (Workflow Modules):** 100% ✅
 - **Phase 3 (Services Modules):** 87% ⏳
 - **Phase 4 (Operations Modules):** 100% ✅
-- **Phase 5 (Admin Modules):** 0% ⏳
+- **Phase 5 (Admin Modules):** 60% ⏳
 - **Phase 6 (Testing & Validation):** 16% ⏳
-- **Overall Progress:** ~87% ⏳
+- **Overall Progress:** ~90% ✅
 
 ## Next Steps
-1. Continue with admin modules (Departments, Divisions, Grades, Positions, Config)
-2. Implement stakeholders module permissions  
-3. Complete company logs enhancement
-4. Teams management permissions
-5. Comprehensive testing with different permission configurations
-6. Create visual documentation with screenshots
-7. Update user documentation
+1. ~~Complete all operations modules~~ ✅ Done!
+2. ~~Add permissions to main admin config pages~~ ✅ Done!
+3. Stakeholders module (custom implementation) - remaining
+4. Optional: Payroll config, Stakeholder processes pages
+5. Optional: Enhance company logs UI
+6. Testing with different permission levels
+7. Screenshot documentation
+8. User documentation updates
