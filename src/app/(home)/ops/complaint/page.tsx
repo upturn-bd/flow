@@ -14,6 +14,7 @@ import {
   ClipboardCheck,
   AlertTriangle
 } from "lucide-react";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 
 export default function ComplaintPage() {
@@ -121,6 +122,8 @@ export default function ComplaintPage() {
       actionButtonLabel="New Complaint"
       actionButtonIcon={<FilePlus className="h-4 w-4" />}
       actionButtonOnClick={() => setActiveTab("home")}
+      module={PERMISSION_MODULES.COMPLAINTS}
+      showPermissionBanner={true}
     />
   );
 }

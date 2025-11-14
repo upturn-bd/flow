@@ -16,6 +16,7 @@ import { TabItem } from "@/components/ui/TabView";
 import SettlementHistoryPage from "@/components/ops/settlement/SettlementHistory";
 import SettlementRequestsPage from "@/components/ops/settlement/SettlementRequestsPage";
 import UpcomingPage from "@/components/ops/settlement/UpcomingPage";
+import { PERMISSION_MODULES } from "@/lib/constants";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
@@ -98,6 +99,8 @@ function SettlementPageContent() {
         router.push("/ops/settlement?tab=create");
       }}
       isLinked={true}
+      module={PERMISSION_MODULES.SETTLEMENT}
+      showPermissionBanner={true}
     />
   );
 }

@@ -9,6 +9,8 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useOnboarding, PendingEmployee } from "@/hooks/useOnboarding";
 import { useDepartments } from "@/hooks/useDepartments";
+import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from "@/components/permissions";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 const Button = ({
   children,
@@ -165,6 +167,9 @@ export default function OnboardingApprovalPage() {
         </h1>
       </motion.div>
 
+      {/* Permission Banner */}
+      <ModulePermissionsBanner module={PERMISSION_MODULES.ONBOARDING} title="Onboarding" compact />
+
       {pendingEmployees.length === 0 ? (
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
@@ -282,22 +287,47 @@ export default function OnboardingApprovalPage() {
               />
 
               <div className="flex gap-4 justify-end">
-                <Button
-                  className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
-                  onClick={() => handleAction(emp.id, "REJECTED")}
-                  disabled={loading}
+                <PermissionGate 
+                  module={PERMISSION_MODULES.ONBOARDING} 
+                  action="can_approve"
+                  fallback={
+                    <PermissionTooltip message="You don't have permission to approve onboarding requests">
+                      <div className="flex gap-4">
+                        <button
+                          disabled
+                          className="bg-gray-300 text-gray-500 rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center gap-2"
+                        >
+                          <X className="h-4 w-4" />
+                          Reject
+                        </button>
+                        <button
+                          disabled
+                          className="bg-gray-300 text-gray-500 rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center gap-2"
+                        >
+                          <Check className="h-4 w-4" />
+                          Accept
+                        </button>
+                      </div>
+                    </PermissionTooltip>
+                  }
                 >
-                  <X className="h-4 w-4" />
-                  Reject
-                </Button>
-                <Button
-                  className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2"
-                  onClick={() => handleAction(emp.id, "ACCEPTED")}
-                  disabled={loading}
-                >
-                  <Check className="h-4 w-4" />
-                  Accept
-                </Button>
+                  <Button
+                    className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+                    onClick={() => handleAction(emp.id, "REJECTED")}
+                    disabled={loading}
+                  >
+                    <X className="h-4 w-4" />
+                    Reject
+                  </Button>
+                  <Button
+                    className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2"
+                    onClick={() => handleAction(emp.id, "ACCEPTED")}
+                    disabled={loading}
+                  >
+                    <Check className="h-4 w-4" />
+                    Accept
+                  </Button>
+                </PermissionGate>
               </div>
             </motion.div>
           ))}

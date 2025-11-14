@@ -12,6 +12,8 @@ import toast from "react-hot-toast";
 import TeamForm from "@/components/admin/teams/TeamForm";
 import TeamMembersModal from "@/components/admin/teams/TeamMembersModal";
 import TeamPermissionsModal from "@/components/admin/teams/TeamPermissionsModal";
+import { ModulePermissionsBanner } from "@/components/permissions";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 export default function TeamsPage() {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -147,6 +149,9 @@ export default function TeamsPage() {
           )}
         </div>
       </motion.div>
+
+      {/* Permission Banner */}
+      <ModulePermissionsBanner module={PERMISSION_MODULES.TEAMS} title="Teams" compact />
 
       {/* Teams Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -4,6 +4,9 @@ import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import TabView, { TabItem } from './TabView';
 import { LucideIcon } from 'lucide-react';
+import { usePermissions } from '@/hooks/usePermissions';
+import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from '@/components/permissions';
+import { PermissionModule } from '@/lib/constants';
 
 interface ServicePageProps {
   title: string;
@@ -17,6 +20,12 @@ interface ServicePageProps {
   actionButtonIcon?: ReactNode;
   actionButtonOnClick?: () => void;
   isLinked?: boolean;
+  /** Module name for permission checks */
+  module?: PermissionModule | string;
+  /** Permission required for the action button (defaults to 'can_write') */
+  actionPermission?: string;
+  /** Show permission banner */
+  showPermissionBanner?: boolean;
 }
 
 export default function ServicePageTemplate({
@@ -30,8 +39,15 @@ export default function ServicePageTemplate({
   actionButtonLabel,
   actionButtonIcon,
   actionButtonOnClick,
-  isLinked
+  isLinked,
+  module,
+  actionPermission = 'can_write',
+  showPermissionBanner = true,
 }: ServicePageProps) {
+  const { hasPermission } = usePermissions();
+  
+  // Check if user has permission for the action button
+  const hasActionPermission = module ? hasPermission(module, actionPermission) : true;
   
   // Animation variants
   const pageVariants = {
@@ -102,17 +118,36 @@ export default function ServicePageTemplate({
         </div>
         
         {actionButtonLabel && actionButtonIcon && actionButtonOnClick && (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={actionButtonOnClick}
-            className={`flex items-center justify-center gap-2 ${primaryColor.includes('text') ? primaryColor.replace('text', 'bg') : 'bg-blue-600'} hover:brightness-110 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm`}
-          >
-            {actionButtonIcon}
-            <span>{actionButtonLabel}</span>
-          </motion.button>
+          <>
+            {hasActionPermission ? (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={actionButtonOnClick}
+                className={`flex items-center justify-center gap-2 ${primaryColor.includes('text') ? primaryColor.replace('text', 'bg') : 'bg-blue-600'} hover:brightness-110 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm`}
+              >
+                {actionButtonIcon}
+                <span>{actionButtonLabel}</span>
+              </motion.button>
+            ) : (
+              <PermissionTooltip message={`You don't have permission to ${actionButtonLabel.toLowerCase()}`}>
+                <button
+                  disabled
+                  className="flex items-center justify-center gap-2 bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-60"
+                >
+                  {actionButtonIcon}
+                  <span>{actionButtonLabel}</span>
+                </button>
+              </PermissionTooltip>
+            )}
+          </>
         )}
       </motion.div>
+
+      {/* Permission Banner */}
+      {module && showPermissionBanner && (
+        <ModulePermissionsBanner module={module} title={title} compact />
+      )}
 
       <TabView 
         tabs={tabs}

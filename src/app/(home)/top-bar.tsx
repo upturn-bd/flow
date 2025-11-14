@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { Bell, User, Search, LogOut, Settings, UserCircle, ShieldAlert } from "lucide-react";
+import { Bell, User, Search, LogOut, UserCircle, ShieldAlert } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";

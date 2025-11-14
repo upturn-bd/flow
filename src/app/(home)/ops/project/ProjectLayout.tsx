@@ -18,6 +18,9 @@ import CompletedProjectsList from "@/components/ops/project/CompletedProjectsLis
 import CreateNewProjectPage from "@/components/ops/project/CreateNewProject";
 import ProjectsList from "@/components/ops/project/OngoingProjectsView";
 import { usePathname } from "next/navigation";
+import { usePermissions } from "@/hooks/usePermissions";
+import { ModulePermissionsBanner } from "@/components/permissions";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 
 const TABS = [
@@ -56,6 +59,7 @@ export default function ProjectLayout({
 }) {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { canWrite } = usePermissions();
 
     const [activeTab, setActiveTab] = useState(initialActiveTab);
     const [user, setUser] = useState<{ id: string; name: string; role: string }>();
@@ -85,8 +89,10 @@ export default function ProjectLayout({
                 const retrievedUser = await getEmployeeInfo();
                 setUser(retrievedUser);
 
+                // Filter tabs based on role AND permissions
+                const hasWritePermission = canWrite(PERMISSION_MODULES.PROJECTS);
                 const visibleTabs =
-                    retrievedUser.role === "Admin"
+                    retrievedUser.role === "Admin" || hasWritePermission
                         ? TABS
                         : TABS.filter((tab) => tab.key !== "create");
 
@@ -101,7 +107,7 @@ export default function ProjectLayout({
             }
         }
         fetchUserData();
-    }, []);
+    }, [canWrite]);
 
     // 🔹 Tab content mapper
     function getTabContent(key: string) {
@@ -150,6 +156,9 @@ export default function ProjectLayout({
                     milestones.
                 </p>
             </div>
+
+            {/* Permission Banner */}
+            <ModulePermissionsBanner module={PERMISSION_MODULES.PROJECTS} title="Projects" compact />
 
             {overrideContent ? (
                 <>

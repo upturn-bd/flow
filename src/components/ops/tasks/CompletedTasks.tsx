@@ -24,6 +24,9 @@ import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useRouter } from "next/navigation";
 import LoadMore from "@/components/ui/LoadMore";
 import { debounce } from "lodash"; // For debouncing search
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSION_MODULES } from "@/lib/constants";
+import { PermissionTooltip } from "@/components/permissions";
 
 function TaskCard({
   adminScoped,
@@ -45,6 +48,7 @@ function TaskCard({
   onDetails: () => void
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const { canDelete } = usePermissions();
 
   const { id, task_title, department_id, task_description, updated_at } = task;
 
@@ -64,10 +68,13 @@ function TaskCard({
   };
 
   const department = departments.find((dept) => dept.id === department_id);
+  
+  // Check if user can delete based on permissions OR ownership
+  const canDeleteTask = canDelete(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && userRole === "Admin");
 
   const actions = (
     <div className="flex items-center gap-2">
-      {(userId === task.created_by || (adminScoped && userRole === "Admin")) && (
+      {canDeleteTask && (
         <Button
           variant="ghost"
           size="sm"
@@ -77,6 +84,19 @@ function TaskCard({
         >
           <Trash2 size={14} />
         </Button>
+      )}
+      
+      {!canDeleteTask && (userId === task.created_by || (adminScoped && userRole === "Admin")) && (
+        <PermissionTooltip message="You don't have permission to delete tasks">
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled
+            className="p-2 h-8 w-8 opacity-50 cursor-not-allowed"
+          >
+            <Trash2 size={14} />
+          </Button>
+        </PermissionTooltip>
       )}
 
       <Button
