@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getCompanyId } from "@/lib/utils/auth";
+import { JOB_STATUS } from "@/lib/constants";
 
 export interface Employee {
   id: string;
@@ -49,8 +50,9 @@ export function useEmployees() {
 
       const { data, error } = await supabase
         .from("employees")
-        .select("id, first_name, last_name")
-        .eq("company_id", company_id);
+        .select("id, first_name, last_name, job_status")
+        .eq("company_id", company_id)
+        .eq("job_status", JOB_STATUS.ACTIVE);
 
       if (error) throw error;
 
@@ -79,8 +81,9 @@ export function useEmployees() {
 
       const { data, error } = await supabase
         .from("employees")
-        .select("id, first_name, last_name, email, phone_number, department_id(name), designation, hire_date, basic_salary")
-        .eq("company_id", company_id);
+        .select("id, first_name, last_name, email, phone_number, department_id(name), designation, hire_date, basic_salary, job_status")
+        .eq("company_id", company_id)
+        .eq("job_status", JOB_STATUS.ACTIVE);
 
       if (error) throw error;
 
@@ -120,8 +123,9 @@ export function useEmployees() {
       // Build query
       let query = supabase
         .from("employees")
-        .select("id, first_name, last_name, email, role", { count: 'exact' })
-        .eq("company_id", company_id);
+        .select("id, first_name, last_name, email, role, job_status", { count: 'exact' })
+        .eq("company_id", company_id)
+        .eq("job_status", JOB_STATUS.ACTIVE);
       
       // Add search filter if provided
       if (searchQuery.trim()) {

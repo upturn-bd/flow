@@ -28,8 +28,7 @@ import {
 } from "@/hooks/useOffboarding";
 import { useDepartments } from "@/hooks/useDepartments";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
-import { usePermissions } from "@/hooks/usePermissions";
-import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
+import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
 
 const Button = ({
@@ -83,7 +82,6 @@ export default function OffboardingPage() {
     notes: "",
   });
 
-  const { canWrite, canApprove } = usePermissions();
   const {
     loading,
     error,
@@ -388,14 +386,30 @@ export default function OffboardingPage() {
 
                 {activeTab === "offboarded" && (
                   <div className="mt-3 pt-3 border-t border-gray-100">
-                    <Button
-                      className="w-full bg-green-600 hover:bg-green-700 flex items-center justify-center gap-2"
-                      onClick={() => handleReactivate(emp.id)}
-                      disabled={loading}
+                    <PermissionGate 
+                      module={PERMISSION_MODULES.OFFBOARDING} 
+                      action="can_write"
+                      fallback={
+                        <PermissionTooltip message="You don't have permission to reactivate employees">
+                          <button
+                            disabled
+                            className="w-full bg-gray-300 text-gray-500 rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center justify-center gap-2"
+                          >
+                            <RotateCcw className="h-4 w-4" />
+                            Reactivate Employee
+                          </button>
+                        </PermissionTooltip>
+                      }
                     >
-                      <RotateCcw className="h-4 w-4" />
-                      Reactivate Employee
-                    </Button>
+                      <Button
+                        className="w-full bg-green-600 hover:bg-green-700 flex items-center justify-center gap-2"
+                        onClick={() => handleReactivate(emp.id)}
+                        disabled={loading}
+                      >
+                        <RotateCcw className="h-4 w-4" />
+                        Reactivate Employee
+                      </Button>
+                    </PermissionGate>
                   </div>
                 )}
               </motion.div>
@@ -499,14 +513,32 @@ export default function OffboardingPage() {
                       <X className="h-4 w-4" />
                       Cancel
                     </Button>
-                    <Button
-                      className="flex-1 bg-red-600 hover:bg-red-700 flex items-center justify-center gap-2"
-                      onClick={handleOffboarding}
-                      disabled={loading}
+                    <PermissionGate 
+                      module={PERMISSION_MODULES.OFFBOARDING} 
+                      action="can_write"
+                      fallback={
+                        <PermissionTooltip message="You don't have permission to offboard employees">
+                          <div className="flex-1">
+                            <button
+                              disabled
+                              className="w-full bg-gray-300 text-gray-500 rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center justify-center gap-2"
+                            >
+                              <Check className="h-4 w-4" />
+                              Confirm Offboarding
+                            </button>
+                          </div>
+                        </PermissionTooltip>
+                      }
                     >
-                      <Check className="h-4 w-4" />
-                      Confirm Offboarding
-                    </Button>
+                      <Button
+                        className="flex-1 bg-red-600 hover:bg-red-700 flex items-center justify-center gap-2"
+                        onClick={handleOffboarding}
+                        disabled={loading}
+                      >
+                        <Check className="h-4 w-4" />
+                        Confirm Offboarding
+                      </Button>
+                    </PermissionGate>
                   </div>
                 </div>
               ) : (
