@@ -24,7 +24,7 @@ test.describe('Responsive Design Tests', () => {
     await page.fill('input[type="email"]', 'admin@test.com');
     await page.fill('input[type="password"]', 'TestPassword123!');
     await page.click('button[type="submit"]');
-    await page.waitForURL('**/operations-and-services/**', { timeout: 10000 });
+    await page.waitForURL('**/ops/**', { timeout: 10000 });
     
     // Check for hamburger menu or bottom navigation
     const menuButton = page.locator('button[aria-label*="menu" i], button:has-text("Menu")').first();
@@ -119,7 +119,7 @@ test.describe('Navigation Tests', () => {
     await page.fill('input[type="email"]', 'admin@test.com');
     await page.fill('input[type="password"]', 'TestPassword123!');
     await page.click('button[type="submit"]');
-    await page.waitForURL('**/operations-and-services/**', { timeout: 10000 });
+    await page.waitForURL('**/ops/**', { timeout: 10000 });
     
     // Navigate to different sections
     const workforceLink = page.locator('a:has-text("Workforce"), a[href*="workforce"]').first();
@@ -137,7 +137,7 @@ test.describe('Navigation Tests', () => {
     await page.fill('input[type="email"]', 'admin@test.com');
     await page.fill('input[type="password"]', 'TestPassword123!');
     await page.click('button[type="submit"]');
-    await page.waitForURL('**/operations-and-services/**', { timeout: 10000 });
+    await page.waitForURL('**/ops/**', { timeout: 10000 });
     
     // Navigate away and back
     const projectLink = page.locator('a:has-text("Project"), a[href*="project"]').first();
@@ -184,7 +184,7 @@ test.describe('Error Handling', () => {
 
 test.describe('Security Tests', () => {
   test('should redirect unauthenticated users to login', async ({ page }) => {
-    await page.goto('/operations-and-services/workflow/project');
+    await page.goto('/ops/project');
     
     // Should redirect to login or show unauthorized
     await page.waitForTimeout(2000);
@@ -220,7 +220,7 @@ test.describe('Search Functionality', () => {
     await page.fill('input[type="email"]', 'admin@test.com');
     await page.fill('input[type="password"]', 'TestPassword123!');
     await page.click('button[type="submit"]');
-    await page.waitForURL('**/operations-and-services/**', { timeout: 10000 });
+    await page.waitForURL('**/ops/**', { timeout: 10000 });
     
     // Look for search input
     const searchInput = page.locator('input[type="search"], input[placeholder*="search" i]').first();

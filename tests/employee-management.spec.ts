@@ -57,7 +57,7 @@ test.describe('Employee Management (via HRIS)', () => {
 
 test.describe('Attendance Management', () => {
   test('should display attendance dashboard', async ({ adminPage }) => {
-    await adminPage.goto('/operations-and-services/workforce/attendance');
+    await adminPage.goto('/ops/attendance?tab=today');
     await adminPage.waitForTimeout(1000);
     
     const attendanceHeading = adminPage.locator('h1:has-text("Attendance"), h2:has-text("Attendance")').first();
@@ -67,7 +67,7 @@ test.describe('Attendance Management', () => {
   });
 
   test('should mark attendance for employee', async ({ employeePage }) => {
-    await employeePage.goto('/operations-and-services/workforce/attendance');
+    await employeePage.goto('/ops/attendance?tab=today');
     await employeePage.waitForTimeout(1000);
     
     // Look for check-in button
@@ -85,7 +85,7 @@ test.describe('Attendance Management', () => {
   });
 
   test('should view attendance history', async ({ employeePage }) => {
-    await employeePage.goto('/operations-and-services/workforce/attendance');
+    await employeePage.goto('/ops/attendance?tab=history');
     await employeePage.waitForTimeout(1000);
     
     // Look for history tab or section
@@ -99,7 +99,7 @@ test.describe('Attendance Management', () => {
 
 test.describe('Leave Management', () => {
   test('should display leave balance', async ({ employeePage }) => {
-    await employeePage.goto('/operations-and-services/workforce/leave');
+    await employeePage.goto('/ops/leave');
     await employeePage.waitForTimeout(1000);
     
     const leaveHeading = employeePage.locator('h1:has-text("Leave"), h2:has-text("Leave")').first();
@@ -109,7 +109,7 @@ test.describe('Leave Management', () => {
   });
 
   test('should submit leave request', async ({ employeePage }) => {
-    await employeePage.goto('/operations-and-services/workforce/leave');
+    await employeePage.goto('/ops/leave');
     await employeePage.waitForTimeout(1000);
     
     // Click new leave request button
@@ -151,7 +151,7 @@ test.describe('Leave Management', () => {
   });
 
   test('should approve leave request as admin', async ({ adminPage }) => {
-    await adminPage.goto('/operations-and-services/workforce/leave');
+    await adminPage.goto('/ops/leave');
     await adminPage.waitForTimeout(1000);
     
     // Look for pending requests

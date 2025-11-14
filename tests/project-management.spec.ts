@@ -2,7 +2,7 @@ import { test, expect } from './fixtures/auth.fixture';
 
 test.describe('Project Management - Admin', () => {
   test('should display project management page', async ({ adminPage }) => {
-    await adminPage.goto('/operations-and-services/workflow/project');
+    await adminPage.goto('/ops/project');
     await adminPage.waitForLoadState('networkidle');
     
     await expect(adminPage.locator('h1:has-text("Project Management")')).toBeVisible();
@@ -11,7 +11,7 @@ test.describe('Project Management - Admin', () => {
   });
 
   test('should show create new project tab for admin', async ({ adminPage }) => {
-    await adminPage.goto('/operations-and-services/workflow/project');
+    await adminPage.goto('/ops/project');
     
     // Admin should see "Create New" tab
     const createNewTab = adminPage.locator('text=Create New');
@@ -19,7 +19,7 @@ test.describe('Project Management - Admin', () => {
   });
 
   test('should create a new project', async ({ adminPage }) => {
-    await adminPage.goto('/operations-and-services/workflow/project');
+    await adminPage.goto('/ops/project');
     
     // Click on Create New tab
     await adminPage.click('text=Create New');
@@ -48,7 +48,7 @@ test.describe('Project Management - Admin', () => {
   });
 
   test('should view ongoing projects', async ({ adminPage }) => {
-    await adminPage.goto('/operations-and-services/workflow/project');
+    await adminPage.goto('/ops/project');
     
     // Click Ongoing tab
     await adminPage.click('text=Ongoing');
@@ -64,7 +64,7 @@ test.describe('Project Management - Admin', () => {
   });
 
   test('should view completed projects', async ({ adminPage }) => {
-    await adminPage.goto('/operations-and-services/workflow/project');
+    await adminPage.goto('/ops/project');
     
     // Click Completed tab
     await adminPage.click('text=Completed');
@@ -76,7 +76,7 @@ test.describe('Project Management - Admin', () => {
   });
 
   test('should filter and search projects', async ({ adminPage }) => {
-    await adminPage.goto('/operations-and-services/workflow/project');
+    await adminPage.goto('/ops/project');
     
     // Look for search input
     const searchInput = adminPage.locator('input[placeholder*="search" i], input[type="search"]').first();
@@ -89,7 +89,7 @@ test.describe('Project Management - Admin', () => {
 
 test.describe('Project Management - Employee', () => {
   test('should not show create new project tab for employee', async ({ employeePage }) => {
-    await employeePage.goto('/operations-and-services/workflow/project');
+    await employeePage.goto('/ops/project');
     await employeePage.waitForTimeout(1000);
     
     // Employee should NOT see "Create New" tab
@@ -98,7 +98,7 @@ test.describe('Project Management - Employee', () => {
   });
 
   test('should view assigned projects only', async ({ employeePage }) => {
-    await employeePage.goto('/operations-and-services/workflow/project');
+    await employeePage.goto('/ops/project');
     
     await expect(employeePage.locator('h1:has-text("Project Management")')).toBeVisible();
     await expect(employeePage.locator('text=Ongoing')).toBeVisible();
@@ -107,7 +107,7 @@ test.describe('Project Management - Employee', () => {
 
 test.describe('Project Details', () => {
   test('should view project details', async ({ adminPage }) => {
-    await adminPage.goto('/operations-and-services/workflow/project');
+    await adminPage.goto('/ops/project');
     
     // Click on first project if exists
     const firstProject = adminPage.locator('[class*="project-card"], [class*="project-item"]').first();
@@ -123,7 +123,7 @@ test.describe('Project Details', () => {
   });
 
   test('should view project milestones', async ({ adminPage }) => {
-    await adminPage.goto('/operations-and-services/workflow/project');
+    await adminPage.goto('/ops/project');
     await adminPage.waitForTimeout(1000);
     
     // Look for milestone section

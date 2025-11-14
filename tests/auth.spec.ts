@@ -71,9 +71,13 @@ test.describe('Authentication Flow', () => {
     await page.fill('input[type="password"]', TEST_USERS.admin.password);
     await page.click('button[type="submit"]');
     
-    // Wait for navigation to dashboard
+    // Wait for navigation to dashboard - can be /home, /hris, /ops, /onboarding, or /profile
     await page.waitForURL((url) => 
-      url.pathname.includes('/home') || url.pathname.includes('/ops'),
+      url.pathname.includes('/home') || 
+      url.pathname.includes('/hris') || 
+      url.pathname.includes('/ops') ||
+      url.pathname.includes('/onboarding') ||
+      url.pathname.includes('/profile'),
       { timeout: 20000 }
     );
     
@@ -116,7 +120,11 @@ test.describe('Authentication Flow', () => {
     await page.click('button[type="submit"]');
     
     await page.waitForURL((url) => 
-      url.pathname.includes('/home') || url.pathname.includes('/ops'),
+      url.pathname.includes('/home') || 
+      url.pathname.includes('/hris') || 
+      url.pathname.includes('/ops') ||
+      url.pathname.includes('/onboarding') ||
+      url.pathname.includes('/profile'),
       { timeout: 20000 }
     );
     
@@ -135,7 +143,11 @@ test.describe('Authentication Flow', () => {
     await page.click('button[type="submit"]');
     
     await page.waitForURL((url) => 
-      url.pathname.includes('/home') || url.pathname.includes('/ops'),
+      url.pathname.includes('/home') || 
+      url.pathname.includes('/hris') || 
+      url.pathname.includes('/ops') ||
+      url.pathname.includes('/onboarding') ||
+      url.pathname.includes('/profile'),
       { timeout: 20000 }
     );
     

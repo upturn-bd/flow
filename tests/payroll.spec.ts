@@ -68,7 +68,7 @@ test.describe('Payroll Management - Admin', () => {
   });
 
   test('should export payroll report', async ({ adminPage }) => {
-    await adminPage.goto('/operations-and-services/payroll');
+    await adminPage.goto('/ops/payroll');
     await adminPage.waitForTimeout(1000);
     
     const exportButton = adminPage.locator('button:has-text("Export"), button:has-text("Download")').first();
@@ -87,7 +87,7 @@ test.describe('Payroll Management - Admin', () => {
 
 test.describe('Payroll Management - Employee', () => {
   test('should view own payslip', async ({ employeePage }) => {
-    await employeePage.goto('/operations-and-services/payroll');
+    await employeePage.goto('/ops/payroll');
     await employeePage.waitForTimeout(1000);
     
     // Employee should see their payroll information
@@ -98,7 +98,7 @@ test.describe('Payroll Management - Employee', () => {
   });
 
   test('should download payslip', async ({ employeePage }) => {
-    await employeePage.goto('/operations-and-services/payroll');
+    await employeePage.goto('/ops/payroll');
     await employeePage.waitForTimeout(1000);
     
     const downloadButton = employeePage.locator('button:has-text("Download"), a:has-text("Download")').first();
@@ -114,7 +114,7 @@ test.describe('Payroll Management - Employee', () => {
   });
 
   test('should view payroll history', async ({ employeePage }) => {
-    await employeePage.goto('/operations-and-services/payroll');
+    await employeePage.goto('/ops/payroll');
     await employeePage.waitForTimeout(1000);
     
     const historyTab = employeePage.locator('text=History, text=Past Payslips').first();
@@ -125,7 +125,7 @@ test.describe('Payroll Management - Employee', () => {
   });
 
   test('should not see other employees payroll', async ({ employeePage }) => {
-    await employeePage.goto('/operations-and-services/payroll');
+    await employeePage.goto('/ops/payroll');
     await employeePage.waitForTimeout(1000);
     
     // Employee should only see their own data
@@ -136,7 +136,7 @@ test.describe('Payroll Management - Employee', () => {
 
 test.describe('Salary Management', () => {
   test('should view salary change log', async ({ adminPage }) => {
-    await adminPage.goto('/operations-and-services/payroll');
+    await adminPage.goto('/ops/payroll');
     await adminPage.waitForTimeout(1000);
     
     const logTab = adminPage.locator('text=Log, text=Changes, text=Audit').first();

@@ -61,7 +61,7 @@ test.describe('Smoke Tests', () => {
       }
     });
     
-    await page.goto('/operations-and-services/workforce');
+    await page.goto('/ops');
     await waitForLoading(page);
     
     // Should have made some API calls
@@ -78,9 +78,9 @@ test.describe('Smoke Tests', () => {
     
     // Visit critical pages
     const criticalPages = [
-      '/operations-and-services/workforce',
-      '/operations-and-services/payroll',
-      '/operations-and-services/workflow/project'
+      '/ops',
+      '/ops/payroll',
+      '/ops/project'
     ];
     
     for (const url of criticalPages) {
@@ -120,7 +120,7 @@ test.describe('Visual Regression Tests', () => {
 
   test('project management page visual snapshot', async ({ page }) => {
     await login(page, TEST_USERS.admin.email, TEST_USERS.admin.password);
-    await page.goto('/operations-and-services/workflow/project');
+    await page.goto('/ops/project');
     await waitForLoading(page);
     
     await expect(page).toHaveScreenshot('project-management.png', {
@@ -147,7 +147,7 @@ test.describe('Cross-browser Compatibility', () => {
     await page.fill('input[type="password"]', TEST_USERS.admin.password);
     await page.click('button[type="submit"]');
     
-    await page.waitForURL('**/operations-and-services/**', { timeout: 10000 });
+    await page.waitForURL('**/ops/**', { timeout: 10000 });
     expect(page.url()).toContain('operations-and-services');
   });
 
@@ -164,7 +164,7 @@ test.describe('Cross-browser Compatibility', () => {
 test.describe('Data Integrity Tests', () => {
   test('employee data persists across sessions', async ({ page, context }) => {
     await login(page, TEST_USERS.admin.email, TEST_USERS.admin.password);
-    await page.goto('/operations-and-services/workforce');
+    await page.goto('/ops');
     await waitForLoading(page);
     
     // Get initial employee count
@@ -172,7 +172,7 @@ test.describe('Data Integrity Tests', () => {
     
     // Create new page in same context
     const newPage = await context.newPage();
-    await newPage.goto('/operations-and-services/workforce');
+    await newPage.goto('/ops');
     await waitForLoading(newPage);
     
     // Should see same data
@@ -183,7 +183,7 @@ test.describe('Data Integrity Tests', () => {
   test('role-based permissions persist', async ({ page, context }) => {
     // Login as employee
     await login(page, TEST_USERS.employee.email, TEST_USERS.employee.password);
-    await page.goto('/operations-and-services/workflow/project');
+    await page.goto('/ops/project');
     
     // Should not see create project button
     const createButton = page.locator('text=Create New');
@@ -212,7 +212,7 @@ test.describe('Performance Benchmarks', () => {
     await login(page, TEST_USERS.admin.email, TEST_USERS.admin.password);
     
     const startTime = Date.now();
-    await page.goto('/operations-and-services/workforce');
+    await page.goto('/ops');
     await waitForLoading(page);
     const loadTime = Date.now() - startTime;
     
@@ -221,7 +221,7 @@ test.describe('Performance Benchmarks', () => {
 
   test('search completes within 2 seconds', async ({ page }) => {
     await login(page, TEST_USERS.admin.email, TEST_USERS.admin.password);
-    await page.goto('/operations-and-services/workforce');
+    await page.goto('/ops');
     
     const searchInput = page.locator('input[type="search"], input[placeholder*="search" i]').first();
     if (await searchInput.isVisible()) {
@@ -241,7 +241,7 @@ test.describe('Critical User Journeys', () => {
     await login(page, TEST_USERS.admin.email, TEST_USERS.admin.password);
     
     // Navigate to employee management
-    await page.goto('/operations-and-services/workforce');
+    await page.goto('/ops');
     await waitForLoading(page);
     
     // Look for add employee button
@@ -268,7 +268,7 @@ test.describe('Critical User Journeys', () => {
   test('complete leave request and approval flow', async ({ page, context }) => {
     // Employee requests leave
     await login(page, TEST_USERS.employee.email, TEST_USERS.employee.password);
-    await page.goto('/operations-and-services/workforce/leave');
+    await page.goto('/ops/leave');
     await waitForLoading(page);
     
     const requestButton = page.locator('button:has-text("Request"), button:has-text("New")').first();
@@ -293,7 +293,7 @@ test.describe('Critical User Journeys', () => {
     // Admin approves leave
     const adminPage = await context.newPage();
     await login(adminPage, TEST_USERS.admin.email, TEST_USERS.admin.password);
-    await adminPage.goto('/operations-and-services/workforce/leave');
+    await adminPage.goto('/ops/leave');
     await waitForLoading(adminPage);
     
     const approveButton = adminPage.locator('button:has-text("Approve")').first();
@@ -305,7 +305,7 @@ test.describe('Critical User Journeys', () => {
 
   test('complete project creation to completion flow', async ({ page }) => {
     await login(page, TEST_USERS.admin.email, TEST_USERS.admin.password);
-    await page.goto('/operations-and-services/workflow/project');
+    await page.goto('/ops/project');
     await waitForLoading(page);
     
     // Create project
