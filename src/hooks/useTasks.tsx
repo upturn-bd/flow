@@ -176,8 +176,11 @@ export function useTasks() {
   const fetchOngoingTasks = useCallback(
     async (companyScopes = false, limit = 10) => {
       try {
+        if (!employeeInfo) {
+          // Auth context not loaded yet, skip silently
+          return;
+        }
         setLoading(true);
-        const user = await getEmployeeInfo();
 
         let query = supabase
           .from("task_records")
@@ -187,7 +190,7 @@ export function useTasks() {
           .limit(limit);
 
         if (!companyScopes) { 
-          query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+          query = query.or(`created_by.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}}`);
         }
 
         if (lastFetchedOngoingTaskId) {
@@ -220,15 +223,18 @@ export function useTasks() {
         setLoading(false);
       }
     },
-    [lastFetchedOngoingTaskId]
+    [lastFetchedOngoingTaskId, employeeInfo]
   );
 
   // Search ongoing tasks by a search term (task_title or description) using fuzzy search
   const searchOngoingTasks = useCallback(
     async (searchTerm: string, limit = 10, companyScopes = false) => {
       try {
+        if (!employeeInfo) {
+          // Auth context not loaded yet, skip silently
+          return [];
+        }
         setLoading(true);
-        const user = await getEmployeeInfo();
 
         // Base query: ongoing tasks
         let query = supabase
@@ -240,7 +246,7 @@ export function useTasks() {
 
         // Apply company/user scope
         if (!companyScopes) {
-          query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+          query = query.or(`created_by.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}}`);
         }
 
         // Apply search filter (fuzzy search using ilike)
@@ -279,7 +285,7 @@ export function useTasks() {
         return [];
       }
     },
-    [lastFetchedOngoingTaskId]
+    [lastFetchedOngoingTaskId, employeeInfo]
   );
 
 
@@ -291,8 +297,11 @@ export function useTasks() {
   const fetchCompletedTasks = useCallback(
     async (companyScopes = false, limit = 10) => {
       try {
+        if (!employeeInfo) {
+          // Auth context not loaded yet, skip silently
+          return;
+        }
         setLoading(true);
-        const user = await getEmployeeInfo();
 
         // Base query: Completed tasks only
         let query = supabase
@@ -304,7 +313,7 @@ export function useTasks() {
 
         // Apply user-specific filtering unless company scope is true
         if (!companyScopes) {
-          query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+          query = query.or(`created_by.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}}`);
         }
 
         // Apply cursor (fetch tasks with id greater than last fetched)
@@ -334,15 +343,18 @@ export function useTasks() {
         setLoading(false);
       }
     },
-    [lastFetchedCompletedTaskId]
+    [lastFetchedCompletedTaskId, employeeInfo]
   );
 
   // Search completed tasks by a search term (task_title or description) using fuzzy search
   const searchCompletedTasks = useCallback(
     async (searchTerm: string, limit = 10, companyScopes = false) => {
       try {
+        if (!employeeInfo) {
+          // Auth context not loaded yet, skip silently
+          return [];
+        }
         setLoading(true);
-        const user = await getEmployeeInfo();
 
         // Base query: completed tasks
         let query = supabase
@@ -354,7 +366,7 @@ export function useTasks() {
 
         // Apply company/user scope
         if (!companyScopes) {
-          query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+          query = query.or(`created_by.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}}`);
         }
 
         // Apply search filter (fuzzy search using ilike)
@@ -393,7 +405,7 @@ export function useTasks() {
         return [];
       }
     },
-    [lastFetchedCompletedTaskId]
+    [lastFetchedCompletedTaskId, employeeInfo]
   );
 
 
@@ -514,18 +526,18 @@ export function useTasks() {
         type_id: 3, // Assuming 3 is the type ID for task assignment
         recipient_id: assignees,
         action_url: `/ops/tasks/${newTask?.id}`,
-        company_id: company_id,
+        company_id: typeof companyId === 'string' ? parseInt(companyId) : companyId,
         department_id: task.department_id
       });
 
       createNotification({
         title: "New Task Created",
-        message: `A new task "${task.task_title}" has been created by ${user.name}.`,
+        message: `A new task "${task.task_title}" has been created by ${employeeInfo.name}.`,
         priority: task.priority,
         type_id: 3, // Assuming 3 is the type ID for task assignment
-        recipient_id: [user.supervisor_id].filter(Boolean) as string[],
+        recipient_id: [employeeInfo.supervisor_id].filter(Boolean) as string[],
         action_url: `/ops/tasks/${newTask?.id}`,
-        company_id: company_id,
+        company_id: typeof companyId === 'string' ? parseInt(companyId) : companyId,
         department_id: task.department_id
       });
 
@@ -583,8 +595,8 @@ export function useTasks() {
       fetchOngoingTasks()
       fetchCompletedTasks()
       const recipients = task.assignees;
-      if (user.supervisor_id) {
-        recipients.push(user.supervisor_id);
+      if (employeeInfo?.supervisor_id) {
+        recipients.push(employeeInfo.supervisor_id);
       }
       createNotification({
         title: "Task Updated",
@@ -593,7 +605,7 @@ export function useTasks() {
         type_id: 3, // 3 is the type ID for task assignment
         recipient_id: recipients,
         action_url: `/ops/tasks/${task.id}`,
-        company_id: company_id,
+        company_id: typeof companyId === 'string' ? parseInt(companyId) : companyId,
         department_id: task.department_id
       });
 
@@ -603,7 +615,7 @@ export function useTasks() {
       console.error("Error updating task:", err);
       return { success: false, error: err };
     }
-  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats, employeeInfo?.company_id]);
+  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats, employeeInfo, fetchOngoingTasks, fetchCompletedTasks, createNotification]);
 
   // Delete a task
   const deleteTask = useCallback(async (taskId: string, projectId?: string, milestoneId?: number, adminScoped?: boolean) => {
