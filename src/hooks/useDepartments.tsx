@@ -4,13 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useBaseEntity } from "./core";
 import { Department } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
-import { getCompanyId } from "@/lib/utils/auth";
 import { useAuth } from "@/lib/auth/auth-context";
 
 export type { Department };
 
 export function useDepartments() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading, employeeInfo } = useAuth();
   const baseResult = useBaseEntity<Department>({
     tableName: "departments",
     entityName: "department",
@@ -29,7 +28,10 @@ export function useDepartments() {
 
     try {
       const supabase = await createClient();
-      const companyId = company_id ? company_id : await getCompanyId()
+      const companyId = company_id ?? employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       const { data, error } = await supabase
         .from("departments")
@@ -57,7 +59,10 @@ export function useDepartments() {
     try {
       setLoading(true);
       const supabase = await createClient();
-      const companyId = await getCompanyId()
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       // Remove `id` before inserting
       const { id, ...insertData } = dept;

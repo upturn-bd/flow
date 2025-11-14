@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 import { StakeholderType } from "@/lib/types/schemas";
 
 // ==============================================================================
@@ -20,6 +20,7 @@ export interface StakeholderTypeFormData {
 // ==============================================================================
 
 export function useStakeholderTypes() {
+  const { employeeInfo } = useAuth();
   const [stakeholderTypes, setStakeholderTypes] = useState<StakeholderType[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,12 +35,15 @@ export function useStakeholderTypes() {
     setError(null);
 
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       let query = supabase
         .from("stakeholder_types")
         .select("*")
-        .eq("company_id", company_id);
+        .eq("company_id", companyId);
 
       if (!includeInactive) {
         query = query.eq("is_active", true);
@@ -62,19 +66,22 @@ export function useStakeholderTypes() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.company_id]);
 
   const fetchStakeholderTypeById = useCallback(async (typeId: number) => {
     setLoading(true);
     setError(null);
 
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       const { data, error } = await supabase
         .from("stakeholder_types")
         .select("*")
-        .eq("company_id", company_id)
+        .eq("company_id", companyId)
         .eq("id", typeId)
         .single();
 
@@ -91,7 +98,7 @@ export function useStakeholderTypes() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.company_id]);
 
   // ==========================================================================
   // CREATE OPERATION
@@ -101,16 +108,19 @@ export function useStakeholderTypes() {
     async (typeData: StakeholderTypeFormData) => {
       setError(null);
       try {
-        const company_id = await getCompanyId();
-        const employeeInfo = await getEmployeeInfo();
+        const companyId = employeeInfo?.company_id;
+        const userId = employeeInfo?.id;
+        if (!companyId || !userId) {
+          throw new Error('Company ID or User ID not available');
+        }
 
         const { data, error } = await supabase
           .from("stakeholder_types")
           .insert([
             {
               ...typeData,
-              company_id,
-              created_by: employeeInfo?.id,
+              company_id: companyId,
+              created_by: userId,
             },
           ])
           .select()
@@ -125,7 +135,7 @@ export function useStakeholderTypes() {
         throw error;
       }
     },
-    []
+    [employeeInfo?.company_id, employeeInfo?.id]
   );
 
   // ==========================================================================

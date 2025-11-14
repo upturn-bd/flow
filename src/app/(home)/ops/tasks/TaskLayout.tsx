@@ -81,9 +81,11 @@ export default function TaskLayout({
 
   // Load tasks
   useEffect(() => {
-    fetchOngoingTasks();
-    fetchCompletedTasks();
-  }, []);
+    if (employeeInfo) {
+      fetchOngoingTasks();
+      fetchCompletedTasks();
+    }
+  }, [employeeInfo, fetchOngoingTasks, fetchCompletedTasks]);
 
   // Tab content
   const ongoingTaskPage = useMemo(

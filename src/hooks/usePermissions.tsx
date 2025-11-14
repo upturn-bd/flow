@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getEmployeeId, getCompanyId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 import type { UserPermissions } from "@/lib/types/schemas";
 import { PERMISSION_ACTIONS, type PermissionAction, type PermissionModule } from "@/lib/constants";
 import { isSubordinate, fetchSubordinateIds } from "@/lib/utils/subordinates";
@@ -12,6 +12,7 @@ import { isSubordinate, fetchSubordinateIds } from "@/lib/utils/subordinates";
  * Aggregates permissions from all teams a user belongs to
  */
 export function usePermissions(employeeId?: string) {
+  const { employeeInfo } = useAuth();
   const [permissions, setPermissions] = useState<UserPermissions>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +26,10 @@ export function usePermissions(employeeId?: string) {
     setError(null);
 
     try {
-      const userId = empId || employeeId || await getEmployeeId();
+      const userId = empId || employeeId || employeeInfo?.id;
+      if (!userId) {
+        throw new Error('User ID not available');
+      }
 
       // Call the database function to get aggregated permissions
       const { data, error: fetchError } = await supabase
@@ -54,7 +58,7 @@ export function usePermissions(employeeId?: string) {
     } finally {
       setLoading(false);
     }
-  }, [employeeId]);
+  }, [employeeId, employeeInfo?.id]);
 
   // Fetch permissions on mount and when employeeId changes
   useEffect(() => {
@@ -204,15 +208,18 @@ export function usePermissions(employeeId?: string) {
    */
   const isSupervisorOf = useCallback(async (targetEmployeeId: string): Promise<boolean> => {
     try {
-      const userId = employeeId || await getEmployeeId();
-      const companyId = await getCompanyId();
+      const userId = employeeId || employeeInfo?.id;
+      const companyId = employeeInfo?.company_id;
+      if (!userId || !companyId) {
+        throw new Error('User ID or Company ID not available');
+      }
       
       return await isSubordinate(targetEmployeeId, userId, companyId);
     } catch (error) {
       console.error("Error checking supervisor relationship:", error);
       return false;
     }
-  }, [employeeId]);
+  }, [employeeId, employeeInfo?.id, employeeInfo?.company_id]);
 
   /**
    * Get all subordinate IDs for current user
@@ -221,15 +228,18 @@ export function usePermissions(employeeId?: string) {
    */
   const getSubordinates = useCallback(async (includeIndirect: boolean = true): Promise<string[]> => {
     try {
-      const userId = employeeId || await getEmployeeId();
-      const companyId = await getCompanyId();
+      const userId = employeeId || employeeInfo?.id;
+      const companyId = employeeInfo?.company_id;
+      if (!userId || !companyId) {
+        throw new Error('User ID or Company ID not available');
+      }
       
       return await fetchSubordinateIds(userId, companyId, includeIndirect);
     } catch (error) {
       console.error("Error fetching subordinates:", error);
       return [];
     }
-  }, [employeeId]);
+  }, [employeeId, employeeInfo?.id, employeeInfo?.company_id]);
 
   /**
    * Check if user can manage subordinate based on EITHER team permission OR supervisor relationship

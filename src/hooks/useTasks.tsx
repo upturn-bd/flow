@@ -1,7 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 import { Task } from "@/lib/types/schemas";
 import { useState, useCallback, useMemo, useRef } from "react";
 import { useNotifications } from "./useNotifications";
@@ -45,6 +45,7 @@ export interface TaskFetchResult {
 export type { Task };
 
 export function useTasks() {
+  const { employeeInfo } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false); // Start with loading true
   const [error, setError] = useState<Error | null>(null);
@@ -77,18 +78,23 @@ export function useTasks() {
     setError(null);
 
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       let query = supabase
         .from("task_records")
         .select("*")
-        .eq("company_id", company_id);
+        .eq("company_id", companyId);
 
       // Apply scope-specific filters
       switch (filters.scope) {
         case TaskScope.USER_TASKS:
-          const user = await getEmployeeInfo();
-          query = query.contains("assignees", [user.id]);
+          if (!employeeInfo?.id) {
+            throw new Error('User ID not available');
+          }
+          query = query.contains("assignees", [employeeInfo.id]);
           break;
         case TaskScope.PROJECT_TASKS:
           if (filters.projectId) {
@@ -170,8 +176,11 @@ export function useTasks() {
   const fetchOngoingTasks = useCallback(
     async (companyScopes = false, limit = 10) => {
       try {
+        if (!employeeInfo) {
+          // Auth context not loaded yet, skip silently
+          return;
+        }
         setLoading(true);
-        const user = await getEmployeeInfo();
 
         let query = supabase
           .from("task_records")
@@ -181,7 +190,7 @@ export function useTasks() {
           .limit(limit);
 
         if (!companyScopes) { 
-          query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+          query = query.or(`created_by.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}}`);
         }
 
         if (lastFetchedOngoingTaskId) {
@@ -214,15 +223,18 @@ export function useTasks() {
         setLoading(false);
       }
     },
-    [lastFetchedOngoingTaskId]
+    [lastFetchedOngoingTaskId, employeeInfo]
   );
 
   // Search ongoing tasks by a search term (task_title or description) using fuzzy search
   const searchOngoingTasks = useCallback(
     async (searchTerm: string, limit = 10, companyScopes = false) => {
       try {
+        if (!employeeInfo) {
+          // Auth context not loaded yet, skip silently
+          return [];
+        }
         setLoading(true);
-        const user = await getEmployeeInfo();
 
         // Base query: ongoing tasks
         let query = supabase
@@ -234,7 +246,7 @@ export function useTasks() {
 
         // Apply company/user scope
         if (!companyScopes) {
-          query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+          query = query.or(`created_by.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}}`);
         }
 
         // Apply search filter (fuzzy search using ilike)
@@ -273,7 +285,7 @@ export function useTasks() {
         return [];
       }
     },
-    [lastFetchedOngoingTaskId]
+    [lastFetchedOngoingTaskId, employeeInfo]
   );
 
 
@@ -285,8 +297,11 @@ export function useTasks() {
   const fetchCompletedTasks = useCallback(
     async (companyScopes = false, limit = 10) => {
       try {
+        if (!employeeInfo) {
+          // Auth context not loaded yet, skip silently
+          return;
+        }
         setLoading(true);
-        const user = await getEmployeeInfo();
 
         // Base query: Completed tasks only
         let query = supabase
@@ -298,7 +313,7 @@ export function useTasks() {
 
         // Apply user-specific filtering unless company scope is true
         if (!companyScopes) {
-          query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+          query = query.or(`created_by.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}}`);
         }
 
         // Apply cursor (fetch tasks with id greater than last fetched)
@@ -328,15 +343,18 @@ export function useTasks() {
         setLoading(false);
       }
     },
-    [lastFetchedCompletedTaskId]
+    [lastFetchedCompletedTaskId, employeeInfo]
   );
 
   // Search completed tasks by a search term (task_title or description) using fuzzy search
   const searchCompletedTasks = useCallback(
     async (searchTerm: string, limit = 10, companyScopes = false) => {
       try {
+        if (!employeeInfo) {
+          // Auth context not loaded yet, skip silently
+          return [];
+        }
         setLoading(true);
-        const user = await getEmployeeInfo();
 
         // Base query: completed tasks
         let query = supabase
@@ -348,7 +366,7 @@ export function useTasks() {
 
         // Apply company/user scope
         if (!companyScopes) {
-          query = query.or(`created_by.eq.${user.id},assignees.cs.{${user.id}}`);
+          query = query.or(`created_by.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}}`);
         }
 
         // Apply search filter (fuzzy search using ilike)
@@ -387,7 +405,7 @@ export function useTasks() {
         return [];
       }
     },
-    [lastFetchedCompletedTaskId]
+    [lastFetchedCompletedTaskId, employeeInfo]
   );
 
 
@@ -436,12 +454,15 @@ export function useTasks() {
   // Get a single task by ID
   const getTaskById = useCallback(async (taskId: string) => {
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       const { data, error } = await supabase
         .from("task_records")
         .select("*")
-        .eq("company_id", company_id)
+        .eq("company_id", companyId)
         .eq("id", taskId)
         .single();
 
@@ -451,23 +472,26 @@ export function useTasks() {
       console.error("Error fetching task by ID:", err);
       throw err;
     }
-  }, []);
+  }, [employeeInfo?.company_id]);
 
   // Create a new task
   const createTask = async (task: Task) => {
     try {
       console.log("Creating task:", task);
 
-      const company_id = await getCompanyId();
-      const user = await getEmployeeInfo();
+      const companyId = employeeInfo?.company_id;
+      const userId = employeeInfo?.id;
+      if (!companyId || !userId) {
+        throw new Error('Company ID or User ID not available');
+      }
 
       const taskId = slugify(task.task_title);
 
       const finalData = {
         ...task,
         id: taskId,
-        created_by: user.id,
-        company_id
+        created_by: userId,
+        company_id: companyId
       };
 
       console.log(finalData)
@@ -502,18 +526,18 @@ export function useTasks() {
         type_id: 3, // Assuming 3 is the type ID for task assignment
         recipient_id: assignees,
         action_url: `/ops/tasks/${newTask?.id}`,
-        company_id: company_id,
+        company_id: typeof companyId === 'string' ? parseInt(companyId) : companyId,
         department_id: task.department_id
       });
 
       createNotification({
         title: "New Task Created",
-        message: `A new task "${task.task_title}" has been created by ${user.name}.`,
+        message: `A new task "${task.task_title}" has been created by ${employeeInfo.name}.`,
         priority: task.priority,
         type_id: 3, // Assuming 3 is the type ID for task assignment
-        recipient_id: [user.supervisor_id].filter(Boolean) as string[],
+        recipient_id: [employeeInfo.supervisor_id].filter(Boolean) as string[],
         action_url: `/ops/tasks/${newTask?.id}`,
-        company_id: company_id,
+        company_id: typeof companyId === 'string' ? parseInt(companyId) : companyId,
         department_id: task.department_id
       });
 
@@ -529,8 +553,10 @@ export function useTasks() {
   // Update an existing task
   const updateTask = useCallback(async (task: Task) => {
     try {
-      const company_id = await getCompanyId();
-      const user = await getEmployeeInfo();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       const finalData = { ...task };
 
@@ -569,8 +595,8 @@ export function useTasks() {
       fetchOngoingTasks()
       fetchCompletedTasks()
       const recipients = task.assignees;
-      if (user.supervisor_id) {
-        recipients.push(user.supervisor_id);
+      if (employeeInfo?.supervisor_id) {
+        recipients.push(employeeInfo.supervisor_id);
       }
       createNotification({
         title: "Task Updated",
@@ -579,7 +605,7 @@ export function useTasks() {
         type_id: 3, // 3 is the type ID for task assignment
         recipient_id: recipients,
         action_url: `/ops/tasks/${task.id}`,
-        company_id: company_id,
+        company_id: typeof companyId === 'string' ? parseInt(companyId) : companyId,
         department_id: task.department_id
       });
 
@@ -589,18 +615,21 @@ export function useTasks() {
       console.error("Error updating task:", err);
       return { success: false, error: err };
     }
-  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
+  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats, employeeInfo, fetchOngoingTasks, fetchCompletedTasks, createNotification]);
 
   // Delete a task
   const deleteTask = useCallback(async (taskId: string, projectId?: string, milestoneId?: number, adminScoped?: boolean) => {
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       const { error } = await supabase
         .from("task_records")
         .delete()
         .eq("id", taskId)
-        .eq("company_id", company_id);
+        .eq("company_id", companyId);
 
       if (error) throw error;
 
@@ -630,18 +659,21 @@ export function useTasks() {
       console.error("Error deleting task:", err);
       return { success: false, error: err };
     }
-  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
+  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats, employeeInfo?.company_id]);
 
   // Mark a task as complete
   const completeTask = useCallback(async (taskId: string, projectId?: string, milestoneId?: number) => {
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       const { data, error } = await supabase
         .from("task_records")
         .update({ status: true })
         .eq("id", taskId)
-        .eq("company_id", company_id)
+        .eq("company_id", companyId)
         .select()
         .single();
 
@@ -662,18 +694,21 @@ export function useTasks() {
       console.error("Error completing task:", err);
       return { success: false, error: err };
     }
-  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
+  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats, employeeInfo?.company_id]);
 
   // Reopen a completed task
   const reopenTask = useCallback(async (taskId: string, projectId?: string, milestoneId?: number) => {
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
 
       const { data, error } = await supabase
         .from("task_records")
         .update({ status: false })
         .eq("id", taskId)
-        .eq("company_id", company_id)
+        .eq("company_id", companyId)
         .select()
         .single();
 
@@ -694,23 +729,26 @@ export function useTasks() {
       console.error("Error reopening task:", err);
       return { success: false, error: err };
     }
-  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats]);
+  }, [getProjectTasks, getMilestoneTasks, fetchTaskStats, employeeInfo?.company_id]);
 
   // Bulk update task milestone
   const updateMilestone = useCallback(async (taskIds: string[], milestoneId: number | null, projectId: string) => {
     try {
-      const company_id = await getCompanyId();
-      const user = await getEmployeeInfo();
+      const companyId = employeeInfo?.company_id;
+      const userId = employeeInfo?.id;
+      if (!companyId || !userId) {
+        throw new Error('Company ID or User ID not available');
+      }
 
       const { data, error } = await supabase
         .from("task_records")
         .update({
           milestone_id: milestoneId,
-          updated_by: user.id,
+          updated_by: userId,
           updated_at: new Date().toLocaleDateString('sv-SE')
         })
         .in("id", taskIds)
-        .eq("company_id", company_id)
+        .eq("company_id", companyId)
         .select();
 
       if (error) throw error;

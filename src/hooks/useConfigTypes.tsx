@@ -2,12 +2,14 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId, DatabaseError } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
+import { DatabaseError } from "@/lib/utils/auth";
 
 // A generic hook for managing configuration types
 export function useConfigTypes<T extends { id?: number, company_id?: number | null }>(
   tableName: string
 ) {
+  const { employeeInfo } = useAuth();
   const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -15,11 +17,14 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
   const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new DatabaseError('Company ID not available');
+      }
       const { data, error } = await supabase
         .from(tableName)
         .select("*")
-        .eq("company_id", company_id);
+        .eq("company_id", companyId);
 
       if (error) {
         throw new DatabaseError(`Failed to fetch ${tableName}: ${error.message}`);
@@ -34,16 +39,19 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
     } finally {
       setLoading(false);
     }
-  }, [tableName]);
+  }, [tableName, employeeInfo?.company_id]);
 
   const createItem = useCallback(async (values: T) => {
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new DatabaseError('Company ID not available');
+      }
       const { data, error } = await supabase
         .from(tableName)
         .insert({
           ...values,
-          company_id,
+          company_id: companyId,
         });
 
       if (error) {
@@ -55,16 +63,19 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
       console.error(error);
       throw error;
     }
-  }, [tableName]);
+  }, [tableName, employeeInfo?.company_id]);
 
   const updateItem = useCallback(async (values: T) => {
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new DatabaseError('Company ID not available');
+      }
       const { data, error } = await supabase
         .from(tableName)
         .update({
           ...values,
-          company_id,
+          company_id: companyId,
         })
         .eq("id", values.id);
 
@@ -77,7 +88,7 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
       console.error(error);
       throw error;
     }
-  }, [tableName]);
+  }, [tableName, employeeInfo?.company_id]);
 
   const deleteItem = useCallback(async (id: number) => {
     try {

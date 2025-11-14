@@ -1,6 +1,6 @@
 "use client";
 
-import { getCompanyId, getEmployeeInfo } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 import { useBaseEntity } from "./core";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
@@ -48,6 +48,7 @@ export function useHolidayConfigs() {
 
 
 export function useLeaveRequests() {
+  const { employeeInfo } = useAuth();
   const baseResult = useBaseEntity<any>({
     tableName: "leave_records",
     entityName: "leave record",
@@ -64,19 +65,21 @@ export function useLeaveRequests() {
   // Create leave request (same as before)
   const createLeaveRequest = async (leaveData: any) => {
     try {
-      const user = await getEmployeeInfo();
+      if (!employeeInfo) {
+        throw new Error('Employee info not available');
+      }
       const result = await baseResult.createItem(leaveData);
 
-      const recipients = [user.supervisor_id].filter(Boolean) as string[];
+      const recipients = [employeeInfo.supervisor_id].filter(Boolean) as string[];
       createNotification({
         title: "New Leave Request",
-        message: `A new leave request has been submitted by ${user.name}.`,
+        message: `A new leave request has been submitted by ${employeeInfo.name}.`,
         priority: "normal",
         type_id: 2,
         recipient_id: recipients,
         action_url: "/ops/leave",
-        company_id: user.company_id,
-        department_id: user.department_id,
+        company_id: employeeInfo.company_id!,
+        department_id: employeeInfo.department_id,
       });
 
       return result;

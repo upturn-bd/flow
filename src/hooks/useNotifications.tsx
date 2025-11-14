@@ -4,7 +4,7 @@ import { useBaseEntity } from "./core";
 import { Notification, NotificationType } from "@/lib/types/schemas";
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId, getUserId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export type { Notification, NotificationType };
 
@@ -30,6 +30,7 @@ export function useNotificationTypes() {
 
 // Hook for notifications with enhanced functionality
 export function useNotifications() {
+  const { employeeInfo } = useAuth();
   const baseResult = useBaseEntity<Notification>({
     tableName: "notifications",
     entityName: "notification",
@@ -42,10 +43,10 @@ export function useNotifications() {
   // Fetch notifications for current user with type information
   const fetchUserNotifications = useCallback(async (limit = 20) => {
     try {
-      const company_id = await getCompanyId();
-      const user_id = await getUserId();
+      const companyId = employeeInfo?.company_id;
+      const userId = employeeInfo?.id;
 
-      if (!company_id || !user_id) {
+      if (!companyId || !userId) {
         console.error('Company ID or User ID not found');
         return;
       }
@@ -56,8 +57,8 @@ export function useNotifications() {
           *,
           type:notification_types(*)
         `)
-        .eq('company_id', company_id)
-        .eq('recipient_id', [user_id])
+        .eq('company_id', companyId)
+        .eq('recipient_id', [userId])
         .order('created_at', { ascending: false })
         .limit(limit);
 
@@ -70,15 +71,15 @@ export function useNotifications() {
       console.error('Error fetching user notifications:', error);
       return [];
     }
-  }, []);
+  }, [employeeInfo?.company_id, employeeInfo?.id]);
 
   // Fetch unread count
   const fetchUnreadCount = useCallback(async () => {
     try {
-      const company_id = await getCompanyId();
-      const user_id = await getUserId();
+      const companyId = employeeInfo?.company_id;
+      const userId = employeeInfo?.id;
 
-      if (!company_id || !user_id) {
+      if (!companyId || !userId) {
         setUnreadCount(0);
         return 0;
       }
@@ -86,8 +87,8 @@ export function useNotifications() {
       const { count, error } = await supabase
         .from('notifications')
         .select('*', { count: 'exact', head: true })
-        .eq('company_id', company_id)
-        .eq('recipient_id', [user_id])
+        .eq('company_id', companyId)
+        .eq('recipient_id', [userId])
         .eq('is_read', false);
 
       if (error) {
@@ -102,7 +103,7 @@ export function useNotifications() {
       setUnreadCount(0);
       return 0;
     }
-  }, []);
+  }, [employeeInfo?.company_id, employeeInfo?.id]);
 
   // Mark notification as read
   const markAsRead = useCallback(async (notificationId: number) => {
@@ -131,10 +132,10 @@ export function useNotifications() {
   // Mark all notifications as read for current user
   const markAllAsRead = useCallback(async () => {
     try {
-      const company_id = await getCompanyId();
-      const user_id = await getUserId();
+      const companyId = employeeInfo?.company_id;
+      const userId = employeeInfo?.id;
 
-      if (!company_id || !user_id) {
+      if (!companyId || !userId) {
         return { success: false, error: 'Company ID or User ID not found' };
       }
 
@@ -144,8 +145,8 @@ export function useNotifications() {
           is_read: true,
           read_at: new Date().toLocaleDateString('sv-SE')
         })
-        .eq('company_id', company_id)
-        .eq('recipient_id', user_id)
+        .eq('company_id', companyId)
+        .eq('recipient_id', userId)
         .eq('is_read', false);
 
       if (error) {
@@ -158,14 +159,14 @@ export function useNotifications() {
       console.error('Error marking all notifications as read:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
-  }, []);
+  }, [employeeInfo?.company_id, employeeInfo?.id]);
 
   // Create notification (for system use)
   const createNotification = useCallback(async (notificationData: Partial<Notification>) => {
     try {
-      const company_id = await getCompanyId();
+      const companyId = employeeInfo?.company_id;
 
-      if (!company_id) {
+      if (!companyId) {
         return { success: false, error: 'Company ID not found' };
       }
 
@@ -186,7 +187,7 @@ export function useNotifications() {
       console.error('Error creating notification:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
-  }, []);
+  }, [employeeInfo?.company_id]);
 
   // Delete notification
   const deleteNotification = useCallback(async (notificationId: number) => {
@@ -245,6 +246,7 @@ export const createSystemNotification = async (
   recipientId: string,
   title: string,
   message: string,
+  companyId: number,
   options: {
     priority?: 'low' | 'normal' | 'high' | 'urgent';
     context?: string;
@@ -254,9 +256,7 @@ export const createSystemNotification = async (
     referenceTable?: string;
   } = {}
 ) => {
-  const company_id = await getCompanyId();
-
-  if (!company_id) {
+  if (!companyId) {
     return { success: false, error: 'Company ID not found' };
   }
 
@@ -267,7 +267,7 @@ export const createSystemNotification = async (
         title,
         message,
         recipient_id: recipientId,
-        company_id,
+        company_id: companyId,
         priority: options.priority || 'normal',
         context: options.context,
         action_url: options.actionUrl,

@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo, getUserId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 
 // Types
 import { BasicInfoFormData } from "@/app/(home)/hris/tabs/basicInfo.constants";
@@ -14,6 +14,7 @@ export type Education = Schooling;
 
 // Comprehensive profile hook that combines basic info, personal info, and education/experience
 export function useProfile() {
+  const { employeeInfo } = useAuth();
   // State for basic info
   const [basicInfo, setBasicInfo] = useState<BasicInfoFormData | null>(null);
   
@@ -34,7 +35,9 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const employeeInfo = await getEmployeeInfo();
+      if (!employeeInfo) {
+        throw new Error('Employee info not available');
+      }
       
       const { data: result, error } = await supabase
         .from('employees')
@@ -84,7 +87,9 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const employeeInfo = await getEmployeeInfo();
+      if (!employeeInfo) {
+        throw new Error('Employee info not available');
+      }
       
       // Filter out undefined values and empty objects
       const updateData = Object.fromEntries(
@@ -142,7 +147,9 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const employeeInfo = await getEmployeeInfo();
+      if (!employeeInfo) {
+        throw new Error('Employee info not available');
+      }
       
       const { data: result, error } = await supabase
         .from('personal_infos')
@@ -218,7 +225,9 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const employeeInfo = await getEmployeeInfo();
+      if (!employeeInfo) {
+        throw new Error('Employee info not available');
+      }
       
       // Filter out empty values and enum fields that are empty strings
       const cleanData = Object.fromEntries(
@@ -536,7 +545,7 @@ export function useProfile() {
     setError(null);
     try {
       // Check if this is the current user's profile
-      const currentUserId = await getUserId();
+      const currentUserId = employeeInfo?.id;
       const isCurrentUserResult = currentUserId === uid;
       setIsCurrentUser(isCurrentUserResult);
       
