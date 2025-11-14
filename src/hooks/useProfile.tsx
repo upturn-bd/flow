@@ -32,13 +32,14 @@ export function useProfile() {
 
   // Basic Info methods
   const fetchCurrentUserBasicInfo = useCallback(async () => {
+    if (!employeeInfo) {
+      console.warn('Cannot fetch basic info: Employee info not available');
+      return null;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      if (!employeeInfo) {
-        throw new Error('Employee info not available');
-      }
-      
       const { data: result, error } = await supabase
         .from('employees')
         .select('*')
@@ -84,13 +85,14 @@ export function useProfile() {
   }, []);
 
   const updateBasicInfo = useCallback(async (data: Partial<BasicInfoFormData>) => {
+    if (!employeeInfo) {
+      console.warn('Cannot update basic info: Employee info not available');
+      return null;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      if (!employeeInfo) {
-        throw new Error('Employee info not available');
-      }
-      
       // Filter out undefined values and empty objects
       const updateData = Object.fromEntries(
         Object.entries(data).filter(([_, value]) => value !== undefined && value !== null)
@@ -144,13 +146,14 @@ export function useProfile() {
 
   // Personal Info methods
   const fetchCurrentUserPersonalInfo = useCallback(async () => {
+    if (!employeeInfo) {
+      console.warn('Cannot fetch personal info: Employee info not available');
+      return null;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      if (!employeeInfo) {
-        throw new Error('Employee info not available');
-      }
-      
       const { data: result, error } = await supabase
         .from('personal_infos')
         .select('*')
@@ -222,13 +225,14 @@ export function useProfile() {
   }, []);
 
   const updatePersonalInfo = useCallback(async (data: Partial<PersonalFormData>) => {
+    if (!employeeInfo) {
+      console.warn('Cannot update personal info: Employee info not available');
+      return null;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      if (!employeeInfo) {
-        throw new Error('Employee info not available');
-      }
-      
       // Filter out empty values and enum fields that are empty strings
       const cleanData = Object.fromEntries(
         Object.entries(data).filter(([key, value]) => {

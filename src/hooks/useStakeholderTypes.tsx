@@ -144,14 +144,15 @@ export function useStakeholderTypes() {
 
   const updateStakeholderType = useCallback(
     async (typeId: number, typeData: Partial<StakeholderTypeFormData>) => {
+      if (!employeeInfo) {
+        console.warn('Cannot update stakeholder type: Employee info not available');
+        return null;
+      }
+
       setError(null);
       setProcessingId(typeId);
 
       try {
-        if (!employeeInfo) {
-          throw new Error('Employee info not available');
-        }
-
         const { data, error } = await supabase
           .from("stakeholder_types")
           .update({

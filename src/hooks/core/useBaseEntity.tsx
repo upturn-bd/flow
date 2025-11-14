@@ -351,7 +351,12 @@ export function useBaseEntity<T extends BaseEntity>(
 
       // Handle department scoping with direct Supabase query
       if (config.departmentScoped) {
-        if (!employeeInfo) throw new Error('Employee info not available');
+        if (!employeeInfo) {
+          console.warn('Cannot fetch department-scoped items: Employee info not available');
+          setItems([]);
+          setLoading(false);
+          return;
+        }
 
         
         // For department scoped items, we want items that are either:

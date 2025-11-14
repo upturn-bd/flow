@@ -73,16 +73,17 @@ export function useTasks() {
       return { tasks: [], totalCount: 0, completedCount: 0, pendingCount: 0 };
     }
 
+    const companyId = employeeInfo?.company_id;
+    if (!companyId) {
+      console.warn('Cannot fetch tasks: Company ID not available');
+      return { tasks: [], totalCount: 0, completedCount: 0, pendingCount: 0 };
+    }
+
     isLoadingRef.current = true;
     setLoading(true);
     setError(null);
 
     try {
-      const companyId = employeeInfo?.company_id;
-      if (!companyId) {
-        throw new Error('Company ID not available');
-      }
-
       let query = supabase
         .from("task_records")
         .select("*")
@@ -92,7 +93,10 @@ export function useTasks() {
       switch (filters.scope) {
         case TaskScope.USER_TASKS:
           if (!employeeInfo?.id) {
-            throw new Error('User ID not available');
+            console.warn('Cannot fetch user tasks: User ID not available');
+            isLoadingRef.current = false;
+            setLoading(false);
+            return { tasks: [], totalCount: 0, completedCount: 0, pendingCount: 0 };
           }
           query = query.contains("assignees", [employeeInfo.id]);
           break;
@@ -453,12 +457,13 @@ export function useTasks() {
 
   // Get a single task by ID
   const getTaskById = useCallback(async (taskId: string) => {
-    try {
-      const companyId = employeeInfo?.company_id;
-      if (!companyId) {
-        throw new Error('Company ID not available');
-      }
+    const companyId = employeeInfo?.company_id;
+    if (!companyId) {
+      console.warn('Cannot get task: Company ID not available');
+      return null;
+    }
 
+    try {
       const { data, error } = await supabase
         .from("task_records")
         .select("*")
@@ -476,14 +481,15 @@ export function useTasks() {
 
   // Create a new task
   const createTask = async (task: Task) => {
+    const companyId = employeeInfo?.company_id;
+    const userId = employeeInfo?.id;
+    if (!companyId || !userId) {
+      console.warn('Cannot create task: Company ID or User ID not available');
+      return { success: false, error: new Error('Company ID or User ID not available') };
+    }
+
     try {
       console.log("Creating task:", task);
-
-      const companyId = employeeInfo?.company_id;
-      const userId = employeeInfo?.id;
-      if (!companyId || !userId) {
-        throw new Error('Company ID or User ID not available');
-      }
 
       const taskId = slugify(task.task_title);
 
@@ -552,12 +558,13 @@ export function useTasks() {
 
   // Update an existing task
   const updateTask = useCallback(async (task: Task) => {
-    try {
-      const companyId = employeeInfo?.company_id;
-      if (!companyId) {
-        throw new Error('Company ID not available');
-      }
+    const companyId = employeeInfo?.company_id;
+    if (!companyId) {
+      console.warn('Cannot update task: Company ID not available');
+      return { success: false, error: new Error('Company ID not available') };
+    }
 
+    try {
       const finalData = { ...task };
 
       // Remove undefined values
@@ -619,12 +626,13 @@ export function useTasks() {
 
   // Delete a task
   const deleteTask = useCallback(async (taskId: string, projectId?: string, milestoneId?: number, adminScoped?: boolean) => {
-    try {
-      const companyId = employeeInfo?.company_id;
-      if (!companyId) {
-        throw new Error('Company ID not available');
-      }
+    const companyId = employeeInfo?.company_id;
+    if (!companyId) {
+      console.warn('Cannot delete task: Company ID not available');
+      return { success: false, error: new Error('Company ID not available') };
+    }
 
+    try {
       const { error } = await supabase
         .from("task_records")
         .delete()
@@ -663,12 +671,13 @@ export function useTasks() {
 
   // Mark a task as complete
   const completeTask = useCallback(async (taskId: string, projectId?: string, milestoneId?: number) => {
-    try {
-      const companyId = employeeInfo?.company_id;
-      if (!companyId) {
-        throw new Error('Company ID not available');
-      }
+    const companyId = employeeInfo?.company_id;
+    if (!companyId) {
+      console.warn('Cannot complete task: Company ID not available');
+      return { success: false, error: new Error('Company ID not available') };
+    }
 
+    try {
       const { data, error } = await supabase
         .from("task_records")
         .update({ status: true })
@@ -698,12 +707,13 @@ export function useTasks() {
 
   // Reopen a completed task
   const reopenTask = useCallback(async (taskId: string, projectId?: string, milestoneId?: number) => {
-    try {
-      const companyId = employeeInfo?.company_id;
-      if (!companyId) {
-        throw new Error('Company ID not available');
-      }
+    const companyId = employeeInfo?.company_id;
+    if (!companyId) {
+      console.warn('Cannot reopen task: Company ID not available');
+      return { success: false, error: new Error('Company ID not available') };
+    }
 
+    try {
       const { data, error } = await supabase
         .from("task_records")
         .update({ status: false })
@@ -733,13 +743,14 @@ export function useTasks() {
 
   // Bulk update task milestone
   const updateMilestone = useCallback(async (taskIds: string[], milestoneId: number | null, projectId: string) => {
-    try {
-      const companyId = employeeInfo?.company_id;
-      const userId = employeeInfo?.id;
-      if (!companyId || !userId) {
-        throw new Error('Company ID or User ID not available');
-      }
+    const companyId = employeeInfo?.company_id;
+    const userId = employeeInfo?.id;
+    if (!companyId || !userId) {
+      console.warn('Cannot update milestone: Company ID or User ID not available');
+      return { success: false, error: new Error('Company ID or User ID not available') };
+    }
 
+    try {
       const { data, error } = await supabase
         .from("task_records")
         .update({

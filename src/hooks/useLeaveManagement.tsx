@@ -64,10 +64,12 @@ export function useLeaveRequests() {
 
   // Create leave request (same as before)
   const createLeaveRequest = async (leaveData: any) => {
+    if (!employeeInfo) {
+      console.warn('Cannot create leave request: Employee info not available');
+      return null;
+    }
+
     try {
-      if (!employeeInfo) {
-        throw new Error('Employee info not available');
-      }
       const result = await baseResult.createItem(leaveData);
 
       const recipients = [employeeInfo.supervisor_id].filter(Boolean) as string[];
@@ -98,11 +100,12 @@ export function useLeaveRequests() {
     start_date: string,
     end_date: string
   ) => {
+    if (!employeeInfo) {
+      console.warn('Cannot update leave request: Employee info not available');
+      return null;
+    }
+
     try {
-      if (!employeeInfo) {
-        throw new Error('Employee info not available');
-      }
-      
       // Check permission: user must have leave approval permission OR be supervisor of employee
       const hasTeamPermission = canApprove('leave');
       const isSupervisor = await isSupervisorOf(employeeId);

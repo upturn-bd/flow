@@ -227,10 +227,12 @@ export function useProjects() {
 
   // --- CREATE PROJECT ---
   const createProject = async (project: Project) => {
+    if (!employeeInfo) {
+      console.warn('Cannot create project: Employee info not available');
+      return null;
+    }
+
     try {
-      if (!employeeInfo) {
-        throw new Error('Employee info not available');
-      }
       const company_id = employeeInfo.company_id;
       const projectId = slugify(project.project_title);
 
@@ -275,10 +277,12 @@ export function useProjects() {
 
   // --- UPDATE PROJECT ---
   const updateProject = async (projectId: string, project: Project) => {
+    if (!employeeInfo) {
+      console.warn('Cannot update project: Employee info not available');
+      return null;
+    }
+
     try {
-      if (!employeeInfo) {
-        throw new Error('Employee info not available');
-      }
       const company_id = employeeInfo.company_id;
 
       const { data: result, error } = await baseResult.updateItem(projectId, project);

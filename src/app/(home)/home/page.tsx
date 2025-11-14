@@ -4,6 +4,7 @@ import { useAttendanceStatus } from "@/hooks/useAttendance";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import { useNotices } from "@/hooks/useNotice";
 import { useTasks, TaskStatus } from "@/hooks/useTasks";
+import { useAuth } from "@/lib/auth/auth-context";
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import SectionContainer from "@/app/(home)/home/components/SectionContainer";
@@ -21,6 +22,7 @@ const initialAttendanceRecord: { tag: string; site_id: number | undefined } = {
 };
 
 export default function HomePage() {
+  const { employeeInfo } = useAuth();
   const [attendanceRecord, setAttendanceRecord] = useState(initialAttendanceRecord);
   const [processing, setProcessing] = useState(false); // block button clicks while updating
 
@@ -48,13 +50,15 @@ export default function HomePage() {
     checkOut: !!today?.check_out_time,
   }), [today]);
 
-  // Fetch initial data
+  // Fetch initial data - only when employeeInfo is available
   useEffect(() => {
+    if (!employeeInfo) return;
+    
     fetchSites();
     fetchNotices();
     getUserTasks(TaskStatus.INCOMPLETE);
     getTodaysAttendance();
-  }, []);
+  }, [employeeInfo]);
 
   // Check-in handler
   const onCheckIn = async () => {

@@ -26,14 +26,15 @@ export function useNotices() {
   const [loading, setLoading] = useState(false);
 
   const createNotice = async (notice: Notice) => {
+    if (!employeeInfo) {
+      console.warn('Cannot create notice: Employee info not available');
+      return null;
+    }
+
     setLoading(true);
     try {
-      if (!employeeInfo) {
-        throw new Error('Employee info not available');
-      }
-
       if (notice.department_id === undefined) notice.department_id = 0;
-      notice.company_id = employeeInfo.company_id!;
+      notice.company_id = parseInt(employeeInfo.company_id!.toString());
       notice.created_by = employeeInfo.id;
 
       const result = await baseResult.createItem(notice);
@@ -47,7 +48,7 @@ export function useNotices() {
         type_id: 6,
         recipient_id: recipients,
         action_url: "/ops/notice",
-        company_id: employeeInfo.company_id!,
+        company_id: parseInt(employeeInfo.company_id!.toString()),
         department_id: notice.department_id,
       });
 
@@ -61,12 +62,13 @@ export function useNotices() {
   };
 
   const updateNotice = async (noticeId: number, notice: Notice) => {
+    if (!employeeInfo) {
+      console.warn('Cannot update notice: Employee info not available');
+      return null;
+    }
+
     setLoading(true);
     try {
-      if (!employeeInfo) {
-        throw new Error('Employee info not available');
-      }
-
       const result = await baseResult.updateItem(noticeId, notice);
 
       const recipients = await getDepartmentEmployeesIds(
@@ -79,7 +81,7 @@ export function useNotices() {
         type_id: 6,
         recipient_id: recipients,
         action_url: "/ops/notice",
-        company_id: employeeInfo.company_id!,
+        company_id: parseInt(employeeInfo.company_id!.toString()),
         department_id: notice.department_id,
       });
 
@@ -93,12 +95,14 @@ export function useNotices() {
   };
 
   const fetchNotices = async (isGlobal = false): Promise<Notice[]> => {
+    if (!employeeInfo) {
+      console.warn('Cannot fetch notices: Employee info not available');
+      setNotices([]);
+      return [];
+    }
+
     setLoading(true);
     try {
-      if (!employeeInfo) {
-        throw new Error('Employee info not available');
-      }
-
       const companyId = employeeInfo.company_id;
       const departmentId = employeeInfo.department_id ?? 0;
 

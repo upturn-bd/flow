@@ -343,14 +343,16 @@ export function useStakeholderIssues() {
 
   const createIssue = useCallback(
     async (issueData: StakeholderIssueFormData) => {
+      if (!employeeInfo) {
+        console.warn('Cannot create issue: Employee info not available');
+        return null;
+      }
+
       setError(null);
       try {
         const company_id = employeeInfo?.company_id as number | undefined;
         if (!company_id) {
           throw new Error('Company ID not available');
-        }
-        if (!employeeInfo) {
-          throw new Error('Employee info not available');
         }
 
         // Get stakeholder data for notifications
@@ -469,14 +471,15 @@ export function useStakeholderIssues() {
 
   const updateIssue = useCallback(
     async (issueId: number, issueData: Partial<StakeholderIssueFormData>) => {
+      if (!employeeInfo) {
+        console.warn('Cannot update issue: Employee info not available');
+        return null;
+      }
+
       setError(null);
       setProcessingId(issueId);
 
       try {
-        if (!employeeInfo) {
-          throw new Error('Employee info not available');
-        }
-
         // Get current issue data
         const { data: currentIssue } = await supabase
           .from("stakeholder_issues")
