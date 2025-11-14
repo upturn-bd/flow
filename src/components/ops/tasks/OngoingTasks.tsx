@@ -238,7 +238,7 @@ function TaskCard({
   const canDeleteTask = canDelete(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && userRole === "Admin");
   
   const actions = (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 task-card">
       {canEditTask && (
         <Button
           variant="ghost"
@@ -293,7 +293,7 @@ function TaskCard({
           variant="ghost"
           size="sm"
           onClick={onDetails}
-          className="p-2 h-8 w-8 hover:bg-gray-50 hover:text-gray-700"
+          className="p-2 h-8 w-8 hover:bg-gray-50 hover:text-gray-700 view-button"
         >
           <ExternalLink size={14} />
         </Button>
