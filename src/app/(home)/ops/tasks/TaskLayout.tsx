@@ -19,9 +19,6 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth/auth-context";
 import TaskDetails from "@/components/ops/tasks/shared/TaskDetails";
 import { useRouter } from "next/navigation";
-import { usePermissions } from "@/hooks/usePermissions";
-import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from "@/components/permissions";
-import { PERMISSION_MODULES } from "@/lib/constants";
 
 const TABS = [
   {
@@ -63,7 +60,6 @@ export default function TaskLayout({
   const [tabs, setTabs] = useState<TabItem[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { employeeInfo } = useAuth();
-  const { canWrite, canRead, loading: permissionsLoading } = usePermissions();
 
   const {
     hasMoreOngoingTasks,
@@ -199,34 +195,14 @@ export default function TaskLayout({
             Manage and track your tasks efficiently. Create, assign, and monitor progress to ensure timely completion of all your activities.
           </p>
         </div>
-        <PermissionGate module={PERMISSION_MODULES.TASKS} action="can_write">
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <PlusSquare className="h-5 w-5" />
-            Create Task
-          </button>
-        </PermissionGate>
-        <PermissionGate 
-          module={PERMISSION_MODULES.TASKS} 
-          action="can_write" 
-          fallback={
-            <PermissionTooltip message="You don't have permission to create tasks">
-              <button
-                disabled
-                className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
-              >
-                <PlusSquare className="h-5 w-5" />
-                Create Task
-              </button>
-            </PermissionTooltip>
-          }
-        />
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <PlusSquare className="h-5 w-5" />
+          Create Task
+        </button>
       </motion.div>
-
-      {/* Permission Banner */}
-      <ModulePermissionsBanner module={PERMISSION_MODULES.TASKS} title="Tasks" compact />
 
       <TabView
         tabs={tabs}

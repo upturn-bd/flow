@@ -66,7 +66,7 @@ const Textarea = ({
 interface OffboardingFormData {
   offboarding_date: string;
   reason: string;
-  offboarding_type: "RESIGNED" | "TERMINATED";
+  offboarding_type: "Resigned" | "Terminated";
   notes?: string;
 }
 
@@ -78,7 +78,7 @@ export default function OffboardingPage() {
   const [formData, setFormData] = useState<OffboardingFormData>({
     offboarding_date: new Date().toISOString().split("T")[0],
     reason: "",
-    offboarding_type: "RESIGNED",
+    offboarding_type: "Resigned",
     notes: "",
   });
 
@@ -135,7 +135,7 @@ export default function OffboardingPage() {
         setFormData({
           offboarding_date: new Date().toISOString().split("T")[0],
           reason: "",
-          offboarding_type: "RESIGNED",
+          offboarding_type: "Resigned",
           notes: "",
         });
       }
@@ -351,7 +351,7 @@ export default function OffboardingPage() {
                   </div>
                   {activeTab === "offboarded" && (
                     <div className={`text-xs font-medium text-white px-2 py-1 rounded-full ${
-                      emp.job_status === "RESIGNED" ? "bg-orange-500" : "bg-red-600"
+                      emp.job_status === "Resigned" ? "bg-orange-500" : "bg-red-600"
                     }`}>
                       {emp.job_status}
                     </div>
@@ -448,14 +448,14 @@ export default function OffboardingPage() {
                         setFormData({
                           ...formData,
                           offboarding_type: e.target.value as
-                            | "RESIGNED"
-                            | "TERMINATED",
+                            | "Resigned"
+                            | "Terminated",
                         })
                       }
                       className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
-                      <option value="RESIGNED">Resignation</option>
-                      <option value="TERMINATED">Termination</option>
+                      <option value="Resigned">Resignation</option>
+                      <option value="Terminated">Termination</option>
                     </select>
                   </div>
 

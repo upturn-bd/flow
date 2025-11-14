@@ -24,7 +24,7 @@ export interface OffboardingData {
   employee_id: string;
   offboarding_date: string;
   reason: string;
-  offboarding_type: 'RESIGNED' | 'TERMINATED';
+  offboarding_type: 'Resigned' | 'Terminated';
   notes?: string;
 }
 
@@ -66,7 +66,7 @@ export function useOffboarding() {
           supervisor_id,
           departments!employees_department_id_fkey(name)
         `)
-        .eq("company_id", company_id)
+        .eq("company_id", companyId)
         .eq("job_status", JOB_STATUS.ACTIVE)
         .order("first_name", { ascending: true });
 
@@ -132,7 +132,7 @@ export function useOffboarding() {
           supervisor_id,
           departments!employees_department_id_fkey(name)
         `)
-        .eq("company_id", company_id)
+        .eq("company_id", companyId)
         .in("job_status", [JOB_STATUS.RESIGNED, JOB_STATUS.TERMINATED])
         .order("first_name", { ascending: true });
 
@@ -207,7 +207,7 @@ export function useOffboarding() {
 
         return {
           success: true,
-          message: `Employee successfully ${data.offboarding_type === 'RESIGNED' ? 'resigned' : 'terminated'}`,
+          message: `Employee successfully ${data.offboarding_type === 'Resigned' ? 'resigned' : 'terminated'}`,
         };
       } catch (err: any) {
         setError(err.message);

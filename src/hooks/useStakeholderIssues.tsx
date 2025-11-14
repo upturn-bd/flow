@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 import { StakeholderIssue, StakeholderIssueAttachment } from "@/lib/types/schemas";
 import { createStakeholderIssueNotification } from "@/lib/utils/notifications";
 
@@ -41,6 +41,7 @@ export interface StakeholderIssueSearchResult {
 // ==============================================================================
 
 export function useStakeholderIssues() {
+  const { employeeInfo } = useAuth();
   const [issues, setIssues] = useState<StakeholderIssue[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +56,10 @@ export function useStakeholderIssues() {
     setError(null);
 
     try {
-      const company_id = await getCompanyId();
+      const company_id = employeeInfo?.company_id as number | undefined;
+      if (!company_id) {
+        throw new Error('Company ID not available');
+      }
 
       let query = supabase
         .from("stakeholder_issues")
@@ -106,14 +110,17 @@ export function useStakeholderIssues() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo]);
 
   const fetchIssueById = useCallback(async (issueId: number) => {
     setLoading(true);
     setError(null);
 
     try {
-      const company_id = await getCompanyId();
+      const company_id = employeeInfo?.company_id as number | undefined;
+      if (!company_id) {
+        throw new Error('Company ID not available');
+      }
 
       const { data, error } = await supabase
         .from("stakeholder_issues")
@@ -160,15 +167,18 @@ export function useStakeholderIssues() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo]);
 
   const fetchIssuesByAssignedEmployee = useCallback(async (assignedToId?: string) => {
     setLoading(true);
     setError(null);
 
     try {
-      const company_id = await getCompanyId();
-      const employeeInfo = await getEmployeeInfo();
+      const company_id = employeeInfo?.company_id as number | undefined;
+      if (!company_id) {
+        throw new Error('Company ID not available');
+      }
+      
       const targetAssignedToId = assignedToId || employeeInfo?.id;
 
       if (!targetAssignedToId) {
@@ -220,7 +230,7 @@ export function useStakeholderIssues() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo]);
 
   const searchIssues = useCallback(async (options: StakeholderIssueSearchOptions = {}) => {
     const { 
@@ -236,8 +246,11 @@ export function useStakeholderIssues() {
     setError(null);
     
     try {
-      const company_id = await getCompanyId();
-      const employeeInfo = await getEmployeeInfo();
+      const company_id = employeeInfo?.company_id as number | undefined;
+      if (!company_id) {
+        throw new Error('Company ID not available');
+      }
+      
       const targetAssignedToId = assignedToId || employeeInfo?.id;
 
       if (!targetAssignedToId) {
@@ -326,14 +339,19 @@ export function useStakeholderIssues() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo]);
 
   const createIssue = useCallback(
     async (issueData: StakeholderIssueFormData) => {
       setError(null);
       try {
-        const company_id = await getCompanyId();
-        const employeeInfo = await getEmployeeInfo();
+        const company_id = employeeInfo?.company_id as number | undefined;
+        if (!company_id) {
+          throw new Error('Company ID not available');
+        }
+        if (!employeeInfo) {
+          throw new Error('Employee info not available');
+        }
 
         // Get stakeholder data for notifications
         const { data: stakeholderData, error: stakeholderError } = await supabase
@@ -446,7 +464,7 @@ export function useStakeholderIssues() {
         throw error;
       }
     },
-    [fetchIssues]
+    [fetchIssues, employeeInfo]
   );
 
   const updateIssue = useCallback(
@@ -455,7 +473,9 @@ export function useStakeholderIssues() {
       setProcessingId(issueId);
 
       try {
-        const employeeInfo = await getEmployeeInfo();
+        if (!employeeInfo) {
+          throw new Error('Employee info not available');
+        }
 
         // Get current issue data
         const { data: currentIssue } = await supabase
@@ -475,7 +495,10 @@ export function useStakeholderIssues() {
 
         // Process new file attachments if any
         if (issueData.attachments && issueData.attachments.length > 0) {
-          const company_id = await getCompanyId();
+          const company_id = employeeInfo?.company_id as number | undefined;
+          if (!company_id) {
+            throw new Error('Company ID not available');
+          }
           
           for (const file of issueData.attachments) {
             const fileName = `${Date.now()}_${file.name}`;
@@ -638,7 +661,7 @@ export function useStakeholderIssues() {
         setProcessingId(null);
       }
     },
-    [fetchIssues]
+    [fetchIssues, employeeInfo]
   );
 
   const deleteIssue = useCallback(

@@ -52,7 +52,8 @@ export function useEmployees() {
       const { data, error } = await supabase
         .from("employees")
         .select("id, first_name, last_name")
-        .eq("company_id", companyId);
+        .eq("company_id", companyId)
+        .eq("job_status", 'Active');
 
       if (error) throw error;
 

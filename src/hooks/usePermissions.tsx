@@ -214,7 +214,10 @@ export function usePermissions(employeeId?: string) {
         throw new Error('User ID or Company ID not available');
       }
       
-      return await isSubordinate(targetEmployeeId, userId, companyId);
+      // Convert company_id to number if it's a string
+      const companyIdNum = typeof companyId === 'string' ? parseInt(companyId, 10) : companyId;
+      
+      return await isSubordinate(targetEmployeeId, userId, companyIdNum);
     } catch (error) {
       console.error("Error checking supervisor relationship:", error);
       return false;
@@ -234,7 +237,10 @@ export function usePermissions(employeeId?: string) {
         throw new Error('User ID or Company ID not available');
       }
       
-      return await fetchSubordinateIds(userId, companyId, includeIndirect);
+      // Convert company_id to number if it's a string
+      const companyIdNum = typeof companyId === 'string' ? parseInt(companyId, 10) : companyId;
+      
+      return await fetchSubordinateIds(userId, companyIdNum, includeIndirect);
     } catch (error) {
       console.error("Error fetching subordinates:", error);
       return [];

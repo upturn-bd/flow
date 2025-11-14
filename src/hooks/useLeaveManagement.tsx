@@ -78,8 +78,8 @@ export function useLeaveRequests() {
         type_id: 2,
         recipient_id: recipients,
         action_url: "/ops/leave",
-        company_id: employeeInfo.company_id!,
-        department_id: employeeInfo.department_id,
+        company_id: typeof employeeInfo.company_id === 'string' ? parseInt(employeeInfo.company_id) : employeeInfo.company_id!,
+        department_id: typeof employeeInfo.department_id === 'string' ? parseInt(employeeInfo.department_id) : employeeInfo.department_id,
       });
 
       return result;
@@ -99,7 +99,9 @@ export function useLeaveRequests() {
     end_date: string
   ) => {
     try {
-      const user = await getEmployeeInfo();
+      if (!employeeInfo) {
+        throw new Error('Employee info not available');
+      }
       
       // Check permission: user must have leave approval permission OR be supervisor of employee
       const hasTeamPermission = canApprove('leave');
@@ -135,8 +137,8 @@ export function useLeaveRequests() {
         type_id: 2,
         recipient_id: recipients,
         action_url: "/ops/leave",
-        company_id: user.company_id,
-        department_id: user.department_id,
+        company_id: typeof employeeInfo.company_id === 'string' ? parseInt(employeeInfo.company_id) : employeeInfo.company_id!,
+        department_id: typeof employeeInfo.department_id === 'string' ? parseInt(employeeInfo.department_id) : employeeInfo.department_id,
       });
 
       return result;
@@ -149,8 +151,11 @@ export function useLeaveRequests() {
   // Fetch pending requests (user's assigned requests + subordinate requests if supervisor)
   const fetchLeaveRequests = async () => {
     try {
+      if (!employeeInfo) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
-      const user = await getEmployeeInfo();
       
       // Get subordinate IDs if user is a supervisor
       const subordinateIds = await getSubordinates();
@@ -163,9 +168,9 @@ export function useLeaveRequests() {
 
       // User can see requests assigned to them OR from their subordinates
       if (subordinateIds.length > 0) {
-        query = query.or(`requested_to.eq.${user.id},employee_id.in.(${subordinateIds.join(',')})`);
+        query = query.or(`requested_to.eq.${employeeInfo.id},employee_id.in.(${subordinateIds.join(',')})`);
       } else {
-        query = query.eq("requested_to", user.id);
+        query = query.eq("requested_to", employeeInfo.id);
       }
 
       const { data, error } = await query;
@@ -194,7 +199,11 @@ export function useLeaveRequests() {
         return;
       }
 
-      const companyId = await getCompanyId()
+      const companyId = employeeInfo?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID not available');
+      }
+
       const { data, error } = await supabase
         .from("leave_records")
         .select("*")
@@ -215,13 +224,17 @@ export function useLeaveRequests() {
   // Fetch leave history (default: only for user)
   const fetchLeaveHistory = async () => {
     try {
+      if (!employeeInfo) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
-      const user = await getEmployeeInfo();
+      
       const { data, error } = await supabase
         .from("leave_records")
         .select("*")
         .neq("status", "Pending")
-        .eq("employee_id", user.id);
+        .eq("employee_id", employeeInfo.id);
 
       if (error) throw error;
 

@@ -3,7 +3,7 @@
 import { useBaseEntity } from "./core";
 import { Project } from "@/lib/types";
 import { useNotifications } from "./useNotifications";
-import { getEmployeeInfo } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 import { useCallback, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { ProjectDetails } from "@/components/ops/project/ProjectForm";
@@ -12,6 +12,7 @@ import { slugify } from "@/lib/utils";
 export type { Project };
 
 export function useProjects() {
+  const { employeeInfo } = useAuth();
   const baseResult = useBaseEntity<Project>({
     tableName: "project_records",
     entityName: "project",
@@ -41,15 +42,17 @@ export function useProjects() {
   const fetchOngoingProjects = useCallback(
     async (limit = 10, reset = false) => {
       try {
+        if (!employeeInfo) {
+          return [];
+        }
         setOngoingLoading(true);
-        const user = await getEmployeeInfo();
 
         let query = supabase
           .from("project_records")
           .select("*")
-          .eq("company_id", user.company_id)
+          .eq("company_id", employeeInfo.company_id)
           .eq("status", "Ongoing")
-          .or(`project_lead_id.eq.${user.id},assignees.cs.{${user.id}},created_by.eq.${user.id}`)
+          .or(`project_lead_id.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}},created_by.eq.${employeeInfo.id}`)
           .order("id", { ascending: true })
           .limit(limit);
 
@@ -83,22 +86,24 @@ export function useProjects() {
         setOngoingLoading(false);
       }
     },
-    [lastFetchedOngoingProjectId]
+    [lastFetchedOngoingProjectId, employeeInfo]
   );
 
   // --- FETCH COMPLETED PROJECTS WITH PAGINATION ---
   const fetchCompletedProjects = useCallback(
     async (limit = 10, reset = false) => {
       try {
+        if (!employeeInfo) {
+          return [];
+        }
         setCompletedLoading(true);
-        const user = await getEmployeeInfo();
 
         let query = supabase
           .from("project_records")
           .select("*")
-          .eq("company_id", user.company_id)
+          .eq("company_id", employeeInfo.company_id)
           .eq("status", "Completed")
-          .or(`project_lead_id.eq.${user.id},assignees.cs.{${user.id}},created_by.eq.${user.id}`)
+          .or(`project_lead_id.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}},created_by.eq.${employeeInfo.id}`)
           .order("id", { ascending: true })
           .limit(limit);
 
@@ -132,15 +137,17 @@ export function useProjects() {
         setCompletedLoading(false);
       }
     },
-    [lastFetchedCompletedProjectId]
+    [lastFetchedCompletedProjectId, employeeInfo]
   );
 
   // --- SEARCH PROJECTS ---
   const searchOngoingProjects = useCallback(
     async (searchTerm: string, limit = 10, companyScopes = false) => {
       try {
+        if (!employeeInfo) {
+          return [];
+        }
         setOngoingSearchLoading(true);
-        const user = await getEmployeeInfo();
 
         let query = supabase
           .from("project_records")
@@ -151,7 +158,7 @@ export function useProjects() {
 
         if (!companyScopes) {
           query = query.or(
-            `project_lead_id.eq.${user.id},assignees.cs.{${user.id}},created_by.eq.${user.id}`
+            `project_lead_id.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}},created_by.eq.${employeeInfo.id}`
           );
         }
 
@@ -173,14 +180,16 @@ export function useProjects() {
         setOngoingSearchLoading(false);
       }
     },
-    []
+    [employeeInfo]
   );
 
   const searchCompletedProjects = useCallback(
     async (searchTerm: string, limit = 10, companyScopes = false) => {
       try {
+        if (!employeeInfo) {
+          return [];
+        }
         setCompletedSearchLoading(true);
-        const user = await getEmployeeInfo();
 
         let query = supabase
           .from("project_records")
@@ -191,7 +200,7 @@ export function useProjects() {
 
         if (!companyScopes) {
           query = query.or(
-            `project_lead_id.eq.${user.id},assignees.cs.{${user.id}},created_by.eq.${user.id}`
+            `project_lead_id.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}},created_by.eq.${employeeInfo.id}`
           );
         }
 
@@ -213,20 +222,22 @@ export function useProjects() {
         setCompletedSearchLoading(false);
       }
     },
-    []
+    [employeeInfo]
   );
 
   // --- CREATE PROJECT ---
   const createProject = async (project: Project) => {
     try {
-      const user = await getEmployeeInfo();
-      const company_id = user.company_id;
+      if (!employeeInfo) {
+        throw new Error('Employee info not available');
+      }
+      const company_id = employeeInfo.company_id;
       const projectId = slugify(project.project_title);
 
       const finalData = {
         id: projectId,
         ...project,
-        created_by: user.id,
+        created_by: employeeInfo.id,
       };
 
       const result = await baseResult.createItem(finalData);
@@ -240,19 +251,19 @@ export function useProjects() {
         type_id: 3,
         recipient_id: recipients,
         action_url: "/ops/project",
-        company_id,
-        department_id: user.department_id,
+        company_id: typeof company_id === 'string' ? parseInt(company_id) : company_id!,
+        department_id: typeof employeeInfo.department_id === 'string' ? parseInt(employeeInfo.department_id) : employeeInfo.department_id,
       });
 
       void createNotification({
         title: "New Project Created",
-        message: `A new project "${project.project_title}" has been created by ${user.name}.`,
+        message: `A new project "${project.project_title}" has been created by ${employeeInfo.name}.`,
         priority: "normal",
         type_id: 3,
-        recipient_id: [user.supervisor_id].filter(Boolean) as string[],
+        recipient_id: [employeeInfo.supervisor_id].filter(Boolean) as string[],
         action_url: "/ops/project",
-        company_id,
-        department_id: user.department_id,
+        company_id: typeof company_id === 'string' ? parseInt(company_id) : company_id!,
+        department_id: typeof employeeInfo.department_id === 'string' ? parseInt(employeeInfo.department_id) : employeeInfo.department_id,
       });
 
       return result;
@@ -265,22 +276,24 @@ export function useProjects() {
   // --- UPDATE PROJECT ---
   const updateProject = async (projectId: string, project: Project) => {
     try {
-      const user = await getEmployeeInfo();
-      const company_id = user.company_id;
+      if (!employeeInfo) {
+        throw new Error('Employee info not available');
+      }
+      const company_id = employeeInfo.company_id;
 
       const { data: result, error } = await baseResult.updateItem(projectId, project);
       if (error) throw error;
 
-      const recipients = [...(project.assignees || []), project.project_lead_id, user.supervisor_id].filter(Boolean) as string[];
+      const recipients = [...(project.assignees || []), project.project_lead_id, employeeInfo.supervisor_id].filter(Boolean) as string[];
 
       createNotification({
         title: "Project Updated",
-        message: `The project "${project.project_title}" has been updated by ${user.name}.`,
+        message: `The project "${project.project_title}" has been updated by ${employeeInfo.name}.`,
         priority: "normal",
         type_id: 3,
         recipient_id: recipients,
         action_url: "/ops/project",
-        company_id,
+        company_id: typeof company_id === 'string' ? parseInt(company_id) : company_id!,
       });
 
       return result;

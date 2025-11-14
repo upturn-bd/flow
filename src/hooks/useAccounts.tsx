@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getCompanyId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 import { Account } from "@/lib/types/schemas";
 import { createAccountNotification } from "@/lib/utils/notifications";
 
@@ -19,6 +19,7 @@ export interface AccountFormData {
 }
 
 export function useAccounts() {
+  const { employeeInfo } = useAuth();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -28,7 +29,10 @@ export function useAccounts() {
     setError(null);
     try {
       if (company_id === undefined) {
-        company_id = await getCompanyId();
+        company_id = employeeInfo?.company_id as number | undefined;
+        if (!company_id) {
+          throw new Error('Company ID not available');
+        }
       }
 
       const { data, error } = await supabase
@@ -52,12 +56,15 @@ export function useAccounts() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo]);
 
   const createAccount = useCallback(async (accountData: AccountFormData, userId?: string) => {
     setError(null);
     try {
-      const company_id = await getCompanyId();
+      const company_id = employeeInfo?.company_id as number | undefined;
+      if (!company_id) {
+        throw new Error('Company ID not available');
+      }
       
       // Get current user if userId not provided
       if (!userId) {
@@ -228,14 +235,17 @@ export function useAccounts() {
       setError(errorObj);
       throw errorObj;
     }
-  }, []);
+  }, [employeeInfo]);
 
   // Fetch accounts by stakeholder ID
   const fetchAccountsByStakeholder = useCallback(async (stakeholderId: number) => {
     setLoading(true);
     setError(null);
     try {
-      const company_id = await getCompanyId();
+      const company_id = employeeInfo?.company_id as number | undefined;
+      if (!company_id) {
+        throw new Error('Company ID not available');
+      }
 
       const { data, error } = await supabase
         .from("accounts")
@@ -246,7 +256,7 @@ export function useAccounts() {
         .eq("company_id", company_id)
         .eq("stakeholder_id", stakeholderId)
         .order("transaction_date", { ascending: false })
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false});
 
       if (error) throw error;
 
@@ -258,7 +268,7 @@ export function useAccounts() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo]);
 
   // Get accounts by status
   const getAccountsByStatus = useCallback((status: 'Complete' | 'Pending') => {

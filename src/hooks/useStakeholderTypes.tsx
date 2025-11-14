@@ -148,13 +148,15 @@ export function useStakeholderTypes() {
       setProcessingId(typeId);
 
       try {
-        const employeeInfo = await getEmployeeInfo();
+        if (!employeeInfo) {
+          throw new Error('Employee info not available');
+        }
 
         const { data, error } = await supabase
           .from("stakeholder_types")
           .update({
             ...typeData,
-            updated_by: employeeInfo?.id,
+            updated_by: employeeInfo.id,
           })
           .eq("id", typeId)
           .select()
@@ -171,7 +173,7 @@ export function useStakeholderTypes() {
         setProcessingId(null);
       }
     },
-    []
+    [employeeInfo]
   );
 
   // ==========================================================================
