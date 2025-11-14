@@ -12,7 +12,7 @@ import {
 import TabView from "@/components/ui/TabView";
 import { RequisitionCard } from "@/components/ops/requisition/RequisitionCard";
 import { RequisitionType, RequisitionInventory } from "@/lib/types";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export default function RequisitionPage() {
   const {
@@ -26,7 +26,7 @@ export default function RequisitionPage() {
 
   const {
     canApprove
-  } = usePermissions()
+  } = useAuth()
 
   const MODULE = "Requisition";
 

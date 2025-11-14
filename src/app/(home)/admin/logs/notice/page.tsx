@@ -15,7 +15,7 @@ import {
 import { motion } from "framer-motion";
 import NoticeUpdateModal from "@/components/ops/notice/NoticeUpdateModal";
 import { toast } from "sonner";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 
 function formatDate(dateStr?: string) {
   if (!dateStr) return "N/A";
@@ -49,7 +49,7 @@ export default function NoticePage() {
   const { notices, fetchNotices, deleteNotice, updateNotice, loading } =
     useNotices();
 
-  const { canWrite, canDelete } = usePermissions();
+  const { canWrite, canDelete } = useAuth();
   const MODULE = "notice"
   const { fetchNoticeTypes } = useNoticeTypes();
 

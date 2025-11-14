@@ -9,7 +9,7 @@ import { Loader2, Trash2, RotateCcw, CheckCircle, Edit3 } from "lucide-react";
 import { toast } from "sonner";
 import TaskUpdateModal from "@/components/ops/tasks/shared/TaskUpdateModal";
 import { getEmployeeName } from "@/lib/utils/auth";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export default function CompanyTaskLogsPage() {
    const {
@@ -26,13 +26,10 @@ export default function CompanyTaskLogsPage() {
    } = useTasks();
 
    const {
-      canRead,
       canWrite,
       canDelete,
       canApprove,
-      hasPermission,
-      loading: permLoading
-   } = usePermissions();
+   } = useAuth();
 
    const MODULE = "tasks";
 

@@ -1,121 +1,54 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { useCallback, useMemo } from "react";
 import { useAuth } from "@/lib/auth/auth-context";
 import type { UserPermissions } from "@/lib/types/schemas";
 import { PERMISSION_ACTIONS, type PermissionAction, type PermissionModule } from "@/lib/constants";
 import { isSubordinate, fetchSubordinateIds } from "@/lib/utils/subordinates";
 
 /**
- * Custom hook for checking user permissions based on team membership
- * Aggregates permissions from all teams a user belongs to
+ * Hook for permission checks with supervisor-related functionality
+ * 
+ * ⚠️ USAGE GUIDANCE:
+ * - For basic permission checks (hasPermission, canRead, canWrite, etc.) → Use useAuth() directly
+ * - For supervisor functionality (isSupervisorOf, getSubordinates, canManageSubordinate) → Use this hook
+ * 
+ * This hook no longer fetches permissions independently. It uses permissions from AuthContext
+ * to avoid redundant API calls. Permissions are fetched once when the user logs in.
+ * 
+ * @param employeeId - Optional. Employee ID to check permissions for. Defaults to current user.
+ *                     Only needed when checking permissions for a different user than the logged-in user.
+ * 
+ * @example Basic Permission Checks (use useAuth instead)
+ * ```tsx
+ * // ✅ RECOMMENDED
+ * const { canWrite, canDelete } = useAuth();
+ * 
+ * // ⚠️ WORKS BUT REDUNDANT
+ * const { canWrite, canDelete } = usePermissions();
+ * ```
+ * 
+ * @example Supervisor Functionality (use this hook)
+ * ```tsx
+ * // ✅ CORRECT USE CASE
+ * const { isSupervisorOf, getSubordinates } = usePermissions();
+ * const isManager = await isSupervisorOf(employeeId);
+ * const myTeam = await getSubordinates();
+ * ```
  */
 export function usePermissions(employeeId?: string) {
-  const { employeeInfo } = useAuth();
-  const [permissions, setPermissions] = useState<UserPermissions>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  /**
-   * Fetch and aggregate permissions for the user
-   * Uses the database function for optimized permission aggregation
-   */
-  const fetchPermissions = useCallback(async (empId?: string) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const userId = empId || employeeId || employeeInfo?.id;
-      if (!userId) {
-        throw new Error('User ID not available');
-      }
-
-      // Call the database function to get aggregated permissions
-      const { data, error: fetchError } = await supabase
-        .rpc('get_user_permissions', { user_id: userId });
-
-      if (fetchError) throw fetchError;
-
-      // Transform array to object for easier lookups
-      const permissionsMap: UserPermissions = {};
-      (data || []).forEach((perm: any) => {
-        permissionsMap[perm.module_name] = {
-          can_read: perm.can_read,
-          can_write: perm.can_write,
-          can_delete: perm.can_delete,
-          can_approve: perm.can_approve,
-          can_comment: perm.can_comment,
-        };
-      });
-
-      setPermissions(permissionsMap);
-    } catch (err: any) {
-      const errorMessage = err.message || "Failed to fetch permissions";
-      setError(errorMessage);
-      console.error("Error fetching permissions:", err);
-      setPermissions({});
-    } finally {
-      setLoading(false);
-    }
-  }, [employeeId, employeeInfo?.id]);
-
-  // Fetch permissions on mount and when employeeId changes
-  useEffect(() => {
-    fetchPermissions();
-  }, [fetchPermissions]);
-
-  /**
-   * Check if user has a specific permission for a module
-   * @param module - The module name (e.g., 'tasks', 'projects')
-   * @param action - The action to check (e.g., 'can_read', 'can_write')
-   * @returns boolean indicating if user has the permission
-   */
-  const hasPermission = useCallback((
-    module: PermissionModule | string,
-    action: PermissionAction | string
-  ): boolean => {
-    if (!permissions[module]) return false;
-    
-    // Type-safe access to permission properties
-    const actionKey = action as keyof typeof permissions[typeof module];
-    return permissions[module][actionKey] === true;
-  }, [permissions]);
-
-  /**
-   * Check if user can read a module
-   */
-  const canRead = useCallback((module: PermissionModule | string): boolean => {
-    return hasPermission(module, PERMISSION_ACTIONS.READ);
-  }, [hasPermission]);
-
-  /**
-   * Check if user can write to a module
-   */
-  const canWrite = useCallback((module: PermissionModule | string): boolean => {
-    return hasPermission(module, PERMISSION_ACTIONS.WRITE);
-  }, [hasPermission]);
-
-  /**
-   * Check if user can delete from a module
-   */
-  const canDelete = useCallback((module: PermissionModule | string): boolean => {
-    return hasPermission(module, PERMISSION_ACTIONS.DELETE);
-  }, [hasPermission]);
-
-  /**
-   * Check if user can approve in a module
-   */
-  const canApprove = useCallback((module: PermissionModule | string): boolean => {
-    return hasPermission(module, PERMISSION_ACTIONS.APPROVE);
-  }, [hasPermission]);
-
-  /**
-   * Check if user can comment in a module
-   */
-  const canComment = useCallback((module: PermissionModule | string): boolean => {
-    return hasPermission(module, PERMISSION_ACTIONS.COMMENT);
-  }, [hasPermission]);
+  const { 
+    employeeInfo, 
+    permissions, 
+    permissionsLoading: loading,
+    hasPermission,
+    canRead,
+    canWrite,
+    canDelete,
+    canApprove,
+    canComment,
+    refreshPermissions
+  } = useAuth();
 
   /**
    * Check if user has any permission for a module
@@ -195,13 +128,6 @@ export function usePermissions(employeeId?: string) {
   }, [canWrite]);
 
   /**
-   * Refresh permissions (useful after team membership changes)
-   */
-  const refreshPermissions = useCallback(async () => {
-    await fetchPermissions();
-  }, [fetchPermissions]);
-
-  /**
    * Check if current user is supervisor of target employee (direct or indirect)
    * @param targetEmployeeId - The employee ID to check
    * @returns Promise<boolean> - True if current user is supervisor of target employee
@@ -276,10 +202,10 @@ export function usePermissions(employeeId?: string) {
   return useMemo(() => ({
     // State
     permissions,
-    loading,
-    error,
+    loading, // Deprecated: use permissionsLoading instead
+    permissionsLoading: loading, // Consistent with AuthContext naming
 
-    // Core permission checks
+    // Core permission checks (from AuthContext)
     hasPermission,
     canRead,
     canWrite,
@@ -309,7 +235,6 @@ export function usePermissions(employeeId?: string) {
   }), [
     permissions,
     loading,
-    error,
     hasPermission,
     canRead,
     canWrite,
@@ -329,48 +254,4 @@ export function usePermissions(employeeId?: string) {
     canManageSubordinate,
     refreshPermissions,
   ]);
-}
-
-/**
- * Hook for checking permissions without automatic fetching
- * Useful when you already have permissions from context
- */
-export function usePermissionChecks(userPermissions: UserPermissions) {
-  const hasPermission = useCallback((
-    module: PermissionModule | string,
-    action: PermissionAction | string
-  ): boolean => {
-    if (!userPermissions[module]) return false;
-    const actionKey = action as keyof typeof userPermissions[typeof module];
-    return userPermissions[module][actionKey] === true;
-  }, [userPermissions]);
-
-  const canRead = useCallback((module: PermissionModule | string): boolean => {
-    return hasPermission(module, PERMISSION_ACTIONS.READ);
-  }, [hasPermission]);
-
-  const canWrite = useCallback((module: PermissionModule | string): boolean => {
-    return hasPermission(module, PERMISSION_ACTIONS.WRITE);
-  }, [hasPermission]);
-
-  const canDelete = useCallback((module: PermissionModule | string): boolean => {
-    return hasPermission(module, PERMISSION_ACTIONS.DELETE);
-  }, [hasPermission]);
-
-  const canApprove = useCallback((module: PermissionModule | string): boolean => {
-    return hasPermission(module, PERMISSION_ACTIONS.APPROVE);
-  }, [hasPermission]);
-
-  const canComment = useCallback((module: PermissionModule | string): boolean => {
-    return hasPermission(module, PERMISSION_ACTIONS.COMMENT);
-  }, [hasPermission]);
-
-  return useMemo(() => ({
-    hasPermission,
-    canRead,
-    canWrite,
-    canDelete,
-    canApprove,
-    canComment,
-  }), [hasPermission, canRead, canWrite, canDelete, canApprove, canComment]);
 }

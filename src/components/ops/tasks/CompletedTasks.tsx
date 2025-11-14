@@ -24,7 +24,7 @@ import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useRouter } from "next/navigation";
 import LoadMore from "@/components/ui/LoadMore";
 import { debounce } from "lodash"; // For debouncing search
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 import { PERMISSION_MODULES } from "@/lib/constants";
 import { PermissionTooltip } from "@/components/permissions";
 
@@ -48,7 +48,7 @@ function TaskCard({
   onDetails: () => void
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { canDelete } = usePermissions();
+  const { canDelete } = useAuth();
 
   const { id, task_title, department_id, task_description, updated_at } = task;
 

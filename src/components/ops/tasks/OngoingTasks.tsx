@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 import LoadMore from "@/components/ui/LoadMore";
 import Link from "next/link";
 import { debounce } from "lodash"; // for debouncing search
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 import { PERMISSION_MODULES } from "@/lib/constants";
 import { PermissionTooltip } from "@/components/permissions";
 
@@ -231,7 +231,7 @@ function TaskCard({
   onDetails?: () => void;
   isDeleting?: boolean;
 }) {
-  const { canWrite, canDelete } = usePermissions();
+  const { canWrite, canDelete } = useAuth();
   
   // Check if user can edit based on permissions OR ownership
   const canEditTask = canWrite(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && userRole === "Admin");

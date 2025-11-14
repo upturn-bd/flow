@@ -9,7 +9,7 @@ import TabView from "@/components/ui/TabView";
 import { Loader2, Trash2, Edit2, X } from "lucide-react";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export default function AttendanceLogsPage() {
   const {
@@ -24,7 +24,7 @@ export default function AttendanceLogsPage() {
   const {
     canWrite,
     canDelete
-  } = usePermissions();
+  } = useAuth();
 
   const MODULE = "Attendance";
 

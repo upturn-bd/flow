@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
 import { UpdateProjectPage } from "@/components/ops/project/CreateNewProject";
 import { ProjectDetails } from "@/components/ops/project/ProjectForm";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export default function CompanyProjectsPage() {
    const {
@@ -27,7 +27,7 @@ export default function CompanyProjectsPage() {
    const {
       canWrite,
       canDelete
-   } = usePermissions();
+   } = useAuth();
 
    const MODULE = "projects";
 

@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import TabView, { TabItem } from './TabView';
 import { LucideIcon } from 'lucide-react';
-import { usePermissions } from '@/hooks/usePermissions';
+import { useAuth } from '@/lib/auth/auth-context';
 import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from '@/components/permissions';
 import { PermissionModule } from '@/lib/constants';
 
@@ -44,7 +44,7 @@ export default function ServicePageTemplate({
   actionPermission = 'can_write',
   showPermissionBanner = true,
 }: ServicePageProps) {
-  const { hasPermission } = usePermissions();
+  const { hasPermission } = useAuth();
   
   // Check if user has permission for the action button
   const hasActionPermission = module ? hasPermission(module, actionPermission) : true;

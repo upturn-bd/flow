@@ -18,7 +18,7 @@ import CompletedProjectsList from "@/components/ops/project/CompletedProjectsLis
 import CreateNewProjectPage from "@/components/ops/project/CreateNewProject";
 import ProjectsList from "@/components/ops/project/OngoingProjectsView";
 import { usePathname } from "next/navigation";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 import { ModulePermissionsBanner } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
 
@@ -59,7 +59,7 @@ export default function ProjectLayout({
 }) {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { canWrite } = usePermissions();
+    const { canWrite } = useAuth();
 
     const [activeTab, setActiveTab] = useState(initialActiveTab);
     const [user, setUser] = useState<{ id: string; name: string; role: string }>();

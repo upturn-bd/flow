@@ -4,7 +4,7 @@ import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useTeams } from "@/hooks/useTeams";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 import { getPublicFileUrl } from "@/lib/utils/files";
 import {
   ArrowLeft,
@@ -46,7 +46,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
   } = useStakeholders();
 
   const { getEmployeeTeamIds } = useTeams();
-  const { hasPermission } = usePermissions();
+  const { hasPermission } = useAuth();
 
   const [stakeholder, setStakeholder] = useState<Stakeholder | null>(null);
   const [stepData, setStepData] = useState<StakeholderStepData[]>([]);

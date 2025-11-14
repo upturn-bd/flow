@@ -16,7 +16,7 @@ import { useComplaints } from "@/hooks/useComplaints";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export default function ComplaintLogsPage() {
   const [activeTab, setActiveTab] = useState<"requests" | "history">("requests");
@@ -41,7 +41,7 @@ export default function ComplaintLogsPage() {
   const {
     canApprove,
     canComment
-  } = usePermissions();
+  } = useAuth();
 
   const MODULE = "complaints";
 

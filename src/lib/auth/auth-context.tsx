@@ -29,12 +29,34 @@ interface AuthContextType {
   permissions: UserPermissions;
   permissionsLoading: boolean;
   getAuthorizedNavItems: () => typeof navItems;
+  
+  // Basic permission checks
   hasPermission: (module: string, action: string) => boolean;
   canRead: (module: string) => boolean;
   canWrite: (module: string) => boolean;
   canDelete: (module: string) => boolean;
   canApprove: (module: string) => boolean;
   canComment: (module: string) => boolean;
+  
+  // Advanced permission checks
+  hasAnyPermission: (module: string) => boolean;
+  hasAllPermissions: (module: string, actions: string[]) => boolean;
+  hasAnyOfPermissions: (module: string, actions: string[]) => boolean;
+  
+  // Permission utilities
+  getAccessibleModules: () => string[];
+  getModulesWithAction: (action: string) => string[];
+  getModulePermissions: (module: string) => {
+    can_read: boolean;
+    can_write: boolean;
+    can_delete: boolean;
+    can_approve: boolean;
+    can_comment: boolean;
+  };
+  isAdmin: () => boolean;
+  canManageOperations: () => boolean;
+  
+  // Permissions management
   refreshPermissions: () => Promise<void>;
 }
 
@@ -149,20 +171,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Determine if the user is approved
   const isApproved = employeeInfo?.has_approval === "ACCEPTED";
 
-  // Permission check functions
+  /**
+   * Check if user has a specific permission for a module
+   * @param module - Module name (e.g., 'tasks', 'projects', 'leave')
+   * @param action - Permission action (e.g., 'can_read', 'can_write', 'can_delete', 'can_approve', 'can_comment')
+   * @returns True if user has the permission, false otherwise
+   */
   const hasPermission = (module: string, action: string): boolean => {
     if (!permissions[module]) return false;
     const actionKey = action as keyof typeof permissions[typeof module];
     return permissions[module][actionKey] === true;
   };
 
+  /** Check if user can read from a module */
   const canRead = (module: string): boolean => hasPermission(module, 'can_read');
+  
+  /** Check if user can write to a module */
   const canWrite = (module: string): boolean => hasPermission(module, 'can_write');
+  
+  /** Check if user can delete from a module */
   const canDelete = (module: string): boolean => hasPermission(module, 'can_delete');
+  
+  /** Check if user can approve in a module */
   const canApprove = (module: string): boolean => hasPermission(module, 'can_approve');
+  
+  /** Check if user can comment in a module */
   const canComment = (module: string): boolean => hasPermission(module, 'can_comment');
 
-  // Refresh permissions (useful after team membership changes)
+  /**
+   * Refresh user permissions from the server
+   * 
+   * Call this after:
+   * - User is added to or removed from a team
+   * - Team permissions are modified
+   * - User's role changes
+   * 
+   * @returns Promise that resolves when permissions are refreshed
+   */
   const refreshPermissions = async () => {
     if (!user) return;
 
@@ -190,6 +235,92 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setPermissionsLoading(false);
     }
+  };
+
+  /**
+   * Check if user has any permission for a module
+   * @param module - Module name
+   * @returns True if user has at least one permission for the module
+   */
+  const hasAnyPermission = (module: string): boolean => {
+    if (!permissions[module]) return false;
+    
+    const modulePerms = permissions[module];
+    return modulePerms.can_read || 
+           modulePerms.can_write || 
+           modulePerms.can_delete || 
+           modulePerms.can_approve || 
+           modulePerms.can_comment;
+  };
+
+  /**
+   * Check if user has all specified permissions for a module
+   * @param module - Module name
+   * @param actions - Array of permission actions to check
+   * @returns True if user has all specified permissions
+   */
+  const hasAllPermissions = (module: string, actions: string[]): boolean => {
+    return actions.every(action => hasPermission(module, action));
+  };
+
+  /**
+   * Check if user has any of the specified permissions for a module
+   * @param module - Module name
+   * @param actions - Array of permission actions to check
+   * @returns True if user has at least one of the specified permissions
+   */
+  const hasAnyOfPermissions = (module: string, actions: string[]): boolean => {
+    return actions.some(action => hasPermission(module, action));
+  };
+
+  /**
+   * Get all modules the user has access to
+   * @returns Array of module names the user can access
+   */
+  const getAccessibleModules = (): string[] => {
+    return Object.keys(permissions).filter(module => hasAnyPermission(module));
+  };
+
+  /**
+   * Get all modules where user has a specific action
+   * @param action - Permission action (e.g., 'can_write', 'can_approve')
+   * @returns Array of module names where user has the specified action
+   */
+  const getModulesWithAction = (action: string): string[] => {
+    return Object.keys(permissions).filter(module => 
+      hasPermission(module, action)
+    );
+  };
+
+  /**
+   * Get full permission object for a module
+   * @param module - Module name
+   * @returns Permission object with all actions for the module
+   */
+  const getModulePermissions = (module: string) => {
+    return permissions[module] || {
+      can_read: false,
+      can_write: false,
+      can_delete: false,
+      can_approve: false,
+      can_comment: false,
+    };
+  };
+
+  /**
+   * Check if user is in admin team (has team management permissions)
+   * @returns True if user can manage teams
+   */
+  const isAdmin = (): boolean => {
+    return hasPermission('teams', 'can_write');
+  };
+
+  /**
+   * Check if user can manage operational modules
+   * @returns True if user can write to onboarding, offboarding, or hris
+   */
+  const canManageOperations = (): boolean => {
+    return canWrite('onboarding') || canWrite('offboarding') || canWrite('hris');
   };
 
   // Function to get navigation items based on user permissions and approval
@@ -227,12 +358,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     permissions,
     permissionsLoading,
     getAuthorizedNavItems,
+    
+    // Basic permission checks
     hasPermission,
     canRead,
     canWrite,
     canDelete,
     canApprove,
     canComment,
+    
+    // Advanced permission checks
+    hasAnyPermission,
+    hasAllPermissions,
+    hasAnyOfPermissions,
+    
+    // Permission utilities
+    getAccessibleModules,
+    getModulesWithAction,
+    getModulePermissions,
+    isAdmin,
+    canManageOperations,
+    
+    // Permissions management
     refreshPermissions,
   };
 

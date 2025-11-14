@@ -19,13 +19,13 @@ import {
   Trash2,
 } from "lucide-react";
 import { StakeholderIssue } from "@/lib/types/schemas";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
 
 export default function StakeholderIssuesPage() {
   const router = useRouter();
-  const { canWrite, canDelete } = usePermissions();
+  const { canWrite, canDelete } = useAuth();
   const {
     issues,
     loading,
@@ -185,7 +185,7 @@ export default function StakeholderIssuesPage() {
       </div>
 
       {/* Permission Banner */}
-      <ModulePermissionsBanner module={PERMISSION_MODULES.STAKEHOLDER_ISSUES} title="Stakeholder Issues" compact />
+      <ModulePermissionsBanner module={PERMISSION_MODULES.STAKEHOLDERS} title="Stakeholder Issues" compact />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -373,7 +373,7 @@ export default function StakeholderIssuesPage() {
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 ml-4">
-                  {canWrite(PERMISSION_MODULES.STAKEHOLDER_ISSUES) ? (
+                  {canWrite(PERMISSION_MODULES.STAKEHOLDERS) ? (
                     <button
                       onClick={() => {
                         setSelectedIssue(issue);
@@ -396,7 +396,7 @@ export default function StakeholderIssuesPage() {
                     </PermissionTooltip>
                   )}
                   
-                  {canDelete(PERMISSION_MODULES.STAKEHOLDER_ISSUES) ? (
+                  {canDelete(PERMISSION_MODULES.STAKEHOLDERS) ? (
                     <button
                       onClick={() => issue.id && handleDeleteIssue(issue.id)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"

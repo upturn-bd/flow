@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Users, Plus, Settings, Trash2, Edit, UserPlus, Shield } from "lucide-react";
 import { useTeams } from "@/hooks/useTeams";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 import type { Team, TeamWithMembers, TeamWithPermissions } from "@/lib/types/schemas";
 import { Button } from "@/components/ui/button";
 import BaseModal from "@/components/ui/modals/BaseModal";
@@ -36,7 +36,7 @@ export default function TeamsPage() {
     loading 
   } = useTeams();
 
-  const { canWrite, canDelete } = usePermissions();
+  const { canWrite, canDelete } = useAuth();
   const canManageTeams = canWrite('teams');
   const canDeleteTeams = canDelete('teams');
 

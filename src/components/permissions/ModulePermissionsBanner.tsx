@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 import { PermissionModule, PERMISSION_MODULES } from "@/lib/constants";
 import { PermissionsBadgeGroup } from "./PermissionBadge";
 import { Info } from "@phosphor-icons/react";
@@ -33,15 +33,26 @@ export function ModulePermissionsBanner({
   compact = false,
   dismissible = false,
 }: ModulePermissionsBannerProps) {
-  const { getModulePermissions, loading, hasAnyPermission } = usePermissions();
+  const { permissions, permissionsLoading } = useAuth();
   const [isDismissed, setIsDismissed] = React.useState(false);
 
-  if (loading || isDismissed) {
+  if (permissionsLoading || isDismissed) {
     return null;
   }
 
-  const permissions = getModulePermissions(module);
-  const hasAccess = hasAnyPermission(module);
+  const modulePermissions = permissions[module] || {
+    can_read: false,
+    can_write: false,
+    can_delete: false,
+    can_approve: false,
+    can_comment: false,
+  };
+  
+  const hasAccess = modulePermissions.can_read || 
+                    modulePermissions.can_write || 
+                    modulePermissions.can_delete || 
+                    modulePermissions.can_approve || 
+                    modulePermissions.can_comment;
 
   // Don't show banner if user has no permissions at all
   if (!hasAccess) {
@@ -68,7 +79,7 @@ export function ModulePermissionsBanner({
                 </span>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <PermissionsBadgeGroup permissions={permissions} iconOnly size="sm" />
+                <PermissionsBadgeGroup permissions={modulePermissions} iconOnly size="sm" />
                 {dismissible && (
                   <button
                     onClick={() => setIsDismissed(true)}
@@ -108,7 +119,7 @@ export function ModulePermissionsBanner({
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <PermissionsBadgeGroup permissions={permissions} size="md" />
+              <PermissionsBadgeGroup permissions={modulePermissions} size="md" />
               {dismissible && (
                 <button
                   onClick={() => setIsDismissed(true)}

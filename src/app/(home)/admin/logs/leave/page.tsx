@@ -10,7 +10,7 @@ import { Loader2, Check, X as CloseIcon, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
 import TabView, { TabItem } from "@/components/ui/TabView";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 
 type LeaveRecord = {
    id: number;
@@ -35,7 +35,7 @@ export default function LeaveLogsPage() {
 
    const {
       canApprove
-   } = usePermissions();
+   } = useAuth();
 
    const MODULE = "leave";
 

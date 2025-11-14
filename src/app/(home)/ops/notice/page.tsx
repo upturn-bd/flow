@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { NoticeCreateModal, NoticeUpdateModal } from "@/components/ops/notice";
 import { getEmployeeId } from "@/lib/utils/auth";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 import { PERMISSION_MODULES } from "@/lib/constants";
 import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from "@/components/permissions";
 
@@ -20,7 +20,7 @@ export default function NoticePage() {
     updateNotice,
     deleteNotice,
   } = useNotices();
-  const { canWrite, canDelete } = usePermissions();
+  const { canWrite, canDelete } = useAuth();
   const [isCreatingNotice, setIsCreatingNotice] = useState(false);
   const [isUpdatingNotice, setIsUpdatingNotice] = useState(false);
   const [editNotice, setEditNotice] = useState<Notice | null>(null);

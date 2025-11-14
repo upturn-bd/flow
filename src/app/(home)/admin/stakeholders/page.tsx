@@ -7,13 +7,13 @@ import { Plus, Search, Filter, Eye, CheckCircle2, Clock, XCircle, Download } fro
 import Pagination from "@/components/ui/Pagination";
 import { exportStakeholdersToCSV } from "@/lib/utils/csv-export";
 import { toast } from "sonner";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
 
 export default function StakeholdersPage() {
   const router = useRouter();
-  const { canWrite } = usePermissions();
+  const { canWrite } = useAuth();
   const {
     stakeholders,
     leads,

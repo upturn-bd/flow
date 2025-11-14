@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/lib/auth/auth-context";
 import { PermissionModule, PermissionAction } from "@/lib/constants";
 
 interface PermissionGateProps {
@@ -33,9 +33,9 @@ export function PermissionGate({
   fallback = null,
   showDisabled = false,
 }: PermissionGateProps) {
-  const { hasPermission, loading } = usePermissions();
+  const { hasPermission, permissionsLoading } = useAuth();
 
-  if (loading) {
+  if (permissionsLoading) {
     return null; // or a skeleton loader
   }
 
@@ -81,8 +81,8 @@ export function PermissionAware({
   action,
   children,
 }: PermissionAwareProps) {
-  const { hasPermission, loading } = usePermissions();
+  const { hasPermission, permissionsLoading } = useAuth();
   const permitted = hasPermission(module, action);
 
-  return <>{children(permitted, loading)}</>;
+  return <>{children(permitted, permissionsLoading)}</>;
 }
