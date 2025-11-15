@@ -1,40 +1,40 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import BaseWidget from './BaseWidget';
 import { WidgetProps } from '@/lib/types/widgets';
 import NoticesSection from '../components/NoticesSection';
+import { useNotices } from "@/hooks/useNotice";
+import { useModalState } from "@/app/(home)/home/components/useModalState";
+import DetailModals from "@/app/(home)/home/components/DetailModals";
 
-interface Notice {
-  id?: number;
-  title: string;
-  urgency?: string;
-  valid_from?: string;
-  valid_till?: string;
-}
+export default function NoticesWidget({ config }: WidgetProps) {
+  const { notices, loading, fetchNotices } = useNotices();
+  const { selectedNoticeId, handleNoticeClick, closeNotice } = useModalState();
 
-interface NoticesWidgetProps extends WidgetProps {
-  notices: Notice[];
-  loading: boolean;
-  onNoticeClick: (noticeId: number) => void;
-  onRefresh: () => void;
-}
+  useEffect(() => {
+    fetchNotices();
+  }, []);
 
-export default function NoticesWidget({
-  config,
-  notices,
-  loading,
-  onNoticeClick,
-  onRefresh,
-}: NoticesWidgetProps) {
   return (
-    <BaseWidget config={config}>
-      <NoticesSection
-        notices={notices}
-        loading={loading}
-        onNoticeClick={onNoticeClick}
-        onRefresh={onRefresh}
-      />
-    </BaseWidget>
+    <>
+      {selectedNoticeId !== null && (
+        <DetailModals
+          selectedNoticeId={selectedNoticeId}
+          selectedTaskId={null}
+          onTaskStatusUpdate={() => {}}
+          onCloseNotice={closeNotice}
+          onCloseTask={() => {}}
+        />
+      )}
+      <BaseWidget config={config}>
+        <NoticesSection
+          notices={notices}
+          loading={loading}
+          onNoticeClick={handleNoticeClick}
+          onRefresh={() => fetchNotices()}
+        />
+      </BaseWidget>
+    </>
   );
 }

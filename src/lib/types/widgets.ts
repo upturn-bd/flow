@@ -61,6 +61,8 @@ export interface WidgetDefinition {
 export interface WidgetProps {
   config: WidgetConfig;
   isEditMode?: boolean;
+  onToggle?: () => void;
+  onSizeChange?: (size: WidgetSize) => void;
   onUpdate?: (config: Partial<WidgetConfig>) => void;
   onRemove?: () => void;
 }

@@ -1,16 +1,9 @@
 "use client";
 
-import { useAttendanceStatus } from "@/hooks/useAttendance";
-import { useSites } from "@/hooks/useAttendanceManagement";
-import { useNotices } from "@/hooks/useNotice";
-import { useTasks, TaskStatus } from "@/hooks/useTasks";
 import { useAuth } from "@/lib/auth/auth-context";
-import { useEffect, useState, useMemo } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import DetailModals from "@/app/(home)/home/components/DetailModals";
-import { handleCheckIn, handleCheckOut } from "@/app/(home)/home/components/attendanceUtils";
 import { pageVariants } from "@/app/(home)/home/components/animations";
-import { useModalState } from "@/app/(home)/home/components/useModalState";
 import { useHomeLayout } from "@/hooks/useHomeLayout";
 import { getWidgetDefinition } from "@/app/(home)/home/widgets/widgetRegistry";
 import AttendanceWidget from "@/app/(home)/home/widgets/AttendanceWidget";
@@ -18,166 +11,115 @@ import NoticesWidget from "@/app/(home)/home/widgets/NoticesWidget";
 import TasksWidget from "@/app/(home)/home/widgets/TasksWidget";
 import ProjectsWidget from "@/app/(home)/home/widgets/ProjectsWidget";
 import StakeholderIssuesWidget from "@/app/(home)/home/widgets/StakeholderIssuesWidget";
-
-const initialAttendanceRecord: { tag: string; site_id: number | undefined } = {
-  tag: "Present",
-  site_id: undefined,
-};
+import { Settings } from "lucide-react";
 
 export default function HomePage() {
   const { employeeInfo } = useAuth();
-  const [attendanceRecord, setAttendanceRecord] = useState(initialAttendanceRecord);
-  const [processing, setProcessing] = useState(false);
-
-  const {
-    selectedNoticeId,
-    selectedTaskId,
-    handleNoticeClick,
-    handleTaskClick,
-    closeNotice,
-    closeTask,
-  } = useModalState();
-
-  const { today, todayLoading, getTodaysAttendance } = useAttendanceStatus();
-  const { sites, loading: sitesLoading, fetchSites } = useSites();
-  const { notices, loading: noticesLoading, fetchNotices } = useNotices();
-  const { tasks, loading: tasksLoading, getUserTasks } = useTasks();
-  const [attendanceLoading, setAttendanceLoading] = useState(false);
-
-  // Load home layout configuration
-  const { layout, loading: layoutLoading } = useHomeLayout();
-
-  // Derived attendance status
-  const attendanceStatus = useMemo(() => ({
-    checkIn: !!today?.check_in_time,
-    checkOut: !!today?.check_out_time,
-  }), [today]);
-
-  // Fetch initial data - only when employeeInfo is available
-  useEffect(() => {
-    if (!employeeInfo) return;
-    
-    fetchSites();
-    fetchNotices();
-    getUserTasks(TaskStatus.INCOMPLETE);
-    getTodaysAttendance();
-  }, [employeeInfo]);
-
-  // Check-in handler
-  const onCheckIn = async () => {
-    setAttendanceLoading(true);
-    setProcessing(true);
-    try {
-      await handleCheckIn(attendanceRecord, sites, getTodaysAttendance);
-    } finally {
-      setProcessing(false);
-      setAttendanceLoading(false);
-    }
-  };
-
-  // Check-out handler
-  const onCheckOut = async () => {
-    setAttendanceLoading(true);
-    setProcessing(true);
-    try {
-      if (today?.id) {
-        await handleCheckOut(today.id);
-      }
-    } finally {
-      setProcessing(false);
-      setAttendanceLoading(false);
-    }
-  };
+  const { layout, loading: layoutLoading, saveLayout, updateWidget } = useHomeLayout();
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // Render widget based on type
   const renderWidget = (widgetConfig: any) => {
-    if (!widgetConfig.enabled) return null;
+    if (!widgetConfig.enabled && !isEditMode) return null;
 
     const widgetDef = getWidgetDefinition(widgetConfig.type);
     if (!widgetDef) return null;
 
     const key = widgetConfig.id;
 
+    const handleToggleWidget = () => {
+      if (updateWidget) {
+        updateWidget(widgetConfig.id, { enabled: !widgetConfig.enabled });
+      }
+    };
+
+    const handleSizeChange = (newSize: any) => {
+      if (updateWidget) {
+        updateWidget(widgetConfig.id, { size: newSize });
+      }
+    };
+
+    const widgetProps = {
+      config: widgetConfig,
+      isEditMode,
+      onToggle: handleToggleWidget,
+      onSizeChange: handleSizeChange,
+    };
+
     switch (widgetConfig.type) {
       case 'attendance':
-        return (
-          <AttendanceWidget
-            key={key}
-            config={widgetConfig}
-            loading={todayLoading}
-            attendanceLoading={attendanceLoading}
-            attendanceStatus={attendanceStatus}
-            attendanceRecord={attendanceRecord}
-            sites={sites}
-            sitesLoading={sitesLoading}
-            onRecordChange={setAttendanceRecord}
-            onCheckIn={onCheckIn}
-            onCheckOut={onCheckOut}
-          />
-        );
+        return <AttendanceWidget key={key} {...widgetProps} />;
       case 'notices':
-        return (
-          <NoticesWidget
-            key={key}
-            config={widgetConfig}
-            notices={notices}
-            loading={noticesLoading}
-            onNoticeClick={handleNoticeClick}
-            onRefresh={() => fetchNotices()}
-          />
-        );
+        return <NoticesWidget key={key} {...widgetProps} />;
       case 'tasks':
-        return (
-          <TasksWidget
-            key={key}
-            config={widgetConfig}
-            tasks={tasks}
-            loading={tasksLoading}
-            onTaskClick={handleTaskClick}
-          />
-        );
+        return <TasksWidget key={key} {...widgetProps} />;
       case 'projects':
-        return <ProjectsWidget key={key} config={widgetConfig} />;
+        return <ProjectsWidget key={key} {...widgetProps} />;
       case 'stakeholder-issues':
-        return <StakeholderIssuesWidget key={key} config={widgetConfig} />;
+        return <StakeholderIssuesWidget key={key} {...widgetProps} />;
       default:
         return null;
     }
   };
 
-  return (
-    <>
-      <DetailModals
-        selectedNoticeId={selectedNoticeId}
-        selectedTaskId={selectedTaskId}
-        onTaskStatusUpdate={() => getUserTasks(TaskStatus.INCOMPLETE)}
-        onCloseNotice={closeNotice}
-        onCloseTask={closeTask}
-      />
+  const handleSaveLayout = async () => {
+    if (layout?.widgets && saveLayout) {
+      await saveLayout(layout.widgets);
+      setIsEditMode(false);
+    }
+  };
 
-      {selectedNoticeId === null && selectedTaskId === null && (
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={pageVariants}
-          className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8"
-        >
-          <div className="max-w-7xl mx-auto">
-            {layoutLoading ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="text-gray-500">Loading dashboard...</div>
-              </div>
+  return (
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={pageVariants}
+      className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8"
+    >
+      <div className="max-w-7xl mx-auto">
+        {/* Header with edit button */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+          <div className="flex gap-2">
+            {isEditMode ? (
+              <>
+                <button
+                  onClick={() => setIsEditMode(false)}
+                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveLayout}
+                  className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Save Changes
+                </button>
+              </>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {layout?.widgets
-                  .filter(w => w.enabled)
-                  .sort((a, b) => a.order - b.order)
-                  .map(widgetConfig => renderWidget(widgetConfig))}
-              </div>
+              <button
+                onClick={() => setIsEditMode(true)}
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <Settings size={18} />
+                Customize
+              </button>
             )}
           </div>
-        </motion.div>
-      )}
-    </>
+        </div>
+
+        {layoutLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-500">Loading dashboard...</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {layout?.widgets
+              .sort((a, b) => a.order - b.order)
+              .map(widgetConfig => renderWidget(widgetConfig))}
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 }
