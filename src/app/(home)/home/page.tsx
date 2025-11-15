@@ -7,14 +7,17 @@ import { useTasks, TaskStatus } from "@/hooks/useTasks";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import SectionContainer from "@/app/(home)/home/components/SectionContainer";
-import NoticesSection from "@/app/(home)/home/components/NoticesSection";
-import AttendanceSection from "@/app/(home)/home/components/AttendanceSection";
-import TaskListSection from "@/app/(home)/home/components/TaskListSection";
 import DetailModals from "@/app/(home)/home/components/DetailModals";
 import { handleCheckIn, handleCheckOut } from "@/app/(home)/home/components/attendanceUtils";
-import { pageVariants, sectionVariants } from "@/app/(home)/home/components/animations";
+import { pageVariants } from "@/app/(home)/home/components/animations";
 import { useModalState } from "@/app/(home)/home/components/useModalState";
+import { useHomeLayout } from "@/hooks/useHomeLayout";
+import { getWidgetDefinition } from "@/app/(home)/home/widgets/widgetRegistry";
+import AttendanceWidget from "@/app/(home)/home/widgets/AttendanceWidget";
+import NoticesWidget from "@/app/(home)/home/widgets/NoticesWidget";
+import TasksWidget from "@/app/(home)/home/widgets/TasksWidget";
+import ProjectsWidget from "@/app/(home)/home/widgets/ProjectsWidget";
+import StakeholderIssuesWidget from "@/app/(home)/home/widgets/StakeholderIssuesWidget";
 
 const initialAttendanceRecord: { tag: string; site_id: number | undefined } = {
   tag: "Present",
@@ -24,7 +27,7 @@ const initialAttendanceRecord: { tag: string; site_id: number | undefined } = {
 export default function HomePage() {
   const { employeeInfo } = useAuth();
   const [attendanceRecord, setAttendanceRecord] = useState(initialAttendanceRecord);
-  const [processing, setProcessing] = useState(false); // block button clicks while updating
+  const [processing, setProcessing] = useState(false);
 
   const {
     selectedNoticeId,
@@ -39,10 +42,10 @@ export default function HomePage() {
   const { sites, loading: sitesLoading, fetchSites } = useSites();
   const { notices, loading: noticesLoading, fetchNotices } = useNotices();
   const { tasks, loading: tasksLoading, getUserTasks } = useTasks();
-  const [attendanceLoading, setAttendanceLoading] = useState(false)
+  const [attendanceLoading, setAttendanceLoading] = useState(false);
 
-
-  const currentAttendanceRecord = today;
+  // Load home layout configuration
+  const { layout, loading: layoutLoading } = useHomeLayout();
 
   // Derived attendance status
   const attendanceStatus = useMemo(() => ({
@@ -62,29 +65,83 @@ export default function HomePage() {
 
   // Check-in handler
   const onCheckIn = async () => {
-    setAttendanceLoading(true)
+    setAttendanceLoading(true);
     setProcessing(true);
     try {
       await handleCheckIn(attendanceRecord, sites, getTodaysAttendance);
     } finally {
       setProcessing(false);
-      setAttendanceLoading(false)
+      setAttendanceLoading(false);
     }
   };
 
   // Check-out handler
   const onCheckOut = async () => {
-    setAttendanceLoading(true)
+    setAttendanceLoading(true);
     setProcessing(true);
-    console.log(today)
     try {
       if (today?.id) {
         await handleCheckOut(today.id);
       }
     } finally {
       setProcessing(false);
-      setAttendanceLoading(false)
+      setAttendanceLoading(false);
+    }
+  };
 
+  // Render widget based on type
+  const renderWidget = (widgetConfig: any) => {
+    if (!widgetConfig.enabled) return null;
+
+    const widgetDef = getWidgetDefinition(widgetConfig.type);
+    if (!widgetDef) return null;
+
+    const key = widgetConfig.id;
+
+    switch (widgetConfig.type) {
+      case 'attendance':
+        return (
+          <AttendanceWidget
+            key={key}
+            config={widgetConfig}
+            loading={todayLoading}
+            attendanceLoading={attendanceLoading}
+            attendanceStatus={attendanceStatus}
+            attendanceRecord={attendanceRecord}
+            sites={sites}
+            sitesLoading={sitesLoading}
+            onRecordChange={setAttendanceRecord}
+            onCheckIn={onCheckIn}
+            onCheckOut={onCheckOut}
+          />
+        );
+      case 'notices':
+        return (
+          <NoticesWidget
+            key={key}
+            config={widgetConfig}
+            notices={notices}
+            loading={noticesLoading}
+            onNoticeClick={handleNoticeClick}
+            onRefresh={() => fetchNotices()}
+          />
+        );
+      case 'tasks':
+        return (
+          <TasksWidget
+            key={key}
+            config={widgetConfig}
+            tasks={tasks}
+            loading={tasksLoading}
+            onTaskClick={handleTaskClick}
+          />
+        );
+      case 'projects':
+        return <ProjectsWidget key={key} config={widgetConfig} />;
+      case 'stakeholder-issues':
+        return <StakeholderIssuesWidget key={key} config={widgetConfig} />;
+      default:
+        return null;
     }
   };
 
@@ -103,41 +160,22 @@ export default function HomePage() {
           initial="hidden"
           animate="visible"
           variants={pageVariants}
-          className="min-h-screen bg-gray-50 p-4 sm:p-6 max-w-4xl mx-auto"
+          className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8"
         >
-          {/* News & Reminder */}
-          <SectionContainer variants={sectionVariants}>
-            <NoticesSection
-              notices={notices}
-              loading={noticesLoading}
-              onNoticeClick={handleNoticeClick}
-              onRefresh={() => fetchNotices()}
-            />
-          </SectionContainer>
-
-          {/* Attendance */}
-          <SectionContainer variants={sectionVariants}>
-            <AttendanceSection
-              loading={todayLoading}
-              attendanceLoading={attendanceLoading}
-              attendanceStatus={attendanceStatus}
-              attendanceRecord={attendanceRecord}
-              sites={sites}
-              sitesLoading={sitesLoading}
-              onRecordChange={setAttendanceRecord}
-              onCheckIn={onCheckIn}
-              onCheckOut={onCheckOut}
-            />
-          </SectionContainer>
-
-          {/* Task List */}
-          <SectionContainer variants={sectionVariants}>
-            <TaskListSection
-              tasks={tasks}
-              loading={tasksLoading}
-              onTaskClick={handleTaskClick}
-            />
-          </SectionContainer>
+          <div className="max-w-7xl mx-auto">
+            {layoutLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-gray-500">Loading dashboard...</div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {layout?.widgets
+                  .filter(w => w.enabled)
+                  .sort((a, b) => a.order - b.order)
+                  .map(widgetConfig => renderWidget(widgetConfig))}
+              </div>
+            )}
+          </div>
         </motion.div>
       )}
     </>
