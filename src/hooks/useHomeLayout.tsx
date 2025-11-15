@@ -82,6 +82,8 @@ export function useHomeLayout() {
           company_id: companyId,
           widgets,
           layout_version: LAYOUT_VERSION,
+        }, {
+          onConflict: 'employee_id,company_id'
         })
         .select()
         .single();
@@ -92,6 +94,7 @@ export function useHomeLayout() {
       console.log('Home page layout saved successfully');
     } catch (error) {
       console.error('Error saving home layout:', error);
+      throw error; // Re-throw to handle in UI
     } finally {
       setSaving(false);
     }

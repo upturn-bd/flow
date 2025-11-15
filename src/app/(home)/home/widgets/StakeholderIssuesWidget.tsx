@@ -72,19 +72,23 @@ export default function StakeholderIssuesWidget({ config }: WidgetProps) {
   return (
     <>
       <BaseWidget config={config}>
-        <SectionContainer variants={{ hidden: {}, visible: {} }}>
-          <SectionHeader 
-            title="Stakeholder Issues" 
-            icon={AlertCircle} 
-            iconColor="text-red-600" 
-          />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col">
+          <div className="p-5">
+            <SectionHeader 
+              title="Stakeholder Issues" 
+              icon={AlertCircle} 
+              iconColor="text-red-600" 
+            />
+          </div>
           
           {loading ? (
-            <LoadingSection text="Loading issues..." icon={AlertCircle} />
+            <div className="flex-1">
+              <LoadingSection text="Loading issues..." icon={AlertCircle} />
+            </div>
           ) : (
             <motion.div
               variants={staggerContainer}
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100"
+              className="px-5 pb-5 flex-1"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-medium text-gray-500">Assigned to You</h3>
@@ -110,7 +114,7 @@ export default function StakeholderIssuesWidget({ config }: WidgetProps) {
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3 min-h-[200px]">
                 {issues.length > 0 ? (
                   issues.slice(0, 5).map((issue) => (
                     <motion.div
@@ -156,7 +160,7 @@ export default function StakeholderIssuesWidget({ config }: WidgetProps) {
               </div>
             </motion.div>
           )}
-        </SectionContainer>
+        </div>
       </BaseWidget>
 
       {isModalOpen && (

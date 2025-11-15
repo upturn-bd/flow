@@ -38,15 +38,19 @@ export default function ProjectsWidget({ config }: WidgetProps) {
 
   return (
     <BaseWidget config={config}>
-      <SectionContainer variants={{ hidden: {}, visible: {} }}>
-        <SectionHeader title="My Projects" icon={FolderKanban} iconColor="text-purple-600" />
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col">
+        <div className="p-5">
+          <SectionHeader title="My Projects" icon={FolderKanban} iconColor="text-purple-600" />
+        </div>
         
         {loading || ongoingLoading ? (
-          <LoadingSection text="Loading projects..." icon={FolderKanban} />
+          <div className="flex-1">
+            <LoadingSection text="Loading projects..." icon={FolderKanban} />
+          </div>
         ) : (
           <motion.div
             variants={staggerContainer}
-            className="bg-white rounded-xl p-5 shadow-sm border border-gray-100"
+            className="px-5 pb-5 flex-1"
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium text-gray-500">Ongoing Projects</h3>
@@ -60,7 +64,7 @@ export default function ProjectsWidget({ config }: WidgetProps) {
               </motion.button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 min-h-[200px]">
               {ongoingProjects.length > 0 ? (
                 ongoingProjects.slice(0, 5).map((project) => (
                   <motion.div
@@ -101,7 +105,7 @@ export default function ProjectsWidget({ config }: WidgetProps) {
             )}
           </motion.div>
         )}
-      </SectionContainer>
+      </div>
     </BaseWidget>
   );
 }
