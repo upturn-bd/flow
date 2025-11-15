@@ -1,145 +1,125 @@
 "use client";
 
-import { useAttendanceStatus } from "@/hooks/useAttendance";
-import { useSites } from "@/hooks/useAttendanceManagement";
-import { useNotices } from "@/hooks/useNotice";
-import { useTasks, TaskStatus } from "@/hooks/useTasks";
 import { useAuth } from "@/lib/auth/auth-context";
-import { useEffect, useState, useMemo } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import SectionContainer from "@/app/(home)/home/components/SectionContainer";
-import NoticesSection from "@/app/(home)/home/components/NoticesSection";
-import AttendanceSection from "@/app/(home)/home/components/AttendanceSection";
-import TaskListSection from "@/app/(home)/home/components/TaskListSection";
-import DetailModals from "@/app/(home)/home/components/DetailModals";
-import { handleCheckIn, handleCheckOut } from "@/app/(home)/home/components/attendanceUtils";
-import { pageVariants, sectionVariants } from "@/app/(home)/home/components/animations";
-import { useModalState } from "@/app/(home)/home/components/useModalState";
-
-const initialAttendanceRecord: { tag: string; site_id: number | undefined } = {
-  tag: "Present",
-  site_id: undefined,
-};
+import { pageVariants } from "@/app/(home)/home/components/animations";
+import { useHomeLayout } from "@/hooks/useHomeLayout";
+import { getWidgetDefinition } from "@/app/(home)/home/widgets/widgetRegistry";
+import AttendanceWidget from "@/app/(home)/home/widgets/AttendanceWidget";
+import NoticesWidget from "@/app/(home)/home/widgets/NoticesWidget";
+import TasksWidget from "@/app/(home)/home/widgets/TasksWidget";
+import ProjectsWidget from "@/app/(home)/home/widgets/ProjectsWidget";
+import StakeholderIssuesWidget from "@/app/(home)/home/widgets/StakeholderIssuesWidget";
+import { Settings } from "lucide-react";
 
 export default function HomePage() {
   const { employeeInfo } = useAuth();
-  const [attendanceRecord, setAttendanceRecord] = useState(initialAttendanceRecord);
-  const [processing, setProcessing] = useState(false); // block button clicks while updating
+  const { layout, loading: layoutLoading, saveLayout, updateWidget } = useHomeLayout();
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  const {
-    selectedNoticeId,
-    selectedTaskId,
-    handleNoticeClick,
-    handleTaskClick,
-    closeNotice,
-    closeTask,
-  } = useModalState();
+  // Render widget based on type
+  const renderWidget = (widgetConfig: any) => {
+    if (!widgetConfig.enabled && !isEditMode) return null;
 
-  const { today, todayLoading, getTodaysAttendance } = useAttendanceStatus();
-  const { sites, loading: sitesLoading, fetchSites } = useSites();
-  const { notices, loading: noticesLoading, fetchNotices } = useNotices();
-  const { tasks, loading: tasksLoading, getUserTasks } = useTasks();
-  const [attendanceLoading, setAttendanceLoading] = useState(false)
+    const widgetDef = getWidgetDefinition(widgetConfig.type);
+    if (!widgetDef) return null;
 
+    const key = widgetConfig.id;
 
-  const currentAttendanceRecord = today;
+    const handleToggleWidget = () => {
+      if (updateWidget) {
+        updateWidget(widgetConfig.id, { enabled: !widgetConfig.enabled });
+      }
+    };
 
-  // Derived attendance status
-  const attendanceStatus = useMemo(() => ({
-    checkIn: !!today?.check_in_time,
-    checkOut: !!today?.check_out_time,
-  }), [today]);
+    const handleSizeChange = (newSize: any) => {
+      if (updateWidget) {
+        updateWidget(widgetConfig.id, { size: newSize });
+      }
+    };
 
-  // Fetch initial data - only when employeeInfo is available
-  useEffect(() => {
-    if (!employeeInfo) return;
-    
-    fetchSites();
-    fetchNotices();
-    getUserTasks(TaskStatus.INCOMPLETE);
-    getTodaysAttendance();
-  }, [employeeInfo]);
+    const widgetProps = {
+      config: widgetConfig,
+      isEditMode,
+      onToggle: handleToggleWidget,
+      onSizeChange: handleSizeChange,
+    };
 
-  // Check-in handler
-  const onCheckIn = async () => {
-    setAttendanceLoading(true)
-    setProcessing(true);
-    try {
-      await handleCheckIn(attendanceRecord, sites, getTodaysAttendance);
-    } finally {
-      setProcessing(false);
-      setAttendanceLoading(false)
+    switch (widgetConfig.type) {
+      case 'attendance':
+        return <AttendanceWidget key={key} {...widgetProps} />;
+      case 'notices':
+        return <NoticesWidget key={key} {...widgetProps} />;
+      case 'tasks':
+        return <TasksWidget key={key} {...widgetProps} />;
+      case 'projects':
+        return <ProjectsWidget key={key} {...widgetProps} />;
+      case 'stakeholder-issues':
+        return <StakeholderIssuesWidget key={key} {...widgetProps} />;
+      default:
+        return null;
     }
   };
 
-  // Check-out handler
-  const onCheckOut = async () => {
-    setAttendanceLoading(true)
-    setProcessing(true);
-    console.log(today)
-    try {
-      if (today?.id) {
-        await handleCheckOut(today.id);
-      }
-    } finally {
-      setProcessing(false);
-      setAttendanceLoading(false)
-
+  const handleSaveLayout = async () => {
+    if (layout?.widgets && saveLayout) {
+      await saveLayout(layout.widgets);
+      setIsEditMode(false);
     }
   };
 
   return (
-    <>
-      <DetailModals
-        selectedNoticeId={selectedNoticeId}
-        selectedTaskId={selectedTaskId}
-        onTaskStatusUpdate={() => getUserTasks(TaskStatus.INCOMPLETE)}
-        onCloseNotice={closeNotice}
-        onCloseTask={closeTask}
-      />
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={pageVariants}
+      className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8"
+    >
+      <div className="max-w-7xl mx-auto">
+        {/* Header with edit button */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+          <div className="flex gap-2">
+            {isEditMode ? (
+              <>
+                <button
+                  onClick={() => setIsEditMode(false)}
+                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveLayout}
+                  className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Save Changes
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setIsEditMode(true)}
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <Settings size={18} />
+                Customize
+              </button>
+            )}
+          </div>
+        </div>
 
-      {selectedNoticeId === null && selectedTaskId === null && (
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={pageVariants}
-          className="min-h-screen bg-gray-50 p-4 sm:p-6 max-w-4xl mx-auto"
-        >
-          {/* News & Reminder */}
-          <SectionContainer variants={sectionVariants}>
-            <NoticesSection
-              notices={notices}
-              loading={noticesLoading}
-              onNoticeClick={handleNoticeClick}
-              onRefresh={() => fetchNotices()}
-            />
-          </SectionContainer>
-
-          {/* Attendance */}
-          <SectionContainer variants={sectionVariants}>
-            <AttendanceSection
-              loading={todayLoading}
-              attendanceLoading={attendanceLoading}
-              attendanceStatus={attendanceStatus}
-              attendanceRecord={attendanceRecord}
-              sites={sites}
-              sitesLoading={sitesLoading}
-              onRecordChange={setAttendanceRecord}
-              onCheckIn={onCheckIn}
-              onCheckOut={onCheckOut}
-            />
-          </SectionContainer>
-
-          {/* Task List */}
-          <SectionContainer variants={sectionVariants}>
-            <TaskListSection
-              tasks={tasks}
-              loading={tasksLoading}
-              onTaskClick={handleTaskClick}
-            />
-          </SectionContainer>
-        </motion.div>
-      )}
-    </>
+        {layoutLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-500">Loading dashboard...</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {layout?.widgets
+              .sort((a, b) => a.order - b.order)
+              .map(widgetConfig => renderWidget(widgetConfig))}
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 }

@@ -17,8 +17,10 @@ export default function LoadingSection({
   color = "blue"
 }: LoadingSectionProps) {
   return (
-    <div className="py-8 flex justify-center">
-      <LoadingSpinner text={text} color={color} icon={icon} />
+    <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+      <div className="py-8 flex justify-center">
+        <LoadingSpinner text={text} color={color} icon={icon} />
+      </div>
     </div>
   );
 }

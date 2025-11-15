@@ -6,3 +6,6 @@
 
 // All types from schemas.ts - single source of truth
 export * from './schemas';
+
+// Widget system types
+export * from './widgets';
