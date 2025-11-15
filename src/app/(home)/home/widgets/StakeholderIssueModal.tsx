@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, AlertCircle, FileText, User } from 'lucide-react';
+import { X, AlertCircle, User, Building2 } from 'lucide-react';
 import { useStakeholderIssues, StakeholderIssueFormData } from '@/hooks/useStakeholderIssues';
+import { useStakeholders } from '@/hooks/useStakeholders';
 import { useAuth } from '@/lib/auth/auth-context';
 import { cn } from '@/components/ui/class';
 
@@ -20,6 +21,7 @@ export default function StakeholderIssueModal({
 }: StakeholderIssueModalProps) {
   const { employeeInfo } = useAuth();
   const { createIssue, fetchIssueById, loading } = useStakeholderIssues();
+  const { stakeholders, fetchStakeholders } = useStakeholders();
   const [issue, setIssue] = useState<any>(null);
   const [formData, setFormData] = useState<Partial<StakeholderIssueFormData>>({
     stakeholder_id: 0,
@@ -27,6 +29,7 @@ export default function StakeholderIssueModal({
     description: '',
     status: 'Pending',
     priority: 'Medium',
+    assigned_to: employeeInfo?.id,
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -34,6 +37,7 @@ export default function StakeholderIssueModal({
     if (issueId) {
       loadIssue();
     }
+    loadStakeholders();
   }, [issueId]);
 
   const loadIssue = async () => {
@@ -42,6 +46,10 @@ export default function StakeholderIssueModal({
     if (data) {
       setIssue(data);
     }
+  };
+
+  const loadStakeholders = async () => {
+    await fetchStakeholders();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -158,6 +166,28 @@ export default function StakeholderIssueModal({
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Stakeholder <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <select
+                      value={formData.stakeholder_id}
+                      onChange={(e) => setFormData({ ...formData, stakeholder_id: Number(e.target.value) })}
+                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      required
+                    >
+                      <option value={0}>Select a stakeholder</option>
+                      {stakeholders.map((stakeholder) => (
+                        <option key={stakeholder.id} value={stakeholder.id}>
+                          {stakeholder.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Title <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -220,10 +250,10 @@ export default function StakeholderIssueModal({
                   </button>
                   <button
                     type="submit"
-                    disabled={submitting || !formData.title}
+                    disabled={submitting || !formData.title || !formData.stakeholder_id}
                     className={cn(
                       'px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors',
-                      (submitting || !formData.title) && 'opacity-50 cursor-not-allowed'
+                      (submitting || !formData.title || !formData.stakeholder_id) && 'opacity-50 cursor-not-allowed'
                     )}
                   >
                     {submitting ? 'Creating...' : 'Create Issue'}
