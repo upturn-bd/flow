@@ -80,7 +80,7 @@ export const DEFAULT_WIDGET_CONFIGS: WidgetConfig[] = [
     type: 'attendance',
     enabled: true,
     position: { row: 0, col: 1 },
-    size: 'medium',
+    size: 'large',
     order: 1,
   },
   {
@@ -98,6 +98,14 @@ export const DEFAULT_WIDGET_CONFIGS: WidgetConfig[] = [
     position: { row: 1, col: 1 },
     size: 'medium',
     order: 3,
+  },
+  {
+    id: 'stakeholder-issues-1',
+    type: 'stakeholder-issues',
+    enabled: true,
+    position: { row: 2, col: 0 },
+    size: 'medium',
+    order: 4,
   },
 ];
 
