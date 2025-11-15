@@ -27,10 +27,9 @@ export function useHomeLayout() {
         .select('*')
         .eq('employee_id', employeeInfo.id)
         .eq('company_id', typeof employeeInfo.company_id === 'string' ? parseInt(employeeInfo.company_id) : employeeInfo.company_id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
-        // PGRST116 is "not found" - that's ok, we'll create default
+      if (error) {
         throw error;
       }
 
