@@ -17,14 +17,15 @@ import "react-grid-layout/css/styles.css";
 import { WidgetConfig } from "@/lib/types/widgets";
 
 // Grid configuration
-const GRID_COLS = 12;
+const DESKTOP_COLS = 12;
+const MOBILE_COLS = 1;
 const ROW_HEIGHT = 80;
 
 export default function HomePage() {
   const { employeeInfo } = useAuth();
   const { layout: homeLayout, loading: layoutLoading, saveLayout, updateAllWidgets } = useHomeLayout();
   const [isEditMode, setIsEditMode] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(1200);
+  const [containerWidth, setContainerWidth] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -33,15 +34,36 @@ export default function HomePage() {
     const updateWidth = () => {
       if (containerRef.current) {
         const width = containerRef.current.offsetWidth;
-        setContainerWidth(width);
-        setIsMobile(width < 768); // Mobile breakpoint at 768px
+        if (width > 0) {
+          setContainerWidth(width);
+          setIsMobile(width < 768); // Mobile breakpoint at 768px
+        }
       }
     };
 
-    updateWidth();
+    // Use ResizeObserver for more reliable container size tracking
+    const resizeObserver = new ResizeObserver(() => {
+      updateWidth();
+    });
+
+    // Attach observer when ref becomes available
+    const currentContainer = containerRef.current;
+    if (currentContainer) {
+      resizeObserver.observe(currentContainer);
+      updateWidth();
+    }
+
+    // Also update on window resize
     window.addEventListener('resize', updateWidth);
-    return () => window.removeEventListener('resize', updateWidth);
-  }, []);
+    
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateWidth);
+    };
+  }, [layoutLoading]); // Re-run when layoutLoading changes
+
+  // Get current grid columns based on screen size
+  const gridCols = isMobile ? MOBILE_COLS : DESKTOP_COLS;
 
   // Convert widget sizes to grid layout format
   const getWidgetGridSize = (size: string) => {
@@ -64,15 +86,19 @@ export default function HomePage() {
         ? { w: widget.position.width, h: widget.position.height }
         : getWidgetGridSize(widget.size);
       
+      // On mobile, force single column layout
+      const responsiveWidth = isMobile ? 1 : gridSize.w;
+      const responsiveX = isMobile ? 0 : (widget.position?.col ?? 0);
+      
       // If widget has stored position, use it
       if (widget.position?.col !== undefined && widget.position?.row !== undefined) {
         return {
           i: widget.id,
-          x: widget.position.col,
-          y: widget.position.row,
-          w: gridSize.w,
+          x: responsiveX,
+          y: isMobile ? index * gridSize.h : widget.position.row,
+          w: responsiveWidth,
           h: gridSize.h,
-          minW: 4,
+          minW: isMobile ? 1 : 4,
           minH: 5,
         };
       }
@@ -98,7 +124,7 @@ export default function HomePage() {
         // Find first available position
         let foundPosition = false;
         for (let testY = 0; testY < 100 && !foundPosition; testY += 1) {
-          for (let testX = 0; testX <= GRID_COLS - gridSize.w && !foundPosition; testX += 1) {
+          for (let testX = 0; testX <= DESKTOP_COLS - gridSize.w && !foundPosition; testX += 1) {
             const hasCollision = occupiedSpaces.some(space => {
               return !(
                 testX + gridSize.w <= space.x ||
@@ -119,15 +145,15 @@ export default function HomePage() {
       
       return {
         i: widget.id,
-        x,
-        y,
-        w: gridSize.w,
+        x: isMobile ? 0 : x,
+        y: isMobile ? index * gridSize.h : y,
+        w: responsiveWidth,
         h: gridSize.h,
-        minW: 4,
+        minW: isMobile ? 1 : 4,
         minH: 5,
       };
     });
-  }, [homeLayout?.widgets]);
+  }, [homeLayout?.widgets, isMobile]);
 
   const handleLayoutChange = (newLayout: any[]) => {
     if (!homeLayout?.widgets || !isEditMode) return;
@@ -198,9 +224,9 @@ export default function HomePage() {
       initial="hidden"
       animate="visible"
       variants={pageVariants}
-      className="min-h-screen bg-gray-50 px-2 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8"
+      className="min-h-screen bg-gray-50 px-2 py-4 sm:px-4 sm:py-6 lg:px-8 lg:py-8"
     >
-      <div className="w-full">
+      <div className="w-full max-w-full">
         {/* Header with edit button */}
         <div className="flex justify-between items-center mb-4 sm:mb-6">
           <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Dashboard</h1>
@@ -238,26 +264,35 @@ export default function HomePage() {
           </div>
         ) : (
           <div ref={containerRef} className="w-full">
-            <GridLayout
-              className="layout"
-              layout={gridLayout}
-              cols={GRID_COLS}
+            {containerWidth > 0 && (
+              <GridLayout
+                className="layout"
+                layout={gridLayout}
+                cols={gridCols}
               rowHeight={isMobile ? 60 : ROW_HEIGHT}
               width={containerWidth}
               margin={isMobile ? [8, 8] : [16, 16]}
               containerPadding={[0, 0]}
-              isDraggable={isEditMode}
-              isResizable={isEditMode}
+              isDraggable={isEditMode && !isMobile}
+              isResizable={isEditMode && !isMobile}
               onLayoutChange={handleLayoutChange}
               compactType={null}
               preventCollision={true}
             >
               {homeLayout?.widgets.map((widget) => (
-                <div key={widget.id} className="h-full w-full">
-                  {renderWidget(widget)}
+                <div key={widget.id} className="h-full w-full relative">
+                  <div className={isEditMode ? 'pointer-events-none' : ''}>
+                    {renderWidget(widget)}
+                  </div>
+                  <div 
+                    className={`absolute inset-0 bg-blue-500/10 border-2 border-blue-400 rounded-lg pointer-events-none z-10 transition-opacity ${
+                      isEditMode ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  />
                 </div>
               ))}
             </GridLayout>
+            )}
           </div>
         )}
       </div>
