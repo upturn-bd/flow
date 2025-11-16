@@ -11,7 +11,8 @@ export type WidgetType =
   | 'notices'
   | 'tasks'
   | 'projects'
-  | 'stakeholder-issues';
+  | 'stakeholder-issues'
+  | 'services';
 
 // Widget size options for grid layout
 export type WidgetSize = 'small' | 'medium' | 'large' | 'full';

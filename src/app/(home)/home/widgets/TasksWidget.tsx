@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { CheckSquare, Clock } from 'lucide-react';
+import { CheckSquare, Clock, Plus } from 'lucide-react';
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import { cn } from '@/components/ui/class';
 import { formatDateToDayMonth } from '@/lib/utils';
@@ -12,17 +12,23 @@ import { useTasks, TaskStatus } from '@/hooks/useTasks';
 import SectionHeader from '../components/SectionHeader';
 import LoadingSection from '../components/LoadingSection';
 import EmptyState from '../components/EmptyState';
+import { useRouter } from 'next/navigation';
 
 interface TasksWidgetProps extends WidgetProps {
   onTaskClick: (taskId: string) => void;
 }
 
 export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange, onTaskClick }: TasksWidgetProps) {
+  const router = useRouter();
   const { tasks, loading, getUserTasks } = useTasks();
 
   useEffect(() => {
     getUserTasks(TaskStatus.INCOMPLETE);
   }, []);
+
+  const handleCreateTask = () => {
+    router.push('/ops/tasks');
+  };
 
   return (
     <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
@@ -42,6 +48,19 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
             animate="visible"
             className="px-5 pb-5 flex-1 overflow-hidden flex flex-col"
           >
+            <div className="flex items-center justify-between mb-4 flex-shrink-0">
+              <h3 className="text-sm font-medium text-gray-500">Your Tasks</h3>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleCreateTask}
+                className="rounded-full p-2 bg-blue-600 hover:bg-blue-700 transition-colors"
+                title="Create new task"
+              >
+                <Plus size={16} className="text-white" />
+              </motion.button>
+            </div>
+
             <div className="space-y-3 flex-1 overflow-y-auto min-h-0">
             {tasks.length > 0 ? (
               tasks.map((task) => (

@@ -11,6 +11,7 @@ import NoticesWidget from "@/app/(home)/home/widgets/NoticesWidget";
 import TasksWidget from "@/app/(home)/home/widgets/TasksWidget";
 import ProjectsWidget from "@/app/(home)/home/widgets/ProjectsWidget";
 import StakeholderIssuesWidget from "@/app/(home)/home/widgets/StakeholderIssuesWidget";
+import ServicesWidget from "@/app/(home)/home/widgets/ServicesWidget";
 import { Settings } from "lucide-react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
@@ -207,6 +208,8 @@ export default function HomePage() {
         return <ProjectsWidget config={widgetConfig} isEditMode={false} />;
       case 'stakeholder-issues':
         return <StakeholderIssuesWidget config={widgetConfig} isEditMode={false} />;
+      case 'services':
+        return <ServicesWidget config={widgetConfig} isEditMode={false} />;
       default:
         return null;
     }

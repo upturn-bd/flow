@@ -1,10 +1,11 @@
-import { Calendar, Bell, CheckSquare, FolderKanban, AlertCircle } from 'lucide-react';
+import { Calendar, Bell, CheckSquare, FolderKanban, AlertCircle, Briefcase } from 'lucide-react';
 import { WidgetDefinition } from '@/lib/types/widgets';
 import AttendanceWidget from './AttendanceWidget';
 import NoticesWidget from './NoticesWidget';
 import TasksWidget from './TasksWidget';
 import ProjectsWidget from './ProjectsWidget';
 import StakeholderIssuesWidget from './StakeholderIssuesWidget';
+import ServicesWidget from './ServicesWidget';
 
 /**
  * Widget Registry
@@ -65,6 +66,17 @@ export const WIDGET_REGISTRY: Record<string, WidgetDefinition> = {
     maxSize: 'large',
     requiresRole: ['employee', 'manager', 'admin'], // All can view, but only manager+ can create
     component: StakeholderIssuesWidget,
+  },
+  services: {
+    type: 'services',
+    name: 'Services',
+    description: 'Quick access to all available services',
+    icon: Briefcase,
+    defaultSize: 'large',
+    minSize: 'medium',
+    maxSize: 'large',
+    requiresRole: ['employee', 'manager', 'admin'],
+    component: ServicesWidget,
   },
 };
 
