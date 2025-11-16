@@ -25,13 +25,16 @@ export default function HomePage() {
   const { layout: homeLayout, loading: layoutLoading, saveLayout, updateAllWidgets } = useHomeLayout();
   const [isEditMode, setIsEditMode] = useState(false);
   const [containerWidth, setContainerWidth] = useState(1200);
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Measure container width for responsive grid
   useEffect(() => {
     const updateWidth = () => {
       if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth);
+        const width = containerRef.current.offsetWidth;
+        setContainerWidth(width);
+        setIsMobile(width < 768); // Mobile breakpoint at 768px
       }
     };
 
@@ -195,24 +198,24 @@ export default function HomePage() {
       initial="hidden"
       animate="visible"
       variants={pageVariants}
-      className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8"
+      className="min-h-screen bg-gray-50 px-2 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full">
         {/* Header with edit button */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Dashboard</h1>
           <div className="flex gap-2">
             {isEditMode ? (
               <>
                 <button
                   onClick={() => setIsEditMode(false)}
-                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-3 py-2 sm:px-4 text-sm sm:text-base text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveLayout}
-                  className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-3 py-2 sm:px-4 text-sm sm:text-base text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Save Changes
                 </button>
@@ -220,10 +223,10 @@ export default function HomePage() {
             ) : (
               <button
                 onClick={() => setIsEditMode(true)}
-                className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 sm:px-4 text-sm sm:text-base text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Settings size={18} />
-                Customize
+                <span className="hidden sm:inline">Customize</span>
               </button>
             )}
           </div>
@@ -239,9 +242,9 @@ export default function HomePage() {
               className="layout"
               layout={gridLayout}
               cols={GRID_COLS}
-              rowHeight={ROW_HEIGHT}
+              rowHeight={isMobile ? 60 : ROW_HEIGHT}
               width={containerWidth}
-              margin={[16, 16]}
+              margin={isMobile ? [8, 8] : [16, 16]}
               containerPadding={[0, 0]}
               isDraggable={isEditMode}
               isResizable={isEditMode}
