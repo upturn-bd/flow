@@ -187,15 +187,20 @@ export default function AttendanceSection({
   }, []);
 
   return (
-    <>
-      <SectionHeader title="Attendance Today" icon={Calendar} />
-      <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col overflow-hidden">
+      <div className="p-5 flex-shrink-0">
+        <SectionHeader title="Attendance Today" icon={Calendar} />
+      </div>
+      <div className="px-5 pb-5 flex-1 overflow-y-auto min-h-0">
         {loading || attendanceLoading ? (
-          <LoadingSection text="Loading attendance status..." icon={Calendar} />
+          <div className="flex items-center justify-center h-full min-h-[200px]">
+            <LoadingSection text="Loading attendance status..." icon={Calendar} />
+          </div>
         ) : (
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
             {/* LEFT COLUMN */}
-            <div className="space-y-4">
+            <div className="space-y-4 flex-1 min-w-0">{/* min-w-0 allows flex children to shrink */}
 
               {checkOutCompleted && checkInCompleted && (
                 <div className="flex items-center text-green-600 font-medium">
@@ -320,7 +325,7 @@ export default function AttendanceSection({
             </div>
 
             {/* RIGHT COLUMN */}
-            <div className="self-end md:self-center">
+            <div className="flex-shrink-0">
               {!checkInCompleted && !checkOutCompleted && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -329,7 +334,7 @@ export default function AttendanceSection({
                   onClick={handleCheckIn}
                   disabled={!attendanceRecord.site_id || !attendanceRecord.tag}
                   className={cn(
-                    "bg-blue-600 text-white font-medium rounded-lg px-5 py-2.5 flex items-center gap-2",
+                    "bg-blue-600 text-white font-medium rounded-lg px-5 py-2.5 flex items-center gap-2 w-full md:w-auto",
                     (!attendanceRecord.site_id || !attendanceRecord.tag) &&
                     "opacity-50 cursor-not-allowed"
                   )}
@@ -345,7 +350,7 @@ export default function AttendanceSection({
                   whileTap={{ scale: 0.95 }}
                   onClick={handleCheckOut}
                   type="button"
-                  className="bg-yellow-500 text-white font-medium rounded-lg px-5 py-2.5 flex items-center gap-2"
+                  className="bg-yellow-500 text-white font-medium rounded-lg px-5 py-2.5 flex items-center gap-2 w-full md:w-auto"
                 >
                   <CheckSquare size={18} />
                   Check-out
@@ -353,10 +358,10 @@ export default function AttendanceSection({
               )}
             </div>
           </div>
-        )}
 
-        {/* TABLE */}
-        <div className="overflow-x-auto rounded-lg border border-gray-200 mt-10">
+        {/* TABLE - Simplified for widget view */}
+        {attendanceData.length > 0 && (
+        <div className="overflow-x-auto rounded-lg border border-gray-200">
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr className="bg-gray-50">
@@ -375,102 +380,94 @@ export default function AttendanceSection({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {attendanceData.length > 0 ? (
-                attendanceData.map((entry, idx) => (
-                  <tr
-                    key={idx}
-                    className="hover:bg-gray-50 transition-colors duration-150"
-                  >
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {sites.length > 0 &&
-                        sites.filter((site) => site.id === entry.site_id)[0]
-                          ?.name || "Unknown Site"}
-                      {sites.length === 0 && (
-                        <span className="inline-flex items-center animate-pulse text-gray-400">
-                          Loading...
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
-                      {entry.check_in_time && (
-                        <div className="space-y-1">
-                          <div className='mb-2' >{formatTimeFromISO(entry.check_in_time)}</div>
-                          {sites.length > 0 && (() => {
-                            const site = sites.find(s => s.id === entry.site_id);
-                            if (site) {
-                              const lateStatus = checkLateStatus(
-                                formatTimeFromISO(entry.check_in_time),
-                                site.check_in
-                              );
-                              return (
-                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${lateStatus === 'late'
-                                    ? 'bg-red-100 text-red-800'
-                                    : 'bg-green-100 text-green-800'
-                                  }`}>
-                                  {lateStatus === 'late' ? 'Late' : 'On Time'}
-                                </span>
-                              );
-                            }
-                            return null;
-                          })()}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
-                      {entry.check_out_time ? (
-                        <div className="space-y-1">
-                          <div className='mb-2'>{formatTimeFromISO(entry.check_out_time)}</div>
-                          {sites.length > 0 && (() => {
-                            const site = sites.find(s => s.id === entry.site_id);
-                            if (site) {
-                              const earlyStatus = checkEarlyCheckOut(
-                                formatTimeFromISO(entry.check_out_time),
-                                site.check_out
-                              );
-                              return (
-                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${earlyStatus === 'early'
-                                    ? 'bg-yellow-100 text-yellow-800'
-                                    : 'bg-green-100 text-green-800'
-                                  }`}>
-                                  {earlyStatus === 'early' ? 'Early' : 'On Time'}
-                                </span>
-                              );
-                            }
-                            return null;
-                          })()}
-                        </div>
-                      ) : (
-                        "N/A"
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      {entry.tag === "Present" ? (
-                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          Present
-                        </span>
-                      ) : (
-                        <ClickableStatusCell
-                          tag={entry.tag}
-                          id={entry.id!}
-                        />
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-4 py-8 text-sm text-gray-500 text-center"
-                  >
-                    No attendance records found.
+              {attendanceData.slice(0, 3).map((entry, idx) => (
+                <tr
+                  key={idx}
+                  className="hover:bg-gray-50 transition-colors duration-150"
+                >
+                  <td className="px-4 py-3 text-sm text-gray-900">
+                    {sites.length > 0 &&
+                      sites.filter((site) => site.id === entry.site_id)[0]
+                        ?.name || "Unknown Site"}
+                    {sites.length === 0 && (
+                      <span className="inline-flex items-center animate-pulse text-gray-400">
+                        Loading...
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                    {entry.check_in_time && (
+                      <div className="space-y-1">
+                        <div className='mb-2' >{formatTimeFromISO(entry.check_in_time)}</div>
+                        {sites.length > 0 && (() => {
+                          const site = sites.find(s => s.id === entry.site_id);
+                          if (site) {
+                            const lateStatus = checkLateStatus(
+                              formatTimeFromISO(entry.check_in_time),
+                              site.check_in
+                            );
+                            return (
+                              <span className={`text-xs px-2 py-1 rounded-full font-medium ${lateStatus === 'late'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-green-100 text-green-800'
+                                }`}>
+                                {lateStatus === 'late' ? 'Late' : 'On Time'}
+                              </span>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                    {entry.check_out_time ? (
+                      <div className="space-y-1">
+                        <div className='mb-2'>{formatTimeFromISO(entry.check_out_time)}</div>
+                        {sites.length > 0 && (() => {
+                          const site = sites.find(s => s.id === entry.site_id);
+                          if (site) {
+                            const earlyStatus = checkEarlyCheckOut(
+                              formatTimeFromISO(entry.check_out_time),
+                              site.check_out
+                            );
+                            return (
+                              <span className={`text-xs px-2 py-1 rounded-full font-medium ${earlyStatus === 'early'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-green-100 text-green-800'
+                                }`}>
+                                {earlyStatus === 'early' ? 'Early' : 'On Time'}
+                              </span>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    {entry.tag === "Present" ? (
+                      <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        Present
+                      </span>
+                    ) : (
+                      <ClickableStatusCell
+                        tag={entry.tag}
+                        id={entry.id!}
+                      />
+                    )}
                   </td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </div>
+        )}
+        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

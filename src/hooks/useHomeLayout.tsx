@@ -112,6 +112,12 @@ export function useHomeLayout() {
     return updatedWidgets;
   }, [layout]);
 
+  // Update all widgets at once (for reordering)
+  const updateAllWidgets = useCallback((widgets: WidgetConfig[]) => {
+    if (!layout) return;
+    setLayout({ ...layout, widgets });
+  }, [layout]);
+
   // Add a new widget
   const addWidget = useCallback((widget: WidgetConfig) => {
     if (!layout) return;
@@ -158,6 +164,7 @@ export function useHomeLayout() {
     saving,
     saveLayout,
     updateWidget,
+    updateAllWidgets,
     addWidget,
     removeWidget,
     resetToDefault,

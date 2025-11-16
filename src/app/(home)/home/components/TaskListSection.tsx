@@ -27,6 +27,8 @@ export default function TaskListSection({
   loading,
   onTaskClick,
 }: TaskListSectionProps) {
+  console.log("Loading: ",loading);
+  
   return (
     <>
       <SectionHeader title="Task List" icon={CheckSquare} />

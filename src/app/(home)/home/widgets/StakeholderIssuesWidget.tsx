@@ -28,7 +28,7 @@ const statusColors = {
   Resolved: 'bg-green-100 text-green-700',
 };
 
-export default function StakeholderIssuesWidget({ config }: WidgetProps) {
+export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, onSizeChange }: WidgetProps) {
   const { employeeInfo } = useAuth();
   const { fetchIssuesByAssignedEmployee, issues, loading } = useStakeholderIssues();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -71,9 +71,9 @@ export default function StakeholderIssuesWidget({ config }: WidgetProps) {
 
   return (
     <>
-      <BaseWidget config={config}>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col">
-          <div className="p-5">
+      <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col overflow-hidden">
+          <div className="p-5 flex-shrink-0">
             <SectionHeader 
               title="Stakeholder Issues" 
               icon={AlertCircle} 
@@ -82,15 +82,17 @@ export default function StakeholderIssuesWidget({ config }: WidgetProps) {
           </div>
           
           {loading ? (
-            <div className="flex-1">
+            <div className="flex-1 flex items-center justify-center overflow-hidden">
               <LoadingSection text="Loading issues..." icon={AlertCircle} />
             </div>
           ) : (
             <motion.div
               variants={staggerContainer}
-              className="px-5 pb-5 flex-1"
+              initial="hidden"
+              animate="visible"
+              className="px-5 pb-5 flex-1 overflow-hidden flex flex-col"
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 flex-shrink-0">
                 <h3 className="text-sm font-medium text-gray-500">Assigned to You</h3>
                 <div className="flex items-center gap-2">
                   <motion.button
@@ -114,7 +116,7 @@ export default function StakeholderIssuesWidget({ config }: WidgetProps) {
                 </div>
               </div>
 
-              <div className="space-y-3 min-h-[200px]">
+              <div className="space-y-3 flex-1 overflow-y-auto min-h-0">
                 {issues.length > 0 ? (
                   issues.slice(0, 5).map((issue) => (
                     <motion.div

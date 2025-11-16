@@ -8,7 +8,7 @@ import { useNotices } from "@/hooks/useNotice";
 import { useModalState } from "@/app/(home)/home/components/useModalState";
 import DetailModals from "@/app/(home)/home/components/DetailModals";
 
-export default function NoticesWidget({ config }: WidgetProps) {
+export default function NoticesWidget({ config, isEditMode, onToggle, onSizeChange }: WidgetProps) {
   const { notices, loading, fetchNotices } = useNotices();
   const { selectedNoticeId, handleNoticeClick, closeNotice } = useModalState();
 
@@ -27,7 +27,7 @@ export default function NoticesWidget({ config }: WidgetProps) {
           onCloseTask={() => {}}
         />
       )}
-      <BaseWidget config={config}>
+      <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
         <NoticesSection
           notices={notices}
           loading={loading}

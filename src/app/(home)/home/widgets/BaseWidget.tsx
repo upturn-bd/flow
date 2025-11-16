@@ -4,7 +4,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { WidgetProps, WidgetSize } from '@/lib/types/widgets';
 import { cn } from '@/components/ui/class';
-import { Eye, EyeOff, Maximize2, Minimize2 } from 'lucide-react';
+import { Eye, EyeOff, Maximize2, Minimize2, GripVertical } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface BaseWidgetProps extends WidgetProps {
   children: React.ReactNode;
@@ -19,11 +21,31 @@ export default function BaseWidget({
   children,
   className,
 }: BaseWidgetProps) {
-  const sizeClasses = {
-    small: 'col-span-1',
-    medium: 'col-span-1 md:col-span-1',
-    large: 'col-span-1 md:col-span-2',
-    full: 'col-span-1 md:col-span-2 lg:col-span-3',
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+    isSorting,
+    overIndex,
+  } = useSortable({ 
+    id: config.id, 
+    disabled: !isEditMode,
+    animateLayoutChanges: () => false, // Disable layout animations
+  });
+
+  // Debug logging
+  React.useEffect(() => {
+    if (isEditMode) {
+      console.log('Widget in edit mode:', config.id, { hasListeners: !!listeners });
+    }
+  }, [isEditMode, config.id, listeners]);
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition: transition || 'transform 250ms ease',
   };
 
   const handleSizeToggle = () => {
@@ -35,17 +57,21 @@ export default function BaseWidget({
     onSizeChange(nextSize);
   };
 
+  // Don't render if disabled and not in edit mode
+  if (!config.enabled && !isEditMode) {
+    return null;
+  }
+
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: config.enabled || isEditMode ? 1 : 0.5, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.3 }}
+    <div
+      ref={setNodeRef}
+      style={style}
       className={cn(
-        sizeClasses[config.size],
+        'h-full w-full',
         'relative',
         !config.enabled && isEditMode && 'opacity-50',
+        isDragging && 'opacity-30 scale-95',
+        'transition-all duration-200',
         className
       )}
     >
@@ -79,14 +105,27 @@ export default function BaseWidget({
           )}
         </div>
       )}
+
+      {/* Drag handle */}
+      {isEditMode && config.enabled && (
+        <button
+          {...attributes}
+          {...listeners}
+          className="absolute -top-3 -left-3 z-10 p-2 bg-gray-700 hover:bg-gray-800 text-white rounded-full shadow-md transition-colors cursor-grab active:cursor-grabbing touch-none"
+          title="Drag to reorder"
+          type="button"
+        >
+          <GripVertical size={16} />
+        </button>
+      )}
       
       {/* Widget content - always show the container */}
       <div className={cn(
-        'h-full',
+        'h-full w-full overflow-hidden',
         !config.enabled && !isEditMode && 'hidden'
       )}>
         {children}
       </div>
-    </motion.div>
+    </div>
   );
 }

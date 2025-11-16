@@ -20,6 +20,8 @@ export type WidgetSize = 'small' | 'medium' | 'large' | 'full';
 export interface WidgetPosition {
   row: number;
   col: number;
+  width?: number; // Grid width (number of columns)
+  height?: number; // Grid height (number of rows)
 }
 
 // Widget configuration for individual widget instance
@@ -73,40 +75,40 @@ export const DEFAULT_WIDGET_CONFIGS: WidgetConfig[] = [
     id: 'notices-1',
     type: 'notices',
     enabled: true,
-    position: { row: 0, col: 0 },
-    size: 'medium',
+    position: { row: 0, col: 8, width: 4, height: 5 },
+    size: 'small',
     order: 0,
   },
   {
-    id: 'attendance-1',
-    type: 'attendance',
+    id: 'stakeholder-issues-1',
+    type: 'stakeholder-issues',
     enabled: true,
-    position: { row: 0, col: 1 },
-    size: 'large',
+    position: { row: 5, col: 4, width: 8, height: 5 },
+    size: 'medium',
     order: 1,
   },
   {
     id: 'tasks-1',
     type: 'tasks',
     enabled: true,
-    position: { row: 1, col: 0 },
-    size: 'medium',
+    position: { row: 5, col: 0, width: 4, height: 5 },
+    size: 'small',
     order: 2,
+  },
+  {
+    id: 'attendance-1',
+    type: 'attendance',
+    enabled: true,
+    position: { row: 0, col: 0, width: 8, height: 5 },
+    size: 'medium',
+    order: 3,
   },
   {
     id: 'projects-1',
     type: 'projects',
     enabled: true,
-    position: { row: 1, col: 1 },
-    size: 'medium',
-    order: 3,
-  },
-  {
-    id: 'stakeholder-issues-1',
-    type: 'stakeholder-issues',
-    enabled: true,
-    position: { row: 2, col: 0 },
-    size: 'medium',
+    position: { row: 10, col: 0, width: 12, height: 5 },
+    size: 'large',
     order: 4,
   },
 ];

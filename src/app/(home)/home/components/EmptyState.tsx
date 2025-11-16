@@ -19,10 +19,10 @@ export default function EmptyState({
   return (
     <motion.div 
       variants={fadeIn}
-      className="flex flex-col items-center justify-center py-10 text-gray-500"
+      className="flex flex-col items-center justify-center h-full min-h-[120px] text-gray-500"
     >
       <Icon size={iconSize} className="text-gray-300 mb-3" />
-      <p>{message}</p>
+      <p className="text-sm text-center px-4">{message}</p>
     </motion.div>
   );
 }

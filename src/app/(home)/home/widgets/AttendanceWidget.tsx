@@ -13,7 +13,7 @@ const initialAttendanceRecord: { tag: string; site_id: number | undefined } = {
   site_id: undefined,
 };
 
-export default function AttendanceWidget({ config }: WidgetProps) {
+export default function AttendanceWidget({ config, isEditMode, onToggle, onSizeChange }: WidgetProps) {
   const [attendanceRecord, setAttendanceRecord] = useState(initialAttendanceRecord);
   const [attendanceLoading, setAttendanceLoading] = useState(false);
   
@@ -55,7 +55,7 @@ export default function AttendanceWidget({ config }: WidgetProps) {
   };
 
   return (
-    <BaseWidget config={config}>
+    <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
       <AttendanceSection
         loading={todayLoading}
         attendanceLoading={attendanceLoading}
