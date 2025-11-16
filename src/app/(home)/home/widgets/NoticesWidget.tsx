@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import BaseWidget from './BaseWidget';
 import { WidgetProps } from '@/lib/types/widgets';
 import NoticesSection from '../components/NoticesSection';
