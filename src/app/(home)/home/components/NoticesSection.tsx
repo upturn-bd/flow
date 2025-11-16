@@ -119,10 +119,12 @@ export default function NoticesSection({
     );
   };
   return (
-    <>
-      <SectionHeader title="News & Reminder" icon={Bell} />
-      <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-        <div className="flex flex-wrap items-center gap-4 text-sm font-medium mb-4">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col overflow-hidden">
+      <div className="p-5 flex-shrink-0">
+        <SectionHeader title="News & Reminder" icon={Bell} />
+      </div>
+      <div className="px-5 pb-5 flex-1 overflow-hidden flex flex-col">
+        <div className="flex flex-wrap items-center gap-4 text-sm font-medium mb-4 flex-shrink-0">
           <TabButton tab="all" label="All" />
           <TabButton tab="unread" label="Unread" />
           <TabButton tab="urgent" label="Urgent" />
@@ -138,13 +140,15 @@ export default function NoticesSection({
         </div>
         
         {loading ? (
-          <LoadingSection text="Loading notices..." icon={Bell} />
+          <div className="flex-1 flex items-center justify-center overflow-hidden">
+            <LoadingSection text="Loading notices..." icon={Bell} />
+          </div>
         ) : (
           <motion.ul 
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="space-y-3 mt-6"
+            className="space-y-3 mt-6 flex-1 overflow-y-auto min-h-0"
           >
             {filteredNotices.length > 0 ? (
               filteredNotices.map((item) => {
@@ -206,6 +210,6 @@ export default function NoticesSection({
           </motion.ul>
         )}
       </div>
-    </>
+    </div>
   );
 }

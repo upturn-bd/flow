@@ -170,3 +170,14 @@ input,select{
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
+
+/* React Grid Layout - Ensure grid items have full height */
+.react-grid-item {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.react-grid-item > div {
+  height: 100%;
+  width: 100%;
+}
