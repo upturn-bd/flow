@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { Plus, Search, Filter, Eye, CheckCircle2, Clock, XCircle, Download } from "lucide-react";
+import { Plus, Search, Filter, Eye, CheckCircle2, Clock, Download } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
 import { exportStakeholdersToCSV } from "@/lib/utils/csv-export";
 import { toast } from "sonner";

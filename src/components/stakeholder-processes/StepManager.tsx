@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { StakeholderProcessStep, FieldDefinitionsSchema, FieldType, FieldDefinition, DropdownOption } from "@/lib/types/schemas";
+import { StakeholderProcessStep, FieldType, FieldDefinition, DropdownOption } from "@/lib/types/schemas";
 import { useTeams } from "@/hooks/useTeams";
-import { Plus, Trash2, GripVertical, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Trash2, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown } from "lucide-react";
 import { FIELD_TYPES } from "@/lib/constants";
 
 interface StepManagerProps {

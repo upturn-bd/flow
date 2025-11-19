@@ -5,8 +5,8 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { StakeholderProcessStep, StakeholderStepData, FieldDefinition } from "@/lib/types/schemas";
-import { Upload, X, CheckCircle2, File as FileIcon, Loader2, XCircle } from "lucide-react";
-import GeolocationPicker, { GeolocationValue } from "@/components/ui/GeolocationPicker";
+import { Upload, X, CheckCircle2, File as FileIcon, XCircle } from "lucide-react";
+import GeolocationPicker from "@/components/ui/GeolocationPicker";
 import DropdownField from "@/components/ui/DropdownField";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 
