@@ -347,9 +347,30 @@ export default function StakeholdersPage() {
                     </td>
                     <td className="px-6 py-4">
                       {stakeholder.current_step ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}
-                        </span>
+                        <div className="flex flex-col gap-1">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}
+                          </span>
+                          {(() => {
+                            // Find step data for current step and extract status
+                            const currentStepData = stakeholder.step_data?.find(
+                              (sd) => sd.step_id === stakeholder.current_step_id
+                            );
+                            const stepStatus = currentStepData?.data?.["__step_status"];
+                            
+                            if (stepStatus && stakeholder.current_step?.status_field?.enabled) {
+                              const statusOption = stakeholder.current_step.status_field.options?.find(
+                                opt => opt.value === stepStatus
+                              );
+                              return (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  {statusOption?.label || stepStatus}
+                                </span>
+                              );
+                            }
+                            return null;
+                          })()}
+                        </div>
                       ) : (
                         <span className="text-sm text-gray-500">Not started</span>
                       )}
@@ -443,9 +464,30 @@ export default function StakeholdersPage() {
                   <div className="col-span-2">
                     <p className="text-gray-500">Current Step</p>
                     {stakeholder.current_step ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-1">
-                        Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}
-                      </span>
+                      <div className="flex flex-col gap-1 mt-1">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 w-fit">
+                          Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}
+                        </span>
+                        {(() => {
+                          // Find step data for current step and extract status
+                          const currentStepData = stakeholder.step_data?.find(
+                            (sd) => sd.step_id === stakeholder.current_step_id
+                          );
+                          const stepStatus = currentStepData?.data?.["__step_status"];
+                          
+                          if (stepStatus && stakeholder.current_step?.status_field?.enabled) {
+                            const statusOption = stakeholder.current_step.status_field.options?.find(
+                              opt => opt.value === stepStatus
+                            );
+                            return (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 w-fit">
+                                {statusOption?.label || stepStatus}
+                              </span>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
                     ) : (
                       <p className="text-gray-400 mt-1">Not started</p>
                     )}

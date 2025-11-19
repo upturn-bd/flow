@@ -233,10 +233,12 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
     start_date: step?.start_date || "",
     end_date: step?.end_date || "",
     can_reject: step?.can_reject || false,
+    status_field: step?.status_field || { enabled: false, label: "Status", options: [] },
   });
 
   const [loading, setLoading] = useState(false);
   const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(null);
+  const [statusOptionInput, setStatusOptionInput] = useState("");
 
   const addField = () => {
     const newField = {
@@ -433,6 +435,155 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
                 </p>
               </div>
             </label>
+          </div>
+
+          {/* Status Field Option */}
+          <div className="border-t border-gray-200 pt-6">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.status_field?.enabled || false}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  status_field: { 
+                    ...formData.status_field,
+                    enabled: e.target.checked,
+                    label: formData.status_field?.label || "Status",
+                    options: formData.status_field?.options || []
+                  } 
+                })}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+              />
+              <div>
+                <span className="text-sm font-medium text-gray-700">Enable Step Status</span>
+                <p className="text-xs text-gray-500">
+                  Add a status dropdown field to track step progress
+                </p>
+              </div>
+            </label>
+
+            {formData.status_field?.enabled && (
+              <div className="mt-4 pl-7 space-y-4">
+                {/* Status Label */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Status Field Label
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.status_field?.label || "Status"}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      status_field: {
+                        ...formData.status_field,
+                        enabled: true,
+                        label: e.target.value,
+                        options: formData.status_field?.options || []
+                      }
+                    })}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="e.g., Status, Progress, Stage"
+                  />
+                </div>
+
+                {/* Status Options */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-2">
+                    Status Options
+                  </label>
+                  
+                  {/* Add Option Input */}
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="text"
+                      value={statusOptionInput}
+                      onChange={(e) => setStatusOptionInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (statusOptionInput.trim()) {
+                            const newOption = {
+                              label: statusOptionInput.trim(),
+                              value: statusOptionInput.trim().toLowerCase().replace(/\s+/g, '_'),
+                            };
+                            setFormData({
+                              ...formData,
+                              status_field: {
+                                ...formData.status_field,
+                                enabled: true,
+                                label: formData.status_field?.label || "Status",
+                                options: [...(formData.status_field?.options || []), newOption]
+                              }
+                            });
+                            setStatusOptionInput("");
+                          }
+                        }
+                      }}
+                      placeholder="Enter status option (e.g., In Progress, Completed)"
+                      className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (statusOptionInput.trim()) {
+                          const newOption = {
+                            label: statusOptionInput.trim(),
+                            value: statusOptionInput.trim().toLowerCase().replace(/\s+/g, '_'),
+                          };
+                          setFormData({
+                            ...formData,
+                            status_field: {
+                              ...formData.status_field,
+                              enabled: true,
+                              label: formData.status_field?.label || "Status",
+                              options: [...(formData.status_field?.options || []), newOption]
+                            }
+                          });
+                          setStatusOptionInput("");
+                        }
+                      }}
+                      className="px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Add
+                    </button>
+                  </div>
+
+                  {/* Options List */}
+                  <div className="space-y-2">
+                    {(formData.status_field?.options || []).length > 0 ? (
+                      (formData.status_field?.options || []).map((option, optIndex) => (
+                        <div
+                          key={optIndex}
+                          className="flex items-center justify-between p-2 bg-white border border-gray-200 rounded text-sm"
+                        >
+                          <span className="text-gray-700">{option.label}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newOptions = (formData.status_field?.options || []).filter((_, i) => i !== optIndex);
+                              setFormData({
+                                ...formData,
+                                status_field: {
+                                  ...formData.status_field,
+                                  enabled: true,
+                                  label: formData.status_field?.label || "Status",
+                                  options: newOptions
+                                }
+                              });
+                            }}
+                            className="text-red-600 hover:text-red-700 text-xs"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-xs text-gray-500 italic">No status options added yet</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Actions */}
