@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { StakeholderProcessStep, FieldDefinitionsSchema, FieldType, FieldDefinition, DropdownOption } from "@/lib/types/schemas";
 import { useTeams } from "@/hooks/useTeams";
-import { Plus, Trash2, GripVertical, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Trash2, GripVertical, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown, List } from "lucide-react";
 import { FIELD_TYPES } from "@/lib/constants";
 
 interface StepManagerProps {
@@ -470,6 +470,8 @@ interface FieldEditorProps {
 
 function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle }: FieldEditorProps) {
   const [optionInput, setOptionInput] = useState("");
+  const [showNestedFields, setShowNestedFields] = useState(false);
+  const [editingOptionNested, setEditingOptionNested] = useState<number | null>(null);
   
   const isDropdownType = field.type === 'dropdown' || field.type === 'multi_select';
 
@@ -489,6 +491,70 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
   const removeOption = (optionIndex: number) => {
     const currentOptions = field.options || [];
     onUpdate(index, { options: currentOptions.filter((_, i) => i !== optionIndex) });
+  };
+
+  const updateOption = (optionIndex: number, updates: Partial<DropdownOption>) => {
+    const currentOptions = field.options || [];
+    const updatedOptions = currentOptions.map((opt, i) =>
+      i === optionIndex ? { ...opt, ...updates } : opt
+    );
+    onUpdate(index, { options: updatedOptions });
+  };
+
+  const addNestedField = (parentNested?: FieldDefinition[]) => {
+    const newField: FieldDefinition = {
+      key: `nested_field_${Date.now()}`,
+      label: "",
+      type: "text" as FieldType,
+      required: false,
+    };
+
+    const currentNested = parentNested || field.nested || [];
+    onUpdate(index, { nested: [...currentNested, newField] });
+  };
+
+  const updateNestedField = (nestedIndex: number, updates: Partial<FieldDefinition>) => {
+    const currentNested = field.nested || [];
+    const updatedNested = currentNested.map((f, i) =>
+      i === nestedIndex ? { ...f, ...updates } : f
+    );
+    onUpdate(index, { nested: updatedNested });
+  };
+
+  const removeNestedField = (nestedIndex: number) => {
+    const currentNested = field.nested || [];
+    onUpdate(index, { nested: currentNested.filter((_, i) => i !== nestedIndex) });
+  };
+
+  const addOptionNestedField = (optionIndex: number) => {
+    const currentOptions = field.options || [];
+    const option = currentOptions[optionIndex];
+    const newField: FieldDefinition = {
+      key: `option_nested_field_${Date.now()}`,
+      label: "",
+      type: "text" as FieldType,
+      required: false,
+    };
+    
+    const currentNested = option.nested || [];
+    updateOption(optionIndex, { nested: [...currentNested, newField] });
+  };
+
+  const updateOptionNestedField = (optionIndex: number, nestedIndex: number, updates: Partial<FieldDefinition>) => {
+    const currentOptions = field.options || [];
+    const option = currentOptions[optionIndex];
+    const currentNested = option.nested || [];
+    const updatedNested = currentNested.map((f, i) =>
+      i === nestedIndex ? { ...f, ...updates } : f
+    );
+    updateOption(optionIndex, { nested: updatedNested });
+  };
+
+  const removeOptionNestedField = (optionIndex: number, nestedIndex: number) => {
+    const currentOptions = field.options || [];
+    const option = currentOptions[optionIndex];
+    const currentNested = option.nested || [];
+    updateOption(optionIndex, { nested: currentNested.filter((_, i) => i !== nestedIndex) });
   };
 
   const getFieldTypeLabel = (type: string) => {
@@ -553,6 +619,14 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
           )}
           <button
             type="button"
+            onClick={() => setShowNestedFields(!showNestedFields)}
+            className={`p-2 rounded transition-colors ${showNestedFields ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-gray-200'}`}
+            title={showNestedFields ? "Hide nested fields" : "Configure nested fields"}
+          >
+            <List size={16} />
+          </button>
+          <button
+            type="button"
             onClick={() => onRemove(index)}
             className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
           >
@@ -596,22 +670,163 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
           <div className="space-y-2">
             {(field.options || []).length > 0 ? (
               (field.options || []).map((option, optIndex) => (
-                <div
-                  key={optIndex}
-                  className="flex items-center justify-between p-2 bg-white border border-gray-200 rounded text-sm"
-                >
-                  <span className="text-gray-700">{option.label}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeOption(optIndex)}
-                    className="text-red-600 hover:text-red-700 text-xs"
-                  >
-                    Remove
-                  </button>
+                <div key={optIndex} className="bg-white border border-gray-200 rounded">
+                  <div className="flex items-center justify-between p-2">
+                    <span className="text-gray-700 text-sm">{option.label}</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setEditingOptionNested(editingOptionNested === optIndex ? null : optIndex)}
+                        className={`px-2 py-1 text-xs rounded transition-colors ${
+                          editingOptionNested === optIndex
+                            ? 'bg-blue-50 text-blue-600'
+                            : 'text-gray-600 hover:bg-gray-100'
+                        }`}
+                        title="Configure nested fields for this option"
+                      >
+                        Nested ({option.nested?.length || 0})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeOption(optIndex)}
+                        className="text-red-600 hover:text-red-700 text-xs px-2"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Option Nested Fields Editor */}
+                  {editingOptionNested === optIndex && (
+                    <div className="px-3 pb-3 border-t border-gray-100 bg-gray-50">
+                      <div className="flex items-center justify-between mb-2 mt-2">
+                        <label className="text-xs font-medium text-gray-700">
+                          Nested Fields for "{option.label}"
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => addOptionNestedField(optIndex)}
+                          className="flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                        >
+                          <Plus size={12} />
+                          Add
+                        </button>
+                      </div>
+                      <div className="space-y-2">
+                        {(option.nested || []).map((nestedField, nestedIdx) => (
+                          <div key={nestedIdx} className="flex items-center gap-2 bg-white p-2 rounded border border-gray-200">
+                            <input
+                              type="text"
+                              value={nestedField.label}
+                              onChange={(e) => updateOptionNestedField(optIndex, nestedIdx, { label: e.target.value })}
+                              placeholder="Label"
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none"
+                            />
+                            <select
+                              value={nestedField.type}
+                              onChange={(e) => updateOptionNestedField(optIndex, nestedIdx, { type: e.target.value as FieldType })}
+                              className="px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none"
+                            >
+                              {Object.values(FIELD_TYPES).map((type) => (
+                                <option key={type} value={type}>
+                                  {getFieldTypeLabel(type)}
+                                </option>
+                              ))}
+                            </select>
+                            <label className="flex items-center gap-1">
+                              <input
+                                type="checkbox"
+                                checked={nestedField.required}
+                                onChange={(e) => updateOptionNestedField(optIndex, nestedIdx, { required: e.target.checked })}
+                                className="w-3 h-3"
+                              />
+                              <span className="text-xs text-gray-600">Req</span>
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => removeOptionNestedField(optIndex, nestedIdx)}
+                              className="p-1 text-red-600 hover:bg-red-50 rounded"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        ))}
+                        {(!option.nested || option.nested.length === 0) && (
+                          <p className="text-xs text-gray-500 italic text-center py-2">
+                            No nested fields defined
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))
             ) : (
               <p className="text-xs text-gray-500 italic">No options added yet</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* General Nested Fields Editor (for all field types) */}
+      {showNestedFields && (
+        <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3 bg-white">
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-xs font-medium text-gray-700">
+              Nested Fields
+            </label>
+            <button
+              type="button"
+              onClick={() => addNestedField()}
+              className="flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            >
+              <Plus size={12} />
+              Add Nested Field
+            </button>
+          </div>
+          <div className="space-y-2">
+            {(field.nested || []).map((nestedField, nestedIdx) => (
+              <div key={nestedIdx} className="flex items-center gap-2 bg-gray-50 p-2 rounded border border-gray-200">
+                <input
+                  type="text"
+                  value={nestedField.label}
+                  onChange={(e) => updateNestedField(nestedIdx, { label: e.target.value })}
+                  placeholder="Label"
+                  className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none bg-white"
+                />
+                <select
+                  value={nestedField.type}
+                  onChange={(e) => updateNestedField(nestedIdx, { type: e.target.value as FieldType })}
+                  className="px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none bg-white"
+                >
+                  {Object.values(FIELD_TYPES).map((type) => (
+                    <option key={type} value={type}>
+                      {getFieldTypeLabel(type)}
+                    </option>
+                  ))}
+                </select>
+                <label className="flex items-center gap-1">
+                  <input
+                    type="checkbox"
+                    checked={nestedField.required}
+                    onChange={(e) => updateNestedField(nestedIdx, { required: e.target.checked })}
+                    className="w-3 h-3"
+                  />
+                  <span className="text-xs text-gray-600">Required</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => removeNestedField(nestedIdx)}
+                  className="p-1 text-red-600 hover:bg-red-50 rounded"
+                >
+                  <Trash2 size={12} />
+                </button>
+              </div>
+            ))}
+            {(!field.nested || field.nested.length === 0) && (
+              <p className="text-xs text-gray-500 italic text-center py-2">
+                No nested fields defined. Click "Add Nested Field" to create one.
+              </p>
             )}
           </div>
         </div>
