@@ -5,15 +5,17 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { StakeholderProcessStep, StakeholderStepData, FieldDefinition, NestedFieldValue } from "@/lib/types/schemas";
-import { Upload, X, CheckCircle2, File as FileIcon, Loader2, XCircle } from "lucide-react";
+import { Upload, X, CheckCircle2, File as FileIcon, Loader2, XCircle, Calculator } from "lucide-react";
 import GeolocationPicker, { GeolocationValue } from "@/components/ui/GeolocationPicker";
 import DropdownField from "@/components/ui/DropdownField";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
+import { calculateFieldValue, formatCalculatedValue } from "@/lib/utils/formula-evaluator";
 
 interface StepDataFormProps {
   stakeholderId: number;
   step: StakeholderProcessStep;
   existingData?: StakeholderStepData;
+  completedStepsData?: Array<{ step_order: number; data: Record<string, any> }>;
   onComplete: () => void;
   onCancel: () => void;
 }
@@ -22,6 +24,7 @@ export default function StepDataForm({
   stakeholderId,
   step,
   existingData,
+  completedStepsData = [],
   onComplete,
   onCancel,
 }: StepDataFormProps) {
@@ -668,6 +671,77 @@ export default function StepDataForm({
               placeholder={field.placeholder || field.label}
             />
             {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
+            {renderNestedFields()}
+          </div>
+        );
+
+      case "number":
+        return (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {field.label}
+              {field.required && <span className="text-red-500 ml-1">*</span>}
+            </label>
+            <input
+              type="number"
+              value={actualValue || ""}
+              onChange={(e) => updateValue(e.target.value)}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
+                hasError ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder={field.placeholder || field.label}
+              step="any"
+              min={field.validation?.min}
+              max={field.validation?.max}
+            />
+            {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
+            {field.helpText && <p className="text-xs text-gray-500 mt-1">{field.helpText}</p>}
+            {renderNestedFields()}
+          </div>
+        );
+
+      case "calculated":
+        // Evaluate formula using completed steps data
+        const calculationResult = field.formula
+          ? calculateFieldValue(field.formula, completedStepsData)
+          : { value: null, error: "No formula defined" };
+        
+        return (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {field.label}
+              <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded">
+                <Calculator size={12} />
+                Calculated
+              </span>
+            </label>
+            <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50">
+              <div className="flex items-center justify-between">
+                <span className="text-lg font-semibold text-gray-900">
+                  {calculationResult.value !== null
+                    ? formatCalculatedValue(calculationResult.value)
+                    : "—"}
+                </span>
+                {calculationResult.missingRefs && calculationResult.missingRefs.length > 0 && (
+                  <span className="text-xs text-amber-600">
+                    Missing data
+                  </span>
+                )}
+              </div>
+            </div>
+            {field.formula && (
+              <p className="text-xs text-gray-500 mt-1">
+                Formula: <code className="bg-gray-100 px-1 py-0.5 rounded">{field.formula}</code>
+              </p>
+            )}
+            {calculationResult.error && (
+              <p className="text-xs text-red-500 mt-1">{calculationResult.error}</p>
+            )}
+            {calculationResult.missingRefs && calculationResult.missingRefs.length > 0 && (
+              <p className="text-xs text-amber-600 mt-1">
+                Missing references: {calculationResult.missingRefs.join(", ")}
+              </p>
+            )}
             {renderNestedFields()}
           </div>
         );

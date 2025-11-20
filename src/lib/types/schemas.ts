@@ -484,13 +484,15 @@ export interface ContactPerson {
 }
 
 // Field definition types for process steps
-export type FieldType = 'text' | 'boolean' | 'date' | 'file' | 'geolocation' | 'dropdown' | 'multi_select';
+export type FieldType = 'text' | 'number' | 'boolean' | 'date' | 'file' | 'geolocation' | 'dropdown' | 'multi_select' | 'calculated';
 
 export interface FieldValidation {
   minLength?: number;
   maxLength?: number;
   pattern?: string;
   message?: string;
+  min?: number; // For number fields
+  max?: number; // For number fields
 }
 
 // Dropdown option for dropdown and multi_select field types
@@ -513,6 +515,9 @@ export interface FieldDefinition {
   options?: DropdownOption[];
   // Nested field definitions for all field types
   nested?: FieldDefinition[];
+  // For calculated field type
+  formula?: string; // Excel-like formula (e.g., "Step1.price * Step2.quantity")
+  referencedFields?: Array<{ stepOrder: number; fieldKey: string }>; // Parsed references
 }
 
 export interface FieldDefinitionsSchema {

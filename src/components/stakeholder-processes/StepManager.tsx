@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { StakeholderProcessStep, FieldType, FieldDefinition, DropdownOption } from "@/lib/types/schemas";
 import { useTeams } from "@/hooks/useTeams";
-import { Plus, Trash2, GripVertical, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown, List, X } from "lucide-react";
+import { Plus, Trash2, GripVertical, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown, List, X, Calculator } from "lucide-react";
 import { FIELD_TYPES } from "@/lib/constants";
 import Toggle from "@/components/ui/Toggle";
+import FormulaEditor from "./FormulaEditor";
 
 interface StepManagerProps {
   processId: number;
@@ -199,6 +200,7 @@ export default function StepManager({
           step={editingStep}
           teams={teams}
           nextStepOrder={steps.length + 1}
+          availableSteps={steps}
           onSubmit={async (data) => {
             if (editingStep) {
               await onUpdateStep(editingStep.id!, data);
@@ -225,11 +227,12 @@ interface StepFormModalProps {
   step: StakeholderProcessStep | null;
   teams: any[];
   nextStepOrder: number;
+  availableSteps: StakeholderProcessStep[];
   onSubmit: (data: any) => Promise<void>;
   onClose: () => void;
 }
 
-function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClose }: StepFormModalProps) {
+function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, onSubmit, onClose }: StepFormModalProps) {
   const [formData, setFormData] = useState({
     process_id: processId,
     name: step?.name || "",
@@ -422,6 +425,8 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
                   onRemove={removeField}
                   isEditing={editingFieldIndex === index}
                   onEditToggle={() => setEditingFieldIndex(editingFieldIndex === index ? null : index)}
+                  availableSteps={availableSteps}
+                  currentStepOrder={formData.step_order}
                 />
               ))}
             </div>
@@ -609,14 +614,18 @@ interface FieldEditorProps {
   onRemove: (index: number) => void;
   isEditing: boolean;
   onEditToggle: () => void;
+  availableSteps: StakeholderProcessStep[];
+  currentStepOrder: number;
 }
 
-function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle }: FieldEditorProps) {
+function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle, availableSteps, currentStepOrder }: FieldEditorProps) {
   const [optionInput, setOptionInput] = useState("");
   const [showNestedFields, setShowNestedFields] = useState(false);
   const [editingOptionNested, setEditingOptionNested] = useState<number | null>(null);
+  const [showFormulaEditor, setShowFormulaEditor] = useState(false);
   
   const isDropdownType = field.type === 'dropdown' || field.type === 'multi_select';
+  const isCalculatedField = field.type === 'calculated';
 
   const addOption = () => {
     if (!optionInput.trim()) return;
@@ -703,12 +712,14 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
   const getFieldTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
       text: 'Text',
+      number: 'Number',
       boolean: 'Boolean',
       date: 'Date',
       file: 'File',
       geolocation: 'Geolocation',
       dropdown: 'Dropdown',
       multi_select: 'Multi-Select',
+      calculated: 'Calculated Field',
     };
     return labels[type] || type;
   };
@@ -761,6 +772,21 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
             >
               {isEditing ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               <span>{isEditing ? "Collapse" : "Options"}</span>
+            </button>
+          )}
+          {isCalculatedField && (
+            <button
+              type="button"
+              onClick={() => setShowFormulaEditor(!showFormulaEditor)}
+              className={`flex-1 sm:flex-initial px-3 py-2 rounded-lg transition-colors font-medium text-sm flex items-center justify-center gap-1.5 ${
+                showFormulaEditor 
+                  ? 'bg-green-600 text-white hover:bg-green-700' 
+                  : 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
+              }`}
+              title={showFormulaEditor ? "Hide formula editor" : "Edit formula"}
+            >
+              <Calculator size={16} />
+              <span>{showFormulaEditor ? "Hide" : "Formula"}</span>
             </button>
           )}
           <button
@@ -941,6 +967,20 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
             )}
           </div>
           </div>
+        </div>
+      )}
+
+      {/* Formula Editor (for calculated fields) */}
+      {isCalculatedField && showFormulaEditor && (
+        <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3 bg-white">
+          <FormulaEditor
+            formula={field.formula || ""}
+            onChange={(formula, references) => {
+              onUpdate(index, { formula, referencedFields: references });
+            }}
+            availableSteps={availableSteps}
+            currentStepOrder={currentStepOrder}
+          />
         </div>
       )}
 
