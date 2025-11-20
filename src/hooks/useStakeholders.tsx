@@ -454,10 +454,11 @@ export function useStakeholders() {
         .select(`
           *,
           process:stakeholder_processes(id, name, is_sequential),
-          current_step:stakeholder_process_steps(id, name, step_order),
+          current_step:stakeholder_process_steps(id, name, step_order, status_field),
           stakeholder_type:stakeholder_types(id, name, description),
           parent_stakeholder:stakeholders!parent_stakeholder_id(id, name, status),
-          kam:employees!kam_id(id, first_name, last_name, email)
+          kam:employees!kam_id(id, first_name, last_name, email),
+          step_data:stakeholder_step_data(id, stakeholder_id, step_id, data, is_completed)
         `)
         .eq("company_id", company_id);
 
@@ -508,10 +509,11 @@ export function useStakeholders() {
         .select(`
           *,
           process:stakeholder_processes(id, name, is_sequential),
-          current_step:stakeholder_process_steps(id, name, step_order),
+          current_step:stakeholder_process_steps(id, name, step_order, status_field),
           stakeholder_type:stakeholder_types(id, name, description),
           parent_stakeholder:stakeholders!parent_stakeholder_id(id, name, status),
-          kam:employees!kam_id(id, first_name, last_name, email)
+          kam:employees!kam_id(id, first_name, last_name, email),
+          step_data:stakeholder_step_data(id, stakeholder_id, step_id, data, is_completed)
         `, { count: 'exact' })
         .eq("company_id", company_id);
       
@@ -948,6 +950,11 @@ export function useStakeholders() {
             // Other field types
             processedData[field.key] = value;
           }
+        }
+        
+        // Include the step status field if it exists in the data
+        if (stepDataForm.data["__step_status"] !== undefined) {
+          processedData["__step_status"] = stepDataForm.data["__step_status"];
         }
 
         const dataToSave = {

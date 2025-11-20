@@ -136,7 +136,7 @@ const sections = [
             },
             {
                 name: "Transaction",
-                path: "/admin/logs/transaction",
+                path: "/admin/transaction",
                 icon: DollarSign,
                 description: "Define and manage financial transaction types and flows",
                 color: "bg-emerald-100 text-emerald-700 border-emerald-200"

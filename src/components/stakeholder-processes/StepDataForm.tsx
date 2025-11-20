@@ -5,8 +5,8 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { StakeholderProcessStep, StakeholderStepData, FieldDefinition } from "@/lib/types/schemas";
-import { Upload, X, CheckCircle2, File as FileIcon, Loader2, XCircle } from "lucide-react";
-import GeolocationPicker, { GeolocationValue } from "@/components/ui/GeolocationPicker";
+import { Upload, X, CheckCircle2, File as FileIcon, XCircle } from "lucide-react";
+import GeolocationPicker from "@/components/ui/GeolocationPicker";
 import DropdownField from "@/components/ui/DropdownField";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 
@@ -102,6 +102,13 @@ export default function StepDataForm({
         }
       }
     });
+    
+    // Add status field if enabled
+    if (step.status_field?.enabled) {
+      const existingStatus = existingData?.data?.["__step_status"];
+      initialData["__step_status"] = existingStatus || "";
+    }
+    
     setFormData(initialData);
   }, [step, existingData]);
 
@@ -477,6 +484,22 @@ export default function StepDataForm({
     <>
       <div className="space-y-4">
         <div className="space-y-4">
+          {/* Step Status Field (if enabled) */}
+          {step.status_field?.enabled && (
+            <div>
+              <DropdownField
+                label={step.status_field.label || "Status"}
+                value={formData["__step_status"] || ""}
+                onChange={(val) => handleFieldChange("__step_status", val)}
+                options={step.status_field.options || []}
+                placeholder="Select status"
+                required={false}
+                error={errors["__step_status"]}
+              />
+            </div>
+          )}
+
+          {/* Regular Fields */}
           {fields.length > 0 ? (
             fields.map((field) => (
               <div key={field.key}>
