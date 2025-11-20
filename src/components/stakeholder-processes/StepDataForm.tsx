@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { getEmployeeInfo } from "@/lib/utils/auth";
-import { StakeholderProcessStep, StakeholderStepData, FieldDefinition } from "@/lib/types/schemas";
-import { Upload, X, CheckCircle2, File as FileIcon, XCircle } from "lucide-react";
-import GeolocationPicker from "@/components/ui/GeolocationPicker";
+import { StakeholderProcessStep, StakeholderStepData, FieldDefinition, NestedFieldValue } from "@/lib/types/schemas";
+import { Upload, X, CheckCircle2, File as FileIcon, Loader2, XCircle } from "lucide-react";
+import GeolocationPicker, { GeolocationValue } from "@/components/ui/GeolocationPicker";
 import DropdownField from "@/components/ui/DropdownField";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 
@@ -58,47 +58,103 @@ export default function StepDataForm({
     
     fields.forEach((field) => {
       const existingValue = existingData?.data?.[field.key];
+      const hasNestedFields = field.nested && field.nested.length > 0;
       
       if (existingValue !== undefined && existingValue !== null) {
-        // Handle file type - preserve file metadata object or legacy string path
-        if (field.type === "file") {
-          // Check if it's the new format (object with path and metadata)
+        // Check if this is new nested format
+        if (hasNestedFields && typeof existingValue === 'object' && 'type' in existingValue && 'value' in existingValue) {
+          // New nested format - preserve as is
+          initialData[field.key] = existingValue;
+        } else if (field.type === "file") {
+          // Handle file type - preserve file metadata object or legacy string path
           if (typeof existingValue === "object" && existingValue.path) {
-            initialData[field.key] = existingValue;
+            initialData[field.key] = hasNestedFields ? {
+              type: field.type,
+              value: existingValue,
+              nested: {}
+            } : existingValue;
           } else if (typeof existingValue === "string") {
             // Legacy format: just a path string
-            initialData[field.key] = existingValue;
+            initialData[field.key] = hasNestedFields ? {
+              type: field.type,
+              value: existingValue,
+              nested: {}
+            } : existingValue;
           } else {
             // Unknown format, reset
-            initialData[field.key] = null;
+            initialData[field.key] = hasNestedFields ? {
+              type: field.type,
+              value: null,
+              nested: {}
+            } : null;
           }
+        } else if (hasNestedFields) {
+          // Convert legacy format to new nested format
+          initialData[field.key] = {
+            type: field.type,
+            value: existingValue,
+            nested: existingValue.nested || {}
+          };
         } else {
-          // For other types, use the existing value
+          // Legacy format without nested fields - preserve as is
           initialData[field.key] = existingValue;
         }
       } else {
         // Set default values based on type
-        switch (field.type) {
-          case "boolean":
-            initialData[field.key] = false;
-            break;
-          case "date":
-            initialData[field.key] = "";
-            break;
-          case "file":
-            initialData[field.key] = null;
-            break;
-          case "geolocation":
-            initialData[field.key] = null;
-            break;
-          case "dropdown":
-            initialData[field.key] = "";
-            break;
-          case "multi_select":
-            initialData[field.key] = [];
-            break;
-          default:
-            initialData[field.key] = "";
+        if (hasNestedFields) {
+          // New nested format
+          let defaultValue: any;
+          switch (field.type) {
+            case "boolean":
+              defaultValue = false;
+              break;
+            case "date":
+              defaultValue = "";
+              break;
+            case "file":
+              defaultValue = null;
+              break;
+            case "geolocation":
+              defaultValue = null;
+              break;
+            case "dropdown":
+              defaultValue = "";
+              break;
+            case "multi_select":
+              defaultValue = [];
+              break;
+            default:
+              defaultValue = "";
+          }
+          initialData[field.key] = {
+            type: field.type,
+            value: defaultValue,
+            nested: {}
+          };
+        } else {
+          // Legacy format
+          switch (field.type) {
+            case "boolean":
+              initialData[field.key] = false;
+              break;
+            case "date":
+              initialData[field.key] = "";
+              break;
+            case "file":
+              initialData[field.key] = null;
+              break;
+            case "geolocation":
+              initialData[field.key] = null;
+              break;
+            case "dropdown":
+              initialData[field.key] = "";
+              break;
+            case "multi_select":
+              initialData[field.key] = [];
+              break;
+            default:
+              initialData[field.key] = "";
+          }
         }
       }
     });
@@ -121,16 +177,116 @@ export default function StepDataForm({
       return false;
     }
 
+    const validateNestedFields = (
+      nestedDefs: FieldDefinition[],
+      nestedData: Record<string, NestedFieldValue>,
+      parentKey: string
+    ): boolean => {
+      let hasErrors = false;
+      nestedDefs.forEach((nestedField) => {
+        if (nestedField.required) {
+          const nestedValue = nestedData[nestedField.key];
+          if (
+            !nestedValue ||
+            nestedValue.value === undefined ||
+            nestedValue.value === null ||
+            nestedValue.value === "" ||
+            (Array.isArray(nestedValue.value) && nestedValue.value.length === 0)
+          ) {
+            newErrors[`${parentKey}.${nestedField.key}`] = `${nestedField.label} is required`;
+            hasErrors = true;
+          }
+        }
+      });
+      return !hasErrors;
+    };
+
     fields.forEach((field) => {
+      const value = formData[field.key];
+      const hasNestedFields = field.nested && field.nested.length > 0;
+      
       if (field.required) {
-        const value = formData[field.key];
-        if (
-          value === undefined ||
-          value === null ||
-          value === "" ||
-          (Array.isArray(value) && value.length === 0)
-        ) {
-          newErrors[field.key] = `${field.label} is required`;
+        // Handle nested format
+        if (hasNestedFields && typeof value === 'object' && 'value' in value) {
+          const actualValue = value.value;
+          if (
+            actualValue === undefined ||
+            actualValue === null ||
+            actualValue === "" ||
+            (Array.isArray(actualValue) && actualValue.length === 0)
+          ) {
+            newErrors[field.key] = `${field.label} is required`;
+          } else {
+            // Validate general nested fields if present
+            if (value.nested && field.nested) {
+              validateNestedFields(field.nested, value.nested, field.key);
+            }
+            
+            // For multi-select, validate option-specific nested fields
+            if (field.type === 'multi_select' && Array.isArray(actualValue)) {
+              actualValue.forEach((selectedValue) => {
+                const option = field.options?.find(opt => opt.value === selectedValue);
+                if (option && option.nested && option.nested.length > 0) {
+                  const optionNestedKey = `${selectedValue}_nested`;
+                  const optionNestedData = value.nested?.[optionNestedKey] || {};
+                  option.nested.forEach((nestedField) => {
+                    if (nestedField.required) {
+                      const nestedValue = optionNestedData[nestedField.key];
+                      if (
+                        !nestedValue ||
+                        nestedValue.value === undefined ||
+                        nestedValue.value === null ||
+                        nestedValue.value === "" ||
+                        (Array.isArray(nestedValue.value) && nestedValue.value.length === 0)
+                      ) {
+                        newErrors[`${field.key}.${optionNestedKey}.${nestedField.key}`] = `${nestedField.label} is required for ${option.label}`;
+                      }
+                    }
+                  });
+                }
+              });
+            }
+          }
+        } else {
+          // Handle legacy format
+          if (
+            value === undefined ||
+            value === null ||
+            value === "" ||
+            (Array.isArray(value) && value.length === 0)
+          ) {
+            newErrors[field.key] = `${field.label} is required`;
+          }
+        }
+      } else if (hasNestedFields && typeof value === 'object' && 'value' in value) {
+        // Validate nested fields even if parent is not required
+        if (value.nested && field.nested) {
+          validateNestedFields(field.nested, value.nested, field.key);
+        }
+        
+        // For multi-select, validate option-specific nested fields
+        if (field.type === 'multi_select' && Array.isArray(value.value)) {
+          value.value.forEach((selectedValue: string) => {
+            const option = field.options?.find(opt => opt.value === selectedValue);
+            if (option && option.nested && option.nested.length > 0) {
+              const optionNestedKey = `${selectedValue}_nested`;
+              const optionNestedData = value.nested?.[optionNestedKey] || {};
+              option.nested.forEach((nestedField) => {
+                if (nestedField.required) {
+                  const nestedValue = optionNestedData[nestedField.key];
+                  if (
+                    !nestedValue ||
+                    nestedValue.value === undefined ||
+                    nestedValue.value === null ||
+                    nestedValue.value === "" ||
+                    (Array.isArray(nestedValue.value) && nestedValue.value.length === 0)
+                  ) {
+                    newErrors[`${field.key}.${optionNestedKey}.${nestedField.key}`] = `${nestedField.label} is required for ${option.label}`;
+                  }
+                }
+              });
+            }
+          });
         }
       }
     });
@@ -151,17 +307,92 @@ export default function StepDataForm({
     }
   };
 
+  const handleNestedFieldChange = (parentFieldName: string, nestedFieldKey: string, value: any, nestedFieldType: string) => {
+    setFormData((prev) => {
+      const parentValue = prev[parentFieldName];
+      if (typeof parentValue === 'object' && 'nested' in parentValue) {
+        return {
+          ...prev,
+          [parentFieldName]: {
+            ...parentValue,
+            nested: {
+              ...parentValue.nested,
+              [nestedFieldKey]: {
+                type: nestedFieldType,
+                value: value,
+                nested: parentValue.nested?.[nestedFieldKey]?.nested || {}
+              }
+            }
+          }
+        };
+      }
+      return prev;
+    });
+    
+    // Clear error for nested field
+    const errorKey = `${parentFieldName}.${nestedFieldKey}`;
+    if (errors[errorKey]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[errorKey];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleMultiSelectNestedChange = (
+    parentFieldName: string,
+    optionValue: string,
+    nestedFieldKey: string,
+    value: any,
+    nestedFieldType: string
+  ) => {
+    setFormData((prev) => {
+      const parentValue = prev[parentFieldName];
+      if (typeof parentValue === 'object' && 'value' in parentValue && Array.isArray(parentValue.value)) {
+        // Find or create nested data for this specific option
+        const optionNestedKey = `${optionValue}_nested`;
+        const currentOptionNested = parentValue.nested?.[optionNestedKey] || {};
+        
+        return {
+          ...prev,
+          [parentFieldName]: {
+            ...parentValue,
+            nested: {
+              ...parentValue.nested,
+              [optionNestedKey]: {
+                ...currentOptionNested,
+                [nestedFieldKey]: {
+                  type: nestedFieldType,
+                  value: value,
+                  nested: currentOptionNested[nestedFieldKey]?.nested || {}
+                }
+              }
+            }
+          }
+        };
+      }
+      return prev;
+    });
+  };
+
   const handleFileRemove = async (fieldName: string) => {
     const currentValue = formData[fieldName];
     
-    // If file was already uploaded (has path), mark it for deletion when form is saved
-    if (currentValue && typeof currentValue === 'object' && 'path' in currentValue) {
-      // Add to deletion queue
-      setFilesToDelete(prev => [...prev, currentValue.path]);
+    // Handle nested format
+    if (currentValue && typeof currentValue === 'object' && 'value' in currentValue) {
+      const fileValue = currentValue.value;
+      if (fileValue && typeof fileValue === 'object' && 'path' in fileValue) {
+        setFilesToDelete(prev => [...prev, fileValue.path]);
+      }
+      handleFieldChange(fieldName, { ...currentValue, value: null });
+    } else {
+      // Handle legacy format
+      if (currentValue && typeof currentValue === 'object' && 'path' in currentValue) {
+        setFilesToDelete(prev => [...prev, currentValue.path]);
+      }
+      handleFieldChange(fieldName, null);
     }
-    
-    // Remove from form data immediately (UI update)
-    handleFieldChange(fieldName, null);
   };
 
   const handleSaveDraft = async () => {
@@ -228,8 +459,196 @@ export default function StepDataForm({
   };
 
   const renderField = (field: FieldDefinition) => {
-    const value = formData[field.key];
+    const fieldData = formData[field.key];
+    const hasNestedFields = field.nested && field.nested.length > 0;
+    
+    // Extract actual value from nested format or use legacy format
+    const actualValue = hasNestedFields && typeof fieldData === 'object' && 'value' in fieldData
+      ? fieldData.value
+      : fieldData;
+    
     const hasError = !!errors[field.key];
+
+    // Helper to update field value (handles both nested and legacy formats)
+    const updateValue = (newValue: any) => {
+      if (hasNestedFields) {
+        handleFieldChange(field.key, {
+          type: field.type,
+          value: newValue,
+          nested: fieldData?.nested || {}
+        });
+      } else {
+        handleFieldChange(field.key, newValue);
+      }
+    };
+
+    // Helper to render nested fields
+    const renderNestedFields = () => {
+      if (!hasNestedFields || !field.nested) return null;
+      
+      const nestedData = typeof fieldData === 'object' && fieldData?.nested ? fieldData.nested : {};
+      
+      return (
+        <div className="mt-3 pl-4 border-l-2 border-gray-200 space-y-3">
+          <p className="text-xs font-medium text-gray-600 mb-2">Additional Information:</p>
+          {field.nested.map((nestedField) => {
+            const nestedValue = nestedData[nestedField.key]?.value;
+            const nestedError = errors[`${field.key}.${nestedField.key}`];
+            
+            return (
+              <div key={nestedField.key}>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  {nestedField.label}
+                  {nestedField.required && <span className="text-red-500 ml-1">*</span>}
+                </label>
+                {renderNestedFieldInput(nestedField, nestedValue, field.key, nestedError)}
+              </div>
+            );
+          })}
+        </div>
+      );
+    };
+
+    // Helper to render nested field input based on type
+    const renderNestedFieldInput = (
+      nestedField: FieldDefinition,
+      value: any,
+      parentKey: string,
+      error?: string
+    ) => {
+      const updateNestedValue = (newValue: any) => {
+        handleNestedFieldChange(parentKey, nestedField.key, newValue, nestedField.type);
+      };
+
+      switch (nestedField.type) {
+        case "text":
+          return (
+            <>
+              <input
+                type="text"
+                value={value || ""}
+                onChange={(e) => updateNestedValue(e.target.value)}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
+                  error ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder={nestedField.placeholder || nestedField.label}
+              />
+              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+            </>
+          );
+        
+        case "boolean":
+          return (
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={value || false}
+                onChange={(e) => updateNestedValue(e.target.checked)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+              />
+              {error && <p className="text-red-500 text-xs">{error}</p>}
+            </div>
+          );
+        
+        case "date":
+          return (
+            <>
+              <input
+                type="date"
+                value={value || ""}
+                onChange={(e) => updateNestedValue(e.target.value)}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
+                  error ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+            </>
+          );
+        
+        default:
+          return (
+            <input
+              type="text"
+              value={value || ""}
+              onChange={(e) => updateNestedValue(e.target.value)}
+              className={`w-full px-3 py-2 text-sm border rounded-lg ${
+                error ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+          );
+      }
+    };
+
+    // Helper to render nested field input for multi-select option-specific nested fields
+    const renderOptionNestedFieldInput = (
+      nestedField: FieldDefinition,
+      value: any,
+      parentKey: string,
+      optionValue: string,
+      error?: string
+    ) => {
+      const updateNestedValue = (newValue: any) => {
+        handleMultiSelectNestedChange(parentKey, optionValue, nestedField.key, newValue, nestedField.type);
+      };
+
+      switch (nestedField.type) {
+        case "text":
+          return (
+            <>
+              <input
+                type="text"
+                value={value || ""}
+                onChange={(e) => updateNestedValue(e.target.value)}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
+                  error ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder={nestedField.placeholder || nestedField.label}
+              />
+              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+            </>
+          );
+        
+        case "boolean":
+          return (
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={value || false}
+                onChange={(e) => updateNestedValue(e.target.checked)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+              />
+              {error && <p className="text-red-500 text-xs">{error}</p>}
+            </div>
+          );
+        
+        case "date":
+          return (
+            <>
+              <input
+                type="date"
+                value={value || ""}
+                onChange={(e) => updateNestedValue(e.target.value)}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
+                  error ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+            </>
+          );
+        
+        default:
+          return (
+            <input
+              type="text"
+              value={value || ""}
+              onChange={(e) => updateNestedValue(e.target.value)}
+              className={`w-full px-3 py-2 text-sm border rounded-lg ${
+                error ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+          );
+      }
+    };
 
     switch (field.type) {
       case "text":
@@ -241,24 +660,26 @@ export default function StepDataForm({
             </label>
             <input
               type="text"
-              value={value || ""}
-              onChange={(e) => handleFieldChange(field.key, e.target.value)}
+              value={actualValue || ""}
+              onChange={(e) => updateValue(e.target.value)}
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
                 hasError ? "border-red-500" : "border-gray-300"
               }`}
               placeholder={field.placeholder || field.label}
             />
             {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
+            {renderNestedFields()}
           </div>
         );
 
       case "boolean":
         return (
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={value || false}
-              onChange={(e) => handleFieldChange(field.key, e.target.checked)}
+          <div>
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={actualValue || false}
+                onChange={(e) => updateValue(e.target.checked)}
               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
             <label className="text-sm font-medium text-gray-700">
@@ -266,6 +687,8 @@ export default function StepDataForm({
               {field.required && <span className="text-red-500 ml-1">*</span>}
             </label>
             {hasError && <p className="text-red-500 text-sm">{errors[field.key]}</p>}
+          </div>
+            {renderNestedFields()}
           </div>
         );
 
@@ -278,38 +701,39 @@ export default function StepDataForm({
             </label>
             <input
               type="date"
-              value={value || ""}
-              onChange={(e) => handleFieldChange(field.key, e.target.value)}
+              value={actualValue || ""}
+              onChange={(e) => updateValue(e.target.value)}
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
                 hasError ? "border-red-500" : "border-gray-300"
               }`}
             />
             {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
+            {renderNestedFields()}
           </div>
         );
 
       case "file":
         const isUploading = uploadingFiles.has(field.key);
-        const hasFile = value && (value instanceof File || typeof value === 'string' || (typeof value === 'object' && value !== null));
+        const hasFile = actualValue && (actualValue instanceof File || typeof actualValue === 'string' || (typeof actualValue === 'object' && actualValue !== null));
         
         // Helper to get display filename
         const getFileName = () => {
-          if (value instanceof File) {
-            return (value as File).name;
-          } else if (typeof value === 'object' && value !== null && 'originalName' in value) {
-            return value.originalName;
-          } else if (typeof value === 'string') {
-            return value.split('/').pop() || 'Uploaded file';
+          if (actualValue instanceof File) {
+            return (actualValue as File).name;
+          } else if (typeof actualValue === 'object' && actualValue !== null && 'originalName' in actualValue) {
+            return actualValue.originalName;
+          } else if (typeof actualValue === 'string') {
+            return actualValue.split('/').pop() || 'Uploaded file';
           }
           return 'Uploaded file';
         };
 
         // Helper to get file URL for viewing
         const getFileUrl = () => {
-          if (typeof value === 'object' && value !== null && 'path' in value) {
-            return getPublicFileUrl(value.path);
-          } else if (typeof value === 'string') {
-            return getPublicFileUrl(value);
+          if (typeof actualValue === 'object' && actualValue !== null && 'path' in actualValue) {
+            return getPublicFileUrl(actualValue.path);
+          } else if (typeof actualValue === 'string') {
+            return getPublicFileUrl(actualValue);
           }
           return null;
         };
@@ -344,7 +768,7 @@ export default function StepDataForm({
                       <X size={16} />
                     </button>
                   </div>
-                  {getFileUrl() && !(value instanceof File) && (
+                  {getFileUrl() && !(actualValue instanceof File) && (
                     <a
                       href={getFileUrl() || '#'}
                       target="_blank"
@@ -377,7 +801,7 @@ export default function StepDataForm({
                           }));
                           return;
                         }
-                        handleFieldChange(field.key, file);
+                        updateValue(file);
                       }
                     }}
                     className="hidden"
@@ -387,6 +811,7 @@ export default function StepDataForm({
               )}
             </div>
             {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
+            {renderNestedFields()}
           </div>
         );
 
@@ -395,11 +820,12 @@ export default function StepDataForm({
           <div>
             <GeolocationPicker
               label={field.label}
-              value={value || null}
-              onChange={(coords) => handleFieldChange(field.key, coords)}
+              value={actualValue || null}
+              onChange={(coords) => updateValue(coords)}
               required={field.required}
               error={errors[field.key]}
             />
+            {renderNestedFields()}
           </div>
         );
 
@@ -408,28 +834,77 @@ export default function StepDataForm({
           <div>
             <DropdownField
               label={field.label}
-              value={value || ""}
-              onChange={(val) => handleFieldChange(field.key, val)}
+              value={actualValue || ""}
+              onChange={(val) => updateValue(val)}
               options={field.options || []}
               placeholder={field.placeholder || "Select an option"}
               required={field.required}
               error={errors[field.key]}
             />
+            {renderNestedFields()}
           </div>
         );
 
       case "multi_select":
+        // For multi-select with option-specific nested fields, we need to render differently
+        const hasOptionNestedFields = field.options?.some(opt => opt.nested && opt.nested.length > 0);
+        
         return (
           <div>
             <MultiSelectDropdown
               label={field.label}
-              value={Array.isArray(value) ? value : []}
-              onChange={(val) => handleFieldChange(field.key, val)}
+              value={Array.isArray(actualValue) ? actualValue : []}
+              onChange={(val) => updateValue(val)}
               options={field.options || []}
               placeholder={field.placeholder || "Select options"}
               required={field.required}
               error={errors[field.key]}
             />
+            
+            {/* Render nested fields for each selected option */}
+            {hasOptionNestedFields && Array.isArray(actualValue) && actualValue.length > 0 && (
+              <div className="mt-4 space-y-3">
+                <p className="text-xs font-medium text-gray-600">Additional Information for Selected Options:</p>
+                {actualValue.map((selectedValue) => {
+                  const option = field.options?.find(opt => opt.value === selectedValue);
+                  if (!option || !option.nested || option.nested.length === 0) return null;
+                  
+                  const optionNestedKey = `${selectedValue}_nested`;
+                  const optionNestedData = typeof fieldData === 'object' && fieldData?.nested?.[optionNestedKey] || {};
+                  
+                  return (
+                    <div key={selectedValue} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                      <p className="text-sm font-medium text-gray-700 mb-2">{option.label}</p>
+                      <div className="space-y-2">
+                        {option.nested.map((nestedField) => {
+                          const nestedValue = optionNestedData[nestedField.key]?.value;
+                          const nestedError = errors[`${field.key}.${optionNestedKey}.${nestedField.key}`];
+                          
+                          return (
+                            <div key={nestedField.key}>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">
+                                {nestedField.label}
+                                {nestedField.required && <span className="text-red-500 ml-1">*</span>}
+                              </label>
+                              {renderOptionNestedFieldInput(
+                                nestedField,
+                                nestedValue,
+                                field.key,
+                                selectedValue,
+                                nestedError
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            
+            {/* Render general nested fields (not option-specific) */}
+            {renderNestedFields()}
           </div>
         );
 

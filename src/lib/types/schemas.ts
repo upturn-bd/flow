@@ -497,6 +497,8 @@ export interface FieldValidation {
 export interface DropdownOption {
   label: string;
   value: string;
+  // Nested field definitions for this option (for multi_select)
+  nested?: FieldDefinition[];
 }
 
 export interface FieldDefinition {
@@ -509,11 +511,24 @@ export interface FieldDefinition {
   helpText?: string;
   // For dropdown and multi_select field types
   options?: DropdownOption[];
+  // Nested field definitions for all field types
+  nested?: FieldDefinition[];
 }
 
 export interface FieldDefinitionsSchema {
   fields: FieldDefinition[];
 }
+
+// Nested field data value structure
+// Supports recursive nesting with type, value, and nested fields
+export interface NestedFieldValue {
+  type: FieldType;
+  value: any;
+  nested?: Record<string, NestedFieldValue>;
+}
+
+// Type for step data that can contain nested values
+export type StepDataValue = string | number | boolean | any[] | NestedFieldValue;
 
 // Stakeholder Process - defines the workflow
 export interface StakeholderProcess {
