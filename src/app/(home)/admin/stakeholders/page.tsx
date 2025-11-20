@@ -98,43 +98,40 @@ export default function StakeholdersPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+    <div className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 lg:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+      <div className="flex flex-col gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Stakeholders & Leads</h1>
-          <p className="text-xs sm:text-sm text-gray-600 mt-1">
+          <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Stakeholders & Leads</h1>
+          <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">
             Manage your stakeholder pipeline and track progress
           </p>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
             onClick={handleExportCSV}
             disabled={loading || stakeholders.length === 0}
-            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs sm:text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Download size={18} />
-            <span className="hidden sm:inline">Export CSV</span>
-            <span className="sm:hidden">Export</span>
+            <Download size={16} className="sm:w-[18px] sm:h-[18px]" />
+            <span>Export</span>
           </button>
           {canWrite(PERMISSION_MODULES.STAKEHOLDERS) ? (
             <button
               onClick={() => router.push("/admin/stakeholders/new")}
-              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs sm:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors"
             >
-              <Plus size={18} />
-              <span className="hidden sm:inline">Add New Lead</span>
-              <span className="sm:hidden">Add</span>
+              <Plus size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span>Add Lead</span>
             </button>
           ) : (
             <PermissionTooltip message="You don't have permission to create stakeholders">
               <button
                 disabled
-                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-sm bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed opacity-60"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs sm:text-sm bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed opacity-60"
               >
-                <Plus size={18} />
-                <span className="hidden sm:inline">Add New Lead</span>
-                <span className="sm:hidden">Add</span>
+                <Plus size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span>Add Lead</span>
               </button>
             </PermissionTooltip>
           )}
@@ -145,43 +142,43 @@ export default function StakeholdersPage() {
       <ModulePermissionsBanner module={PERMISSION_MODULES.STAKEHOLDERS} title="Stakeholders" compact />
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 lg:gap-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-3.5 sm:p-4 lg:p-6">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm text-gray-600">Active Leads</p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{leads.length}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-gray-600 truncate">Active Leads</p>
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mt-0.5 sm:mt-1">{leads.length}</p>
             </div>
-            <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
-              <Clock className="text-blue-600" size={20} />
+            <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0 ml-2">
+              <Clock className="text-blue-600" size={18} />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-3.5 sm:p-4 lg:p-6">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm text-gray-600">Stakeholders</p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-gray-600 truncate">Stakeholders</p>
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mt-0.5 sm:mt-1">
                 {completedStakeholders.length}
               </p>
             </div>
-            <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
-              <CheckCircle2 className="text-green-600" size={20} />
+            <div className="p-2 bg-green-100 rounded-lg flex-shrink-0 ml-2">
+              <CheckCircle2 className="text-green-600" size={18} />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-3.5 sm:p-4 lg:p-6">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm text-gray-600">Total Records</p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-gray-600 truncate">Total Records</p>
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mt-0.5 sm:mt-1">
                 {searchResult?.totalCount || 0}
               </p>
             </div>
-            <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
-              <Filter className="text-purple-600" size={20} />
+            <div className="p-2 bg-purple-100 rounded-lg flex-shrink-0 ml-2">
+              <Filter className="text-purple-600" size={18} />
             </div>
           </div>
         </div>
@@ -189,57 +186,57 @@ export default function StakeholdersPage() {
 
       {/* Filters */}
       <div className="bg-white rounded-lg border border-gray-200 p-3 sm:p-4">
-        <div className="flex flex-col md:flex-row gap-3 sm:gap-4">
+        <div className="flex flex-col gap-2.5 sm:gap-3">
           {/* Search */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
               placeholder="Search stakeholders..."
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
 
           {/* Status Filter */}
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
             <button
               onClick={() => handleFilterChange("all")}
-              className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+              className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 filterStatus === "all"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300"
               }`}
             >
               All ({searchResult?.totalCount || 0})
             </button>
             <button
               onClick={() => handleFilterChange("Lead")}
-              className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+              className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 filterStatus === "Lead"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300"
               }`}
             >
               Leads ({leads.length})
             </button>
             <button
               onClick={() => handleFilterChange("Permanent")}
-              className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+              className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 filterStatus === "Permanent"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300"
               }`}
             >
               Permanent ({completedStakeholders.length})
             </button>
             <button
               onClick={() => handleFilterChange("Rejected")}
-              className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+              className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 filterStatus === "Rejected"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300"
               }`}
             >
               Rejected
@@ -264,9 +261,9 @@ export default function StakeholdersPage() {
 
       {/* Empty State */}
       {!loading && stakeholders.length === 0 && (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <h3 className="text-lg font-semibold text-gray-900">No stakeholders found</h3>
-          <p className="text-sm text-gray-500 mt-1">
+        <div className="text-center py-8 sm:py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 px-4">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">No stakeholders found</h3>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             {searchTerm
               ? "Try adjusting your search or filters"
               : "Get started by adding your first lead"}
@@ -274,9 +271,9 @@ export default function StakeholdersPage() {
           {!searchTerm && (
             <button
               onClick={() => router.push("/admin/stakeholders/new")}
-              className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="mt-3 sm:mt-4 inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-sm"
             >
-              <Plus size={20} />
+              <Plus size={18} />
               Add New Lead
             </button>
           )}
@@ -421,55 +418,57 @@ export default function StakeholdersPage() {
           </div>
 
           {/* Mobile Card View */}
-          <div className="md:hidden space-y-3">
+          <div className="md:hidden space-y-2.5">
             {stakeholders.map((stakeholder) => (
               <div
                 key={stakeholder.id}
                 onClick={() => router.push(`/admin/stakeholders/${stakeholder.id}`)}
-                className="bg-white rounded-lg border border-gray-200 p-4 space-y-3 hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white rounded-lg border border-gray-200 p-3 space-y-2.5 active:shadow-md transition-shadow cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 truncate">{stakeholder.name}</h3>
+                    <h3 className="text-sm font-semibold text-gray-900 truncate">{stakeholder.name}</h3>
                     {stakeholder.address && (
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-1">{stakeholder.address}</p>
+                      <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{stakeholder.address}</p>
                     )}
                   </div>
                   <span
-                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getStepStatusColor(
+                    className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium flex-shrink-0 leading-tight ${getStepStatusColor(
                       stakeholder.status
                     )}`}
                   >
-                    {stakeholder.status === 'Lead' && <Clock size={12} />}
-                    {stakeholder.status === 'Permanent' && <CheckCircle2 size={12} />}
+                    {stakeholder.status === 'Lead' && <Clock size={10} />}
+                    {stakeholder.status === 'Permanent' && <CheckCircle2 size={10} />}
                     {stakeholder.status}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <p className="text-gray-500">Type</p>
-                    {stakeholder.stakeholder_type ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 mt-1">
-                        {stakeholder.stakeholder_type.name}
-                      </span>
-                    ) : (
-                      <p className="text-gray-400 mt-1">—</p>
-                    )}
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-gray-500 text-[10px] uppercase tracking-wide mb-0.5">Type</p>
+                      {stakeholder.stakeholder_type ? (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-100 text-purple-800">
+                          {stakeholder.stakeholder_type.name}
+                        </span>
+                      ) : (
+                        <p className="text-gray-400">—</p>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-gray-500 text-[10px] uppercase tracking-wide mb-0.5">Process</p>
+                      <p className="text-gray-900 truncate">{stakeholder.process?.name || "N/A"}</p>
+                    </div>
                   </div>
+                  
                   <div>
-                    <p className="text-gray-500">Process</p>
-                    <p className="text-gray-900 mt-1 truncate">{stakeholder.process?.name || "N/A"}</p>
-                  </div>
-                  <div className="col-span-2">
-                    <p className="text-gray-500">Current Step</p>
+                    <p className="text-gray-500 text-[10px] uppercase tracking-wide mb-0.5">Current Step</p>
                     {stakeholder.current_step ? (
-                      <div className="flex flex-col gap-1 mt-1">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 w-fit">
+                      <div className="flex flex-wrap gap-1">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
                           Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}
                         </span>
                         {(() => {
-                          // Find step data for current step and extract status
                           const currentStepData = stakeholder.step_data?.find(
                             (sd) => sd.step_id === stakeholder.current_step_id
                           );
@@ -480,7 +479,7 @@ export default function StakeholdersPage() {
                               opt => opt.value === stepStatus
                             );
                             return (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 w-fit">
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-800">
                                 {statusOption?.label || stepStatus}
                               </span>
                             );
@@ -489,12 +488,13 @@ export default function StakeholdersPage() {
                         })()}
                       </div>
                     ) : (
-                      <p className="text-gray-400 mt-1">Not started</p>
+                      <p className="text-gray-400">Not started</p>
                     )}
                   </div>
+                  
                   <div>
-                    <p className="text-gray-500">Created</p>
-                    <p className="text-gray-900 mt-1">
+                    <p className="text-gray-500 text-[10px] uppercase tracking-wide mb-0.5">Created</p>
+                    <p className="text-gray-900">
                       {stakeholder.created_at
                         ? new Date(stakeholder.created_at).toLocaleDateString()
                         : "N/A"}
@@ -502,30 +502,30 @@ export default function StakeholdersPage() {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-gray-200">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/admin/stakeholders/${stakeholder.id}`);
-                    }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-                  >
-                    <Eye size={16} />
-                    View Details
-                  </button>
-                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/admin/stakeholders/${stakeholder.id}`);
+                  }}
+                  className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs text-blue-600 bg-blue-50 rounded-lg active:bg-blue-100 transition-colors font-medium"
+                >
+                  <Eye size={14} />
+                  View Details
+                </button>
               </div>
             ))}
 
             {/* Mobile Pagination */}
             {searchResult && (
-              <Pagination
-                currentPage={searchResult.currentPage}
-                totalPages={searchResult.totalPages}
-                totalCount={searchResult.totalCount}
-                pageSize={pageSize}
-                onPageChange={handlePageChange}
-              />
+              <div className="pt-1">
+                <Pagination
+                  currentPage={searchResult.currentPage}
+                  totalPages={searchResult.totalPages}
+                  totalCount={searchResult.totalCount}
+                  pageSize={pageSize}
+                  onPageChange={handlePageChange}
+                />
+              </div>
             )}
           </div>
         </>
