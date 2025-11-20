@@ -46,7 +46,8 @@ export function useEmployees() {
     try {
       const companyId = company_id ?? employeeInfo?.company_id;
       if (!companyId) {
-        throw new Error('Company ID not available');
+        setLoading(false);
+        return [];
       }
 
       const { data, error } = await supabase
@@ -80,7 +81,8 @@ export function useEmployees() {
     try {
       const companyId = employeeInfo?.company_id;
       if (!companyId) {
-        throw new Error('Company ID not available');
+        setLoading(false);
+        return [];
       }
 
       const { data, error } = await supabase
@@ -123,7 +125,15 @@ export function useEmployees() {
     try {
       const companyId = employeeInfo?.company_id;
       if (!companyId) {
-        throw new Error('Company ID not available');
+        const emptyResult: EmployeeSearchResult = {
+          employees: [],
+          totalCount: 0,
+          totalPages: 0,
+          currentPage: page,
+        };
+        setLoading(false);
+        setSearchResult(emptyResult);
+        return emptyResult;
       }
       
       // Build query

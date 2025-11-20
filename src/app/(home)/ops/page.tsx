@@ -190,7 +190,7 @@ export default function ServicesPage() {
 
   return (
     <motion.div 
-      className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6"
+      className="p-4 sm:p-10 lg:p-14"
       initial="hidden"
       animate="visible"
       variants={pageVariants}

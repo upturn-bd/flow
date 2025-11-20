@@ -23,6 +23,7 @@ import {
 import { staggerContainer, fadeInUp } from "@/components/ui/animations";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useStakeholders } from "@/hooks/useStakeholders";
+import { useAuth } from "@/lib/auth/auth-context";
 import { Account } from "@/lib/types/schemas";
 import { PAYMENT_METHODS, CURRENCIES, STATUS } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
@@ -130,6 +131,8 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
 }
 
 export default function AccountsTab() {
+  const { employeeInfo } = useAuth();
+  
   const {
     accounts,
     loading,
@@ -283,10 +286,13 @@ export default function AccountsTab() {
   };
 
   useEffect(() => {
-    fetchAccounts();
-    fetchStakeholders(true);
+    // Wait for employeeInfo to be loaded before fetching
+    if (employeeInfo?.company_id) {
+      fetchAccounts();
+      fetchStakeholders(true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
+  }, [employeeInfo?.company_id]); // Re-fetch when company_id becomes available
 
   const filteredAccounts = accounts.filter(account => {
     const matchesSearch = account.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -58,7 +58,8 @@ export function useStakeholderIssues() {
     try {
       const company_id = employeeInfo?.company_id as number | undefined;
       if (!company_id) {
-        throw new Error('Company ID not available');
+        setLoading(false);
+        return [];
       }
 
       let query = supabase
@@ -119,7 +120,8 @@ export function useStakeholderIssues() {
     try {
       const company_id = employeeInfo?.company_id as number | undefined;
       if (!company_id) {
-        throw new Error('Company ID not available');
+        setLoading(false);
+        return null;
       }
 
       const { data, error } = await supabase
@@ -176,13 +178,15 @@ export function useStakeholderIssues() {
     try {
       const company_id = employeeInfo?.company_id as number | undefined;
       if (!company_id) {
-        throw new Error('Company ID not available');
+        setLoading(false);
+        return [];
       }
       
       const targetAssignedToId = assignedToId || employeeInfo?.id;
 
       if (!targetAssignedToId) {
-        throw new Error("No assigned employee ID provided");
+        setLoading(false);
+        return [];
       }
 
       const { data, error } = await supabase
@@ -248,13 +252,27 @@ export function useStakeholderIssues() {
     try {
       const company_id = employeeInfo?.company_id as number | undefined;
       if (!company_id) {
-        throw new Error('Company ID not available');
+        const emptyResult: StakeholderIssueSearchResult = {
+          issues: [],
+          totalCount: 0,
+          totalPages: 0,
+          currentPage: page,
+        };
+        setLoading(false);
+        return emptyResult;
       }
       
       const targetAssignedToId = assignedToId || employeeInfo?.id;
 
       if (!targetAssignedToId) {
-        throw new Error("No assigned employee ID provided");
+        const emptyResult: StakeholderIssueSearchResult = {
+          issues: [],
+          totalCount: 0,
+          totalPages: 0,
+          currentPage: page,
+        };
+        setLoading(false);
+        return emptyResult;
       }
       
       // Build query

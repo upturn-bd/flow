@@ -19,7 +19,8 @@ export function useConfigTypes<T extends { id?: number, company_id?: number | nu
     try {
       const companyId = employeeInfo?.company_id;
       if (!companyId) {
-        throw new DatabaseError('Company ID not available');
+        setLoading(false);
+        return [];
       }
       const { data, error } = await supabase
         .from(tableName)

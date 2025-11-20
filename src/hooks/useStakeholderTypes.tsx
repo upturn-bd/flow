@@ -37,7 +37,8 @@ export function useStakeholderTypes() {
     try {
       const companyId = employeeInfo?.company_id;
       if (!companyId) {
-        throw new Error('Company ID not available');
+        setLoading(false);
+        return [];
       }
 
       let query = supabase
@@ -75,7 +76,8 @@ export function useStakeholderTypes() {
     try {
       const companyId = employeeInfo?.company_id;
       if (!companyId) {
-        throw new Error('Company ID not available');
+        setLoading(false);
+        return null;
       }
 
       const { data, error } = await supabase

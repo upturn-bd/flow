@@ -31,7 +31,9 @@ export function useAccounts() {
       if (company_id === undefined) {
         company_id = employeeInfo?.company_id as number | undefined;
         if (!company_id) {
-          throw new Error('Company ID not available');
+          // Don't throw error, just return empty array if company_id not ready
+          setLoading(false);
+          return [];
         }
       }
 
@@ -244,7 +246,8 @@ export function useAccounts() {
     try {
       const company_id = employeeInfo?.company_id as number | undefined;
       if (!company_id) {
-        throw new Error('Company ID not available');
+        setLoading(false);
+        return [];
       }
 
       const { data, error } = await supabase
