@@ -631,7 +631,8 @@ export function useTeams() {
     try {
       const empId = employeeId ?? employeeInfo?.id;
       if (!empId) {
-        throw new Error('Employee ID not available');
+        // Silently return empty array if employee info not yet loaded
+        return [];
       }
 
       const { data, error: fetchError } = await supabase

@@ -561,6 +561,11 @@ export interface StakeholderProcessStep {
   start_date?: string; // ISO date string
   end_date?: string; // ISO date string
   can_reject: boolean; // Whether team members can reject stakeholders at this step
+  status_field?: {
+    enabled: boolean;
+    label?: string;
+    options?: DropdownOption[];
+  }; // Optional status field configuration
   created_at?: string;
   updated_at?: string;
   created_by?: string;

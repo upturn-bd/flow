@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, RefreshCw, AlertCircle } from 'lucide-react';
+import { Bell, RefreshCw, AlertCircle, Plus } from 'lucide-react';
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import SectionHeader from './SectionHeader';
 import EmptyState from './EmptyState';
@@ -21,6 +21,8 @@ interface NewsReminderSectionProps {
   loading: boolean;
   onNoticeClick: (noticeId: number) => void;
   onRefresh: () => void;
+  canCreate?: boolean;
+  onCreateClick?: () => void;
 }
 
 type TabType = 'all' | 'unread' | 'urgent';
@@ -30,6 +32,8 @@ export default function NoticesSection({
   loading,
   onNoticeClick,
   onRefresh,
+  canCreate = false,
+  onCreateClick,
 }: NewsReminderSectionProps) {
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const [readNotices, setReadNotices] = useState<Set<number>>(new Set());
@@ -129,14 +133,27 @@ export default function NoticesSection({
           <TabButton tab="unread" label="Unread" />
           <TabButton tab="urgent" label="Urgent" />
           
-          <motion.button 
-            whileHover={{ rotate: 180 }}
-            transition={{ duration: 0.3 }}
-            onClick={onRefresh}
-            className="ml-auto rounded-full p-2 bg-gray-100 hover:bg-gray-200 transition-colors"
-          >
-            <RefreshCw size={16} className="text-gray-600" />
-          </motion.button>
+          <div className="ml-auto flex items-center gap-2">
+            <motion.button 
+              whileHover={{ rotate: 180 }}
+              transition={{ duration: 0.3 }}
+              onClick={onRefresh}
+              className="rounded-full p-2 bg-gray-100 hover:bg-gray-200 transition-colors"
+            >
+              <RefreshCw size={16} className="text-gray-600" />
+            </motion.button>
+            {canCreate && onCreateClick && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onCreateClick}
+                className="rounded-full p-2 bg-blue-600 hover:bg-blue-700 transition-colors"
+                title="Create new notice"
+              >
+                <Plus size={16} className="text-white" />
+              </motion.button>
+            )}
+          </div>
         </div>
         
         {loading ? (

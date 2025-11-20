@@ -1,6 +1,7 @@
 "use client";
 
 import { createSystemNotification } from "@/hooks/useNotifications";
+import { getCompanyId } from "@/lib/utils/auth";
 
 export interface NotificationOptions {
   message: string;
@@ -325,10 +326,12 @@ export const createLeaveRequestNotification = async (
       throw new Error('Invalid leave request notification type');
   }
 
+  const companyId = await getCompanyId();
   return await createSystemNotification(
     recipientId,
     template.title,
     template.message,
+    companyId,
     {
       priority: template.priority,
       context: template.context,
@@ -360,10 +363,12 @@ export const createProjectNotification = async (
       throw new Error('Invalid project notification type');
   }
 
+  const companyId = await getCompanyId();
   return await createSystemNotification(
     recipientId,
     template.title,
     template.message,
+    companyId,
     {
       priority: template.priority,
       context: template.context,
@@ -395,10 +400,12 @@ export const createEmployeeNotification = async (
       throw new Error('Invalid employee notification type');
   }
 
+  const companyId = await getCompanyId();
   return await createSystemNotification(
     recipientId,
     template.title,
     template.message,
+    companyId,
     {
       priority: template.priority,
       context: template.context,
@@ -427,10 +434,12 @@ export const createAttendanceNotification = async (
       throw new Error('Invalid attendance notification type');
   }
 
+  const companyId = await getCompanyId();
   return await createSystemNotification(
     recipientId,
     template.title,
     template.message,
+    companyId,
     {
       priority: template.priority,
       context: template.context,
@@ -459,10 +468,12 @@ export const createSystemNotificationHelper = async (
       throw new Error('Invalid system notification type');
   }
 
+  const companyId = await getCompanyId();
   return await createSystemNotification(
     recipientId,
     template.title,
     template.message,
+    companyId,
     {
       priority: template.priority,
       context: template.context,
@@ -498,10 +509,12 @@ export const createPayrollNotification = async (
       throw new Error('Invalid payroll notification type');
   }
 
+  const companyId = await getCompanyId();
   return await createSystemNotification(
     recipientId,
     template.title,
     template.message,
+    companyId,
     {
       priority: template.priority,
       context: template.context,
@@ -543,10 +556,12 @@ export const createAccountNotification = async (
       throw new Error('Invalid account notification type');
   }
 
+  const companyId = await getCompanyId();
   return await createSystemNotification(
     recipientId,
     template.title,
     template.message,
+    companyId,
     {
       priority: template.priority,
       context: template.context,
@@ -597,10 +612,12 @@ export const createStakeholderNotification = async (
       throw new Error('Invalid stakeholder notification type');
   }
 
+  const companyId = await getCompanyId();
   return await createSystemNotification(
     recipientId,
     template.title,
     template.message,
+    companyId,
     {
       priority: template.priority,
       context: template.context,
@@ -636,10 +653,12 @@ export const createStakeholderIssueNotification = async (
       throw new Error('Invalid stakeholder issue notification type');
   }
 
+  const companyId = await getCompanyId();
   return await createSystemNotification(
     recipientId,
     template.title,
     template.message,
+    companyId,
     {
       priority: template.priority,
       context: template.context,

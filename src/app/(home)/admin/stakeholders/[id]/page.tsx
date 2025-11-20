@@ -717,6 +717,8 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                         (f) => f.key === key
                                       );
                                       const isFileField = fieldDef?.type === 'file';
+                                      const isMultiSelect = fieldDef?.type === 'multi_select';
+                                      const isGeolocation = fieldDef?.type === 'geolocation';
                                       const fieldLabel = fieldDef?.label || key.replace(/_/g, " ");
 
                                       // Helper to get file info
@@ -739,6 +741,27 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       };
 
                                       const fileInfo = isFileField ? getFileInfo() : null;
+
+                                      // Helper to format value based on field type
+                                      const formatValue = () => {
+                                        if (typeof value === "boolean") {
+                                          return value ? "Yes" : "No";
+                                        }
+                                        if (isMultiSelect && Array.isArray(value)) {
+                                          if (value.length === 0) return "None selected";
+                                          // Map values to labels using the field definition options
+                                          const options = fieldDef?.options || [];
+                                          const labels = value.map(val => {
+                                            const option = options.find(opt => opt.value === val);
+                                            return option ? option.label : val;
+                                          });
+                                          return labels.join(", ");
+                                        }
+                                        if (isGeolocation && typeof value === 'object' && value !== null && 'latitude' in value && 'longitude' in value) {
+                                          return `${value.latitude}, ${value.longitude}`;
+                                        }
+                                        return String(value);
+                                      };
 
                                       return (
                                         <div key={key}>
@@ -763,13 +786,24 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                                 </p>
                                               )}
                                             </div>
+                                          ) : isGeolocation && typeof value === 'object' && value !== null && 'latitude' in value && 'longitude' in value ? (
+                                            <div className="mt-1">
+                                              <p className="text-sm text-gray-900 flex items-center gap-2">
+                                                <MapPin size={14} className="text-gray-400" />
+                                                {value.latitude.toFixed(6)}, {value.longitude.toFixed(6)}
+                                              </p>
+                                              <a
+                                                href={`https://www.google.com/maps?q=${value.latitude},${value.longitude}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-xs text-blue-600 hover:underline mt-1 inline-block"
+                                              >
+                                                View on Google Maps
+                                              </a>
+                                            </div>
                                           ) : (
                                             <p className="text-sm text-gray-900 mt-1">
-                                              {typeof value === "boolean"
-                                                ? value
-                                                  ? "Yes"
-                                                  : "No"
-                                                : String(value)}
+                                              {formatValue()}
                                             </p>
                                           )}
                                         </div>
