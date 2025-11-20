@@ -112,6 +112,14 @@ export const DEFAULT_WIDGET_CONFIGS: WidgetConfig[] = [
     size: 'large',
     order: 4,
   },
+  {
+    id: 'services-1',
+    type: 'services',
+    enabled: true,
+    position: { row: 15, col: 0, width: 12, height: 5 },
+    size: 'large',
+    order: 5,
+  },
 ];
 
 // Grid layout constants

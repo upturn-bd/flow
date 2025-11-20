@@ -12,10 +12,10 @@ import TasksWidget from "@/app/(home)/home/widgets/TasksWidget";
 import ProjectsWidget from "@/app/(home)/home/widgets/ProjectsWidget";
 import StakeholderIssuesWidget from "@/app/(home)/home/widgets/StakeholderIssuesWidget";
 import ServicesWidget from "@/app/(home)/home/widgets/ServicesWidget";
-import { Settings } from "lucide-react";
+import { Settings, GripVertical, Eye, EyeOff, ArrowDownRight } from "lucide-react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
-import { WidgetConfig } from "@/lib/types/widgets";
+import { WidgetConfig, WidgetSize } from "@/lib/types/widgets";
 
 // Grid configuration
 const DESKTOP_COLS = 12;
@@ -81,7 +81,12 @@ export default function HomePage() {
   const gridLayout = useMemo(() => {
     if (!homeLayout?.widgets) return [];
     
-    return homeLayout.widgets.map((widget, index) => {
+    // Filter out hidden widgets when not in edit mode
+    const visibleWidgets = isEditMode 
+      ? homeLayout.widgets 
+      : homeLayout.widgets.filter(w => w.enabled);
+    
+    return visibleWidgets.map((widget, index) => {
       // Use stored dimensions if available, otherwise use size-based defaults
       const gridSize = widget.position?.width && widget.position?.height
         ? { w: widget.position.width, h: widget.position.height }
@@ -110,7 +115,7 @@ export default function HomePage() {
       
       // Calculate position based on previous widgets
       if (index > 0) {
-        const prevWidgets = homeLayout.widgets.slice(0, index);
+        const prevWidgets = visibleWidgets.slice(0, index);
         const occupiedSpaces: { x: number; y: number; w: number; h: number }[] = [];
         
         prevWidgets.forEach((prevWidget, prevIndex) => {
@@ -154,7 +159,7 @@ export default function HomePage() {
         minH: 5,
       };
     });
-  }, [homeLayout?.widgets, isMobile]);
+  }, [homeLayout?.widgets, isMobile, isEditMode]);
 
   const handleLayoutChange = (newLayout: any[]) => {
     if (!homeLayout?.widgets || !isEditMode) return;
@@ -193,23 +198,42 @@ export default function HomePage() {
     }
   };
 
+  // Toggle widget visibility
+  const handleToggleWidget = (widgetId: string) => {
+    if (!homeLayout?.widgets) return;
+    
+    const updatedWidgets = homeLayout.widgets.map(widget =>
+      widget.id === widgetId ? { ...widget, enabled: !widget.enabled } : widget
+    );
+    
+    if (updateAllWidgets) {
+      updateAllWidgets(updatedWidgets);
+    }
+  };
+
   // Render widget content based on type  
   const renderWidget = (widgetConfig: WidgetConfig) => {
     if (!widgetConfig.enabled && !isEditMode) return null;
 
+    const commonProps = {
+      config: widgetConfig,
+      isEditMode,
+      onToggle: () => handleToggleWidget(widgetConfig.id),
+    };
+
     switch (widgetConfig.type) {
       case 'attendance':
-        return <AttendanceWidget config={widgetConfig} isEditMode={false} />;
+        return <AttendanceWidget {...commonProps} />;
       case 'notices':
-        return <NoticesWidget config={widgetConfig} isEditMode={false} />;
+        return <NoticesWidget {...commonProps} />;
       case 'tasks':
-        return <TasksWidget config={widgetConfig} isEditMode={false} onTaskClick={() => {}} />;
+        return <TasksWidget {...commonProps} onTaskClick={() => {}} />;
       case 'projects':
-        return <ProjectsWidget config={widgetConfig} isEditMode={false} />;
+        return <ProjectsWidget {...commonProps} />;
       case 'stakeholder-issues':
-        return <StakeholderIssuesWidget config={widgetConfig} isEditMode={false} />;
+        return <StakeholderIssuesWidget {...commonProps} />;
       case 'services':
-        return <ServicesWidget config={widgetConfig} isEditMode={false} />;
+        return <ServicesWidget {...commonProps} />;
       default:
         return null;
     }
@@ -282,16 +306,55 @@ export default function HomePage() {
               compactType={null}
               preventCollision={true}
             >
-              {homeLayout?.widgets.map((widget) => (
+              {(isEditMode ? homeLayout?.widgets : homeLayout?.widgets.filter(w => w.enabled))?.map((widget) => (
                 <div key={widget.id} className="h-full w-full relative">
                   <div className={isEditMode ? 'pointer-events-none' : ''}>
                     {renderWidget(widget)}
                   </div>
-                  <div 
-                    className={`absolute inset-0 bg-blue-500/10 border-2 border-blue-400 rounded-lg pointer-events-none z-10 transition-opacity ${
-                      isEditMode ? 'opacity-100' : 'opacity-0'
-                    }`}
-                  />
+                  {/* Edit mode overlay with controls */}
+                  {isEditMode && (
+                    <div className={`absolute inset-0 border-2 rounded-lg pointer-events-none z-10 transition-all ${
+                      widget.enabled 
+                        ? 'bg-blue-500/10 border-blue-400' 
+                        : 'bg-gray-500/20 border-gray-400'
+                    }`}>
+                      {/* Control bar at top */}
+                      <div className={`absolute top-0 left-0 right-0 backdrop-blur-sm px-4 py-3 flex items-center justify-between rounded-t-md pointer-events-auto ${
+                        widget.enabled 
+                          ? 'bg-blue-500/90' 
+                          : 'bg-gray-500/90'
+                      }`}>
+                        <div className="flex items-center gap-3">
+                          <GripVertical size={20} className="text-white cursor-grab active:cursor-grabbing" />
+                          <span className="text-white text-base font-semibold">
+                            {widget.type.charAt(0).toUpperCase() + widget.type.slice(1).replace('-', ' ')}
+                          </span>
+                          {!widget.enabled && (
+                            <span className="text-white/80 text-sm">(Hidden)</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleWidget(widget.id);
+                            }}
+                            className="p-2 hover:bg-white/20 rounded transition-colors text-white"
+                            title={widget.enabled ? 'Hide widget' : 'Show widget'}
+                          >
+                            {widget.enabled ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
+                      </div>
+                      {/* Resize handle indicator at bottom-right */}
+                      {widget.enabled && (
+                        <div className="absolute bottom-0 right-0 w-8 h-8 pointer-events-none flex items-center justify-center bg-blue-500 rounded-tl">
+                          <ArrowDownRight size={20} className="text-white" strokeWidth={3} />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </GridLayout>
