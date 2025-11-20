@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { X, FloppyDisk } from '@phosphor-icons/react';
 import { TeamWithPermissions, TeamPermission, PermissionCategory, Permission } from '@/lib/types';
 import { supabase } from '@/lib/supabase/client';
@@ -126,6 +125,15 @@ export default function TeamPermissionsModal({
     setPermissions((prev) => {
       const updated = { ...prev };
       modulesByCategory[category].forEach((module) => {
+        if (!updated[module.name]) {
+          updated[module.name] = {
+            can_read: false,
+            can_write: false,
+            can_delete: false,
+            can_approve: false,
+            can_comment: false,
+          };
+        }
         updated[module.name] = {
           ...updated[module.name],
           [action]: true,
@@ -139,6 +147,15 @@ export default function TeamPermissionsModal({
     setPermissions((prev) => {
       const updated = { ...prev };
       modulesByCategory[category].forEach((module) => {
+        if (!updated[module.name]) {
+          updated[module.name] = {
+            can_read: false,
+            can_write: false,
+            can_delete: false,
+            can_approve: false,
+            can_comment: false,
+          };
+        }
         updated[module.name] = {
           ...updated[module.name],
           [action]: false,
@@ -198,34 +215,35 @@ export default function TeamPermissionsModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-lg shadow-xl max-w-7xl w-full mx-4 max-h-[90vh] overflow-hidden"
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-7xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
-              Configure Team Permissions
+            <h2 className="text-2xl font-bold text-gray-900">
+              Configure Permissions
             </h2>
-            <p className="text-sm text-gray-500 mt-1">{team.name}</p>
+            <p className="text-sm text-gray-600 mt-1 flex items-center gap-2">
+              <span className="font-medium text-purple-600">{team.name}</span>
+              <span className="text-gray-400">•</span>
+              <span>Set granular access controls</span>
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+            aria-label="Close"
           >
-            <X size={24} className="text-gray-500" />
+            <X size={24} className="text-gray-600" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+        <div className="p-6 overflow-y-auto flex-1">
           {loadingPermissions ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-gray-500">Loading permissions...</div>
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+              <div className="text-gray-600 font-medium">Loading permissions...</div>
             </div>
           ) : (
             <div className="space-y-8">
@@ -239,108 +257,111 @@ export default function TeamPermissionsModal({
 
                   return (
                     <div key={categoryKey} className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-gray-900 capitalize">
-                        {categoryName}
-                      </h3>
-                    </div>
+                      <div className="flex items-center gap-3 pb-2">
+                        <div className="h-8 w-1 bg-gradient-to-b from-purple-500 to-indigo-500 rounded-full"></div>
+                        <h3 className="text-xl font-bold text-gray-900 capitalize">
+                          {categoryName} Permissions
+                        </h3>
+                      </div>
 
-                    {/* Permission Matrix */}
-                    <div className="border border-gray-300 rounded-lg overflow-hidden">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">
-                              Module
-                            </th>
-                            {Object.values(PERMISSION_ACTIONS).map((action) => (
-                              <th
-                                key={action}
-                                className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                              >
-                                <div className="flex flex-col items-center gap-1">
-                                  <span>{action}</span>
-                                  <div className="flex gap-1">
-                                    <button
-                                      onClick={() => handleSelectAll(categoryKey, `can_${action.toLowerCase()}` as keyof PermissionState[string])}
-                                      className="text-xs text-blue-600 hover:text-blue-800"
-                                      title="Select all"
-                                    >
-                                      All
-                                    </button>
-                                    <span className="text-gray-400">|</span>
-                                    <button
-                                      onClick={() => handleClearAll(categoryKey, `can_${action.toLowerCase()}` as keyof PermissionState[string])}
-                                      className="text-xs text-gray-600 hover:text-gray-800"
-                                      title="Clear all"
-                                    >
-                                      None
-                                    </button>
-                                  </div>
-                                </div>
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {modules.map((module) => (
-                            <tr key={module.name} className="hover:bg-gray-50">
-                              <td className="px-4 py-3">
-                                <div className="font-medium text-gray-900">
-                                  {module.displayName}
-                                </div>
-                                {module.description && (
-                                  <div className="text-xs text-gray-500 mt-1">
-                                    {module.description}
-                                  </div>
-                                )}
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                <input
-                                  type="checkbox"
-                                  checked={permissions[module.name]?.can_read || false}
-                                  onChange={() => handlePermissionToggle(module.name, 'can_read')}
-                                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                />
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                <input
-                                  type="checkbox"
-                                  checked={permissions[module.name]?.can_write || false}
-                                  onChange={() => handlePermissionToggle(module.name, 'can_write')}
-                                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                />
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                <input
-                                  type="checkbox"
-                                  checked={permissions[module.name]?.can_delete || false}
-                                  onChange={() => handlePermissionToggle(module.name, 'can_delete')}
-                                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                />
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                <input
-                                  type="checkbox"
-                                  checked={permissions[module.name]?.can_approve || false}
-                                  onChange={() => handlePermissionToggle(module.name, 'can_approve')}
-                                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                />
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                <input
-                                  type="checkbox"
-                                  checked={permissions[module.name]?.can_comment || false}
-                                  onChange={() => handlePermissionToggle(module.name, 'can_comment')}
-                                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                />
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                      {/* Permission Matrix */}
+                      <div className="border-2 border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                              <tr>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider w-1/3 sticky left-0 bg-gray-50">
+                                  Module
+                                </th>
+                                {Object.values(PERMISSION_ACTIONS).map((action) => (
+                                  <th
+                                    key={action}
+                                    className="px-4 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
+                                  >
+                                    <div className="flex flex-col items-center gap-2">
+                                      <span>{action}</span>
+                                      <div className="flex gap-1.5 text-xs font-normal normal-case">
+                                        <button
+                                          onClick={() => handleSelectAll(categoryKey, `can_${action.toLowerCase()}` as keyof PermissionState[string])}
+                                          className="px-2 py-1 text-indigo-600 hover:bg-indigo-100 rounded transition-colors font-medium"
+                                          title="Select all"
+                                        >
+                                          All
+                                        </button>
+                                        <span className="text-gray-300">|</span>
+                                        <button
+                                          onClick={() => handleClearAll(categoryKey, `can_${action.toLowerCase()}` as keyof PermissionState[string])}
+                                          className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded transition-colors font-medium"
+                                          title="Clear all"
+                                        >
+                                          None
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-100">
+                              {modules.map((module) => (
+                                <tr key={module.name} className="hover:bg-purple-50/50 transition-colors">
+                                  <td className="px-6 py-4 sticky left-0 bg-white">
+                                    <div className="font-semibold text-gray-900">
+                                      {module.displayName}
+                                    </div>
+                                    {module.description && (
+                                      <div className="text-xs text-gray-500 mt-1 leading-relaxed">
+                                        {module.description}
+                                      </div>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-4 text-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={permissions[module.name]?.can_read || false}
+                                      onChange={() => handlePermissionToggle(module.name, 'can_read')}
+                                      className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="px-4 py-4 text-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={permissions[module.name]?.can_write || false}
+                                      onChange={() => handlePermissionToggle(module.name, 'can_write')}
+                                      className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="px-4 py-4 text-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={permissions[module.name]?.can_delete || false}
+                                      onChange={() => handlePermissionToggle(module.name, 'can_delete')}
+                                      className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="px-4 py-4 text-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={permissions[module.name]?.can_approve || false}
+                                      onChange={() => handlePermissionToggle(module.name, 'can_approve')}
+                                      className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="px-4 py-4 text-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={permissions[module.name]?.can_comment || false}
+                                      onChange={() => handlePermissionToggle(module.name, 'can_comment')}
+                                      className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                    />
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
                     </div>
-                  </div>
                 );
               }
             )}
@@ -349,24 +370,29 @@ export default function TeamPermissionsModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50">
-          <button
-            onClick={onClose}
-            disabled={isSaving}
-            className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={isSaving || loading}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            <FloppyDisk size={20} />
-            {isSaving ? 'Saving...' : 'Save Permissions'}
-          </button>
+        <div className="flex justify-between items-center gap-3 px-6 py-4 border-t bg-gradient-to-r from-gray-50 to-gray-100">
+          <p className="text-sm text-gray-600">
+            Changes will apply to all team members
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              disabled={isSaving}
+              className="px-6 py-2.5 text-gray-700 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 active:scale-[0.98] transition-all disabled:opacity-50 font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={isSaving || loading}
+              className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 active:scale-[0.98] transition-all disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed font-medium shadow-md hover:shadow-lg"
+            >
+              <FloppyDisk size={20} />
+              {isSaving ? 'Saving...' : 'Save Permissions'}
+            </button>
+          </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
