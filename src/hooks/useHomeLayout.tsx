@@ -34,7 +34,33 @@ export function useHomeLayout() {
       }
 
       if (data) {
-        setLayout(data);
+        // Merge with default widgets: add any new widgets that don't exist in saved layout
+        const savedWidgetTypes = new Set(data.widgets.map((w: WidgetConfig) => w.type));
+        const newWidgets = DEFAULT_WIDGET_CONFIGS.filter(
+          defaultWidget => !savedWidgetTypes.has(defaultWidget.type)
+        );
+        
+        // If there are new widgets, add them to the layout
+        if (newWidgets.length > 0) {
+          const maxOrder = Math.max(...data.widgets.map((w: WidgetConfig) => w.order || 0), -1);
+          const maxRow = Math.max(...data.widgets.map((w: WidgetConfig) => w.position?.row || 0), -1);
+          
+          const widgetsWithNew = [
+            ...data.widgets,
+            ...newWidgets.map((widget, index) => ({
+              ...widget,
+              order: maxOrder + index + 1,
+              position: {
+                ...widget.position,
+                row: maxRow + (index + 1) * 5, // Stack new widgets below existing ones
+              }
+            }))
+          ];
+          
+          setLayout({ ...data, widgets: widgetsWithNew });
+        } else {
+          setLayout(data);
+        }
       } else {
         // No layout found, create default
         const defaultLayout: HomeLayoutConfig = {
