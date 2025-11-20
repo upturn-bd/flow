@@ -637,39 +637,55 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
 
       {/* Dropdown Options Editor */}
       {isDropdownType && isEditing && (
-        <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3">
-          <label className="block text-xs font-medium text-gray-700 mb-2">
-            {field.type === 'multi_select' ? 'Multi-Select Options' : 'Dropdown Options'}
-          </label>
+        <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3 bg-white">
+          {/* Section Header */}
+          <div className="mb-3">
+            <h4 className="text-sm font-semibold text-gray-800 mb-1">
+              {field.type === 'multi_select' ? 'Multi-Select Options' : 'Dropdown Options'}
+            </h4>
+            <p className="text-xs text-gray-600">
+              Add the options that users can select from for this field
+            </p>
+          </div>
           
           {/* Add Option Input */}
-          <div className="flex gap-2 mb-3">
-            <input
-              type="text"
-              value={optionInput}
-              onChange={(e) => setOptionInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addOption();
-                }
-              }}
-              placeholder="Enter option label"
-              className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-            />
-            <button
-              type="button"
-              onClick={addOption}
-              className="px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Add
-            </button>
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <label className="block text-xs font-medium text-blue-900 mb-2">
+              Add New Option
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={optionInput}
+                onChange={(e) => setOptionInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addOption();
+                  }
+                }}
+                placeholder="Type option name and press Enter or click Add"
+                className="flex-1 px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white"
+              />
+              <button
+                type="button"
+                onClick={addOption}
+                className="flex items-center gap-1 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                <Plus size={14} />
+                Add Option
+              </button>
+            </div>
           </div>
 
           {/* Options List */}
-          <div className="space-y-2">
-            {(field.options || []).length > 0 ? (
-              (field.options || []).map((option, optIndex) => (
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-2">
+              Available Options ({(field.options || []).length})
+            </label>
+            <div className="space-y-2">
+              {(field.options || []).length > 0 ? (
+                (field.options || []).map((option, optIndex) => (
                 <div key={optIndex} className="bg-white border border-gray-200 rounded">
                   <div className="flex items-center justify-between p-2">
                     <span className="text-gray-700 text-sm">{option.label}</span>
@@ -762,8 +778,12 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
                 </div>
               ))
             ) : (
-              <p className="text-xs text-gray-500 italic">No options added yet</p>
+              <div className="text-center py-6 px-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
+                <p className="text-sm text-gray-600 mb-1">No options added yet</p>
+                <p className="text-xs text-gray-500">Use the "Add New Option" section above to create your first option</p>
+              </div>
             )}
+          </div>
           </div>
         </div>
       )}
@@ -771,19 +791,29 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
       {/* General Nested Fields Editor (for all field types) */}
       {showNestedFields && (
         <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3 bg-white">
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-xs font-medium text-gray-700">
+          {/* Section Header */}
+          <div className="mb-3">
+            <h4 className="text-sm font-semibold text-gray-800 mb-1">
               Nested Fields
-            </label>
+            </h4>
+            <p className="text-xs text-gray-600">
+              Define additional fields that appear when this field is filled
+            </p>
+          </div>
+          
+          {/* Add Nested Field Button */}
+          <div className="mb-3">
             <button
               type="button"
               onClick={() => addNestedField()}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors font-medium w-full justify-center"
             >
-              <Plus size={12} />
+              <Plus size={14} />
               Add Nested Field
             </button>
           </div>
+          
+          {/* Nested Fields List */}
           <div className="space-y-2">
             {(field.nested || []).map((nestedField, nestedIdx) => (
               <div key={nestedIdx} className="flex items-center gap-2 bg-gray-50 p-2 rounded border border-gray-200">
