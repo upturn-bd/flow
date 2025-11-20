@@ -6,6 +6,7 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getPublicFileUrl } from "@/lib/utils/files";
+import { calculateFieldValue, formatCalculatedValue } from "@/lib/utils/formula-evaluator";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -22,6 +23,7 @@ import {
   Download,
   DollarSign,
   Database,
+  Calculator,
 } from "lucide-react";
 import { Stakeholder, StakeholderProcessStep, StakeholderStepData } from "@/lib/types/schemas";
 import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
@@ -779,7 +781,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                           return typeof value === 'number' ? value.toFixed(2) : String(value);
                                         }
                                         if (isCalculated && fieldDef?.formula) {
-                                          // For calculated fields, we need to compute the value from formula
+                                          // For calculated fields, compute the value from formula
                                           const completedStepsData = stepData
                                             .filter((sd) => {
                                               const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
@@ -793,17 +795,61 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                               };
                                             });
                                           
-                                          // Dynamically import and use the calculator
-                                          try {
-                                            // Note: This is a sync operation in display - in production,
-                                            // calculated values should be stored when the step completes
-                                            return "Calculated value (see formula)";
-                                          } catch (error) {
-                                            return "Error calculating value";
+                                          const result = calculateFieldValue(fieldDef.formula, completedStepsData);
+                                          if (result.value !== null) {
+                                            return formatCalculatedValue(result.value);
                                           }
+                                          return result.error || "Unable to calculate";
                                         }
                                         return String(value);
                                       };
+
+                                      // Skip rendering calculated fields - they're computed, not stored
+                                      if (isCalculated && fieldDef?.formula) {
+                                        // Compute value for display
+                                        const completedStepsData = stepData
+                                          .filter((sd) => {
+                                            const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
+                                            return sdStep && sdStep.step_order < step.step_order;
+                                          })
+                                          .map((sd) => {
+                                            const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
+                                            return {
+                                              step_order: sdStep?.step_order || 0,
+                                              data: sd.data || {},
+                                            };
+                                          });
+                                        
+                                        const result = calculateFieldValue(fieldDef.formula, completedStepsData);
+                                        
+                                        return (
+                                          <div key={key} className="col-span-2">
+                                            <p className="text-xs font-medium text-gray-500 uppercase">
+                                              {fieldLabel}
+                                              <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded normal-case">
+                                                <Calculator size={12} />
+                                                Calculated
+                                              </span>
+                                            </p>
+                                            <div className="mt-1 flex items-baseline gap-3">
+                                              <p className="text-lg font-semibold text-gray-900">
+                                                {result.value !== null ? formatCalculatedValue(result.value) : "—"}
+                                              </p>
+                                              {result.error && (
+                                                <span className="text-xs text-red-600">{result.error}</span>
+                                              )}
+                                            </div>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                              Formula: <code className="bg-gray-100 px-1 py-0.5 rounded">{fieldDef.formula}</code>
+                                            </p>
+                                            {result.missingRefs && result.missingRefs.length > 0 && (
+                                              <p className="text-xs text-amber-600 mt-1">
+                                                Missing: {result.missingRefs.join(", ")}
+                                              </p>
+                                            )}
+                                          </div>
+                                        );
+                                      }
 
                                       return (
                                         <div key={key}>

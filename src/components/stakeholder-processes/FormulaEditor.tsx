@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { StakeholderProcessStep } from "@/lib/types/schemas";
-import { X, Plus, Calculator } from "lucide-react";
+import { X, Plus, Calculator, AlertCircle } from "lucide-react";
 
 interface CellReference {
   stepOrder: number;
@@ -29,6 +29,7 @@ export default function FormulaEditor({
   const [formulaText, setFormulaText] = useState(formula || "");
   const [showCellPicker, setShowCellPicker] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   // Filter to only show previous steps (for sequential processes)
   const previousSteps = availableSteps.filter(
@@ -123,10 +124,11 @@ export default function FormulaEditor({
   const handleSave = () => {
     const validation = validateFormula(formulaText);
     if (!validation.valid) {
-      alert(validation.error);
+      setValidationError(validation.error || "Invalid formula");
       return;
     }
 
+    setValidationError(null);
     const references = parseReferences(formulaText);
     onChange(formulaText, references);
     
@@ -153,6 +155,24 @@ export default function FormulaEditor({
         )}
       </div>
 
+      {/* Validation Error */}
+      {validationError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+          <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={16} />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-red-800">Invalid Formula</p>
+            <p className="text-sm text-red-600 mt-1">{validationError}</p>
+          </div>
+          <button
+            onClick={() => setValidationError(null)}
+            className="text-red-400 hover:text-red-600"
+            type="button"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
       {/* Formula Input */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -163,6 +183,7 @@ export default function FormulaEditor({
           onChange={(e) => {
             setFormulaText(e.target.value);
             setCursorPosition(e.target.selectionStart);
+            setValidationError(null); // Clear error when user types
           }}
           onSelect={(e) => {
             const target = e.target as HTMLTextAreaElement;
