@@ -201,7 +201,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
               You need to have at least one active stakeholder process to edit this stakeholder.
             </p>
             <button
-              onClick={() => router.push("/admin/config/stakeholder-processes")}
+              onClick={() => router.push("/admin/config/stakeholder-process")}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
             >
               Go to Process Management

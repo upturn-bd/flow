@@ -110,6 +110,7 @@ export function useNotices() {
         .from("notice_records")
         .select("*")
         .eq("company_id", companyId)
+        .gte("valid_till", new Date().toISOString())
         .order("created_at", { ascending: false });
 
       // If not global, apply department/user filters

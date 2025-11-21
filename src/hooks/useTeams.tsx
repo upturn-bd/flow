@@ -35,7 +35,8 @@ export function useTeams() {
     try {
       const companyId = employeeInfo?.company_id;
       if (!companyId) {
-        throw new Error('Company ID not available');
+        setLoading(false);
+        return [];
       }
 
       const { data, error: fetchError } = await supabase
@@ -152,7 +153,8 @@ export function useTeams() {
     try {
       const companyId = employeeInfo?.company_id;
       if (!companyId) {
-        throw new Error('Company ID not available');
+        setLoading(false);
+        return null;
       }
 
       // Fetch team details

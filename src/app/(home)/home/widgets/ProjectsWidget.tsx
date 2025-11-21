@@ -12,20 +12,31 @@ import { WidgetProps } from '@/lib/types/widgets';
 import { useProjects } from '@/hooks/useProjects';
 import { formatDateToDayMonth } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth/auth-context';
+import NoPermissionMessage from '@/components/ui/NoPermissionMessage';
 
 export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeChange }: WidgetProps) {
   const router = useRouter();
+  const { canRead, canWrite } = useAuth();
   const { fetchOngoingProjects, ongoingProjects, ongoingLoading } = useProjects();
   const [loading, setLoading] = useState(true);
 
+  // Check permissions
+  const canViewProjects = canRead('projects');
+  const canCreateProjects = canWrite('projects');
+
   useEffect(() => {
     const loadProjects = async () => {
+      if (!canViewProjects) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       await fetchOngoingProjects(5, true); // Fetch 5 most recent ongoing projects
       setLoading(false);
     };
     loadProjects();
-  }, [fetchOngoingProjects]);
+  }, [fetchOngoingProjects, canViewProjects]);
 
   const handleRefresh = async () => {
     await fetchOngoingProjects(5, true);
@@ -46,7 +57,9 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
           <SectionHeader title="My Projects" icon={FolderKanban} iconColor="text-purple-600" />
         </div>
         
-        {loading || ongoingLoading ? (
+        {!canViewProjects ? (
+          <NoPermissionMessage moduleName="projects" />
+        ) : loading || ongoingLoading ? (
           <div className="flex-1 flex items-center justify-center overflow-hidden">
             <LoadingSection text="Loading projects..." icon={FolderKanban} />
           </div>
@@ -68,15 +81,17 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
                 >
                   <RefreshCw size={16} className="text-gray-600" />
                 </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleCreateProject}
-                  className="rounded-full p-2 bg-purple-600 hover:bg-purple-700 transition-colors"
-                  title="Create new project"
-                >
-                  <Plus size={16} className="text-white" />
-                </motion.button>
+                {canCreateProjects && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleCreateProject}
+                    className="rounded-full p-2 bg-purple-600 hover:bg-purple-700 transition-colors"
+                    title="Create new project"
+                  >
+                    <Plus size={16} className="text-white" />
+                  </motion.button>
+                )}
               </div>
             </div>
 

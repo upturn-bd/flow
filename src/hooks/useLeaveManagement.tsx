@@ -204,7 +204,10 @@ export function useLeaveRequests() {
 
       const companyId = employeeInfo?.company_id;
       if (!companyId) {
-        throw new Error('Company ID not available');
+        console.warn('Company ID not available, cannot fetch leave requests');
+        setLeaveRequests([]);
+        setLoading(false);
+        return;
       }
 
       const { data, error } = await supabase

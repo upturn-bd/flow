@@ -7,6 +7,8 @@ import AttendanceSection from '../components/AttendanceSection';
 import { useAttendanceStatus } from "@/hooks/useAttendance";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import { handleCheckIn, handleCheckOut } from "@/app/(home)/home/components/attendanceUtils";
+import { useAuth } from '@/lib/auth/auth-context';
+import NoPermissionMessage from '@/components/ui/NoPermissionMessage';
 
 const initialAttendanceRecord: { tag: string; site_id: number | undefined } = {
   tag: "Present",
@@ -14,9 +16,11 @@ const initialAttendanceRecord: { tag: string; site_id: number | undefined } = {
 };
 
 export default function AttendanceWidget({ config, isEditMode, onToggle, onSizeChange }: WidgetProps) {
+  const { canRead } = useAuth();
   const [attendanceRecord, setAttendanceRecord] = useState(initialAttendanceRecord);
   const [attendanceLoading, setAttendanceLoading] = useState(false);
   
+  const canViewAttendance = canRead('attendance');
   const { today, todayLoading, getTodaysAttendance } = useAttendanceStatus();
   const { sites, loading: sitesLoading, fetchSites } = useSites();
 
@@ -28,9 +32,11 @@ export default function AttendanceWidget({ config, isEditMode, onToggle, onSizeC
 
   // Fetch initial data
   useEffect(() => {
-    fetchSites();
-    getTodaysAttendance();
-  }, []);
+    if (canViewAttendance) {
+      fetchSites();
+      getTodaysAttendance();
+    }
+  }, [canViewAttendance]);
 
   // Check-in handler
   const onCheckIn = async () => {
@@ -56,17 +62,23 @@ export default function AttendanceWidget({ config, isEditMode, onToggle, onSizeC
 
   return (
     <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
-      <AttendanceSection
-        loading={todayLoading}
-        attendanceLoading={attendanceLoading}
-        attendanceStatus={attendanceStatus}
-        attendanceRecord={attendanceRecord}
-        sites={sites}
-        sitesLoading={sitesLoading}
-        onRecordChange={setAttendanceRecord}
-        onCheckIn={onCheckIn}
-        onCheckOut={onCheckOut}
-      />
+      {!canViewAttendance ? (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col overflow-hidden">
+          <NoPermissionMessage moduleName="attendance" />
+        </div>
+      ) : (
+        <AttendanceSection
+          loading={todayLoading}
+          attendanceLoading={attendanceLoading}
+          attendanceStatus={attendanceStatus}
+          attendanceRecord={attendanceRecord}
+          sites={sites}
+          sitesLoading={sitesLoading}
+          onRecordChange={setAttendanceRecord}
+          onCheckIn={onCheckIn}
+          onCheckOut={onCheckOut}
+        />
+      )}
     </BaseWidget>
   );
 }

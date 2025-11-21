@@ -209,7 +209,11 @@ export function useBaseEntity<T extends BaseEntity>(
           // Add company scoping if enabled
           if (config.companyScoped) {
             const companyId = employeeInfo?.company_id;
-            if (!companyId) throw new Error('Company ID not available');
+            if (!companyId) {
+              // Return empty array for fetch operations when company_id not available
+              setLoading(false);
+              return [];
+            }
             if (!scopingFilters.eq) scopingFilters.eq = {};
             scopingFilters.eq.company_id = companyId;
           }
@@ -271,7 +275,11 @@ export function useBaseEntity<T extends BaseEntity>(
           // Add company scoping if enabled
           if (config.companyScoped) {
             const companyId = employeeInfo?.company_id;
-            if (!companyId) throw new Error('Company ID not available');
+            if (!companyId) {
+              // Return null for single item fetch when company_id not available
+              setLoading(false);
+              return null;
+            }
             if (!scopingFilters.eq) scopingFilters.eq = {};
             scopingFilters.eq.company_id = companyId;
           }
@@ -337,7 +345,12 @@ export function useBaseEntity<T extends BaseEntity>(
         } else {
           // If no company_id provided, get from employee info
           const companyId = employeeInfo?.company_id;
-          if (!companyId) throw new Error('Company ID not available');
+          if (!companyId) {
+            // Return empty for fetch when company_id not available
+            setItems([]);
+            setLoading(false);
+            return;
+          }
           filters.company_id = companyId;
         }
       }

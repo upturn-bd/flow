@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/lib/auth/auth-context";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { pageVariants } from "@/app/(home)/home/components/animations";
 import { useHomeLayout } from "@/hooks/useHomeLayout";
@@ -12,6 +12,8 @@ import TasksWidget from "@/app/(home)/home/widgets/TasksWidget";
 import ProjectsWidget from "@/app/(home)/home/widgets/ProjectsWidget";
 import StakeholderIssuesWidget from "@/app/(home)/home/widgets/StakeholderIssuesWidget";
 import ServicesWidget from "@/app/(home)/home/widgets/ServicesWidget";
+import DetailModals from "@/app/(home)/home/components/DetailModals";
+import Portal from "@/components/ui/Portal";
 import { Settings, GripVertical, Eye, EyeOff, ArrowDownRight } from "lucide-react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
@@ -28,6 +30,7 @@ export default function HomePage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Measure container width for responsive grid
@@ -211,6 +214,19 @@ export default function HomePage() {
     }
   };
 
+  // Task modal handlers
+  const handleTaskClick = useCallback((taskId: string) => {
+    setSelectedTaskId(taskId);
+  }, []);
+
+  const handleCloseTask = useCallback(() => {
+    setSelectedTaskId(null);
+  }, []);
+
+  const handleTaskStatusUpdate = useCallback(() => {
+    // Task status updated, could refresh tasks here if needed
+  }, []);
+
   // Render widget content based on type  
   const renderWidget = (widgetConfig: WidgetConfig) => {
     if (!widgetConfig.enabled && !isEditMode) return null;
@@ -227,7 +243,7 @@ export default function HomePage() {
       case 'notices':
         return <NoticesWidget {...commonProps} />;
       case 'tasks':
-        return <TasksWidget {...commonProps} onTaskClick={() => {}} />;
+        return <TasksWidget {...commonProps} onTaskClick={handleTaskClick} />;
       case 'projects':
         return <ProjectsWidget {...commonProps} />;
       case 'stakeholder-issues':
@@ -247,6 +263,7 @@ export default function HomePage() {
   };
 
   return (
+    <>
     <motion.div
       initial="hidden"
       animate="visible"
@@ -308,12 +325,10 @@ export default function HomePage() {
             >
               {(isEditMode ? homeLayout?.widgets : homeLayout?.widgets.filter(w => w.enabled))?.map((widget) => (
                 <div key={widget.id} className="h-full w-full relative">
-                  <div className={isEditMode ? 'pointer-events-none' : ''}>
-                    {renderWidget(widget)}
-                  </div>
+                  {renderWidget(widget)}
                   {/* Edit mode overlay with controls */}
                   {isEditMode && (
-                    <div className={`absolute inset-0 border-2 rounded-lg pointer-events-none z-10 transition-all ${
+                    <div className={`absolute inset-0 border-2 rounded-lg z-10 transition-all pointer-events-none ${
                       widget.enabled 
                         ? 'bg-blue-500/10 border-blue-400' 
                         : 'bg-gray-500/20 border-gray-400'
@@ -362,6 +377,20 @@ export default function HomePage() {
           </div>
         )}
       </div>
+      
+      {/* Task Detail Modal - Rendered in Portal */}
+      {selectedTaskId && (
+        <Portal>
+          <DetailModals
+            selectedNoticeId={null}
+            selectedTaskId={selectedTaskId}
+            onTaskStatusUpdate={handleTaskStatusUpdate}
+            onCloseNotice={() => {}}
+            onCloseTask={handleCloseTask}
+          />
+        </Portal>
+      )}
     </motion.div>
+    </>
   );
 }

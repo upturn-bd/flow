@@ -24,7 +24,8 @@ export function useEmployeeInfo() {
     try {
       const companyId = employeeInfo?.company_id;
       if (!companyId) {
-        throw new DatabaseError('Company ID not available');
+        setLoading(false);
+        return;
       }
 
       const { data, error } = await supabase

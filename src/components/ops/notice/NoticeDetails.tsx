@@ -17,6 +17,8 @@ import { useNotices, useNoticeTypes } from "@/hooks/useNotice";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow, PriorityBadge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import BaseModal from "@/components/ui/modals/BaseModal";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface NoticeDetailsProps {
   id: number;
@@ -76,53 +78,70 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
   }, [notice]);
 
   if (loadingNotice || loadingNoticeType || loadingDepartment) {
-    return <LoadingSection 
+    return (
+      <BaseModal
+        isOpen={true}
+        onClose={onClose}
+        title="Notice Details"
+        icon={<Bell size={24} />}
+        size="xl"
+      >
+        <LoadingSection 
           text="Loading notice details..."
           icon={AlertCircleIcon}
           color="blue"
-          />;
+        />
+      </BaseModal>
+    );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <XCircle className="h-12 w-12 text-red-500 mb-4" />
-        <p className="text-red-500 font-medium mb-4">{error}</p>
-        <Button
-          variant="outline"
-          onClick={onClose}
-          className="flex items-center gap-2"
-        >
-          <ChevronLeft size={16} />
-          Go back
-        </Button>
-      </div>
+      <BaseModal
+        isOpen={true}
+        onClose={onClose}
+        title="Notice Details"
+        icon={<Bell size={24} />}
+        size="xl"
+      >
+        <EmptyState
+          icon={<XCircle className="h-12 w-12" />}
+          title="Error loading notice"
+          description={error}
+          action={{
+            label: "Go back",
+            onClick: onClose,
+            icon: <ChevronLeft size={16} />
+          }}
+        />
+      </BaseModal>
+    );
+  }
+
+  if (!notice) {
+    return (
+      <EmptyState 
+        icon={<Bell className="h-12 w-12" />}
+        title="Notice not found"
+        description="The requested notice could not be found"
+        action={{
+          label: "Go back",
+          onClick: onClose,
+          icon: <ChevronLeft size={16} />
+        }}
+      />
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="max-w-4xl mx-auto space-y-6"
+    <BaseModal
+      isOpen={true}
+      onClose={onClose}
+      title="Notice Details"
+      icon={<Bell size={24} />}
+      size="xl"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-          <Bell className="text-amber-500" size={28} />
-          Notice Details
-        </h1>
-        <Button
-          variant="outline"
-          onClick={onClose}
-          className="flex items-center gap-2"
-        >
-          <ChevronLeft size={16} />
-          Back
-        </Button>
-      </div>
-
+      <div className="space-y-6">
       {/* Main Notice Card */}
       <Card variant="elevated">
         <CardHeader
@@ -190,6 +209,7 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
+    </BaseModal>
   );
 }

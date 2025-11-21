@@ -30,7 +30,7 @@ export function useDepartments() {
       const supabase = await createClient();
       const companyId = company_id ?? employeeInfo?.company_id;
       if (!companyId) {
-        throw new Error('Company ID not available');
+        return [];
       }
 
       const { data, error } = await supabase

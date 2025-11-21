@@ -138,7 +138,7 @@ export default function NewStakeholderPage() {
               Processes define the workflow and steps for converting leads into stakeholders.
             </p>
             <button
-              onClick={() => router.push("/admin/config/stakeholder-processes")}
+              onClick={() => router.push("/admin/config/stakeholder-process")}
               className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
             >
               Go to Process Management
