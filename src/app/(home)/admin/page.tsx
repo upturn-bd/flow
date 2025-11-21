@@ -59,8 +59,8 @@ const sections = [
                 color: "bg-violet-100 text-violet-700 border-violet-200"
             },
             {
-                name: "Stakeholder Processes",
-                path: "/admin/config/stakeholder-processes",
+                name: "Stakeholder Process",
+                path: "/admin/config/stakeholder-process",
                 icon: GitBranch,
                 description: "Manage workflow processes for stakeholders and leads",
                 color: "bg-teal-100 text-teal-700 border-teal-200"
