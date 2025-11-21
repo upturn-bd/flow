@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { StakeholderProcessStep, FieldType, FieldDefinition, DropdownOption } from "@/lib/types/schemas";
 import { useTeams } from "@/hooks/useTeams";
-import { Plus, Trash2, GripVertical, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown, List, X } from "lucide-react";
+import { Plus, Trash2, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown, List, X, Calculator, AlertCircle } from "lucide-react";
 import { FIELD_TYPES } from "@/lib/constants";
 import Toggle from "@/components/ui/Toggle";
+import FormulaEditor from "./FormulaEditor";
 
 interface StepManagerProps {
   processId: number;
@@ -199,15 +200,21 @@ export default function StepManager({
           step={editingStep}
           teams={teams}
           nextStepOrder={steps.length + 1}
+          availableSteps={steps}
           onSubmit={async (data) => {
-            if (editingStep) {
-              await onUpdateStep(editingStep.id!, data);
-            } else {
-              await onCreateStep(data);
+            try {
+              if (editingStep) {
+                await onUpdateStep(editingStep.id!, data);
+              } else {
+                await onCreateStep(data);
+              }
+              setShowAddStep(false);
+              setEditingStep(null);
+              onStepsChange();
+            } catch (error) {
+              console.error("Error in onSubmit:", error);
+              throw error; // Re-throw to be caught by handleSubmit
             }
-            setShowAddStep(false);
-            setEditingStep(null);
-            onStepsChange();
           }}
           onClose={() => {
             setShowAddStep(false);
@@ -225,11 +232,12 @@ interface StepFormModalProps {
   step: StakeholderProcessStep | null;
   teams: any[];
   nextStepOrder: number;
+  availableSteps: StakeholderProcessStep[];
   onSubmit: (data: any) => Promise<void>;
   onClose: () => void;
 }
 
-function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClose }: StepFormModalProps) {
+function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, onSubmit, onClose }: StepFormModalProps) {
   const [formData, setFormData] = useState({
     process_id: processId,
     name: step?.name || "",
@@ -247,6 +255,72 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
   const [loading, setLoading] = useState(false);
   const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(null);
   const [statusOptionInput, setStatusOptionInput] = useState("");
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
+  // Validate form before submission
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    
+    // Validate step name
+    if (!formData.name.trim()) {
+      errors.name = "Step name is required";
+    }
+    
+    // Validate team selection
+    if (!formData.team_id || formData.team_id === 0) {
+      errors.team_id = "Please assign a team to this step";
+    }
+    
+    // Validate fields
+    formData.field_definitions.fields.forEach((field, index) => {
+      const fieldKey = `field_${index}`;
+      
+      // Check if field has a label
+      if (!field.label.trim()) {
+        errors[`${fieldKey}_label`] = `Field ${index + 1}: Label is required`;
+      }
+      
+      // Validate dropdown/multi-select fields have options
+      if ((field.type === 'dropdown' || field.type === 'multi_select') && (!field.options || field.options.length === 0)) {
+        errors[`${fieldKey}_options`] = `Field "${field.label || index + 1}": Add at least one option`;
+      }
+      
+      // Validate calculated fields have a formula
+      if (field.type === 'calculated' && (!field.formula || !field.formula.trim())) {
+        errors[`${fieldKey}_formula`] = `Field "${field.label || index + 1}": Formula is required`;
+      }
+      
+      // Validate nested fields have labels
+      if (field.nested && field.nested.length > 0) {
+        field.nested.forEach((nestedField, nestedIndex) => {
+          if (!nestedField.label.trim()) {
+            errors[`${fieldKey}_nested_${nestedIndex}`] = `Nested field in "${field.label || index + 1}" is missing a label`;
+          }
+        });
+      }
+      
+      // Validate option-specific nested fields
+      if (field.options) {
+        field.options.forEach((option, optIndex) => {
+          if (option.nested && option.nested.length > 0) {
+            option.nested.forEach((nestedField, nestedIndex) => {
+              if (!nestedField.label.trim()) {
+                errors[`${fieldKey}_option_${optIndex}_nested_${nestedIndex}`] = `Nested field in option "${option.label}" is missing a label`;
+              }
+            });
+          }
+        });
+      }
+    });
+    
+    // Validate status field if enabled
+    if (formData.status_field?.enabled && (!formData.status_field.options || formData.status_field.options.length === 0)) {
+      errors.status_field = "Add at least one status option";
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const addField = () => {
     const newField = {
@@ -284,6 +358,17 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form before submission
+    if (!validateForm()) {
+      // Scroll to first error
+      const firstErrorElement = document.querySelector('[data-validation-error]');
+      if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    
     setLoading(true);
     try {
       // Convert empty date strings to null for PostgreSQL
@@ -292,10 +377,22 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
         start_date: formData.start_date || null,
         end_date: formData.end_date || null,
       };
+      
       await onSubmit(submissionData);
-    } finally {
+      // Clear any validation errors on success
+      setValidationErrors({});
+    } catch (error) {
+      console.error("Error submitting step:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to save step";
+      setValidationErrors({ 
+        submit: `${errorMessage}. Please check your permissions and try again.` 
+      });
+      // Don't close modal on error - keep it open so user can see the error
       setLoading(false);
+      return;
     }
+    
+    setLoading(false);
   };
 
   return (
@@ -315,6 +412,26 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5 sm:space-y-6">
+          {/* Validation Errors Summary */}
+          {Object.keys(validationErrors).length > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4" data-validation-error>
+              <div className="flex items-start gap-2">
+                <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-red-800 mb-2">Please fix the following errors:</h4>
+                  <ul className="text-sm text-red-700 space-y-1 list-disc list-inside">
+                    {Object.entries(validationErrors).slice(0, 5).map(([key, message]) => (
+                      <li key={key}>{message}</li>
+                    ))}
+                    {Object.keys(validationErrors).length > 5 && (
+                      <li className="text-red-600">...and {Object.keys(validationErrors).length - 5} more errors</li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* Step Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -323,10 +440,21 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
             <input
               type="text"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+              onChange={(e) => {
+                setFormData({ ...formData, name: e.target.value });
+                if (validationErrors.name) {
+                  const { name, ...rest } = validationErrors;
+                  setValidationErrors(rest);
+                }
+              }}
+              className={`w-full px-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors ${
+                validationErrors.name ? 'border-red-500' : 'border-gray-300'
+              }`}
               required
             />
+            {validationErrors.name && (
+              <p className="text-red-600 text-xs mt-1">{validationErrors.name}</p>
+            )}
           </div>
 
           {/* Description */}
@@ -345,21 +473,32 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
           {/* Team Assignment */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Assigned Team <span className="text-red-500">*</span>
+              Team <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.team_id}
-              onChange={(e) => setFormData({ ...formData, team_id: Number(e.target.value) })}
-              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+              onChange={(e) => {
+                setFormData({ ...formData, team_id: parseInt(e.target.value) });
+                if (validationErrors.team_id) {
+                  const { team_id, ...rest } = validationErrors;
+                  setValidationErrors(rest);
+                }
+              }}
+              className={`w-full px-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors ${
+                validationErrors.team_id ? 'border-red-500' : 'border-gray-300'
+              }`}
               required
             >
-              <option value={0}>Select a team</option>
+              <option value={0}>Select a team...</option>
               {teams.map((team) => (
                 <option key={team.id} value={team.id}>
                   {team.name}
                 </option>
               ))}
             </select>
+            {validationErrors.team_id && (
+              <p className="text-red-600 text-xs mt-1">{validationErrors.team_id}</p>
+            )}
           </div>
 
           {/* Date Range */}
@@ -422,6 +561,15 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
                   onRemove={removeField}
                   isEditing={editingFieldIndex === index}
                   onEditToggle={() => setEditingFieldIndex(editingFieldIndex === index ? null : index)}
+                  availableSteps={availableSteps}
+                  currentStepOrder={formData.step_order}
+                  validationErrors={validationErrors}
+                  onClearError={(key) => {
+                    const newErrors = { ...validationErrors };
+                    delete newErrors[key];
+                    setValidationErrors(newErrors);
+                  }}
+                  allFields={formData.field_definitions.fields}
                 />
               ))}
             </div>
@@ -456,6 +604,14 @@ function StepFormModal({ processId, step, teams, nextStepOrder, onSubmit, onClos
 
             {formData.status_field?.enabled && (
               <div className="mt-4 pl-0 sm:pl-14 space-y-4">
+                {/* Status Field Error Warning */}
+                {validationErrors.status_field && (
+                  <div className="p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                    <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={14} />
+                    <p className="text-xs text-red-800">{validationErrors.status_field}</p>
+                  </div>
+                )}
+                
                 {/* Status Label */}
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -609,14 +765,39 @@ interface FieldEditorProps {
   onRemove: (index: number) => void;
   isEditing: boolean;
   onEditToggle: () => void;
+  availableSteps: StakeholderProcessStep[];
+  currentStepOrder: number;
+  validationErrors: Record<string, string>;
+  onClearError: (key: string) => void;
+  allFields: FieldDefinition[]; // All fields in current step for formula validation
 }
 
-function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle }: FieldEditorProps) {
+function FieldEditor({ 
+  field, 
+  index, 
+  onUpdate, 
+  onRemove, 
+  isEditing, 
+  onEditToggle, 
+  availableSteps, 
+  currentStepOrder,
+  validationErrors,
+  onClearError,
+  allFields
+}: FieldEditorProps) {
   const [optionInput, setOptionInput] = useState("");
   const [showNestedFields, setShowNestedFields] = useState(false);
   const [editingOptionNested, setEditingOptionNested] = useState<number | null>(null);
+  const [showFormulaEditor, setShowFormulaEditor] = useState(false);
   
   const isDropdownType = field.type === 'dropdown' || field.type === 'multi_select';
+  const isCalculatedField = field.type === 'calculated';
+  
+  // Check for validation errors related to this field
+  const fieldKey = `field_${index}`;
+  const hasLabelError = !!validationErrors[`${fieldKey}_label`];
+  const hasOptionsError = !!validationErrors[`${fieldKey}_options`];
+  const hasFormulaError = !!validationErrors[`${fieldKey}_formula`];
 
   const addOption = () => {
     if (!optionInput.trim()) return;
@@ -629,6 +810,11 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
     const currentOptions = field.options || [];
     onUpdate(index, { options: [...currentOptions, newOption] });
     setOptionInput("");
+    
+    // Clear options error when adding first option
+    if (currentOptions.length === 0 && hasOptionsError) {
+      onClearError(`${fieldKey}_options`);
+    }
   };
 
   const removeOption = (optionIndex: number) => {
@@ -703,28 +889,58 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
   const getFieldTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
       text: 'Text',
+      number: 'Number',
       boolean: 'Boolean',
       date: 'Date',
       file: 'File',
       geolocation: 'Geolocation',
       dropdown: 'Dropdown',
       multi_select: 'Multi-Select',
+      calculated: 'Calculated Field',
     };
     return labels[type] || type;
   };
 
   return (
-    <div className="bg-gray-50 rounded-lg border border-gray-200">
+    <div className={`bg-gray-50 rounded-lg border ${
+      hasLabelError || hasOptionsError || hasFormulaError ? 'border-red-300 bg-red-50/50' : 'border-gray-200'
+    }`}>
+      {/* Validation Error Banner */}
+      {(hasLabelError || hasOptionsError || hasFormulaError) && (
+        <div className="px-3 py-2 bg-red-100 border-b border-red-200 flex items-center gap-2">
+          <AlertCircle className="text-red-600 flex-shrink-0" size={16} />
+          <div className="flex-1">
+            <p className="text-xs font-medium text-red-800">
+              {hasLabelError && validationErrors[`${fieldKey}_label`]}
+              {hasOptionsError && validationErrors[`${fieldKey}_options`]}
+              {hasFormulaError && validationErrors[`${fieldKey}_formula`]}
+            </p>
+          </div>
+        </div>
+      )}
+      
       {/* Field Header */}
       <div className="flex flex-col sm:flex-row items-start gap-3 p-3">
         <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <input
-            type="text"
-            value={field.label}
-            onChange={(e) => onUpdate(index, { label: e.target.value })}
-            placeholder="Field Label"
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-colors"
-          />
+          <div>
+            <input
+              type="text"
+              value={field.label}
+              onChange={(e) => {
+                onUpdate(index, { label: e.target.value });
+                if (hasLabelError) {
+                  onClearError(`${fieldKey}_label`);
+                }
+              }}
+              placeholder="Field Label"
+              className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-colors ${
+                hasLabelError ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {hasLabelError && (
+              <p className="text-red-600 text-xs mt-1">{validationErrors[`${fieldKey}_label`]}</p>
+            )}
+          </div>
           <select
             value={field.type}
             onChange={(e) => {
@@ -763,6 +979,21 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
               <span>{isEditing ? "Collapse" : "Options"}</span>
             </button>
           )}
+          {isCalculatedField && (
+            <button
+              type="button"
+              onClick={() => setShowFormulaEditor(!showFormulaEditor)}
+              className={`flex-1 sm:flex-initial px-3 py-2 rounded-lg transition-colors font-medium text-sm flex items-center justify-center gap-1.5 ${
+                showFormulaEditor 
+                  ? 'bg-green-600 text-white hover:bg-green-700' 
+                  : 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
+              }`}
+              title={showFormulaEditor ? "Hide formula editor" : "Edit formula"}
+            >
+              <Calculator size={16} />
+              <span>{showFormulaEditor ? "Hide" : "Formula"}</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setShowNestedFields(!showNestedFields)}
@@ -790,6 +1021,14 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
       {/* Dropdown Options Editor */}
       {isDropdownType && isEditing && (
         <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3 bg-white">
+          {/* Options Error Warning */}
+          {hasOptionsError && (
+            <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+              <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={14} />
+              <p className="text-xs text-red-800">{validationErrors[`${fieldKey}_options`]}</p>
+            </div>
+          )}
+          
           {/* Section Header */}
           <div className="mb-3">
             <h4 className="text-sm font-semibold text-gray-800 mb-1">
@@ -904,15 +1143,13 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
                               </select>
                             </div>
                             <div className="flex items-center justify-between">
-                              <label className="flex items-center gap-1.5">
-                                <input
-                                  type="checkbox"
+                              <div className="flex items-center gap-2">
+                                <Toggle
                                   checked={nestedField.required}
-                                  onChange={(e) => updateOptionNestedField(optIndex, nestedIdx, { required: e.target.checked })}
-                                  className="w-3.5 h-3.5"
+                                  onChange={(checked) => updateOptionNestedField(optIndex, nestedIdx, { required: checked })}
                                 />
                                 <span className="text-xs text-gray-700 font-medium">Required</span>
-                              </label>
+                              </div>
                               <button
                                 type="button"
                                 onClick={() => removeOptionNestedField(optIndex, nestedIdx)}
@@ -941,6 +1178,33 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
             )}
           </div>
           </div>
+        </div>
+      )}
+
+      {/* Formula Editor (for calculated fields) */}
+      {isCalculatedField && showFormulaEditor && (
+        <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3 bg-white">
+          {hasFormulaError && (
+            <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded flex items-start gap-2">
+              <AlertCircle className="text-yellow-600 flex-shrink-0 mt-0.5" size={14} />
+              <p className="text-xs text-yellow-800">
+                Please configure a valid formula for this calculated field
+              </p>
+            </div>
+          )}
+          <FormulaEditor
+            formula={field.formula || ""}
+            onChange={(formula, references) => {
+              onUpdate(index, { formula, referencedFields: references });
+              if (hasFormulaError && formula.trim()) {
+                onClearError(`${fieldKey}_formula`);
+              }
+            }}
+            availableSteps={availableSteps}
+            currentStepOrder={currentStepOrder}
+            currentStepFields={allFields.filter(f => f.type === 'number' && f.key !== field.key)}
+            onClose={() => setShowFormulaEditor(false)}
+          />
         </div>
       )}
 
@@ -994,15 +1258,13 @@ function FieldEditor({ field, index, onUpdate, onRemove, isEditing, onEditToggle
                   </select>
                 </div>
                 <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
+                  <div className="flex items-center gap-2">
+                    <Toggle
                       checked={nestedField.required}
-                      onChange={(e) => updateNestedField(nestedIdx, { required: e.target.checked })}
-                      className="w-3.5 h-3.5"
+                      onChange={(checked) => updateNestedField(nestedIdx, { required: checked })}
                     />
                     <span className="text-xs text-gray-700 font-medium">Required</span>
-                  </label>
+                  </div>
                   <button
                     type="button"
                     onClick={() => removeNestedField(nestedIdx)}

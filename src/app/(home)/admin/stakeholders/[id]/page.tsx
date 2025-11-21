@@ -6,6 +6,7 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getPublicFileUrl } from "@/lib/utils/files";
+import { calculateFieldValue, formatCalculatedValue, formulaToReadable } from "@/lib/utils/formula-evaluator";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -22,6 +23,7 @@ import {
   Download,
   DollarSign,
   Database,
+  Calculator,
 } from "lucide-react";
 import { Stakeholder, StakeholderProcessStep, StakeholderStepData } from "@/lib/types/schemas";
 import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
@@ -701,6 +703,20 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                     stakeholderId={stakeholderId}
                                     step={step}
                                     existingData={stepDataEntry}
+                                    completedStepsData={stepData
+                                      .filter((sd) => {
+                                        // Get all previous steps (step_order < current step)
+                                        const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
+                                        return sdStep && sdStep.step_order < step.step_order;
+                                      })
+                                      .map((sd) => {
+                                        const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
+                                        return {
+                                          step_order: sdStep?.step_order || 0,
+                                          data: sd.data || {},
+                                        };
+                                      })}
+                                    processSteps={sortedSteps}
                                     onComplete={handleStepComplete}
                                     onCancel={() => setActiveStepId(null)}
                                   />
@@ -719,6 +735,8 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       const isFileField = fieldDef?.type === 'file';
                                       const isMultiSelect = fieldDef?.type === 'multi_select';
                                       const isGeolocation = fieldDef?.type === 'geolocation';
+                                      const isCalculated = fieldDef?.type === 'calculated';
+                                      const isNumber = fieldDef?.type === 'number';
                                       const fieldLabel = fieldDef?.label || key.replace(/_/g, " ");
 
                                       // Helper to get file info
@@ -760,13 +778,89 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                         if (isGeolocation && typeof value === 'object' && value !== null && 'latitude' in value && 'longitude' in value) {
                                           return `${value.latitude}, ${value.longitude}`;
                                         }
+                                        if (isNumber) {
+                                          return typeof value === 'number' ? value.toFixed(2) : String(value);
+                                        }
+                                        if (isCalculated && fieldDef?.formula) {
+                                          // For calculated fields, compute the value from formula
+                                          const completedStepsData = stepData
+                                            .filter((sd) => {
+                                              const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
+                                              return sdStep && sdStep.step_order < step.step_order;
+                                            })
+                                            .map((sd) => {
+                                              const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
+                                              return {
+                                                step_order: sdStep?.step_order || 0,
+                                                data: sd.data || {},
+                                              };
+                                            });
+                                          
+                                          const result = calculateFieldValue(fieldDef.formula, completedStepsData, undefined, undefined, sortedSteps);
+                                          if (result.value !== null) {
+                                            return formatCalculatedValue(result.value);
+                                          }
+                                          return result.error || "Unable to calculate";
+                                        }
                                         return String(value);
                                       };
+
+                                      // Skip rendering calculated fields - they're computed, not stored
+                                      if (isCalculated && fieldDef?.formula) {
+                                        // Compute value for display
+                                        const completedStepsData = stepData
+                                          .filter((sd) => {
+                                            const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
+                                            return sdStep && sdStep.step_order < step.step_order;
+                                          })
+                                          .map((sd) => {
+                                            const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
+                                            return {
+                                              step_order: sdStep?.step_order || 0,
+                                              data: sd.data || {},
+                                            };
+                                          });
+                                        
+                                        const result = calculateFieldValue(fieldDef.formula, completedStepsData, undefined, undefined, sortedSteps);
+                                        
+                                        return (
+                                          <div key={key} className="col-span-2">
+                                            <p className="text-xs font-medium text-gray-500 uppercase">
+                                              {fieldLabel}
+                                              <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded normal-case">
+                                                <Calculator size={12} />
+                                                Calculated
+                                              </span>
+                                            </p>
+                                            <div className="mt-1 flex items-baseline gap-3">
+                                              <p className="text-lg font-semibold text-gray-900">
+                                                {result.value !== null ? formatCalculatedValue(result.value) : "—"}
+                                              </p>
+                                              {result.error && (
+                                                <span className="text-xs text-red-600">{result.error}</span>
+                                              )}
+                                            </div>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                              Formula: <code className="bg-gray-100 px-1 py-0.5 rounded">{formulaToReadable(fieldDef.formula, sortedSteps)}</code>
+                                            </p>
+                                            {result.missingRefs && result.missingRefs.length > 0 && (
+                                              <p className="text-xs text-amber-600 mt-1">
+                                                Missing: {(result.missingLabels || result.missingRefs).join(", ")}
+                                              </p>
+                                            )}
+                                          </div>
+                                        );
+                                      }
 
                                       return (
                                         <div key={key}>
                                           <p className="text-xs font-medium text-gray-500 uppercase">
                                             {fieldLabel}
+                                            {isCalculated && (
+                                              <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded normal-case">
+                                                Calculated
+                                              </span>
+                                            )}
                                           </p>
                                           {isFileField && fileInfo ? (
                                             <div className="mt-1">

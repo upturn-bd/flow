@@ -262,12 +262,14 @@ export type MaritalStatus = typeof MARITAL_STATUS[keyof typeof MARITAL_STATUS];
 
 export const FIELD_TYPES = {
   TEXT: 'text',
+  NUMBER: 'number',
   BOOLEAN: 'boolean',
   DATE: 'date',
   FILE: 'file',
   GEOLOCATION: 'geolocation',
   DROPDOWN: 'dropdown',
   MULTI_SELECT: 'multi_select',
+  CALCULATED: 'calculated',
 } as const;
 
 export type FieldType = typeof FIELD_TYPES[keyof typeof FIELD_TYPES];
