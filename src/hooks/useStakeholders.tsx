@@ -346,16 +346,29 @@ export function useStakeholders() {
           updateData.version = (currentStep?.version || 1) + 1;
         }
 
-        const { data, error } = await supabase
+        const { error: updateError } = await supabase
           .from("stakeholder_process_steps")
           .update(updateData)
+          .eq("id", stepId);
+
+        if (updateError) {
+          console.error("Error updating process step:", updateError);
+          throw updateError;
+        }
+
+        // Fetch the updated step to return it
+        const { data: updatedStep, error: fetchError } = await supabase
+          .from("stakeholder_process_steps")
+          .select("*")
           .eq("id", stepId)
-          .select()
           .single();
+        
+        if (fetchError || !updatedStep) {
+          // Update succeeded but fetch failed - return update data as fallback
+          return { id: stepId, ...updateData };
+        }
 
-        if (error) throw error;
-
-        return data;
+        return updatedStep;
       } catch (error) {
         console.error("Error updating process step:", error);
         setError("Failed to update process step");

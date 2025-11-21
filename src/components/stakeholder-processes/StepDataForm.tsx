@@ -5,17 +5,19 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { StakeholderProcessStep, StakeholderStepData, FieldDefinition, NestedFieldValue } from "@/lib/types/schemas";
-import { Upload, X, CheckCircle2, File as FileIcon, Loader2, XCircle, Calculator } from "lucide-react";
+import { Upload, X, CheckCircle2, File as FileIcon, Loader2, XCircle, Calculator, AlertCircle } from "lucide-react";
 import GeolocationPicker, { GeolocationValue } from "@/components/ui/GeolocationPicker";
 import DropdownField from "@/components/ui/DropdownField";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
-import { calculateFieldValue, formatCalculatedValue } from "@/lib/utils/formula-evaluator";
+import Toggle from "@/components/ui/Toggle";
+import { calculateFieldValue, formatCalculatedValue,formulaToReadable } from "@/lib/utils/formula-evaluator";
 
 interface StepDataFormProps {
   stakeholderId: number;
   step: StakeholderProcessStep;
   existingData?: StakeholderStepData;
   completedStepsData?: Array<{ step_order: number; data: Record<string, any> }>;
+  processSteps?: StakeholderProcessStep[]; // For human-readable formula labels
   onComplete: () => void;
   onCancel: () => void;
 }
@@ -25,6 +27,7 @@ export default function StepDataForm({
   step,
   existingData,
   completedStepsData = [],
+  processSteps = [],
   onComplete,
   onCancel,
 }: StepDataFormProps) {
@@ -125,6 +128,9 @@ export default function StepDataForm({
               break;
             case "multi_select":
               defaultValue = [];
+              break;
+            case "number":
+              defaultValue = "";
               break;
             default:
               defaultValue = "";
@@ -542,14 +548,12 @@ export default function StepDataForm({
         
         case "boolean":
           return (
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
+            <div>
+              <Toggle
                 checked={value || false}
-                onChange={(e) => updateNestedValue(e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                onChange={(checked) => updateNestedValue(checked)}
               />
-              {error && <p className="text-red-500 text-xs">{error}</p>}
+              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </div>
           );
         
@@ -563,6 +567,23 @@ export default function StepDataForm({
                 className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
                   error ? "border-red-500" : "border-gray-300"
                 }`}
+              />
+              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+            </>
+          );
+        
+        case "number":
+          return (
+            <>
+              <input
+                type="number"
+                value={value || ""}
+                onChange={(e) => updateNestedValue(e.target.value)}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
+                  error ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder={nestedField.placeholder || nestedField.label}
+                step="any"
               />
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </>
@@ -613,14 +634,12 @@ export default function StepDataForm({
         
         case "boolean":
           return (
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
+            <div>
+              <Toggle
                 checked={value || false}
-                onChange={(e) => updateNestedValue(e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                onChange={(checked) => updateNestedValue(checked)}
               />
-              {error && <p className="text-red-500 text-xs">{error}</p>}
+              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </div>
           );
         
@@ -634,6 +653,23 @@ export default function StepDataForm({
                 className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
                   error ? "border-red-500" : "border-gray-300"
                 }`}
+              />
+              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+            </>
+          );
+        
+        case "number":
+          return (
+            <>
+              <input
+                type="number"
+                value={value || ""}
+                onChange={(e) => updateNestedValue(e.target.value)}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
+                  error ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder={nestedField.placeholder || nestedField.label}
+                step="any"
               />
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </>
@@ -701,10 +737,13 @@ export default function StepDataForm({
         );
 
       case "calculated":
-        // Evaluate formula using completed steps data
+        // Evaluate formula using completed steps data AND current step data for same-step references
         const calculationResult = field.formula
-          ? calculateFieldValue(field.formula, completedStepsData)
+          ? calculateFieldValue(field.formula, completedStepsData, formData, step.step_order, processSteps)
           : { value: null, error: "No formula defined" };
+        
+        const hasCalculationError = calculationResult.error || calculationResult.value === null;
+        const hasMissingRefs = calculationResult.missingRefs && calculationResult.missingRefs.length > 0;
         
         return (
           <div>
@@ -715,33 +754,86 @@ export default function StepDataForm({
                 Calculated
               </span>
             </label>
-            <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50">
+            
+            {/* Calculation Result Display */}
+            <div className={`w-full px-4 py-3 border rounded-lg ${
+              hasCalculationError 
+                ? 'bg-red-50 border-red-300' 
+                : hasMissingRefs 
+                  ? 'bg-amber-50 border-amber-300' 
+                  : 'bg-gray-50 border-gray-200'
+            }`}>
               <div className="flex items-center justify-between">
-                <span className="text-lg font-semibold text-gray-900">
-                  {calculationResult.value !== null
-                    ? formatCalculatedValue(calculationResult.value)
-                    : "—"}
-                </span>
-                {calculationResult.missingRefs && calculationResult.missingRefs.length > 0 && (
-                  <span className="text-xs text-amber-600">
-                    Missing data
+                <div className="flex items-center gap-2">
+                  {hasCalculationError && (
+                    <AlertCircle className="text-red-600 flex-shrink-0" size={16} />
+                  )}
+                  {hasMissingRefs && !hasCalculationError && (
+                    <AlertCircle className="text-amber-600 flex-shrink-0" size={16} />
+                  )}
+                  <span className={`text-lg font-semibold ${
+                    hasCalculationError 
+                      ? 'text-red-700' 
+                      : hasMissingRefs 
+                        ? 'text-amber-700' 
+                        : 'text-gray-900'
+                  }`}>
+                    {calculationResult.value !== null
+                      ? formatCalculatedValue(calculationResult.value)
+                      : "—"}
+                  </span>
+                </div>
+                {hasMissingRefs && (
+                  <span className="text-xs font-medium text-amber-600 bg-amber-100 px-2 py-1 rounded">
+                    Incomplete Data
+                  </span>
+                )}
+                {hasCalculationError && (
+                  <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded">
+                    Error
                   </span>
                 )}
               </div>
             </div>
+            
+            {/* Formula Display */}
             {field.formula && (
-              <p className="text-xs text-gray-500 mt-1">
-                Formula: <code className="bg-gray-100 px-1 py-0.5 rounded">{field.formula}</code>
-              </p>
+              <div className="mt-2 p-2 bg-gray-100 rounded">
+                <p className="text-xs text-gray-600 mb-1 font-medium">Formula:</p>
+                <code className="text-xs text-gray-800 break-all">{formulaToReadable(field.formula, processSteps)}</code>
+              </div>
             )}
+            
+            {/* Error Messages */}
             {calculationResult.error && (
-              <p className="text-xs text-red-500 mt-1">{calculationResult.error}</p>
+              <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={14} />
+                <p className="text-xs text-red-700">
+                  <span className="font-medium">Calculation Error:</span> {calculationResult.error}
+                </p>
+              </div>
             )}
+            
+            {/* Missing References Warning */}
             {calculationResult.missingRefs && calculationResult.missingRefs.length > 0 && (
-              <p className="text-xs text-amber-600 mt-1">
-                Missing references: {calculationResult.missingRefs.join(", ")}
-              </p>
+              <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded flex items-start gap-2">
+                <AlertCircle className="text-amber-600 flex-shrink-0 mt-0.5" size={14} />
+                <div className="flex-1">
+                  <p className="text-xs text-amber-800 font-medium mb-1">
+                    Missing or incomplete field data:
+                  </p>
+                  <ul className="text-xs text-amber-700 list-disc list-inside space-y-0.5">
+                    {(calculationResult.missingLabels || calculationResult.missingRefs).map((ref, idx) => (
+                      <li key={idx}>{ref}</li>
+                    ))}
+                  </ul>
+                  <p className="text-xs text-amber-600 mt-1 italic">
+                    Please fill in the referenced fields or complete previous steps.
+                  </p>
+                </div>
+              </div>
             )}
+            
             {renderNestedFields()}
           </div>
         );
@@ -749,19 +841,15 @@ export default function StepDataForm({
       case "boolean":
         return (
           <div>
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={actualValue || false}
-                onChange={(e) => updateValue(e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label className="text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               {field.label}
               {field.required && <span className="text-red-500 ml-1">*</span>}
             </label>
-            {hasError && <p className="text-red-500 text-sm">{errors[field.key]}</p>}
-          </div>
+            <Toggle
+              checked={actualValue || false}
+              onChange={(checked) => updateValue(checked)}
+            />
+            {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
             {renderNestedFields()}
           </div>
         );

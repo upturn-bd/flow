@@ -6,7 +6,7 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getPublicFileUrl } from "@/lib/utils/files";
-import { calculateFieldValue, formatCalculatedValue } from "@/lib/utils/formula-evaluator";
+import { calculateFieldValue, formatCalculatedValue, formulaToReadable } from "@/lib/utils/formula-evaluator";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -716,6 +716,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                           data: sd.data || {},
                                         };
                                       })}
+                                    processSteps={sortedSteps}
                                     onComplete={handleStepComplete}
                                     onCancel={() => setActiveStepId(null)}
                                   />
@@ -795,7 +796,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                               };
                                             });
                                           
-                                          const result = calculateFieldValue(fieldDef.formula, completedStepsData);
+                                          const result = calculateFieldValue(fieldDef.formula, completedStepsData, undefined, undefined, sortedSteps);
                                           if (result.value !== null) {
                                             return formatCalculatedValue(result.value);
                                           }
@@ -820,7 +821,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                             };
                                           });
                                         
-                                        const result = calculateFieldValue(fieldDef.formula, completedStepsData);
+                                        const result = calculateFieldValue(fieldDef.formula, completedStepsData, undefined, undefined, sortedSteps);
                                         
                                         return (
                                           <div key={key} className="col-span-2">
@@ -840,11 +841,11 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                               )}
                                             </div>
                                             <p className="text-xs text-gray-500 mt-1">
-                                              Formula: <code className="bg-gray-100 px-1 py-0.5 rounded">{fieldDef.formula}</code>
+                                              Formula: <code className="bg-gray-100 px-1 py-0.5 rounded">{formulaToReadable(fieldDef.formula, sortedSteps)}</code>
                                             </p>
                                             {result.missingRefs && result.missingRefs.length > 0 && (
                                               <p className="text-xs text-amber-600 mt-1">
-                                                Missing: {result.missingRefs.join(", ")}
+                                                Missing: {(result.missingLabels || result.missingRefs).join(", ")}
                                               </p>
                                             )}
                                           </div>
