@@ -1,10 +1,8 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { WidgetProps, WidgetSize } from '@/lib/types/widgets';
+import { WidgetProps } from '@/lib/types/widgets';
 import { cn } from '@/components/ui/class';
-import { Eye, EyeOff, Maximize2, Minimize2, GripVertical } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -16,20 +14,15 @@ interface BaseWidgetProps extends WidgetProps {
 export default function BaseWidget({
   config,
   isEditMode = false,
-  onToggle,
-  onSizeChange,
   children,
   className,
 }: BaseWidgetProps) {
   const {
-    attributes,
     listeners,
     setNodeRef,
     transform,
     transition,
     isDragging,
-    isSorting,
-    overIndex,
   } = useSortable({ 
     id: config.id, 
     disabled: !isEditMode,

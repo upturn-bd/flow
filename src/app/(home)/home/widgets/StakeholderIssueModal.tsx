@@ -20,9 +20,12 @@ export default function StakeholderIssueModal({
   onSuccess,
 }: StakeholderIssueModalProps) {
   const { employeeInfo } = useAuth();
-  const { createIssue, fetchIssueById, loading } = useStakeholderIssues();
+  const { createIssue, updateIssue, fetchIssueById, loading } = useStakeholderIssues();
   const { stakeholders, fetchStakeholders } = useStakeholders();
   const [issue, setIssue] = useState<any>(null);
+  const [loadingIssue, setLoadingIssue] = useState(!!issueId);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showResolveConfirm, setShowResolveConfirm] = useState(false);
   const [formData, setFormData] = useState<Partial<StakeholderIssueFormData>>({
     stakeholder_id: 0,
     title: '',
@@ -42,10 +45,21 @@ export default function StakeholderIssueModal({
 
   const loadIssue = async () => {
     if (!issueId) return;
+    setLoadingIssue(true);
     const data = await fetchIssueById(issueId);
     if (data) {
       setIssue(data);
+      // Populate form data for editing
+      setFormData({
+        stakeholder_id: data.stakeholder_id,
+        title: data.title,
+        description: data.description || '',
+        status: data.status,
+        priority: data.priority,
+        assigned_to: data.assigned_to,
+      });
     }
+    setLoadingIssue(false);
   };
 
   const loadStakeholders = async () => {
@@ -58,16 +72,34 @@ export default function StakeholderIssueModal({
 
     setSubmitting(true);
     try {
-      await createIssue(formData as StakeholderIssueFormData);
+      if (issueId) {
+        await updateIssue(issueId, formData as StakeholderIssueFormData);
+      } else {
+        await createIssue(formData as StakeholderIssueFormData);
+      }
       onSuccess();
     } catch (error) {
-      console.error('Error creating issue:', error);
+      console.error('Error saving issue:', error);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const isViewMode = !!issueId;
+  const handleMarkAsResolved = async () => {
+    if (!issueId) return;
+    setSubmitting(true);
+    try {
+      await updateIssue(issueId, { status: 'Resolved' });
+      setShowResolveConfirm(false);
+      onSuccess();
+    } catch (error) {
+      console.error('Error resolving issue:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const isViewMode = !!issueId && !isEditing;
 
   return (
     <AnimatePresence>
@@ -90,7 +122,7 @@ export default function StakeholderIssueModal({
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 text-red-600" />
               <h2 className="text-xl font-bold text-gray-800">
-                {isViewMode ? 'Issue Details' : 'Create Stakeholder Issue'}
+                {issueId ? (isEditing ? 'Edit Issue' : 'Issue Details') : 'Create Stakeholder Issue'}
               </h2>
             </div>
             <button
@@ -102,7 +134,15 @@ export default function StakeholderIssueModal({
           </div>
 
           <div className="p-6">
-            {isViewMode && issue ? (
+            {loadingIssue ? (
+              // Loading state
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+                  <p className="text-gray-500">Loading issue details...</p>
+                </div>
+              </div>
+            ) : isViewMode && issue ? (
               // View mode
               <div className="space-y-4">
                 <div>
@@ -160,6 +200,27 @@ export default function StakeholderIssueModal({
                     </div>
                   </div>
                 )}
+
+                <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                  {issue.status !== 'Resolved' && (
+                    <button
+                      type="button"
+                      onClick={() => setShowResolveConfirm(true)}
+                      className="px-4 py-2 text-green-700 bg-green-100 hover:bg-green-200 rounded-lg transition-colors font-medium"
+                    >
+                      Mark as Resolved
+                    </button>
+                  )}
+                  <div className={cn("flex gap-3", issue.status === 'Resolved' && 'ml-auto')}>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(true)}
+                      className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                    >
+                      Edit Issue
+                    </button>
+                  </div>
+                </div>
               </div>
             ) : (
               // Create mode
@@ -243,7 +304,13 @@ export default function StakeholderIssueModal({
                 <div className="flex justify-end gap-3 pt-4">
                   <button
                     type="button"
-                    onClick={onClose}
+                    onClick={() => {
+                      if (issueId && isEditing) {
+                        setIsEditing(false);
+                      } else {
+                        onClose();
+                      }
+                    }}
                     className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     Cancel
@@ -256,13 +323,58 @@ export default function StakeholderIssueModal({
                       (submitting || !formData.title || !formData.stakeholder_id) && 'opacity-50 cursor-not-allowed'
                     )}
                   >
-                    {submitting ? 'Creating...' : 'Create Issue'}
+                    {submitting ? (issueId ? 'Updating...' : 'Creating...') : (issueId ? 'Update Issue' : 'Create Issue')}
                   </button>
                 </div>
               </form>
             )}
           </div>
         </motion.div>
+
+        {/* Resolve Confirmation Dialog */}
+        {showResolveConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/30 flex items-center justify-center z-10"
+            onClick={() => setShowResolveConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-lg shadow-xl p-6 max-w-md mx-4"
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Mark as Resolved?</h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to mark this issue as resolved? This action can be undone later by editing the issue.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowResolveConfirm(false)}
+                  disabled={submitting}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleMarkAsResolved}
+                  disabled={submitting}
+                  className={cn(
+                    'px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors',
+                    submitting && 'opacity-50 cursor-not-allowed'
+                  )}
+                >
+                  {submitting ? 'Resolving...' : 'Mark as Resolved'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </div>
     </AnimatePresence>
   );

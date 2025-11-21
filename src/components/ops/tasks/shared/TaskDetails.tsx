@@ -11,6 +11,7 @@ import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/component
 import { EmptyState } from "@/components/ui/EmptyState";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { getCompanyId } from "@/lib/utils/auth";
+import BaseModal from "@/components/ui/modals/BaseModal";
 
 interface TaskDetailsProps {
   id: string;
@@ -192,32 +193,24 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <Target size={24} className="text-blue-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Task Details</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={handleTaskStatusUpdate}
-            disabled={isUpdatingStatus}
-            variant={taskDetails?.status ? "outline" : "primary"}
-            size="sm"
-          >
-            {isUpdatingStatus ? "Updating..." : (taskDetails?.status ? "Reopen Task" : "Mark as Complete")}
-          </Button>
-          <Button
-            onClick={onClose}
-            variant="outline"
-            size="sm"
-            className="flex"
-          >
-            <ChevronLeft size={16} className="mr-2" />
-            Back
-          </Button>
-        </div>
+    <BaseModal
+      isOpen={true}
+      onClose={onClose}
+      title="Task Details"
+      icon={<Target size={24} />}
+      size="xl"
+    >
+      <div className="space-y-6">
+      {/* Action Buttons */}
+      <div className="flex items-center justify-end gap-3">
+        <Button
+          onClick={handleTaskStatusUpdate}
+          disabled={isUpdatingStatus}
+          variant={taskDetails?.status ? "outline" : "primary"}
+          size="sm"
+        >
+          {isUpdatingStatus ? "Updating..." : (taskDetails?.status ? "Reopen Task" : "Mark as Complete")}
+        </Button>
       </div>
 
       {/* Task Overview */}
@@ -330,5 +323,6 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
         </Card>
       )}
     </div>
+    </BaseModal>
   );
 }
