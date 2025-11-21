@@ -21,7 +21,7 @@ import {
   Users
 } from "lucide-react";
 import { staggerContainer, fadeInUp } from "@/components/ui/animations";
-import { useAccounts } from "@/hooks/useAccounts";
+import { useAccounts, AccountFilters } from "@/hooks/useAccounts";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useAuth } from "@/lib/auth/auth-context";
 import { Account } from "@/lib/types/schemas";
@@ -152,6 +152,25 @@ export default function AccountsTab() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<'All' | 'Complete' | 'Pending'>('All');
+  const [methodFilter, setMethodFilter] = useState<string>('All');
+  
+  // Default to last 30 days
+  const getDefaultDateRange = () => {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+    return {
+      start: startDate.toISOString().split('T')[0],
+      end: endDate.toISOString().split('T')[0]
+    };
+  };
+  
+  const defaultRange = getDefaultDateRange();
+  const [startDate, setStartDate] = useState<string>(defaultRange.start);
+  const [endDate, setEndDate] = useState<string>(defaultRange.end);
+  const [minAmount, setMinAmount] = useState<string>('');
+  const [maxAmount, setMaxAmount] = useState<string>('');
+  const [stakeholderFilter, setStakeholderFilter] = useState<string>('All');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
@@ -288,27 +307,31 @@ export default function AccountsTab() {
   useEffect(() => {
     // Wait for employeeInfo to be loaded before fetching
     if (employeeInfo?.company_id) {
-      fetchAccounts();
+      const filters: AccountFilters = {
+        status: statusFilter,
+        method: methodFilter !== 'All' ? methodFilter : undefined,
+        startDate,
+        endDate,
+        minAmount: minAmount ? parseFloat(minAmount) : undefined,
+        maxAmount: maxAmount ? parseFloat(maxAmount) : undefined,
+        stakeholderId: stakeholderFilter === 'All' ? undefined : 
+                       stakeholderFilter === 'none' ? null : 
+                       parseInt(stakeholderFilter),
+        searchTerm: searchTerm || undefined,
+      };
+      
+      fetchAccounts(filters);
       fetchStakeholders(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [employeeInfo?.company_id]); // Re-fetch when company_id becomes available
+  }, [employeeInfo?.company_id, statusFilter, methodFilter, startDate, endDate, 
+      minAmount, maxAmount, stakeholderFilter, searchTerm]); // Re-fetch when filters change
 
-  const filteredAccounts = accounts.filter(account => {
-    const matchesSearch = account.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      account.from_source.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      account.method?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'All' || account.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  // Accounts are already filtered server-side
+  const filteredAccounts = accounts;
 
-  // Calculate filtered summary based on current filters
-  const filteredSummary = {
-    total: filteredAccounts.length,
-    complete: filteredAccounts.filter(account => account.status === 'Complete').length,
-    pending: filteredAccounts.filter(account => account.status === 'Pending').length,
-    totalAmount: filteredAccounts.reduce((sum, account) => sum + account.amount, 0)
-  };
+  // Summary already calculated from filtered server-side results
+  const filteredSummary = summary;
 
   const handleEditClick = (account: Account) => {
     setSelectedAccount(account);
@@ -348,50 +371,50 @@ export default function AccountsTab() {
         {/* Header with Summary */}
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white"
+          className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 sm:p-6 text-white"
         >
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <CreditCard size={28} />
-              <h2 className="text-2xl font-bold">Accounts Management</h2>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <CreditCard size={24} className="sm:w-7 sm:h-7" />
+              <h2 className="text-xl sm:text-2xl font-bold">Accounts</h2>
             </div>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+              className="w-full sm:w-auto bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
             >
               <Plus size={16} />
               Add Transaction
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white/10 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Building size={16} />
-                <span className="text-sm opacity-90">Total Transactions</span>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="bg-white/10 rounded-lg p-3 sm:p-4">
+              <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                <Building size={14} className="sm:w-4 sm:h-4" />
+                <span className="text-xs sm:text-sm opacity-90">Total</span>
               </div>
-              <span className="text-2xl font-bold">{summary.total}</span>
+              <span className="text-xl sm:text-2xl font-bold">{summary.total}</span>
             </div>
-            <div className="bg-white/10 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <CheckCircle size={16} />
-                <span className="text-sm opacity-90">Complete</span>
+            <div className="bg-white/10 rounded-lg p-3 sm:p-4">
+              <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                <CheckCircle size={14} className="sm:w-4 sm:h-4" />
+                <span className="text-xs sm:text-sm opacity-90">Complete</span>
               </div>
-              <span className="text-2xl font-bold">{summary.complete}</span>
+              <span className="text-xl sm:text-2xl font-bold">{summary.complete}</span>
             </div>
-            <div className="bg-white/10 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Clock size={16} />
-                <span className="text-sm opacity-90">Pending</span>
+            <div className="bg-white/10 rounded-lg p-3 sm:p-4">
+              <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                <Clock size={14} className="sm:w-4 sm:h-4" />
+                <span className="text-xs sm:text-sm opacity-90">Pending</span>
               </div>
-              <span className="text-2xl font-bold">{summary.pending}</span>
+              <span className="text-xl sm:text-2xl font-bold">{summary.pending}</span>
             </div>
-            <div className="bg-white/10 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <DollarSign size={16} />
-                <span className="text-sm opacity-90">Net Amount (Status-wise)</span>
+            <div className="bg-white/10 rounded-lg p-3 sm:p-4 col-span-2 lg:col-span-1">
+              <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                <DollarSign size={14} className="sm:w-4 sm:h-4" />
+                <span className="text-xs sm:text-sm opacity-90">Net Amount</span>
               </div>
-              <span className="text-xl font-bold">
+              <span className="text-lg sm:text-xl font-bold">
                 {filteredSummary.totalAmount.toLocaleString('en-US', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
@@ -404,30 +427,162 @@ export default function AccountsTab() {
         {/* Filters and Search */}
         <motion.div
           variants={fadeInUp}
-          className="bg-white rounded-xl shadow-sm p-6 flex flex-col sm:flex-row gap-4 items-center justify-between"
+          className="bg-white rounded-xl shadow-sm p-4 sm:p-6 space-y-4"
         >
-          <div className="relative flex-1 max-w-md">
+          {/* Search Bar */}
+          <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search transactions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
           </div>
 
-          <div className="flex items-center gap-2">
-            <Filter size={16} className="text-gray-500" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="All">All Status</option>
-              <option value="Complete">Complete</option>
-              <option value="Pending">Pending</option>
-            </select>
+          {/* Filter Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Status Filter */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                <Filter size={12} className="inline mr-1" />
+                Status
+              </label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as any)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              >
+                <option value="All">All Status</option>
+                <option value="Complete">Complete</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </div>
+
+            {/* Payment Method Filter */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                <CreditCard size={12} className="inline mr-1" />
+                Payment Method
+              </label>
+              <select
+                value={methodFilter}
+                onChange={(e) => setMethodFilter(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              >
+                <option value="All">All Methods</option>
+                {PAYMENT_METHODS.map(method => (
+                  <option key={method} value={method}>{method}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Start Date Filter */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                <Calendar size={12} className="inline mr-1" />
+                Start Date
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              />
+            </div>
+
+            {/* End Date Filter */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                <Calendar size={12} className="inline mr-1" />
+                End Date
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              />
+            </div>
+
+            {/* Stakeholder Filter */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                <Users size={12} className="inline mr-1" />
+                Stakeholder
+              </label>
+              <select
+                value={stakeholderFilter}
+                onChange={(e) => setStakeholderFilter(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              >
+                <option value="All">All Stakeholders</option>
+                <option value="none">No Stakeholder</option>
+                {stakeholders.map(s => (
+                  <option key={s.id} value={s.id?.toString()}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Min Amount Filter */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                <DollarSign size={12} className="inline mr-1" />
+                Min Amount
+              </label>
+              <input
+                type="number"
+                placeholder="Min"
+                value={minAmount}
+                onChange={(e) => setMinAmount(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              />
+            </div>
+
+            {/* Max Amount Filter */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                <DollarSign size={12} className="inline mr-1" />
+                Max Amount
+              </label>
+              <input
+                type="number"
+                placeholder="Max"
+                value={maxAmount}
+                onChange={(e) => setMaxAmount(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              />
+            </div>
+
+            {/* Clear Filters Button */}
+            <div className="flex items-end">
+              <button
+                onClick={() => {
+                  const defaultRange = getDefaultDateRange();
+                  setSearchTerm('');
+                  setStatusFilter('All');
+                  setMethodFilter('All');
+                  setStartDate(defaultRange.start);
+                  setEndDate(defaultRange.end);
+                  setMinAmount('');
+                  setMaxAmount('');
+                  setStakeholderFilter('All');
+                }}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
+              >
+                <X size={14} />
+                Reset to Last 30 Days
+              </button>
+            </div>
+          </div>
+
+          {/* Active Filters Summary */}
+          <div className="flex items-center gap-2 text-xs text-gray-600 bg-blue-50 p-3 rounded-lg">
+            <Filter size={12} className="text-blue-600" />
+            <span className="font-medium text-blue-900">
+              Showing {filteredAccounts.length} transaction{filteredAccounts.length !== 1 ? 's' : ''} from {startDate} to {endDate}
+            </span>
           </div>
         </motion.div>
 
@@ -440,97 +595,193 @@ export default function AccountsTab() {
             <div className="p-8 text-center text-gray-500">
               <CreditCard size={48} className="mx-auto mb-4 text-gray-300" />
               <p className="text-lg font-medium mb-2">No transactions found</p>
-              <p>Create your first transaction to get started</p>
+              <p className="text-sm">Create your first transaction to get started</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stakeholder</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Additional Data</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredAccounts.map((account) => (
-                    <tr key={account.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="font-medium text-gray-900">{account.title}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {account.stakeholder ? (
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden lg:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stakeholder</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredAccounts.map((account) => (
+                      <tr key={account.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3">
+                          <div className="font-medium text-gray-900 text-sm">{account.title}</div>
+                        </td>
+                        <td className="px-4 py-3">
+                          {account.stakeholder ? (
+                            <div className="flex items-center gap-1">
+                              <Users size={12} className="text-blue-500 flex-shrink-0" />
+                              <span className="text-xs text-gray-900 truncate max-w-[100px]" title={account.stakeholder.name}>
+                                {account.stakeholder.name}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 text-xs italic">None</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            {account.method || 'N/A'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-900 max-w-[120px] truncate" title={account.from_source}>
+                          {account.from_source}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-500">
                           <div className="flex items-center gap-1">
-                            <Users size={14} className="text-blue-500" />
-                            <span className="text-sm text-gray-900">{account.stakeholder.name}</span>
+                            <Calendar size={12} />
+                            {formatDate(account.transaction_date)}
                           </div>
-                        ) : (
-                          <span className="text-gray-400 text-xs italic">No stakeholder</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          {account.method || 'N/A'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {account.from_source}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div className="flex items-center gap-1">
-                          <Calendar size={14} />
-                          {formatDate(account.transaction_date)}
+                        </td>
+                        <td className="px-4 py-3 text-xs font-medium whitespace-nowrap">
+                          <span className={account.amount >= 0 ? 'text-green-600' : 'text-red-600'}>
+                            {formatAmount(account.amount, account.currency)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${account.status === 'Complete'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                            {account.status === 'Complete' ? (
+                              <><CheckCircle size={10} className="mr-1" />Complete</>
+                            ) : (
+                              <><Clock size={10} className="mr-1" />Pending</>
+                            )}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 max-w-[150px]">
+                          {formatAdditionalData(account.additional_data)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleEditClick(account)}
+                              className="text-blue-600 hover:text-blue-800 transition-colors"
+                              title="Edit"
+                            >
+                              <Edit size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClick(account)}
+                              className="text-red-600 hover:text-red-800 transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="lg:hidden divide-y divide-gray-200">
+                {filteredAccounts.map((account) => (
+                  <motion.div
+                    key={account.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">{account.title}</h3>
+                        <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                          <Calendar size={12} />
+                          <span>{formatDate(account.transaction_date)}</span>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <span className={account.amount >= 0 ? 'text-green-600' : 'text-red-600'}>
+                      </div>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ml-2 ${account.status === 'Complete'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                        {account.status === 'Complete' ? (
+                          <><CheckCircle size={10} className="mr-1" />Complete</>
+                        ) : (
+                          <><Clock size={10} className="mr-1" />Pending</>
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 mb-3">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Amount:</span>
+                        <span className={`font-semibold ${account.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {formatAmount(account.amount, account.currency)}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${account.status === 'Complete'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                          {account.status === 'Complete' ? (
-                            <><CheckCircle size={12} className="mr-1" />Complete</>
-                          ) : (
-                            <><Clock size={12} className="mr-1" />Pending</>
-                          )}
+                      </div>
+
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">From:</span>
+                        <span className="text-gray-900 text-xs truncate max-w-[180px]" title={account.from_source}>
+                          {account.from_source}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 max-w-xs overflow-hidden">
-                        {formatAdditionalData(account.additional_data)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleEditClick(account)}
-                            className="text-blue-600 hover:text-blue-800 transition-colors"
-                            title="Edit"
-                          >
-                            <Edit size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(account)}
-                            className="text-red-600 hover:text-red-800 transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                      </div>
+
+                      {account.method && (
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Method:</span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            {account.method}
+                          </span>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      )}
+
+                      {account.stakeholder && (
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Stakeholder:</span>
+                          <div className="flex items-center gap-1">
+                            <Users size={12} className="text-blue-500" />
+                            <span className="text-xs text-gray-900">{account.stakeholder.name}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {account.additional_data && Object.keys(account.additional_data).length > 0 && (
+                        <div className="pt-2 border-t border-gray-100">
+                          <span className="text-xs text-gray-600 mb-2 block">Additional Data:</span>
+                          {formatAdditionalData(account.additional_data)}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                      <button
+                        onClick={() => handleEditClick(account)}
+                        className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Edit size={14} />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(account)}
+                        className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Trash2 size={14} />
+                        Delete
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </>
           )}
         </motion.div>
 

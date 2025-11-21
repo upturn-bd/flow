@@ -18,13 +18,24 @@ export interface AccountFormData {
   stakeholder_id?: number | null; // Add stakeholder reference
 }
 
+export interface AccountFilters {
+  status?: 'All' | 'Complete' | 'Pending';
+  method?: string;
+  startDate?: string;
+  endDate?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  stakeholderId?: number | null;
+  searchTerm?: string;
+}
+
 export function useAccounts() {
   const { employeeInfo } = useAuth();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchAccounts = useCallback(async (company_id?: number) => {
+  const fetchAccounts = useCallback(async (filters?: AccountFilters, company_id?: number) => {
     setLoading(true);
     setError(null);
     try {
@@ -37,13 +48,47 @@ export function useAccounts() {
         }
       }
 
-      const { data, error } = await supabase
+      let query = supabase
         .from("accounts")
         .select(`
           *,
           stakeholder:stakeholders(id, name, address, is_completed)
         `)
-        .eq("company_id", company_id)
+        .eq("company_id", company_id);
+
+      // Apply filters server-side
+      if (filters) {
+        if (filters.status && filters.status !== 'All') {
+          query = query.eq('status', filters.status);
+        }
+        if (filters.method && filters.method !== 'All') {
+          query = query.eq('method', filters.method);
+        }
+        if (filters.startDate) {
+          query = query.gte('transaction_date', filters.startDate);
+        }
+        if (filters.endDate) {
+          query = query.lte('transaction_date', filters.endDate);
+        }
+        if (filters.minAmount !== undefined) {
+          query = query.gte('amount', filters.minAmount);
+        }
+        if (filters.maxAmount !== undefined) {
+          query = query.lte('amount', filters.maxAmount);
+        }
+        if (filters.stakeholderId !== undefined) {
+          if (filters.stakeholderId === null) {
+            query = query.is('stakeholder_id', null);
+          } else {
+            query = query.eq('stakeholder_id', filters.stakeholderId);
+          }
+        }
+        if (filters.searchTerm) {
+          query = query.or(`title.ilike.%${filters.searchTerm}%,from_source.ilike.%${filters.searchTerm}%,method.ilike.%${filters.searchTerm}%`);
+        }
+      }
+
+      const { data, error } = await query
         .order("transaction_date", { ascending: false }) // Newest first
         .order("created_at", { ascending: false }); // Secondary sort by creation time
 
