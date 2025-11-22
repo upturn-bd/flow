@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getEmployeeInfo } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export type UserProfileData = {
   id: string;
@@ -21,12 +22,25 @@ export type UserProfileData = {
 } | null;
 
 export function useUserData() {
+  const { user, isLoading: authLoading } = useAuth();
   const [userData, setUserData] = useState<UserProfileData>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
+    // Wait for auth to complete
+    if (authLoading) {
+      return;
+    }
+
+    // If no user, clear data and stop loading
+    if (!user) {
+      setUserData(null);
+      setLoading(false);
+      return;
+    }
+
     const fetchUserData = async () => {
       try {
         setLoading(true);
@@ -73,7 +87,7 @@ export function useUserData() {
     };
 
     fetchUserData();
-  }, []);
+  }, [authLoading, user]);
 
   const logout = useCallback(async () => {
     try {

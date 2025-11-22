@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { getCompanyInfo as getCompanyInfoApi, updateCompanySettings as updateCompanySettingsApi } from "@/lib/utils/auth";
 import { supabase } from "@/lib/supabase/client";
+import { useAuth } from "@/lib/auth/auth-context";
 
 interface CompanyInfo {
   id: number;
@@ -28,6 +29,7 @@ interface Industry {
 }
 
 export function useCompanyInfo() {
+  const { user, isLoading: authLoading } = useAuth();
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
   const [industries, setIndustries] = useState<Industry[]>([]);
@@ -99,11 +101,23 @@ export function useCompanyInfo() {
     }
   }, []);
 
-  // Auto-fetch on mount (only once)
+  // Auto-fetch on mount - wait for auth to be ready
   useEffect(() => {
+    // Don't fetch if auth is still loading
+    if (authLoading) {
+      return;
+    }
+
+    // Don't fetch if user is not authenticated
+    if (!user) {
+      setLoading(false);
+      setHasInitialized(true);
+      return;
+    }
+
     fetchCompanyInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array - run only on mount
+  }, [authLoading, user]);
 
   return {
     companyInfo,

@@ -1,14 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { FormModal } from '@/components/ui/modals';
 import { FormField, SelectField, NumberField } from '@/components/forms';
 import { validateClaimType, type ClaimTypeData } from '@/lib/validation';
 import { useEmployees } from '@/hooks/useEmployees';
+import { usePositions } from '@/hooks/usePositions';
 import { Receipt, UserPlus, Money } from '@phosphor-icons/react';
-
-interface Position {
-  id: number;
-  name: string;
-}
 
 interface ClaimTypeUpdateModalProps {
   isOpen: boolean;
@@ -26,14 +22,14 @@ export const ClaimTypeUpdateModal: React.FC<ClaimTypeUpdateModalProps> = ({
   isLoading = false,
 }) => {
   const { employees: allSettlers, loading: loadingEmployees, fetchEmployees } = useEmployees();
-  const [allPositions, setAllPositions] = useState<Position[]>([]);
+  const { positions: allPositions, fetchPositions } = usePositions();
 
   useEffect(() => {
     if (isOpen) {
       fetchEmployees();
-      // TODO: Fetch positions if needed
+      fetchPositions();
     }
-  }, [isOpen, fetchEmployees]);
+  }, [isOpen, fetchEmployees, fetchPositions]);
 
   if (!isOpen) return null;
 
