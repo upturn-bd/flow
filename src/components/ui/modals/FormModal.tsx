@@ -20,6 +20,7 @@ interface FormModalProps<T> {
     values: T;
     errors: Record<string, string>;
     handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+    setFieldValue: (field: keyof T, value: any) => void;
   }) => ReactNode);
 }
 
@@ -92,6 +93,13 @@ export default function FormModal<T extends Record<string, any>>({
     });
   };
 
+  const setFieldValue = (field: keyof T, value: any) => {
+    setFormValues((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -122,7 +130,7 @@ export default function FormModal<T extends Record<string, any>>({
       <form onSubmit={handleSubmit}>
         <div className="space-y-4">
           {typeof children === 'function' 
-            ? children({ values: formValues, errors, handleChange })
+            ? children({ values: formValues, errors, handleChange, setFieldValue })
             : children
           }
         </div>
