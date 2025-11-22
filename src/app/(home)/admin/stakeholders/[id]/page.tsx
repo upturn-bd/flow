@@ -397,13 +397,13 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                     </div>
                   </div>
                 )}
-                {stakeholder.rejected_by_employee && (
+                {stakeholder.rejected_by && (
                   <div className="flex items-start gap-3">
                     <User className="text-red-400 mt-0.5" size={18} />
                     <div>
                       <p className="text-sm font-medium text-gray-700">Rejected By</p>
                       <p className="text-sm text-gray-600 mt-0.5">
-                        {stakeholder.rejected_by_employee.name}
+                        {stakeholder.rejected_by.name}
                       </p>
                     </div>
                   </div>
@@ -959,25 +959,25 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Stakeholder</h3>
-            <p className="text-gray-600 mb-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-4">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2">Delete Stakeholder</h3>
+            <p className="text-sm text-gray-600 mb-4 sm:mb-6">
               Are you sure you want to delete "{stakeholder.name}"? This action cannot be
               undone and will remove all associated step data.
             </p>
-            <div className="flex items-center justify-end gap-3">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={deleting}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="w-full sm:w-auto px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
               >
                 {deleting ? "Deleting..." : "Delete"}
               </button>

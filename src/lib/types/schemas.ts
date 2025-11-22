@@ -620,7 +620,7 @@ export interface Stakeholder {
   kam_id?: string; // Key Accounts Manager - Employee ID assigned to handle stakeholder
   status: StakeholderStatus; // Lead, Permanent, or Rejected
   rejected_at?: string;
-  rejected_by?: string;
+  rejected_by_id?: string; // UUID of the employee who rejected (database column: rejected_by)
   rejection_reason?: string;
   additional_data?: Record<string, any>; // Additional key-value data for permanent stakeholders
   company_id: number;
@@ -644,7 +644,7 @@ export interface Stakeholder {
     name: string;
     email?: string;
   };
-  rejected_by_employee?: {
+  rejected_by?: {
     id: string;
     name: string;
     email?: string;

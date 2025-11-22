@@ -1154,13 +1154,13 @@ export default function StepDataForm({
           </div>
         )}
 
-        <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-200">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={onCancel}
               disabled={submitting || rejecting}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              className="w-full sm:w-auto px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
             >
               Cancel
             </button>
@@ -1169,19 +1169,19 @@ export default function StepDataForm({
                 type="button"
                 onClick={() => setShowRejectionDialog(true)}
                 disabled={submitting || rejecting}
-                className="flex items-center gap-2 px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm border border-red-300 text-red-700 rounded-lg hover:bg-red-50"
               >
                 <XCircle size={16} />
                 Reject
               </button>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={handleSaveDraft}
               disabled={submitting || rejecting}
-              className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50"
+              className="w-full sm:w-auto px-4 py-2 text-sm border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50"
             >
               Save Draft
             </button>
@@ -1189,7 +1189,7 @@ export default function StepDataForm({
               type="button"
               onClick={handleCompleteStep}
               disabled={submitting || rejecting}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
               <CheckCircle2 size={16} />
               {submitting ? "Completing..." : "Complete Step"}
@@ -1201,9 +1201,9 @@ export default function StepDataForm({
       {/* Rejection Dialog */}
       {showRejectionDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Reject Stakeholder</h3>
-            <p className="text-sm text-gray-600 mb-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-4 sm:p-6">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Reject Stakeholder</h3>
+            <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
               Please provide a reason for rejecting this stakeholder. This action will mark the stakeholder as rejected and make it inactive.
             </p>
             <textarea
@@ -1211,12 +1211,12 @@ export default function StepDataForm({
               onChange={(e) => setRejectionReason(e.target.value)}
               placeholder="Enter rejection reason..."
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
             />
             {errors.rejection && (
-              <p className="text-red-500 text-sm mt-2">{errors.rejection}</p>
+              <p className="text-red-500 text-xs sm:text-sm mt-2">{errors.rejection}</p>
             )}
-            <div className="flex items-center justify-end gap-3 mt-4">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-3 mt-4">
               <button
                 type="button"
                 onClick={() => {
@@ -1227,7 +1227,7 @@ export default function StepDataForm({
                   setErrors(newErrors);
                 }}
                 disabled={rejecting}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="w-full sm:w-auto px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
               >
                 Cancel
               </button>
@@ -1235,7 +1235,7 @@ export default function StepDataForm({
                 type="button"
                 onClick={handleReject}
                 disabled={rejecting}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                className="w-full sm:w-auto px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
               >
                 {rejecting ? "Rejecting..." : "Confirm Rejection"}
               </button>

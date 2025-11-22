@@ -12,29 +12,140 @@ import {
   Wallet,
   Activity,
   Search,
-  Filter
+  Filter,
+  Plus,
+  CreditCard,
+  Building,
+  Edit,
+  X
 } from "lucide-react";
 import { useAccounts } from "@/hooks/useAccounts";
 import { Account } from "@/lib/types/schemas";
 import { formatDate } from "@/lib/utils";
 import { fadeInUp } from "@/components/ui/animations";
 import Pagination from "@/components/ui/Pagination";
+import FormModal from "@/components/ui/modals/FormModal";
+import FormInputField from "@/components/ui/FormInputField";
+import FormSelectField from "@/components/ui/FormSelectField";
+import { PAYMENT_METHODS, CURRENCIES } from "@/lib/constants";
 
 interface StakeholderTransactionsProps {
   stakeholderId: number;
   stakeholderName: string;
 }
 
+interface TransactionFormData {
+  title: string;
+  method: string;
+  status: 'Complete' | 'Pending';
+  from_source: string;
+  transaction_date: string;
+  amount: number;
+  currency: string;
+  additional_data: string;
+}
+
+// KeyValueEditor component for managing additional data
+interface KeyValuePair {
+  key: string;
+  value: string;
+}
+
+interface KeyValueEditorProps {
+  pairs: KeyValuePair[];
+  onChange: (pairs: KeyValuePair[]) => void;
+  error?: string;
+}
+
+function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
+  const addPair = () => {
+    onChange([...pairs, { key: '', value: '' }]);
+  };
+
+  const removePair = (index: number) => {
+    onChange(pairs.filter((_, i) => i !== index));
+  };
+
+  const updatePair = (index: number, field: 'key' | 'value', newValue: string) => {
+    const newPairs = [...pairs];
+    newPairs[index][field] = newValue;
+    onChange(newPairs);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="block text-sm font-medium text-gray-700">
+          Additional Data (Optional)
+        </label>
+        <button
+          type="button"
+          onClick={addPair}
+          className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+        >
+          <Plus size={14} className="mr-1" />
+          Add Field
+        </button>
+      </div>
+
+      {pairs.length === 0 ? (
+        <div className="text-center py-4 border-2 border-dashed border-gray-200 rounded-lg">
+          <p className="text-sm text-gray-500 italic">No additional data fields</p>
+          <p className="text-xs text-gray-400 mt-1">Click "Add Field" to create key-value pairs</p>
+        </div>
+      ) : (
+        <div className="space-y-2 max-h-48 overflow-y-auto">
+          {pairs.map((pair, index) => (
+            <div key={index} className="flex gap-2 items-center p-2 bg-gray-50 rounded-lg">
+              <input
+                type="text"
+                placeholder="Key (e.g., reference)"
+                value={pair.key}
+                onChange={(e) => updatePair(index, 'key', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              />
+              <span className="text-gray-400 font-mono">:</span>
+              <input
+                type="text"
+                placeholder="Value (e.g., REF123)"
+                value={pair.value}
+                onChange={(e) => updatePair(index, 'value', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              />
+              <button
+                type="button"
+                onClick={() => removePair(index)}
+                className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+                title="Remove field"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {error && (
+        <p className="text-red-600 text-xs mt-1">{error}</p>
+      )}
+    </div>
+  );
+}
+
 export default function StakeholderTransactions({ 
   stakeholderId, 
   stakeholderName 
 }: StakeholderTransactionsProps) {
-  const { fetchAccountsByStakeholder, getStakeholderTransactionSummary, loading } = useAccounts();
+  const { fetchAccountsByStakeholder, getStakeholderTransactionSummary, createAccount, loading } = useAccounts();
   const [transactions, setTransactions] = useState<Account[]>([]);
+  const [allTransactions, setAllTransactions] = useState<Account[]>([]); // Store all transactions
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<'All' | 'Complete' | 'Pending'>('All');
+  const [dateRangeFilter, setDateRangeFilter] = useState<'7days' | '30days' | '90days' | 'all'>('30days');
+  const [amountFilter, setAmountFilter] = useState<'all' | 'income' | 'expense'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [summary, setSummary] = useState({
     totalTransactions: 0,
     totalIncome: 0,
@@ -48,7 +159,7 @@ export default function StakeholderTransactions({
     const loadData = async () => {
       try {
         const txns = await fetchAccountsByStakeholder(stakeholderId);
-        setTransactions(txns);
+        setAllTransactions(txns); // Store all transactions
         
         const summaryData = await getStakeholderTransactionSummary(stakeholderId);
         setSummary(summaryData);
@@ -59,6 +170,31 @@ export default function StakeholderTransactions({
     
     loadData();
   }, [stakeholderId, fetchAccountsByStakeholder, getStakeholderTransactionSummary]);
+
+  // Apply date range filter
+  useEffect(() => {
+    if (dateRangeFilter === 'all') {
+      setTransactions(allTransactions);
+      return;
+    }
+
+    const now = new Date();
+    const daysMap = {
+      '7days': 7,
+      '30days': 30,
+      '90days': 90,
+    };
+    
+    const daysAgo = new Date();
+    daysAgo.setDate(daysAgo.getDate() - daysMap[dateRangeFilter]);
+    
+    const filtered = allTransactions.filter(txn => {
+      const txnDate = new Date(txn.transaction_date);
+      return txnDate >= daysAgo;
+    });
+    
+    setTransactions(filtered);
+  }, [allTransactions, dateRangeFilter]);
 
   // Filter and search transactions
   const filteredTransactions = useMemo(() => {
@@ -71,9 +207,14 @@ export default function StakeholderTransactions({
       
       const matchesStatus = statusFilter === 'All' || txn.status === statusFilter;
       
-      return matchesSearch && matchesStatus;
+      const matchesAmount = 
+        amountFilter === 'all' ||
+        (amountFilter === 'income' && txn.amount >= 0) ||
+        (amountFilter === 'expense' && txn.amount < 0);
+      
+      return matchesSearch && matchesStatus && matchesAmount;
     });
-  }, [transactions, searchTerm, statusFilter]);
+  }, [transactions, searchTerm, statusFilter, amountFilter]);
 
   // Paginate filtered transactions
   const paginatedTransactions = useMemo(() => {
@@ -87,7 +228,57 @@ export default function StakeholderTransactions({
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter]);
+  }, [searchTerm, statusFilter, amountFilter, dateRangeFilter]);
+
+  // Helper functions for additional data
+  const parseAdditionalData = (dataString: string): Record<string, any> | null => {
+    if (!dataString || dataString.trim() === '') return null;
+    try {
+      return JSON.parse(dataString);
+    } catch {
+      return null;
+    }
+  };
+
+  const formatDataForEdit = (data: Record<string, any> | null): KeyValuePair[] => {
+    if (!data) return [];
+    return Object.entries(data).map(([key, value]) => ({ key, value: String(value) }));
+  };
+
+  const stringifyAdditionalData = (pairs: KeyValuePair[]): string => {
+    if (pairs.length === 0) return '';
+    const obj = pairs.reduce((acc, pair) => {
+      if (pair.key.trim()) {
+        acc[pair.key.trim()] = pair.value;
+      }
+      return acc;
+    }, {} as Record<string, string>);
+    return Object.keys(obj).length > 0 ? JSON.stringify(obj) : '';
+  };
+
+  const handleCreateTransaction = async (data: TransactionFormData) => {
+    const accountData = {
+      title: data.title.trim(),
+      method: data.method.trim() || null,
+      status: data.status,
+      from_source: data.from_source.trim(),
+      transaction_date: data.transaction_date,
+      amount: data.amount,
+      currency: data.currency.trim(),
+      additional_data: parseAdditionalData(data.additional_data) || undefined,
+      stakeholder_id: stakeholderId,
+    };
+
+    await createAccount(accountData);
+    setIsCreateModalOpen(false);
+    
+    // Reload transactions and summary
+    const txns = await fetchAccountsByStakeholder(stakeholderId);
+    setAllTransactions(txns); // Update all transactions
+    
+    const summaryData = await getStakeholderTransactionSummary(stakeholderId);
+    setSummary(summaryData);
+  };
 
   const formatAmount = (amount: number, currency: string) => {
     const sign = amount >= 0 ? '+' : '';
@@ -103,75 +294,75 @@ export default function StakeholderTransactions({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200"
+          className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 sm:p-4 border border-blue-200"
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-blue-600 font-medium">Total Transactions</p>
-              <p className="text-2xl font-bold text-blue-900 mt-1">
+              <p className="text-xs sm:text-sm text-blue-600 font-medium">Total Transactions</p>
+              <p className="text-xl sm:text-2xl font-bold text-blue-900 mt-1">
                 {summary.totalTransactions}
               </p>
             </div>
-            <div className="p-3 bg-blue-200 rounded-lg">
-              <Activity className="text-blue-700" size={24} />
+            <div className="p-2 sm:p-3 bg-blue-200 rounded-lg">
+              <Activity className="text-blue-700" size={20} />
             </div>
           </div>
         </motion.div>
 
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200"
+          className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-3 sm:p-4 border border-green-200"
         >
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-green-600 font-medium">Total Income</p>
-              <p className="text-2xl font-bold text-green-900 mt-1">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm text-green-600 font-medium">Total Income</p>
+              <p className="text-lg sm:text-2xl font-bold text-green-900 mt-1 truncate">
                 {summary.totalIncome.toLocaleString()} BDT
               </p>
             </div>
-            <div className="p-3 bg-green-200 rounded-lg">
-              <TrendingUp className="text-green-700" size={24} />
+            <div className="p-2 sm:p-3 bg-green-200 rounded-lg flex-shrink-0">
+              <TrendingUp className="text-green-700" size={20} />
             </div>
           </div>
         </motion.div>
 
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border border-red-200"
+          className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-3 sm:p-4 border border-red-200"
         >
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-red-600 font-medium">Total Expense</p>
-              <p className="text-2xl font-bold text-red-900 mt-1">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm text-red-600 font-medium">Total Expense</p>
+              <p className="text-lg sm:text-2xl font-bold text-red-900 mt-1 truncate">
                 {summary.totalExpense.toLocaleString()} BDT
               </p>
             </div>
-            <div className="p-3 bg-red-200 rounded-lg">
-              <TrendingDown className="text-red-700" size={24} />
+            <div className="p-2 sm:p-3 bg-red-200 rounded-lg flex-shrink-0">
+              <TrendingDown className="text-red-700" size={20} />
             </div>
           </div>
         </motion.div>
 
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200"
+          className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 sm:p-4 border border-purple-200"
         >
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-purple-600 font-medium">Net Amount</p>
-              <p className={`text-2xl font-bold mt-1 ${
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm text-purple-600 font-medium">Net Amount</p>
+              <p className={`text-lg sm:text-2xl font-bold mt-1 truncate ${
                 summary.netAmount >= 0 ? 'text-green-700' : 'text-red-700'
               }`}>
                 {summary.netAmount.toLocaleString()} BDT
               </p>
             </div>
-            <div className="p-3 bg-purple-200 rounded-lg">
-              <Wallet className="text-purple-700" size={24} />
+            <div className="p-2 sm:p-3 bg-purple-200 rounded-lg flex-shrink-0">
+              <Wallet className="text-purple-700" size={20} />
             </div>
           </div>
         </motion.div>
@@ -179,33 +370,139 @@ export default function StakeholderTransactions({
 
       {/* Transactions List */}
       <div className="bg-white rounded-lg border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Transaction History</h3>
-          <p className="text-sm text-gray-600 mt-1">
-            All financial activities for {stakeholderName}
-          </p>
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Transaction History</h3>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words">
+                {dateRangeFilter === 'all' 
+                  ? `All transactions for ${stakeholderName}`
+                  : dateRangeFilter === '7days'
+                  ? `Last 7 days of transactions for ${stakeholderName}`
+                  : dateRangeFilter === '30days'
+                  ? `Last 30 days of transactions for ${stakeholderName}`
+                  : `Last 90 days of transactions for ${stakeholderName}`
+                }
+              </p>
+            </div>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex-shrink-0"
+            >
+              <Plus size={16} />
+              <span className="hidden sm:inline">New Transaction</span>
+              <span className="sm:hidden">New</span>
+            </button>
+          </div>
         </div>
 
         {/* Search and Filter */}
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div className="relative flex-1 max-w-md w-full">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50 space-y-3 sm:space-y-4">
+          {/* Time Range Filter Buttons */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-xs sm:text-sm font-medium text-gray-700 flex-shrink-0">Time Period:</span>
+            <button
+              onClick={() => setDateRangeFilter('7days')}
+              className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
+                dateRangeFilter === '7days'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <span className="hidden sm:inline">Last 7 Days</span>
+              <span className="sm:hidden">7d</span>
+            </button>
+            <button
+              onClick={() => setDateRangeFilter('30days')}
+              className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
+                dateRangeFilter === '30days'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <span className="hidden sm:inline">Last 30 Days</span>
+              <span className="sm:hidden">30d</span>
+            </button>
+            <button
+              onClick={() => setDateRangeFilter('90days')}
+              className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
+                dateRangeFilter === '90days'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <span className="hidden sm:inline">Last 90 Days</span>
+              <span className="sm:hidden">90d</span>
+            </button>
+            <button
+              onClick={() => setDateRangeFilter('all')}
+              className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
+                dateRangeFilter === 'all'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <span className="hidden sm:inline">All Time</span>
+              <span className="sm:hidden">All</span>
+            </button>
+          </div>
+
+          {/* Amount Type Filter Buttons */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-xs sm:text-sm font-medium text-gray-700 flex-shrink-0">Type:</span>
+            <button
+              onClick={() => setAmountFilter('all')}
+              className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
+                amountFilter === 'all'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setAmountFilter('income')}
+              className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
+                amountFilter === 'income'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <span className="hidden sm:inline">Income Only</span>
+              <span className="sm:hidden">Income</span>
+            </button>
+            <button
+              onClick={() => setAmountFilter('expense')}
+              className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
+                amountFilter === 'expense'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <span className="hidden sm:inline">Expenses Only</span>
+              <span className="sm:hidden">Expenses</span>
+            </button>
+          </div>
+
+          {/* Search and Status Filter */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="relative flex-1">
               <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search by title, method, source, or amount..."
+                placeholder="Search transactions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <Filter size={16} className="text-gray-500" />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="All">All Status</option>
                 <option value="Complete">Complete</option>
@@ -214,20 +511,34 @@ export default function StakeholderTransactions({
             </div>
           </div>
           
-          {/* Results count */}
-          {(searchTerm || statusFilter !== 'All') && (
-            <div className="mt-3 text-sm text-gray-600">
-              Found {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''}
-              {searchTerm && ` matching "${searchTerm}"`}
-              {statusFilter !== 'All' && ` with status "${statusFilter}"`}
-            </div>
-          )}
+          {/* Results count and active filters */}
+          <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+            <span className="text-gray-600">
+              Showing {filteredTransactions.length} of {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}
+            </span>
+            {(searchTerm || statusFilter !== 'All' || amountFilter !== 'all' || dateRangeFilter !== '30days') && (
+              <>
+                <span className="text-gray-400 hidden sm:inline">•</span>
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setStatusFilter('All');
+                    setAmountFilter('all');
+                    setDateRangeFilter('30days');
+                  }}
+                  className="text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Clear filters
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         {filteredTransactions.length === 0 ? (
-          <div className="px-6 py-12 text-center">
-            <DollarSign size={48} className="mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500 text-sm">
+          <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
+            <DollarSign size={40} className="mx-auto text-gray-300 mb-3" />
+            <p className="text-gray-500 text-xs sm:text-sm">
               {transactions.length === 0 
                 ? 'No transactions found' 
                 : 'No transactions match your search criteria'
@@ -242,7 +553,55 @@ export default function StakeholderTransactions({
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
+            {/* Mobile Card View */}
+            <div className="sm:hidden divide-y divide-gray-200">
+              {paginatedTransactions.map((txn) => (
+                <motion.div
+                  key={txn.id}
+                  variants={fadeInUp}
+                  className="p-4 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-900 text-sm truncate">{txn.title}</h4>
+                      <p className="text-xs text-gray-500 mt-1">{txn.from_source}</p>
+                    </div>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ml-2 ${
+                      txn.status === 'Complete' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {txn.status === 'Complete' ? (
+                        <><CheckCircle size={10} className="mr-1" />Done</>
+                      ) : (
+                        <><Clock size={10} className="mr-1" />Pending</>
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <Calendar size={12} />
+                        {formatDate(txn.transaction_date)}
+                      </div>
+                      {txn.method && (
+                        <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
+                          {txn.method}
+                        </span>
+                      )}
+                    </div>
+                    <span className={`text-sm font-semibold ${
+                      txn.amount >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {formatAmount(txn.amount, txn.currency)}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden sm:block overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -327,6 +686,142 @@ export default function StakeholderTransactions({
           </>
         )}
       </div>
+
+      {/* Create Transaction Modal */}
+      <FormModal<TransactionFormData>
+        title="Create New Transaction"
+        icon={<Plus size={24} />}
+        isOpen={isCreateModalOpen}
+        initialValues={{
+          title: '',
+          method: '',
+          status: 'Pending',
+          from_source: '',
+          transaction_date: new Date().toISOString().split('T')[0],
+          amount: 0,
+          currency: 'BDT',
+          additional_data: ''
+        }}
+        validationFn={(values) => {
+          const errors = [];
+          if (!values.title.trim()) errors.push({ field: 'title', message: 'Title is required' });
+          if (!values.from_source.trim()) errors.push({ field: 'from_source', message: 'From source is required' });
+          if (!values.transaction_date) errors.push({ field: 'transaction_date', message: 'Transaction date is required' });
+          if (!values.amount) errors.push({ field: 'amount', message: 'Amount is required' });
+          if (!values.currency.trim()) errors.push({ field: 'currency', message: 'Currency is required' });
+          if (!values.status) errors.push({ field: 'status', message: 'Status is required' });
+
+          // Validate amount is a number
+          if (values.amount && isNaN(values.amount)) {
+            errors.push({ field: 'amount', message: 'Amount must be a valid number' });
+          }
+
+          return errors.length === 0 ? { success: true, data: values } : { success: false, errors };
+        }}
+        onSubmit={handleCreateTransaction}
+        onClose={() => setIsCreateModalOpen(false)}
+        isLoading={loading}
+        submitButtonText="Create Transaction"
+      >
+        {({ values, errors, handleChange }) => (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormInputField
+                icon={<DollarSign size={18} />}
+                label="Transaction Title"
+                name="title"
+                value={values.title}
+                onChange={handleChange}
+                error={errors.title}
+              />
+
+              <FormSelectField
+                icon={<CreditCard size={18} />}
+                label="Payment Method"
+                name="method"
+                value={values.method}
+                onChange={handleChange}
+                error={errors.method}
+                options={PAYMENT_METHODS.map(method => ({ value: method, label: method }))}
+                placeholder="Select method (optional)"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormInputField
+                icon={<Building size={18} />}
+                label="From Source"
+                name="from_source"
+                value={values.from_source}
+                onChange={handleChange}
+                error={errors.from_source}
+              />
+
+              <FormSelectField
+                icon={<CheckCircle size={18} />}
+                label="Status"
+                name="status"
+                value={values.status}
+                onChange={handleChange}
+                error={errors.status}
+                options={[
+                  { value: 'Pending', label: 'Pending' },
+                  { value: 'Complete', label: 'Complete' }
+                ]}
+                placeholder="Select status"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormInputField
+                icon={<Calendar size={18} />}
+                label="Transaction Date"
+                name="transaction_date"
+                type="date"
+                value={values.transaction_date}
+                onChange={handleChange}
+                error={errors.transaction_date}
+              />
+
+              <FormInputField
+                icon={<DollarSign size={18} />}
+                label="Amount"
+                name="amount"
+                type="number"
+                value={values.amount.toString()}
+                onChange={handleChange}
+                error={errors.amount}
+              />
+            </div>
+
+            <FormSelectField
+              icon={<DollarSign size={18} />}
+              label="Currency"
+              name="currency"
+              value={values.currency}
+              onChange={handleChange}
+              error={errors.currency}
+              options={CURRENCIES.map(currency => ({ value: currency, label: currency }))}
+              placeholder="Select currency"
+            />
+
+            <KeyValueEditor
+              pairs={formatDataForEdit(parseAdditionalData(values.additional_data))}
+              onChange={(pairs) => {
+                const stringValue = stringifyAdditionalData(pairs);
+                const event = {
+                  target: {
+                    name: 'additional_data',
+                    value: stringValue
+                  }
+                } as any;
+                handleChange(event);
+              }}
+              error={errors.additional_data}
+            />
+          </>
+        )}
+      </FormModal>
     </div>
   );
 }

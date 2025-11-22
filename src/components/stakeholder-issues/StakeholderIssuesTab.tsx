@@ -129,12 +129,12 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Issues</h2>
-          <p className="text-sm text-gray-600 mt-1">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Issues</h2>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">
             Track and manage issues for this stakeholder
           </p>
         </div>
@@ -143,10 +143,11 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
             setSelectedIssue(null);
             openCreateModal();
           }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex-shrink-0"
         >
-          <Plus size={20} />
-          Add Issue
+          <Plus size={18} />
+          <span className="hidden sm:inline">Add Issue</span>
+          <span className="sm:hidden">New Issue</span>
         </button>
       </div>
 
@@ -159,9 +160,9 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
 
       {/* Empty State */}
       {!loading && issues.length === 0 && (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <h3 className="text-lg font-semibold text-gray-900">No issues yet</h3>
-          <p className="text-sm text-gray-500 mt-1">
+        <div className="text-center py-8 sm:py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">No issues yet</h3>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             Create an issue to start tracking problems or requests
           </p>
           <button
@@ -169,38 +170,39 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
               setSelectedIssue(null);
               openCreateModal();
             }}
-            className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="mt-4 inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
           >
-            <Plus size={20} />
-            Add Issue
+            <Plus size={18} />
+            <span className="hidden sm:inline">Add Issue</span>
+            <span className="sm:hidden">New Issue</span>
           </button>
         </div>
       )}
 
       {/* Issues List */}
       {!loading && issues.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {issues.map((issue) => (
             <div
               key={issue.id}
-              className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{issue.title}</h3>
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(issue.status)}`}>
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">{issue.title}</h3>
+                    <span className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(issue.status)}`}>
                       {getStatusIcon(issue.status)}
-                      {issue.status}
+                      <span className="hidden sm:inline">{issue.status}</span>
                     </span>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(issue.priority)}`}>
+                    <span className={`px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(issue.priority)}`}>
                       {issue.priority}
                     </span>
                   </div>
 
                   {/* Description */}
                   {issue.description && (
-                    <p className="text-sm text-gray-600 mt-2">{issue.description}</p>
+                    <p className="text-xs sm:text-sm text-gray-600 mt-2 break-words">{issue.description}</p>
                   )}
 
                   {/* Attachments */}
@@ -213,23 +215,26 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                           className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
                         >
                           <Download size={12} />
-                          {attachment.originalName}
+                          <span className="truncate max-w-[150px] sm:max-w-none">{attachment.originalName}</span>
                         </button>
                       ))}
                     </div>
                   )}
 
                   {/* Metadata */}
-                  <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
+                  <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500">
                     <span>Created {issue.created_at ? new Date(issue.created_at).toLocaleDateString() : "N/A"}</span>
                     {issue.resolved_at && (
-                      <span>Resolved {new Date(issue.resolved_at).toLocaleDateString()}</span>
+                      <>
+                        <span className="hidden sm:inline">•</span>
+                        <span>Resolved {new Date(issue.resolved_at).toLocaleDateString()}</span>
+                      </>
                     )}
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 ml-4">
+                <div className="flex items-center gap-2 sm:flex-col sm:items-end flex-shrink-0">
                   <button
                     onClick={() => {
                       setSelectedIssue(issue);

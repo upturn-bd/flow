@@ -142,10 +142,7 @@ export function useStakeholders() {
         .from("stakeholder_processes")
         .select(`
           *,
-          steps:stakeholder_process_steps(
-            *,
-            team:teams(id, name)
-          )
+          steps:stakeholder_process_steps(*)
         `)
         .eq("company_id", company_id)
         .eq("id", processId)
@@ -272,10 +269,7 @@ export function useStakeholders() {
     try {
       const { data, error } = await supabase
         .from("stakeholder_process_steps")
-        .select(`
-          *,
-          team:teams(id, name)
-        `)
+        .select('*')
         .eq("process_id", processId)
         .order("step_order");
 
@@ -620,10 +614,7 @@ export function useStakeholders() {
           *,
           process:stakeholder_processes(
             *,
-            steps:stakeholder_process_steps(
-              *,
-              team:teams(id, name)
-            )
+            steps:stakeholder_process_steps(*)
           ),
           current_step:stakeholder_process_steps(id, name, step_order),
           stakeholder_type:stakeholder_types(id, name, description),
@@ -632,7 +623,7 @@ export function useStakeholders() {
             step:stakeholder_process_steps(id, name, step_order)
           ),
           kam:employees!kam_id(id, first_name, last_name, email),
-          rejected_by_employee:employees!rejected_by(id, first_name, last_name, email)
+          rejected_by:employees!stakeholders_rejected_by_fkey(id, first_name, last_name, email)
         `)
         .eq("company_id", company_id)
         .eq("id", stakeholderId)
@@ -651,8 +642,8 @@ export function useStakeholders() {
         data.kam.name = `${data.kam.first_name} ${data.kam.last_name}`;
       }
 
-      if(data.rejected_by_employee) {
-        data.rejected_by_employee.name = `${data.rejected_by_employee.first_name} ${data.rejected_by_employee.last_name}`;
+      if(data.rejected_by) {
+        data.rejected_by.name = `${data.rejected_by.first_name} ${data.rejected_by.last_name}`;
       }
 
       return data;
