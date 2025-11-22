@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import DepartmentModal from "./DepartmentModal";
 import DepartmentDetailsModal from "./DepartmentDetailsModal";
 import { Building, Plus, Eye, X } from "lucide-react";
-import { fadeInUp } from "@/components/ui/animations";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { TrashSimple } from "@phosphor-icons/react";
 import { getCompanyInfo } from "@/lib/utils/auth";
@@ -78,10 +77,7 @@ export default function DepartmentsSection({
   );
 
   return (
-    <motion.section
-      variants={fadeInUp}
-      className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm"
-    >
+    <section className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm">
       <div className="border-b border-gray-200 pb-4 mb-4">
         <h3 className="text-lg font-semibold text-gray-800 flex items-center">
           <Building className="w-5 h-5 mr-2 text-gray-600" />
@@ -105,10 +101,9 @@ export default function DepartmentsSection({
             </div>
           ) : (
             departments.map((dept) => (
-              <motion.div
+              <div
                 key={dept.id}
                 className="bg-white rounded-lg border border-gray-200 p-2 sm:p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
-                whileHover={{ scale: 1.01 }}
               >
                 <div className="flex items-center mb-2 sm:mb-0">
                   <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 mr-2 sm:mr-3">
@@ -120,18 +115,14 @@ export default function DepartmentsSection({
                 </div>
 
                 <div className="flex gap-2 w-full sm:w-auto justify-end">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  <button
                     onClick={() => setViewDepartment(dept.id ?? null)}
                     className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs sm:text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
                   >
                     <Eye size={14} />
                     <span className="hidden xs:inline">Details</span>
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  </button>
+                  <button
                     onClick={() => handleDeleteDepartment(dept.id ?? 0)}
                     disabled={departmentDeleteLoading === dept.id}
                     className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-red-50 text-red-600 text-xs sm:text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${departmentDeleteLoading === dept.id
@@ -145,23 +136,21 @@ export default function DepartmentsSection({
                         ? "Deleting..."
                         : "Delete"}
                     </span>
-                  </motion.button>
+                  </button>
                 </div>
-              </motion.div>
+              </div>
             ))
           )}
         </div>
       )}
 
       <div className="flex justify-center sm:justify-start mt-4">
-        <motion.button
-          whileHover={{ scale: 1.1, rotate: 90 }}
-          whileTap={{ scale: 0.9 }}
+        <button
           onClick={() => setIsCreatingDepartment(true)}
           className="flex items-center justify-center text-white bg-gray-800 rounded-full w-10 h-10 sm:w-8 sm:h-8 shadow-sm hover:bg-gray-700 transition-colors"
         >
           <Plus size={18} />
-        </motion.button>
+        </button>
       </div>
 
       <AnimatePresence>
@@ -200,6 +189,6 @@ export default function DepartmentsSection({
           />
         )}
       </AnimatePresence>
-    </motion.section>
+    </section>
   );
 }

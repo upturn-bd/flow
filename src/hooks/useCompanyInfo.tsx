@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { getCompanyInfo as getCompanyInfoApi, updateCompanySettings as updateCompanySettingsApi } from "@/lib/utils/auth";
-import { useEmployees } from "@/hooks/useEmployees";
+import { supabase } from "@/lib/supabase/client";
 
 interface CompanyInfo {
   id: number;
@@ -31,36 +31,50 @@ export function useCompanyInfo() {
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
   const [industries, setIndustries] = useState<Industry[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { employees, fetchEmployees } = useEmployees();
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const fetchCompanyInfo = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await getCompanyInfoApi();
+      // Fetch all data in parallel
+      const [companyResult, countriesResult, industriesResult, employeesResult] = await Promise.all([
+        getCompanyInfoApi(),
+        supabase.from('countries').select('id, name').order('name'),
+        supabase.from('industries').select('id, name').order('name'),
+        supabase.from('employees').select('id, first_name, last_name, email, designation').then(res => res.data || [])
+      ]);
       
-      setCompanyInfo(result);
+      setCompanyInfo(companyResult);
       
-      // Fetch countries and industries separately
-      // For now, setting empty arrays - these should be fetched from proper endpoints
-      setCountries([]);
-      setIndustries([]);
+      if (countriesResult.error) {
+        console.error('Failed to fetch countries:', countriesResult.error);
+      } else {
+        setCountries(countriesResult.data || []);
+      }
       
-      // Also fetch employees since they're often needed with company info
-      await fetchEmployees();
+      if (industriesResult.error) {
+        console.error('Failed to fetch industries:', industriesResult.error);
+      } else {
+        setIndustries(industriesResult.data || []);
+      }
       
-      return result;
+      setEmployees(employeesResult);
+      
+      return companyResult;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch company info";
       setError(errorMessage);
-      console.error(errorMessage, err);
+      console.error('Failed to fetch company info:', errorMessage, err);
       throw err;
     } finally {
       setLoading(false);
+      setHasInitialized(true);
     }
-  }, [fetchEmployees]);
+  }, []);
 
   const updateCompanySettings = useCallback(async (settings: {
     live_absent_enabled?: boolean;
@@ -84,6 +98,12 @@ export function useCompanyInfo() {
       throw err;
     }
   }, []);
+
+  // Auto-fetch on mount (only once)
+  useEffect(() => {
+    fetchCompanyInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - run only on mount
 
   return {
     companyInfo,

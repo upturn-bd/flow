@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import PositionDetailsModal from "./PositionDetailsModal";
 import PositionModal from "./PositionModal";
 import { BriefcaseBusiness, Plus, Eye } from "lucide-react";
-import { fadeInUp } from "@/components/ui/animations";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { TrashSimple } from "@phosphor-icons/react";
 
@@ -73,10 +72,7 @@ export default function PositionsSection({
   const selectedPositionEdit = positions.find((d) => d.id === editPosition);
 
   return (
-    <motion.section
-      variants={fadeInUp}
-      className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm"
-    >
+    <section className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm">
       <div className="border-b border-gray-200 pb-4 mb-4">
         <h3 className="text-lg font-semibold text-gray-800 flex items-center">
           <BriefcaseBusiness className="w-5 h-5 mr-2 text-gray-600" />
@@ -100,10 +96,9 @@ export default function PositionsSection({
             </div>
           ) : (
             positions.map((position) => (
-              <motion.div
+              <div
                 key={position.id}
                 className="bg-white rounded-lg border border-gray-200 p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
-                whileHover={{ scale: 1.01 }}
               >
                 <div className="flex items-center mb-2 sm:mb-0">
                   <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 mr-3">
@@ -115,18 +110,14 @@ export default function PositionsSection({
                 </div>
 
                 <div className="flex gap-2 w-full sm:w-auto justify-end">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  <button
                     onClick={() => setViewPosition(position.id ?? null)}
                     className="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
                   >
                     <Eye size={14} />
                     <span className="hidden sm:inline">Details</span>
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  </button>
+                  <button
                     onClick={() => handleDeletePosition(position.id ?? 0)}
                     disabled={positionDeleteLoading === position.id}
                     className={`px-3 py-1.5 rounded-md bg-red-50 text-red-600 text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${
@@ -141,23 +132,21 @@ export default function PositionsSection({
                     ) : (
                       <span className="hidden sm:inline">Delete</span>
                     )}
-                  </motion.button>
+                  </button>
                 </div>
-              </motion.div>
+              </div>
             ))
           )}
         </div>
       )}
 
       <div className="flex justify-center sm:justify-start mt-4">
-        <motion.button
-          whileHover={{ scale: 1.1, rotate: 90 }}
-          whileTap={{ scale: 0.9 }}
+        <button
           onClick={() => setIsCreatingPosition(true)}
           className="flex items-center justify-center text-white bg-gray-800 rounded-full w-10 h-10 sm:w-8 sm:h-8 shadow-sm hover:bg-gray-700 transition-colors"
         >
           <Plus size={18} />
-        </motion.button>
+        </button>
       </div>
 
       <AnimatePresence>
@@ -194,6 +183,6 @@ export default function PositionsSection({
           />
         )}
       </AnimatePresence>
-    </motion.section>
+    </section>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
-import { TrashSimple, Receipt, Money, Plus, Eye } from "@phosphor-icons/react";
+import { TrashSimple, Receipt, Money, Plus, Eye, MoneyIcon, EyeIcon, ReceiptIcon } from "@phosphor-icons/react";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { ClaimType } from "@/lib/types/schemas";
 import {
@@ -136,7 +136,7 @@ export default function ClaimSettlementView() {
                       
                       <div className="mt-2">
                         <span className="flex items-center gap-1.5 text-sm bg-gray-100 px-2 py-1 rounded text-gray-700 w-fit">
-                          <Money size={16} weight="duotone" className="text-gray-500" />
+                          <MoneyIcon size={16} weight="duotone" className="text-gray-500" />
                           Allowance: {formatCurrency(settlementType.allowance)}
                         </span>
                       </div>
@@ -148,7 +148,7 @@ export default function ClaimSettlementView() {
                           onClick={() => settlementType.id !== undefined && setEditClaimType(settlementType.id)}
                           className="text-sm flex items-center gap-1 text-gray-600 hover:text-gray-800"
                         >
-                          <Eye size={16} weight="bold" />
+                          <EyeIcon size={16} weight="bold" />
                           View Details
                         </Button>
                       </div>
@@ -158,7 +158,7 @@ export default function ClaimSettlementView() {
               ) : (
                 <div className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
                   <div className="flex justify-center mb-3">
-                    <Receipt size={40} weight="duotone" className="text-gray-400" />
+                    <ReceiptIcon size={40} weight="duotone" className="text-gray-400" />
                   </div>
                   <p className="text-gray-500 mb-1">No settlement types found</p>
                   <p className="text-gray-400 text-sm mb-4">Add settlement types to configure the settlement system</p>

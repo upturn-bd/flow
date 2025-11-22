@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { useAuth } from "@/lib/auth/auth-context";
 
 // Import all the hooks we need
 import { useDepartments } from "@/hooks/useDepartments";
@@ -84,6 +85,7 @@ interface AdminDataProviderProps {
 
 export function AdminDataProvider({ children }: AdminDataProviderProps) {
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const { user, isLoading: authLoading } = useAuth();
 
   // Use all the hooks
   const {
@@ -172,17 +174,32 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
 
 
 
-  // Load all data on mount
+  // Load all data on mount - wait for auth to be ready
   useEffect(() => {
+    // Don't fetch if auth is still loading
+    if (authLoading) {
+      return;
+    }
+
+    // Don't fetch if user is not authenticated
+    if (!user) {
+      return;
+    }
+
     const loadAllData = async () => {
       try {
-        await Promise.all([
-          fetchDepartments(),
-          fetchDivisions(),
-          fetchGrades(),
-          fetchPositions(),
-          fetchCompanyInfo(),
-        ]);
+        // Fetch company info first to ensure company_id is available
+        const companyData = await fetchCompanyInfo();
+        
+        // Then fetch other data that depends on company_id
+        if (companyData) {
+          await Promise.all([
+            fetchDepartments(),
+            fetchDivisions(),
+            fetchGrades(),
+            fetchPositions(),
+          ]);
+        }
       } catch (error) {
         console.error('Failed to load admin data:', error);
         setGlobalError(error instanceof Error ? error.message : 'Failed to load data');
@@ -190,7 +207,8 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
     };
 
     loadAllData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, user]);
 
   // Refresh functions
   const refreshAll = useCallback(async () => {

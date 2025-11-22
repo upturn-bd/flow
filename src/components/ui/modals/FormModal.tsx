@@ -72,7 +72,7 @@ export default function FormModal<T extends Record<string, any>>({
       if ((name.endsWith('_id') || name === 'grade') && value !== '') {
         return {
           ...prev,
-          [name]: Number(value),
+          [name]: value,
         };
       }
       

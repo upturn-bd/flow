@@ -23,13 +23,17 @@ export function useDepartments() {
   const fetchDepartments = async (company_id?: number | undefined) => {
     // Don't fetch if auth is still loading or user isn't authenticated
     if (authLoading || !user) {
+      setDepartments([]);
       return [];
     }
 
     try {
+      setLoading(true);
       const supabase = await createClient();
       const companyId = company_id ?? employeeInfo?.company_id;
       if (!companyId) {
+        setDepartments([]);
+        setLoading(false);
         return [];
       }
 
@@ -40,11 +44,14 @@ export function useDepartments() {
 
       if (error) throw error;
 
-      setDepartments(data)
+      setDepartments(data || []);
+      setLoading(false);
 
       return data || [];
     } catch (error) {
       console.error("Error fetching departments:", error);
+      setDepartments([]);
+      setLoading(false);
       throw error;
     }
   };

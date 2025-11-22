@@ -328,11 +328,15 @@ export function validateClaimType(data: ClaimTypeData): ValidationResult<ClaimTy
   if (allowanceError) errors.push(allowanceError);
 
   // Validate settler_id
-  const settlerError = validateString(data.settler_id, 'settler_id', { required: true, minLength: 1 });
-  if (settlerError) errors.push(settlerError);
+  if (data.settler_id === undefined || data.settler_id === null || data.settler_id === '') {
+    errors.push({ field: 'settler_id', message: 'Settler is required' });
+  } else {
+    const settlerError = validateString(data.settler_id, 'settler_id', { required: true });
+    if (settlerError) errors.push(settlerError);
+  }
 
   // Validate settlement_level_id if provided
-  if (data.settlement_level_id !== undefined) {
+  if (data.settlement_level_id !== undefined && data.settlement_level_id !== 0) {
     const levelError = validateNumber(data.settlement_level_id, 'settlement_level_id', { min: 1 });
     if (levelError) errors.push(levelError);
   }

@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Building, Code, Briefcase, Globe, LoaderCircle } from "lucide-react";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
-import { fadeIn, staggerContainer } from "@/components/ui/animations";
 import { validateCompanyBasics, validationErrorsToObject } from "@/lib/utils/validation";
 import { CompanyBasics } from "@/lib/types/schemas";
 import CompanyBasicsConfigView from "@/components/admin/CompanyBasicsConfigView";
@@ -24,6 +22,7 @@ export default function BasicTab() {
     loading,
     updateCompanySettings
   } = useAdminData();
+  
   const [formValues, setFormValues] = useState<CompanyBasicsFormData>({
     company_name: "",
     company_id: "",
@@ -89,19 +88,21 @@ export default function BasicTab() {
     // Handle form submission here
   };
 
+  // Show loading state while data is being fetched
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <LoaderCircle className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading configuration...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={staggerContainer}
-      className="space-y-6"
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="bg-white rounded-xl shadow-sm mb-8"
-      >
+    <div className="space-y-6">
+      <div className="bg-white rounded-xl shadow-sm mb-8">
         <div className="border-b border-gray-200 px-3 py-4">
           <h3 className="text-lg font-semibold text-gray-700 flex items-center">
             <Building className="w-5 h-5 mr-2 text-gray-600" />
@@ -160,14 +161,9 @@ export default function BasicTab() {
             />
           </div>
         </form>
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="mb-8"
-      >
+      <div className="mb-8">
         <CompanySettingsConfigView
           formValues={{
             live_absent_enabled: formValues.live_absent_enabled,
@@ -179,16 +175,11 @@ export default function BasicTab() {
             fiscal_year_start: errors.fiscal_year_start,
           }}
         />
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
-        className="bg-white rounded-xl shadow-sm p-2"
-      >
+      <div className="bg-white rounded-xl shadow-sm p-2">
         <CompanyBasicsConfigView />
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }

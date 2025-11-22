@@ -83,7 +83,7 @@ export const ClaimTypeCreateModal: React.FC<ClaimTypeCreateModalProps> = ({
           <SelectField
             name="settler_id"
             label="Settler"
-            value={values.settler_id}
+            value={values.settler_id || ''}
             onChange={handleChange}
             error={errors.settler_id}
             required
@@ -97,12 +97,12 @@ export const ClaimTypeCreateModal: React.FC<ClaimTypeCreateModalProps> = ({
           <SelectField
             name="settlement_level_id"
             label="Settlement Level (Optional)"
-            value={values.settlement_level_id || ''}
+            value={values.settlement_level_id ? String(values.settlement_level_id) : ''}
             onChange={handleChange}
             error={errors.settlement_level_id}
             placeholder="Select Settlement Level"
             options={allPositions.map(position => ({
-              value: position.id,
+              value: String(position.id),
               label: position.name
             }))}
           />
