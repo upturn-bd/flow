@@ -13,6 +13,7 @@ import {
   X 
 } from "@phosphor-icons/react";
 import { filterEmployeesBySearch } from "@/lib/utils/user-search";
+import { toast } from "sonner";
 
 interface EmployeeSearchResult {
   id: string;
@@ -150,11 +151,12 @@ export default function TeamDetailPage() {
 
       if (error) {
         if (error.code === '23505') {
-          alert("This employee is already a member of this team");
+          toast.error("This employee is already a member of this team");
         } else {
           throw error;
         }
       } else {
+        toast.success("Team member added successfully");
         setShowAddMemberModal(false);
         setSelectedEmployee(null);
         setSearchTerm("");
@@ -162,7 +164,7 @@ export default function TeamDetailPage() {
       }
     } catch (error) {
       console.error("Error adding team member:", error);
-      alert("Failed to add team member");
+      toast.error("Failed to add team member");
     }
   };
 
@@ -173,9 +175,11 @@ export default function TeamDetailPage() {
 
     try {
       await supabase.from("team_members").delete().eq("id", memberId);
+      toast.success("Team member removed successfully");
       fetchTeamData();
     } catch (error) {
       console.error("Error removing team member:", error);
+      toast.error("Failed to remove team member");
     }
   };
 
@@ -212,9 +216,11 @@ export default function TeamDetailPage() {
         ]);
       }
 
+      toast.success("Permission updated successfully");
       fetchTeamData();
     } catch (error) {
       console.error("Error updating permission:", error);
+      toast.error("Failed to update permission");
     }
   };
 

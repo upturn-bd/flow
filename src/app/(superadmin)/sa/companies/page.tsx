@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Company, Country, Industry } from "@/lib/types/schemas";
 import { Plus, Pencil, Trash, MagnifyingGlass } from "@phosphor-icons/react";
+import { toast } from "sonner";
 
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -72,8 +73,10 @@ export default function CompaniesPage() {
           .from("companies")
           .update(payload)
           .eq("id", editingCompany.id);
+        toast.success("Company updated successfully");
       } else {
         await supabase.from("companies").insert([payload]);
+        toast.success("Company created successfully");
       }
 
       setShowModal(false);
@@ -81,6 +84,7 @@ export default function CompaniesPage() {
       fetchData();
     } catch (error) {
       console.error("Error saving company:", error);
+      toast.error("Failed to save company");
     }
   };
 
@@ -91,9 +95,11 @@ export default function CompaniesPage() {
 
     try {
       await supabase.from("companies").delete().eq("id", id);
+      toast.success("Company deleted successfully");
       fetchData();
     } catch (error) {
       console.error("Error deleting company:", error);
+      toast.error("Failed to delete company");
     }
   };
 

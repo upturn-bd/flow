@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Country } from "@/lib/types/schemas";
 import { Plus, Pencil, Trash, MagnifyingGlass } from "@phosphor-icons/react";
+import { toast } from "sonner";
 
 export default function CountriesPage() {
   const [countries, setCountries] = useState<Country[]>([]);
@@ -43,8 +44,10 @@ export default function CountriesPage() {
           .from("countries")
           .update({ name: formData.name })
           .eq("id", editingCountry.id);
+        toast.success("Country updated successfully");
       } else {
         await supabase.from("countries").insert([{ name: formData.name }]);
+        toast.success("Country created successfully");
       }
 
       setShowModal(false);
@@ -53,6 +56,7 @@ export default function CountriesPage() {
       fetchCountries();
     } catch (error) {
       console.error("Error saving country:", error);
+      toast.error("Failed to save country");
     }
   };
 
@@ -63,10 +67,11 @@ export default function CountriesPage() {
 
     try {
       await supabase.from("countries").delete().eq("id", id);
+      toast.success("Country deleted successfully");
       fetchCountries();
     } catch (error) {
       console.error("Error deleting country:", error);
-      alert("Cannot delete country. It may be in use by companies.");
+      toast.error("Cannot delete country. It may be in use by companies.");
     }
   };
 

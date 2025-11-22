@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import SuperadminNav from "./nav";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Superadmin | Flow HRIS",
@@ -17,6 +18,7 @@ export default function SuperadminLayout({
       <main className="container mx-auto px-4 py-8">
         {children}
       </main>
+      <Toaster position="top-right" richColors />
     </div>
   );
 }

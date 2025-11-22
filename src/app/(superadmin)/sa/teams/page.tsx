@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Company, Team } from "@/lib/types/schemas";
 import { MagnifyingGlass, Users, Pencil, Trash, Plus } from "@phosphor-icons/react";
+import { toast } from "sonner";
 
 interface TeamWithDetails extends Team {
   member_count?: number;
@@ -85,10 +86,11 @@ export default function TeamsManagementPage() {
 
     try {
       await supabase.from("teams").delete().eq("id", teamId);
+      toast.success("Team deleted successfully");
       fetchTeams();
     } catch (error) {
       console.error("Error deleting team:", error);
-      alert("Failed to delete team. It may be in use.");
+      toast.error("Failed to delete team. It may be in use.");
     }
   };
 

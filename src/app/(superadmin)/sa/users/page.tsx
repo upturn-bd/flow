@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase/client";
 import type { Superadmin, Company } from "@/lib/types/schemas";
 import { Plus, Trash, MagnifyingGlass, X } from "@phosphor-icons/react";
 import { filterEmployeesBySearch } from "@/lib/utils/user-search";
+import { toast } from "sonner";
 
 interface EmployeeSearchResult {
   id: string;
@@ -101,18 +102,19 @@ export default function SuperadminUsersPage() {
 
       if (error) {
         if (error.code === '23505') {
-          alert("This user is already a superadmin");
+          toast.error("This user is already a superadmin");
         } else {
           throw error;
         }
       } else {
+        toast.success("Superadmin added successfully");
         setShowModal(false);
         resetForm();
         fetchData();
       }
     } catch (error) {
       console.error("Error adding superadmin:", error);
-      alert("Failed to add superadmin");
+      toast.error("Failed to add superadmin");
     }
   };
 
@@ -123,9 +125,11 @@ export default function SuperadminUsersPage() {
 
     try {
       await supabase.from("superadmins").delete().eq("id", id);
+      toast.success("Superadmin access removed");
       fetchData();
     } catch (error) {
       console.error("Error removing superadmin:", error);
+      toast.error("Failed to remove superadmin");
     }
   };
 
@@ -135,9 +139,11 @@ export default function SuperadminUsersPage() {
         .from("superadmins")
         .update({ is_active: !currentStatus })
         .eq("id", id);
+      toast.success(`Superadmin ${!currentStatus ? 'activated' : 'deactivated'}`);
       fetchData();
     } catch (error) {
       console.error("Error toggling superadmin status:", error);
+      toast.error("Failed to update superadmin status");
     }
   };
 

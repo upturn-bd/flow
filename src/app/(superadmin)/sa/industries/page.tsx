@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Industry } from "@/lib/types/schemas";
 import { Plus, Pencil, Trash, MagnifyingGlass } from "@phosphor-icons/react";
+import { toast } from "sonner";
 
 export default function IndustriesPage() {
   const [industries, setIndustries] = useState<Industry[]>([]);
@@ -43,8 +44,10 @@ export default function IndustriesPage() {
           .from("industries")
           .update({ name: formData.name })
           .eq("id", editingIndustry.id);
+        toast.success("Industry updated successfully");
       } else {
         await supabase.from("industries").insert([{ name: formData.name }]);
+        toast.success("Industry created successfully");
       }
 
       setShowModal(false);
@@ -53,6 +56,7 @@ export default function IndustriesPage() {
       fetchIndustries();
     } catch (error) {
       console.error("Error saving industry:", error);
+      toast.error("Failed to save industry");
     }
   };
 
@@ -63,10 +67,11 @@ export default function IndustriesPage() {
 
     try {
       await supabase.from("industries").delete().eq("id", id);
+      toast.success("Industry deleted successfully");
       fetchIndustries();
     } catch (error) {
       console.error("Error deleting industry:", error);
-      alert("Cannot delete industry. It may be in use by companies.");
+      toast.error("Cannot delete industry. It may be in use by companies.");
     }
   };
 
