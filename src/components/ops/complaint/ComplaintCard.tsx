@@ -16,11 +16,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { ComplaintRecord, ComplaintsType } from "@/lib/types";
-
-interface Employee {
-  id: string;
-  name: string;
-}
+import { Employee } from "@/lib/types/schemas";
 
 interface ComplaintCardProps {
   complaint: ComplaintRecord;

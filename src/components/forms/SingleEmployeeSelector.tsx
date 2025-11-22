@@ -2,14 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MagnifyingGlass as Search, X, CaretDown, User } from '@phosphor-icons/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { matchesEmployeeSearch } from '@/lib/utils/user-search';
-
-interface Employee {
-  id: string | number;
-  name: string;
-  email?: string;
-  designation?: string;
-  avatar?: string;
-}
+import { Employee } from '@/lib/types/schemas';
 
 interface SingleEmployeeSelectorProps {
   value: string;

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { FormModal } from '@/components/ui/modals';
-import { FormField, SelectField, NumberField } from '@/components/forms';
+import { FormField, SelectField, NumberField, SingleEmployeeSelector } from '@/components/forms';
 import { validateClaimType, type ClaimTypeData } from '@/lib/validation';
 import { useEmployees } from '@/hooks/useEmployees';
 import { usePositions } from '@/hooks/usePositions';
@@ -46,7 +46,7 @@ export const ClaimTypeUpdateModal: React.FC<ClaimTypeUpdateModalProps> = ({
       submitButtonText="Update Settlement Item"
       size="md"
     >
-      {({ values, handleChange, errors }) => (
+      {({ values, handleChange, errors, setFieldValue }) => (
         <>
           <FormField
             name="settlement_item"
@@ -71,18 +71,14 @@ export const ClaimTypeUpdateModal: React.FC<ClaimTypeUpdateModalProps> = ({
             icon={<Money size={18} weight="duotone" className="text-gray-500" />}
           />
 
-          <SelectField
-            name="settler_id"
+          <SingleEmployeeSelector
             label="Settler"
             value={values.settler_id || ''}
-            onChange={handleChange}
+            onChange={(value) => setFieldValue('settler_id', value)}
+            employees={allSettlers}
+            placeholder="Search and select settler..."
             error={errors.settler_id}
             required
-            placeholder="Select Settler"
-            options={allSettlers.map((employee: any) => ({
-              value: employee.id,
-              label: employee.name
-            }))}
           />
 
           <SelectField

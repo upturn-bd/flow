@@ -4,17 +4,11 @@ import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
 import { DatabaseError } from "@/lib/utils/auth";
-
-// Define type for employee info
-export type EmployeeInfo = {
-  id: string;
-  name: string;
-  department_id: number;
-};
+import { Employee } from "@/lib/types/schemas";
 
 export function useEmployeeInfo() {
   const { employeeInfo } = useAuth();
-  const [employees, setEmployees] = useState<EmployeeInfo[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +24,7 @@ export function useEmployeeInfo() {
 
       const { data, error } = await supabase
         .from("employees")
-        .select("id, first_name, last_name, department_id")
+        .select("id, first_name, last_name, email, designation, department_id(name)")
         .eq("company_id", companyId);
 
       if (error) {
@@ -40,7 +34,9 @@ export function useEmployeeInfo() {
       const employees = data?.map((employee) => ({
         id: employee.id,
         name: `${employee.first_name} ${employee.last_name}`,
-        department_id: employee.department_id
+        email: employee.email,
+        designation: employee.designation || undefined,
+        department: (employee.department_id as unknown as { name: string })?.name || undefined
       })) || [];
 
       setEmployees(employees);

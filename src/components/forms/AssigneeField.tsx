@@ -3,15 +3,7 @@ import { MagnifyingGlass as Search, X, Check } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { matchesEmployeeSearch } from '@/lib/utils/user-search';
-
-interface Employee {
-  id: string | number;
-  name: string;
-  email?: string;
-  position?: string;
-  designation?: string;
-  avatar?: string;
-}
+import { Employee } from '@/lib/types/schemas';
 
 interface AssigneeFieldProps {
   value: string[];

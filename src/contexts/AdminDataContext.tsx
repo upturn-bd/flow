@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useAuth } from "@/lib/auth/auth-context";
+import { Employee } from "@/lib/types/schemas";
 
 // Import all the hooks we need
 import { useDepartments } from "@/hooks/useDepartments";
@@ -17,7 +18,7 @@ interface AdminDataContextType {
   divisions: any[];
   grades: any[];
   positions: any[];
-  employees: any[];
+  employees: Employee[];
   companyInfo: any | null;
   countries: any[];
   industries: any[];

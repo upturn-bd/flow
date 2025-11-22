@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { FormModal } from '@/components/ui/modals';
-import { FormField, SelectField, TextAreaField, NumberField } from '@/components/forms';
+import { FormField, SelectField, TextAreaField, NumberField, SingleEmployeeSelector } from '@/components/forms';
 import { validateRequisitionInventory, type RequisitionInventoryData } from '@/lib/validation';
 import { useDepartments } from '@/hooks/useDepartments';
 import { useEmployees } from '@/hooks/useEmployees';
@@ -59,7 +59,7 @@ export const RequisitionInventoryCreateModal: React.FC<RequisitionInventoryCreat
       submitButtonText="Create Item"
       size="md"
     >
-      {({ values, handleChange, errors }) => {
+      {({ values, handleChange, errors, setFieldValue }) => {
         const handleIncrement = () => {
           const event = {
             target: {
@@ -118,18 +118,14 @@ export const RequisitionInventoryCreateModal: React.FC<RequisitionInventoryCreat
               onDecrement={handleDecrement}
             />
 
-            <SelectField
-              name="asset_owner"
+            <SingleEmployeeSelector
               label="Asset Owner"
               value={values.asset_owner}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue('asset_owner', value)}
+              employees={assetOwners}
+              placeholder="Search and select asset owner..."
               error={errors.asset_owner}
               required
-              placeholder="Select Asset Owner"
-              options={assetOwners.map((employee: any) => ({
-                value: employee.id,
-                label: employee.name
-              }))}
             />
 
             <SelectField

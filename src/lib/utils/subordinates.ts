@@ -5,8 +5,8 @@
 
 import { supabase } from "@/lib/supabase/client";
 
-// Employee interface for subordinate operations
-interface Employee {
+// Employee interface for subordinate operations - extends base with supervisor relationship
+interface EmployeeWithSupervisor {
   id: string;
   supervisor_id?: string | null;
   company_id: number;
@@ -92,7 +92,7 @@ export async function fetchSubordinates(
       return [];
     }
 
-    const subordinates: Employee[] = [];
+    const subordinates: EmployeeWithSupervisor[] = [];
     const processedIds = new Set<string>();
     const toProcess: string[] = [supervisorId];
 
@@ -260,7 +260,7 @@ export async function getSupervisorChain(
   companyId: number
 ): Promise<Employee[]> {
   try {
-    const chain: Employee[] = [];
+    const chain: EmployeeWithSupervisor[] = [];
     let currentId = employeeId;
     let maxDepth = 10;
     let depth = 0;

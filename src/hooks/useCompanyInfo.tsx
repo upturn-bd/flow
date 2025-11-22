@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { getCompanyInfo as getCompanyInfoApi, updateCompanySettings as updateCompanySettingsApi } from "@/lib/utils/auth";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
+import { Employee } from "@/lib/types/schemas";
 
 interface CompanyInfo {
   id: number;
@@ -33,7 +34,7 @@ export function useCompanyInfo() {
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
   const [industries, setIndustries] = useState<Industry[]>([]);
-  const [employees, setEmployees] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -47,7 +48,19 @@ export function useCompanyInfo() {
         getCompanyInfoApi(),
         supabase.from('countries').select('id, name').order('name'),
         supabase.from('industries').select('id, name').order('name'),
-        supabase.from('employees').select('id, first_name, last_name, email, designation').then(res => res.data || [])
+        supabase.from('employees').select('id, first_name, last_name, email, designation, department_id(name)').then(res => {
+          if (res.error) {
+            console.error('Failed to fetch employees:', res.error);
+            return [];
+          }
+          return (res.data || []).map(emp => ({
+            id: emp.id,
+            name: `${emp.first_name} ${emp.last_name}`,
+            email: emp.email,
+            designation: emp.designation || undefined,
+            department: (emp.department_id as unknown as { name: string })?.name || undefined
+          }));
+        })
       ]);
       
       setCompanyInfo(companyResult);
