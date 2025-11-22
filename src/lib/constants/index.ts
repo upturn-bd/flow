@@ -171,6 +171,17 @@ export const ROUTES = {
     SETTLEMENT: '/admin/settlement',
     SUPERVISOR: '/admin/supervisor-lineage',
   },
+
+  // Superadmin Routes
+  SUPERADMIN: {
+    BASE: '/sa',
+    DASHBOARD: '/sa',
+    COMPANIES: '/sa/companies',
+    COUNTRIES: '/sa/countries',
+    INDUSTRIES: '/sa/industries',
+    TEAMS: '/sa/teams',
+    USERS: '/sa/users',
+  },
   
   // API Routes
   API: {

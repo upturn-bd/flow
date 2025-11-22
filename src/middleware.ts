@@ -78,6 +78,24 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Check for superadmin routes
+  const isSuperadminRoute = currentPath.startsWith("/sa");
+
+  if (isSuperadminRoute) {
+    // Check if user is a superadmin
+    const { data: superadminData, error: superadminError } = await supabase
+      .rpc('is_superadmin', { check_user_id: supabaseUser.id });
+
+    if (superadminError || !superadminData) {
+      console.log('🚫 [MIDDLEWARE] Superadmin access denied for user:', supabaseUser.id);
+      url.pathname = "/unauthorized";
+      return NextResponse.redirect(url);
+    }
+
+    console.log('✅ [MIDDLEWARE] Superadmin access granted for user:', supabaseUser.id);
+    return response;
+  }
+
   // Redirect "/" to "/home"
   if (currentPath === "/") {
     url.pathname = "/home";
