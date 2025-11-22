@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { ChartBar, Buildings, Users, GlobeHemisphereWest, Factory } from "@phosphor-icons/react";
@@ -147,41 +148,41 @@ export default function SuperadminDashboard() {
           Quick Actions
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <a
+          <Link
             href="/sa/companies"
             className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
           >
             <Buildings size={24} className="text-blue-600" />
             <span className="text-gray-900 font-medium">Manage Companies</span>
-          </a>
-          <a
+          </Link>
+          <Link
             href="/sa/countries"
             className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors"
           >
             <GlobeHemisphereWest size={24} className="text-purple-600" />
             <span className="text-gray-900 font-medium">Manage Countries</span>
-          </a>
-          <a
+          </Link>
+          <Link
             href="/sa/industries"
             className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors"
           >
             <Factory size={24} className="text-orange-600" />
             <span className="text-gray-900 font-medium">Manage Industries</span>
-          </a>
-          <a
+          </Link>
+          <Link
             href="/sa/teams"
             className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors"
           >
             <Users size={24} className="text-green-600" />
             <span className="text-gray-900 font-medium">Manage Teams</span>
-          </a>
-          <a
+          </Link>
+          <Link
             href="/sa/users"
             className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 transition-colors"
           >
             <ChartBar size={24} className="text-red-600" />
             <span className="text-gray-900 font-medium">Manage Superadmins</span>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

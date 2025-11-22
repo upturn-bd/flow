@@ -41,7 +41,7 @@ export default function CompaniesPage() {
         supabase.from("industries").select("*").order("name"),
       ]);
 
-      if (companiesResult.data) setCompanies(companiesResult.data as any);
+      if (companiesResult.data) setCompanies(companiesResult.data as Company[]);
       if (countriesResult.data) setCountries(countriesResult.data);
       if (industriesResult.data) setIndustries(industriesResult.data);
     } catch (error) {

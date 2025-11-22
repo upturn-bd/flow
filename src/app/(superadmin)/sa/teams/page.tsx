@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import type { Company, Team, TeamMember } from "@/lib/types/schemas";
+import type { Company, Team } from "@/lib/types/schemas";
 import { MagnifyingGlass, Users, Pencil, Trash, Plus } from "@phosphor-icons/react";
 
 interface TeamWithDetails extends Team {
@@ -27,6 +27,7 @@ export default function TeamsManagementPage() {
     } else {
       setTeams([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCompany]);
 
   const fetchCompanies = async () => {
@@ -64,9 +65,9 @@ export default function TeamsManagementPage() {
       if (teamsError) throw teamsError;
 
       // Transform the data to include member_count
-      const teamsWithCount = teamsData?.map((team: any) => ({
+      const teamsWithCount = teamsData?.map((team: Record<string, unknown>) => ({
         ...team,
-        member_count: team.team_members?.[0]?.count || 0,
+        member_count: (team.team_members as Array<{ count: number }>)?.[0]?.count || 0,
       })) || [];
 
       setTeams(teamsWithCount);

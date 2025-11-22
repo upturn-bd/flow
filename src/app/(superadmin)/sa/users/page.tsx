@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Superadmin, Company } from "@/lib/types/schemas";
 import { Plus, Trash, MagnifyingGlass, X } from "@phosphor-icons/react";
-import { matchesEmployeeSearch, filterEmployeesBySearch } from "@/lib/utils/user-search";
+import { filterEmployeesBySearch } from "@/lib/utils/user-search";
 
 interface EmployeeSearchResult {
   id: string;
@@ -36,6 +36,7 @@ export default function SuperadminUsersPage() {
     } else {
       setEmployees([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCompany]);
 
   const fetchData = async () => {
@@ -52,7 +53,7 @@ export default function SuperadminUsersPage() {
         supabase.from("companies").select("*").order("name"),
       ]);
 
-      if (superadminsResult.data) setSuperadmins(superadminsResult.data as any);
+      if (superadminsResult.data) setSuperadmins(superadminsResult.data as Superadmin[]);
       if (companiesResult.data) setCompanies(companiesResult.data);
     } catch (error) {
       console.error("Error fetching data:", error);
