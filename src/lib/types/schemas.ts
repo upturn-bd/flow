@@ -823,3 +823,59 @@ export interface TeamWithMembers extends Team {
 export interface TeamWithPermissions extends Team {
   permissions?: TeamPermission[];
 }
+// ==============================================================================
+// Superadmin Types
+// ==============================================================================
+
+export interface Superadmin {
+  id?: number;
+  user_id: string;
+  granted_by?: string;
+  granted_at?: string;
+  notes?: string;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+  // Joined data
+  employee?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    designation?: string;
+  };
+  granted_by_user?: {
+    id: string;
+    email: string;
+  };
+}
+
+export interface Country {
+  id: number;
+  name: string;
+  created_at?: string;
+}
+
+export interface Industry {
+  id: number;
+  name: string;
+  created_at?: string;
+}
+
+export interface Company {
+  id: number;
+  name: string;
+  code: string;
+  industry_id: number;
+  country_id: number;
+  live_absent_enabled?: boolean;
+  payroll_generation_day?: number;
+  fiscal_year_start?: string;
+  live_payroll_enabled?: boolean;
+  has_division?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  // Joined data
+  industry?: Industry;
+  country?: Country;
+}
