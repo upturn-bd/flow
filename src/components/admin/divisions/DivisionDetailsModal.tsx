@@ -1,18 +1,21 @@
 "use client";
 
+"use client";
+
 import { Division } from "@/hooks/useDivisions";
 import { PencilSimple, TrashSimple, User, FileText, X } from "@phosphor-icons/react";
 import { Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
+import { Employee } from "@/lib/types/schemas";
 
 interface DivisionDetailsModalProps {
   division: Division;
   onClose: () => void;
   editDivision: () => void;
   deleteDivision: () => void;
-  employees: { id: string; name: string }[];
+  employees: Employee[];
 }
 
 export default function DivisionDetailsModal({

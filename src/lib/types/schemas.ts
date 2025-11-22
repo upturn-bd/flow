@@ -99,6 +99,18 @@ export interface NoticeType {
   company_id?: number;
 }
 
+/**
+ * Standard Employee interface for consistent employee data across the application.
+ * Use this for all employee selections, listings, and references.
+ */
+export interface Employee {
+  id: string;
+  name: string;
+  email: string;
+  department?: string;
+  designation?: string;
+}
+
 export interface ComplaintsType {
   id?: number;
   name: string;

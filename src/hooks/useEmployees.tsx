@@ -3,18 +3,11 @@
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
-
-export interface Employee {
-  id: string;
-  name: string;
-  role?: string;
-}
+import { Employee } from "@/lib/types/schemas";
 
 export interface ExtendedEmployee extends Employee {
-  email?: string;
+  role?: string;
   phone?: string;
-  department?: string;
-  designation?: string;
   joinDate?: string;
   basic_salary?: number;
 }
@@ -52,15 +45,18 @@ export function useEmployees() {
 
       const { data, error } = await supabase
         .from("employees")
-        .select("id, first_name, last_name")
+        .select("id, first_name, last_name, email, designation, department_id(name)")
         .eq("company_id", companyId)
         .eq("job_status", 'Active');
 
       if (error) throw error;
 
-      const employees = data?.map((employee) => ({
+      const employees: Employee[] = data?.map((employee) => ({
         id: employee.id,
         name: `${employee.first_name} ${employee.last_name}`,
+        email: employee.email,
+        designation: employee.designation || undefined,
+        department: (employee.department_id as unknown as { name: string })?.name || undefined
       })) || [];
 
       setEmployees(employees);
@@ -96,9 +92,9 @@ export function useEmployees() {
         id: employee.id,
         name: `${employee.first_name} ${employee.last_name}`,
         email: employee.email,
+        designation: employee.designation || undefined,
+        department: (employee.department_id as unknown as { name: string })?.name || undefined,
         phone: employee.phone_number,
-        department: (employee.department_id as unknown as { name: string })?.name,
-        designation: employee.designation,
         joinDate: employee.hire_date,
         basic_salary: employee.basic_salary,
       })) || [];
@@ -163,6 +159,8 @@ export function useEmployees() {
         id: employee.id,
         name: `${employee.first_name} ${employee.last_name}`,
         email: employee.email,
+        designation: undefined,
+        department: undefined,
         role: employee.role,
       })) || [];
       

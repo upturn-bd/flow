@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { Calendar, DollarSign, User, FileText, Edit, Trash2, ExternalLink, AlertCircle } from "lucide-react";
+import { Employee } from "@/lib/types/schemas";
 
 interface Settlement {
   id: number;
@@ -21,11 +22,6 @@ interface SettlementType {
   id: number;
   name: string;
   allowance?: number;
-}
-
-interface Employee {
-  id: string;
-  name: string;
 }
 
 interface SettlementCardProps {

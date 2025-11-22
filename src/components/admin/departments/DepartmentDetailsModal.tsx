@@ -1,11 +1,14 @@
 "use client";
 
+"use client";
+
 import { Department } from "@/hooks/useDepartments";
 import { Division } from "@/hooks/useDivisions";
 import { PencilSimple, TrashSimple, Building, User, StackSimple, FileText, X } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
+import { Employee } from "@/lib/types/schemas";
 
 interface DepartmentDetailsModalProps {
   department: Department;
@@ -13,7 +16,7 @@ interface DepartmentDetailsModalProps {
   onClose: () => void;
   editDepartment: () => void;
   deleteDepartment: () => void;
-  employees: { id: string; name: string }[];
+  employees: Employee[];
 }
 
 export default function DepartmentDetailsModal({

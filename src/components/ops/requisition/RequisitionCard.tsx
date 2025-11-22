@@ -18,12 +18,7 @@ import {
 import { motion } from "framer-motion";
 
 import { RequisitionType, RequisitionInventory } from "@/lib/types";
-
-
-interface Employee {
-  id: string;
-  name: string;
-}
+import { Employee } from "@/lib/types/schemas";
 
 export interface RequisitionCardProps {
   req: any;

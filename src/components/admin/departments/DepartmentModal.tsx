@@ -16,6 +16,7 @@ import {
 } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 import { getCompanyInfo } from "@/lib/utils/auth";
+import { Employee } from "@/lib/types/schemas";
 
 interface DepartmentModalProps {
   isOpen: boolean;
@@ -23,7 +24,7 @@ interface DepartmentModalProps {
   onSubmit: (values: Department) => void;
   onClose: () => void;
   isLoading?: boolean;
-  employees?: { id: string; name: string }[];
+  employees?: Employee[];
   divisions: any[];
 }
 

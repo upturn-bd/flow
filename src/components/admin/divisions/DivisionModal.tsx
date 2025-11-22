@@ -7,13 +7,14 @@ import { validateDivision, validationErrorsToObject } from "@/lib/utils/validati
 import { BaseModal } from "@/components/ui/modals";
 import { FormField, SingleEmployeeSelector } from "@/components/forms";
 import { Button } from "@/components/ui/button";
+import { Employee } from "@/lib/types/schemas";
 
 interface DivisionModalProps {
   isOpen: boolean;
   initialData?: Division | null;
   onSubmit: (values: Division) => void;
   onClose: () => void;
-  employees: { id: string; name: string }[];
+  employees: Employee[];
 }
 
 export default function DivisionModal({

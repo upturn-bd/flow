@@ -4,11 +4,7 @@ import { Card, CardHeader, CardContent, CardFooter, StatusBadge, InfoRow } from 
 import { ExternalLink, Trash2, Edit, Clock, Calendar, Building2, User, Target } from "lucide-react";
 import { Project } from "@/hooks/useProjects";
 import Link from "next/link";
-
-interface Employee {
-  id: number | string;
-  name: string;
-}
+import { Employee } from "@/lib/types/schemas";
 
 interface Department {
   id: number | string;
