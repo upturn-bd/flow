@@ -23,7 +23,6 @@
 CREATE TABLE IF NOT EXISTS superadmins (
   id SERIAL PRIMARY KEY,
   user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
-  employee_id UUID REFERENCES employees(id) ON DELETE SET NULL,
   granted_by UUID REFERENCES auth.users(id),
   granted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   notes TEXT,
@@ -34,113 +33,82 @@ CREATE TABLE IF NOT EXISTS superadmins (
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_superadmins_user_id ON superadmins(user_id);
-CREATE INDEX IF NOT EXISTS idx_superadmins_employee_id ON superadmins(employee_id);
 CREATE INDEX IF NOT EXISTS idx_superadmins_is_active ON superadmins(is_active);
 
 -- Add comment
 COMMENT ON TABLE superadmins IS 'Stores users who have superadmin access to manage the entire SaaS platform';
 COMMENT ON COLUMN superadmins.user_id IS 'Reference to auth.users - the authenticated user with superadmin privileges';
-COMMENT ON COLUMN superadmins.employee_id IS 'Optional reference to employees table if superadmin is also an employee';
 COMMENT ON COLUMN superadmins.granted_by IS 'User who granted superadmin access';
 COMMENT ON COLUMN superadmins.is_active IS 'Whether the superadmin access is currently active';
 
 -- ==============================================================================
--- PART 2: RLS POLICIES
+-- PART 2: HELPER FUNCTION (SECURITY DEFINER TO AVOID RLS RECURSION)
+-- ==============================================================================
+
+-- Function to check if a user is an active superadmin
+-- SECURITY DEFINER allows it to bypass RLS and avoid infinite recursion
+CREATE OR REPLACE FUNCTION is_superadmin(check_user_id UUID DEFAULT auth.uid())
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+STABLE
+AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM superadmins
+    WHERE user_id = check_user_id
+    AND is_active = TRUE
+  );
+END;
+$$;
+
+-- Grant execute permission to authenticated users
+GRANT EXECUTE ON FUNCTION is_superadmin(UUID) TO authenticated;
+
+COMMENT ON FUNCTION is_superadmin IS 'Checks if a user is an active superadmin. Uses SECURITY DEFINER to bypass RLS and prevent infinite recursion.';
+
+-- ==============================================================================
+-- PART 3: RLS POLICIES
 -- ==============================================================================
 
 -- Enable RLS on superadmins table
 ALTER TABLE superadmins ENABLE ROW LEVEL SECURITY;
 
 -- Only superadmins can view the superadmins table
+-- Using the security definer function to avoid recursion
 CREATE POLICY "Superadmins can view all superadmin records"
   ON superadmins
   FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM superadmins sa
-      WHERE sa.user_id = auth.uid()
-      AND sa.is_active = TRUE
-    )
-  );
+  USING (is_superadmin());
 
 -- Only superadmins can insert new superadmin records
 CREATE POLICY "Superadmins can insert superadmin records"
   ON superadmins
   FOR INSERT
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM superadmins sa
-      WHERE sa.user_id = auth.uid()
-      AND sa.is_active = TRUE
-    )
-  );
+  WITH CHECK (is_superadmin());
 
 -- Only superadmins can update superadmin records
 CREATE POLICY "Superadmins can update superadmin records"
   ON superadmins
   FOR UPDATE
-  USING (
-    EXISTS (
-      SELECT 1 FROM superadmins sa
-      WHERE sa.user_id = auth.uid()
-      AND sa.is_active = TRUE
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM superadmins sa
-      WHERE sa.user_id = auth.uid()
-      AND sa.is_active = TRUE
-    )
-  );
+  USING (is_superadmin())
+  WITH CHECK (is_superadmin());
 
 -- Only superadmins can delete superadmin records
 CREATE POLICY "Superadmins can delete superadmin records"
   ON superadmins
   FOR DELETE
-  USING (
-    EXISTS (
-      SELECT 1 FROM superadmins sa
-      WHERE sa.user_id = auth.uid()
-      AND sa.is_active = TRUE
-    )
-  );
+  USING (is_superadmin());
 
 -- ==============================================================================
--- PART 3: HELPER FUNCTIONS
+-- PART 4: ADDITIONAL HELPER FUNCTIONS
 -- ==============================================================================
-
--- Function to check if a user is a superadmin
-CREATE OR REPLACE FUNCTION is_superadmin(check_user_id UUID DEFAULT NULL)
-RETURNS BOOLEAN
-LANGUAGE plpgsql
-SECURITY DEFINER
-STABLE
-AS $$
-DECLARE
-  target_user_id UUID;
-BEGIN
-  -- Use provided user_id or current user
-  target_user_id := COALESCE(check_user_id, auth.uid());
-  
-  -- Return true if user is an active superadmin
-  RETURN EXISTS (
-    SELECT 1 
-    FROM superadmins 
-    WHERE user_id = target_user_id 
-    AND is_active = TRUE
-  );
-END;
-$$;
-
-COMMENT ON FUNCTION is_superadmin IS 'Check if a user has active superadmin privileges';
 
 -- Function to get superadmin info for a user
 CREATE OR REPLACE FUNCTION get_superadmin_info(check_user_id UUID DEFAULT NULL)
 RETURNS TABLE (
   id INTEGER,
   user_id UUID,
-  employee_id UUID,
   granted_at TIMESTAMP WITH TIME ZONE,
   is_active BOOLEAN
 )
@@ -159,7 +127,6 @@ BEGIN
   SELECT 
     sa.id,
     sa.user_id,
-    sa.employee_id,
     sa.granted_at,
     sa.is_active
   FROM superadmins sa

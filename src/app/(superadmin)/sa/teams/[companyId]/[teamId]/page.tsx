@@ -40,8 +40,13 @@ interface TeamPermissionWithModule extends TeamPermission {
 export default function TeamDetailPage() {
   const params = useParams();
   const router = useRouter();
+  
+  // Validate and parse route parameters
   const companyId = parseInt(params.companyId as string);
   const teamId = parseInt(params.teamId as string);
+
+  // Validate that parameters are valid numbers
+  const isValidParams = !isNaN(companyId) && !isNaN(teamId) && companyId > 0 && teamId > 0;
 
   const [team, setTeam] = useState<Team | null>(null);
   const [members, setMembers] = useState<TeamMemberWithEmployee[]>([]);
@@ -56,12 +61,25 @@ export default function TeamDetailPage() {
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeSearchResult | null>(null);
 
   useEffect(() => {
+    if (!isValidParams) {
+      console.error("Invalid route parameters:", { companyId: params.companyId, teamId: params.teamId });
+      toast.error("Invalid team or company ID");
+      router.push("/sa/teams");
+      return;
+    }
+    
     fetchTeamData();
     fetchAllPermissions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamId]);
+  }, [teamId, isValidParams]);
 
   const fetchTeamData = async () => {
+    // Guard clause: Don't fetch if parameters are invalid
+    if (!isValidParams) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       // Fetch team details
@@ -76,11 +94,12 @@ export default function TeamDetailPage() {
       setTeam(teamData);
 
       // Fetch team members
+      // Use !team_members_employee_id_fkey to specify which relationship to use
       const { data: membersData, error: membersError } = await supabase
         .from("team_members")
         .select(`
           *,
-          employee:employees(id, first_name, last_name, email, designation)
+          employee:employees!team_members_employee_id_fkey(id, first_name, last_name, email, designation)
         `)
         .eq("team_id", teamId);
 
@@ -100,6 +119,7 @@ export default function TeamDetailPage() {
       setPermissions((permissionsData as TeamPermissionWithModule[]) || []);
     } catch (error) {
       console.error("Error fetching team data:", error);
+      toast.error("Failed to load team data");
     } finally {
       setLoading(false);
     }

@@ -14,6 +14,7 @@ export default function CompaniesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [companyStats, setCompanyStats] = useState<Record<number, { employees: number; teams: number }>>({});
   const [formData, setFormData] = useState({
     name: "",
     code: "",
@@ -25,6 +26,7 @@ export default function CompaniesPage() {
     live_payroll_enabled: false,
     has_division: false,
   });
+  const [codeError, setCodeError] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -42,7 +44,26 @@ export default function CompaniesPage() {
         supabase.from("industries").select("*").order("name"),
       ]);
 
-      if (companiesResult.data) setCompanies(companiesResult.data as Company[]);
+      if (companiesResult.data) {
+        setCompanies(companiesResult.data as Company[]);
+        
+        // Fetch stats for each company
+        const stats: Record<number, { employees: number; teams: number }> = {};
+        await Promise.all(
+          companiesResult.data.map(async (company) => {
+            const [employeesCount, teamsCount] = await Promise.all([
+              supabase.from("employees").select("id", { count: "exact", head: true }).eq("company_id", company.id),
+              supabase.from("teams").select("id", { count: "exact", head: true }).eq("company_id", company.id),
+            ]);
+            stats[company.id] = {
+              employees: employeesCount.count || 0,
+              teams: teamsCount.count || 0,
+            };
+          })
+        );
+        setCompanyStats(stats);
+      }
+      
       if (countriesResult.data) setCountries(countriesResult.data);
       if (industriesResult.data) setIndustries(industriesResult.data);
     } catch (error) {
@@ -52,8 +73,32 @@ export default function CompaniesPage() {
     }
   };
 
+  const validateCode = (code: string): string => {
+    if (code.length <= 8) {
+      return "Code must be more than 8 characters";
+    }
+    if (!/[A-Z]/.test(code)) {
+      return "Code must contain at least one uppercase letter";
+    }
+    if (!/[a-z]/.test(code)) {
+      return "Code must contain at least one lowercase letter";
+    }
+    if (!/\W/.test(code)) {
+      return "Code must contain at least one special character";
+    }
+    return "";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate company code
+    const codeValidationError = validateCode(formData.code);
+    if (codeValidationError) {
+      setCodeError(codeValidationError);
+      toast.error(codeValidationError);
+      return;
+    }
     
     try {
       const payload = {
@@ -69,13 +114,27 @@ export default function CompaniesPage() {
       };
 
       if (editingCompany) {
-        await supabase
+        const { error } = await supabase
           .from("companies")
           .update(payload)
           .eq("id", editingCompany.id);
+        
+        if (error) {
+          console.error("Error updating company:", error);
+          toast.error(error.message || "Failed to update company");
+          return;
+        }
+        
         toast.success("Company updated successfully");
       } else {
-        await supabase.from("companies").insert([payload]);
+        const { error } = await supabase.from("companies").insert([payload]);
+        
+        if (error) {
+          console.error("Error creating company:", error);
+          toast.error(error.message || "Failed to create company");
+          return;
+        }
+        
         toast.success("Company created successfully");
       }
 
@@ -89,12 +148,35 @@ export default function CompaniesPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this company? This will delete all related data.")) {
+    const stats = companyStats[id];
+    const hasData = stats && (stats.employees > 0 || stats.teams > 0);
+    
+    let confirmMessage = "Are you sure you want to delete this company?";
+    if (hasData) {
+      confirmMessage = `This company has ${stats.employees} employee(s) and ${stats.teams} team(s). Deleting it will remove all related data. Are you sure?`;
+    }
+    
+    if (!confirm(confirmMessage)) {
       return;
     }
 
     try {
-      await supabase.from("companies").delete().eq("id", id);
+      const { error } = await supabase.from("companies").delete().eq("id", id);
+      
+      if (error) {
+        console.error("Error deleting company:", error);
+        
+        // Check if it's a foreign key constraint error
+        if (error.code === '23503') {
+          toast.error("Cannot delete company: It has associated employees, teams, or other data. Please remove or reassign them first.");
+        } else if (error.message) {
+          toast.error(error.message);
+        } else {
+          toast.error("Failed to delete company");
+        }
+        return;
+      }
+      
       toast.success("Company deleted successfully");
       fetchData();
     } catch (error) {
@@ -132,6 +214,7 @@ export default function CompaniesPage() {
       live_payroll_enabled: false,
       has_division: false,
     });
+    setCodeError("");
   };
 
   const filteredCompanies = companies.filter((company) =>
@@ -186,6 +269,7 @@ export default function CompaniesPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Industry</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Country</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Settings</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
@@ -204,6 +288,16 @@ export default function CompaniesPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-600">
                       {company.country?.name || "-"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex gap-2 text-xs text-gray-600">
+                        <span className="px-2 py-1 bg-gray-100 rounded">
+                          {companyStats[company.id]?.employees || 0} employees
+                        </span>
+                        <span className="px-2 py-1 bg-gray-100 rounded">
+                          {companyStats[company.id]?.teams || 0} teams
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-wrap gap-1">
@@ -281,9 +375,26 @@ export default function CompaniesPage() {
                     type="text"
                     required
                     value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => {
+                      const newCode = e.target.value;
+                      setFormData({ ...formData, code: newCode });
+                      if (newCode) {
+                        setCodeError(validateCode(newCode));
+                      } else {
+                        setCodeError("");
+                      }
+                    }}
+                    placeholder="e.g., MyCompany@2024"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                      codeError ? 'border-red-300 focus:border-red-500' : 'border-gray-300'
+                    }`}
                   />
+                  {codeError && (
+                    <p className="mt-1 text-xs text-red-600">{codeError}</p>
+                  )}
+                  <p className="mt-1 text-xs text-gray-500">
+                    Must be 9+ characters with uppercase, lowercase, and special character
+                  </p>
                 </div>
 
                 <div>

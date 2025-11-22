@@ -830,7 +830,6 @@ export interface TeamWithPermissions extends Team {
 export interface Superadmin {
   id?: number;
   user_id: string;
-  employee_id?: string;
   granted_by?: string;
   granted_at?: string;
   notes?: string;

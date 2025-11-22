@@ -43,21 +43,39 @@ export default function SuperadminUsersPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [superadminsResult, companiesResult] = await Promise.all([
-        supabase
-          .from("superadmins")
-          .select(`
-            *,
-            employee:employees(id, first_name, last_name, email, designation)
-          `)
-          .order("created_at", { ascending: false }),
-        supabase.from("companies").select("*").order("name"),
-      ]);
+      // Fetch superadmins with joined employee data
+      const { data: superadminsData, error: superadminsError } = await supabase
+        .from("superadmins")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-      if (superadminsResult.data) setSuperadmins(superadminsResult.data as Superadmin[]);
-      if (companiesResult.data) setCompanies(companiesResult.data);
+      if (superadminsError) throw superadminsError;
+
+      // Fetch employee data for each superadmin
+      let enrichedSuperadmins: Superadmin[] = [];
+      if (superadminsData) {
+        const employeeIds = superadminsData.map(sa => sa.user_id);
+        const { data: employeesData } = await supabase
+          .from("employees")
+          .select("id, first_name, last_name, email, designation")
+          .in("id", employeeIds);
+
+        enrichedSuperadmins = superadminsData.map(sa => ({
+          ...sa,
+          employee: employeesData?.find(emp => emp.id === sa.user_id)
+        }));
+      }
+
+      const { data: companiesData } = await supabase
+        .from("companies")
+        .select("*")
+        .order("name");
+
+      setSuperadmins(enrichedSuperadmins);
+      if (companiesData) setCompanies(companiesData);
     } catch (error) {
       console.error("Error fetching data:", error);
+      toast.error("Failed to load superadmins");
     } finally {
       setLoading(false);
     }
@@ -93,7 +111,6 @@ export default function SuperadminUsersPage() {
       const { error } = await supabase.from("superadmins").insert([
         {
           user_id: selectedEmployee.id,
-          employee_id: selectedEmployee.id,
           granted_by: user?.id,
           notes: notes || null,
           is_active: true,

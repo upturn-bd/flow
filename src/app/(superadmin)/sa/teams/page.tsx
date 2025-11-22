@@ -66,14 +66,29 @@ export default function TeamsManagementPage() {
       if (teamsError) throw teamsError;
 
       // Transform the data to include member_count
-      const teamsWithCount = teamsData?.map((team: Record<string, unknown>) => ({
-        ...team,
-        member_count: (team.team_members as Array<{ count: number }>)?.[0]?.count || 0,
-      })) || [];
+      const teamsWithCount = teamsData?.map((team) => {
+        // Extract the team_members count from the aggregation
+        const memberCount = Array.isArray(team.team_members) 
+          ? team.team_members.length 
+          : (team.team_members as unknown as { count: number })?.count || 0;
+        
+        return {
+          id: team.id,
+          name: team.name,
+          description: team.description,
+          company_id: team.company_id,
+          is_default: team.is_default,
+          created_at: team.created_at,
+          updated_at: team.updated_at,
+          created_by: team.created_by,
+          member_count: memberCount,
+        } as TeamWithDetails;
+      }) || [];
 
       setTeams(teamsWithCount);
     } catch (error) {
       console.error("Error fetching teams:", error);
+      toast.error("Failed to load teams");
     } finally {
       setLoading(false);
     }
@@ -193,14 +208,16 @@ export default function TeamsManagementPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end space-x-2">
-                          <a
-                            href={`/sa/teams/${selectedCompany}/${team.id}`}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                            title="Manage Team"
-                          >
-                            <Pencil size={18} />
-                          </a>
-                          {!team.is_default && (
+                          {team.id ? (
+                            <a
+                              href={`/sa/teams/${selectedCompany}/${team.id}`}
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                              title="Manage Team"
+                            >
+                              <Pencil size={18} />
+                            </a>
+                          ) : null}
+                          {!team.is_default && team.id && (
                             <button
                               onClick={() => handleDeleteTeam(team.id!)}
                               className="p-2 text-red-600 hover:bg-red-50 rounded"
