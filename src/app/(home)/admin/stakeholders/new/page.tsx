@@ -23,6 +23,8 @@ export default function NewStakeholderPage() {
     parent_stakeholder_id: "",
   });
 
+  const [createAsPermanent, setCreateAsPermanent] = useState(false);
+
   const [contactPersons, setContactPersons] = useState<ContactPerson[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -62,7 +64,8 @@ export default function NewStakeholderPage() {
       newErrors.name = "Name is required";
     }
 
-    if (!formData.process_id) {
+    // Process is only required for leads, not permanent stakeholders
+    if (!createAsPermanent && !formData.process_id) {
       newErrors.process_id = "Please select a process";
     }
 
@@ -96,12 +99,13 @@ export default function NewStakeholderPage() {
       await createStakeholder({
         name: formData.name.trim(),
         address: formData.address.trim() || undefined,
-        process_id: parseInt(formData.process_id),
+        process_id: formData.process_id ? parseInt(formData.process_id) : undefined,
         stakeholder_type_id: formData.stakeholder_type_id ? parseInt(formData.stakeholder_type_id) : undefined,
         parent_stakeholder_id: formData.parent_stakeholder_id ? parseInt(formData.parent_stakeholder_id) : undefined,
         contact_persons: validContactPersons,
-        is_active: true, // New leads are active by default
-        kam_id: formData.kam_id || undefined, // Changed from issue_handler_id
+        is_active: true,
+        kam_id: formData.kam_id || undefined,
+        createAsPermanent, // Pass the permanent flag
       });
 
       router.push("/admin/stakeholders");
@@ -113,8 +117,8 @@ export default function NewStakeholderPage() {
     }
   };
 
-  // Show error if no processes exist
-  if (!loading && activeProcesses.length === 0) {
+  // Show error if no processes exist (only for lead creation)
+  if (!loading && !createAsPermanent && activeProcesses.length === 0) {
     return (
       <div className="p-4 sm:p-6">
         <button
@@ -161,7 +165,35 @@ export default function NewStakeholderPage() {
       </button>
 
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Add New Lead</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+          {createAsPermanent ? "Add Permanent Stakeholder" : "Add New Lead"}
+        </h1>
+
+        {/* Stakeholder Type Toggle */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={createAsPermanent}
+              onChange={(e) => {
+                setCreateAsPermanent(e.target.checked);
+                // Clear process_id when switching to permanent
+                if (e.target.checked) {
+                  setFormData({ ...formData, process_id: "" });
+                }
+              }}
+              className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <div>
+              <span className="font-medium text-gray-900">Create as Permanent Stakeholder</span>
+              <p className="text-sm text-gray-600 mt-1">
+                {createAsPermanent 
+                  ? "Will be created directly as a permanent stakeholder, skipping the lead process workflow"
+                  : "Will be created as a lead and must go through the configured process to become permanent"}
+              </p>
+            </div>
+          </label>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Basic Information */}
@@ -220,31 +252,33 @@ export default function NewStakeholderPage() {
               </p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Process <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={formData.process_id}
-                onChange={(e) => setFormData({ ...formData, process_id: e.target.value })}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                  errors.process_id ? "border-red-500" : "border-gray-300"
-                }`}
-              >
-                <option value="">Select a process</option>
-                {activeProcesses.map((process) => (
-                  <option key={process.id} value={process.id}>
-                    {process.name} ({process.is_sequential ? "Sequential" : "Independent"})
-                  </option>
-                ))}
-              </select>
-              {errors.process_id && (
-                <p className="text-red-500 text-sm mt-1">{errors.process_id}</p>
-              )}
-              <p className="text-gray-500 text-sm mt-1">
-                Select the workflow process this lead will follow
-              </p>
-            </div>
+            {!createAsPermanent && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Process <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.process_id}
+                  onChange={(e) => setFormData({ ...formData, process_id: e.target.value })}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
+                    errors.process_id ? "border-red-500" : "border-gray-300"
+                  }`}
+                >
+                  <option value="">Select a process</option>
+                  {activeProcesses.map((process) => (
+                    <option key={process.id} value={process.id}>
+                      {process.name} ({process.is_sequential ? "Sequential" : "Independent"})
+                    </option>
+                  ))}
+                </select>
+                {errors.process_id && (
+                  <p className="text-red-500 text-sm mt-1">{errors.process_id}</p>
+                )}
+                <p className="text-gray-500 text-sm mt-1">
+                  Select the workflow process this lead will follow
+                </p>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -414,7 +448,11 @@ export default function NewStakeholderPage() {
               disabled={submitting || loading}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {submitting ? "Creating..." : "Create Lead"}
+              {submitting 
+                ? "Creating..." 
+                : createAsPermanent 
+                  ? "Create Permanent Stakeholder" 
+                  : "Create Lead"}
             </button>
           </div>
         </form>

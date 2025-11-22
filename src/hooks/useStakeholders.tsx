@@ -46,12 +46,13 @@ export interface StakeholderFormData {
   name: string;
   address?: string;
   contact_persons: ContactPerson[];
-  process_id: number;
+  process_id?: number; // Optional - not required for permanent stakeholders
   stakeholder_type_id?: number;
   parent_stakeholder_id?: number;
   is_active: boolean;
   kam_id?: string;
   status?: 'Lead' | 'Permanent' | 'Rejected';
+  createAsPermanent?: boolean; // Flag to create directly as permanent
 }
 
 export interface StakeholderStepDataFormData {
@@ -652,6 +653,61 @@ export function useStakeholders() {
       try {
         const company_id = await getCompanyId();
         const employeeInfo = await getEmployeeInfo();
+
+        // If creating as permanent, skip process validation
+        if (stakeholderData.createAsPermanent) {
+          const { data, error } = await supabase
+            .from("stakeholders")
+            .insert([
+              {
+                name: stakeholderData.name,
+                address: stakeholderData.address,
+                contact_persons: stakeholderData.contact_persons,
+                stakeholder_type_id: stakeholderData.stakeholder_type_id,
+                parent_stakeholder_id: stakeholderData.parent_stakeholder_id,
+                kam_id: stakeholderData.kam_id,
+                company_id,
+                is_active: stakeholderData.is_active,
+                is_completed: true, // Permanent stakeholders are marked as completed
+                completed_at: new Date().toISOString(),
+                status: 'Permanent', // Directly set as Permanent
+                current_step_order: 0, // No process steps
+                created_by: employeeInfo?.id,
+              },
+            ])
+            .select()
+            .single();
+
+          if (error) throw error;
+
+          // Send notification to KAM if assigned
+          if (stakeholderData.kam_id) {
+            try {
+              await createStakeholderNotification(
+                stakeholderData.kam_id,
+                'created',
+                {
+                  stakeholderName: stakeholderData.name,
+                  processName: 'Permanent (No Process)',
+                },
+                {
+                  referenceId: data.id,
+                  actionUrl: `/stakeholders/${data.id}`,
+                }
+              );
+            } catch (notificationError) {
+              console.warn('Failed to send KAM notification:', notificationError);
+            }
+          }
+
+          await fetchStakeholders();
+          return data;
+        }
+
+        // Original lead creation flow with process
+        if (!stakeholderData.process_id) {
+          throw new Error("Process ID is required for lead creation");
+        }
 
         const process = await fetchProcessById(stakeholderData.process_id);
         if (!process) {
