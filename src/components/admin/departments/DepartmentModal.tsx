@@ -12,6 +12,7 @@ import {
   FormField,
   SelectField,
   TextAreaField,
+  SingleEmployeeSelector,
 } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 import { getCompanyInfo } from "@/lib/utils/auth";
@@ -91,6 +92,11 @@ export default function DepartmentModal({
     setTouched((prev) => ({ ...prev, [name]: true }));
   };
 
+  const handleHeadChange = (value: string) => {
+    setFormValues((prev) => ({ ...prev, head_id: value }));
+    setTouched((prev) => ({ ...prev, head_id: true }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -128,11 +134,6 @@ export default function DepartmentModal({
   const isDisabled =
     isSubmitting || (initialData ? !isDirty : false) || !isValid;
 
-  const employeeOptions = employees.map((employee) => ({
-    value: employee.id,
-    label: employee.name,
-  }));
-
   const divisionOptions = divisions.map((division) => ({
     value: division.id.toString(),
     label: division.name,
@@ -157,14 +158,13 @@ export default function DepartmentModal({
           required
         />
 
-        <SelectField
+        <SingleEmployeeSelector
           label="Department Head"
-          name="head_id"
-          value={formValues.head_id}
-          onChange={handleChange}
-          options={employeeOptions}
-          placeholder="Select Employee"
-          error={touched.head_id ? (errors.head_id as string) : undefined}
+          value={formValues.head_id || ""}
+          onChange={handleHeadChange}
+          employees={employees}
+          placeholder="Search and select department head..."
+          error={touched.head_id && errors.head_id ? String(errors.head_id) : undefined}
           required
         />
 

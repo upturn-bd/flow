@@ -17,6 +17,7 @@ export { ToggleField } from './ToggleField';
 export { default as MapField } from './MapField';
 export { default as HierarchyField } from './HierarchyField';
 export { default as AssigneeField } from './AssigneeField';
+export { default as SingleEmployeeSelector } from './SingleEmployeeSelector';
 
 // Form containers
 export { default as BaseForm } from './BaseForm';

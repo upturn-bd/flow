@@ -5,7 +5,7 @@ import { dirtyValuesChecker } from "@/lib/utils";
 import { Division } from "@/lib/types/schemas";
 import { validateDivision, validationErrorsToObject } from "@/lib/utils/validation";
 import { BaseModal } from "@/components/ui/modals";
-import { FormField, SelectField } from "@/components/forms";
+import { FormField, SingleEmployeeSelector } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 
 interface DivisionModalProps {
@@ -53,6 +53,10 @@ export default function DivisionModal({
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleHeadChange = (value: string) => {
+    setFormValues((prev) => ({ ...prev, head_id: value }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -85,14 +89,6 @@ export default function DivisionModal({
                     (initialData ? !isDirty : false) || 
                     !isValid;
 
-  // Prepare options for employee select
-  const employeeOptions = [
-    ...employees.map(employee => ({
-      value: employee.id,
-      label: employee.name
-    }))
-  ];
-
   return (
     <BaseModal
       isOpen={isOpen}
@@ -112,14 +108,13 @@ export default function DivisionModal({
           required
         />
 
-        <SelectField
+        <SingleEmployeeSelector
           label="Division Head"
-          name="head_id"
-          value={formValues.head_id}
-          onChange={handleChange}
-          options={employeeOptions}
-          placeholder="Select Employee"
-          error={errors.head_id as string}
+          value={formValues.head_id || ""}
+          onChange={handleHeadChange}
+          employees={employees}
+          placeholder="Search and select division head..."
+          error={errors.head_id ? String(errors.head_id) : undefined}
         />
 
         {/* Action Buttons */}
