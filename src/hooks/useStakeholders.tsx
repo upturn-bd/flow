@@ -34,7 +34,8 @@ export interface StakeholderProcessStepFormData {
   name: string;
   description?: string;
   step_order: number;
-  team_id: number;
+  team_id?: number; // DEPRECATED - Use team_ids instead. Will be removed after migration.
+  team_ids: number[]; // Array of team IDs for multi-team assignment
   field_definitions: FieldDefinitionsSchema;
   use_date_range: boolean;
   start_date?: string;
@@ -283,8 +284,25 @@ export function useStakeholders() {
         throw error;
       }
 
-      setProcessSteps(data || []);
-      return data;
+      // Fetch teams for each step based on team_ids array
+      const stepsWithTeams = await Promise.all(
+        (data || []).map(async (step) => {
+          if (step.team_ids && Array.isArray(step.team_ids) && step.team_ids.length > 0) {
+            const { data: teams, error: teamsError } = await supabase
+              .from("teams")
+              .select("id, name")
+              .in("id", step.team_ids);
+
+            if (!teamsError && teams) {
+              return { ...step, teams };
+            }
+          }
+          return step;
+        })
+      );
+
+      setProcessSteps(stepsWithTeams || []);
+      return stepsWithTeams;
     } catch (error) {
       console.error("Error fetching process steps:", error);
       setError("Failed to fetch process steps");
@@ -756,7 +774,37 @@ export function useStakeholders() {
           }
 
           // Notify team members of the first step
-          if (firstStep.team_id) {
+          if (firstStep.team_ids && firstStep.team_ids.length > 0) {
+            // Get all team members from all assigned teams
+            const { data: teamMembers } = await supabase
+              .from('team_members')
+              .select('employee_id, team_id')
+              .in('team_id', firstStep.team_ids);
+
+            if (teamMembers && teamMembers.length > 0) {
+              // Get unique employee IDs to avoid duplicate notifications
+              const uniqueEmployeeIds = [...new Set(teamMembers.map(m => m.employee_id))];
+              
+              await Promise.all(
+                uniqueEmployeeIds.map((employeeId) =>
+                  createStakeholderNotification(
+                    employeeId,
+                    'assignedToTeam',
+                    {
+                      stakeholderName: stakeholderData.name,
+                      stepName: firstStep.name,
+                      teamName: firstStep.teams?.map(t => t.name).join(', ') || 'Team',
+                    },
+                    {
+                      referenceId: data.id,
+                      actionUrl: `/stakeholders/${data.id}`,
+                    }
+                  )
+                )
+              );
+            }
+          } else if (firstStep.team_id) {
+            // Fallback for backward compatibility
             const { data: teamMembers } = await supabase
               .from('team_members')
               .select('employee_id')
@@ -1068,17 +1116,24 @@ export function useStakeholders() {
             }
 
             // Notify team members about step update
-            if (stepDef.team_id) {
+            const teamIds = stepDef.team_ids && stepDef.team_ids.length > 0 
+              ? stepDef.team_ids 
+              : (stepDef.team_id ? [stepDef.team_id] : []);
+
+            if (teamIds.length > 0) {
               const { data: teamMembers } = await supabase
                 .from('team_members')
                 .select('employee_id')
-                .eq('team_id', stepDef.team_id);
+                .in('team_id', teamIds);
 
               if (teamMembers && teamMembers.length > 0) {
+                // Get unique employee IDs to avoid duplicate notifications
+                const uniqueEmployeeIds = [...new Set(teamMembers.map(m => m.employee_id))];
+                
                 await Promise.all(
-                  teamMembers.map((member) =>
+                  uniqueEmployeeIds.map((employeeId) =>
                     createStakeholderNotification(
-                      member.employee_id,
+                      employeeId,
                       'stepUpdated',
                       {
                         stakeholderName: stakeholderData.name,
@@ -1223,17 +1278,23 @@ export function useStakeholders() {
           }
 
           // Notify current step team members about completion
-          if (completedStep?.team_id) {
+          const currentTeamIds = completedStep?.team_ids && completedStep.team_ids.length > 0
+            ? completedStep.team_ids
+            : (completedStep?.team_id ? [completedStep.team_id] : []);
+
+          if (currentTeamIds.length > 0) {
             const { data: teamMembers } = await supabase
               .from('team_members')
               .select('employee_id')
-              .eq('team_id', completedStep.team_id);
+              .in('team_id', currentTeamIds);
 
             if (teamMembers && teamMembers.length > 0) {
+              const uniqueEmployeeIds = [...new Set(teamMembers.map(m => m.employee_id))];
+              
               await Promise.all(
-                teamMembers.map((member) =>
+                uniqueEmployeeIds.map((employeeId) =>
                   createStakeholderNotification(
-                    member.employee_id,
+                    employeeId,
                     'stepCompleted',
                     {
                       stakeholderName: stakeholderData.name,
@@ -1250,17 +1311,23 @@ export function useStakeholders() {
           }
 
           // Notify next step team members if sequential
-          if (nextStep && nextStep.team_id) {
+          const nextTeamIds = nextStep?.team_ids && nextStep.team_ids.length > 0
+            ? nextStep.team_ids
+            : (nextStep?.team_id ? [nextStep.team_id] : []);
+
+          if (nextStep && nextTeamIds.length > 0) {
             const { data: nextTeamMembers } = await supabase
               .from('team_members')
               .select('employee_id')
-              .eq('team_id', nextStep.team_id);
+              .in('team_id', nextTeamIds);
 
             if (nextTeamMembers && nextTeamMembers.length > 0) {
+              const uniqueEmployeeIds = [...new Set(nextTeamMembers.map(m => m.employee_id))];
+              
               await Promise.all(
-                nextTeamMembers.map((member) =>
+                uniqueEmployeeIds.map((employeeId) =>
                   createStakeholderNotification(
-                    member.employee_id,
+                    employeeId,
                     'assignedToTeam',
                     {
                       stakeholderName: stakeholderData.name,
@@ -1398,17 +1465,23 @@ export function useStakeholders() {
           }
 
           // Notify team members of the rolled back step
-          if (stepBeingRolledBack?.team_id) {
+          const rollbackTeamIds = stepBeingRolledBack?.team_ids && stepBeingRolledBack.team_ids.length > 0
+            ? stepBeingRolledBack.team_ids
+            : (stepBeingRolledBack?.team_id ? [stepBeingRolledBack.team_id] : []);
+
+          if (rollbackTeamIds.length > 0) {
             const { data: teamMembers } = await supabase
               .from('team_members')
               .select('employee_id')
-              .eq('team_id', stepBeingRolledBack.team_id);
+              .in('team_id', rollbackTeamIds);
 
             if (teamMembers && teamMembers.length > 0) {
+              const uniqueEmployeeIds = [...new Set(teamMembers.map(m => m.employee_id))];
+              
               await Promise.all(
-                teamMembers.map((member) =>
+                uniqueEmployeeIds.map((employeeId) =>
                   createStakeholderNotification(
-                    member.employee_id,
+                    employeeId,
                     'stepRolledBack',
                     {
                       stakeholderName: stakeholderData.name,

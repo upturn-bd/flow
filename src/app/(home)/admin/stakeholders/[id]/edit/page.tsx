@@ -13,7 +13,6 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
   const stakeholderId = parseInt(id);
 
   const {
-    processes,
     activeProcesses,
     stakeholders,
     loading,

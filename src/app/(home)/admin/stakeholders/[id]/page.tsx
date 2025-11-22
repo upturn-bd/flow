@@ -576,7 +576,10 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         // Both sequential and independent processes: allow editing incomplete steps
                         // Sequential: only current step
                         // Independent: any incomplete step
-                        const isTeamMember = step.team_id ? userTeamIds.includes(step.team_id) : false;
+                        const stepTeamIds = step.team_ids && step.team_ids.length > 0 
+                          ? step.team_ids 
+                          : (step.team_id ? [step.team_id] : []);
+                        const isTeamMember = stepTeamIds.some(teamId => userTeamIds.includes(teamId));
                         const hasFullWritePermission = hasPermission('stakeholders', 'can_write');
                         const hasTeamAccess = isTeamMember || hasFullWritePermission;
 
@@ -633,12 +636,32 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words">{step.description}</p>
                                     )}
                                     <div className="flex items-center flex-wrap gap-2 sm:gap-4 mt-2 text-xs text-gray-500">
-                                      <span>Team: {step.team?.name || "N/A"}</span>
+                                      <span>
+                                        {step.teams && step.teams.length > 1 ? "Teams: " : "Team: "}
+                                        {step.teams && step.teams.length > 0 ? (
+                                          step.teams.map((team, idx) => (
+                                            <span key={team.id}>
+                                              {team.name}
+                                              {idx < step.teams!.length - 1 && ", "}
+                                            </span>
+                                          ))
+                                        ) : step.team?.name ? (
+                                          step.team.name
+                                        ) : (
+                                          "N/A"
+                                        )}
+                                      </span>
                                     </div>
                                     {/* Show permission/access warnings */}
                                     {!isCompleted && !hasTeamAccess && (
                                       <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded break-words">
-                                        You must be a member of the {step.team?.name || "assigned team"} to work on this step
+                                        You must be a member of {
+                                          step.teams && step.teams.length > 0 
+                                            ? `one of these teams: ${step.teams.map(t => t.name).join(', ')}`
+                                            : step.team?.name 
+                                              ? `the ${step.team.name} team`
+                                              : "the assigned team"
+                                        } to work on this step
                                       </div>
                                     )}
                                     {!isCompleted && hasTeamAccess && isSequential && !isCurrent && (

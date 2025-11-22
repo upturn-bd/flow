@@ -7,6 +7,7 @@ import { Plus, Trash2, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown, Lis
 import { FIELD_TYPES } from "@/lib/constants";
 import Toggle from "@/components/ui/Toggle";
 import FormulaEditor from "./FormulaEditor";
+import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 
 interface StepManagerProps {
   processId: number;
@@ -154,7 +155,23 @@ export default function StepManager({
                     )}
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-gray-500">
                       <span className="inline-flex items-center gap-1">
-                        <span className="font-medium">Team:</span> {step.team?.name || "Not assigned"}
+                        <span className="font-medium">
+                          {step.teams && step.teams.length > 1 ? "Teams:" : "Team:"}
+                        </span>
+                        {step.teams && step.teams.length > 0 ? (
+                          <span className="inline-flex flex-wrap gap-1">
+                            {step.teams.map((team, idx) => (
+                              <span key={team.id}>
+                                {team.name}
+                                {idx < step.teams!.length - 1 && ","}
+                              </span>
+                            ))}
+                          </span>
+                        ) : step.team?.name ? (
+                          step.team.name
+                        ) : (
+                          "Not assigned"
+                        )}
                       </span>
                       <span className="hidden sm:inline">•</span>
                       <span>{step.field_definitions?.fields?.length || 0} fields</span>
@@ -243,7 +260,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
     name: step?.name || "",
     description: step?.description || "",
     step_order: step?.step_order || nextStepOrder,
-    team_id: step?.team_id || 0,
+    team_ids: step?.team_ids || [],
     field_definitions: step?.field_definitions || { fields: [] },
     use_date_range: step?.use_date_range || false,
     start_date: step?.start_date || "",
@@ -267,8 +284,8 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
     }
     
     // Validate team selection
-    if (!formData.team_id || formData.team_id === 0) {
-      errors.team_id = "Please assign a team to this step";
+    if (!formData.team_ids || formData.team_ids.length === 0) {
+      errors.team_ids = "Please assign at least one team to this step";
     }
     
     // Validate fields
@@ -472,33 +489,31 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
 
           {/* Team Assignment */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Team <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={formData.team_id}
-              onChange={(e) => {
-                setFormData({ ...formData, team_id: parseInt(e.target.value) });
-                if (validationErrors.team_id) {
-                  const { team_id, ...rest } = validationErrors;
+            <MultiSelectDropdown
+              label="Teams"
+              value={formData.team_ids.map(String)}
+              onChange={(values) => {
+                const teamIds = values.map(Number);
+                setFormData({ 
+                  ...formData, 
+                  team_ids: teamIds
+                });
+                if (validationErrors.team_ids) {
+                  const { team_ids, ...rest } = validationErrors;
                   setValidationErrors(rest);
                 }
               }}
-              className={`w-full px-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors ${
-                validationErrors.team_id ? 'border-red-500' : 'border-gray-300'
-              }`}
+              options={teams.map(team => ({
+                label: team.name,
+                value: String(team.id)
+              }))}
+              placeholder="Select teams..."
               required
-            >
-              <option value={0}>Select a team...</option>
-              {teams.map((team) => (
-                <option key={team.id} value={team.id}>
-                  {team.name}
-                </option>
-              ))}
-            </select>
-            {validationErrors.team_id && (
-              <p className="text-red-600 text-xs mt-1">{validationErrors.team_id}</p>
-            )}
+              error={validationErrors.team_ids}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Select one or more teams that can work on this step
+            </p>
           </div>
 
           {/* Date Range */}
