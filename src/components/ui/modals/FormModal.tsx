@@ -20,7 +20,7 @@ interface FormModalProps<T> {
     values: T;
     errors: Record<string, string>;
     handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
-    setFieldValue: (field: keyof T, value: any) => void;
+    setFieldValue: (field: keyof T, value: T[keyof T]) => void;
   }) => ReactNode);
 }
 
@@ -93,7 +93,7 @@ export default function FormModal<T extends Record<string, any>>({
     });
   };
 
-  const setFieldValue = (field: keyof T, value: any) => {
+  const setFieldValue = (field: keyof T, value: T[keyof T]) => {
     setFormValues((prev) => ({
       ...prev,
       [field]: value,
