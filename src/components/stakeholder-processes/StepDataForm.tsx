@@ -320,17 +320,19 @@ export default function StepDataForm({
   const handleNestedFieldChange = (parentFieldName: string, nestedFieldKey: string, value: any, nestedFieldType: string) => {
     setFormData((prev) => {
       const parentValue = prev[parentFieldName];
-      if (typeof parentValue === 'object' && 'nested' in parentValue) {
+      if (typeof parentValue === 'object' && parentValue !== null) {
+        // Ensure parent has nested structure, create if missing
+        const existingNested = 'nested' in parentValue ? parentValue.nested : {};
         return {
           ...prev,
           [parentFieldName]: {
             ...parentValue,
             nested: {
-              ...parentValue.nested,
+              ...existingNested,
               [nestedFieldKey]: {
                 type: nestedFieldType,
                 value: value,
-                nested: parentValue.nested?.[nestedFieldKey]?.nested || {}
+                nested: existingNested?.[nestedFieldKey]?.nested || {}
               }
             }
           }
@@ -360,17 +362,19 @@ export default function StepDataForm({
     setFormData((prev) => {
       const parentValue = prev[parentFieldName];
       // Support both multi-select (array value) and dropdown (string value) with option-specific nested fields
-      if (typeof parentValue === 'object' && 'value' in parentValue) {
+      if (typeof parentValue === 'object' && parentValue !== null && 'value' in parentValue) {
         // Find or create nested data for this specific option
         const optionNestedKey = `${optionValue}_nested`;
-        const currentOptionNested = parentValue.nested?.[optionNestedKey] || {};
+        // Ensure parent has nested structure, create if missing
+        const existingNested = 'nested' in parentValue ? parentValue.nested : {};
+        const currentOptionNested = existingNested?.[optionNestedKey] || {};
         
         return {
           ...prev,
           [parentFieldName]: {
             ...parentValue,
             nested: {
-              ...parentValue.nested,
+              ...existingNested,
               [optionNestedKey]: {
                 ...currentOptionNested,
                 [nestedFieldKey]: {
