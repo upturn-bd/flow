@@ -51,6 +51,19 @@ export default function StepDataForm({
     );
   }
 
+  // Helper to check if field has any nested fields (general or option-specific)
+  const hasAnyNestedFields = (field: FieldDefinition): boolean => {
+    // Check for general nested fields
+    if (field.nested && field.nested.length > 0) {
+      return true;
+    }
+    // Check for option-specific nested fields in dropdown/multi-select
+    if ((field.type === 'dropdown' || field.type === 'multi_select') && field.options) {
+      return field.options.some(opt => opt.nested && opt.nested.length > 0);
+    }
+    return false;
+  };
+
   useEffect(() => {
     // Initialize form with existing data or empty values
     const initialData: Record<string, any> = {};
@@ -64,7 +77,7 @@ export default function StepDataForm({
     
     fields.forEach((field) => {
       const existingValue = existingData?.data?.[field.key];
-      const hasNestedFields = field.nested && field.nested.length > 0;
+      const hasNestedFields = hasAnyNestedFields(field);
       
       if (existingValue !== undefined && existingValue !== null) {
         // Check if this is new nested format
@@ -320,17 +333,19 @@ export default function StepDataForm({
   const handleNestedFieldChange = (parentFieldName: string, nestedFieldKey: string, value: any, nestedFieldType: string) => {
     setFormData((prev) => {
       const parentValue = prev[parentFieldName];
-      if (typeof parentValue === 'object' && 'nested' in parentValue) {
+      if (typeof parentValue === 'object' && parentValue !== null) {
+        // Ensure parent has nested structure, create if missing
+        const existingNested = 'nested' in parentValue ? parentValue.nested : {};
         return {
           ...prev,
           [parentFieldName]: {
             ...parentValue,
             nested: {
-              ...parentValue.nested,
+              ...existingNested,
               [nestedFieldKey]: {
                 type: nestedFieldType,
                 value: value,
-                nested: parentValue.nested?.[nestedFieldKey]?.nested || {}
+                nested: existingNested?.[nestedFieldKey]?.nested || {}
               }
             }
           }
@@ -360,17 +375,19 @@ export default function StepDataForm({
     setFormData((prev) => {
       const parentValue = prev[parentFieldName];
       // Support both multi-select (array value) and dropdown (string value) with option-specific nested fields
-      if (typeof parentValue === 'object' && 'value' in parentValue) {
+      if (typeof parentValue === 'object' && parentValue !== null && 'value' in parentValue) {
         // Find or create nested data for this specific option
         const optionNestedKey = `${optionValue}_nested`;
-        const currentOptionNested = parentValue.nested?.[optionNestedKey] || {};
+        // Ensure parent has nested structure, create if missing
+        const existingNested = 'nested' in parentValue ? parentValue.nested : {};
+        const currentOptionNested = existingNested?.[optionNestedKey] || {};
         
         return {
           ...prev,
           [parentFieldName]: {
             ...parentValue,
             nested: {
-              ...parentValue.nested,
+              ...existingNested,
               [optionNestedKey]: {
                 ...currentOptionNested,
                 [nestedFieldKey]: {
@@ -471,7 +488,7 @@ export default function StepDataForm({
 
   const renderField = (field: FieldDefinition) => {
     const fieldData = formData[field.key];
-    const hasNestedFields = field.nested && field.nested.length > 0;
+    const hasNestedFields = hasAnyNestedFields(field);
     
     // Extract actual value from nested format or use legacy format
     const actualValue = hasNestedFields && typeof fieldData === 'object' && 'value' in fieldData
