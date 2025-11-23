@@ -190,7 +190,7 @@ export default function StepDataForm({
     setFormData(initialData);
   }, [step, existingData]);
 
-  const validateForm = (): boolean => {
+  const validateForm = (skipRequired: boolean = false): boolean => {
     const newErrors: Record<string, string> = {};
     const fields = step.field_definitions?.fields || [];
 
@@ -206,7 +206,8 @@ export default function StepDataForm({
     ): boolean => {
       let hasErrors = false;
       nestedDefs.forEach((nestedField) => {
-        if (nestedField.required) {
+        // Skip required validation when saving as draft
+        if (nestedField.required && !skipRequired) {
           const nestedValue = nestedData[nestedField.key];
           if (
             !nestedValue ||
@@ -237,7 +238,8 @@ export default function StepDataForm({
           const optionNestedKey = `${selectedValue}_nested`;
           const optionNestedData = nestedData[optionNestedKey] || {};
           option.nested.forEach((nestedField) => {
-            if (nestedField.required) {
+            // Skip required validation when saving as draft
+            if (nestedField.required && !skipRequired) {
               const nestedValue = optionNestedData[nestedField.key];
               if (
                 !nestedValue ||
@@ -258,7 +260,8 @@ export default function StepDataForm({
       const value = formData[field.key];
       const hasNestedFields = field.nested && field.nested.length > 0;
       
-      if (field.required) {
+      // Skip required validation when saving as draft
+      if (field.required && !skipRequired) {
         // Handle nested format
         if (hasNestedFields && typeof value === 'object' && 'value' in value) {
           const actualValue = value.value;
