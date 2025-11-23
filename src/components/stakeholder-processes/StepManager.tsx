@@ -1217,7 +1217,7 @@ function FieldEditor({
             }}
             availableSteps={availableSteps}
             currentStepOrder={currentStepOrder}
-            currentStepFields={allFields.filter(f => f.type === 'number' && f.key !== field.key)}
+            currentStepFields={allFields.filter(f => f.key !== field.key)}
             onClose={() => setShowFormulaEditor(false)}
           />
         </div>
