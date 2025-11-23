@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckSquare, Clock, Plus } from 'lucide-react';
+import { CheckSquare, Clock, Plus } from '@/lib/icons';
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import { cn } from '@/components/ui/class';
 import { formatDateToDayMonth } from '@/lib/utils';

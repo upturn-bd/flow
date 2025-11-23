@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, AlertTriangle, CheckCircle, XCircle, Loader2, Users, DollarSign } from 'lucide-react';
+import { Calendar, AlertTriangle, CheckCircle, XCircle, Loader, Users, DollarSign } from '@/lib/icons';
 import { usePayroll } from '@/hooks/usePayroll';
 import { formatDate } from '@/lib/utils';
 

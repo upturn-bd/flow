@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, AlertCircle, User, Building2 } from 'lucide-react';
+import { X, AlertCircle, User, Building } from '@/lib/icons';
 import { useStakeholderIssues, StakeholderIssueFormData } from '@/hooks/useStakeholderIssues';
 import { useStakeholders } from '@/hooks/useStakeholders';
 import { useAuth } from '@/lib/auth/auth-context';

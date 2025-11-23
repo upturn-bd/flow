@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Save, RotateCcw, Eye, EyeOff, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
+import { X, Save, RotateCcw, Eye, EyeOff, GripVertical, CaretUp as ChevronUp, CaretDown as ChevronDown } from '@/lib/icons';
 import { WidgetConfig, WidgetSize } from '@/lib/types/widgets';
 import { getWidgetDefinition } from '@/app/(home)/home/widgets/widgetRegistry';
 

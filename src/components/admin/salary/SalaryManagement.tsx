@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { DollarSign, Edit3, Save, X, AlertTriangle, CheckCircle, Users, History } from 'lucide-react';
+import { DollarSign, Edit, Save, X, AlertTriangle, CheckCircle, Users, History } from '@/lib/icons';
 import { useSalaryManagement } from '@/hooks/useSalaryManagement';
 import { useEmployees } from '@/hooks/useEmployees';
 import { formatDate } from '@/lib/utils';

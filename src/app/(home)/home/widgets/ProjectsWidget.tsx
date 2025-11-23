@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FolderKanban, Clock, RefreshCw, Plus } from 'lucide-react';
+import { FolderKanban, Clock, RefreshCw, Plus } from '@/lib/icons';
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import SectionHeader from '@/app/(home)/home/components/SectionHeader';
 import LoadingSection from '@/app/(home)/home/components/LoadingSection';

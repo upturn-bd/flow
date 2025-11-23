@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, RefreshCw, AlertCircle, Plus } from 'lucide-react';
+import { Bell, RefreshCw, AlertCircle, Plus } from '@/lib/icons';
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import SectionHeader from './SectionHeader';
 import EmptyState from './EmptyState';

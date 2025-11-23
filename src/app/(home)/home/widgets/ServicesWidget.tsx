@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   Calendar, 
-  MessageSquare, 
+  MessageCircle as MessageSquare, 
   FileText, 
   DollarSign, 
   Briefcase,
@@ -12,7 +12,7 @@ import {
   UserMinus,
   CreditCard,
   ArrowRight
-} from 'lucide-react';
+} from '@/lib/icons';
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import BaseWidget from './BaseWidget';
 import { WidgetProps } from '@/lib/types/widgets';
@@ -24,7 +24,7 @@ import { cn } from '@/components/ui/class';
 interface Service {
   name: string;
   description: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: React.ComponentType<{ size?: number; weight?: string; className?: string }>;
   route: string;
   color: string;
   bgColor: string;

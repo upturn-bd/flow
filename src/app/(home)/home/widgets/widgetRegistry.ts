@@ -1,4 +1,4 @@
-import { Calendar, Bell, CheckSquare, FolderKanban, AlertCircle, Briefcase } from 'lucide-react';
+import { Calendar, Bell, CheckSquare, FolderKanban, AlertCircle, Briefcase } from '@/lib/icons';
 import { WidgetDefinition } from '@/lib/types/widgets';
 import AttendanceWidget from './AttendanceWidget';
 import NoticesWidget from './NoticesWidget';

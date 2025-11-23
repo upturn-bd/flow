@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, CheckCircle2, Clock, CheckSquare, MapPin, Navigation, AlertTriangle, AlertCircle } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, CheckSquare, MapPin, Navigation, AlertTriangle, AlertCircle } from '@/lib/icons';
 import { cn } from '@/components/ui/class';
 import SectionHeader from './SectionHeader';
 import LoadingSection from './LoadingSection';

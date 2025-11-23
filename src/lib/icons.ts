@@ -124,6 +124,7 @@ import {
   ShoppingCart,
   Tag,
   Package,
+  CreditCard,
   
   // Tasks & Projects
   CheckSquare,
@@ -313,6 +314,7 @@ export {
   ShoppingCart,
   Tag,
   Package,
+  CreditCard,
   
   // Tasks & Projects
   CheckSquare,
@@ -481,6 +483,7 @@ export default {
   ShoppingCart,
   Tag,
   Package,
+  CreditCard,
   CheckSquare,
   Square,
   ListChecks,
