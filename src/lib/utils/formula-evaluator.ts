@@ -45,7 +45,11 @@ export function cellReferenceToLabel(
     pathSegments: string[],
     labelPath: string[] = []
   ): string | null => {
-    if (pathSegments.length === 0) return null;
+    // Handle edge case of empty path
+    if (pathSegments.length === 0) {
+      console.warn('findFieldByPath called with empty pathSegments');
+      return null;
+    }
     
     const currentKey = pathSegments[0];
     const remainingPath = pathSegments.slice(1);
@@ -68,8 +72,8 @@ export function cellReferenceToLabel(
     }
     
     // Check in option-specific nested fields (for dropdown/multi-select)
-    if (field.options && field.options.length > 0) {
-      const optionValue = remainingPath[0]; // Next segment should be the option value
+    if (field.options && field.options.length > 0 && remainingPath.length > 0) {
+      const optionValue = remainingPath[0]; // Next segment is the option value
       const option = field.options.find(opt => opt.value === optionValue);
       if (option && option.nested && option.nested.length > 0) {
         const optionLabel = [...currentLabel, `[${option.label}]`];
