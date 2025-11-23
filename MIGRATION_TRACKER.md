@@ -6,16 +6,16 @@ This file tracks the migration from hook-based data management to context-based 
 ## Migration Status
 
 ### Contexts Created
-- [ ] EmployeesContext
-- [ ] DepartmentsContext
-- [ ] DivisionsContext
-- [ ] TeamsContext
-- [ ] PositionsContext
-- [ ] GradesContext
+- [x] EmployeesContext
+- [x] DepartmentsContext
+- [x] DivisionsContext
+- [x] TeamsContext
+- [x] PositionsContext
+- [x] GradesContext
 
 ### Hooks Deprecated
-- [ ] useEmployees.tsx → EmployeesContext
-- [ ] useDepartments.tsx → DepartmentsContext
+- [x] useEmployees.tsx → EmployeesContext (partially migrated - 3 files done)
+- [x] useDepartments.tsx → DepartmentsContext (2 files done)
 - [ ] useDivisions.tsx → DivisionsContext
 - [ ] useTeams.tsx → TeamsContext
 - [ ] usePositions.tsx → PositionsContext
@@ -24,15 +24,18 @@ This file tracks the migration from hook-based data management to context-based 
 ### Files Migrated
 
 #### Admin Pages
+- [x] src/app/(home)/admin/data-export/page.tsx (useEmployees → useEmployeesContext)
 - [ ] src/app/(home)/admin/stakeholders/new/page.tsx
 - [ ] src/app/(home)/admin/stakeholders/[id]/edit/page.tsx
 - [ ] src/app/(home)/admin/stakeholders/[id]/page.tsx
-- [ ] src/app/(home)/admin/data-export/page.tsx
 - [ ] src/app/(home)/admin/logs/complaint/page.tsx
 - [ ] src/app/(home)/admin/config/teams/page.tsx
 
 #### HRIS Pages
-- [ ] src/app/(home)/hris/tabs/BasicInfoTab.tsx
+- [x] src/app/(home)/hris/tabs/BasicInfoTab.tsx (useDepartments → useDepartmentsContext)
+
+#### Profile Pages
+- [x] src/app/(home)/profile/tabs/BasicInfoTab.tsx (useDepartments → useDepartmentsContext)
 
 #### Operations Pages
 - [ ] src/app/(home)/ops/hris/page.tsx

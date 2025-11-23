@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useDepartments } from "@/hooks/useDepartments";
+import { useDepartmentsContext } from "@/contexts";
 import { useSalaryManagement } from "@/hooks/useSalaryManagement";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import {
@@ -71,9 +71,9 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
   const [currentUserRole, setCurrentUserRole] = useState<string>("");
   const [targetEmployeeId, setTargetEmployeeId] = useState<string>("");
   
-  const { departments, fetchDepartments } = useDepartments();
+  const { departments, loading: loadingStates } = useDepartmentsContext();
   const { updateEmployeeSalary } = useSalaryManagement();
-  const [loadingDepartments, setLoadingDepartments] = useState(true);
+  const loadingDepartments = loadingStates.fetching;
   
   const {
     loading,
@@ -244,10 +244,8 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
     };
 
     fetchUserRole();
-    
-    setLoadingDepartments(true);
-    fetchDepartments().finally(() => setLoadingDepartments(false));
-  }, [fetchDepartments]);
+    // Departments are auto-fetched by DepartmentsContext
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {

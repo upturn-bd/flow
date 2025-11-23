@@ -14,7 +14,7 @@ import {
   Calendar,
   ClipboardCheck,
 } from "lucide-react";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext } from "@/contexts";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useProjects } from "@/hooks/useProjects";
 import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
@@ -147,7 +147,7 @@ export default function DataExportPage() {
     includeLocationStatus: true,
   });
 
-  const { extendedEmployees, fetchExtendedEmployees, loading: employeesLoading } = useEmployees();
+  const { extendedEmployees, fetchExtendedEmployees, loading: employeesLoading } = useEmployeesContext();
   const { stakeholders, fetchStakeholders, loading: stakeholdersLoading } = useStakeholders();
   const { ongoingProjects, completedProjects, fetchOngoingProjects, fetchCompletedProjects } = useProjects();
   const { ongoingTasks, completedTasks, fetchTasks } = useTasks();
@@ -156,6 +156,7 @@ export default function DataExportPage() {
 
   const [dataLoadedFor, setDataLoadedFor] = useState<Set<ExportType>>(new Set());
   const [isLoadingData, setIsLoadingData] = useState(false);
+  const employeesLoadingState = employeesLoading.fetching;
 
   // Lazy load data only when export type is selected
   useEffect(() => {
@@ -388,7 +389,7 @@ export default function DataExportPage() {
       icon: Users,
       color: "bg-blue-100 text-blue-700 border-blue-200",
       count: extendedEmployees.length,
-      loading: employeesLoading,
+      loading: employeesLoadingState,
     },
     {
       type: "stakeholders" as ExportType,
@@ -436,7 +437,7 @@ export default function DataExportPage() {
       loading: attendanceLoading,
     },
   ], [
-    extendedEmployees.length, employeesLoading,
+    extendedEmployees.length, employeesLoadingState,
     stakeholders.length, stakeholdersLoading,
     ongoingProjects.length, completedProjects.length,
     ongoingTasks.length, completedTasks.length,
@@ -687,7 +688,7 @@ export default function DataExportPage() {
                     <div className="flex justify-end pt-4 border-t border-gray-200">
                       <button
                         onClick={handleExportEmployees}
-                        disabled={employeesLoading || isLoadingData}
+                        disabled={employeesLoadingState || isLoadingData}
                         className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Download size={20} />
