@@ -12,13 +12,13 @@ interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>
 }
 
 const variantClasses = {
-  primary: "bg-blue-600 hover:bg-blue-700 text-white shadow-sm",
-  secondary: "bg-gray-200 hover:bg-gray-300 text-gray-800 shadow-sm",
-  outline: "border border-gray-300 hover:bg-gray-100 text-gray-800 shadow-sm",
-  ghost: "hover:bg-gray-100 text-gray-800 shadow-sm",
-  danger: "bg-red-600 hover:bg-red-700 text-white shadow-sm",
-  pending: "bg-yellow-200 hover:bg-yellow-300 text-yellow-700 shadow-sm",
-  complete: "bg-green-200 hover:bg-green-300 text-green-700 shadow-sm",
+  primary: "bg-primary-600 hover:bg-primary-700 text-white shadow-sm dark:bg-primary-500 dark:hover:bg-primary-600",
+  secondary: "bg-surface-secondary hover:bg-surface-hover text-foreground-primary shadow-sm border border-border-primary",
+  outline: "border border-border-primary hover:bg-surface-hover text-foreground-primary shadow-sm",
+  ghost: "hover:bg-surface-hover text-foreground-primary",
+  danger: "bg-red-600 hover:bg-red-700 text-white shadow-sm dark:bg-red-500 dark:hover:bg-red-600",
+  pending: "bg-yellow-100 hover:bg-yellow-200 text-yellow-700 shadow-sm dark:bg-yellow-900/30 dark:hover:bg-yellow-900/50 dark:text-yellow-400",
+  complete: "bg-green-100 hover:bg-green-200 text-green-700 shadow-sm dark:bg-green-900/30 dark:hover:bg-green-900/50 dark:text-green-400",
 };
 
 const sizeClasses = {
@@ -51,7 +51,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         whileHover={!disabled && !isLoading ? { scale: 1.02 } : {}}
         whileTap={!disabled && !isLoading ? { scale: 0.95 } : {}}
         className={`
-          font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+          font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
           ${variantClasses[variant]}
           ${sizeClasses[size]}
           ${fullWidth ? "w-full" : ""}
@@ -88,11 +88,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ) : (
           <>
             {children}
-                      <span>{text}</span>
-
+            <span>{text}</span>
           </>
         )}
       </motion.button>
     );
   }
-); 
+);
