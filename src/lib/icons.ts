@@ -94,7 +94,7 @@ import {
   
   // Maps & Location
   MapPin,
-  Navigation,
+  NavigationArrow as Navigation,
   Compass,
   Globe,
   
@@ -103,7 +103,7 @@ import {
   TextAlignLeft as AlignLeft,
   TextAlignCenter as AlignCenter,
   TextAlignRight as AlignRight,
-  TextBolder as Bold,
+  TextB as Bold,
   TextItalic as Italic,
   TextUnderline as Underline,
   Code,
@@ -111,7 +111,7 @@ import {
   LinkBreak as Unlink,
   
   // Tools & Utilities
-  WrenchSimple as Wrench,
+  Wrench,
   Hammer,
   Sliders,
   FunnelSimple as Filter,
@@ -154,7 +154,7 @@ import {
   
   // Misc
   Palette,
-  Paint,
+  PaintBucket as Paint,
   Sparkle,
   Gift,
   Flag,
