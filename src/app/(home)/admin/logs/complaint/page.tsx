@@ -23,7 +23,7 @@ export default function ComplaintLogsPage() {
   const [comment, setComment] = useState<string>("");
   const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
 
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
   const { 
     complaintHistory,
@@ -45,11 +45,11 @@ export default function ComplaintLogsPage() {
 
   const MODULE = "complaints";
 
-  // Load employees and complaint types
+  // Load complaint types
   useEffect(() => {
-    
+    // Employees auto-fetched by context
     fetchComplaintTypes();
-  }, [fetchEmployees, fetchComplaintTypes]);
+  }, [fetchComplaintTypes]);
 
   // Load complaints based on active tab
   useEffect(() => {

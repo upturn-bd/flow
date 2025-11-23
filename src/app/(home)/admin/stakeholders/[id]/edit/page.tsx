@@ -21,7 +21,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
     fetchStakeholderById,
     fetchStakeholders,
   } = useStakeholders();
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
 
   const [stakeholder, setStakeholder] = useState<Stakeholder | null>(null);
   const [formData, setFormData] = useState({
@@ -43,7 +43,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
       try {
         setLoadingStakeholder(true);
         await fetchProcesses();
-        await 
+        // Employees auto-fetched by context
         await fetchStakeholders(); // Fetch stakeholders for parent selection
         
         const data = await fetchStakeholderById(stakeholderId);
