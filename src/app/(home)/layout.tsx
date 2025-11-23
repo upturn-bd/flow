@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthProvider, useAuth } from "@/lib/auth/auth-context";
+import { DataContextProvider } from "@/contexts/DataContextProvider";
 import Sidebar from "./side-navbar";
 import TopBar from "./top-bar";
 
@@ -11,7 +12,9 @@ export default function HomeLayout({
 }) {
   return (
     <AuthProvider>
-      <ApprovalLayout>{children}</ApprovalLayout>
+      <DataContextProvider>
+        <ApprovalLayout>{children}</ApprovalLayout>
+      </DataContextProvider>
     </AuthProvider>
   );
 }
