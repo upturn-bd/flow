@@ -214,13 +214,15 @@ export default function StepDataForm({
     const validateOptionNestedFields = (
       field: FieldDefinition,
       selectedValues: string[],
-      nestedData: Record<string, any>
+      nestedData: Record<string, NestedFieldValue> | undefined
     ) => {
+      if (!nestedData) return;
+      
       selectedValues.forEach((selectedValue) => {
         const option = field.options?.find(opt => opt.value === selectedValue);
         if (option && option.nested && option.nested.length > 0) {
           const optionNestedKey = `${selectedValue}_nested`;
-          const optionNestedData = nestedData?.[optionNestedKey] || {};
+          const optionNestedData = nestedData[optionNestedKey] || {};
           option.nested.forEach((nestedField) => {
             if (nestedField.required) {
               const nestedValue = optionNestedData[nestedField.key];
@@ -1015,7 +1017,7 @@ export default function StepDataForm({
                 <div className="space-y-2">
                   {selectedOption.nested!.map((nestedField) => {
                     const optionNestedKey = `${actualValue}_nested`;
-                    const optionNestedData = typeof fieldData === 'object' && fieldData?.nested?.[optionNestedKey] || {};
+                    const optionNestedData = (typeof fieldData === 'object' && fieldData !== null && 'nested' in fieldData && fieldData.nested?.[optionNestedKey]) || {};
                     const nestedValue = optionNestedData[nestedField.key]?.value;
                     const nestedError = errors[`${field.key}.${optionNestedKey}.${nestedField.key}`];
                     
@@ -1069,7 +1071,7 @@ export default function StepDataForm({
                   if (!option || !option.nested || option.nested.length === 0) return null;
                   
                   const optionNestedKey = `${selectedValue}_nested`;
-                  const optionNestedData = typeof fieldData === 'object' && fieldData?.nested?.[optionNestedKey] || {};
+                  const optionNestedData = (typeof fieldData === 'object' && fieldData !== null && 'nested' in fieldData && fieldData.nested?.[optionNestedKey]) || {};
                   
                   return (
                     <div key={selectedValue} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
