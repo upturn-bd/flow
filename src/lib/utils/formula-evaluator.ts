@@ -195,9 +195,16 @@ export function prepareFormulaForEvaluation(
       if (fieldData !== undefined && fieldData !== null) {
         // Handle NestedFieldValue format (has 'type' and 'value' properties)
         if (typeof fieldData === 'object' && 'value' in fieldData) {
-          numericValue = parseFloat(fieldData.value);
+          // Check if value is empty string or null before parsing
+          const rawValue = fieldData.value;
+          if (rawValue !== null && rawValue !== undefined && rawValue !== '') {
+            numericValue = parseFloat(rawValue);
+          }
         } else {
-          numericValue = parseFloat(fieldData);
+          // Check if value is empty string or null before parsing
+          if (fieldData !== null && fieldData !== undefined && fieldData !== '') {
+            numericValue = parseFloat(fieldData);
+          }
         }
       }
 
