@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import FormInputField from "@/components/ui/FormInputField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
-import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
+import { ExtendedEmployee, useEmployeesContext } from "@/contexts";
 import { matchesEmployeeSearch } from "@/lib/utils/user-search";
 import { exportEmployeesToCSV } from "@/lib/utils/csv-export";
 import { toast } from "sonner";
@@ -40,11 +40,14 @@ export default function FinderPage() {
     designation: "",
   });
 
-  const { extendedEmployees, loading, fetchExtendedEmployees } = useEmployees();
-
+  const { extendedEmployees, loading: loadingStates, fetchExtendedEmployees } = useEmployeesContext();
+  const loading = loadingStates.fetching;
+  
+  // Auto-fetch is handled by context, but we can manually refresh if needed
   useEffect(() => { 
-    fetchExtendedEmployees();
-  }, [fetchExtendedEmployees]);
+    // Optional: force refresh on mount
+    // fetchExtendedEmployees(true);
+  }, []);
 
 useEffect(() => {
   if (extendedEmployees.length === 0) return;

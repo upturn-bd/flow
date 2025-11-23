@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { useTeams } from "@/hooks/useTeams";
+import { useTeamsContext } from "@/contexts";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getPublicFileUrl } from "@/lib/utils/files";
 import { calculateFieldValue, formatCalculatedValue, formulaToReadable } from "@/lib/utils/formula-evaluator";

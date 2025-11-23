@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import TabView from "@/components/ui/TabView";
 import { ComplaintCard } from "@/components/ops/complaint/ComplaintCard";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext } from "@/contexts";
 import { useComplaints } from "@/hooks/useComplaints";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
@@ -23,7 +23,7 @@ export default function ComplaintLogsPage() {
   const [comment, setComment] = useState<string>("");
   const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
 
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees } = useEmployees();
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
   const { 
     complaintHistory,
@@ -47,7 +47,7 @@ export default function ComplaintLogsPage() {
 
   // Load employees and complaint types
   useEffect(() => {
-    fetchEmployees();
+    
     fetchComplaintTypes();
   }, [fetchEmployees, fetchComplaintTypes]);
 

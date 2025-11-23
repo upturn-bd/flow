@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext } from "@/contexts";
 import { ArrowLeft, AlertCircle, Plus, Trash2 } from "lucide-react";
 import { ContactPerson, Stakeholder } from "@/lib/types/schemas";
 
@@ -21,7 +21,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
     fetchStakeholderById,
     fetchStakeholders,
   } = useStakeholders();
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees } = useEmployees();
 
   const [stakeholder, setStakeholder] = useState<Stakeholder | null>(null);
   const [formData, setFormData] = useState({
@@ -43,7 +43,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
       try {
         setLoadingStakeholder(true);
         await fetchProcesses();
-        await fetchEmployees();
+        await 
         await fetchStakeholders(); // Fetch stakeholders for parent selection
         
         const data = await fetchStakeholderById(stakeholderId);
@@ -68,7 +68,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
     };
 
     loadData();
-  }, [stakeholderId, fetchProcesses, fetchEmployees, fetchStakeholderById]);
+  }, [stakeholderId, fetchProcesses, fetchStakeholderById]);
 
   const handleAddContactPerson = () => {
     setContactPersons([

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext } from "@/contexts";
 import { useStakeholderTypes } from "@/hooks/useStakeholderTypes";
 import { ArrowLeft, AlertCircle, Plus, Trash2 } from "lucide-react";
 import { ContactPerson } from "@/lib/types/schemas";
@@ -11,7 +11,7 @@ import { ContactPerson } from "@/lib/types/schemas";
 export default function NewStakeholderPage() {
   const router = useRouter();
   const { processes, activeProcesses, stakeholders, loading, createStakeholder, fetchProcesses, fetchStakeholders } = useStakeholders();
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const { activeStakeholderTypes, fetchStakeholderTypes } = useStakeholderTypes();
 
   const [formData, setFormData] = useState({
@@ -31,10 +31,10 @@ export default function NewStakeholderPage() {
 
   useEffect(() => {
     fetchProcesses();
-    fetchEmployees();
+    // Employees auto-fetched by context
     fetchStakeholderTypes();
     fetchStakeholders(); // Fetch stakeholders for parent selection
-  }, [fetchProcesses, fetchEmployees, fetchStakeholderTypes, fetchStakeholders]);
+  }, [fetchProcesses, fetchStakeholderTypes, fetchStakeholders]);
 
   const handleAddContactPerson = () => {
     setContactPersons([
