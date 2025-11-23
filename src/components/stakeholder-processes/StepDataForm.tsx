@@ -231,6 +231,29 @@ export default function StepDataForm({
               validateNestedFields(field.nested, value.nested, field.key);
             }
             
+            // For dropdown, validate option-specific nested fields
+            if (field.type === 'dropdown' && typeof actualValue === 'string' && actualValue) {
+              const option = field.options?.find(opt => opt.value === actualValue);
+              if (option && option.nested && option.nested.length > 0) {
+                const optionNestedKey = `${actualValue}_nested`;
+                const optionNestedData = value.nested?.[optionNestedKey] || {};
+                option.nested.forEach((nestedField) => {
+                  if (nestedField.required) {
+                    const nestedValue = optionNestedData[nestedField.key];
+                    if (
+                      !nestedValue ||
+                      nestedValue.value === undefined ||
+                      nestedValue.value === null ||
+                      nestedValue.value === "" ||
+                      (Array.isArray(nestedValue.value) && nestedValue.value.length === 0)
+                    ) {
+                      newErrors[`${field.key}.${optionNestedKey}.${nestedField.key}`] = `${nestedField.label} is required for ${option.label}`;
+                    }
+                  }
+                });
+              }
+            }
+            
             // For multi-select, validate option-specific nested fields
             if (field.type === 'multi_select' && Array.isArray(actualValue)) {
               actualValue.forEach((selectedValue) => {
@@ -271,6 +294,29 @@ export default function StepDataForm({
         // Validate nested fields even if parent is not required
         if (value.nested && field.nested) {
           validateNestedFields(field.nested, value.nested, field.key);
+        }
+        
+        // For dropdown, validate option-specific nested fields
+        if (field.type === 'dropdown' && typeof value.value === 'string' && value.value) {
+          const option = field.options?.find(opt => opt.value === value.value);
+          if (option && option.nested && option.nested.length > 0) {
+            const optionNestedKey = `${value.value}_nested`;
+            const optionNestedData = value.nested?.[optionNestedKey] || {};
+            option.nested.forEach((nestedField) => {
+              if (nestedField.required) {
+                const nestedValue = optionNestedData[nestedField.key];
+                if (
+                  !nestedValue ||
+                  nestedValue.value === undefined ||
+                  nestedValue.value === null ||
+                  nestedValue.value === "" ||
+                  (Array.isArray(nestedValue.value) && nestedValue.value.length === 0)
+                ) {
+                  newErrors[`${field.key}.${optionNestedKey}.${nestedField.key}`] = `${nestedField.label} is required for ${option.label}`;
+                }
+              }
+            });
+          }
         }
         
         // For multi-select, validate option-specific nested fields
@@ -358,7 +404,8 @@ export default function StepDataForm({
   ) => {
     setFormData((prev) => {
       const parentValue = prev[parentFieldName];
-      if (typeof parentValue === 'object' && 'value' in parentValue && Array.isArray(parentValue.value)) {
+      // Support both multi-select (array value) and dropdown (string value) with option-specific nested fields
+      if (typeof parentValue === 'object' && 'value' in parentValue) {
         // Find or create nested data for this specific option
         const optionNestedKey = `${optionValue}_nested`;
         const currentOptionNested = parentValue.nested?.[optionNestedKey] || {};
@@ -578,7 +625,11 @@ export default function StepDataForm({
               <input
                 type="number"
                 value={value || ""}
-                onChange={(e) => updateNestedValue(e.target.value)}
+                onChange={(e) => {
+                  // Keep value as string to allow proper input UX
+                  const value = e.target.value;
+                  updateNestedValue(value);
+                }}
                 className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
                   error ? "border-red-500" : "border-gray-300"
                 }`}
@@ -664,7 +715,11 @@ export default function StepDataForm({
               <input
                 type="number"
                 value={value || ""}
-                onChange={(e) => updateNestedValue(e.target.value)}
+                onChange={(e) => {
+                  // Keep value as string to allow proper input UX
+                  const value = e.target.value;
+                  updateNestedValue(value);
+                }}
                 className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
                   error ? "border-red-500" : "border-gray-300"
                 }`}
@@ -721,7 +776,11 @@ export default function StepDataForm({
             <input
               type="number"
               value={actualValue || ""}
-              onChange={(e) => updateValue(e.target.value)}
+              onChange={(e) => {
+                // Convert to number or keep as empty string for better UX
+                const value = e.target.value === "" ? "" : e.target.value;
+                updateValue(value);
+              }}
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
                 hasError ? "border-red-500" : "border-gray-300"
               }`}
@@ -992,6 +1051,10 @@ export default function StepDataForm({
         );
 
       case "dropdown":
+        // Check if selected option has nested fields
+        const selectedOption = field.options?.find(opt => opt.value === actualValue);
+        const hasDropdownOptionNested = selectedOption && selectedOption.nested && selectedOption.nested.length > 0;
+        
         return (
           <div>
             <DropdownField
@@ -1003,6 +1066,39 @@ export default function StepDataForm({
               required={field.required}
               error={errors[field.key]}
             />
+            
+            {/* Render option-specific nested fields if selected option has them */}
+            {hasDropdownOptionNested && actualValue && (
+              <div className="mt-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
+                <p className="text-xs font-medium text-gray-600 mb-2">Additional Information for "{selectedOption.label}":</p>
+                <div className="space-y-2">
+                  {selectedOption.nested!.map((nestedField) => {
+                    const optionNestedKey = `${actualValue}_nested`;
+                    const optionNestedData = typeof fieldData === 'object' && fieldData?.nested?.[optionNestedKey] || {};
+                    const nestedValue = optionNestedData[nestedField.key]?.value;
+                    const nestedError = errors[`${field.key}.${optionNestedKey}.${nestedField.key}`];
+                    
+                    return (
+                      <div key={nestedField.key}>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          {nestedField.label}
+                          {nestedField.required && <span className="text-red-500 ml-1">*</span>}
+                        </label>
+                        {renderOptionNestedFieldInput(
+                          nestedField,
+                          nestedValue,
+                          field.key,
+                          actualValue,
+                          nestedError
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            
+            {/* Render general nested fields (not option-specific) */}
             {renderNestedFields()}
           </div>
         );
