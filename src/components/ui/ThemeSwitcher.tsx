@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Moon, Sun, Palette } from '@phosphor-icons/react';
+import { Moon, Sun, Palette } from '@/lib/icons';
 import { ColorScheme } from '@/lib/theme/theme-config';
 
 export const ThemeSwitcher: React.FC = () => {

@@ -266,6 +266,7 @@ export {
   CheckCircle,
   XCircle,
   AlertCircle,
+  AlertCircle as WarningCircle, // Alias for consistency
   AlertTriangle,
   Info,
   Question,
