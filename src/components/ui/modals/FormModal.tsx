@@ -140,7 +140,6 @@ export default function FormModal<T extends Record<string, any>>({
             type="button"
             variant="outline"
             onClick={onClose}
-            className="border border-gray-300 text-gray-700 hover:bg-gray-50"
           >
             Cancel
           </Button>
@@ -154,7 +153,6 @@ export default function FormModal<T extends Record<string, any>>({
               !isValid ||
               Object.keys(errors).length > 0
             }
-            className="bg-gray-800 hover:bg-gray-900 text-white"
           >
             {submitButtonText}
           </Button>

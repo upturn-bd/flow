@@ -63,10 +63,56 @@ This is a **Next.js 15 + Supabase HRIS (Human Resource Information System)** wit
   - Role definitions and path arrays for middleware
 
 ### UI & Styling Conventions
-- **Tailwind CSS**: Standard setup with custom CSS variables for theming
-- **Animations**: Framer Motion with reusable variants in `src/components/ui/animations.ts` (fadeInUp, staggerContainer, etc.)
-- **Icons**: Mixed usage - Phosphor Icons (`@phosphor-icons/react`) primary, Lucide React for specific cases
+
+#### Theming System (CRITICAL)
+- **Theme Provider**: All applications must be wrapped with `ThemeProvider` from `src/contexts/ThemeContext.tsx`
+- **Theme Modes**: Supports light and dark modes with system preference detection
+- **Color Schemes**: Four built-in color schemes (blue, green, purple, orange) - default is blue
+- **Theme Hook**: Use `useTheme()` hook to access and modify theme settings
+  ```typescript
+  const { mode, colorScheme, setMode, setColorScheme, toggleMode } = useTheme();
+  ```
+- **CSS Custom Properties**: All colors defined as CSS variables in `src/app/globals.css`
+- **Theme Configuration**: Color definitions in `src/lib/theme/theme-config.ts`
+
+#### Color Usage Guidelines
+- **ALWAYS** use theme color variables, **NEVER** hardcode colors (e.g., `bg-gray-100`)
+- **Primary Colors**: Use `bg-primary-{50-950}`, `text-primary-{50-950}`, `border-primary-{50-950}`
+- **Background**: Use `bg-background-{primary|secondary|tertiary}`
+- **Text/Foreground**: Use `text-foreground-{primary|secondary|tertiary}`
+- **Borders**: Use `border-border-{primary|secondary}`
+- **Surfaces**: Use `bg-surface-{primary|secondary|hover}`
+- **Semantic Colors**: Use `text-success`, `text-warning`, `text-error`, `text-info` for status indicators
+- **Dark Mode Support**: All components automatically adapt to dark mode via CSS variables
+
+#### Icon System (CRITICAL)
+- **ONLY** use Phosphor Icons (`@phosphor-icons/react`) - **NO** Lucide React or React Icons
+- **Unified Import**: Import from `src/lib/icons.ts` for consistent icon usage
+  ```typescript
+  import { User, Settings, Calendar } from '@/lib/icons';
+  ```
+- **Icon Props**: Use `size` and `weight` props for consistency
+  ```tsx
+  <User size={20} weight="duotone" />
+  ```
+- **Common Patterns**:
+  - Regular text icons: `size={16-20}`, `weight="regular"`
+  - Headers/Important: `size={24}`, `weight="bold"`
+  - Decorative: `weight="duotone"` or `weight="fill"`
+
+#### Component Styling Standards
+- **Buttons**: Use `Button` component from `src/components/ui/button.tsx` with theme-aware variants
+- **Form Fields**: All form fields use theme colors (border-border-primary, bg-surface-primary, etc.)
+- **Cards**: Use `Card` components from `src/components/ui/Card.tsx` with theme support
+- **Modals**: `BaseModal` and `FormModal` are fully theme-aware
+- **Animations**: Framer Motion with reusable variants in `src/components/ui/animations.ts`
 - **Rich Text**: TipTap editor integration for content editing features
+
+#### Accessibility & Dark Mode
+- All interactive elements have proper focus states with `focus:ring-primary-500`
+- Dark mode variants automatically apply via `dark:` prefix
+- Ensure sufficient contrast ratios for text on backgrounds
+- Test components in both light and dark modes before committing
 
 ## Role-Based Access Control
 
