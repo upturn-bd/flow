@@ -162,7 +162,7 @@ export function PositionsProvider({
         if (createError) throw createError;
 
         // Update state only on success
-        setPositions((prev) => optimisticAdd(prev, newPosition as Position));
+        setPositions((prev) => [...prev, newPosition as Position]);
 
         devLog.action("PositionsContext", "Position created successfully", {
           id: newPosition.id,
@@ -195,7 +195,7 @@ export function PositionsProvider({
         setError((prev) => ({ ...prev, updateError: null }));
 
         // Optimistic update
-        setPositions((prev) => optimisticUpdate(prev, id, data));
+        setPositions((prev) => prev.map((pos) => (pos.id === id ? { ...pos, ...data } : pos)));
 
         devLog.action("PositionsContext", "Updating position", { id, data });
 
@@ -245,7 +245,7 @@ export function PositionsProvider({
         setError((prev) => ({ ...prev, deleteError: null }));
 
         // Optimistic remove
-        setPositions((prev) => optimisticRemove(prev, id));
+        setPositions((prev) => prev.filter((pos) => pos.id !== id));
 
         devLog.action("PositionsContext", "Deleting position", { id });
 

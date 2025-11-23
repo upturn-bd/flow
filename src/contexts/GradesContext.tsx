@@ -162,7 +162,7 @@ export function GradesProvider({
         if (createError) throw createError;
 
         // Update state only on success
-        setGrades((prev) => optimisticAdd(prev, newGrade as Grade));
+        setGrades((prev) => [...prev, newGrade as Grade]);
 
         devLog.action("GradesContext", "Grade created successfully", {
           id: newGrade.id,
@@ -195,7 +195,7 @@ export function GradesProvider({
         setError((prev) => ({ ...prev, updateError: null }));
 
         // Optimistic update
-        setGrades((prev) => optimisticUpdate(prev, id, data));
+        setGrades((prev) => prev.map((grade) => (grade.id === id ? { ...grade, ...data } : grade)));
 
         devLog.action("GradesContext", "Updating grade", { id, data });
 
@@ -245,7 +245,7 @@ export function GradesProvider({
         setError((prev) => ({ ...prev, deleteError: null }));
 
         // Optimistic remove
-        setGrades((prev) => optimisticRemove(prev, id));
+        setGrades((prev) => prev.filter((grade) => grade.id !== id));
 
         devLog.action("GradesContext", "Deleting grade", { id });
 

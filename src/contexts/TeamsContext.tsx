@@ -171,7 +171,7 @@ export function TeamsProvider({
         if (createError) throw createError;
 
         // Update state only on success
-        setTeams((prev) => optimisticAdd(prev, newTeam as Team));
+        setTeams((prev) => [...prev, newTeam as Team]);
 
         devLog.action("TeamsContext", "Team created successfully", {
           id: newTeam.id,
@@ -204,7 +204,7 @@ export function TeamsProvider({
         setError((prev) => ({ ...prev, updateError: null }));
 
         // Optimistic update
-        setTeams((prev) => optimisticUpdate(prev, id, data));
+        setTeams((prev) => prev.map((team) => (team.id === id ? { ...team, ...data } : team)));
 
         devLog.action("TeamsContext", "Updating team", { id, data });
 
@@ -254,7 +254,7 @@ export function TeamsProvider({
         setError((prev) => ({ ...prev, deleteError: null }));
 
         // Optimistic remove
-        setTeams((prev) => optimisticRemove(prev, id));
+        setTeams((prev) => prev.filter((team) => team.id !== id));
 
         devLog.action("TeamsContext", "Deleting team", { id });
 

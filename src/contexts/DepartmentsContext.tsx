@@ -162,7 +162,7 @@ export function DepartmentsProvider({
         if (createError) throw createError;
 
         // Update state only on success
-        setDepartments((prev) => optimisticAdd(prev, newDepartment as Department));
+        setDepartments((prev) => [...prev, newDepartment as Department]);
 
         devLog.action("DepartmentsContext", "Department created successfully", {
           id: newDepartment.id,
@@ -195,7 +195,9 @@ export function DepartmentsProvider({
         setError((prev) => ({ ...prev, updateError: null }));
 
         // Optimistic update
-        setDepartments((prev) => optimisticUpdate(prev, id, data));
+        setDepartments((prev) =>
+          prev.map((dept) => (dept.id === id ? { ...dept, ...data } : dept))
+        );
 
         devLog.action("DepartmentsContext", "Updating department", { id, data });
 
@@ -245,7 +247,7 @@ export function DepartmentsProvider({
         setError((prev) => ({ ...prev, deleteError: null }));
 
         // Optimistic remove
-        setDepartments((prev) => optimisticRemove(prev, id));
+        setDepartments((prev) => prev.filter((dept) => dept.id !== id));
 
         devLog.action("DepartmentsContext", "Deleting department", { id });
 

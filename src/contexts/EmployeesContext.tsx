@@ -253,7 +253,7 @@ export function EmployeesProvider({
           designation: newEmployee.designation || undefined,
         };
 
-        setEmployees((prev) => optimisticAdd(prev, formattedEmployee));
+        setEmployees((prev) => [...prev, formattedEmployee]);
 
         devLog.action("EmployeesContext", "Employee created successfully", {
           id: newEmployee.id,
@@ -286,7 +286,9 @@ export function EmployeesProvider({
         setError((prev) => ({ ...prev, updateError: null }));
 
         // Optimistic update
-        setEmployees((prev) => optimisticUpdate(prev, id, data));
+        setEmployees((prev) =>
+          prev.map((emp) => (emp.id === id ? { ...emp, ...data } : emp))
+        );
 
         devLog.action("EmployeesContext", "Updating employee", { id, data });
 
@@ -343,7 +345,7 @@ export function EmployeesProvider({
         setError((prev) => ({ ...prev, deleteError: null }));
 
         // Optimistic remove
-        setEmployees((prev) => optimisticRemove(prev, id));
+        setEmployees((prev) => prev.filter((emp) => emp.id !== id));
 
         devLog.action("EmployeesContext", "Deleting employee", { id });
 

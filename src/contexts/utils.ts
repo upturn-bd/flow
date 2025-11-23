@@ -48,7 +48,7 @@ export function createSuccessResponse<T>(data: T): MutationResponse<T> {
 }
 
 // Error response helper
-export function createErrorResponse(error: string): MutationResponse {
+export function createErrorResponse<T = unknown>(error: string): MutationResponse<T> {
   return {
     success: false,
     error,
@@ -75,7 +75,7 @@ export function validateCompanyId(companyId: number | string | undefined): numbe
 }
 
 // Optimistic update helper - adds item to array
-export function optimisticAdd<T extends { id: string | number }>(
+export function optimisticAdd<T>(
   items: T[],
   newItem: T
 ): T[] {
@@ -83,7 +83,7 @@ export function optimisticAdd<T extends { id: string | number }>(
 }
 
 // Optimistic update helper - updates item in array
-export function optimisticUpdate<T extends { id: string | number }>(
+export function optimisticUpdate<T extends { id?: string | number }>(
   items: T[],
   id: string | number,
   updates: Partial<T>
@@ -94,7 +94,7 @@ export function optimisticUpdate<T extends { id: string | number }>(
 }
 
 // Optimistic update helper - removes item from array
-export function optimisticRemove<T extends { id: string | number }>(
+export function optimisticRemove<T extends { id?: string | number }>(
   items: T[],
   id: string | number
 ): T[] {

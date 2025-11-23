@@ -162,7 +162,7 @@ export function DivisionsProvider({
         if (createError) throw createError;
 
         // Update state only on success
-        setDivisions((prev) => optimisticAdd(prev, newDivision as Division));
+        setDivisions((prev) => [...prev, newDivision as Division]);
 
         devLog.action("DivisionsContext", "Division created successfully", {
           id: newDivision.id,
@@ -195,7 +195,7 @@ export function DivisionsProvider({
         setError((prev) => ({ ...prev, updateError: null }));
 
         // Optimistic update
-        setDivisions((prev) => optimisticUpdate(prev, id, data));
+        setDivisions((prev) => prev.map((div) => (div.id === id ? { ...div, ...data } : div)));
 
         devLog.action("DivisionsContext", "Updating division", { id, data });
 
@@ -245,7 +245,7 @@ export function DivisionsProvider({
         setError((prev) => ({ ...prev, deleteError: null }));
 
         // Optimistic remove
-        setDivisions((prev) => optimisticRemove(prev, id));
+        setDivisions((prev) => prev.filter((div) => div.id !== id));
 
         devLog.action("DivisionsContext", "Deleting division", { id });
 
