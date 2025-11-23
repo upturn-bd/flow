@@ -51,6 +51,19 @@ export default function StepDataForm({
     );
   }
 
+  // Helper to check if field has any nested fields (general or option-specific)
+  const hasAnyNestedFields = (field: FieldDefinition): boolean => {
+    // Check for general nested fields
+    if (field.nested && field.nested.length > 0) {
+      return true;
+    }
+    // Check for option-specific nested fields in dropdown/multi-select
+    if ((field.type === 'dropdown' || field.type === 'multi_select') && field.options) {
+      return field.options.some(opt => opt.nested && opt.nested.length > 0);
+    }
+    return false;
+  };
+
   useEffect(() => {
     // Initialize form with existing data or empty values
     const initialData: Record<string, any> = {};
@@ -61,19 +74,6 @@ export default function StepDataForm({
       console.error("Invalid fields in step:", { step, field_definitions: step.field_definitions, fields });
       return;
     }
-    
-    // Helper to check if field has any nested fields (general or option-specific)
-    const hasAnyNestedFields = (field: FieldDefinition): boolean => {
-      // Check for general nested fields
-      if (field.nested && field.nested.length > 0) {
-        return true;
-      }
-      // Check for option-specific nested fields in dropdown/multi-select
-      if ((field.type === 'dropdown' || field.type === 'multi_select') && field.options) {
-        return field.options.some(opt => opt.nested && opt.nested.length > 0);
-      }
-      return false;
-    };
     
     fields.forEach((field) => {
       const existingValue = existingData?.data?.[field.key];
@@ -488,20 +488,6 @@ export default function StepDataForm({
 
   const renderField = (field: FieldDefinition) => {
     const fieldData = formData[field.key];
-    
-    // Helper to check if field has any nested fields (general or option-specific)
-    const hasAnyNestedFields = (field: FieldDefinition): boolean => {
-      // Check for general nested fields
-      if (field.nested && field.nested.length > 0) {
-        return true;
-      }
-      // Check for option-specific nested fields in dropdown/multi-select
-      if ((field.type === 'dropdown' || field.type === 'multi_select') && field.options) {
-        return field.options.some(opt => opt.nested && opt.nested.length > 0);
-      }
-      return false;
-    };
-    
     const hasNestedFields = hasAnyNestedFields(field);
     
     // Extract actual value from nested format or use legacy format
