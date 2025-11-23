@@ -8,7 +8,7 @@ import {
     FolderCheck,
     FolderOpen,
     Folder,
-} from "lucide-react";
+} from "@/lib/icons";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import { fadeInUp } from "@/components/ui/animations";
 import { getEmployeeInfo } from "@/lib/utils/auth";

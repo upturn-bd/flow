@@ -5,7 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import DivisionModal from "./DivisionModal";
 import DivisionDetailsModal from "./DivisionDetailsModal";
-import { Layers, Plus, Eye, X } from "lucide-react";
+import { Layers, Plus, Eye, X } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { TrashSimple } from "@phosphor-icons/react";
 import { getCompanyInfo } from "@/lib/utils/auth";

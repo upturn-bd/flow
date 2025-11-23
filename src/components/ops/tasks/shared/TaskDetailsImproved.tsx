@@ -4,7 +4,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { Task, useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, ChevronLeft, User, CheckCircle, XCircle, Clock, Target } from "lucide-react";
+import { Calendar, CaretLeft, User, CheckCircle, XCircle, Clock, Target } from "@/lib/icons";
 import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
 import { Button } from "@/components/ui/button";
@@ -155,7 +155,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
         action={{
           label: "Go back",
           onClick: onClose,
-          icon: <ChevronLeft size={16} />
+          icon: <CaretLeft size={16} />
         }}
       />
     );
@@ -170,7 +170,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
         action={{
           label: "Go back",
           onClick: onClose,
-          icon: <ChevronLeft size={16} />
+          icon: <CaretLeft size={16} />
         }}
       />
     );
@@ -219,7 +219,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
             variant="outline"
             size="sm"
           >
-            <ChevronLeft size={16} className="mr-2" />
+            <CaretLeft size={16} className="mr-2" />
             Back
           </Button>
         </div>

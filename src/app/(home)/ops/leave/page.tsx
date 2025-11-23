@@ -11,9 +11,9 @@ import {
   FileCheck,
   BookOpen,
   PlusCircle,
-  AlertCircle,
+  WarningCircle,
   Calendar
-} from "lucide-react";
+} from "@/lib/icons";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PERMISSION_MODULES } from "@/lib/constants";
 
@@ -68,7 +68,7 @@ function LeavePageContent() {
           </p>
           <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 max-w-md">
             <div className="flex gap-3">
-              <AlertCircle className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <WarningCircle className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-sm font-semibold text-blue-800 mb-1">Policy Information</h4>
                 <p className="text-sm text-blue-700">

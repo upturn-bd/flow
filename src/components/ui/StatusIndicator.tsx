@@ -5,11 +5,11 @@ import {
   CheckCircle, 
   Clock, 
   XCircle, 
-  AlertCircle, 
+  WarningCircle, 
   FileText, 
-  Loader2,
+  Loader,
   Circle
-} from "lucide-react";
+} from "@/lib/icons";
 
 interface StatusIndicatorProps {
   status: string;
@@ -61,7 +61,7 @@ export function StatusIndicator({
     
     if (statusLower.includes("in progress") || statusLower.includes("ongoing") || statusLower.includes("processing")) {
       return {
-        icon: Loader2,
+        icon: Loader,
         bgColor: "bg-blue-100",
         textColor: "text-blue-800",
         borderColor: "border-blue-200",
@@ -81,7 +81,7 @@ export function StatusIndicator({
     
     if (statusLower.includes("review")) {
       return {
-        icon: AlertCircle,
+        icon: WarningCircle,
         bgColor: "bg-orange-100",
         textColor: "text-orange-800",
         borderColor: "border-orange-200",
@@ -121,7 +121,7 @@ export function StatusIndicator({
   };
 
   const Component = animate ? motion.span : "span";
-  const iconProps = animate && Icon === Loader2 ? {
+  const iconProps = animate && Icon === Loader ? {
     animate: { rotate: 360 },
     transition: { duration: 1, repeat: Infinity }
   } : {};

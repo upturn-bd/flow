@@ -13,8 +13,8 @@ import {
   BarChart2,
   FileCheck,
   ArrowLeft,
-  Loader2,
-} from "lucide-react";
+  Loader,
+} from "@/lib/icons";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import Link from "next/link";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -148,7 +148,7 @@ function ProfileContent() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-96">
-        <Loader2 className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
+        <Loader className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
         <p className="text-gray-600">Loading profile information...</p>
       </div>
     );
@@ -225,7 +225,7 @@ export default function ProfilePage() {
     <Suspense
       fallback={
         <div className="flex flex-col items-center justify-center h-96">
-          <Loader2 className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
+          <Loader className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
           <p className="text-gray-600">Loading profile data...</p>
         </div>
       }

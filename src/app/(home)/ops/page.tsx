@@ -9,16 +9,16 @@ import {
   Bell, // Notice
   Clipboard, // Requisition
   DollarSign,
-  AlertCircle,
+  WarningCircle,
   UserPlus, // Onboarding
   File,
   Search,
   BellDot, // Reports
   Users,
   CreditCard, // Payroll
-  Building2,
+  Building,
   UserMinus, // Stakeholder
-} from "lucide-react";
+} from "@/lib/icons";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -85,7 +85,7 @@ const sections = [
       {
         name: "Complaint",
         path: "/ops/complaint",
-        icon: AlertCircle,
+        icon: WarningCircle,
         description: "Submit and track workplace issues and concerns",
         color: "bg-red-100 text-red-700 border-red-200"
       },
@@ -99,7 +99,7 @@ const sections = [
       {
         name: "Stakeholder Issues",
         path: "/ops/stakeholder-issues",
-        icon: Building2,
+        icon: Building,
         description: "Manage stakeholder relationships and track issues",
         color: "bg-purple-100 text-purple-700 border-purple-200"
       },

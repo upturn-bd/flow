@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Bell, Send, TestTube, Calendar, User, Briefcase, Clock, AlertTriangle } from "lucide-react";
+import { Bell, Send, TestTube, Calendar, User, Briefcase, Clock, AlertTriangle } from "@/lib/icons";
 import { useNotifications } from "@/hooks/useNotifications";
 import { 
   createLeaveRequestNotification,

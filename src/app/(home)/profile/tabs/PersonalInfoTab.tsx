@@ -23,7 +23,7 @@ import {
   Users,
   PhoneCall,
   MapPin,
-} from "lucide-react";
+} from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { fadeIn } from "@/components/ui/animations";
 import { useProfile } from "@/hooks/useProfile";

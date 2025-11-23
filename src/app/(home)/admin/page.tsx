@@ -13,14 +13,14 @@ import {
     CalendarX, // Leave Log
     Bell, // Notice Log
     Clipboard, // Requisition Log
-    AlertCircle, // Complaint Log
-    Building2, // Stakeholder Log
+    WarningCircle, // Complaint Log
+    Building, // Stakeholder Log
     UserPlus, // Onboarding Log
     GitBranch, // Stakeholder Processes (workflow/branching)
     File,
     Search,
     Download, // Data Export
-} from "lucide-react";
+} from "@/lib/icons";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -123,14 +123,14 @@ const sections = [
             {
                 name: "Complaint",
                 path: "/admin/logs/complaint",
-                icon: AlertCircle,
+                icon: WarningCircle,
                 description: "Archive of all submitted workplace complaints",
                 color: "bg-red-100 text-red-700 border-red-200"
             },
             {
                 name: "Stakeholder",
                 path: "/admin/stakeholders",
-                icon: Building2,
+                icon: Building,
                 description: "Records of all stakeholder interactions and issues",
                 color: "bg-purple-100 text-purple-700 border-purple-200"
             },

@@ -5,7 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import PositionDetailsModal from "./PositionDetailsModal";
 import PositionModal from "./PositionModal";
-import { BriefcaseBusiness, Plus, Eye } from "lucide-react";
+import { BriefcaseBusiness, Plus, Eye } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { TrashSimple } from "@phosphor-icons/react";
 

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   PackageOpen, 
   Truck 
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";

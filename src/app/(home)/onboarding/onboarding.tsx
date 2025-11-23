@@ -5,22 +5,22 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Calendar, 
-  Building2, 
+  Building, 
   User, 
   Mail, 
   Phone, 
   Briefcase, 
   Users, 
   CircleCheck, 
-  AlertCircle, 
-  Loader2, 
-  CheckCircle2, 
+  WarningCircle, 
+  Loader, 
+  CheckCircle, 
   Clock, 
   XCircle, 
   BadgeCheck, 
   Send,
   LogOut
-} from "lucide-react";
+} from "@/lib/icons";
 import { logout } from "@/app/(auth)/auth-actions";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
@@ -289,7 +289,7 @@ export default function EmployeeOnboarding() {
             
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6">
               <p className="text-sm text-blue-700 flex items-start">
-                <AlertCircle size={16} className="mr-2 mt-0.5 flex-shrink-0" />
+                <WarningCircle size={16} className="mr-2 mt-0.5 flex-shrink-0" />
                 If you have any questions about your application status, please contact your supervisor or the HR department.
               </p>
             </div>
@@ -341,7 +341,7 @@ export default function EmployeeOnboarding() {
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                   activeSection === "company" ? "bg-blue-600" : isCompanyCodeValid ? "bg-green-600" : "bg-gray-300"
                 } text-white font-medium`}>
-                  {isCompanyCodeValid ? <CheckCircle2 size={18} /> : 1}
+                  {isCompanyCodeValid ? <CheckCircle size={18} /> : 1}
                 </div>
                 <div className={`h-1 w-20 sm:w-32 ${isCompanyCodeValid ? "bg-green-600" : "bg-gray-300"}`}></div>
               </div>
@@ -432,7 +432,7 @@ export default function EmployeeOnboarding() {
                   className="p-6"
                 >
                   <div className="flex items-center mb-6">
-                    <Building2 className="h-6 w-6 text-blue-600 mr-2" />
+                    <Building className="h-6 w-6 text-blue-600 mr-2" />
                     <h2 className="text-xl font-semibold text-gray-800">Company Information</h2>
                   </div>
                   
@@ -445,7 +445,7 @@ export default function EmployeeOnboarding() {
                     <FormInputField
                       name="company_name"
                       label="Company Name"
-                      icon={<Building2 size={18} />}
+                      icon={<Building size={18} />}
                       value={formData.company_name}
                       onChange={handleChange}
                       readOnly={!!status}
@@ -483,7 +483,7 @@ export default function EmployeeOnboarding() {
                         >
                           {verifyLoading ? (
                             <>
-                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                              <Loader className="mr-2 h-5 w-5 animate-spin" />
                               Verifying...
                             </>
                           ) : (
@@ -562,7 +562,7 @@ export default function EmployeeOnboarding() {
                       <FormSelectField
                         name="department_id"
                         label="Department"
-                        icon={<Building2 size={18} />}
+                        icon={<Building size={18} />}
                         options={departments
                           .filter(dept => dept.id !== undefined)
                           .map(dept => ({ value: dept.id as number, label: dept.name }))}
@@ -630,7 +630,7 @@ export default function EmployeeOnboarding() {
                       >
                         {loading ? (
                           <>
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            <Loader className="mr-2 h-5 w-5 animate-spin" />
                             Processing...
                           </>
                         ) : status === "rejected" ? (
@@ -654,7 +654,7 @@ export default function EmployeeOnboarding() {
                         className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm"
                       >
                         <div className="flex items-start">
-                          <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                          <WarningCircle className="h-5 w-5 mr-2 flex-shrink-0" />
                           <span>{errors.submit}</span>
                         </div>
                       </motion.div>

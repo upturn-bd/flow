@@ -11,16 +11,16 @@ import {
   Upload,
   Calendar,
   Clock,
-  ChevronLeft,
-  ChevronDown,
+  CaretLeft,
+  CaretDown,
   PackageOpen,
-  AlertCircle,
+  WarningCircle,
   Save,
   Check,
-  Loader2,
+  Loader,
   X,
   FileText,
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
@@ -311,7 +311,7 @@ export default function RequisitionCreatePage({
           onClick={onClose}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
         >
-          <ChevronLeft size={16} />
+          <CaretLeft size={16} />
           <span>Back</span>
         </motion.button>
       </div>
@@ -363,13 +363,13 @@ export default function RequisitionCreatePage({
                     </option>
                   ))}
               </select>
-              <ChevronDown
+              <CaretDown
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
                 size={16}
               />
               {touchedFields.requisition_category_id && errors.requisition_category_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
-                  <AlertCircle size={14} className="mr-1" />
+                  <WarningCircle size={14} className="mr-1" />
                   {errors.requisition_category_id}
                 </p>
               )}
@@ -402,13 +402,13 @@ export default function RequisitionCreatePage({
                       </option>
                     ))}
               </select>
-              <ChevronDown
+              <CaretDown
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
                 size={16}
               />
               {touchedFields.item_id && errors.item_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
-                  <AlertCircle size={14} className="mr-1" />
+                  <WarningCircle size={14} className="mr-1" />
                   {errors.item_id}
                 </p>
               )}
@@ -429,7 +429,7 @@ export default function RequisitionCreatePage({
             />
             {touchedFields.quantity && errors.quantity && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
-                <AlertCircle size={14} className="mr-1" />
+                <WarningCircle size={14} className="mr-1" />
                 {errors.quantity}
               </p>
             )}
@@ -454,7 +454,7 @@ export default function RequisitionCreatePage({
               </div>
               {touchedFields.date && errors.date && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
-                  <AlertCircle size={14} className="mr-1" />
+                  <WarningCircle size={14} className="mr-1" />
                   {errors.date}
                 </p>
               )}
@@ -480,7 +480,7 @@ export default function RequisitionCreatePage({
                   </div>
                   {touchedFields.from_time && errors.from_time && (
                     <p className="mt-1 text-red-500 text-sm flex items-center">
-                      <AlertCircle size={14} className="mr-1" />
+                      <WarningCircle size={14} className="mr-1" />
                       {errors.from_time}
                     </p>
                   )}
@@ -504,7 +504,7 @@ export default function RequisitionCreatePage({
                   </div>
                   {touchedFields.to_time && errors.to_time && (
                     <p className="mt-1 text-red-500 text-sm flex items-center">
-                      <AlertCircle size={14} className="mr-1" />
+                      <WarningCircle size={14} className="mr-1" />
                       {errors.to_time}
                     </p>
                   )}
@@ -621,7 +621,7 @@ export default function RequisitionCreatePage({
           >
             {isSubmitting ? (
               <>
-                <Loader2 size={18} className="animate-spin" />
+                <Loader size={18} className="animate-spin" />
                 <span>Submitting...</span>
               </>
             ) : (

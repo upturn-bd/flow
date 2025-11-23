@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter, StatusBadge, InfoRow } from "@/components/ui/Card";
-import { ExternalLink, Trash2, Edit, Clock, Calendar, Building2, User, Target } from "lucide-react";
+import { ExternalLink, Trash, Edit, Clock, Calendar, Building, User, Target } from "@/lib/icons";
 import { Project } from "@/hooks/useProjects";
 import Link from "next/link";
 import { Employee } from "@/lib/types/schemas";
@@ -80,7 +80,7 @@ export default function ProjectCard({
           isLoading={isDeleting}
           className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
         >
-          <Trash2 size={14} />
+          <Trash size={14} />
         </Button>
       )}
       {showDetails && (
@@ -109,7 +109,7 @@ export default function ProjectCard({
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <InfoRow
-            icon={<Building2 size={16} />}
+            icon={<Building size={16} />}
             label="Departments"
             value={
               project.department_ids && project.department_ids.length > 0

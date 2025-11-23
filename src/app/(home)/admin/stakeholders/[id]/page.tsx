@@ -9,7 +9,7 @@ import { getPublicFileUrl } from "@/lib/utils/files";
 import { calculateFieldValue, formatCalculatedValue, formulaToReadable } from "@/lib/utils/formula-evaluator";
 import {
   ArrowLeft,
-  CheckCircle2,
+  CheckCircle,
   Clock,
   Calendar,
   MapPin,
@@ -17,14 +17,14 @@ import {
   Phone,
   User,
   Edit,
-  Trash2,
-  AlertCircle,
+  Trash,
+  WarningCircle,
   FileText,
   Download,
   DollarSign,
   Database,
   Calculator,
-} from "lucide-react";
+} from "@/lib/icons";
 import { Stakeholder, StakeholderProcessStep, StakeholderStepData } from "@/lib/types/schemas";
 import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
 import StakeholderIssuesTab from "@/components/stakeholder-issues/StakeholderIssuesTab";
@@ -197,7 +197,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
     return (
       <div className="p-6">
         <div className="max-w-2xl mx-auto text-center py-12">
-          <AlertCircle className="mx-auto text-gray-400" size={48} />
+          <WarningCircle className="mx-auto text-gray-400" size={48} />
           <h2 className="text-xl font-bold text-gray-900 mt-4">Stakeholder Not Found</h2>
           <p className="text-gray-600 mt-2">
             The stakeholder you're looking for doesn't exist or has been deleted.
@@ -234,12 +234,12 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900 break-words">{stakeholder.name}</h1>
               {stakeholder.status === "Rejected" ? (
                 <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-red-100 text-red-800 flex-shrink-0">
-                  <AlertCircle size={14} />
+                  <WarningCircle size={14} />
                   Rejected
                 </span>
               ) : stakeholder.is_completed || stakeholder.status === "Permanent" ? (
                 <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800 flex-shrink-0">
-                  <CheckCircle2 size={14} />
+                  <CheckCircle size={14} />
                   Stakeholder
                 </span>
               ) : (
@@ -266,7 +266,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               onClick={() => setShowDeleteConfirm(true)}
               className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
             >
-              <Trash2 size={14} />
+              <Trash size={14} />
               <span className="hidden sm:inline">Delete</span>
             </button>
           </div>
@@ -305,7 +305,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
       {stakeholder.status === "Rejected" && (
         <div className="bg-red-50 border-l-4 border-red-500 px-4 py-3 rounded-lg">
           <div className="flex items-start gap-3">
-            <AlertCircle className="text-red-500 mt-0.5" size={20} />
+            <WarningCircle className="text-red-500 mt-0.5" size={20} />
             <div>
               <p className="font-medium text-red-800">This stakeholder has been rejected</p>
               {stakeholder.rejection_reason && (
@@ -373,7 +373,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
             {stakeholder.completed_at && (
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="text-green-500 mt-0.5" size={18} />
+                <CheckCircle className="text-green-500 mt-0.5" size={18} />
                 <div>
                   <p className="text-sm font-medium text-gray-700">Completed</p>
                   <p className="text-sm text-gray-600 mt-0.5">
@@ -388,7 +388,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               <>
                 {stakeholder.rejected_at && (
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="text-red-500 mt-0.5" size={18} />
+                    <WarningCircle className="text-red-500 mt-0.5" size={18} />
                     <div>
                       <p className="text-sm font-medium text-gray-700">Rejected On</p>
                       <p className="text-sm text-gray-600 mt-0.5">
@@ -625,7 +625,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       }`}
                                   >
                                     {isCompleted ? (
-                                      <CheckCircle2 size={16} />
+                                      <CheckCircle size={16} />
                                     ) : (
                                       <span>{step.step_order}</span>
                                     )}

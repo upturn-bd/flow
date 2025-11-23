@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { LucideIcon } from "lucide-react";
+import { IconType } from "@/lib/icons";
 import { ReactNode } from "react";
 import { Button } from "./button";
 

@@ -5,20 +5,20 @@ import { motion } from "framer-motion";
 import {
   Bell,
   Clock,
-  AlertCircle,
+  WarningCircle,
   Calendar,
   Briefcase,
   User,
-  Trash2,
+  Trash,
   Check,
   ExternalLink
-} from "lucide-react";
+} from "@/lib/icons";
 import { useNotifications, Notification } from "@/hooks/useNotifications";
 import { formatRelativeTime } from "@/lib/utils";
 import Link from "next/link";
 
 const iconMap = {
-  'alert-circle': AlertCircle,
+  'alert-circle': WarningCircle,
   'calendar': Calendar,
   'briefcase': Briefcase,
   'user': User,
@@ -229,7 +229,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
             className="text-red-600 hover:bg-red-50 p-1.5 rounded"
             title="Delete notification"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash className="h-4 w-4" />
           </button>
         </div>
       </div>

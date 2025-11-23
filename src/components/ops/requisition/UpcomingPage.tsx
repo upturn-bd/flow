@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import RequisitionCreatePage, { RequisitionDraftPage } from "./RequisitionCreatePage";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
-import { Clock, FileEdit, Trash2 } from "lucide-react";
+import { Clock, FileEdit, Trash } from "@/lib/icons";
 import { motion } from "framer-motion";
 
 export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:string) => void }) {
@@ -114,7 +114,7 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
                             className="p-1.5 text-red-600 hover:bg-red-50 rounded-full transition-colors"
                             aria-label="Delete draft"
                           >
-                            <Trash2 className="h-5 w-5" />
+                            <Trash className="h-5 w-5" />
                           </button>
                         </div>
                       </div>

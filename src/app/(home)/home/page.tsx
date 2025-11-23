@@ -14,7 +14,7 @@ import StakeholderIssuesWidget from "@/app/(home)/home/widgets/StakeholderIssues
 import ServicesWidget from "@/app/(home)/home/widgets/ServicesWidget";
 import DetailModals from "@/app/(home)/home/components/DetailModals";
 import Portal from "@/components/ui/Portal";
-import { Settings, GripVertical, Eye, EyeOff, ArrowDownRight } from "lucide-react";
+import { Settings, GripVertical, Eye, EyeOff, ArrowDownRight } from "@/lib/icons";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import { WidgetConfig, WidgetSize } from "@/lib/types/widgets";

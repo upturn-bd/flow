@@ -164,6 +164,10 @@ import {
   Shield,
   ShieldCheck,
   Key,
+  Target,
+  ExternalLink,
+  Target,
+  ArrowSquareOut as ExternalLink,
   
   // Development
   GitBranch,
@@ -354,6 +358,10 @@ export {
   Shield,
   ShieldCheck,
   Key,
+  Target,
+  ExternalLink,
+  Target,
+  ExternalLink,
   
   // Development
   GitBranch,
@@ -513,6 +521,8 @@ export default {
   Shield,
   ShieldCheck,
   Key,
+  Target,
+  ExternalLink,
   GitBranch,
   GitCommit,
   GitMerge,

@@ -7,11 +7,11 @@ import {
   XCircle,
   Clock,
   User,
-  MessageSquare,
+  MessageCircle,
   FileText,
   X,
   Check
-} from "lucide-react";
+} from "@/lib/icons";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
@@ -135,7 +135,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
       {mode === "history" && complaint.comment && (
         <div className="mt-3 text-sm text-gray-700 bg-blue-50 p-3 rounded-md">
           <div className="flex items-center gap-2 mb-1">
-            <MessageSquare size={14} />
+            <MessageCircle size={14} />
             <p className="font-medium">Feedback:</p>
           </div>
           <p>{complaint.comment}</p>
@@ -170,7 +170,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
             {canComment && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <MessageSquare size={16} className="inline mr-2" />
+                  <MessageCircle size={16} className="inline mr-2" />
                   Add Comment
                 </label>
                 <textarea

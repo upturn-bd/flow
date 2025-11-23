@@ -10,11 +10,11 @@ import {
   Calendar,
   User,
   FileText,
-  MessageSquare,
-  Loader2,
+  MessageCircle,
+  Loader,
   Check,
   X,
-} from "lucide-react";
+} from "@/lib/icons";
 import { motion } from "framer-motion";
 
 import { RequisitionType, RequisitionInventory } from "@/lib/types";
@@ -188,7 +188,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
             {/* Comment input */}
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <MessageSquare size={14} />
+                <MessageCircle size={14} />
                 <span>Add Comment</span>
               </label>
               <input
@@ -216,7 +216,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                   className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                 >
                   {processingId === req.id ? (
-                    <Loader2 size={16} className="animate-spin" />
+                    <Loader size={16} className="animate-spin" />
                   ) : (
                     <X size={16} />
                   )}
@@ -234,7 +234,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                   className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                 >
                   {processingId === req.id ? (
-                    <Loader2 size={16} className="animate-spin" />
+                    <Loader size={16} className="animate-spin" />
                   ) : (
                     <Check size={16} />
                   )}

@@ -4,7 +4,7 @@ import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useEmployees } from "@/hooks/useEmployees";
-import { ArrowLeft, AlertCircle, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, WarningCircle, Plus, Trash } from "@/lib/icons";
 import { ContactPerson, Stakeholder } from "@/lib/types/schemas";
 
 export default function EditStakeholderPage({ params }: { params: Promise<{ id: string }> }) {
@@ -160,7 +160,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
     return (
       <div className="p-6">
         <div className="max-w-2xl mx-auto text-center py-12">
-          <AlertCircle className="mx-auto text-gray-400" size={48} />
+          <WarningCircle className="mx-auto text-gray-400" size={48} />
           <h2 className="text-xl font-bold text-gray-900 mt-4">Stakeholder Not Found</h2>
           <p className="text-gray-600 mt-2">
             The stakeholder you're trying to edit doesn't exist or has been deleted.
@@ -191,7 +191,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
         <div className="max-w-2xl mx-auto">
           <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-8 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
-              <AlertCircle className="text-yellow-600" size={32} />
+              <WarningCircle className="text-yellow-600" size={32} />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">
               No Stakeholder Processes Found
@@ -380,7 +380,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                         onClick={() => handleRemoveContactPerson(index)}
                         className="text-red-600 hover:text-red-700 p-1"
                       >
-                        <Trash2 size={16} />
+                        <Trash size={16} />
                       </button>
                     </div>
 

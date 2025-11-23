@@ -1,11 +1,11 @@
-import { LucideIcon } from "lucide-react";
+import { IconType } from "@/lib/icons";
 import { cn } from "./class";
 
 export type ColorType = "blue" | "emerald" | "purple" | "amber" | "red" | "gray";
 
 type LoadingSpinnerProps = {
   /** Optional icon to display in the center of the spinner */
-  icon?: LucideIcon;
+  icon?: IconType;
   /** Text to display alongside the spinner */
   text?: string;
   /** Color theme for the spinner (blue, emerald, purple, amber, red, gray) */

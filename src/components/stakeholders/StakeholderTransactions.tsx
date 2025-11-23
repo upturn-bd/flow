@@ -18,7 +18,7 @@ import {
   Building,
   Edit,
   X
-} from "lucide-react";
+} from "@/lib/icons";
 import { useAccounts } from "@/hooks/useAccounts";
 import { Account } from "@/lib/types/schemas";
 import { formatDate } from "@/lib/utils";

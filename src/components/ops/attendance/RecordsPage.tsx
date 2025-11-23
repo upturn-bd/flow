@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo } from "react";
 import { FaChevronDown, FaCalendarAlt } from "react-icons/fa";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { Clock } from "lucide-react";
+import { Clock } from "@/lib/icons";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function AttendanceRecordsPage() {

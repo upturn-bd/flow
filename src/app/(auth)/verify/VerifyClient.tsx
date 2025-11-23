@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { MailCheck } from "lucide-react";
+import { MailCheck } from "@/lib/icons";
 import { useSearchParams } from "next/navigation";
 
 const Verify = () => {

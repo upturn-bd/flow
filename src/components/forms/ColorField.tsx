@@ -1,4 +1,4 @@
-import { Palette } from "lucide-react";
+import { Palette } from "@/lib/icons";
 import { forwardRef, useState, useRef, useEffect } from "react";
 
 export interface ColorFieldProps {

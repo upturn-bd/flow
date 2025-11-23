@@ -4,11 +4,11 @@ import React, { useEffect, useState } from "react";
 import { useRequisitionRequests } from "@/hooks/useRequisition";
 import { supabase } from "@/lib/supabase/client";
 import {
-  Loader2,
+  Loader,
   ClipboardList,
   Clock,
-  AlertCircle,
-} from "lucide-react";
+  WarningCircle,
+} from "@/lib/icons";
 import TabView from "@/components/ui/TabView";
 import { RequisitionCard } from "@/components/ops/requisition/RequisitionCard";
 import { RequisitionType, RequisitionInventory } from "@/lib/types";
@@ -94,14 +94,14 @@ export default function RequisitionPage() {
                 <>
                   {loading && (
                     <div className="flex justify-center items-center py-20 text-gray-500">
-                      <Loader2 className="animate-spin mr-2" />
+                      <Loader className="animate-spin mr-2" />
                       Loading requisitions...
                     </div>
                   )}
 
                   {!loading && filtered.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-                      <AlertCircle className="mb-2" size={28} />
+                      <WarningCircle className="mb-2" size={28} />
                       <p>No pending requisition requests found.</p>
                     </div>
                   )}
@@ -135,14 +135,14 @@ export default function RequisitionPage() {
                 <>
                   {loading && (
                     <div className="flex justify-center items-center py-20 text-gray-500">
-                      <Loader2 className="animate-spin mr-2" />
+                      <Loader className="animate-spin mr-2" />
                       Loading history...
                     </div>
                   )}
 
                   {!loading && filtered.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-                      <AlertCircle className="mb-2" size={28} />
+                      <WarningCircle className="mb-2" size={28} />
                       <p>No past requisitions found.</p>
                     </div>
                   )}

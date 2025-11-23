@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { ArrowLeft, Edit, Play, Pause, ToggleRight, ToggleLeft } from "lucide-react";
+import { ArrowLeft, Edit, Play, Pause, ToggleRight, ToggleLeft } from "@/lib/icons";
 import ProcessForm from "@/components/stakeholder-processes/ProcessForm";
 import StepManager from "@/components/stakeholder-processes/StepManager";
 

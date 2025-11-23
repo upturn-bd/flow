@@ -7,7 +7,7 @@ import { Department, useDepartments } from "@/hooks/useDepartments";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { useProjects } from "@/hooks/useProjects";
 import { useMilestones } from "@/hooks/useMilestones";
-import { AlertCircle, Building2, X } from "lucide-react";
+import { WarningCircle, Building, X } from "@/lib/icons";
 import ProjectForm, { type ProjectDetails } from "./ProjectForm";
 import MilestoneList from "./milestone/MilestoneList";
 import MilestoneForm, { type Milestone } from "./milestone/MilestoneForm";
@@ -119,7 +119,7 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
         className="flex items-center justify-between mb-6"
       >
         <div className="flex items-center gap-3">
-          <Building2 size={24} className="text-gray-600" strokeWidth={1.5} />
+          <Building size={24} className="text-gray-600" strokeWidth={1.5} />
           <h2 className="text-xl font-semibold text-gray-800">
             Create New Project
           </h2>
@@ -198,7 +198,7 @@ export function UpdateProjectPage({
     >
       <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Building2 size={24} className="text-gray-600" strokeWidth={1.5} />
+          <Building size={24} className="text-gray-600" strokeWidth={1.5} />
           <h2 className="text-xl font-semibold text-gray-800">Update Project</h2>
         </div>
         <Button

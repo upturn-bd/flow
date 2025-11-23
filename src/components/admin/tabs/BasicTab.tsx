@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Building, Code, Briefcase, Globe, LoaderCircle } from "lucide-react";
+import { Building, Code, Briefcase, Globe, Loader } from "@/lib/icons";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { validateCompanyBasics, validationErrorsToObject } from "@/lib/utils/validation";
@@ -93,7 +93,7 @@ export default function BasicTab() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <LoaderCircle className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <Loader className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
           <p className="text-gray-600">Loading configuration...</p>
         </div>
       </div>

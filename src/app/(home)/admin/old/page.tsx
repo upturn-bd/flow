@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building, Settings, ChevronRight, ChevronLeft, LoaderCircle, CheckCircle2, XCircle, CreditCard, DollarSign, Shield } from "lucide-react";
+import { Building, Settings, CaretRight, CaretLeft, Loader, CheckCircle, XCircle, CreditCard, DollarSign, Shield } from "@/lib/icons";
 import { staggerContainer } from "@/components/ui/animations";
 
 // Import context
@@ -80,7 +80,7 @@ function AdminManagementContent() {
         animate={{ opacity: 1 }}
         className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm p-6 max-w-6xl mx-auto mt-8"
       >
-        <LoaderCircle className="w-12 h-12 text-gray-500 animate-spin mb-4" />
+        <Loader className="w-12 h-12 text-gray-500 animate-spin mb-4" />
         <p className="text-gray-600">Loading admin management...</p>
       </motion.div>
     );
@@ -121,7 +121,7 @@ function AdminManagementContent() {
               <span className="font-medium">Step 1</span>
               <Building size={16} />
             </div>
-            <ChevronRight className="text-gray-400" size={16} />
+            <CaretRight className="text-gray-400" size={16} />
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
               currentStep === 2 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
             }`}>
@@ -135,7 +135,7 @@ function AdminManagementContent() {
             {Object.entries(entityStatus).map(([entity, complete]) => (
               <div key={entity} className="flex items-center justify-center gap-2 p-2 bg-gray-50 rounded-lg">
                 {complete ? (
-                  <CheckCircle2 className="text-green-500" size={16} />
+                  <CheckCircle className="text-green-500" size={16} />
                 ) : (
                   <XCircle className="text-red-500" size={16} />
                 )}
@@ -190,7 +190,7 @@ function AdminManagementContent() {
                 : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
             }`}
           >
-            <ChevronLeft size={18} />
+            <CaretLeft size={18} />
             <span className="font-medium">Previous</span>
           </motion.button>
 
@@ -208,7 +208,7 @@ function AdminManagementContent() {
             <span className="font-medium">
               {currentStep === 2 ? 'Complete Setup' : 'Next Step'}
             </span>
-            <ChevronRight size={18} />
+            <CaretRight size={18} />
           </motion.button>
         </motion.div>
       </motion.div>
@@ -376,7 +376,7 @@ export default function AdminManagement() {
           animate={{ opacity: 1 }}
           className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm p-6 max-w-6xl mx-auto mt-8"
         >
-          <LoaderCircle className="w-12 h-12 text-gray-500 animate-spin mb-4" />
+          <Loader className="w-12 h-12 text-gray-500 animate-spin mb-4" />
           <p className="text-gray-600">Loading admin management...</p>
         </motion.div>
       }>

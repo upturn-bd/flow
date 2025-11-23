@@ -3,11 +3,11 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Loader2,
+  Loader,
   XCircle,
   PackageOpen,
   Calendar,
-} from "lucide-react";
+} from "@/lib/icons";
 import { extractFileNameFromStoragePath } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";

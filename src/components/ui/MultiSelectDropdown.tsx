@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Check, X, ChevronDown } from "lucide-react";
+import { Check, X, CaretDown } from "@/lib/icons";
 
 export interface DropdownOption {
   label: string;
@@ -106,7 +106,7 @@ export default function MultiSelectDropdown({
                 <span className="text-gray-400 text-sm">{placeholder}</span>
               )}
             </div>
-            <ChevronDown
+            <CaretDown
               className={`text-gray-400 transition-transform flex-shrink-0 ${
                 isOpen ? "rotate-180" : ""
               }`}

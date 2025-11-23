@@ -10,7 +10,7 @@ import {
   DollarSign,
   AlertTriangle,
   FilePlus
-} from "lucide-react";
+} from "@/lib/icons";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
 import SettlementHistoryPage from "@/components/ops/settlement/SettlementHistory";

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
-import { Calendar, DollarSign, User, FileText, Edit, Trash2, ExternalLink, AlertCircle } from "lucide-react";
+import { Calendar, DollarSign, User, FileText, Edit, Trash, ExternalLink, WarningCircle } from "@/lib/icons";
 import { Employee } from "@/lib/types/schemas";
 
 interface Settlement {
@@ -88,7 +88,7 @@ export default function SettlementCard({
           isLoading={isDeleting}
           className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
         >
-          <Trash2 size={14} />
+          <Trash size={14} />
         </Button>
       )}
       {showDetails && (
@@ -109,7 +109,7 @@ export default function SettlementCard({
       <CardHeader
         title={settlementType?.name || "Settlement Request"}
         subtitle={settlement.description}
-        icon={settlement.in_advance ? <AlertCircle size={20} className="text-orange-500" /> : <DollarSign size={20} className="text-green-500" />}
+        icon={settlement.in_advance ? <WarningCircle size={20} className="text-orange-500" /> : <DollarSign size={20} className="text-green-500" />}
         action={actions}
       />
       

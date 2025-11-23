@@ -7,13 +7,13 @@ import { TabItem } from "@/components/ui/TabView";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  AlertCircle,
+  WarningCircle,
   History,
   BookOpen,
   FilePlus,
   ClipboardCheck,
   AlertTriangle
-} from "lucide-react";
+} from "@/lib/icons";
 import { PERMISSION_MODULES } from "@/lib/constants";
 
 
@@ -114,7 +114,7 @@ export default function ComplaintPage() {
     <ServicePageTemplate
       title="Complaint Management"
       description="Submit, track, and manage workplace complaints and concerns. Our system ensures all issues are addressed promptly and fairly."
-      icon={<AlertCircle className="h-6 w-6" />}
+      icon={<WarningCircle className="h-6 w-6" />}
       primaryColor="text-red-600"
       tabs={tabs}
       activeTab={activeTab}

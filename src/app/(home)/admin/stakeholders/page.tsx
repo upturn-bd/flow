@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { Plus, Search, Filter, Eye, CheckCircle2, Clock, Download } from "lucide-react";
+import { Plus, Search, Filter, Eye, CheckCircle, Clock, Download } from "@/lib/icons";
 import Pagination from "@/components/ui/Pagination";
 import { exportStakeholdersToCSV } from "@/lib/utils/csv-export";
 import { toast } from "sonner";
@@ -164,7 +164,7 @@ export default function StakeholdersPage() {
               </p>
             </div>
             <div className="p-2 bg-green-100 rounded-lg flex-shrink-0 ml-2">
-              <CheckCircle2 className="text-green-600" size={18} />
+              <CheckCircle className="text-green-600" size={18} />
             </div>
           </div>
         </div>
@@ -379,7 +379,7 @@ export default function StakeholdersPage() {
                         )}`}
                       >
                         {stakeholder.status === 'Lead' && <Clock size={14} />}
-                        {stakeholder.status === 'Permanent' && <CheckCircle2 size={14} />}
+                        {stakeholder.status === 'Permanent' && <CheckCircle size={14} />}
                         {stakeholder.status}
                       </span>
                     </td>
@@ -438,7 +438,7 @@ export default function StakeholdersPage() {
                     )}`}
                   >
                     {stakeholder.status === 'Lead' && <Clock size={10} />}
-                    {stakeholder.status === 'Permanent' && <CheckCircle2 size={10} />}
+                    {stakeholder.status === 'Permanent' && <CheckCircle size={10} />}
                     {stakeholder.status}
                   </span>
                 </div>

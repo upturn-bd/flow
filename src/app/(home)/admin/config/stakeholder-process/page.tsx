@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { Plus, Settings, Trash2, Edit } from "lucide-react";
+import { Plus, Settings, Trash, Edit } from "@/lib/icons";
 import { StakeholderProcess } from "@/lib/types/schemas";
 import ProcessForm from "@/components/stakeholder-processes/ProcessForm";
 
@@ -158,7 +158,7 @@ export default function StakeholderProcessesPage() {
                     {processingId === process.id ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
                     ) : (
-                      <Trash2 size={18} />
+                      <Trash size={18} />
                     )}
                   </button>
                 </div>

@@ -7,7 +7,7 @@ import { FaChevronDown, FaCalendarAlt, FaSearch } from "react-icons/fa";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { Clock } from "lucide-react";
+import { Clock } from "@/lib/icons";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import ClickableStatusCell from "./ClickableStatusCell";
 

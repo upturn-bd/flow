@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, X } from "lucide-react";
+import { ArrowLeft, Save, X } from "@/lib/icons";
 import { ReactNode } from "react";
 
 interface FormLayoutProps {

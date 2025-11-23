@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import GradeModal from "./GradeModal";
-import { GraduationCap, Plus } from "lucide-react";
+import { GraduationCap, Plus } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { TrashSimple } from "@phosphor-icons/react";
 

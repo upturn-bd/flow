@@ -5,7 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import DepartmentModal from "./DepartmentModal";
 import DepartmentDetailsModal from "./DepartmentDetailsModal";
-import { Building, Plus, Eye, X } from "lucide-react";
+import { Building, Plus, Eye, X } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { TrashSimple } from "@phosphor-icons/react";
 import { getCompanyInfo } from "@/lib/utils/auth";

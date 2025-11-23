@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { CaretDown } from "@/lib/icons";
 
 export interface DropdownOption {
   label: string;
@@ -50,7 +50,7 @@ export default function DropdownField({
             </option>
           ))}
         </select>
-        <ChevronDown
+        <CaretDown
           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
           size={20}
         />

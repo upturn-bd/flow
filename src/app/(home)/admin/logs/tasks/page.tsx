@@ -5,7 +5,7 @@ import { useTasks } from "@/hooks/useTasks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
-import { Loader2, Trash2, RotateCcw, CheckCircle, Edit3 } from "lucide-react";
+import { Loader, Trash, RotateCcw, CheckCircle, Edit } from "@/lib/icons";
 import { toast } from "sonner";
 import TaskUpdateModal from "@/components/ops/tasks/shared/TaskUpdateModal";
 import { getEmployeeName } from "@/lib/utils/auth";
@@ -186,7 +186,7 @@ export default function CompanyTaskLogsPage() {
                                  onClick={() => handleEdit(task)}
                                  className="p-2"
                               >
-                                 <Edit3 size={16} />
+                                 <Edit size={16} />
                               </Button>
                            )}
 
@@ -198,7 +198,7 @@ export default function CompanyTaskLogsPage() {
                               onClick={() => task.id && handleDelete(task.id)}
                               className="p-2"
                            >
-                              <Trash2 size={16} />
+                              <Trash size={16} />
                            </Button>
                         )}
                      </div>
@@ -239,7 +239,7 @@ export default function CompanyTaskLogsPage() {
                            <>
                               {loading ? (
                                  <div className="flex justify-center items-center h-32">
-                                    <Loader2 className="animate-spin text-gray-500" />
+                                    <Loader className="animate-spin text-gray-500" />
                                  </div>
                               ) : error ? (
                                  <p className="text-red-500">
@@ -260,7 +260,7 @@ export default function CompanyTaskLogsPage() {
                            <>
                               {loading ? (
                                  <div className="flex justify-center items-center h-32">
-                                    <Loader2 className="animate-spin text-gray-500" />
+                                    <Loader className="animate-spin text-gray-500" />
                                  </div>
                               ) : error ? (
                                  <p className="text-red-500">

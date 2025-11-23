@@ -7,13 +7,13 @@ import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIss
 import BaseModal from "@/components/ui/modals/BaseModal";
 import {
   Plus,
-  AlertCircle,
+  WarningCircle,
   Download,
-  Trash2,
+  Trash,
   Eye,
-  CheckCircle2,
+  CheckCircle,
   Clock,
-} from "lucide-react";
+} from "@/lib/icons";
 import { StakeholderIssue } from "@/lib/types/schemas";
 
 interface StakeholderIssuesTabProps {
@@ -112,9 +112,9 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
       case "Pending":
         return <Clock size={16} />;
       case "In Progress":
-        return <AlertCircle size={16} />;
+        return <WarningCircle size={16} />;
       case "Resolved":
-        return <CheckCircle2 size={16} />;
+        return <CheckCircle size={16} />;
       default:
         return null;
     }
@@ -250,7 +250,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                     className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
                     title="Delete issue"
                   >
-                    <Trash2 size={18} />
+                    <Trash size={18} />
                   </button>
                 </div>
               </div>

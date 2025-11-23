@@ -6,7 +6,7 @@ import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, FileText, MessageSquare, Check, X, CalendarDays } from "lucide-react";
+import { Calendar, User, FileText, MessageCircle, Check, X, CalendarDays } from "@/lib/icons";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
 import { set } from "react-hook-form";
@@ -190,7 +190,7 @@ function LeaveRequestCard({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              <MessageSquare size={16} className="inline mr-2" />
+              <MessageCircle size={16} className="inline mr-2" />
               Comment
             </label>
             <textarea

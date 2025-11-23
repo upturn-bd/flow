@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Settings, Calendar, DollarSign, Clock, Activity, Timer } from "lucide-react";
+import { Settings, Calendar, DollarSign, Clock, Activity, Timer } from "@/lib/icons";
 import { staggerContainer } from "@/components/ui/animations";
 import FormToggleField from "@/components/ui/FormToggleField";
 import FormNumberField from "@/components/ui/FormNumberField";

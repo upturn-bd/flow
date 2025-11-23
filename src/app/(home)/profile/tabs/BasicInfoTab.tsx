@@ -11,7 +11,7 @@ import {
 import { validateBasicInfo, validationErrorsToObject } from "@/lib/utils/validation";
 import { BasicInfoField } from "./BasicInfoField";
 import { motion } from "framer-motion";
-import { User, Briefcase, Calendar, CheckCircle, AlertCircle, DollarSign } from "lucide-react";
+import { User, Briefcase, Calendar, CheckCircle, WarningCircle, DollarSign } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { fadeIn } from "@/components/ui/animations";
 import { useProfile } from "@/hooks/useProfile";
@@ -326,7 +326,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
           className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm"
         >
           <div className="flex items-start">
-            <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
+            <WarningCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
             <p className="text-sm font-medium text-red-700">{submitError}</p>
           </div>
         </motion.div>

@@ -14,8 +14,8 @@ import {
   MapPin,
   Calendar,
   Filter,
-  LoaderCircle 
-} from "lucide-react";
+  Loader 
+} from "@/lib/icons";
 import FormInputField from "@/components/ui/FormInputField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
@@ -211,7 +211,7 @@ export default function FinderPage() {
               exit={{ opacity: 0 }}
               className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm p-6"
             >
-              <LoaderCircle className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
+              <Loader className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
               <p className="text-gray-600">Loading employee data...</p>
             </motion.div>
           ) : filteredEmployees.length === 0 ? (

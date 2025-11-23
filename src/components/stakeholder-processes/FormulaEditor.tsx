@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import { StakeholderProcessStep, FieldDefinition } from "@/lib/types/schemas";
-import { X, Plus, Calculator, AlertCircle } from "lucide-react";
+import { X, Plus, Calculator, WarningCircle } from "@/lib/icons";
 
 interface CellReference {
   stepOrder: number;
@@ -609,7 +609,7 @@ export default function FormulaEditor({
       {/* Validation Error */}
       {validationError && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
-          <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={16} />
+          <WarningCircle className="text-red-600 flex-shrink-0 mt-0.5" size={16} />
           <div className="flex-1">
             <p className="text-sm font-medium text-red-800">Invalid Formula</p>
             <p className="text-sm text-red-600 mt-1">{validationError}</p>

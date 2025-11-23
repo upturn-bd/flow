@@ -9,17 +9,17 @@ import {
   Filter,
   Eye,
   Edit,
-  Trash2,
+  Trash,
   DollarSign,
   Calendar,
   Building,
-  LoaderCircle,
+  Loader,
   CheckCircle,
   Clock,
   X,
   Minus,
   Users
-} from "lucide-react";
+} from "@/lib/icons";
 import { staggerContainer, fadeInUp } from "@/components/ui/animations";
 import { useAccounts, AccountFilters } from "@/hooks/useAccounts";
 import { useStakeholders } from "@/hooks/useStakeholders";
@@ -360,7 +360,7 @@ export default function AccountsTab() {
         animate={{ opacity: 1 }}
         className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm p-6"
       >
-        <LoaderCircle className="w-12 h-12 text-gray-500 animate-spin mb-4" />
+        <Loader className="w-12 h-12 text-gray-500 animate-spin mb-4" />
         <p className="text-gray-600">Loading accounts...</p>
       </motion.div>
     );
@@ -681,7 +681,7 @@ export default function AccountsTab() {
                               className="text-red-600 hover:text-red-800 transition-colors"
                               title="Delete"
                             >
-                              <Trash2 size={14} />
+                              <Trash size={14} />
                             </button>
                           </div>
                         </td>
@@ -774,7 +774,7 @@ export default function AccountsTab() {
                         onClick={() => handleDeleteClick(account)}
                         className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
                       >
-                        <Trash2 size={14} />
+                        <Trash size={14} />
                         Delete
                       </button>
                     </div>

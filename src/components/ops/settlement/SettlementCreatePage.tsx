@@ -7,10 +7,10 @@ import {
   X,
   FileText,
   User,
-  AlertCircle,
+  WarningCircle,
   Paperclip,
   CheckCircle
-} from "lucide-react";
+} from "@/lib/icons";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useSettlementRequests } from "@/hooks/useSettlement";
@@ -267,7 +267,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
               style={{ display: 'block', flex: 'none' }}
             />
             <label htmlFor="in_advance" className="flex items-center gap-2 text-sm font-medium text-orange-800 ml-2">
-              <AlertCircle size={16} />
+              <WarningCircle size={16} />
               Request as advance payment
             </label>
           </div>

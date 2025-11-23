@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, Plus, Settings, Trash2, Edit, UserPlus, Shield, Search, X, Loader2 } from "lucide-react";
+import { Users, Plus, Settings, Trash, Edit, UserPlus, Shield, Search, X, Loader } from "@/lib/icons";
 import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/lib/auth/auth-context";
 import type { Team, TeamWithMembers, TeamWithPermissions } from "@/lib/types/schemas";
@@ -233,7 +233,7 @@ export default function TeamsPage() {
       {/* Loading State */}
       {loading && teams.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20">
-          <Loader2 className="h-12 w-12 text-indigo-600 animate-spin mb-4" />
+          <Loader className="h-12 w-12 text-indigo-600 animate-spin mb-4" />
           <p className="text-gray-600">Loading teams...</p>
         </div>
       )}
@@ -284,7 +284,7 @@ export default function TeamsPage() {
                             className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete team"
                           >
-                            <Trash2 className="h-4 w-4 text-red-600" />
+                            <Trash className="h-4 w-4 text-red-600" />
                           </button>
                         )}
                       </div>
@@ -459,7 +459,7 @@ export default function TeamsPage() {
             >
               {isLoadingAction ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader className="h-4 w-4 mr-2 animate-spin" />
                   Deleting...
                 </>
               ) : (

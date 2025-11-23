@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Pencil, ExternalLink } from "lucide-react";
+import { Pencil, ExternalLink } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { Milestone, Project } from "@/lib/types/schemas";
 

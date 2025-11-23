@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 import {
   FileText,
   Target,
-  Building2,
+  Building,
   UserCircle,
   Calendar,
   Check,
   X,
-  AlertCircle,
-} from "lucide-react";
+  WarningCircle,
+} from "@/lib/icons";
 import {
   validateProject,
   validationErrorsToObject,
@@ -389,7 +389,7 @@ export default function ProjectForm({
                 <FormSelectField
                   name={`department_${index}`}
                   value={deptId.toString()}
-                  icon={<Building2 size={16} className="text-gray-500" />}
+                  icon={<Building size={16} className="text-gray-500" />}
                   onChange={(e) => {
                     const newDeptId = Number(e.target.value);
                     setProjectDetails((prev) => {

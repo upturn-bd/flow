@@ -5,7 +5,7 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { StakeholderProcessStep, StakeholderStepData, FieldDefinition, NestedFieldValue } from "@/lib/types/schemas";
-import { Upload, X, CheckCircle2, File as FileIcon, Loader2, XCircle, Calculator, AlertCircle } from "lucide-react";
+import { Upload, X, CheckCircle, File as FileIcon, Loader, XCircle, Calculator, WarningCircle } from "@/lib/icons";
 import GeolocationPicker, { GeolocationValue } from "@/components/ui/GeolocationPicker";
 import DropdownField from "@/components/ui/DropdownField";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
@@ -766,10 +766,10 @@ export default function StepDataForm({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {hasCalculationError && (
-                    <AlertCircle className="text-red-600 flex-shrink-0" size={16} />
+                    <WarningCircle className="text-red-600 flex-shrink-0" size={16} />
                   )}
                   {hasMissingRefs && !hasCalculationError && (
-                    <AlertCircle className="text-amber-600 flex-shrink-0" size={16} />
+                    <WarningCircle className="text-amber-600 flex-shrink-0" size={16} />
                   )}
                   <span className={`text-lg font-semibold ${
                     hasCalculationError 
@@ -807,7 +807,7 @@ export default function StepDataForm({
             {/* Error Messages */}
             {calculationResult.error && (
               <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
-                <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={14} />
+                <WarningCircle className="text-red-600 flex-shrink-0 mt-0.5" size={14} />
                 <p className="text-xs text-red-700">
                   <span className="font-medium">Calculation Error:</span> {calculationResult.error}
                 </p>
@@ -817,7 +817,7 @@ export default function StepDataForm({
             {/* Missing References Warning */}
             {calculationResult.missingRefs && calculationResult.missingRefs.length > 0 && (
               <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded flex items-start gap-2">
-                <AlertCircle className="text-amber-600 flex-shrink-0 mt-0.5" size={14} />
+                <WarningCircle className="text-amber-600 flex-shrink-0 mt-0.5" size={14} />
                 <div className="flex-1">
                   <p className="text-xs text-amber-800 font-medium mb-1">
                     Missing or incomplete field data:
@@ -1191,7 +1191,7 @@ export default function StepDataForm({
               disabled={submitting || rejecting}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              <CheckCircle2 size={16} />
+              <CheckCircle size={16} />
               {submitting ? "Completing..." : "Complete Step"}
             </button>
           </div>

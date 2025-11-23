@@ -14,7 +14,7 @@ import {
   BookOpen,
   Building,
   Calendar 
-} from "lucide-react";
+} from "@/lib/icons";
 import { Education } from "@/hooks/useProfile";
 import { Experience } from "@/lib/types";
 import { extractFilenameFromUrl } from "@/lib/utils";

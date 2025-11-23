@@ -6,11 +6,11 @@ import {
   Calendar,
   Users,
   Search,
-  AlertCircle,
+  WarningCircle,
   X,
   Check,
   Target,
-} from "lucide-react";
+} from "@/lib/icons";
 import { Milestone } from "@/lib/types/schemas";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
@@ -246,7 +246,7 @@ export default function MilestoneForm({
             />
             {errors.weightage && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
-                <AlertCircle size={14} className="mr-1" strokeWidth={2} />
+                <WarningCircle size={14} className="mr-1" strokeWidth={2} />
                 {errors.weightage}
               </p>
             )}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { StakeholderProcess } from "@/lib/types/schemas";
-import { X } from "lucide-react";
+import { X } from "@/lib/icons";
 import Toggle from "@/components/ui/Toggle";
 
 interface ProcessFormProps {

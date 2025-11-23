@@ -15,7 +15,7 @@ import {
   UserX,
   Clock,
   ClipboardCheck,
-} from "lucide-react";
+} from "@/lib/icons";
 import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 import { PERMISSION_MODULES } from "@/lib/constants";

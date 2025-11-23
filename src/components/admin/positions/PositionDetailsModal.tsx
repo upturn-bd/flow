@@ -4,7 +4,7 @@ import { Department } from "@/hooks/useDepartments";
 import { Grade } from "@/hooks/useGrades";
 import { Position } from "@/hooks/usePositions";
 import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
-import { BriefcaseBusiness, Building, GraduationCap, FileText, X } from "lucide-react";
+import { BriefcaseBusiness, Building, GraduationCap, FileText, X } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";

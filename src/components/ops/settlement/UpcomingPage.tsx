@@ -3,7 +3,7 @@ import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEffect, useState } from "react";
 import SettlementCreatePage from "./SettlementCreatePage";
 import SettlementDraftPage from "./SettlementDraftPage";
-import { Receipt, FileEdit, Trash2, Clock } from "lucide-react";
+import { Receipt, FileEdit, Trash, Clock } from "@/lib/icons";
 import { motion } from "framer-motion";
 
 export default function UpcomingPage({setActiveTab} : {setActiveTab: (tab:string) => void}) {
@@ -115,7 +115,7 @@ export default function UpcomingPage({setActiveTab} : {setActiveTab: (tab:string
                             className="p-1.5 text-red-600 hover:bg-red-50 rounded-full transition-colors"
                             aria-label="Delete draft"
                           >
-                            <Trash2 className="h-5 w-5" />
+                            <Trash className="h-5 w-5" />
                           </button>
                         </div>
                       </div>

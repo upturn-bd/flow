@@ -7,7 +7,7 @@ import {
   CheckSquare,
   ArchiveIcon,
   PlusSquare
-} from "lucide-react";
+} from "@/lib/icons";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import OngoingTaskPage from "@/components/ops/tasks/OngoingTasks";
 import CompletedTasksList from "@/components/ops/tasks/CompletedTasks";

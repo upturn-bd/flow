@@ -4,7 +4,7 @@
 
 import { Division } from "@/hooks/useDivisions";
 import { PencilSimple, TrashSimple, User, FileText, X } from "@phosphor-icons/react";
-import { Layers } from "lucide-react";
+import { Layers } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";

@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Users } from "lucide-react";
+import { Search, X, Users } from "@/lib/icons";
 import { matchesEmployeeSearch } from "@/lib/utils/user-search";
 
 interface AssigneeSelectProps {

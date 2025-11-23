@@ -5,13 +5,13 @@ import { useNotices, useNoticeTypes } from "@/hooks/useNotice";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import {
-  Loader2,
+  Loader,
   Search,
-  AlertCircle,
+  WarningCircle,
   FileText,
   Pencil,
-  Trash2,
-} from "lucide-react";
+  Trash,
+} from "@/lib/icons";
 import { motion } from "framer-motion";
 import NoticeUpdateModal from "@/components/ops/notice/NoticeUpdateModal";
 import { toast } from "sonner";
@@ -152,7 +152,7 @@ export default function NoticePage() {
       {/* Loading */}
       {loading && (
         <div className="flex justify-center items-center py-20 text-gray-500">
-          <Loader2 className="animate-spin mr-2" />
+          <Loader className="animate-spin mr-2" />
           Loading notices...
         </div>
       )}
@@ -160,7 +160,7 @@ export default function NoticePage() {
       {/* Empty */}
       {!loading && filtered.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-          <AlertCircle className="mb-2" size={28} />
+          <WarningCircle className="mb-2" size={28} />
           <p>No notices found.</p>
         </div>
       )}
@@ -242,7 +242,7 @@ export default function NoticePage() {
                       title="Delete Notice"
                       onClick={() => handleDelete(notice.id)}
                     >
-                      <Trash2 size={16} />
+                      <Trash size={16} />
                     </Button>
                   )}
 

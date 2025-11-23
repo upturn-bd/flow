@@ -13,9 +13,9 @@ import {
   Clock, 
   Check, 
   X,
-  MessageSquare,
+  MessageCircle,
   List
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -210,7 +210,7 @@ function SettlementRequestCard({
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              <MessageSquare size={16} className="inline mr-2" />
+              <MessageCircle size={16} className="inline mr-2" />
               Add Comment
             </label>
             <textarea

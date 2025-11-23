@@ -3,7 +3,7 @@
 import { AdminDataProvider } from "@/contexts/AdminDataContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, ChevronRight, ClipboardList, FileText } from "lucide-react";
+import { Home, CaretRight, ClipboardList, FileText } from "@/lib/icons";
 import { motion } from "framer-motion";
 
 // Helper function to capitalize and format the path segment
@@ -43,7 +43,7 @@ const LogsBreadcrumbs = () => {
                     <li key={index} className="inline-flex items-center">
                         <div className="flex items-center">
                             {/* Render separator for all items after the first one */}
-                            {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
+                            {index > 0 && <CaretRight className="w-4 h-4 text-gray-400" />}
                             
                             <Link 
                                 href={item.href} 
@@ -59,7 +59,7 @@ const LogsBreadcrumbs = () => {
                 {/* 2. Current Active Page */}
                 <li aria-current="page">
                     <div className="flex items-center">
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                        <CaretRight className="w-4 h-4 text-gray-400" />
                         {/* Using ClipboardList icon for log-related pages */}
                         <span className="ml-1 text-blue-600 md:ml-3 flex items-center font-semibold">
                             <ClipboardList className="w-4 h-4 mr-1.5" />

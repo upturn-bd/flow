@@ -15,10 +15,10 @@ import {
   TrendingUp,
   Minus,
   Plus,
-  Edit3,
+  Edit,
   Save,
   X
-} from "lucide-react";
+} from "@/lib/icons";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { formatDate } from "@/lib/utils";
 import { PayrollAdjustment } from "@/lib/types/schemas";
@@ -493,7 +493,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                                     disabled={processingUpdate}
                                     className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
                                   >
-                                    <Edit3 className="h-4 w-4 mr-2" />
+                                    <Edit className="h-4 w-4 mr-2" />
                                     Add Adjustments
                                   </button>
                                   <button

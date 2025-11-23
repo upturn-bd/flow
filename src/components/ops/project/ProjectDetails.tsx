@@ -13,7 +13,7 @@ import { type MilestoneData } from "@/lib/validation/schemas/advanced";
 import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import {
   Plus,
-  Building2,
+  Building,
   User,
   Clock,
   Users,
@@ -22,10 +22,10 @@ import {
   Target,
   Calendar,
   Pencil,
-  Trash2,
+  Trash,
   Projector,
   ExternalLink,
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -380,7 +380,7 @@ export default function ProjectDetails({
   if (error) {
     return (
       <EmptyState
-        icon={<Building2 className="h-12 w-12" />}
+        icon={<Building className="h-12 w-12" />}
         title="Error loading project"
         description={error}
       />
@@ -390,7 +390,7 @@ export default function ProjectDetails({
   if (!projectDetails) {
     return (
       <EmptyState
-        icon={<Building2 className="h-12 w-12" />}
+        icon={<Building className="h-12 w-12" />}
         title="Project not found"
         description="The requested project could not be found"
       />
@@ -412,7 +412,7 @@ export default function ProjectDetails({
             className="flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
-              <Building2 size={24} className="text-blue-600" />
+              <Building size={24} className="text-blue-600" />
               <h1 className="text-2xl font-bold text-gray-900">
                 Project Details
               </h1>
@@ -432,7 +432,7 @@ export default function ProjectDetails({
               <CardHeader
                 title={projectDetails.project_title}
                 subtitle={projectDetails.description}
-                icon={<Building2 size={20} />}
+                icon={<Building size={20} />}
                 action={
                   <StatusBadge
                     status={projectDetails.status || "pending"}

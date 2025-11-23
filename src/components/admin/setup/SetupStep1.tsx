@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Building, Code, Briefcase, Globe } from "lucide-react";
+import { Building, Code, Briefcase, Globe } from "@/lib/icons";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { staggerContainer } from "@/components/ui/animations";

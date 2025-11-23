@@ -6,7 +6,7 @@ import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
-import { Loader2, Trash2, Edit2, X } from "lucide-react";
+import { Loader, Trash, Edit2, X } from "@/lib/icons";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -211,7 +211,7 @@ export default function AttendanceLogsPage() {
                       className="p-2 hover:bg-red-100 transition-colors"
                       onClick={() => handleDelete(att)}
                     >
-                      <Trash2 size={16} />
+                      <Trash size={16} />
                     </Button>
                   )}
                 </td>
@@ -249,7 +249,7 @@ export default function AttendanceLogsPage() {
                 color: "text-blue-500",
                 content: todayLoading ? (
                   <div className="flex justify-center items-center h-32">
-                    <Loader2 className="animate-spin text-gray-500" />
+                    <Loader className="animate-spin text-gray-500" />
                   </div>
                 ) : (
                   renderTable(filteredToday)

@@ -1,4 +1,4 @@
-import { Check, ChevronDown, X } from "lucide-react";
+import { Check, CaretDown, X } from "@/lib/icons";
 import { forwardRef, useState, useRef, useEffect } from "react";
 import { Button } from "../ui/button";
 
@@ -144,7 +144,7 @@ export const MultiSelectField = forwardRef<HTMLDivElement, MultiSelectFieldProps
               </>
             )}
             
-            <ChevronDown 
+            <CaretDown 
               className={`h-4 w-4 text-gray-400 ml-auto transition-transform ${isOpen ? 'rotate-180' : ''}`} 
             />
           </div>

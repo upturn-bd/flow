@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Plus, Trash2, Save } from "lucide-react";
+import { X, Plus, Trash, Save } from "@/lib/icons";
 import { StakeholderStepData, StakeholderProcessStep } from "@/lib/types/schemas";
 
 interface AdditionalDataModalProps {
@@ -216,7 +216,7 @@ export default function AdditionalDataModal({
                       onClick={() => handleRemoveField(field.key)}
                       className="flex-shrink-0 text-red-600 hover:text-red-700 transition-colors"
                     >
-                      <Trash2 size={18} />
+                      <Trash size={18} />
                     </button>
                   </div>
                 ))}
@@ -281,7 +281,7 @@ export default function AdditionalDataModal({
                           onClick={() => handleRemoveCustomField(index)}
                           className="flex-shrink-0 px-2 text-red-600 hover:text-red-700 transition-colors"
                         >
-                          <Trash2 size={18} />
+                          <Trash size={18} />
                         </button>
                       </div>
                     </div>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useStakeholderTypes } from "@/hooks/useStakeholderTypes";
-import { ArrowLeft, AlertCircle, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, WarningCircle, Plus, Trash } from "@/lib/icons";
 import { ContactPerson } from "@/lib/types/schemas";
 
 export default function NewStakeholderPage() {
@@ -132,7 +132,7 @@ export default function NewStakeholderPage() {
         <div className="max-w-2xl mx-auto">
           <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 sm:p-8 text-center">
             <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-yellow-100 rounded-full mb-3 sm:mb-4">
-              <AlertCircle className="text-yellow-600" size={24} />
+              <WarningCircle className="text-yellow-600" size={24} />
             </div>
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
               No Stakeholder Processes Found
@@ -357,7 +357,7 @@ export default function NewStakeholderPage() {
                         onClick={() => handleRemoveContactPerson(index)}
                         className="text-red-600 hover:text-red-700 p-1"
                       >
-                        <Trash2 size={16} />
+                        <Trash size={16} />
                       </button>
                     </div>
 

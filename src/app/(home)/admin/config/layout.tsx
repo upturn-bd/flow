@@ -4,7 +4,7 @@
 import { AdminDataProvider } from "@/contexts/AdminDataContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation"; // Hook to get the current URL
-import { Home, ChevronRight, Settings } from "lucide-react";
+import { Home, CaretRight, Settings } from "@/lib/icons";
 import { motion } from "framer-motion";
 
 // Helper function to capitalize and format the path segment
@@ -43,11 +43,11 @@ const ConfigurationBreadcrumbs = () => {
                     <li key={index} className="inline-flex items-center">
                         {/* Corrected Logic: 
                             - Always show the link.
-                            - Only show the ChevronRight separator for items after the first one (i.e., index > 0). 
+                            - Only show the CaretRight separator for items after the first one (i.e., index > 0). 
                         */}
                         <div className="flex items-center">
                             {/* Check if it's not the first item to render the separator */}
-                            {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
+                            {index > 0 && <CaretRight className="w-4 h-4 text-gray-400" />}
                             
                             <Link 
                                 href={item.href} 
@@ -63,7 +63,7 @@ const ConfigurationBreadcrumbs = () => {
                 {/* 2. Current Active Page */}
                 <li aria-current="page">
                     <div className="flex items-center">
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                        <CaretRight className="w-4 h-4 text-gray-400" />
                         <span className="ml-1 text-blue-600 md:ml-3 flex items-center">
                             <Settings className="w-4 h-4 mr-1.5" />
                             {currentPageLabel}

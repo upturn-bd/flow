@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
-import { UserPlus, Loader2, Check, X, AlertTriangle, Users, User, RefreshCw } from "lucide-react";
+import { UserPlus, Loader, Check, X, AlertTriangle, Users, User, RefreshCw } from "@/lib/icons";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useEmployees } from "@/hooks/useEmployees";

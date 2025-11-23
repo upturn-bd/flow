@@ -7,7 +7,7 @@ import {
   ClipboardCheck,
   AlertTriangle,
   Users
-} from "lucide-react";
+} from "@/lib/icons";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
 import PendingPayrolls from "@/components/ops/payroll/PendingPayrolls";

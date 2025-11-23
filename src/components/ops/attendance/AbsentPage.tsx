@@ -7,7 +7,7 @@ import { FaChevronDown, FaCalendarAlt, FaSearch } from "react-icons/fa";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { Ban } from "lucide-react";
+import { Ban } from "@/lib/icons";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function AttendanceAbsentPage() {

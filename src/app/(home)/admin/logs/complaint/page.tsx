@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { 
-  Loader2, 
+  Loader, 
   ClipboardList, 
   Clock, 
-  AlertCircle, 
+  WarningCircle, 
   Flag 
-} from "lucide-react";
+} from "@/lib/icons";
 import TabView from "@/components/ui/TabView";
 import { ComplaintCard } from "@/components/ops/complaint/ComplaintCard";
 import { useEmployees } from "@/hooks/useEmployees";

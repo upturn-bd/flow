@@ -1,6 +1,6 @@
 "use client";
 
-import { Save, X } from "lucide-react";
+import { Save, X } from "@/lib/icons";
 import { motion } from "framer-motion";
 import LoadingSpinner from "./LoadingSpinner";
 

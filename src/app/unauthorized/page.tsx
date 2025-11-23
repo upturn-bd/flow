@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShieldAlert } from "lucide-react";
+import { ShieldAlert } from "@/lib/icons";
 
 export default function UnauthorizedPage() {
   return (

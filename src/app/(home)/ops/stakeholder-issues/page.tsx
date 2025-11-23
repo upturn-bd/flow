@@ -8,16 +8,16 @@ import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIss
 import BaseModal from "@/components/ui/modals/BaseModal";
 import Pagination from "@/components/ui/Pagination";
 import {
-  AlertCircle,
-  CheckCircle2,
+  WarningCircle,
+  CheckCircle,
   Clock,
   Download,
   Eye,
   Filter,
   Plus,
   Search,
-  Trash2,
-} from "lucide-react";
+  Trash,
+} from "@/lib/icons";
 import { StakeholderIssue } from "@/lib/types/schemas";
 import { useAuth } from "@/lib/auth/auth-context";
 import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
@@ -208,7 +208,7 @@ export default function StakeholderIssuesPage() {
               <p className="text-2xl font-bold text-gray-900 mt-1">{inProgressIssues.length}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
-              <AlertCircle className="text-blue-600" size={24} />
+              <WarningCircle className="text-blue-600" size={24} />
             </div>
           </div>
         </div>
@@ -220,7 +220,7 @@ export default function StakeholderIssuesPage() {
               <p className="text-2xl font-bold text-gray-900 mt-1">{resolvedIssues.length}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
-              <CheckCircle2 className="text-green-600" size={24} />
+              <CheckCircle className="text-green-600" size={24} />
             </div>
           </div>
         </div>
@@ -232,7 +232,7 @@ export default function StakeholderIssuesPage() {
               <p className="text-2xl font-bold text-gray-900 mt-1">{highPriorityIssues.length}</p>
             </div>
             <div className="p-3 bg-red-100 rounded-lg">
-              <AlertCircle className="text-red-600" size={24} />
+              <WarningCircle className="text-red-600" size={24} />
             </div>
           </div>
         </div>
@@ -402,7 +402,7 @@ export default function StakeholderIssuesPage() {
                       className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
                       title="Delete issue"
                     >
-                      <Trash2 size={18} />
+                      <Trash size={18} />
                     </button>
                   ) : (
                     <PermissionTooltip message="You don't have permission to delete issues">
@@ -411,7 +411,7 @@ export default function StakeholderIssuesPage() {
                         className="p-2 text-gray-400 rounded cursor-not-allowed opacity-50"
                         title="Delete issue (no permission)"
                       >
-                        <Trash2 size={18} />
+                        <Trash size={18} />
                       </button>
                     </PermissionTooltip>
                   )}

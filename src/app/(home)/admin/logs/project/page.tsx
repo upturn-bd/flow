@@ -6,7 +6,7 @@ import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
-import { Loader2, Trash2, Edit3 } from "lucide-react";
+import { Loader, Trash, Edit } from "@/lib/icons";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
 import { UpdateProjectPage } from "@/components/ops/project/CreateNewProject";
@@ -164,7 +164,7 @@ export default function CompanyProjectsPage() {
                               onClick={() => handleEdit(project)}
                               className="p-2"
                            >
-                              <Edit3 size={16} />
+                              <Edit size={16} />
                            </Button>
                         )}
 
@@ -175,7 +175,7 @@ export default function CompanyProjectsPage() {
                               onClick={() => project.id && handleDelete(project.id)}
                               className="p-2"
                            >
-                              <Trash2 size={16} />
+                              <Trash size={16} />
                            </Button>
                         )}
                      </div>
@@ -216,7 +216,7 @@ export default function CompanyProjectsPage() {
                            <>
                               {ongoingLoading ? (
                                  <div className="flex justify-center items-center h-32">
-                                    <Loader2 className="animate-spin text-gray-500" />
+                                    <Loader className="animate-spin text-gray-500" />
                                  </div>
                               ) : (
                                  renderProjectList(filteredOngoing)
@@ -233,7 +233,7 @@ export default function CompanyProjectsPage() {
                            <>
                               {ongoingLoading ? (
                                  <div className="flex justify-center items-center h-32">
-                                    <Loader2 className="animate-spin text-gray-500" />
+                                    <Loader className="animate-spin text-gray-500" />
                                  </div>
                               ) : (
                                  renderProjectList(filteredCompleted)

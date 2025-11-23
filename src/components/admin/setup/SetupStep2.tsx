@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "@/components/ui/animations";
-import { Settings } from "lucide-react";
+import { Settings } from "@/lib/icons";
 
 // Import all the admin management components
 import SupervisorLineageView from "@/components/admin/supervisor-lineage/SupervisorLineageView";

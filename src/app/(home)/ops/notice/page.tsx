@@ -2,7 +2,7 @@
 import { Notice, useNotices } from "@/hooks/useNotice";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Pencil, Trash2, Plus, Clock, CalendarDays, Info } from "lucide-react";
+import { Bell, Pencil, Trash, Plus, Clock, CalendarDays, Info } from "@/lib/icons";
 import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { NoticeCreateModal, NoticeUpdateModal } from "@/components/ops/notice";
@@ -281,7 +281,7 @@ export default function NoticePage() {
                                 className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
                                 aria-label="Delete notice"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash className="h-4 w-4" />
                               </motion.button>
                             ) : (
                               <PermissionTooltip message="You don't have permission to delete notices">
@@ -290,7 +290,7 @@ export default function NoticePage() {
                                   className="p-2 text-gray-400 rounded-full cursor-not-allowed opacity-50"
                                   aria-label="Delete notice (disabled)"
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  <Trash className="h-4 w-4" />
                                 </button>
                               </PermissionTooltip>
                             )}

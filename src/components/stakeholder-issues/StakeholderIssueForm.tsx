@@ -10,7 +10,7 @@ import { StakeholderIssueFormData } from "@/hooks/useStakeholderIssues";
 import { StakeholderIssueAttachment } from "@/lib/types/schemas";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
-import { X, Upload, Trash2, Download, FileText } from "lucide-react";
+import { X, Upload, Trash, Download, FileText } from "@/lib/icons";
 
 interface StakeholderIssueFormProps {
   stakeholderId: number;
@@ -327,7 +327,7 @@ export default function StakeholderIssueForm({
                           {deletingAttachment === attachment.path ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
                           ) : (
-                            <Trash2 size={16} />
+                            <Trash size={16} />
                           )}
                         </button>
                       )}
@@ -387,7 +387,7 @@ export default function StakeholderIssueForm({
                       onClick={() => removeFile(index)}
                       className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
                     >
-                      <Trash2 size={16} />
+                      <Trash size={16} />
                     </button>
                   </div>
                 ))}

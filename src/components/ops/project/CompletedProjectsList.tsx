@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { debounce } from "lodash";
 import { toast } from "sonner";
-import { CheckCircle, Search } from "lucide-react";
+import { CheckCircle, Search } from "@/lib/icons";
 
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";

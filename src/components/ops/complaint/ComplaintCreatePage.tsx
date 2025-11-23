@@ -4,17 +4,17 @@ import React, { useEffect, useState, ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload,
-  ChevronLeft,
-  ChevronDown,
-  AlertCircle,
+  CaretLeft,
+  CaretDown,
+  WarningCircle,
   Check,
-  Loader2,
+  Loader,
   X,
   FileText,
-  MessageSquare,
+  MessageCircle,
   User,
   Flag
-} from "lucide-react";
+} from "@/lib/icons";
 import { supabase } from "@/lib/supabase/client";
 import { ComplaintRecord } from "@/lib/types/schemas";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -186,7 +186,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
           onClick={onClose}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
         >
-          <ChevronLeft size={16} />
+          <CaretLeft size={16} />
           <span>Back</span>
         </motion.button>
       </div>
@@ -239,14 +239,14 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                     </option>
                   ))}
               </select>
-              <ChevronDown
+              <CaretDown
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
                 size={16}
               />
             </div>
             {touched.complaint_type_id && errors.complaint_type_id && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
-                <AlertCircle size={14} className="mr-1" />
+                <WarningCircle size={14} className="mr-1" />
                 {errors.complaint_type_id}
               </p>
             )}
@@ -273,14 +273,14 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                     </option>
                   ))}
               </select>
-              <ChevronDown
+              <CaretDown
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
                 size={16}
               />
             </div>
             {touched.against_whom && errors.against_whom && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
-                <AlertCircle size={14} className="mr-1" />
+                <WarningCircle size={14} className="mr-1" />
                 {errors.against_whom}
               </p>
             )}
@@ -289,7 +289,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
           {/* Description */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
-              <MessageSquare size={16} className="mr-2" />
+              <MessageCircle size={16} className="mr-2" />
               Description
             </label>
             <textarea
@@ -302,7 +302,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
             />
             {touched.description && errors.description && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
-                <AlertCircle size={14} className="mr-1" />
+                <WarningCircle size={14} className="mr-1" />
                 {errors.description}
               </p>
             )}
@@ -391,7 +391,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
           >
             {isSubmitting ? (
               <>
-                <Loader2 size={18} className="animate-spin" />
+                <Loader size={18} className="animate-spin" />
                 <span>Submitting...</span>
               </>
             ) : (

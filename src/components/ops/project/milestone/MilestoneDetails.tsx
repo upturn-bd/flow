@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 import {
   Calendar,
   Pencil,
-  Trash2,
+  Trash,
   Plus,
   Target,
   Users,
   ArrowUpRight,
-  ChevronLeft,
-} from "lucide-react";
+  CaretLeft,
+} from "@/lib/icons";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Milestone } from "@/hooks/useMilestones";
 import { Task, useTasks } from "@/hooks/useTasks";
@@ -224,7 +224,7 @@ export default function MilestoneDetails({
               onClick={onClose}
               className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors duration-150"
             >
-              <ChevronLeft size={16} strokeWidth={2} />
+              <CaretLeft size={16} strokeWidth={2} />
               Back
             </motion.button>
           </div>
@@ -352,7 +352,7 @@ export default function MilestoneDetails({
                             onClick={() => task.id !== null && handleDeleteTask(task.id!)}
                             className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors duration-150"
                           >
-                            <Trash2 size={15} strokeWidth={2} />
+                            <Trash size={15} strokeWidth={2} />
                           </motion.button>
                         </>
                       )}

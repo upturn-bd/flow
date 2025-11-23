@@ -7,14 +7,14 @@ import {
   X,
   Check,
   Clock,
-  AlertCircle,
+  WarningCircle,
   Calendar,
   Briefcase,
   User,
-  Trash2,
+  Trash,
   CheckCheck,
   ExternalLink
-} from "lucide-react";
+} from "@/lib/icons";
 import { useNotifications, Notification } from "@/hooks/useNotifications";
 import { formatRelativeTime } from "@/lib/utils";
 import { Z_INDEX } from "@/lib/theme";
@@ -28,7 +28,7 @@ interface NotificationDropdownProps {
 }
 
 const iconMap = {
-  'alert-circle': AlertCircle,
+  'alert-circle': WarningCircle,
   'calendar': Calendar,
   'briefcase': Briefcase,
   'user': User,
@@ -325,7 +325,7 @@ function NotificationItem({
               className="text-red-600 hover:bg-red-100 p-1 rounded text-xs flex items-center gap-1"
               title="Delete"
             >
-              <Trash2 className="h-3 w-3" />
+              <Trash className="h-3 w-3" />
               Delete
             </button>
           </div>

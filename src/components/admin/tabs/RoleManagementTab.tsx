@@ -6,10 +6,10 @@ import {
   Users, 
   Search, 
   Shield, 
-  ChevronLeft, 
-  ChevronRight,
+  CaretLeft, 
+  CaretRight,
   AlertTriangle 
-} from "lucide-react";
+} from "@/lib/icons";
 import { useEmployees, ExtendedEmployee } from "@/hooks/useEmployees";
 import { USER_ROLES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
@@ -113,7 +113,7 @@ export default function RoleManagementTab() {
             disabled={currentPage === 1}
             className="px-3 py-1"
           >
-            <ChevronLeft size={16} />
+            <CaretLeft size={16} />
             Previous
           </Button>
           
@@ -152,7 +152,7 @@ export default function RoleManagementTab() {
             className="px-3 py-1"
           >
             Next
-            <ChevronRight size={16} />
+            <CaretRight size={16} />
           </Button>
         </div>
       </div>

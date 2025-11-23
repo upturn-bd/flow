@@ -14,11 +14,11 @@ import {
   Briefcase, 
   RefreshCw,
   CheckCircle,
-  AlertCircle,
+  WarningCircle,
   Clock,
   Settings,
   LinkIcon
-} from "lucide-react";
+} from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import Link from "next/link";
 
@@ -131,7 +131,7 @@ export default function AccountPage() {
             {notification.type === 'success' ? (
               <CheckCircle className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0" />
             ) : (
-              <AlertCircle className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0" />
+              <WarningCircle className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0" />
             )}
             <p className="text-sm font-medium">{notification.message}</p>
           </div>

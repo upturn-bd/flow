@@ -1,6 +1,6 @@
 "use client";
 
-import { Info, X, LoaderCircle } from "lucide-react";
+import { Info, X, Loader } from "@/lib/icons";
 import { useState } from "react";
 
 // Import the section components directly
@@ -35,7 +35,7 @@ export default function CompanyBasicsConfigView() {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
         <div className="text-center">
-          <LoaderCircle className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
+          <Loader className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
           <p className="text-sm text-gray-600">Loading organizational structure...</p>
         </div>
       </div>

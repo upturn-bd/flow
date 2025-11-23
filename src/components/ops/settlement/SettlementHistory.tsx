@@ -14,9 +14,9 @@ import {
   CheckCheck, 
   XCircle,
   Clock,
-  MessageSquare,
+  MessageCircle,
   FormInput
-} from "lucide-react";
+} from "@/lib/icons";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 
 // Define the structure of a settlement request
@@ -163,7 +163,7 @@ export default function SettlementHistoryPage() {
                     {settlement.comment && (
                       <div className="mt-3 text-sm text-gray-700 bg-blue-50 p-3 rounded-md">
                         <div className="flex items-center gap-2 mb-1">
-                          <MessageSquare size={14} />
+                          <MessageCircle size={14} />
                           <p className="font-medium">Feedback:</p>
                         </div>
                         <p>{settlement.comment}</p>

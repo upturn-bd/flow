@@ -3,16 +3,16 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Loader2,
+  Loader,
   XCircle,
   Flag,
   User,
   CheckCheck,
-  MessageSquare,
+  MessageCircle,
   FileText,
   Clock,
   List
-} from "lucide-react";
+} from "@/lib/icons";
 import { extractFileNameFromStoragePath, extractFilenameFromUrl } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";

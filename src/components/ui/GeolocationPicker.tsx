@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { MapPin, Loader2 } from "lucide-react";
+import { MapPin, Loader } from "@/lib/icons";
 
 // Dynamically import the map component to avoid SSR issues
 const MapComponent = dynamic(
@@ -11,7 +11,7 @@ const MapComponent = dynamic(
     ssr: false,
     loading: () => (
       <div className="w-full h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
-        <Loader2 className="animate-spin text-gray-400" size={32} />
+        <Loader className="animate-spin text-gray-400" size={32} />
       </div>
     )
   }

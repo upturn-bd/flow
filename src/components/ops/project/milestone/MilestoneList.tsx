@@ -6,11 +6,11 @@ import {
   Calendar,
   ArrowRight,
   Pencil,
-  Trash2,
+  Trash,
   Plus,
   Target,
   Users,
-} from "lucide-react";
+} from "@/lib/icons";
 import { type Milestone as MilestoneType } from "./MilestoneForm";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -93,7 +93,7 @@ export default function MilestoneList({
                           size="sm"
                           onClick={() => m.milestone_title && onDelete(m.milestone_title)}
                         >
-                          <Trash2 size={14} />
+                          <Trash size={14} />
                         </Button>
                       </div>
                     </div>

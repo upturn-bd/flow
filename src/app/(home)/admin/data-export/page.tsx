@@ -5,15 +5,15 @@ import { motion } from "framer-motion";
 import {
   Download,
   Users,
-  Building2,
+  Building,
   CheckCircle,
   FileSpreadsheet,
-  AlertCircle,
+  WarningCircle,
   FolderKanban,
   ListTodo,
   Calendar,
   ClipboardCheck,
-} from "lucide-react";
+} from "@/lib/icons";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useProjects } from "@/hooks/useProjects";
@@ -394,7 +394,7 @@ export default function DataExportPage() {
       type: "stakeholders" as ExportType,
       title: "Stakeholder Data",
       description: "Export stakeholder and lead information with contact details and process status",
-      icon: Building2,
+      icon: Building,
       color: "bg-purple-100 text-purple-700 border-purple-200",
       count: stakeholders.length,
       loading: stakeholdersLoading,
@@ -487,7 +487,7 @@ export default function DataExportPage() {
         variants={fadeInUp}
         className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3"
       >
-        <AlertCircle className="text-amber-600 mt-0.5" size={20} />
+        <WarningCircle className="text-amber-600 mt-0.5" size={20} />
         <div>
           <h3 className="font-semibold text-amber-900">Data Privacy Notice</h3>
           <p className="text-sm text-amber-800 mt-1">

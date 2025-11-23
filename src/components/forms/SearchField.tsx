@@ -1,4 +1,4 @@
-import { Search, X } from "lucide-react";
+import { Search, X } from "@/lib/icons";
 import { forwardRef, useState } from "react";
 import { Button } from "../ui/button";
 

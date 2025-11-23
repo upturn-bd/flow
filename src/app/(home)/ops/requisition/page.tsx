@@ -13,7 +13,7 @@ import {
   BookOpen,
   AlertTriangle,
   ScrollText
-} from "lucide-react";
+} from "@/lib/icons";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PERMISSION_MODULES } from "@/lib/constants";
 

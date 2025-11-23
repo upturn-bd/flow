@@ -7,11 +7,11 @@ import TaskDetails from "./shared/TaskDetails";
 import { AnimatePresence } from "framer-motion";
 import {
   Edit,
-  Trash2,
+  Trash,
   ExternalLink,
   ClipboardList,
   Calendar,
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import {
   Card,
@@ -271,7 +271,7 @@ function TaskCard({
           isLoading={isDeleting}
           className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
         >
-          <Trash2 size={14} />
+          <Trash size={14} />
         </Button>
       )}
       
@@ -283,7 +283,7 @@ function TaskCard({
             disabled
             className="p-2 h-8 w-8 opacity-50 cursor-not-allowed"
           >
-            <Trash2 size={14} />
+            <Trash size={14} />
           </Button>
         </PermissionTooltip>
       )}

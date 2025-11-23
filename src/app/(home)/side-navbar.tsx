@@ -8,11 +8,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
 import {
-  ChevronLeft,
-  ChevronRight,
+  CaretLeft,
+  CaretRight,
   List,
   X,
-} from "lucide-react";
+} from "@/lib/icons";
 
 export default function Sidebar() {
   const { isApproved, getAuthorizedNavItems } = useAuth();
@@ -57,7 +57,7 @@ export default function Sidebar() {
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="p-2 rounded-md text-gray-300 hover:text-white hover:bg-[#001c4f] transition-colors"
         >
-          {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
+          {isCollapsed ? <CaretRight /> : <CaretLeft />}
         </button>
       </div>
 

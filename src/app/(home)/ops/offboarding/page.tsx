@@ -17,7 +17,7 @@ import {
   Mail,
   AlertTriangle,
   RotateCcw,
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import FormInputField from "@/components/ui/FormInputField";

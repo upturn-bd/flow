@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { StakeholderProcessStep, FieldType, FieldDefinition, DropdownOption } from "@/lib/types/schemas";
 import { useTeams } from "@/hooks/useTeams";
-import { Plus, Trash2, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown, List, X, Calculator, AlertCircle } from "lucide-react";
+import { Plus, Trash, Calendar, CaretDown, CaretUp, ArrowUp, ArrowDown, List, X, Calculator, WarningCircle } from "@/lib/icons";
 import { FIELD_TYPES } from "@/lib/constants";
 import Toggle from "@/components/ui/Toggle";
 import FormulaEditor from "./FormulaEditor";
@@ -200,7 +200,7 @@ export default function StepManager({
                       className="p-1.5 sm:p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
                       aria-label="Delete step"
                     >
-                      <Trash2 size={16} />
+                      <Trash size={16} />
                     </button>
                   </div>
                 </div>
@@ -433,7 +433,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
           {Object.keys(validationErrors).length > 0 && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4" data-validation-error>
               <div className="flex items-start gap-2">
-                <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
+                <WarningCircle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
                 <div className="flex-1">
                   <h4 className="text-sm font-semibold text-red-800 mb-2">Please fix the following errors:</h4>
                   <ul className="text-sm text-red-700 space-y-1 list-disc list-inside">
@@ -622,7 +622,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
                 {/* Status Field Error Warning */}
                 {validationErrors.status_field && (
                   <div className="p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
-                    <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={14} />
+                    <WarningCircle className="text-red-600 flex-shrink-0 mt-0.5" size={14} />
                     <p className="text-xs text-red-800">{validationErrors.status_field}</p>
                   </div>
                 )}
@@ -923,7 +923,7 @@ function FieldEditor({
       {/* Validation Error Banner */}
       {(hasLabelError || hasOptionsError || hasFormulaError) && (
         <div className="px-3 py-2 bg-red-100 border-b border-red-200 flex items-center gap-2">
-          <AlertCircle className="text-red-600 flex-shrink-0" size={16} />
+          <WarningCircle className="text-red-600 flex-shrink-0" size={16} />
           <div className="flex-1">
             <p className="text-xs font-medium text-red-800">
               {hasLabelError && validationErrors[`${fieldKey}_label`]}
@@ -990,7 +990,7 @@ function FieldEditor({
               }`}
               title={isEditing ? "Collapse options" : "Edit options"}
             >
-              {isEditing ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              {isEditing ? <CaretUp size={16} /> : <CaretDown size={16} />}
               <span>{isEditing ? "Collapse" : "Options"}</span>
             </button>
           )}
@@ -1028,7 +1028,7 @@ function FieldEditor({
             className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
             aria-label="Remove field"
           >
-            <Trash2 size={16} />
+            <Trash size={16} />
           </button>
         </div>
       </div>
@@ -1039,7 +1039,7 @@ function FieldEditor({
           {/* Options Error Warning */}
           {hasOptionsError && (
             <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
-              <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={14} />
+              <WarningCircle className="text-red-600 flex-shrink-0 mt-0.5" size={14} />
               <p className="text-xs text-red-800">{validationErrors[`${fieldKey}_options`]}</p>
             </div>
           )}
@@ -1201,7 +1201,7 @@ function FieldEditor({
         <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3 bg-white">
           {hasFormulaError && (
             <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded flex items-start gap-2">
-              <AlertCircle className="text-yellow-600 flex-shrink-0 mt-0.5" size={14} />
+              <WarningCircle className="text-yellow-600 flex-shrink-0 mt-0.5" size={14} />
               <p className="text-xs text-yellow-800">
                 Please configure a valid formula for this calculated field
               </p>

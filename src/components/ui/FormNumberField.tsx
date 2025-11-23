@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AlertCircle } from "lucide-react";
+import { WarningCircle } from "@/lib/icons";
 import { motion } from "framer-motion";
 import { fadeInUp } from "./animations";
 
@@ -78,7 +78,7 @@ export default function FormNumberField({
             exit="hidden"
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500"
           >
-            <AlertCircle size={16} />
+            <WarningCircle size={16} />
           </motion.div>
         )}
       </div>
