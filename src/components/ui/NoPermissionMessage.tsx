@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { LockKeyhole } from 'lucide-react';
+import { Lock } from '@/lib/icons';
 import { motion } from 'framer-motion';
 import { fadeInUp } from './animations';
 
@@ -23,13 +23,13 @@ export default function NoPermissionMessage({
       animate="visible"
       className="flex flex-col items-center justify-center p-8 text-center h-full"
     >
-      <div className="bg-gray-100 rounded-full p-4 mb-4">
-        <LockKeyhole className="h-8 w-8 text-gray-400" />
+      <div className="bg-surface-secondary rounded-full p-4 mb-4">
+        <Lock size={32} weight="duotone" className="text-foreground-tertiary" />
       </div>
-      <h3 className="text-lg font-semibold text-gray-700 mb-2">
+      <h3 className="text-lg font-semibold text-foreground-primary mb-2">
         Access Restricted
       </h3>
-      <p className="text-sm text-gray-500 max-w-md">
+      <p className="text-sm text-foreground-secondary max-w-md">
         {message || defaultMessage}
       </p>
     </motion.div>

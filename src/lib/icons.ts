@@ -72,6 +72,7 @@ import {
   Clock,
   Timer,
   Hourglass,
+  ClockCounterClockwise as History,
   
   // Status & Indicators
   CheckCircle,
@@ -129,6 +130,7 @@ import {
   Square,
   ListChecks,
   Kanban,
+  FolderOpen as FolderKanban,
   
   // Nature & Science
   Lightning,
@@ -184,7 +186,7 @@ import {
   // Additional
   Spinner,
   CircleNotch as Loader,
-  GripVertical,
+  DotsNine as GripVertical,
   SortAscending,
   SortDescending,
 } from '@phosphor-icons/react';
@@ -258,6 +260,7 @@ export {
   Clock,
   Timer,
   Hourglass,
+  History,
   
   // Status & Indicators
   CheckCircle,
@@ -315,6 +318,7 @@ export {
   Square,
   ListChecks,
   Kanban,
+  FolderKanban,
   
   // Nature & Science
   Lightning,
@@ -375,6 +379,9 @@ export {
   SortDescending,
 };
 
+// TypeScript type for icon components
+export type IconType = typeof Plus;
+
 // Default export with all icons
 export default {
   Plus,
@@ -433,6 +440,7 @@ export default {
   Clock,
   Timer,
   Hourglass,
+  History,
   CheckCircle,
   XCircle,
   AlertCircle,
@@ -476,6 +484,7 @@ export default {
   Square,
   ListChecks,
   Kanban,
+  FolderKanban,
   Lightning,
   Cloud,
   Sun,
