@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 import { FormModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, NumberField, SingleEmployeeSelector } from '@/components/forms';
 import { validateRequisitionInventory, type RequisitionInventoryData } from '@/lib/validation';
-import { useDepartments } from '@/hooks/useDepartments';
-import { useEmployees } from '@/hooks/useEmployees';
+import { useDepartmentsContext, useEmployeesContext } from '@/contexts';
 import { Package, UserPlus, Buildings, Tag } from '@phosphor-icons/react';
 
 interface RequisitionInventoryCreateModalProps {
@@ -21,19 +20,19 @@ export const RequisitionInventoryCreateModal: React.FC<RequisitionInventoryCreat
   onClose,
   isLoading = false,
 }) => {
-  const { items: departments, fetchItems: fetchDepartments } = useDepartments();
+  const { departments, fetchDepartments } = useDepartmentsContext();
   const { 
     employees: assetOwners, 
     loading: loadingEmployees, 
     fetchEmployees 
-  } = useEmployees();
+  } = useEmployeesContext();
 
   useEffect(() => {
     if (isOpen) {
       fetchDepartments();
       fetchEmployees();
     }
-  }, [isOpen, fetchDepartments, fetchEmployees]);
+  }, [isOpen]);
 
   const defaultData: RequisitionInventoryData = {
     name: '',

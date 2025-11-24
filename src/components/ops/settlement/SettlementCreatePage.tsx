@@ -12,7 +12,7 @@ import {
   CheckCircle
 } from "lucide-react";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
-import { useEmployeesContextContext } from "@/contexts";
+import { useEmployeesContext } from "@/contexts";
 import { useSettlementRequests } from "@/hooks/useSettlement";
 import { toast } from "sonner";
 import { FormLayout, FormSection, FormGrid } from "@/components/ui/FormLayout";

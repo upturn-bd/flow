@@ -57,10 +57,6 @@ export default function StakeholderIssueForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    
-  }, [fetchEmployees]);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -214,10 +210,10 @@ export default function StakeholderIssueForm({
             name="assigned_to"
             value={formData.assigned_to}
             onChange={handleChange}
-            disabled={loadingEmployees}
+            disabled={loadingEmployees.fetching}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
               errors.assigned_to ? "border-red-500" : "border-gray-300"
-            } ${loadingEmployees ? "opacity-50 cursor-not-allowed" : ""}`}
+            } ${loadingEmployees.fetching ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <option value="">-- Select an employee --</option>
             {employees.map((employee) => (

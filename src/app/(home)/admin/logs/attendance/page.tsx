@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useAttendances } from "@/hooks/useAttendance";
-import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
+import { useEmployeesContext } from "@/contexts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
@@ -28,7 +28,7 @@ export default function AttendanceLogsPage() {
 
   const MODULE = "Attendance";
 
-  const { fetchEmployeeInfo } = useEmployeeInfo();
+  const { fetchEmployees } = useEmployeesContext();
 
   const [allAttendance, setAllAttendance] = useState<any[]>([]);
   const [employeeNames, setEmployeeNames] = useState<Record<string, string>>({});
@@ -54,7 +54,7 @@ export default function AttendanceLogsPage() {
   ];
 
   useEffect(() => {
-    fetchEmployeeInfo();
+    fetchEmployees();
     fetchTodayAttendance();
     fetchAllAttendance();
   }, []);

@@ -15,7 +15,7 @@ import NoPermissionMessage from '@/components/ui/NoPermissionMessage';
 
 export default function NoticesWidget({ config, isEditMode, onToggle, onSizeChange }: WidgetProps) {
   const { canRead, canWrite } = useAuth();
-  const { notices, loading, createNotice } = useNoticesContext();
+  const { notices, loading, createNotice, fetchNotices } = useNoticesContext();
   const { selectedNoticeId, handleNoticeClick, closeNotice } = useModalState();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -33,12 +33,12 @@ export default function NoticesWidget({ config, isEditMode, onToggle, onSizeChan
 
   const handleNoticeCreated = async (data: any) => {
     const result = await createNotice(data);
-    if (result?.success) {
+    if (result && 'id' in result) {
       toast.success('Notice created successfully!');
       fetchNotices();
       handleCloseCreateModal();
     } else {
-      toast.error((result?.error as string) || 'Failed to create notice');
+      toast.error('Failed to create notice');
     }
   };
 

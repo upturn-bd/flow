@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useProjectsContext } from "@/contexts";
-import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
+import { useProjectsContext, useEmployeesContext } from "@/contexts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
 import { Loader2, Trash2, Edit3 } from "lucide-react";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
+import type { Project } from "@/lib/types";
 import { UpdateProjectPage } from "@/components/ops/project/CreateNewProject";
 import { ProjectDetails } from "@/components/ops/project/ProjectForm";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -16,13 +16,13 @@ import { useAuth } from "@/lib/auth/auth-context";
 export default function CompanyProjectsPage() {
    const {
       ongoingProjects,
-      ongoingLoading,
+      loading,
       fetchOngoingProjects,
       completedProjects,
       fetchCompletedProjects,
       updateProject,
       deleteProject,
-   } = useProjects();
+   } = useProjectsContext();
 
    const {
       canWrite,
@@ -31,7 +31,7 @@ export default function CompanyProjectsPage() {
 
    const MODULE = "projects";
 
-   const { employees, fetchEmployeeInfo } = useEmployeeInfo();
+   const { employees, fetchEmployees } = useEmployeesContext();
    const [employeeNames, setEmployeeNames] = useState<Record<string, string>>({});
 
    const [activeTab, setActiveTab] = useState<"ongoing" | "completed">("ongoing");
@@ -44,7 +44,7 @@ export default function CompanyProjectsPage() {
    useEffect(() => {
       fetchOngoingProjects();
       fetchCompletedProjects();
-      fetchEmployeeInfo();
+      fetchEmployees();
    }, []);
 
    // Fetch employee names for "Created by"
@@ -64,11 +64,11 @@ export default function CompanyProjectsPage() {
       fetchEmployeeNames();
    }, [ongoingProjects, completedProjects]);
 
-   const filteredOngoing = ongoingProjects.filter((project) =>
+   const filteredOngoing = ongoingProjects.filter((project: Project) =>
       project.project_title.toLowerCase().includes(search.toLowerCase())
    );
 
-   const filteredCompleted = completedProjects.filter((project) =>
+   const filteredCompleted = completedProjects.filter((project: Project) =>
       project.project_title.toLowerCase().includes(search.toLowerCase())
    );
 

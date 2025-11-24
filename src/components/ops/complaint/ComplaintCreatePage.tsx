@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { ComplaintRecord } from "@/lib/types/schemas";
-import { useEmployeesContextContext } from "@/contexts";
+import { useEmployeesContext } from "@/contexts";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import { toast } from "sonner";
 import { getEmployeeInfo } from "@/lib/utils/auth";

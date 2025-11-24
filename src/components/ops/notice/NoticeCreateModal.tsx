@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField } from '@/components/forms';
 import { validateNotice, type NoticeData } from '@/lib/validation';
-import { useDepartments } from '@/hooks/useDepartments';
+import { useDepartmentsContext } from '@/contexts';
 import { Bell } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { useNoticeTypes } from '@/hooks/useNotice';
@@ -36,13 +36,13 @@ export default function NoticeCreateModal({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { items: departments, loading: departmentsLoading, fetchItems: fetchDepartments } = useDepartments();
+  const { departments, loading: departmentsLoading, fetchDepartments } = useDepartmentsContext();
   const { items: noticeTypes, loading: noticesLoading, fetchItems: fetchNoticeTypes } = useNoticeTypes();
 
   useEffect(() => {
     fetchDepartments();
     fetchNoticeTypes();
-  }, [fetchDepartments, fetchNoticeTypes]);
+  }, []);
 
   const handleInputChange = (field: keyof NoticeData, value: any) => {
     setFormData(prev => ({

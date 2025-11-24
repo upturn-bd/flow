@@ -3,8 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { X, MagnifyingGlass, UserPlus, Trash, Users } from '@phosphor-icons/react';
 import { TeamWithMembers } from '@/lib/types';
-import { useEmployees, ExtendedEmployee } from '@/hooks/useEmployees';
-import { useTeams } from '@/hooks/useTeams';
+import { ExtendedEmployee, useEmployeesContext, useTeamsContext } from '@/contexts';
 import { matchesEmployeeSearch } from '@/lib/utils/user-search';
 
 interface TeamMembersModalProps {
@@ -20,8 +19,8 @@ export default function TeamMembersModal({
   team,
   onMembersUpdated,
 }: TeamMembersModalProps) {
-  const { employees, extendedEmployees, fetchEmployees, fetchExtendedEmployees, loading: employeesLoading } = useEmployees();
-  const { addTeamMember, removeTeamMember, loading: teamLoading } = useTeams();
+  const { employees, extendedEmployees, fetchEmployees, fetchExtendedEmployees, loading: employeesLoading } = useEmployeesContext();
+  const { addTeamMember, removeTeamMember, loading: teamLoading } = useTeamsContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
 
@@ -30,7 +29,7 @@ export default function TeamMembersModal({
     if (isOpen) {
       fetchExtendedEmployees();
     }
-  }, [isOpen, fetchExtendedEmployees]);
+  }, [isOpen]);
 
   // Get current member IDs
   const memberIds = useMemo(

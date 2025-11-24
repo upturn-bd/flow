@@ -1,7 +1,7 @@
 "use client";
 
 import { useDepartmentsContext } from "@/contexts";
-import { useEmployeesContextContext } from "@/contexts";
+import { useEmployeesContext } from "@/contexts";
 import { Task, TaskStatus, useTasks } from "@/hooks/useTasks";
 import { useEffect, useState, memo, useCallback } from "react";
 import { Department } from "@/lib/types/schemas";

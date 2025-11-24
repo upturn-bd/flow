@@ -47,7 +47,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
     updateAdditionalData,
   } = useStakeholders();
 
-  const { getEmployeeTeamIds } = useTeams();
+  const { getEmployeeTeamIds } = useTeamsContext();
   const { hasPermission } = useAuth();
 
   const [stakeholder, setStakeholder] = useState<Stakeholder | null>(null);

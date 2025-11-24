@@ -4,11 +4,11 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import { useAuth } from "@/lib/auth/auth-context";
 import { Employee } from "@/lib/types/schemas";
 
-// Import all the hooks we need
-import { useDepartments } from "@/hooks/useDepartments";
-import { useDivisions } from "@/hooks/useDivisions";
-import { useGrades } from "@/hooks/useGrades";
-import { usePositions } from "@/hooks/usePositions";
+// Import the new contexts
+import { useDepartmentsContext } from "./DepartmentsContext";
+import { useDivisionsContext } from "./DivisionsContext";
+import { useGradesContext } from "./GradesContext";
+import { usePositionsContext } from "./PositionsContext";
 import { useCompanyInfo } from "@/hooks/useCompanyInfo";
 
 // Types for our context
@@ -88,16 +88,16 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
   const [globalError, setGlobalError] = useState<string | null>(null);
   const { user, isLoading: authLoading } = useAuth();
 
-  // Use all the hooks
+  // Use all the new contexts
   const {
     departments,
     fetchDepartments,
     createDepartment: createDept,
     updateDepartment: updateDept,
     deleteDepartment: deleteDept,
-    loading: departmentsLoading,
-    error: departmentError,
-  } = useDepartments();
+    loading: departmentsLoadingStates,
+    error: departmentErrorStates,
+  } = useDepartmentsContext();
 
   const {
     divisions,
@@ -105,9 +105,9 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
     createDivision: createDiv,
     updateDivision: updateDiv,
     deleteDivision: deleteDiv,
-    loading: divisionsLoading,
-    error: divisionError,
-  } = useDivisions();
+    loading: divisionsLoadingStates,
+    error: divisionErrorStates,
+  } = useDivisionsContext();
 
   const {
     grades,
@@ -115,9 +115,9 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
     createGrade: createGrd,
     updateGrade: updateGrd,
     deleteGrade: deleteGrd,
-    loading: gradesLoading,
-    error: gradeError,
-  } = useGrades();
+    loading: gradesLoadingStates,
+    error: gradeErrorStates,
+  } = useGradesContext();
 
   const {
     positions,
@@ -125,9 +125,9 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
     createPosition: createPos,
     updatePosition: updatePos,
     deletePosition: deletePos,
-    loading: positionsLoading,
-    error: positionError,
-  } = usePositions();
+    loading: positionsLoadingStates,
+    error: positionErrorStates,
+  } = usePositionsContext();
 
   const {
     companyInfo,
@@ -139,6 +139,18 @@ export function AdminDataProvider({ children }: AdminDataProviderProps) {
     loading: companyLoading,
     error: companyError,
   } = useCompanyInfo();
+
+  // Convert LoadingStates to booleans for backward compatibility
+  const departmentsLoading = departmentsLoadingStates.fetching;
+  const divisionsLoading = divisionsLoadingStates.fetching;
+  const gradesLoading = gradesLoadingStates.fetching;
+  const positionsLoading = positionsLoadingStates.fetching;
+
+  // Convert ErrorStates to strings for backward compatibility
+  const departmentError = departmentErrorStates.fetchError;
+  const divisionError = divisionErrorStates.fetchError;
+  const gradeError = gradeErrorStates.fetchError;
+  const positionError = positionErrorStates.fetchError;
 
   // Overall loading state
   const loading = companyLoading;

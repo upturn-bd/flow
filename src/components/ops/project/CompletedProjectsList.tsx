@@ -6,7 +6,7 @@ import { debounce } from "lodash";
 import { toast } from "sonner";
 import { CheckCircle, Search } from "lucide-react";
 
-import { useDepartmentsContextContext } from "@/contexts";
+import { useDepartmentsContext } from "@/contexts";
 import { useEmployeesContext } from "@/contexts";
 import { useProjectsContext } from "@/contexts";
 import { Project } from "@/lib/types";

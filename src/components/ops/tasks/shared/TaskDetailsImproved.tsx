@@ -1,6 +1,6 @@
 "use client";
 
-import { useEmployeesContextContext } from "@/contexts";
+import { useEmployeesContext } from "@/contexts";
 import { Task, useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";

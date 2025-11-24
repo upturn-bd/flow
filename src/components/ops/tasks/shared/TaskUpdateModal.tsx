@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField, AssigneeField } from '@/components/forms';
 import { validateTask, type TaskData } from '@/lib/validation';
-import { useEmployeesContext } from '@/hooks/useEmployeesContext';
+import { useEmployeesContext } from '@/contexts';
 import { CheckSquare } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
@@ -155,7 +155,7 @@ export default function TaskUpdateModal({
           onChange={(assignees) => handleInputChange('assignees', assignees)}
           employees={employees}
           error={errors.assignees}
-          disabled={loading || employeesLoading}
+          disabled={loading || employeesLoading.fetching}
           placeholder="Search and select assignees..."
         />
 

@@ -148,7 +148,7 @@ export default function DataExportPage() {
 
   const { extendedEmployees, fetchExtendedEmployees, loading: employeesLoading } = useEmployeesContext();
   const { stakeholders, fetchStakeholders, loading: stakeholdersLoading } = useStakeholders();
-  const { ongoingProjects, completedProjects, fetchOngoingProjects, fetchCompletedProjects } = useProjects();
+  const { ongoingProjects, completedProjects, fetchOngoingProjects, fetchCompletedProjects, loading: projectsLoading } = useProjectsContext();
   const { ongoingTasks, completedTasks, fetchTasks } = useTasks();
   const { leaveRequests, fetchLeaveRequests, loading: leavesLoading } = useLeaveRequests();
   const { items: attendanceRecords, fetchItems: fetchAttendance, loading: attendanceLoading } = useAttendances();

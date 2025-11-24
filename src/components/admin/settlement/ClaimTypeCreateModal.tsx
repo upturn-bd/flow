@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 import { FormModal } from '@/components/ui/modals';
 import { FormField, SelectField, NumberField, SingleEmployeeSelector } from '@/components/forms';
 import { validateClaimType, type ClaimTypeData } from '@/lib/validation';
-import { useEmployees } from '@/hooks/useEmployees';
-import { usePositions } from '@/hooks/usePositions';
+import { useEmployeesContext, usePositionsContext } from '@/contexts';
 import { Receipt, UserPlus, Money } from '@phosphor-icons/react';
 
 interface ClaimTypeCreateModalProps {
@@ -19,15 +18,15 @@ export const ClaimTypeCreateModal: React.FC<ClaimTypeCreateModalProps> = ({
   onClose,
   isLoading = false,
 }) => {
-  const { employees: allSettlers, loading: loadingEmployees, fetchEmployees } = useEmployees();
-  const { positions: allPositions, fetchPositions } = usePositions();
+  const { employees: allSettlers, loading: loadingEmployees, fetchEmployees } = useEmployeesContext();
+  const { positions: allPositions, fetchPositions } = usePositionsContext();
 
   useEffect(() => {
     if (isOpen) {
       fetchEmployees();
       fetchPositions();
     }
-  }, [isOpen, fetchEmployees, fetchPositions]);
+  }, [isOpen]);
 
   const defaultData: ClaimTypeData = {
     settlement_item: '',

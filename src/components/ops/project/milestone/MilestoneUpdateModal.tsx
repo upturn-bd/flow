@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField, NumberField, AssigneeField } from '@/components/forms';
 import { validateMilestone, type MilestoneData } from '@/lib/validation';
-import { useEmployees } from '@/hooks/useEmployees';
+import { useEmployeesContext } from '@/contexts';
 import { Target } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
@@ -30,11 +30,11 @@ export default function MilestoneUpdateModal({
   const [formData, setFormData] = useState<MilestoneData>(initialData);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { employees, loading: employeesLoading, fetchEmployees } = useEmployees();
+  const { employees, loading: employeesLoading, fetchEmployees } = useEmployeesContext();
 
   useEffect(() => {
     fetchEmployees();
-  }, [fetchEmployees]);
+  }, []);
 
   function formatDateForInput(date: string | Date | undefined): string {
     if (!date) return "";

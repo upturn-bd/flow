@@ -1,6 +1,6 @@
 "use client";
 
-import { useEmployeesContextContext } from "@/contexts";
+import { useEmployeesContext } from "@/contexts";
 import { Task, useTasks} from "@/hooks/useTasks";
 import { useEffect, useState } from "react";
 import { Calendar, ChevronLeft, User, XCircle, Clock, Target } from "lucide-react";

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/modals';
 import { FormField, HierarchyField } from '@/components/forms';
 import { validateLineageForm, type LineageFormData } from '@/lib/validation';
-import { usePositions } from '@/hooks/usePositions';
+import { usePositionsContext } from '@/contexts';
 import { Buildings } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
@@ -34,11 +34,11 @@ export default function SupervisorLineageCreateModal({
     hierarchy: []
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { positions, loading: positionsLoading, fetchPositions } = usePositions();
+  const { positions, loading: positionsLoading, fetchPositions } = usePositionsContext();
 
   useEffect(() => {
     fetchPositions();
-  }, [fetchPositions]);
+  }, []);
 
   // Initialize with first position if available
   useEffect(() => {

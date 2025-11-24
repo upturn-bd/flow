@@ -1,5 +1,5 @@
-import { useDepartmentsContext } from "@/contexts";
-import { useEffect, useState } from "react";
+import { useDepartmentsContext, useNoticesContext } from "@/contexts";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   ChevronLeft,
@@ -13,7 +13,7 @@ import {
   AlertCircleIcon,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useNotices, useNoticeTypes } from "@/hooks/useNotice";
+import { useNoticeTypes } from "@/hooks/useNotice";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow, PriorityBadge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
@@ -51,33 +51,44 @@ function formatDate(dateStr: string): string {
 
 export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
   const [error, setError] = useState<string | null>(null);
-  const { noticeType, loading: loadingNoticeType,fetchNoticeType } = useNoticeTypes();
-  const { department, loading: loadingDepartment,fetchDepartment } = useDepartmentsContext();
-  const { notice, fetchNotice, loading: loadingNotice } = useNotices();
+  const { noticeType, loading: loadingNoticeType, fetchNoticeType } = useNoticeTypes();
+  const { departments, loading: departmentsLoading, getDepartmentById, fetchDepartments } = useDepartmentsContext();
+  const { notices, loading: loadingNotices, fetchNotices } = useNoticesContext();
+  
+  // Get the specific notice from context
+  const notice = useMemo(() => notices.find(n => n.id === id), [notices, id]);
+  
+  // Get the department for this notice
+  const department = useMemo(() => {
+    if (!notice?.department_id) return null;
+    return getDepartmentById(notice.department_id);
+  }, [notice?.department_id, getDepartmentById]);
 
+  // Fetch notices if not already loaded
   useEffect(() => {
-    if (id !== null) {
-      const fetchNoticeDetails = async function (id: string) {
-        try {
-          await fetchNotice(id);
-
-        } catch (error) {
-          setError("Error fetching notice details");
-          toast.error("Error fetching notice details");
-          console.error(error);
-        }
-      };
-      fetchNoticeDetails(id.toString());
+    if (!loadingNotices && notices.length === 0) {
+      fetchNotices().catch((err) => {
+        setError("Error fetching notices");
+        toast.error("Error fetching notices");
+        console.error(err);
+      });
     }
-  }, [id]);
+  }, []);
+  
+  // Fetch departments if not already loaded
+  useEffect(() => {
+    if (!departmentsLoading.fetching && departments.length === 0) {
+      fetchDepartments();
+    }
+  }, []);
 
   useEffect(() => {
-    if(!notice) return;
-    fetchNoticeType(notice?.notice_type_id || "");
-    fetchDepartment(notice?.department_id || "");
-  }, [notice]);
+    if (notice?.notice_type_id) {
+      fetchNoticeType(notice.notice_type_id.toString());
+    }
+  }, [notice?.notice_type_id, fetchNoticeType]);
 
-  if (loadingNotice || loadingNoticeType || loadingDepartment) {
+  if (loadingNotices || loadingNoticeType || departmentsLoading.fetching) {
     return (
       <BaseModal
         isOpen={true}

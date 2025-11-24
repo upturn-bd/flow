@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
 import { LeaveState } from "./LeaveCreatePage";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEmployeesContextContext } from "@/contexts";
+import { useEmployeesContext } from "@/contexts";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { Calendar, User, FileText, Clock } from "lucide-react";

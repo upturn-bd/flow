@@ -6,7 +6,7 @@ import { Trash, Plus, Buildings } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
-import { usePositionsContextContext } from "@/contexts";
+import { usePositionsContext } from "@/contexts";
 
 interface LineageModalProps {
   initialData?: Lineage[] | null;

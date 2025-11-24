@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Building2, Plus, Search } from "lucide-react";
 
-import { useDepartmentsContextContext } from "@/contexts";
+import { useDepartmentsContext } from "@/contexts";
 import { useEmployeesContext } from "@/contexts";
 import { useProjectsContext } from "@/contexts";
 import { Project } from "@/lib/types";

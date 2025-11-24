@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DollarSign, Edit3, Save, X, AlertTriangle, CheckCircle, Users, History } from 'lucide-react';
 import { useSalaryManagement } from '@/hooks/useSalaryManagement';
-import { useEmployees } from '@/hooks/useEmployees';
+import { useEmployeesContext } from '@/contexts';
 import { formatDate } from '@/lib/utils';
 
 interface SalaryManagementModalProps {

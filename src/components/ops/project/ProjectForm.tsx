@@ -28,7 +28,7 @@ import MilestoneForm from "./milestone/MilestoneForm";
 import { useMilestones } from "@/hooks/useMilestones";
 import { MilestoneUpdateModal } from "./milestone";
 import { fadeInUp } from "@/components/ui/animations";
-import { EmployeeInfo, useEmployeeInfo } from "@/hooks/useEmployeeInfo";
+import { useEmployeesContext } from "@/contexts";
 
 export type ProjectDetails = Project;
 
@@ -79,10 +79,10 @@ export default function ProjectForm({
 
   const { fetchProjectMilestones, updateMilestone } = useMilestones();
 
-  const { employees, fetchEmployeeInfo } = useEmployeeInfo();
+  const { employees, fetchEmployees } = useEmployeesContext();
 
   useEffect(() => {
-    fetchEmployeeInfo();
+    fetchEmployees();
   }, []);
 
   const getTotalMilestoneWeightage = () => {

@@ -64,6 +64,19 @@ interface EmployeesContextType {
   ) => Promise<MutationResponse<Employee>>;
   deleteEmployee: (id: string | number) => Promise<MutationResponse<boolean>>;
   
+  // Search operations
+  searchEmployeesForRoleManagement: (params: {
+    searchQuery: string;
+    page: number;
+    pageSize: number;
+  }) => Promise<{
+    employees: ExtendedEmployee[];
+    totalCount: number;
+    totalPages: number;
+    currentPage: number;
+  }>;
+  updateEmployeeRole: (id: string | number, role: string) => Promise<MutationResponse<Employee>>;
+  
   // Utility functions
   getEmployeeById: (id: string | number) => Employee | undefined;
   clearErrors: () => void;
@@ -390,6 +403,106 @@ export function EmployeesProvider({
     setError(createInitialErrorStates());
   }, []);
 
+  // Server-side search for role management (efficient pagination)
+  const searchEmployeesForRoleManagement = useCallback(
+    async (params: { searchQuery: string; page: number; pageSize: number }) => {
+      if (!companyId) {
+        throw new Error("Company ID is required");
+      }
+
+      devLog.action("EmployeesContext", "Searching employees for role management", params);
+      setLoading((prev) => ({ ...prev, fetching: true }));
+      setError((prev) => ({ ...prev, fetchError: null }));
+
+      try {
+        const { searchQuery, page, pageSize } = params;
+        const offset = (page - 1) * pageSize;
+
+        let query = supabase
+          .from("employees")
+          .select("id, name, email, role, designation, phone, join_date, basic_salary", { count: "exact" })
+          .eq("company_id", companyId);
+
+        // Apply search filter if provided
+        if (searchQuery.trim()) {
+          query = query.or(
+            `name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,designation.ilike.%${searchQuery}%`
+          );
+        }
+
+        // Apply pagination
+        query = query.range(offset, offset + pageSize - 1).order("name", { ascending: true });
+
+        const { data, error: fetchError, count } = await query;
+
+        if (fetchError) throw fetchError;
+
+        const totalCount = count || 0;
+        const totalPages = Math.ceil(totalCount / pageSize);
+
+        devLog.action("EmployeesContext", `Found ${data?.length || 0} employees (${totalCount} total)`);
+
+        return {
+          employees: (data || []) as ExtendedEmployee[],
+          totalCount,
+          totalPages,
+          currentPage: page,
+        };
+      } catch (err) {
+        const errorMsg = extractErrorMessage(err);
+        devLog.error("EmployeesContext", errorMsg);
+        setError((prev) => ({ ...prev, fetchError: errorMsg }));
+        throw err;
+      } finally {
+        setLoading((prev) => ({ ...prev, fetching: false }));
+      }
+    },
+    [companyId]
+  );
+
+  // Update employee role
+  const updateEmployeeRole = useCallback(
+    async (id: string | number, role: string): Promise<MutationResponse<Employee>> => {
+      if (!companyId) {
+        return createErrorResponse("Company ID is required");
+      }
+
+      devLog.action("EmployeesContext", "Updating employee role", { id, role });
+      setLoading((prev) => ({ ...prev, updating: true }));
+      setError((prev) => ({ ...prev, updateError: null }));
+
+      try {
+        const { data, error: updateError } = await supabase
+          .from("employees")
+          .update({ role })
+          .eq("id", id)
+          .eq("company_id", companyId)
+          .select()
+          .single();
+
+        if (updateError) throw updateError;
+        if (!data) throw new Error("No data returned after update");
+
+        // Update local state if employee exists in cache
+        setEmployees((prev) => optimisticUpdate(prev, id, data));
+        setExtendedEmployees((prev) =>
+          optimisticUpdate(prev, id, { ...data, role } as ExtendedEmployee)
+        );
+
+        devLog.action("EmployeesContext", "Employee role updated", data.id);
+        return createSuccessResponse(data as Employee);
+      } catch (err) {
+        const errorMsg = extractErrorMessage(err);
+        devLog.error("EmployeesContext", errorMsg);
+        setError((prev) => ({ ...prev, updateError: errorMsg }));
+        return createErrorResponse(errorMsg);
+      } finally {
+        setLoading((prev) => ({ ...prev, updating: false }));
+      }
+    },
+    [companyId]
+  );
+
   // Refresh all data
   const refresh = useCallback(async () => {
     devLog.action("EmployeesContext", "Refreshing all data");
@@ -411,6 +524,8 @@ export function EmployeesProvider({
       createEmployee,
       updateEmployee,
       deleteEmployee,
+      searchEmployeesForRoleManagement,
+      updateEmployeeRole,
       getEmployeeById,
       clearErrors,
       refresh,
@@ -426,6 +541,8 @@ export function EmployeesProvider({
       createEmployee,
       updateEmployee,
       deleteEmployee,
+      searchEmployeesForRoleManagement,
+      updateEmployeeRole,
       getEmployeeById,
       clearErrors,
       refresh,

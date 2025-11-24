@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
 import { useLeaveTypes } from "@/hooks/useLeaveManagement";
-import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
+import { useEmployeesContext } from "@/contexts";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Check, X as CloseIcon, RotateCw } from "lucide-react";
@@ -40,7 +40,7 @@ export default function LeaveLogsPage() {
    const MODULE = "leave";
 
    const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
-   const { fetchEmployeeInfo } = useEmployeeInfo();
+   const { fetchEmployees } = useEmployeesContext();
    const [employeeNames, setEmployeeNames] = useState<Record<string, string>>({});
    const [activeTab, setActiveTab] = useState<"requests" | "history">("requests");
 
@@ -49,7 +49,7 @@ export default function LeaveLogsPage() {
    // Fetch leave types + employee info + leave data
    useEffect(() => {
       fetchLeaveTypes();
-      fetchEmployeeInfo();
+      fetchEmployees();
       if (activeTab === "requests") {
          fetchGlobalLeaveRequests();
       } else {

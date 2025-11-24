@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField } from '@/components/forms';
 import { validateNotice, type NoticeData } from '@/lib/validation';
-import { useDepartments } from '@/hooks/useDepartments';
+import { useDepartmentsContext } from '@/contexts';
 import { Bell } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Notice, useNotices } from '@/hooks/useNotice';
@@ -32,7 +32,7 @@ export default function NoticeUpdateModal({
   const [formData, setFormData] = useState<Notice>(initialData);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { items: departments, fetchItems: fetchDepartments } = useDepartments();
+  const { departments, fetchDepartments } = useDepartmentsContext();
   const { items: noticeTypes, fetchItems: fetchNoticeTypes } = useNotices();
 
   // Fetch once on mount

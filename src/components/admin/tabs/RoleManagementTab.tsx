@@ -10,7 +10,7 @@ import {
   ChevronRight,
   AlertTriangle 
 } from "lucide-react";
-import { useEmployeesContextContext, ExtendedEmployee } from "@/contexts";
+import { useEmployeesContext, ExtendedEmployee } from "@/contexts";
 import { USER_ROLES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import FormInputField from "@/components/ui/FormInputField";
@@ -31,19 +31,33 @@ export default function RoleManagementTab() {
   const [newRole, setNewRole] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchResult, setSearchResult] = useState<{
+    employees: ExtendedEmployee[];
+    totalCount: number;
+    totalPages: number;
+    currentPage: number;
+  } | null>(null);
   
-  const { searchResult, loading, error, searchEmployeesForRoleManagement, updateEmployeeRole } = useEmployeesContext();
+  const { loading, error, searchEmployeesForRoleManagement, updateEmployeeRole } = useEmployeesContext();
 
   const pageSize = 25;
 
   // Fetch employees on component mount and when search/page changes
   useEffect(() => {
-    searchEmployeesForRoleManagement({
-      searchQuery,
-      page: currentPage,
-      pageSize,
-    });
-  }, [searchQuery, currentPage, searchEmployeesForRoleManagement]);
+    const performSearch = async () => {
+      try {
+        const result = await searchEmployeesForRoleManagement({
+          searchQuery,
+          page: currentPage,
+          pageSize,
+        });
+        setSearchResult(result);
+      } catch (err) {
+        console.error("Failed to search employees:", err);
+      }
+    };
+    performSearch();
+  }, [searchQuery, currentPage]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -68,15 +82,20 @@ export default function RoleManagementTab() {
     setIsSubmitting(true);
     
     try {
-      await updateEmployeeRole(selectedEmployee.id, newRole);
-      toast.success(`Successfully updated ${selectedEmployee.name}'s role to ${newRole}`);
-      
-      // Refresh the employee list
-      searchEmployeesForRoleManagement({
-        searchQuery,
-        page: currentPage,
-        pageSize,
-      });
+      const result = await updateEmployeeRole(selectedEmployee.id, newRole);
+      if ('data' in result) {
+        toast.success(`Successfully updated ${selectedEmployee.name}'s role to ${newRole}`);
+        
+        // Refresh the employee list
+        const refreshResult = await searchEmployeesForRoleManagement({
+          searchQuery,
+          page: currentPage,
+          pageSize,
+        });
+        setSearchResult(refreshResult);
+      } else {
+        toast.error("Failed to update employee role");
+      }
     } catch (error) {
       toast.error("Failed to update employee role");
       console.error("Role update error:", error);
@@ -195,13 +214,13 @@ export default function RoleManagementTab() {
 
       {/* Content */}
       <div className="min-h-[400px]">
-        {loading ? (
+        {loading.fetching ? (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
           </div>
-        ) : error ? (
+        ) : error.fetchError ? (
           <div className="flex items-center justify-center h-64 text-red-600">
-            <p>Error loading employees: {error.message}</p>
+            <p>Error loading employees: {error.fetchError}</p>
           </div>
         ) : !searchResult || searchResult.employees.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 text-gray-500">

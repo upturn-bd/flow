@@ -3,7 +3,7 @@
  * Provides standardized CSV export functionality for various data types
  */
 
-import { ExtendedEmployee } from "@/hooks/useEmployees";
+import { ExtendedEmployee } from "@/contexts";
 import { 
   Stakeholder, 
   Project, 
