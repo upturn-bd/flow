@@ -69,6 +69,7 @@ const SignIn = () => {
             >
               <div>
                 <input
+                  data-testid="email-input"
                   className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full placeholder:text-gray-500"
                   type="email"
                   placeholder="Email"
@@ -83,6 +84,7 @@ const SignIn = () => {
 
               <div className="relative">
                 <input
+                  data-testid="password-input"
                   className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full pr-12 placeholder:text-gray-500"
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
@@ -110,6 +112,7 @@ const SignIn = () => {
               </div>
 
               <button
+                data-testid="login-button"
                 type="submit"
                 className="px-8 py-3 mt-2 rounded-full bg-amber-400 text-black font-semibold shadow-xl cursor-pointer disabled:opacity-50 transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
                 disabled={loading}

@@ -47,7 +47,7 @@ export default function TaskCreateModal({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(isLoading);
-  
+
   const { employees, loading: employeesLoading, fetchEmployees } = useEmployees();
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function TaskCreateModal({
       ...prev,
       [field]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => {
@@ -70,28 +70,28 @@ export default function TaskCreateModal({
     }
   };
 
-const handleSubmit = async () => {
-  setLoading(true);
+  const handleSubmit = async () => {
+    setLoading(true);
 
-  try {
-    const validation = validateTask(formData);
+    try {
+      const validation = validateTask(formData);
 
-    if (!validation.success && validation.errors) {
-      const errorMap: Record<string, string> = {};
-      validation.errors.forEach(error => {
-        errorMap[error.field] = error.message;
-      });
-      setErrors(errorMap);
-      return; // exit, but loading will be reset in finally
+      if (!validation.success && validation.errors) {
+        const errorMap: Record<string, string> = {};
+        validation.errors.forEach(error => {
+          errorMap[error.field] = error.message;
+        });
+        setErrors(errorMap);
+        return; // exit, but loading will be reset in finally
+      }
+
+      if (validation.success && validation.data) {
+        await onSubmit(validation.data); // wait until finished
+      }
+    } finally {
+      setLoading(false); // always reset
     }
-
-    if (validation.success && validation.data) {
-      await onSubmit(validation.data); // wait until finished
-    }
-  } finally {
-    setLoading(false); // always reset
-  }
-};
+  };
 
 
   const isFormValid = () => {
@@ -107,7 +107,7 @@ const handleSubmit = async () => {
       onClose={onClose}
       size="lg"
     >
-      <div className="space-y-6">
+      <div className="space-y-6" data-testid="task-create-modal">
         <FormField
           label="Task Title"
           value={formData.task_title}
@@ -136,7 +136,7 @@ const handleSubmit = async () => {
             error={errors.start_date}
             required
           />
-          
+
           <DateField
             label="Due Date"
             name="end_date"
@@ -187,6 +187,7 @@ const handleSubmit = async () => {
           Cancel
         </Button>
         <Button
+          data-testid="create-task-button"
           type="button"
           variant="primary"
           onClick={handleSubmit}

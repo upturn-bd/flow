@@ -34,7 +34,7 @@ export default function TaskUpdateModal({
   const [formData, setFormData] = useState<TaskData>(initialData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(isLoading);
-  
+
   const { employees, loading: employeesLoading, fetchEmployees } = useEmployees();
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function TaskUpdateModal({
       ...prev,
       [field]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => {
@@ -64,7 +64,7 @@ export default function TaskUpdateModal({
   const handleSubmit = async () => {
     setLoading(true);
     const validation = validateTask(formData);
-    
+
     if (!validation.success && validation.errors) {
       const errorMap: Record<string, string> = {};
       validation.errors.forEach(error => {
@@ -84,7 +84,7 @@ export default function TaskUpdateModal({
     const validation = validateTask(formData);
     console.log('Validation data:', formData);
     console.log('Validation errors:', validation.errors);
-    
+
     return validation.success;
   };
 
@@ -94,6 +94,7 @@ export default function TaskUpdateModal({
 
   return (
     <BaseModal
+      data-testid="task-create-modal"
       isOpen={true}
       title="Update Task"
       icon={<CheckSquare size={24} weight="duotone" />}
