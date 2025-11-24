@@ -26,7 +26,7 @@ import {
   OffboardingEmployee,
   OffboardingData,
 } from "@/hooks/useOffboarding";
-import { useDepartments } from "@/hooks/useDepartments";
+import { useDepartmentsContext } from "@/contexts";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
@@ -93,12 +93,12 @@ export default function OffboardingPage() {
     reactivateEmployee,
   } = useOffboarding();
 
-  const { departments, fetchDepartments } = useDepartments();
+  const { departments } = useDepartmentsContext();
 
   useEffect(() => {
     fetchActiveEmployees();
     fetchOffboardedEmployees();
-    fetchDepartments();
+    // Departments auto-fetched by context
   }, []);
 
   const handleRefresh = async () => {

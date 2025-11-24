@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import FormInputField from "@/components/ui/FormInputField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
-import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
+import { ExtendedEmployee, useEmployeesContext } from "@/contexts";
 import { matchesEmployeeSearch } from "@/lib/utils/user-search";
 
 // Filter options
@@ -36,13 +36,15 @@ export default function FinderPage() {
     designation: "",
   });
 
-  // Use the useEmployees hook
-  const { extendedEmployees, loading, fetchExtendedEmployees } = useEmployees();
+  // Use the employees context (auto-fetched)
+  const { extendedEmployees, loading: loadingStates, fetchExtendedEmployees } = useEmployeesContext();
+  const loading = loadingStates.fetching;
 
-  // Fetch basic employee data on mount
+  // Optional: force refresh on mount if needed
   useEffect(() => {
-    fetchExtendedEmployees();
-  }, [fetchExtendedEmployees]);
+    // Data is auto-fetched by context
+    // fetchExtendedEmployees(true); // Uncomment to force refresh
+  }, []);
 
   // Filter employees when search query or filters change
   useEffect(() => {

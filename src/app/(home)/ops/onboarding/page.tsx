@@ -6,9 +6,8 @@ import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
 import { UserPlus, Loader2, Check, X, AlertTriangle, Users, User, RefreshCw } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext, useDepartmentsContext } from "@/contexts";
 import { useOnboarding, PendingEmployee } from "@/hooks/useOnboarding";
-import { useDepartments } from "@/hooks/useDepartments";
 import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
 
@@ -41,8 +40,8 @@ export default function OnboardingApprovalPage() {
   const [rejectionReasons, setRejectionReasons] = useState<
     Record<string, string>
   >({});
-  const { employees, fetchEmployees } = useEmployees();
-  const { departments, fetchDepartments } = useDepartments();
+  const { employees } = useEmployeesContext();
+  const { departments } = useDepartmentsContext();
   const {
     loading,
     error,
@@ -54,8 +53,7 @@ export default function OnboardingApprovalPage() {
 
   useEffect(() => {
     fetchPendingEmployees();
-    fetchEmployees();
-    fetchDepartments();
+    // Employees and departments auto-fetched by contexts
 
     // Set up polling for updates (replaces realtime)
     const unsubscribe = subscribeToOnboardingUpdates((payload) => {

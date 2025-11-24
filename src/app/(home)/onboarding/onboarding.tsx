@@ -26,8 +26,7 @@ import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { useCompanyValidation } from "@/hooks/useCompanyValidation";
-import { useEmployees } from "@/hooks/useEmployees";
-import { useDepartments } from "@/hooks/useDepartments";
+import { useEmployeesContext, useDepartmentsContext } from "@/contexts";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { validateOnboardingForm, validationErrorsToObject } from "@/lib/utils/validation";
 import { OnboardingFormData } from "@/lib/types/schemas";
@@ -73,8 +72,8 @@ export default function EmployeeOnboarding() {
     companyId,
   } = useCompanyValidation();
   
-  const { employees, fetchEmployees } = useEmployees();
-  const { departments, fetchDepartments } = useDepartments();
+  const { employees } = useEmployeesContext();
+  const { departments } = useDepartmentsContext();
   const { getUserOnboardingInfo, submitOnboarding, subscribeToUserOnboardingUpdates } = useOnboarding();
 
   useEffect(() => {
@@ -102,15 +101,7 @@ export default function EmployeeOnboarding() {
             setFormData(formatted);
             setActiveSection("personal");
             
-            // Fetch departments when application is rejected
-            await (async () => {
-              try {
-                await fetchDepartments(companyId!);
-              } catch (error) {
-                console.error("Error fetching departments:", error);
-              }
-            })();
-            await fetchEmployees();
+            // Departments and employees auto-fetched by contexts
           }
         } catch (e) {
           console.error("Failed to fetch rejected data:", e);
@@ -134,12 +125,11 @@ export default function EmployeeOnboarding() {
   useEffect(() => {
     if (isCompanyCodeValid && formData.company_id) {
       try{
-        fetchDepartments(companyId!);
-        fetchEmployees(companyId!);
+        // Departments and employees auto-fetched by contexts
         getEmployeeId().then(id => setUserId(id));
       }
       catch (error) {
-        console.error("Error fetching departments or employees:", error);
+        console.error("Error fetching employee ID:", error);
       }
     }
   }, [companyId]);

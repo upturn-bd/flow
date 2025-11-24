@@ -14,8 +14,8 @@ This file tracks the migration from hook-based data management to context-based 
 - [x] GradesContext
 
 ### Hooks Deprecated
-- [x] useEmployees.tsx → EmployeesContext (8 files migrated)
-- [x] useDepartments.tsx → DepartmentsContext (4 files migrated)
+- [x] useEmployees.tsx → EmployeesContext (12 files migrated)
+- [x] useDepartments.tsx → DepartmentsContext (7 files migrated)
 - [x] useTeams.tsx → TeamsContext (1 file migrated)
 - [ ] useDivisions.tsx → DivisionsContext
 - [ ] usePositions.tsx → PositionsContext
@@ -37,13 +37,17 @@ This file tracks the migration from hook-based data management to context-based 
 #### Profile Pages
 - [x] src/app/(home)/profile/tabs/BasicInfoTab.tsx (useDepartments → useDepartmentsContext)
 
+#### Onboarding/Offboarding Pages
+- [x] src/app/(home)/ops/onboarding/page.tsx (useEmployees, useDepartments → contexts)
+- [x] src/app/(home)/onboarding/onboarding.tsx (useEmployees, useDepartments → contexts)
+- [x] src/app/(home)/ops/offboarding/page.tsx (useDepartments → useDepartmentsContext)
+
 #### Operations Pages
 - [x] src/app/(home)/ops/hris/page.tsx (useEmployees → useEmployeesContext)
 - [x] src/app/(home)/ops/project/[id]/page.tsx (useEmployees, useDepartments → contexts)
 
-#### Operations Pages
-- [ ] src/app/(home)/ops/hris/page.tsx
-- [ ] src/app/(home)/ops/project/[id]/page.tsx
+#### Finder Page
+- [x] src/app/(home)/finder/page.tsx (useEmployees → useEmployeesContext)
 
 #### Components
 - [ ] Search usage of each hook across all components
