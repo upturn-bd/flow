@@ -1,6 +1,6 @@
 "use client";
 
-import { useEmployeesContext } from "@/contexts";
+import { useEmployeesContextContext } from "@/contexts";
 import { Task, useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -37,7 +37,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
   const [taskDetails, setTaskDetails] = useState<Task | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const [projectName, setProjectName] = useState<string | null>(null);
   const { completeTask, reopenTask } = useTasks();
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { ExternalLink, Trash2, Edit, Clock, Calendar, Building2, User, Target } from "lucide-react";
-import { Project } from "@/hooks/useProjects";
+import { Project } from "@/lib/types";
 import Link from "next/link";
 import { Employee } from "@/lib/types/schemas";
 

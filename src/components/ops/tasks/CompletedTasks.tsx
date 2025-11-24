@@ -1,7 +1,7 @@
 "use client";
 
-import { useDepartments } from "@/hooks/useDepartments";
-import { useEmployeesContext } from "@/contexts";
+import { useDepartmentsContext } from "@/contexts";
+import { useEmployeesContextContext } from "@/contexts";
 import { Task, TaskStatus, useTasks } from "@/hooks/useTasks";
 import { useEffect, useState, memo, useCallback } from "react";
 import { Department } from "@/lib/types/schemas";
@@ -157,8 +157,8 @@ const CompletedTasksList = memo(({
 }: CompletedTasksListProps) => {
   const [taskDetailsId, setTaskDetailsId] = useState<string | null>(null);
 
-  const { fetchEmployees, loading: employeeLoading } = useEmployees();
-  const { departments, fetchDepartments, loading: departmentsLoading } = useDepartments();
+  const { fetchEmployees, loading: employeeLoading } = useEmployeesContext();
+  const { departments, fetchDepartments, loading: departmentsLoading } = useDepartmentsContext();
   const { searchCompletedTasks } = useTasks();
 
   const [userId, setUserId] = useState<string>('');

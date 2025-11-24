@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField, AssigneeField } from '@/components/forms';
 import { validateTask, type TaskData } from '@/lib/validation';
-import { useEmployees } from '@/hooks/useEmployees';
+import { useEmployeesContext } from '@/hooks/useEmployeesContext';
 import { CheckSquare } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
@@ -35,7 +35,7 @@ export default function TaskUpdateModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(isLoading);
   
-  const { employees, loading: employeesLoading, fetchEmployees } = useEmployees();
+  const { employees, loading: employeesLoading, fetchEmployees } = useEmployeesContext();
 
   useEffect(() => {
     fetchEmployees();

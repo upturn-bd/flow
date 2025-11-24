@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useEmployeesContext } from "@/contexts";
+import { useEmployeesContextContext } from "@/contexts";
 import { toast } from "sonner";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
@@ -26,7 +26,7 @@ export default function LeaveRequestsPage() {
   const [comment, setComment] = useState<string>("");
   const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
 
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
   const {
     leaveRequests,

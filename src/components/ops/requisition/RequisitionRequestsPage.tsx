@@ -7,7 +7,7 @@ import {
   Truck 
 } from "lucide-react";
 import { toast } from "sonner";
-import { useEmployeesContext } from "@/contexts";
+import { useEmployeesContextContext } from "@/contexts";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { useRequisitionRequests } from "@/hooks/useRequisition";
@@ -18,7 +18,7 @@ import { RequisitionCard } from "./RequisitionCard";
 
 export default function RequisitionRequestsPage() {
   const [comment, setComment] = useState<string>("");
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } = useRequisitionInventories();
 

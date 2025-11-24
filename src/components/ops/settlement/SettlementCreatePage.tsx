@@ -12,7 +12,7 @@ import {
   CheckCircle
 } from "lucide-react";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
-import { useEmployeesContext } from "@/contexts";
+import { useEmployeesContextContext } from "@/contexts";
 import { useSettlementRequests } from "@/hooks/useSettlement";
 import { toast } from "sonner";
 import { FormLayout, FormSection, FormGrid } from "@/components/ui/FormLayout";
@@ -67,7 +67,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
   const [settlementState, setSettlementState] = useState<SettlementState>(initialSettlementState);
   const [attachments, setAttachments] = useState<File[]>([]);
   const { claimTypes, fetchClaimTypes } = useClaimTypes();
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const { createSettlementRequest, loading: submitting } = useSettlementRequests();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);

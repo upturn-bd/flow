@@ -1,8 +1,8 @@
 "use client";
 
-import { Department } from "@/hooks/useDepartments";
-import { Grade } from "@/hooks/useGrades";
-import { Position } from "@/hooks/usePositions";
+import { Department } from "@/lib/types";
+import { Grade } from "@/lib/types";
+import { Position } from "@/lib/types";
 import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
 import { BriefcaseBusiness, Building, GraduationCap, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";

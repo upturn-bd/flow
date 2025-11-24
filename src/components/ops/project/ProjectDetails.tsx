@@ -43,7 +43,7 @@ import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { getCompanyId, getEmployeeId } from "@/lib/utils/auth";
 import { MilestoneUpdateModal } from "./milestone";
 import MilestoneListItem from "./milestone/MilestoneListItem";
-import { useProjects } from "@/hooks/useProjects";
+import { useProjectsContext } from "@/contexts";
 import { useRouter } from "next/navigation";
 
 interface ProjectDetailsProps {
@@ -106,7 +106,7 @@ export default function ProjectDetails({
 
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-  const {updateProject} = useProjects()
+  const {updateProject} = useProjectsContext()
 
   useEffect(() => {
     async function fetchUserId() {

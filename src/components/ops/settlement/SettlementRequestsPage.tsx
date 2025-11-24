@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { extractFileNameFromStoragePath, extractFilenameFromUrl } from "@/lib/utils";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
-import { useEmployeesContext } from "@/contexts";
+import { useEmployeesContextContext } from "@/contexts";
 import { useSettlementRequests } from "@/hooks/useSettlement";
 import { 
   FileText, 
@@ -40,7 +40,7 @@ interface SettlementRequest {
 export default function SettlementRequestsPage() {
   const [comment, setComment] = useState<string>("");
   const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const { claimTypes, fetchClaimTypes } = useClaimTypes();
   const { 
     settlementRequests, 

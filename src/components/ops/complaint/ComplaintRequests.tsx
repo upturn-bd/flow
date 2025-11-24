@@ -16,7 +16,7 @@ import {
   List
 } from "lucide-react";
 import { extractFileNameFromStoragePath, extractFilenameFromUrl } from "@/lib/utils";
-import { useEmployeesContext } from "@/contexts";
+import { useEmployeesContextContext } from "@/contexts";
 import { useComplaints } from "@/hooks/useComplaints";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import { toast } from "sonner";
@@ -29,7 +29,7 @@ import { ComplaintCard } from "./ComplaintCard";
 export default function ComplaintRequestsPage() {
   const [comment, setComment] = useState<string>("");
   const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
   const {
     complaints,

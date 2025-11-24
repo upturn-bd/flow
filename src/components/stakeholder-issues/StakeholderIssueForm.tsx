@@ -36,7 +36,7 @@ export default function StakeholderIssueForm({
   onCancel,
   submitLabel = "Create Issue",
 }: StakeholderIssueFormProps) {
-  const { employees, loading: loadingEmployees } = useEmployees();
+  const { employees, loading: loadingEmployees } = useEmployeesContext();
   const { deleteAttachment, downloadAttachment } = useStakeholderIssues();
   const [files, setFiles] = useState<File[]>([]);
   const [existingAttachments, setExistingAttachments] = useState<StakeholderIssueAttachment[]>(

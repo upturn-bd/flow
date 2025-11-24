@@ -19,7 +19,7 @@ import {
   formatDateToDayMonth,
 } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
-import { useEmployeesContext } from "@/contexts";
+import { useEmployeesContextContext } from "@/contexts";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ export default function AttendanceRequestsPage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(false);
   const { sites, fetchSites } = useSites();
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const [selectedRecord, setSelectedRecord] = useState<Attendance | null>(null);
   const [updateTag, setUpdateTag] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);

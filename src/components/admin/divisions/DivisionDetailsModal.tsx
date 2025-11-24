@@ -2,7 +2,7 @@
 
 "use client";
 
-import { Division } from "@/hooks/useDivisions";
+import { Division } from "@/lib/types";
 import { PencilSimple, TrashSimple, User, FileText, X } from "@phosphor-icons/react";
 import { Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";

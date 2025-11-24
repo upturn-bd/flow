@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { useDepartmentsContext } from "@/contexts";
+import { useDepartmentsContextContext } from "@/contexts";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
-import { useProjects } from "@/hooks/useProjects";
+import { useProjectsContext } from "@/contexts";
 import { useMilestones } from "@/hooks/useMilestones";
 import { AlertCircle, Building2, X } from "lucide-react";
 import ProjectForm, { type ProjectDetails } from "./ProjectForm";
@@ -40,9 +40,9 @@ const initialProjectDetails: ProjectDetails = {
 
 export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (key: string) => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { departments } = useDepartmentsContext();
+  const { departments } = useDepartmentsContextContext();
   const { employees, fetchEmployeeInfo } = useEmployeeInfo();
-  const { createProject } = useProjects();
+  const { createProject } = useProjectsContext();
   const { createMilestone } = useMilestones();
 
   useEffect(() => {

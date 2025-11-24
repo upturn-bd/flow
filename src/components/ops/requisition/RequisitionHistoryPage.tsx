@@ -9,7 +9,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { extractFileNameFromStoragePath } from "@/lib/utils";
-import { useEmployeesContext } from "@/contexts";
+import { useEmployeesContextContext } from "@/contexts";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { useRequisitionRequests } from "@/hooks/useRequisition";
@@ -17,7 +17,7 @@ import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { RequisitionCard } from "./RequisitionCard";
 
 export default function RequisitionHistoryPage() {
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } = useRequisitionInventories();
   const {

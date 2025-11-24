@@ -12,7 +12,7 @@ import {
   ArrowUpRight,
   ChevronLeft,
 } from "lucide-react";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext } from "@/contexts";
 import { Milestone } from "@/hooks/useMilestones";
 import { Task, useTasks } from "@/hooks/useTasks";
 import { createClient } from '@/lib/supabase/client';
@@ -61,7 +61,7 @@ export default function MilestoneDetails({
   const [milestoneDetails, setMilestoneDetails] = useState<Milestone | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployees } = useEmployeesContext();
 
   // Tasks states and functions
   const [tasks, setTasks] = useState<Task[]>([]);

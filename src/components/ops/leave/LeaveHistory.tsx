@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase/client";
 import React, { useEffect, useState } from "react";
 import { LeaveState } from "./LeaveCreatePage";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEmployeesContext } from "@/contexts";
+import { useEmployeesContextContext } from "@/contexts";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { Calendar, User, FileText, Clock } from "lucide-react";
@@ -17,7 +17,7 @@ export default function LeaveHistoryPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
 
   async function fetchComplaintRequests() {
     setLoading(true);

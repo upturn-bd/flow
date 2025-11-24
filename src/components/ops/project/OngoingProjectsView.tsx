@@ -7,9 +7,10 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Building2, Plus, Search } from "lucide-react";
 
-import { useDepartmentsContext } from "@/contexts";
-import { useEmployees } from "@/hooks/useEmployees";
-import { Project, useProjects } from "@/hooks/useProjects";
+import { useDepartmentsContextContext } from "@/contexts";
+import { useEmployeesContext } from "@/contexts";
+import { useProjectsContext } from "@/contexts";
+import { Project } from "@/lib/types";
 import { getEmployeeId } from "@/lib/utils/auth";
 
 import ProjectDetails from "./ProjectDetails";
@@ -29,10 +30,10 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
     hasMoreOngoingProjects,
     ongoingLoading,
     searchOngoingProjects,
-  } = useProjects();
+  } = useProjectsContext();
 
-  const { employees, fetchEmployees } = useEmployees();
-  const { departments } = useDepartments();
+  const { employees, fetchEmployees } = useEmployeesContext();
+  const { departments } = useDepartmentsContext();
   const router = useRouter();
 
   const [projectDetailsId, setProjectDetailsId] = useState<string | null>(null);

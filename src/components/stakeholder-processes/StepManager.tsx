@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { StakeholderProcessStep, FieldType, FieldDefinition, DropdownOption } from "@/lib/types/schemas";
-import { useTeams } from "@/hooks/useTeams";
+import { useTeamsContext } from "@/contexts";
 import { Plus, Trash2, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown, List, X, Calculator, AlertCircle } from "lucide-react";
 import { FIELD_TYPES } from "@/lib/constants";
 import Toggle from "@/components/ui/Toggle";
@@ -28,7 +28,7 @@ export default function StepManager({
   onDeleteStep,
   onReorderSteps,
 }: StepManagerProps) {
-  const { teams, fetchTeams } = useTeams();
+  const { teams, fetchTeams } = useTeamsContext();
   const [showAddStep, setShowAddStep] = useState(false);
   const [editingStep, setEditingStep] = useState<StakeholderProcessStep | null>(null);
 

@@ -10,7 +10,7 @@ import {
   ChevronRight,
   AlertTriangle 
 } from "lucide-react";
-import { useEmployees, ExtendedEmployee } from "@/hooks/useEmployees";
+import { useEmployeesContextContext, ExtendedEmployee } from "@/contexts";
 import { USER_ROLES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import FormInputField from "@/components/ui/FormInputField";
@@ -32,7 +32,7 @@ export default function RoleManagementTab() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const { searchResult, loading, error, searchEmployeesForRoleManagement, updateEmployeeRole } = useEmployees();
+  const { searchResult, loading, error, searchEmployeesForRoleManagement, updateEmployeeRole } = useEmployeesContext();
 
   const pageSize = 25;
 

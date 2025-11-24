@@ -1,4 +1,4 @@
-import { useDepartments } from "@/hooks/useDepartments";
+import { useDepartmentsContext } from "@/contexts";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -52,7 +52,7 @@ function formatDate(dateStr: string): string {
 export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
   const [error, setError] = useState<string | null>(null);
   const { noticeType, loading: loadingNoticeType,fetchNoticeType } = useNoticeTypes();
-  const { department, loading: loadingDepartment,fetchDepartment } = useDepartments();
+  const { department, loading: loadingDepartment,fetchDepartment } = useDepartmentsContext();
   const { notice, fetchNotice, loading: loadingNotice } = useNotices();
 
   useEffect(() => {

@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { extractFileNameFromStoragePath, extractFilenameFromUrl } from "@/lib/utils";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
-import { useEmployeesContext } from "@/contexts";
+import { useEmployeesContextContext } from "@/contexts";
 import { useSettlementRequests } from "@/hooks/useSettlement";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -34,7 +34,7 @@ interface SettlementRequest {
 }
 
 export default function SettlementHistoryPage() {
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const { claimTypes, fetchClaimTypes } = useClaimTypes();
   const { 
     settlementRequests, 

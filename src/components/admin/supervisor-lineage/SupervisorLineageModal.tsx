@@ -6,7 +6,7 @@ import { Trash, Plus, Buildings } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
-import { usePositions } from "@/hooks/usePositions";
+import { usePositionsContextContext } from "@/contexts";
 
 interface LineageModalProps {
   initialData?: Lineage[] | null;
@@ -31,7 +31,7 @@ export default function LineageCreateModal({
   isLoading = false,
 }: LineageModalProps) {
   const [name, setName] = useState<string>("");
-  const { positions, loading: positionsLoading, fetchPositions } = usePositions();
+  const { positions, loading: positionsLoading, fetchPositions } = usePositionsContext();
   const [hierarchy, setHierarchy] = useState<HierarchyLevel[]>([]);
   const [showAddButton, setShowAddButton] = useState<boolean>(true);
 
@@ -305,7 +305,7 @@ export function LineageUpdateModal({
 }: LineageModalProps) {
   const { lineages, fetchLineages } = useLineage();
   const [name, setName] = useState<string>("");
-  const { positions: allPositions, loading: positionsLoading, fetchPositions } = usePositions();
+  const { positions: allPositions, loading: positionsLoading, fetchPositions } = usePositionsContext();
   const [hierarchy, setHierarchy] = useState<HierarchyLevel[]>([]);
   const [showAddButton, setShowAddButton] = useState<boolean>(true);
   const [remainingPositions, setRemainingPositions] = useState<Position[]>([]);

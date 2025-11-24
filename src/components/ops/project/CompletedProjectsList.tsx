@@ -6,9 +6,10 @@ import { debounce } from "lodash";
 import { toast } from "sonner";
 import { CheckCircle, Search } from "lucide-react";
 
-import { useDepartmentsContext } from "@/contexts";
-import { useEmployees } from "@/hooks/useEmployees";
-import { Project, useProjects } from "@/hooks/useProjects";
+import { useDepartmentsContextContext } from "@/contexts";
+import { useEmployeesContext } from "@/contexts";
+import { useProjectsContext } from "@/contexts";
+import { Project } from "@/lib/types";
 import { getEmployeeId } from "@/lib/utils/auth";
 
 import ProjectDetails from "./ProjectDetails";
@@ -27,10 +28,10 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
     hasMoreCompletedProjects,
     completedLoading,
     searchCompletedProjects,
-  } = useProjects();
+  } = useProjectsContext();
 
-  const { employees, fetchEmployees } = useEmployees();
-  const { departments } = useDepartments();
+  const { employees, fetchEmployees } = useEmployeesContext();
+  const { departments } = useDepartmentsContext();
 
   const [projectDetailsId, setProjectDetailsId] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);

@@ -4,7 +4,7 @@ import React, { useEffect, useState, ChangeEvent } from "react";
 import { FiUploadCloud } from "react-icons/fi";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { IoMdCalendar } from "react-icons/io";
-import { useEmployeesContext } from "@/contexts";
+import { useEmployeesContextContext } from "@/contexts";
 import { supabase } from "@/lib/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -125,7 +125,7 @@ export default function RequisitionCreatePage({
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } =
     useRequisitionInventories();
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -652,7 +652,7 @@ export function RequisitionDraftPage({
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } =
     useRequisitionInventories();
-  const { employees } = useEmployees();
+  const { employees } = useEmployeesContext();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);

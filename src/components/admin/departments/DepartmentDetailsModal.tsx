@@ -2,8 +2,8 @@
 
 "use client";
 
-import { Department } from "@/hooks/useDepartments";
-import { Division } from "@/hooks/useDivisions";
+import { Department } from "@/lib/types";
+import { Division } from "@/lib/types";
 import { PencilSimple, TrashSimple, Building, User, StackSimple, FileText, X } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
