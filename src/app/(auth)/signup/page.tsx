@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
+import { EyeOff, Eye } from "@/lib/icons";
 import Link from "next/link";
 
 import { signup } from "../auth-actions";
@@ -135,9 +135,9 @@ const Signup = () => {
                   tabIndex={-1}
                 >
                   {showPassword ? (
-                    <AiOutlineEyeInvisible className="text-2xl" />
+                    <EyeOff className="text-2xl" />
                   ) : (
-                    <AiFillEye className="text-2xl" />
+                    <Eye className="text-2xl" />
                   )}
                 </button>
                 {errors.password && (
@@ -166,9 +166,9 @@ const Signup = () => {
                   tabIndex={-1}
                 >
                   {showConfirmPassword ? (
-                    <AiOutlineEyeInvisible className="text-2xl" />
+                    <EyeOff className="text-2xl" />
                   ) : (
-                    <AiFillEye className="text-2xl" />
+                    <Eye className="text-2xl" />
                   )}
                 </button>
                 {errors.confirmPassword && (

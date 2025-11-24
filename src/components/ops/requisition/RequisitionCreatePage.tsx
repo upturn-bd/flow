@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, ChangeEvent } from "react";
-import { FiUploadCloud } from "react-icons/fi";
-import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
-import { IoMdCalendar } from "react-icons/io";
+import { CloudUpload, ToggleLeft, ToggleRight } from "@/lib/icons";
 import { useEmployees } from "@/hooks/useEmployees";
 import { supabase } from "@/lib/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -886,9 +884,9 @@ export function RequisitionDraftPage({
           onClick={() => setIsOneOff(!isOneOff)}
         >
           {isOneOff ? (
-            <PiToggleRightFill size={36} className="text-blue-500" />
+            <ToggleRight size={36} className="text-blue-500" />
           ) : (
-            <PiToggleLeftFill size={36} className="text-gray-400" />
+            <ToggleLeft size={36} className="text-gray-400" />
           )}
           <span className="text-sm text-blue-600">One-Off</span>
         </div>
@@ -984,7 +982,7 @@ export function RequisitionDraftPage({
           <div className="flex-1">
             <label className="block font-bold text-[#003366] mb-1">Date</label>
             <div className="relative bg-white shadow px-4 py-2 rounded-md flex items-center gap-2">
-              <IoMdCalendar className="text-gray-600" />
+              <Calendar className="text-gray-600" />
               <input
                 type="date"
                 name="date"
@@ -1056,7 +1054,7 @@ export function RequisitionDraftPage({
             Attachment
           </label>
           <div className="bg-gray-100 rounded-md border border-gray-300 p-6 text-center text-sm text-gray-500">
-            <FiUploadCloud className="mx-auto mb-4 text-2xl" />
+            <CloudUpload className="mx-auto mb-4 text-2xl" />
             <label
               htmlFor="file_upload"
               className="px-4 py-2 bg-white border border-gray-400 text-sm rounded-md cursor-pointer hover:bg-gray-200 transition"

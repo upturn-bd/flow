@@ -5,7 +5,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useState, useRef, useEffect } from "react";
-import { FaEllipsisV } from "react-icons/fa";
+import { DotsThree } from "@/lib/icons";
 
 const ClickableStatusCell = ({
     tag, id }: {
@@ -104,7 +104,7 @@ const ClickableStatusCell = ({
                     className="ml-2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100 focus:outline-none"
                     aria-label="Toggle menu"
                 >
-                    <FaEllipsisV className="text-sm" />
+                    <DotsThree className="text-sm" />
                 </button>
             )}
 

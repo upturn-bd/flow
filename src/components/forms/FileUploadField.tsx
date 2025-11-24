@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { FiUploadCloud, FiX, FiFile } from "react-icons/fi";
+import { CloudUpload, X, File } from "@/lib/icons";
 import { extractFilenameFromUrl } from "@/lib/utils";
 
 interface FileUploadFieldProps {
@@ -90,7 +90,7 @@ export default function FileUploadField({
         onClick={() => fileInputRef.current?.click()}
       >
         <div className="text-center">
-          <FiUploadCloud className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+          <CloudUpload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
           <p className="text-sm text-gray-600">
             Click to upload or drag and drop files here
           </p>
@@ -116,7 +116,7 @@ export default function FileUploadField({
           {existingFiles.map((url, index) => (
             <div key={`existing-${index}`} className="flex items-center justify-between bg-blue-50 p-2 rounded-lg">
               <div className="flex items-center space-x-2">
-                <FiFile className="text-blue-500" />
+                <File className="text-blue-500" />
                 <span className="text-sm text-blue-700">
                   {extractFilenameFromUrl(url)}
                 </span>
@@ -128,7 +128,7 @@ export default function FileUploadField({
                   onClick={() => removeExistingFile(url)}
                   className="text-red-500 hover:text-red-700 p-1"
                 >
-                  <FiX size={14} />
+                  <X size={14} />
                 </button>
               )}
             </div>
@@ -138,7 +138,7 @@ export default function FileUploadField({
           {files.map((file, index) => (
             <div key={`new-${index}`} className="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
               <div className="flex items-center space-x-2">
-                <FiFile className="text-gray-500" />
+                <File className="text-gray-500" />
                 <span className="text-sm text-gray-700">{file.name}</span>
                 <span className="text-xs text-gray-500">
                   ({Math.round(file.size / 1024)} KB)
@@ -149,7 +149,7 @@ export default function FileUploadField({
                 onClick={() => removeFile(file.name)}
                 className="text-red-500 hover:text-red-700 p-1"
               >
-                <FiX size={14} />
+                <X size={14} />
               </button>
             </div>
           ))}

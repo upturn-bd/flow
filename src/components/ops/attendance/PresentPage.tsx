@@ -3,7 +3,7 @@
 import { Attendance } from "@/hooks/useAttendance";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { FaChevronDown, FaCalendarAlt, FaSearch } from "react-icons/fa";
+import { CaretDown, Calendar, Search } from "@/lib/icons";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
@@ -66,7 +66,7 @@ export default function AttendancePresentPage() {
         <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FaCalendarAlt className="text-gray-400" />
+              <Calendar className="text-gray-400" />
             </div>
             <input
               type="date"
@@ -78,7 +78,7 @@ export default function AttendancePresentPage() {
 
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FaCalendarAlt className="text-gray-400" />
+              <Calendar className="text-gray-400" />
             </div>
             <input
               type="date"
@@ -100,7 +100,7 @@ export default function AttendancePresentPage() {
               ))}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <FaChevronDown className="text-gray-400 text-xs" />
+              <CaretDown className="text-gray-400 text-xs" />
             </div>
           </div>
 
@@ -108,7 +108,7 @@ export default function AttendancePresentPage() {
             onClick={fetchAttendanceData}
             className="bg-[#192D46] text-white rounded-lg px-4 py-2.5 font-medium hover:bg-[#0f1c2d] transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
           >
-            <FaSearch />
+            <Search />
             <span>Search</span>
           </button>
         </div>

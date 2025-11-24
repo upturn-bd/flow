@@ -3,7 +3,7 @@
 import { Attendance } from "@/hooks/useAttendance";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState, useMemo } from "react";
-import { FaChevronDown, FaCalendarAlt } from "react-icons/fa";
+import { CaretDown, Calendar } from "@/lib/icons";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { Clock } from "@/lib/icons";
@@ -99,7 +99,7 @@ export default function AttendanceRecordsPage() {
                {/* Choose Month */}
                <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                     <FaCalendarAlt className="text-gray-400" />
+                     <Calendar className="text-gray-400" />
                   </div>
                   <input
                      type="month"
@@ -125,7 +125,7 @@ export default function AttendanceRecordsPage() {
                      <option value="On_Leave">On Leave</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                     <FaChevronDown className="text-gray-400 text-xs" />
+                     <CaretDown className="text-gray-400 text-xs" />
                   </div>
                </div>
             </div>

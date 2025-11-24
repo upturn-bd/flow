@@ -3,9 +3,8 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
+import { EyeOff, Eye, GoogleLogo } from "@/lib/icons";
 import Link from "next/link";
-import { FcGoogle } from "react-icons/fc";
 
 import { googleSignIn, login } from "../auth-actions";
 
@@ -99,9 +98,9 @@ const SignIn = () => {
                   tabIndex={-1}
                 >
                   {showPassword ? (
-                    <AiOutlineEyeInvisible className="text-2xl" />
+                    <EyeOff className="text-2xl" />
                   ) : (
-                    <AiFillEye className="text-2xl" />
+                    <Eye className="text-2xl" />
                   )}
                 </button>
                 {errors.password && (
@@ -127,7 +126,7 @@ const SignIn = () => {
               className="w-full flex items-center justify-center gap-2 px-8 py-3 mt-4 rounded-full border border-yellow-950 text-black font-semibold shadow-2xl disabled:opacity-50 transition hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
               disabled={loading}
             >
-              <FcGoogle className="text-2xl" />
+              <GoogleLogo className="text-2xl" />
               {loading ? "Signing in..." : "Sign In with Google"}
             </button>
 
