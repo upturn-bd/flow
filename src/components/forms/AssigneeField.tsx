@@ -160,8 +160,8 @@ export default function AssigneeField({
                     {employee.email && (
                       <div className="text-sm text-gray-500">{employee.email}</div>
                     )}
-                    {(employee.designation || employee.position) && (
-                      <div className="text-xs text-gray-400">{employee.designation || employee.position}</div>
+                    {employee.designation && (
+                      <div className="text-xs text-gray-400">{employee.designation}</div>
                     )}
                   </div>
                   <Check size={16} className="text-green-600" />

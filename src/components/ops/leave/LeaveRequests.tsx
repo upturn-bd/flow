@@ -46,7 +46,7 @@ export default function LeaveRequestsPage() {
     setCurrentlyProcessingId(id);
     const updateData = { status: action, remarks: comment };
     const result = await updateLeaveRequest(id, updateData, leaveTypeId, employeeId, start_date, end_date);
-    if (result.success) {
+    if (result && result.success) {
       toast.success(`Leave request ${action.toLowerCase()} successfully`);
       fetchLeaveRequests();
     } else {

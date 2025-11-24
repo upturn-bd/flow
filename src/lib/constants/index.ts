@@ -287,6 +287,66 @@ export type FieldType = typeof FIELD_TYPES[keyof typeof FIELD_TYPES];
 
 export const FIELD_TYPE_OPTIONS = Object.values(FIELD_TYPES);
 
+/**
+ * Generate a human-readable field key from a label
+ * Converts "Product Price" to "product_price"
+ * Adds counter suffix to ensure uniqueness
+ */
+export function generateFieldKey(label: string, existingKeys: string[] = []): string {
+  // Convert label to snake_case
+  const baseKey = label
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_') // Replace non-alphanumeric chars with underscore
+    .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
+    .replace(/_+/g, '_'); // Replace multiple underscores with single
+  
+  // If no valid characters, use default
+  if (!baseKey) {
+    return `field_${Date.now()}`;
+  }
+  
+  // Check if key already exists
+  let finalKey = baseKey;
+  let counter = 1;
+  
+  while (existingKeys.includes(finalKey)) {
+    finalKey = `${baseKey}_${counter}`;
+    counter++;
+  }
+  
+  return finalKey;
+}
+ * Generate a human-readable field key from a label
+ * Converts "Product Price" to "product_price"
+ * Adds timestamp suffix to ensure uniqueness
+ */
+export function generateFieldKey(label: string, existingKeys: string[] = []): string {
+  // Convert label to snake_case
+  const baseKey = label
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_') // Replace non-alphanumeric chars with underscore
+    .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
+    .replace(/_+/g, '_'); // Replace multiple underscores with single
+  
+  // If no valid characters, use default
+  if (!baseKey) {
+    return `field_${Date.now()}`;
+  }
+  
+  // Check if key already exists
+  let finalKey = baseKey;
+  let counter = 1;
+  
+  while (existingKeys.includes(finalKey)) {
+    finalKey = `${baseKey}_${counter}`;
+    counter++;
+  }
+  
+  return finalKey;
+}
+
 // Stakeholder Status
 export const STAKEHOLDER_STATUS = {
   LEAD: 'Lead',

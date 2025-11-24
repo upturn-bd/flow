@@ -87,12 +87,10 @@ export async function middleware(request: NextRequest) {
       .rpc('is_superadmin', { check_user_id: supabaseUser.id });
 
     if (superadminError || !superadminData) {
-      console.log('🚫 [MIDDLEWARE] Superadmin access denied for user:', supabaseUser.id);
       url.pathname = "/unauthorized";
       return NextResponse.redirect(url);
     }
 
-    console.log('✅ [MIDDLEWARE] Superadmin access granted for user:', supabaseUser.id);
     return response;
   }
 
@@ -162,10 +160,8 @@ export async function middleware(request: NextRequest) {
   // Handle permission errors gracefully
   if (permError) {
     if (permError.code === "42883") {
-      console.warn("⚠️  [MIDDLEWARE] Permission RPC not found, skipping checks");
       return response;
     }
-    console.error("❌ [MIDDLEWARE] Error fetching user permissions:", permError);
   }
 
   // Require at least one permission to access the app
@@ -182,24 +178,12 @@ export async function middleware(request: NextRequest) {
   if (matchedRoute) {
     const requiredPermission = ROUTE_PERMISSION_MAP[matchedRoute];
     
-    console.log(`🔒 [MIDDLEWARE] Checking permission for ${currentPath}:`, {
-      requiredModule: requiredPermission.module,
-      requiredAction: requiredPermission.action,
-      userPermissionsCount: userPermissions?.length || 0,
-      userPermissions: userPermissions?.map((p: any) => ({
-        module: p.module_name,
-        [requiredPermission.action]: p[requiredPermission.action]
-      }))
-    });
-    
     // Use cached permissions instead of additional RPC call
     const hasAccess = hasPermissionInCache(
       userPermissions,
       requiredPermission.module,
       requiredPermission.action
     );
-
-    console.log(`🔐 [MIDDLEWARE] Access ${hasAccess ? 'GRANTED' : 'DENIED'} for ${currentPath}`);
 
     if (!hasAccess) {
       url.pathname = "/unauthorized";

@@ -240,7 +240,7 @@ export default function StepDataForm({
           option.nested.forEach((nestedField) => {
             // Skip required validation when saving as draft
             if (nestedField.required && !skipRequired) {
-              const nestedValue = optionNestedData[nestedField.key];
+              const nestedValue = optionNestedData[nestedField.key as keyof typeof optionNestedData];
               if (
                 !nestedValue ||
                 nestedValue.value === undefined ||

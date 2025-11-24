@@ -34,7 +34,6 @@ export interface StakeholderProcessStepFormData {
   name: string;
   description?: string;
   step_order: number;
-  team_id?: number; // DEPRECATED - Use team_ids instead. Will be removed after migration.
   team_ids: number[]; // Array of team IDs for multi-team assignment
   field_definitions: FieldDefinitionsSchema;
   use_date_range: boolean;
@@ -728,11 +727,14 @@ export function useStakeholders() {
 
         const firstStep = process.steps.sort((a: any, b: any) => a.step_order - b.step_order)[0];
 
+        // Exclude client-side only properties
+        const { createAsPermanent, ...dbStakeholderData } = stakeholderData;
+
         const { data, error } = await supabase
           .from("stakeholders")
           .insert([
             {
-              ...stakeholderData,
+              ...dbStakeholderData,
               company_id,
               current_step_id: firstStep.id,
               current_step_order: firstStep.step_order,
@@ -784,33 +786,7 @@ export function useStakeholders() {
                     {
                       stakeholderName: stakeholderData.name,
                       stepName: firstStep.name,
-                      teamName: firstStep.teams?.map(t => t.name).join(', ') || 'Team',
-                    },
-                    {
-                      referenceId: data.id,
-                      actionUrl: `/stakeholders/${data.id}`,
-                    }
-                  )
-                )
-              );
-            }
-          } else if (firstStep.team_id) {
-            // Fallback for backward compatibility
-            const { data: teamMembers } = await supabase
-              .from('team_members')
-              .select('employee_id')
-              .eq('team_id', firstStep.team_id);
-
-            if (teamMembers && teamMembers.length > 0) {
-              await Promise.all(
-                teamMembers.map((member) =>
-                  createStakeholderNotification(
-                    member.employee_id,
-                    'assignedToTeam',
-                    {
-                      stakeholderName: stakeholderData.name,
-                      stepName: firstStep.name,
-                      teamName: firstStep.team?.name || 'Team',
+                      teamName: firstStep.teams?.map((t: any) => t.name).join(', ') || 'Team',
                     },
                     {
                       referenceId: data.id,
@@ -1005,7 +981,7 @@ export function useStakeholders() {
 
         const { data: stepDef, error: stepError } = await supabase
           .from("stakeholder_process_steps")
-          .select("field_definitions, version, name, team_id")
+          .select("field_definitions, version, name, team_ids")
           .eq("id", stepDataForm.step_id)
           .single();
 
@@ -1070,7 +1046,7 @@ export function useStakeholders() {
           step_id: stepDataForm.step_id,
           data: processedData,
           field_definitions_snapshot: stepDef.field_definitions,
-          step_version: stepDef.version,
+          step_version: stepDef.version || 1,
           is_completed: stepDataForm.is_completed || false,
           completed_at: stepDataForm.is_completed ? new Date().toISOString() : null,
           completed_by: stepDataForm.is_completed ? employeeInfo?.id : null,
@@ -1109,7 +1085,7 @@ export function useStakeholders() {
             // Notify team members about step update
             const teamIds = stepDef.team_ids && stepDef.team_ids.length > 0 
               ? stepDef.team_ids 
-              : (stepDef.team_id ? [stepDef.team_id] : []);
+              : [];
 
             if (teamIds.length > 0) {
               const { data: teamMembers } = await supabase
@@ -1271,7 +1247,7 @@ export function useStakeholders() {
           // Notify current step team members about completion
           const currentTeamIds = completedStep?.team_ids && completedStep.team_ids.length > 0
             ? completedStep.team_ids
-            : (completedStep?.team_id ? [completedStep.team_id] : []);
+            : [];
 
           if (currentTeamIds.length > 0) {
             const { data: teamMembers } = await supabase
@@ -1304,7 +1280,7 @@ export function useStakeholders() {
           // Notify next step team members if sequential
           const nextTeamIds = nextStep?.team_ids && nextStep.team_ids.length > 0
             ? nextStep.team_ids
-            : (nextStep?.team_id ? [nextStep.team_id] : []);
+            : [];
 
           if (nextStep && nextTeamIds.length > 0) {
             const { data: nextTeamMembers } = await supabase
@@ -1458,7 +1434,7 @@ export function useStakeholders() {
           // Notify team members of the rolled back step
           const rollbackTeamIds = stepBeingRolledBack?.team_ids && stepBeingRolledBack.team_ids.length > 0
             ? stepBeingRolledBack.team_ids
-            : (stepBeingRolledBack?.team_id ? [stepBeingRolledBack.team_id] : []);
+            : [];
 
           if (rollbackTeamIds.length > 0) {
             const { data: teamMembers } = await supabase
