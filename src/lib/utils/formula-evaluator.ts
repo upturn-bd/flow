@@ -11,7 +11,8 @@ interface EvaluationContext {
 
 /**
  * Convert a cell reference to human-readable format
- * @param cellRef - Cell reference like [Step1.field_123]
+ * Handles nested field paths like [Step1.parent.nested] or [Step1.dropdown.option_value.nested]
+ * @param cellRef - Cell reference like [Step1.field_123] or [Step1.parent.nested]
  * @param processSteps - Array of process steps with field definitions
  * @returns Human-readable label or original reference if not found
  */
@@ -30,7 +31,7 @@ export function cellReferenceToLabel(
   }
 
   const stepOrder = parseInt(match[1], 10);
-  const fieldKey = match[2];
+  const fieldPath = match[2]; // Could be "field" or "parent.nested" or "dropdown.option.nested"
 
   // Find the step
   const step = processSteps.find((s) => s.step_order === stepOrder);
@@ -38,13 +39,60 @@ export function cellReferenceToLabel(
     return cellRef;
   }
 
-  // Find the field in the step's field definitions
-  const field = step.field_definitions?.fields?.find((f: FieldDefinition) => f.key === fieldKey);
-  if (!field) {
-    return cellRef;
-  }
+  // Helper function to recursively find a field by path
+  const findFieldByPath = (
+    fields: FieldDefinition[],
+    pathSegments: string[],
+    labelPath: string[] = []
+  ): string | null => {
+    // Handle edge case of empty path
+    if (pathSegments.length === 0) {
+      console.warn('findFieldByPath called with empty pathSegments');
+      return null;
+    }
+    
+    const currentKey = pathSegments[0];
+    const remainingPath = pathSegments.slice(1);
+    
+    // Find field with matching key
+    const field = fields.find((f: FieldDefinition) => f.key === currentKey);
+    if (!field) return null;
+    
+    const currentLabel = [...labelPath, field.label];
+    
+    // If this is the last segment, return the label
+    if (remainingPath.length === 0) {
+      return currentLabel.join(' > ');
+    }
+    
+    // Otherwise, continue searching in nested fields
+    if (field.nested && field.nested.length > 0) {
+      const nestedResult = findFieldByPath(field.nested, remainingPath, currentLabel);
+      if (nestedResult) return nestedResult;
+    }
+    
+    // Check in option-specific nested fields (for dropdown/multi-select)
+    if (field.options && field.options.length > 0 && remainingPath.length > 0) {
+      const optionValue = remainingPath[0]; // Next segment is the option value
+      const option = field.options.find(opt => opt.value === optionValue);
+      if (option && option.nested && option.nested.length > 0) {
+        const optionLabel = [...currentLabel, `[${option.label}]`];
+        const optionNestedPath = remainingPath.slice(1); // Skip the option value segment
+        if (optionNestedPath.length > 0) {
+          const optionNestedResult = findFieldByPath(option.nested, optionNestedPath, optionLabel);
+          if (optionNestedResult) return optionNestedResult;
+        }
+      }
+    }
+    
+    return null;
+  };
 
-  return field.label;
+  // Split the field path and search for it
+  const pathSegments = fieldPath.split('.');
+  const label = findFieldByPath(step.field_definitions?.fields || [], pathSegments);
+  
+  return label || cellRef;
 }
 
 /**
@@ -147,9 +195,16 @@ export function prepareFormulaForEvaluation(
       if (fieldData !== undefined && fieldData !== null) {
         // Handle NestedFieldValue format (has 'type' and 'value' properties)
         if (typeof fieldData === 'object' && 'value' in fieldData) {
-          numericValue = parseFloat(fieldData.value);
+          // Check if value is empty string or null before parsing
+          const rawValue = fieldData.value;
+          if (rawValue !== null && rawValue !== undefined && rawValue !== '') {
+            numericValue = parseFloat(rawValue);
+          }
         } else {
-          numericValue = parseFloat(fieldData);
+          // Check if value is empty string or null before parsing
+          if (fieldData !== null && fieldData !== undefined && fieldData !== '') {
+            numericValue = parseFloat(fieldData);
+          }
         }
       }
 
