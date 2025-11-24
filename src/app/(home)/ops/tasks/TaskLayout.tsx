@@ -80,18 +80,24 @@ export default function TaskLayout({
   useEffect(() => {
     if (employeeInfo) {
       fetchOngoingTasks();
+      console.log("OT")
       fetchCompletedTasks();
     }
-  }, [employeeInfo, fetchOngoingTasks, fetchCompletedTasks]);
+  }, [employeeInfo]);
 
   // Tab content
+  const [loadMoreLoading, setLoadMoreLoading] = useState(false);
+  const loadMoreOngoing = async () => {
+    setLoadMoreLoading(true)
+    await fetchOngoingTasks(true, 10)
+    setLoadMoreLoading(false)
+  }
   const ongoingTaskPage = useMemo(
     () => (
       <OngoingTaskPage
+        loadMoreLoading={loadMoreLoading}
         hasMoreOngoingTasks={hasMoreOngoingTasks}
-        onLoadMore={() => {
-          fetchOngoingTasks(true, 10)
-        }}
+        onLoadMore={loadMoreOngoing}
         ongoingTasks={ongoingTasks}
         loading={ongoingTasksLoading}
         updateTask={updateTask}
