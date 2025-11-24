@@ -31,11 +31,20 @@ const SignIn = () => {
   const handleSignIn = async (data: SignInFormData) => {
     setGeneralError(null);
     setLoading(true);
-    const { error } = await login({ email: data.email, password: data.password });
-    if (error) {
-      setGeneralError("Login failed. " + error.message);
+    
+    try {
+      const result = await login({ email: data.email, password: data.password });
+      
+      if (result.error) {
+        setGeneralError("Login failed. " + result.error.message);
+        setLoading(false);
+      } else if (result.success) {
+        window.location.href = "/";
+      }
+    } catch (err) {
+      setGeneralError("An unexpected error occurred. Please try again.");
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
@@ -45,7 +54,6 @@ const SignIn = () => {
       await googleSignIn();
     } catch (err) {
       if (err instanceof Error) {
-        console.error("Google Sign-In Error:", err.message);
         setGeneralError("Google sign-in failed. Please try again.");
       }
     } finally {

@@ -23,11 +23,9 @@ const Page: React.FC = () => {
                 throw error;
             }
 
-            console.log('Password reset email sent successfully');
             router.push('/');
         } catch (err) {
             if (err instanceof Error) {
-                console.error('Error:', err.message);
                 setError("email", { type: "manual", message: err.message });
             }
         }
