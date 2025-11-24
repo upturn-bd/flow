@@ -68,6 +68,7 @@ export default function TaskLayout({
     ongoingTasks,
     completedTasks,
     loading,
+    ongoingTasksLoading,
     createTask,
     updateTask,
     deleteTask,
@@ -87,19 +88,19 @@ export default function TaskLayout({
   const ongoingTaskPage = useMemo(
     () => (
       <OngoingTaskPage
-      hasMoreOngoingTasks={hasMoreOngoingTasks}
-      onLoadMore={() => {
-        fetchOngoingTasks(true, 10)
-      }}
+        hasMoreOngoingTasks={hasMoreOngoingTasks}
+        onLoadMore={() => {
+          fetchOngoingTasks(true, 10)
+        }}
         ongoingTasks={ongoingTasks}
-        loading={loading}
+        loading={ongoingTasksLoading}
         updateTask={updateTask}
         deleteTask={deleteTask}
         adminScoped={false}
 
       />
     ),
-    [ongoingTasks, loading, updateTask, deleteTask]
+    [ongoingTasks, updateTask, deleteTask]
   );
 
   const completedTasksList = useMemo(
@@ -171,7 +172,6 @@ export default function TaskLayout({
     if (success) {
       toast.success("Task created successfully");
       setShowCreateModal(false);
-      await fetchOngoingTasks();
     } else {
       toast.error("Failed to create task");
       console.error("Error creating task:", error);
@@ -208,7 +208,7 @@ export default function TaskLayout({
         tabs={tabs}
         activeTab={selectedTaskId ? "" : activeTab || ""} // no tab active if viewing task
         setActiveTab={handleTabChange}
-      
+
       />
 
       {/* Only show tab content when no task is selected
