@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { StakeholderProcessStep, FieldType, FieldDefinition, DropdownOption } from "@/lib/types/schemas";
 import { useTeams } from "@/hooks/useTeams";
 import { Plus, Trash2, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown, List, X, Calculator, AlertCircle } from "lucide-react";
-import { FIELD_TYPES } from "@/lib/constants";
+import { FIELD_TYPES, generateFieldKey } from "@/lib/constants";
 import Toggle from "@/components/ui/Toggle";
 import FormulaEditor from "./FormulaEditor";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
@@ -340,8 +340,9 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
   };
 
   const addField = () => {
+    const existingKeys = formData.field_definitions.fields.map(f => f.key);
     const newField = {
-      key: `field_${Date.now()}`,
+      key: `field_${Date.now()}`, // Temporary key, will be updated when label is set
       label: "",
       type: "text" as FieldType,
       required: true, // Default to required
@@ -847,7 +848,7 @@ function FieldEditor({
 
   const addNestedField = (parentNested?: FieldDefinition[]) => {
     const newField: FieldDefinition = {
-      key: `nested_field_${Date.now()}`,
+      key: `nested_${Date.now()}`, // Temporary key, will be updated when label is set
       label: "",
       type: "text" as FieldType,
       required: true, // Default to required
@@ -874,7 +875,7 @@ function FieldEditor({
     const currentOptions = field.options || [];
     const option = currentOptions[optionIndex];
     const newField: FieldDefinition = {
-      key: `option_nested_field_${Date.now()}`,
+      key: `opt_nested_${Date.now()}`, // Temporary key, will be updated when label is set
       label: "",
       type: "text" as FieldType,
       required: true, // Default to required
@@ -942,7 +943,18 @@ function FieldEditor({
               type="text"
               value={field.label}
               onChange={(e) => {
-                onUpdate(index, { label: e.target.value });
+                const newLabel = e.target.value;
+                const updates: any = { label: newLabel };
+                
+                // Generate human-readable key when label changes
+                if (newLabel.trim()) {
+                  const existingKeys = allFields
+                    .filter((f, i) => i !== index)
+                    .map(f => f.key);
+                  updates.key = generateFieldKey(newLabel, existingKeys);
+                }
+                
+                onUpdate(index, updates);
                 if (hasLabelError) {
                   onClearError(`${fieldKey}_label`);
                 }
@@ -1141,7 +1153,20 @@ function FieldEditor({
                               <input
                                 type="text"
                                 value={nestedField.label}
-                                onChange={(e) => updateOptionNestedField(optIndex, nestedIdx, { label: e.target.value })}
+                                onChange={(e) => {
+                                  const newLabel = e.target.value;
+                                  const updates: any = { label: newLabel };
+                                  
+                                  // Generate human-readable key when label changes
+                                  if (newLabel.trim()) {
+                                    const existingKeys = (option.nested || [])
+                                      .filter((_, i) => i !== nestedIdx)
+                                      .map(f => f.key);
+                                    updates.key = generateFieldKey(newLabel, existingKeys);
+                                  }
+                                  
+                                  updateOptionNestedField(optIndex, nestedIdx, updates);
+                                }}
                                 placeholder="Field Label"
                                 className="flex-1 px-2 py-1.5 sm:py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none"
                               />
@@ -1256,7 +1281,20 @@ function FieldEditor({
                   <input
                     type="text"
                     value={nestedField.label}
-                    onChange={(e) => updateNestedField(nestedIdx, { label: e.target.value })}
+                    onChange={(e) => {
+                      const newLabel = e.target.value;
+                      const updates: any = { label: newLabel };
+                      
+                      // Generate human-readable key when label changes
+                      if (newLabel.trim()) {
+                        const existingKeys = (field.nested || [])
+                          .filter((_, i) => i !== nestedIdx)
+                          .map(f => f.key);
+                        updates.key = generateFieldKey(newLabel, existingKeys);
+                      }
+                      
+                      updateNestedField(nestedIdx, updates);
+                    }}
                     placeholder="Field Label"
                     className="flex-1 px-2 py-1.5 sm:py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none"
                   />
