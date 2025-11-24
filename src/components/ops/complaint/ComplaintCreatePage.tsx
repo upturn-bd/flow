@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { ComplaintRecord } from "@/lib/types/schemas";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext } from "@/contexts";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import { toast } from "sonner";
 import { getEmployeeInfo } from "@/lib/utils/auth";
@@ -47,7 +47,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
   const [complaintState, setComplaintState] = useState<ComplaintState>(initialComplaintRecord);
   const [attachments, setAttachments] = useState<File[]>([]);
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees } = useEmployees();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
@@ -167,8 +167,8 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
 
   useEffect(() => {
     fetchComplaintTypes();
-    fetchEmployees();
-  }, [fetchComplaintTypes, fetchEmployees]);
+    
+  }, [fetchComplaintTypes]);
 
   return (
     <motion.div

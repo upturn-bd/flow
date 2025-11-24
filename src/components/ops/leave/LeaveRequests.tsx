@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext } from "@/contexts";
 import { toast } from "sonner";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
@@ -26,7 +26,7 @@ export default function LeaveRequestsPage() {
   const [comment, setComment] = useState<string>("");
   const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
 
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees } = useEmployees();
   const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
   const {
     leaveRequests,
@@ -38,7 +38,7 @@ export default function LeaveRequestsPage() {
 
   useEffect(() => {
     fetchLeaveRequests();
-    fetchEmployees();
+    
     fetchLeaveTypes();
   }, []);
 

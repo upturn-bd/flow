@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Building2, Plus, Search } from "lucide-react";
 
-import { useDepartments } from "@/hooks/useDepartments";
+import { useDepartmentsContext } from "@/contexts";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Project, useProjects } from "@/hooks/useProjects";
 import { getEmployeeId } from "@/lib/utils/auth";
@@ -32,7 +32,7 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
   } = useProjects();
 
   const { employees, fetchEmployees } = useEmployees();
-  const { departments, fetchDepartments } = useDepartments();
+  const { departments } = useDepartments();
   const router = useRouter();
 
   const [projectDetailsId, setProjectDetailsId] = useState<string | null>(null);
@@ -56,7 +56,7 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
       setUserId(id);
       await fetchOngoingProjects(10, true);
       fetchEmployees();
-      fetchDepartments();
+      
       setInitialLoadComplete(true);
     };
     initData();

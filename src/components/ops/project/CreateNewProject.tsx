@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { Department, useDepartments } from "@/hooks/useDepartments";
+import { useDepartmentsContext } from "@/contexts";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { useProjects } from "@/hooks/useProjects";
 import { useMilestones } from "@/hooks/useMilestones";
@@ -40,13 +40,13 @@ const initialProjectDetails: ProjectDetails = {
 
 export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (key: string) => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { departments, fetchDepartments } = useDepartments();
+  const { departments } = useDepartmentsContext();
   const { employees, fetchEmployeeInfo } = useEmployeeInfo();
   const { createProject } = useProjects();
   const { createMilestone } = useMilestones();
 
   useEffect(() => {
-    fetchDepartments();
+    // Departments auto-fetched by context
     fetchEmployeeInfo();
   }, []);
 

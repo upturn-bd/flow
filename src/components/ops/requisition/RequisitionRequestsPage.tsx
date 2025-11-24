@@ -7,7 +7,7 @@ import {
   Truck 
 } from "lucide-react";
 import { toast } from "sonner";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext } from "@/contexts";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { useRequisitionRequests } from "@/hooks/useRequisition";
@@ -18,7 +18,7 @@ import { RequisitionCard } from "./RequisitionCard";
 
 export default function RequisitionRequestsPage() {
   const [comment, setComment] = useState<string>("");
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees } = useEmployees();
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } = useRequisitionInventories();
 
@@ -36,7 +36,7 @@ export default function RequisitionRequestsPage() {
   }, [fetchRequisitionRequests]);
 
   useEffect(() => {
-    fetchEmployees();
+    
   }, [fetchEmployees]);
 
   useEffect(() => {

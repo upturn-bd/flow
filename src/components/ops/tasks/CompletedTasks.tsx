@@ -1,7 +1,7 @@
 "use client";
 
 import { useDepartments } from "@/hooks/useDepartments";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext } from "@/contexts";
 import { Task, TaskStatus, useTasks } from "@/hooks/useTasks";
 import { useEffect, useState, memo, useCallback } from "react";
 import { Department } from "@/lib/types/schemas";
@@ -177,7 +177,7 @@ const CompletedTasksList = memo(({
 
   useEffect(() => {
     userIdInit();
-    fetchEmployees();
+    
     fetchDepartments();
   }, []);
 

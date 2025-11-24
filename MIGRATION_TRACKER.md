@@ -50,8 +50,31 @@ This file tracks the migration from hook-based data management to context-based 
 - [x] src/app/(home)/finder/page.tsx (useEmployees → useEmployeesContext)
 
 #### Components
-- [ ] Search usage of each hook across all components
-- [ ] Update imports systematically
+- [x] src/components/ops/project/CreateNewProject.tsx
+- [x] src/components/ops/complaint/ComplaintCreatePage.tsx
+- [x] src/components/ops/complaint/ComplaintHistory.tsx
+- [x] src/components/ops/complaint/ComplaintRequests.tsx
+- [x] src/components/ops/tasks/CompletedTasks.tsx
+- [x] src/components/ops/tasks/shared/TaskDetails.tsx
+- [x] src/components/ops/tasks/shared/TaskDetailsImproved.tsx
+- [x] src/components/ops/requisition/RequisitionCreatePage.tsx
+- [x] src/components/ops/requisition/RequisitionHistoryPage.tsx
+- [x] src/components/ops/requisition/RequisitionRequestsPage.tsx
+- [x] src/components/ops/settlement/SettlementCreatePage.tsx
+- [x] src/components/ops/settlement/SettlementHistory.tsx
+- [x] src/components/ops/settlement/SettlementRequestsPage.tsx
+- [x] src/components/ops/leave/LeaveHistory.tsx
+- [x] src/components/ops/leave/LeaveRequests.tsx
+- [x] src/components/ops/project/OngoingProjectsView.tsx
+- [x] src/components/ops/project/CompletedProjectsList.tsx
+- [x] src/components/ops/attendance/RequestsPage.tsx
+- [x] src/components/ops/notice/NoticeDetails.tsx
+- [x] src/components/ops/project/milestone/MilestoneDetails.tsx
+- [x] src/components/admin/positions/PositionDetailsModal.tsx
+- [x] src/components/stakeholder-issues/StakeholderIssueForm.tsx
+- [x] src/components/stakeholder-processes/StepManager.tsx
+- [ ] src/components/admin/tabs/RoleManagementTab.tsx (needs advanced search methods)
+- [ ] src/components/admin/departments/DepartmentDetailsModal.tsx (only imports types, no migration needed)
 
 ## Notes
 - Keep AdminDataContext until all migrations complete

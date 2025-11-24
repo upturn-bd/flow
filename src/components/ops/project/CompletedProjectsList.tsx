@@ -6,7 +6,7 @@ import { debounce } from "lodash";
 import { toast } from "sonner";
 import { CheckCircle, Search } from "lucide-react";
 
-import { useDepartments } from "@/hooks/useDepartments";
+import { useDepartmentsContext } from "@/contexts";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Project, useProjects } from "@/hooks/useProjects";
 import { getEmployeeId } from "@/lib/utils/auth";
@@ -30,7 +30,7 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
   } = useProjects();
 
   const { employees, fetchEmployees } = useEmployees();
-  const { departments, fetchDepartments } = useDepartments();
+  const { departments } = useDepartments();
 
   const [projectDetailsId, setProjectDetailsId] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -53,7 +53,7 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
       setUserId(id);
       await fetchCompletedProjects(10, true);
       fetchEmployees();
-      fetchDepartments();
+      
       setInitialLoadComplete(true);
     };
     initData();

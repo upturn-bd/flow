@@ -4,7 +4,7 @@ import React, { useEffect, useState, ChangeEvent } from "react";
 import { FiUploadCloud } from "react-icons/fi";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { IoMdCalendar } from "react-icons/io";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext } from "@/contexts";
 import { supabase } from "@/lib/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -125,7 +125,7 @@ export default function RequisitionCreatePage({
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } =
     useRequisitionInventories();
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees } = useEmployees();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -292,8 +292,8 @@ export default function RequisitionCreatePage({
   useEffect(() => {
     fetchRequisitionTypes();
     fetchRequisitionInventories();
-    fetchEmployees();
-  }, [fetchRequisitionTypes, fetchRequisitionInventories, fetchEmployees]);
+    
+  }, [fetchRequisitionTypes, fetchRequisitionInventories]);
 
   return (
     <motion.div
@@ -652,7 +652,7 @@ export function RequisitionDraftPage({
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } =
     useRequisitionInventories();
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees } = useEmployees();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -866,8 +866,8 @@ export function RequisitionDraftPage({
   useEffect(() => {
     fetchRequisitionTypes();
     fetchRequisitionInventories();
-    fetchEmployees();
-  }, [fetchRequisitionTypes, fetchRequisitionInventories, fetchEmployees]);
+    
+  }, [fetchRequisitionTypes, fetchRequisitionInventories]);
 
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto lg:mx-20">

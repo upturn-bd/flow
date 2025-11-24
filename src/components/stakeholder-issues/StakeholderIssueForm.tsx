@@ -8,7 +8,7 @@ import {
 } from "@/lib/validation/schemas/stakeholder-issues";
 import { StakeholderIssueFormData } from "@/hooks/useStakeholderIssues";
 import { StakeholderIssueAttachment } from "@/lib/types/schemas";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext } from "@/contexts";
 import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { X, Upload, Trash2, Download, FileText } from "lucide-react";
 
@@ -36,7 +36,7 @@ export default function StakeholderIssueForm({
   onCancel,
   submitLabel = "Create Issue",
 }: StakeholderIssueFormProps) {
-  const { employees, fetchEmployees, loading: loadingEmployees } = useEmployees();
+  const { employees, loading: loadingEmployees } = useEmployees();
   const { deleteAttachment, downloadAttachment } = useStakeholderIssues();
   const [files, setFiles] = useState<File[]>([]);
   const [existingAttachments, setExistingAttachments] = useState<StakeholderIssueAttachment[]>(
@@ -58,7 +58,7 @@ export default function StakeholderIssueForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetchEmployees();
+    
   }, [fetchEmployees]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {

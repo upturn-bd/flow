@@ -14,14 +14,14 @@ import {
   List
 } from "lucide-react";
 import { extractFileNameFromStoragePath, extractFilenameFromUrl } from "@/lib/utils";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeesContext } from "@/contexts";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import { useComplaints } from "@/hooks/useComplaints";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { ComplaintCard } from "./ComplaintCard";
 
 export default function ComplaintHistoryPage() {
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees } = useEmployees();
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
   const {
     complaintHistory: complaints,
@@ -35,7 +35,7 @@ export default function ComplaintHistoryPage() {
   }, []);
 
   useEffect(() => {
-    fetchEmployees();
+    
   }, [fetchEmployees]);
 
   useEffect(() => {
