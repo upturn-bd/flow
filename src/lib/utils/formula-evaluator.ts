@@ -65,24 +65,24 @@ export function cellReferenceToLabel(
       return currentLabel.join(' > ');
     }
     
-    // Otherwise, continue searching in nested fields
+    // Check for option-specific nested fields first (format: optionValue.nestedField)
+    if (remainingPath.length >= 2 && (field.type === 'dropdown' || field.type === 'multi_select')) {
+      const potentialOptionValue = remainingPath[0];
+      const option = field.options?.find(opt => opt.value === potentialOptionValue);
+      
+      if (option && option.nested && option.nested.length > 0) {
+        // This is an option-specific nested field
+        const nestedFieldKeys = remainingPath.slice(1);
+        const optionLabel = [...currentLabel, `[${option.label}]`];
+        const nestedResult = findFieldByPath(option.nested, nestedFieldKeys, optionLabel);
+        if (nestedResult) return nestedResult;
+      }
+    }
+    
+    // Otherwise, continue searching in regular nested fields
     if (field.nested && field.nested.length > 0) {
       const nestedResult = findFieldByPath(field.nested, remainingPath, currentLabel);
       if (nestedResult) return nestedResult;
-    }
-    
-    // Check in option-specific nested fields (for dropdown/multi-select)
-    if (field.options && field.options.length > 0 && remainingPath.length > 0) {
-      const optionValue = remainingPath[0]; // Next segment is the option value
-      const option = field.options.find(opt => opt.value === optionValue);
-      if (option && option.nested && option.nested.length > 0) {
-        const optionLabel = [...currentLabel, `[${option.label}]`];
-        const optionNestedPath = remainingPath.slice(1); // Skip the option value segment
-        if (optionNestedPath.length > 0) {
-          const optionNestedResult = findFieldByPath(option.nested, optionNestedPath, optionLabel);
-          if (optionNestedResult) return optionNestedResult;
-        }
-      }
     }
     
     return null;
@@ -171,21 +171,74 @@ export function prepareFormulaForEvaluation(
 
     if (step && step.data) {
       // Handle nested field paths (e.g., "address.zipcode" or "contact.phone.number")
+      // Or option-specific nested fields (e.g., "dropdown_field.option_value.nested_field")
       const fieldPath = fieldKey.split('.');
       let fieldData: any = step.data;
 
-      // Traverse the nested path
-      for (const pathSegment of fieldPath) {
-        if (fieldData && typeof fieldData === 'object') {
-          // Check if this level has a 'nested' property (NestedFieldValue structure)
-          if ('nested' in fieldData && fieldData.nested) {
-            fieldData = fieldData.nested[pathSegment];
+      // Start with the first segment (the main field key)
+      const mainFieldKey = fieldPath[0];
+      fieldData = step.data[mainFieldKey];
+      
+      // If we have more segments, we need to navigate through nested data
+      if (fieldPath.length > 1) {
+        // Check if this is a NestedFieldValue structure (has 'nested' property)
+        if (fieldData && typeof fieldData === 'object' && 'nested' in fieldData && fieldData.nested) {
+          const remainingPath = fieldPath.slice(1);
+          
+          // Check if the next segment might be an option value (for option-specific nested fields)
+          // Format: field.optionValue.nestedField or field.optionValue.nestedField.deeperNested
+          if (remainingPath.length >= 2) {
+            const potentialOptionValue = remainingPath[0];
+            const optionNestedKey = `${potentialOptionValue}_nested`;
+            
+            // Try to access option-specific nested data first
+            if (fieldData.nested[optionNestedKey]) {
+              // Navigate to the nested field within the option
+              const nestedFieldKeys = remainingPath.slice(1);
+              fieldData = fieldData.nested[optionNestedKey];
+              
+              // Now traverse through the remaining nested fields
+              for (const nestedKey of nestedFieldKeys) {
+                if (fieldData && typeof fieldData === 'object') {
+                  if ('nested' in fieldData && fieldData.nested) {
+                    fieldData = fieldData.nested[nestedKey];
+                  } else if (nestedKey in fieldData) {
+                    fieldData = fieldData[nestedKey];
+                  } else {
+                    fieldData = undefined;
+                    break;
+                  }
+                } else {
+                  fieldData = undefined;
+                  break;
+                }
+              }
+            } else {
+              // Fall back to regular nested field navigation
+              for (const pathSegment of remainingPath) {
+                if (fieldData.nested && fieldData.nested[pathSegment]) {
+                  fieldData = fieldData.nested[pathSegment];
+                } else {
+                  fieldData = undefined;
+                  break;
+                }
+              }
+            }
           } else {
-            fieldData = fieldData[pathSegment];
+            // Single remaining segment - regular nested field
+            const nestedFieldKey = remainingPath[0];
+            fieldData = fieldData.nested[nestedFieldKey];
           }
         } else {
-          fieldData = undefined;
-          break;
+          // Legacy format or direct nested object access
+          for (let i = 1; i < fieldPath.length; i++) {
+            if (fieldData && typeof fieldData === 'object') {
+              fieldData = fieldData[fieldPath[i]];
+            } else {
+              fieldData = undefined;
+              break;
+            }
+          }
         }
       }
 

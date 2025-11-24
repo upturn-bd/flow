@@ -572,8 +572,7 @@ export interface StakeholderProcessStep {
   name: string;
   description?: string;
   step_order: number;
-  team_id?: number; // DEPRECATED - Use team_ids instead. Will be removed after migration.
-  team_ids: number[]; // Array of team IDs - primary field for multi-team assignment
+  team_ids: number[]; // Array of team IDs for multi-team assignment
   field_definitions: FieldDefinitionsSchema;
   use_date_range: boolean;
   start_date?: string; // ISO date string

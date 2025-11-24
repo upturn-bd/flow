@@ -578,7 +578,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         // Independent: any incomplete step
                         const stepTeamIds = step.team_ids && step.team_ids.length > 0 
                           ? step.team_ids 
-                          : (step.team_id ? [step.team_id] : []);
+                          : (step.team_ids ? step.team_ids : []);
                         const isTeamMember = stepTeamIds.some(teamId => userTeamIds.includes(teamId));
                         const hasFullWritePermission = hasPermission('stakeholders', 'can_write');
                         const hasTeamAccess = isTeamMember || hasFullWritePermission;

@@ -81,7 +81,7 @@ export function PermissionBadge({
   size = "sm",
   iconOnly = false,
 }: PermissionBadgeProps) {
-  const config = actionConfig[action] || {
+  const config = actionConfig[action as keyof typeof actionConfig] || {
     icon: Lock,
     label: "Unknown",
     colorGranted: "bg-gray-100 text-gray-700 border-gray-200",
