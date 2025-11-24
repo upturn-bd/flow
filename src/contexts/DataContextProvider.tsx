@@ -7,6 +7,8 @@ import { DivisionsProvider } from "./DivisionsContext";
 import { TeamsProvider } from "./TeamsContext";
 import { PositionsProvider } from "./PositionsContext";
 import { GradesProvider } from "./GradesContext";
+import { ProjectsProvider } from "./ProjectsContext";
+import { NoticesProvider } from "./NoticesContext";
 
 /**
  * Combined provider that wraps all data contexts
@@ -40,7 +42,11 @@ export function DataContextProvider({
           <TeamsProvider autoFetch={autoFetch}>
             <PositionsProvider autoFetch={autoFetch}>
               <GradesProvider autoFetch={autoFetch}>
-                {children}
+                <ProjectsProvider>
+                  <NoticesProvider>
+                    {children}
+                  </NoticesProvider>
+                </ProjectsProvider>
               </GradesProvider>
             </PositionsProvider>
           </TeamsProvider>

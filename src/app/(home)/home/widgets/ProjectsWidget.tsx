@@ -9,7 +9,7 @@ import LoadingSection from '@/app/(home)/home/components/LoadingSection';
 import EmptyState from '@/app/(home)/home/components/EmptyState';
 import BaseWidget from './BaseWidget';
 import { WidgetProps } from '@/lib/types/widgets';
-import { useProjects } from '@/hooks/useProjects';
+import { useProjectsContext } from '@/contexts';
 import { formatDateToDayMonth } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/auth-context';
@@ -18,7 +18,7 @@ import NoPermissionMessage from '@/components/ui/NoPermissionMessage';
 export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeChange }: WidgetProps) {
   const router = useRouter();
   const { canRead, canWrite } = useAuth();
-  const { fetchOngoingProjects, ongoingProjects, ongoingLoading } = useProjects();
+  const { ongoingProjects, ongoingLoading, fetchOngoingProjects } = useProjectsContext();
   const [loading, setLoading] = useState(true);
 
   // Check permissions

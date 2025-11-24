@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useProjects } from "@/hooks/useProjects";
+import { useProjectsContext } from "@/contexts";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";

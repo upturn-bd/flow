@@ -14,9 +14,8 @@ import {
   Calendar,
   ClipboardCheck,
 } from "lucide-react";
-import { useEmployeesContext } from "@/contexts";
+import { useEmployeesContext, useProjectsContext } from "@/contexts";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { useProjects } from "@/hooks/useProjects";
 import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
 import { useAttendances } from "@/hooks/useAttendance";

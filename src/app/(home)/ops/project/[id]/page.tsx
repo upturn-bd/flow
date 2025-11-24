@@ -3,8 +3,7 @@
 import { use } from "react"; // ✅ Import React.use() to unwrap params
 import ProjectLayout from "../ProjectLayout";
 import ProjectDetails from "@/components/ops/project/ProjectDetails";
-import { useEmployeesContext, useDepartmentsContext } from "@/contexts";
-import { useProjects } from "@/hooks/useProjects";
+import { useEmployeesContext, useDepartmentsContext, useProjectsContext } from "@/contexts";
 
 export default function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params); // ✅ unwrap params safely

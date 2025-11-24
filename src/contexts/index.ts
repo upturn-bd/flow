@@ -26,6 +26,12 @@ export { PositionsProvider, usePositionsContext } from "./PositionsContext";
 // Grades Context
 export { GradesProvider, useGradesContext } from "./GradesContext";
 
+// Projects Context
+export { ProjectsProvider, useProjectsContext } from "./ProjectsContext";
+
+// Notices Context
+export { NoticesProvider, useNoticesContext } from "./NoticesContext";
+
 // Admin Data Context (legacy - will be deprecated)
 export { AdminDataProvider, useAdminData } from "./AdminDataContext";
 
