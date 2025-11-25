@@ -26,8 +26,8 @@ const priorityColors = {
 };
 
 const statusColors = {
-  Pending: 'bg-gray-100 text-gray-700',
-  'In Progress': 'bg-blue-100 text-blue-700',
+  Pending: 'bg-background-tertiary text-foreground-primary',
+  'In Progress': 'bg-primary-100 text-primary-700',
   Resolved: 'bg-green-100 text-green-700',
 };
 
@@ -76,7 +76,7 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
   return (
     <>
       <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col overflow-hidden">
+        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
           <div className="p-5 flex-shrink-0">
             <SectionHeader
               title="Stakeholder Issues"
@@ -99,22 +99,22 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
               className="px-5 pb-5 flex-1 overflow-hidden flex flex-col"
             >
               <div className="flex items-center justify-between mb-4 flex-shrink-0">
-                <h3 className="text-sm font-medium text-gray-500">Assigned to You</h3>
+                <h3 className="text-sm font-medium text-foreground-secondary">Assigned to You</h3>
                 <div className="flex items-center gap-2">
                   <motion.button
                     whileHover={{ rotate: 180 }}
                     transition={{ duration: 0.3 }}
                     onClick={handleRefresh}
-                    className="rounded-full p-2 bg-gray-100 hover:bg-gray-200 transition-colors"
+                    className="rounded-full p-2 bg-surface-secondary hover:bg-surface-hover transition-colors"
                   >
-                    <RefreshCw size={16} className="text-gray-600" />
+                    <RefreshCw size={16} className="text-foreground-secondary" />
                   </motion.button>
                   {canManageStakeholders && (
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handleOpenModal}
-                      className="rounded-full p-2 bg-red-600 hover:bg-red-700 transition-colors"
+                      className="rounded-full p-2 bg-primary-600 hover:bg-primary-700 transition-colors"
                       title="Go to Stakeholders page"
                     >
                       <Plus size={16} className="text-white" />
@@ -130,7 +130,7 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
                       key={issue.id}
                       variants={fadeInUp}
                       onClick={() => handleIssueClick(issue.id!)}
-                      className="px-4 py-3 bg-gray-50 hover:bg-red-50 rounded-lg transition-colors border border-gray-100 cursor-pointer"
+                      className="px-4 py-3 bg-background-secondary hover:bg-surface-hover rounded-lg transition-colors border border-border-primary cursor-pointer"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
@@ -138,7 +138,7 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
                             <h4 className="font-medium text-sm truncate">{issue.title}</h4>
                           </div>
                           {issue.stakeholder && (
-                            <p className="text-xs text-gray-500 truncate">
+                            <p className="text-xs text-foreground-tertiary truncate">
                               {typeof issue.stakeholder === 'object' ? issue.stakeholder.name : 'Stakeholder'}
                             </p>
                           )}

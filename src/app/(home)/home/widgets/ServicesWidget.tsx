@@ -19,12 +19,13 @@ import { WidgetProps } from '@/lib/types/widgets';
 import SectionHeader from '../components/SectionHeader';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/components/ui/class';
+import { Icon } from '@phosphor-icons/react';
 
 // Service definitions
 interface Service {
   name: string;
   description: string;
-  icon: React.ComponentType<{ size?: number; weight?: string; className?: string }>;
+  icon: Icon;
   route: string;
   color: string;
   bgColor: string;
@@ -37,72 +38,72 @@ const services: Service[] = [
     description: 'Request and manage leave applications',
     icon: Calendar,
     route: '/ops/leave',
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
-    hoverBgColor: 'hover:bg-green-100',
+    color: 'text-primary-600',
+    bgColor: 'bg-surface-primary',
+    hoverBgColor: 'hover:bg-surface-hover',
   },
   {
     name: 'Complaints',
     description: 'Submit and track employee complaints',
     icon: MessageSquare,
     route: '/ops/complaint',
-    color: 'text-orange-600',
-    bgColor: 'bg-orange-50',
-    hoverBgColor: 'hover:bg-orange-100',
+    color: 'text-primary-600',
+    bgColor: 'bg-surface-primary',
+    hoverBgColor: 'hover:bg-surface-hover',
   },
   {
     name: 'Requisitions',
     description: 'Create and manage requisition requests',
     icon: FileText,
     route: '/ops/requisition',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    hoverBgColor: 'hover:bg-blue-100',
+    color: 'text-primary-600',
+    bgColor: 'bg-surface-primary',
+    hoverBgColor: 'hover:bg-surface-hover',
   },
   {
     name: 'Settlement',
     description: 'Handle employee settlements',
     icon: DollarSign,
     route: '/ops/settlement',
-    color: 'text-indigo-600',
-    bgColor: 'bg-indigo-50',
-    hoverBgColor: 'hover:bg-indigo-100',
+    color: 'text-primary-600',
+    bgColor: 'bg-surface-primary',
+    hoverBgColor: 'hover:bg-surface-hover',
   },
   {
     name: 'Payroll',
     description: 'View payroll information',
     icon: CreditCard,
     route: '/ops/payroll',
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50',
-    hoverBgColor: 'hover:bg-purple-100',
+    color: 'text-primary-600',
+    bgColor: 'bg-surface-primary',
+    hoverBgColor: 'hover:bg-surface-hover',
   },
   {
     name: 'Onboarding',
     description: 'Manage employee onboarding',
     icon: UserPlus,
     route: '/ops/onboarding',
-    color: 'text-teal-600',
-    bgColor: 'bg-teal-50',
-    hoverBgColor: 'hover:bg-teal-100',
+    color: 'text-primary-600',
+    bgColor: 'bg-surface-primary',
+    hoverBgColor: 'hover:bg-surface-hover',
   },
   {
     name: 'Offboarding',
     description: 'Handle employee offboarding',
     icon: UserMinus,
     route: '/ops/offboarding',
-    color: 'text-red-600',
-    bgColor: 'bg-red-50',
-    hoverBgColor: 'hover:bg-red-100',
+    color: 'text-primary-600',
+    bgColor: 'bg-surface-primary',
+    hoverBgColor: 'hover:bg-surface-hover',
   },
   {
     name: 'HRIS',
     description: 'Access HRIS information',
     icon: Briefcase,
     route: '/ops/hris',
-    color: 'text-gray-600',
-    bgColor: 'bg-gray-50',
-    hoverBgColor: 'hover:bg-gray-100',
+    color: 'text-primary-600',
+    bgColor: 'bg-surface-primary',
+    hoverBgColor: 'hover:bg-surface-hover',
   },
 ];
 
@@ -115,9 +116,9 @@ export default function ServicesWidget({ config, isEditMode, onToggle, onSizeCha
 
   return (
     <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col overflow-hidden">
+      <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
         <div className="p-5 flex-shrink-0">
-          <SectionHeader title="Services" icon={Briefcase} iconColor="text-gray-600" />
+          <SectionHeader title="Services" icon={Briefcase} iconColor="text-foreground-secondary" />
         </div>
         
         <motion.div
@@ -133,21 +134,21 @@ export default function ServicesWidget({ config, isEditMode, onToggle, onSizeCha
                 variants={fadeInUp}
                 onClick={() => handleServiceClick(service.route)}
                 className={cn(
-                  'flex items-center justify-between p-4 rounded-lg transition-all text-left border border-gray-100',
+                  'flex items-center justify-between p-4 rounded-lg transition-all text-left border border-border-primary',
                   service.bgColor,
                   service.hoverBgColor,
                   'group'
                 )}
               >
                 <div className="flex items-start gap-3 flex-1">
-                  <div className={cn('p-2 rounded-lg bg-white shadow-sm', service.color)}>
+                  <div className={cn('p-2 rounded-lg bg-primary-50 dark:bg-primary-950/30 shadow-sm', service.color)}>
                     <service.icon size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className={cn('font-semibold text-sm mb-1', service.color)}>
+                    <h3 className={cn('font-semibold text-sm mb-1 text-foreground-primary')}>
                       {service.name}
                     </h3>
-                    <p className="text-xs text-gray-600 line-clamp-2">
+                    <p className="text-xs text-foreground-secondary line-clamp-2">
                       {service.description}
                     </p>
                   </div>
@@ -156,7 +157,7 @@ export default function ServicesWidget({ config, isEditMode, onToggle, onSizeCha
                   size={16} 
                   className={cn(
                     'flex-shrink-0 ml-2 transition-transform group-hover:translate-x-1',
-                    service.color
+                    'text-primary-600 dark:text-primary-400'
                   )} 
                 />
               </motion.button>

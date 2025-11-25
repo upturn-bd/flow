@@ -63,7 +63,7 @@ export default function AttendanceWidget({ config, isEditMode, onToggle, onSizeC
   return (
     <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
       {!canViewAttendance ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col overflow-hidden">
+        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
           <NoPermissionMessage moduleName="attendance" />
         </div>
       ) : (

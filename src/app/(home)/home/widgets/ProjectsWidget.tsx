@@ -52,7 +52,7 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
 
   return (
     <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col overflow-hidden">
+      <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
         <div className="p-5 flex-shrink-0">
           <SectionHeader title="My Projects" icon={FolderKanban} iconColor="text-purple-600" />
         </div>
@@ -71,22 +71,22 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
             className="px-5 pb-5 flex-1 overflow-hidden flex flex-col"
           >
             <div className="flex items-center justify-between mb-4 flex-shrink-0">
-              <h3 className="text-sm font-medium text-gray-500">Ongoing Projects</h3>
+              <h3 className="text-sm font-medium text-foreground-secondary">Ongoing Projects</h3>
               <div className="flex items-center gap-2">
                 <motion.button
                   whileHover={{ rotate: 180 }}
                   transition={{ duration: 0.3 }}
                   onClick={handleRefresh}
-                  className="rounded-full p-2 bg-gray-100 hover:bg-gray-200 transition-colors"
+                  className="rounded-full p-2 bg-surface-secondary hover:bg-surface-hover transition-colors"
                 >
-                  <RefreshCw size={16} className="text-gray-600" />
+                  <RefreshCw size={16} className="text-foreground-secondary" />
                 </motion.button>
                 {canCreateProjects && (
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleCreateProject}
-                    className="rounded-full p-2 bg-purple-600 hover:bg-purple-700 transition-colors"
+                    className="rounded-full p-2 bg-primary-600 hover:bg-primary-700 transition-colors"
                     title="Create new project"
                   >
                     <Plus size={16} className="text-white" />
@@ -102,15 +102,15 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
                     key={project.id}
                     variants={fadeInUp}
                     onClick={handleProjectClick}
-                    className="flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-purple-50 rounded-lg transition-colors text-sm font-medium border border-gray-100 cursor-pointer"
+                    className="flex items-center justify-between px-4 py-3 bg-background-secondary hover:bg-primary-50 rounded-lg transition-colors text-sm font-medium border border-border-primary cursor-pointer"
                   >
                     <div className="flex items-center space-x-3 flex-1 min-w-0">
-                      <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0"></div>
+                      <div className="w-2 h-2 rounded-full bg-primary-500 flex-shrink-0"></div>
                       <span className="truncate">{project.project_title}</span>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                      <Clock size={14} className="text-gray-400" />
-                      <span className="whitespace-nowrap text-gray-600 text-xs">
+                      <Clock size={14} className="text-foreground-tertiary" />
+                      <span className="whitespace-nowrap text-foreground-secondary text-xs">
                         {formatDateToDayMonth(project.end_date)}
                       </span>
                     </div>
@@ -128,7 +128,7 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
               <div className="mt-4 text-center">
                 <button
                   onClick={() => router.push('/ops/project')}
-                  className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+                  className="text-sm text-primary-600 hover:text-primary-700 font-medium"
                 >
                   View all projects →
                 </button>

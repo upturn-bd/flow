@@ -9,13 +9,13 @@ import { motion } from "framer-motion";
 import {
   Clock,
   FileCheck,
-  BookOpen,
   PlusCircle,
   WarningCircle,
   Calendar
 } from "@/lib/icons";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PERMISSION_MODULES } from "@/lib/constants";
+import { BookOpen } from "@phosphor-icons/react";
 
 function LeavePageContent() {
   const router = useRouter();

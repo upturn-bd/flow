@@ -140,29 +140,29 @@ export default function WidgetCustomizationPanel({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-surface-primary rounded-xl shadow-2xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
       >
         {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between">
+        <div className="p-4 sm:p-6 border-b border-border-primary flex items-center justify-between">
           <div className="flex-1 min-w-0 mr-4">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 truncate">Customize Dashboard</h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground-primary truncate">Customize Dashboard</h2>
+            <p className="text-xs sm:text-sm text-foreground-tertiary mt-1">
               {enabledCount} of {totalCount} widgets enabled · Show/hide, resize, and reorder
             </p>
           </div>
           <button
             onClick={onCancel}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+            className="p-2 hover:bg-surface-hover rounded-lg transition-colors flex-shrink-0"
             aria-label="Close"
           >
-            <X size={24} className="text-gray-600" />
+            <X size={24} className="text-foreground-tertiary" />
           </button>
         </div>
 
         {/* Widget List */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
-            <p className="text-xs sm:text-sm text-blue-800">
+          <div className="mb-4 p-3 bg-primary-50 border border-primary-100 rounded-lg dark:bg-primary-950/20 dark:border-primary-900/30">
+            <p className="text-xs sm:text-sm text-primary-800 dark:text-primary-300">
               <strong>💡 Tip:</strong> Use the arrows to reorder widgets, toggle visibility with the eye icon, and adjust sizes with the dropdown.
             </p>
           </div>
@@ -180,8 +180,8 @@ export default function WidgetCustomizationPanel({
                   layout
                   className={`border rounded-lg p-3 sm:p-4 transition-all ${
                     widget.enabled
-                      ? 'border-gray-200 bg-white'
-                      : 'border-gray-100 bg-gray-50 opacity-60'
+                      ? 'border-border-primary bg-surface-primary'
+                      : 'border-border-primary bg-background-secondary opacity-60'
                   }`}
                 >
                   <div className="flex items-center gap-2 sm:gap-4">
@@ -190,28 +190,28 @@ export default function WidgetCustomizationPanel({
                       <button
                         onClick={() => moveWidgetUp(index)}
                         disabled={index === 0}
-                        className="p-1 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        className="p-1 hover:bg-surface-hover rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       >
-                        <ChevronUp size={16} className="text-gray-600" />
+                        <ChevronUp size={16} className="text-foreground-tertiary" />
                       </button>
-                      <GripVertical size={16} className="text-gray-400" />
+                      <GripVertical size={16} className="text-foreground-tertiary" />
                       <button
                         onClick={() => moveWidgetDown(index)}
                         disabled={index === localWidgets.length - 1}
-                        className="p-1 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        className="p-1 hover:bg-surface-hover rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       >
-                        <ChevronDown size={16} className="text-gray-600" />
+                        <ChevronDown size={16} className="text-foreground-tertiary" />
                       </button>
                     </div>
 
                     {/* Widget Info */}
                     <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                      <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${widget.enabled ? 'bg-blue-50' : 'bg-gray-100'}`}>
-                        <Icon size={18} className={widget.enabled ? 'text-blue-600' : 'text-gray-400'} />
+                      <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${widget.enabled ? 'bg-primary-50 dark:bg-primary-950/20' : 'bg-background-tertiary'}`}>
+                        <Icon size={18} className={widget.enabled ? 'text-primary-600 dark:text-primary-400' : 'text-foreground-tertiary'} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-sm sm:text-base text-gray-800 truncate">{definition.name}</h3>
-                        <p className="text-xs sm:text-sm text-gray-500 hidden sm:block truncate">{definition.description}</p>
+                        <h3 className="font-medium text-sm sm:text-base text-foreground-primary truncate">{definition.name}</h3>
+                        <p className="text-xs sm:text-sm text-foreground-tertiary hidden sm:block truncate">{definition.description}</p>
                       </div>
                     </div>
 
@@ -220,7 +220,7 @@ export default function WidgetCustomizationPanel({
                       value={widget.size}
                       onChange={(e) => updateWidgetSize(widget.id, e.target.value as WidgetSize)}
                       disabled={!widget.enabled}
-                      className="px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                      className="px-2 sm:px-3 py-1.5 sm:py-2 border border-border-secondary rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 bg-surface-primary"
                     >
                       {sizeOptions.map(option => (
                         <option key={option.value} value={option.value}>
@@ -234,8 +234,8 @@ export default function WidgetCustomizationPanel({
                       onClick={() => toggleWidget(widget.id)}
                       className={`p-1.5 sm:p-2 rounded-lg transition-colors flex-shrink-0 ${
                         widget.enabled
-                          ? 'bg-green-50 hover:bg-green-100 text-green-600'
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-400'
+                          ? 'bg-success/10 hover:bg-success/20 text-success dark:bg-success/20 dark:hover:bg-success/30'
+                          : 'bg-background-tertiary hover:bg-surface-hover text-foreground-tertiary'
                       }`}
                       aria-label={widget.enabled ? 'Hide widget' : 'Show widget'}
                     >
@@ -249,10 +249,10 @@ export default function WidgetCustomizationPanel({
         </div>
 
         {/* Footer */}
-        <div className="p-4 sm:p-6 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="p-4 sm:p-6 border-t border-border-primary bg-background-secondary flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
           <button
             onClick={handleReset}
-            className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="px-4 py-2 text-sm font-medium text-foreground-secondary hover:bg-surface-hover rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <RotateCcw size={16} />
             <span className="hidden sm:inline">Reset to Default</span>
@@ -262,14 +262,14 @@ export default function WidgetCustomizationPanel({
           <div className="flex items-center gap-3">
             <button
               onClick={onCancel}
-              className="flex-1 sm:flex-none px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+              className="flex-1 sm:flex-none px-6 py-2 text-sm font-medium text-foreground-secondary hover:bg-surface-hover rounded-lg transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={!hasChanges || saving}
-              className="flex-1 sm:flex-none px-6 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              className="flex-1 sm:flex-none px-6 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
             >
               <Save size={16} />
               {saving ? 'Saving...' : 'Save Changes'}

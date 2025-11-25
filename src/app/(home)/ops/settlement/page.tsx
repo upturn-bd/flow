@@ -39,7 +39,7 @@ function SettlementPageContent() {
       key: "history",
       label: "History",
       icon: <History className="h-5 w-5" />,
-      color: "text-blue-600",
+      color: "text-primary-600",
       content: <SettlementHistoryPage />,
       link: "/ops/settlement?tab=history",
     },
@@ -57,7 +57,7 @@ function SettlementPageContent() {
       icon: <BookOpen className="h-5 w-5" />,
       color: "text-purple-600",
       content: (
-        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+        <div className="flex flex-col items-center justify-center py-12 text-foreground-secondary">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

@@ -5,13 +5,12 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { StakeholderProcessStep, StakeholderStepData, FieldDefinition, NestedFieldValue } from "@/lib/types/schemas";
-import { Upload, X, CheckCircle2, File as FileIcon, Loader2, XCircle, Calculator, AlertCircle } from "lucide-react";
+import { Upload, X, CheckCircle, File, Loader, XCircle, Calculator, WarningCircle } from "@/lib/icons";
 import GeolocationPicker, { GeolocationValue } from "@/components/ui/GeolocationPicker";
 import DropdownField from "@/components/ui/DropdownField";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 import Toggle from "@/components/ui/Toggle";
 import { calculateFieldValue, formatCalculatedValue, formulaToReadable } from "@/lib/utils/formula-evaluator";
-import { CheckCircleIcon, WarningCircleIcon } from "@phosphor-icons/react";
 
 interface StepDataFormProps {
   stakeholderId: number;
@@ -48,7 +47,7 @@ export default function StepDataForm({
   // Safety check: ensure step has required properties
   if (!step || !step.id) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg text-sm">
+      <div className="bg-warning/10 border border-warning/30 text-warning px-4 py-3 rounded-lg text-sm">
         Invalid step configuration. Please refresh the page.
       </div>
     );
@@ -543,17 +542,17 @@ export default function StepDataForm({
       const nestedData = typeof fieldData === 'object' && fieldData?.nested ? fieldData.nested : {};
 
       return (
-        <div className="mt-3 pl-4 border-l-2 border-gray-200 space-y-3">
-          <p className="text-xs font-medium text-gray-600 mb-2">Additional Information:</p>
+        <div className="mt-3 pl-4 border-l-2 border-border-primary space-y-3">
+          <p className="text-xs font-medium text-foreground-tertiary mb-2">Additional Information:</p>
           {field.nested.map((nestedField) => {
             const nestedValue = nestedData[nestedField.key]?.value;
             const nestedError = errors[`${field.key}.${nestedField.key}`];
 
             return (
               <div key={nestedField.key}>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-foreground-secondary mb-1">
                   {nestedField.label}
-                  {nestedField.required && <span className="text-red-500 ml-1">*</span>}
+                  {nestedField.required && <span className="text-error ml-1">*</span>}
                 </label>
                 {renderNestedFieldInput(nestedField, nestedValue, field.key, nestedError)}
               </div>
@@ -582,11 +581,11 @@ export default function StepDataForm({
                 type="text"
                 value={value || ""}
                 onChange={(e) => updateNestedValue(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${error ? "border-red-500" : "border-gray-300"
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none ${error ? "border-error" : "border-border-primary"
                   }`}
                 placeholder={nestedField.placeholder || nestedField.label}
               />
-              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+              {error && <p className="text-error text-xs mt-1">{error}</p>}
             </>
           );
 
@@ -597,7 +596,7 @@ export default function StepDataForm({
                 checked={value || false}
                 onChange={(checked) => updateNestedValue(checked)}
               />
-              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+              {error && <p className="text-error text-xs mt-1">{error}</p>}
             </div>
           );
 
@@ -608,10 +607,10 @@ export default function StepDataForm({
                 type="date"
                 value={value || ""}
                 onChange={(e) => updateNestedValue(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${error ? "border-red-500" : "border-gray-300"
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none ${error ? "border-error" : "border-border-primary"
                   }`}
               />
-              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+              {error && <p className="text-error text-xs mt-1">{error}</p>}
             </>
           );
 
@@ -622,12 +621,12 @@ export default function StepDataForm({
                 type="number"
                 value={value || ""}
                 onChange={(e) => updateNestedValue(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${error ? "border-red-500" : "border-gray-300"
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none ${error ? "border-error" : "border-border-primary"
                   }`}
                 placeholder={nestedField.placeholder || nestedField.label}
                 step="any"
               />
-              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+              {error && <p className="text-error text-xs mt-1">{error}</p>}
             </>
           );
 
@@ -637,7 +636,7 @@ export default function StepDataForm({
               type="text"
               value={value || ""}
               onChange={(e) => updateNestedValue(e.target.value)}
-              className={`w-full px-3 py-2 text-sm border rounded-lg ${error ? "border-red-500" : "border-gray-300"
+              className={`w-full px-3 py-2 text-sm border rounded-lg ${error ? "border-error" : "border-border-primary"
                 }`}
             />
           );
@@ -664,11 +663,11 @@ export default function StepDataForm({
                 type="text"
                 value={value || ""}
                 onChange={(e) => updateNestedValue(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${error ? "border-red-500" : "border-gray-300"
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none ${error ? "border-error" : "border-border-primary"
                   }`}
                 placeholder={nestedField.placeholder || nestedField.label}
               />
-              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+              {error && <p className="text-error text-xs mt-1">{error}</p>}
             </>
           );
 
@@ -679,7 +678,7 @@ export default function StepDataForm({
                 checked={value || false}
                 onChange={(checked) => updateNestedValue(checked)}
               />
-              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+              {error && <p className="text-error text-xs mt-1">{error}</p>}
             </div>
           );
 
@@ -690,10 +689,10 @@ export default function StepDataForm({
                 type="date"
                 value={value || ""}
                 onChange={(e) => updateNestedValue(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${error ? "border-red-500" : "border-gray-300"
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none ${error ? "border-error" : "border-border-primary"
                   }`}
               />
-              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+              {error && <p className="text-error text-xs mt-1">{error}</p>}
             </>
           );
 
@@ -704,12 +703,12 @@ export default function StepDataForm({
                 type="number"
                 value={value || ""}
                 onChange={(e) => updateNestedValue(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${error ? "border-red-500" : "border-gray-300"
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none ${error ? "border-error" : "border-border-primary"
                   }`}
                 placeholder={nestedField.placeholder || nestedField.label}
                 step="any"
               />
-              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+              {error && <p className="text-error text-xs mt-1">{error}</p>}
             </>
           );
 
@@ -719,7 +718,7 @@ export default function StepDataForm({
               type="text"
               value={value || ""}
               onChange={(e) => updateNestedValue(e.target.value)}
-              className={`w-full px-3 py-2 text-sm border rounded-lg ${error ? "border-red-500" : "border-gray-300"
+              className={`w-full px-3 py-2 text-sm border rounded-lg ${error ? "border-error" : "border-border-primary"
                 }`}
             />
           );
@@ -730,19 +729,19 @@ export default function StepDataForm({
       case "text":
         return (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground-secondary mb-2">
               {field.label}
-              {field.required && <span className="text-red-500 ml-1">*</span>}
+              {field.required && <span className="text-error ml-1">*</span>}
             </label>
             <input
               type="text"
               value={actualValue || ""}
               onChange={(e) => updateValue(e.target.value)}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${hasError ? "border-red-500" : "border-gray-300"
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none ${hasError ? "border-error" : "border-border-primary"
                 }`}
               placeholder={field.placeholder || field.label}
             />
-            {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
+            {hasError && <p className="text-error text-sm mt-1">{errors[field.key]}</p>}
             {renderNestedFields()}
           </div>
         );
@@ -750,23 +749,23 @@ export default function StepDataForm({
       case "number":
         return (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground-secondary mb-2">
               {field.label}
-              {field.required && <span className="text-red-500 ml-1">*</span>}
+              {field.required && <span className="text-error ml-1">*</span>}
             </label>
             <input
               type="number"
               value={actualValue || ""}
               onChange={(e) => updateValue(e.target.value)}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${hasError ? "border-red-500" : "border-gray-300"
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none ${hasError ? "border-error" : "border-border-primary"
                 }`}
               placeholder={field.placeholder || field.label}
               step="any"
               min={field.validation?.min}
               max={field.validation?.max}
             />
-            {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
-            {field.helpText && <p className="text-xs text-gray-500 mt-1">{field.helpText}</p>}
+            {hasError && <p className="text-error text-sm mt-1">{errors[field.key]}</p>}
+            {field.helpText && <p className="text-xs text-foreground-tertiary mt-1">{field.helpText}</p>}
             {renderNestedFields()}
           </div>
         );
@@ -785,9 +784,9 @@ export default function StepDataForm({
 
         return (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground-secondary mb-2">
               {field.label}
-              <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded">
+              <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-success/10 text-success text-xs rounded">
                 <Calculator size={12} />
                 Calculated
               </span>
@@ -795,24 +794,24 @@ export default function StepDataForm({
 
             {/* Calculation Result Display */}
             <div className={`w-full px-4 py-3 border rounded-lg ${hasCalculationError
-              ? 'bg-red-50 border-red-300'
+              ? 'bg-error/10 border-error/30'
               : hasMissingRefs
-                ? 'bg-amber-50 border-amber-300'
-                : 'bg-gray-50 border-gray-200'
+                ? 'bg-warning/10 border-warning/30'
+                : 'bg-background-secondary border-border-primary'
               }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {hasCalculationError && (
-                    <WarningCircleIcon className="text-red-600 flex-shrink-0" size={16} />
+                    <WarningCircle className="text-error flex-shrink-0" size={16} />
                   )}
                   {hasMissingRefs && !hasCalculationError && (
-                    <WarningCircleIcon className="text-amber-600 flex-shrink-0" size={16} />
+                    <WarningCircle className="text-warning flex-shrink-0" size={16} />
                   )}
                   <span className={`text-lg font-semibold ${hasCalculationError
-                    ? 'text-red-700'
+                    ? 'text-error'
                     : hasMissingRefs
-                      ? 'text-amber-700'
-                      : 'text-gray-900'
+                      ? 'text-warning'
+                      : 'text-foreground-primary'
                     }`}>
                     {calculationResult.value !== null
                       ? formatCalculatedValue(calculationResult.value)
@@ -820,12 +819,12 @@ export default function StepDataForm({
                   </span>
                 </div>
                 {hasMissingRefs && (
-                  <span className="text-xs font-medium text-amber-600 bg-amber-100 px-2 py-1 rounded">
+                  <span className="text-xs font-medium text-warning bg-warning/10 px-2 py-1 rounded">
                     Incomplete Data
                   </span>
                 )}
                 {hasCalculationError && (
-                  <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded">
+                  <span className="text-xs font-medium text-error bg-error/10 px-2 py-1 rounded">
                     Error
                   </span>
                 )}
@@ -834,17 +833,17 @@ export default function StepDataForm({
 
             {/* Formula Display */}
             {field.formula && (
-              <div className="mt-2 p-2 bg-gray-100 rounded">
-                <p className="text-xs text-gray-600 mb-1 font-medium">Formula:</p>
-                <code className="text-xs text-gray-800 break-all">{formulaToReadable(field.formula, processSteps)}</code>
+              <div className="mt-2 p-2 bg-background-tertiary rounded">
+                <p className="text-xs text-foreground-tertiary mb-1 font-medium">Formula:</p>
+                <code className="text-xs text-foreground-secondary break-all">{formulaToReadable(field.formula, processSteps)}</code>
               </div>
             )}
 
             {/* Error Messages */}
             {calculationResult.error && (
-              <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
-                <WarningCircleIcon className="text-red-600 flex-shrink-0 mt-0.5" size={14} />
-                <p className="text-xs text-red-700">
+              <div className="mt-2 p-2 bg-error/10 border border-error/30 rounded flex items-start gap-2">
+                <WarningCircle className="text-error flex-shrink-0 mt-0.5" size={14} />
+                <p className="text-xs text-error">
                   <span className="font-medium">Calculation Error:</span> {calculationResult.error}
                 </p>
               </div>
@@ -852,18 +851,18 @@ export default function StepDataForm({
 
             {/* Missing References Warning */}
             {calculationResult.missingRefs && calculationResult.missingRefs.length > 0 && (
-              <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded flex items-start gap-2">
-                <WarningCircleIcon className="text-amber-600 flex-shrink-0 mt-0.5" size={14} />
+              <div className="mt-2 p-2 bg-warning/10 border border-warning/30 rounded flex items-start gap-2">
+                <WarningCircle className="text-warning flex-shrink-0 mt-0.5" size={14} />
                 <div className="flex-1">
-                  <p className="text-xs text-amber-800 font-medium mb-1">
+                  <p className="text-xs text-warning font-medium mb-1">
                     Missing or incomplete field data:
                   </p>
-                  <ul className="text-xs text-amber-700 list-disc list-inside space-y-0.5">
+                  <ul className="text-xs text-warning list-disc list-inside space-y-0.5">
                     {(calculationResult.missingLabels || calculationResult.missingRefs).map((ref, idx) => (
                       <li key={idx}>{ref}</li>
                     ))}
                   </ul>
-                  <p className="text-xs text-amber-600 mt-1 italic">
+                  <p className="text-xs text-warning mt-1 italic">
                     Please fill in the referenced fields or complete previous steps.
                   </p>
                 </div>
@@ -877,15 +876,15 @@ export default function StepDataForm({
       case "boolean":
         return (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground-secondary mb-2">
               {field.label}
-              {field.required && <span className="text-red-500 ml-1">*</span>}
+              {field.required && <span className="text-error ml-1">*</span>}
             </label>
             <Toggle
               checked={actualValue || false}
               onChange={(checked) => updateValue(checked)}
             />
-            {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
+            {hasError && <p className="text-error text-sm mt-1">{errors[field.key]}</p>}
             {renderNestedFields()}
           </div>
         );
@@ -893,18 +892,18 @@ export default function StepDataForm({
       case "date":
         return (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground-secondary mb-2">
               {field.label}
-              {field.required && <span className="text-red-500 ml-1">*</span>}
+              {field.required && <span className="text-error ml-1">*</span>}
             </label>
             <input
               type="date"
               value={actualValue || ""}
               onChange={(e) => updateValue(e.target.value)}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${hasError ? "border-red-500" : "border-gray-300"
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none ${hasError ? "border-error" : "border-border-primary"
                 }`}
             />
-            {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
+            {hasError && <p className="text-error text-sm mt-1">{errors[field.key]}</p>}
             {renderNestedFields()}
           </div>
         );
@@ -937,20 +936,20 @@ export default function StepDataForm({
 
         return (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground-secondary mb-2">
               {field.label}
-              {field.required && <span className="text-red-500 ml-1">*</span>}
+              {field.required && <span className="text-error ml-1">*</span>}
             </label>
             <div
-              className={`border-2 border-dashed rounded-lg p-4 ${hasError ? "border-red-500" : "border-gray-300"
+              className={`border-2 border-dashed rounded-lg p-4 ${hasError ? "border-error" : "border-border-primary"
                 }`}
             >
               {hasFile ? (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center justify-between bg-background-secondary p-3 rounded-lg">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileIcon className="text-blue-600 flex-shrink-0" size={20} />
-                      <span className="text-sm text-gray-700 truncate">
+                      <File className="text-primary-600 flex-shrink-0" size={20} />
+                      <span className="text-sm text-foreground-secondary truncate">
                         {getFileName()}
                       </span>
                     </div>
@@ -958,7 +957,7 @@ export default function StepDataForm({
                       type="button"
                       onClick={() => handleFileRemove(field.key)}
                       disabled={isUploading || submitting}
-                      className="text-red-600 hover:text-red-700 ml-2 disabled:opacity-50"
+                      className="text-error hover:text-error ml-2 disabled:opacity-50"
                       title="Remove file"
                     >
                       <X size={16} />
@@ -969,7 +968,7 @@ export default function StepDataForm({
                       href={getFileUrl() || '#'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-blue-600 hover:underline inline-flex items-center gap-1"
+                      className="text-xs text-primary-600 hover:underline inline-flex items-center gap-1"
                     >
                       View file
                     </a>
@@ -977,11 +976,11 @@ export default function StepDataForm({
                 </div>
               ) : (
                 <label className="flex flex-col items-center cursor-pointer">
-                  <Upload className="text-gray-400" size={32} />
-                  <span className="text-sm text-gray-600 mt-2">
+                  <Upload className="text-foreground-tertiary" size={32} />
+                  <span className="text-sm text-foreground-secondary mt-2">
                     Click to upload or drag and drop
                   </span>
-                  <span className="text-xs text-gray-500 mt-1">
+                  <span className="text-xs text-foreground-tertiary mt-1">
                     {field.placeholder || 'PDF, DOC, DOCX, JPG, PNG (max 10MB)'}
                   </span>
                   <input
@@ -1006,7 +1005,7 @@ export default function StepDataForm({
                 </label>
               )}
             </div>
-            {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
+            {hasError && <p className="text-error text-sm mt-1">{errors[field.key]}</p>}
             {renderNestedFields()}
           </div>
         );
@@ -1044,8 +1043,8 @@ export default function StepDataForm({
 
             {/* Render option-specific nested fields if selected option has them */}
             {hasDropdownOptionNested && actualValue && (
-              <div className="mt-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
-                <p className="text-xs font-medium text-gray-600 mb-2">Additional Information for "{selectedOption.label}":</p>
+              <div className="mt-3 border border-border-primary rounded-lg p-3 bg-background-secondary">
+                <p className="text-xs font-medium text-foreground-secondary mb-2">Additional Information for "{selectedOption.label}":</p>
                 <div className="space-y-2">
                   {selectedOption.nested!.map((nestedField) => {
                     const optionNestedData = getOptionNestedData(fieldData, actualValue);
@@ -1055,9 +1054,9 @@ export default function StepDataForm({
 
                     return (
                       <div key={nestedField.key}>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
                           {nestedField.label}
-                          {nestedField.required && <span className="text-red-500 ml-1">*</span>}
+                          {nestedField.required && <span className="text-error ml-1">*</span>}
                         </label>
                         {renderOptionNestedFieldInput(
                           nestedField,
@@ -1097,7 +1096,7 @@ export default function StepDataForm({
             {/* Render nested fields for each selected option */}
             {hasOptionNestedFields && Array.isArray(actualValue) && actualValue.length > 0 && (
               <div className="mt-4 space-y-3">
-                <p className="text-xs font-medium text-gray-600">Additional Information for Selected Options:</p>
+                <p className="text-xs font-medium text-foreground-secondary">Additional Information for Selected Options:</p>
                 {actualValue.map((selectedValue) => {
                   const option = field.options?.find(opt => opt.value === selectedValue);
                   if (!option || !option.nested || option.nested.length === 0) return null;
@@ -1106,8 +1105,8 @@ export default function StepDataForm({
                   const optionNestedKey = `${selectedValue}_nested`;
 
                   return (
-                    <div key={selectedValue} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
-                      <p className="text-sm font-medium text-gray-700 mb-2">{option.label}</p>
+                    <div key={selectedValue} className="border border-border-primary rounded-lg p-3 bg-background-secondary">
+                      <p className="text-sm font-medium text-foreground-secondary mb-2">{option.label}</p>
                       <div className="space-y-2">
                         {option.nested.map((nestedField) => {
                           const nestedValue = optionNestedData[nestedField.key]?.value;
@@ -1115,9 +1114,9 @@ export default function StepDataForm({
 
                           return (
                             <div key={nestedField.key}>
-                              <label className="block text-xs font-medium text-gray-700 mb-1">
+                              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                                 {nestedField.label}
-                                {nestedField.required && <span className="text-red-500 ml-1">*</span>}
+                                {nestedField.required && <span className="text-error ml-1">*</span>}
                               </label>
                               {renderOptionNestedFieldInput(
                                 nestedField,
@@ -1152,7 +1151,7 @@ export default function StepDataForm({
   if (!Array.isArray(fields)) {
     console.error("Invalid field_definitions:", step.field_definitions);
     return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+      <div className="bg-error/10 border border-error text-error px-4 py-3 rounded-lg text-sm">
         Error: Invalid field definitions for this step. Please contact support.
       </div>
     );
@@ -1215,23 +1214,23 @@ export default function StepDataForm({
               </div>
             ))
           ) : (
-            <p className="text-sm text-gray-500">No fields defined for this step</p>
+            <p className="text-sm text-foreground-tertiary">No fields defined for this step</p>
           )}
         </div>
 
         {errors.submit && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          <div className="bg-error/10 border border-error text-error px-4 py-3 rounded-lg text-sm">
             {errors.submit}
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-border-primary">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={onCancel}
               disabled={submitting || rejecting}
-              className="w-full sm:w-auto px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              className="w-full sm:w-auto px-4 py-2 text-sm border border-border-primary text-foreground-secondary rounded-lg hover:bg-background-secondary"
             >
               Cancel
             </button>
@@ -1240,7 +1239,7 @@ export default function StepDataForm({
                 type="button"
                 onClick={() => setShowRejectionDialog(true)}
                 disabled={submitting || rejecting}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm border border-red-300 text-red-700 rounded-lg hover:bg-red-50"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm border border-error text-error rounded-lg hover:bg-error/10"
               >
                 <XCircle size={16} />
                 Reject
@@ -1252,7 +1251,7 @@ export default function StepDataForm({
               type="button"
               onClick={handleSaveDraft}
               disabled={submitting || rejecting}
-              className="w-full sm:w-auto px-4 py-2 text-sm border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50"
+              className="w-full sm:w-auto px-4 py-2 text-sm border border-primary-300 text-primary-700 rounded-lg hover:bg-primary-50"
             >
               Save Draft
             </button>
@@ -1260,9 +1259,9 @@ export default function StepDataForm({
               type="button"
               onClick={handleCompleteStep}
               disabled={submitting || rejecting}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
             >
-              <CheckCircleIcon size={16} />
+              <CheckCircle size={16} />
               {submitting ? "Completing..." : "Complete Step"}
             </button>
           </div>
@@ -1272,9 +1271,9 @@ export default function StepDataForm({
       {/* Rejection Dialog */}
       {showRejectionDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Reject Stakeholder</h3>
-            <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
+          <div className="bg-surface-primary rounded-lg max-w-md w-full p-4 sm:p-6">
+            <h3 className="text-base sm:text-lg font-bold text-foreground-primary mb-3 sm:mb-4">Reject Stakeholder</h3>
+            <p className="text-xs sm:text-sm text-foreground-secondary mb-3 sm:mb-4">
               Please provide a reason for rejecting this stakeholder. This action will mark the stakeholder as rejected and make it inactive.
             </p>
             <textarea
@@ -1282,10 +1281,10 @@ export default function StepDataForm({
               onChange={(e) => setRejectionReason(e.target.value)}
               placeholder="Enter rejection reason..."
               rows={4}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+              className="w-full px-3 py-2 text-sm border border-border-primary rounded-lg focus:ring-2 focus:ring-error focus:border-error outline-none"
             />
             {errors.rejection && (
-              <p className="text-red-500 text-xs sm:text-sm mt-2">{errors.rejection}</p>
+              <p className="text-error text-xs sm:text-sm mt-2">{errors.rejection}</p>
             )}
             <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-3 mt-4">
               <button
@@ -1298,7 +1297,7 @@ export default function StepDataForm({
                   setErrors(newErrors);
                 }}
                 disabled={rejecting}
-                className="w-full sm:w-auto px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="w-full sm:w-auto px-4 py-2 text-sm border border-border-primary text-foreground-secondary rounded-lg hover:bg-background-secondary"
               >
                 Cancel
               </button>
@@ -1306,7 +1305,7 @@ export default function StepDataForm({
                 type="button"
                 onClick={handleReject}
                 disabled={rejecting}
-                className="w-full sm:w-auto px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                className="w-full sm:w-auto px-4 py-2 text-sm bg-error text-white rounded-lg hover:bg-error disabled:opacity-50"
               >
                 {rejecting ? "Rejecting..." : "Confirm Rejection"}
               </button>

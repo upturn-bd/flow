@@ -626,6 +626,7 @@ export default {
   Gift,
   Flag,
   Book,
+  BookOpen,
   Certificate,
   Shield,
   ShieldCheck,

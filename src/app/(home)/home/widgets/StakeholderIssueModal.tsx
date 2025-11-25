@@ -116,20 +116,20 @@ export default function StakeholderIssueModal({
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+          className="relative bg-surface-primary rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
         >
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <div className="sticky top-0 bg-surface-primary border-b border-border-primary px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 text-red-600" />
-              <h2 className="text-xl font-bold text-gray-800">
+              <h2 className="text-xl font-bold text-foreground-primary">
                 {issueId ? (isEditing ? 'Edit Issue' : 'Issue Details') : 'Create Stakeholder Issue'}
               </h2>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-surface-hover rounded-full transition-colors"
             >
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5 text-foreground-secondary" />
             </button>
           </div>
 
@@ -139,20 +139,20 @@ export default function StakeholderIssueModal({
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-                  <p className="text-gray-500">Loading issue details...</p>
+                  <p className="text-foreground-secondary">Loading issue details...</p>
                 </div>
               </div>
             ) : isViewMode && issue ? (
               // View mode
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                  <label className="block text-sm font-medium text-foreground-secondary mb-1">Title</label>
                   <p className="text-base font-semibold">{issue.title}</p>
                 </div>
                 
                 {issue.stakeholder && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Stakeholder</label>
+                    <label className="block text-sm font-medium text-foreground-secondary mb-1">Stakeholder</label>
                     <p className="text-base">
                       {typeof issue.stakeholder === 'object' ? issue.stakeholder.name : 'Unknown'}
                     </p>
@@ -160,17 +160,17 @@ export default function StakeholderIssueModal({
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                  <p className="text-base text-gray-600">{issue.description || 'No description provided'}</p>
+                  <label className="block text-sm font-medium text-foreground-secondary mb-1">Description</label>
+                  <p className="text-base text-foreground-secondary">{issue.description || 'No description provided'}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <label className="block text-sm font-medium text-foreground-secondary mb-1">Status</label>
                     <span className={cn(
                       'inline-block px-3 py-1 rounded-full text-sm font-medium',
-                      issue.status === 'Pending' && 'bg-gray-100 text-gray-700',
-                      issue.status === 'In Progress' && 'bg-blue-100 text-blue-700',
+                      issue.status === 'Pending' && 'bg-background-tertiary text-foreground-primary',
+                      issue.status === 'In Progress' && 'bg-primary-100 text-primary-700',
                       issue.status === 'Resolved' && 'bg-green-100 text-green-700'
                     )}>
                       {issue.status}
@@ -178,7 +178,7 @@ export default function StakeholderIssueModal({
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                    <label className="block text-sm font-medium text-foreground-secondary mb-1">Priority</label>
                     <span className={cn(
                       'inline-block px-3 py-1 rounded-full text-sm font-medium',
                       issue.priority === 'Low' && 'bg-green-100 text-green-700',
@@ -193,15 +193,15 @@ export default function StakeholderIssueModal({
 
                 {issue.assigned_employee && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
+                    <label className="block text-sm font-medium text-foreground-secondary mb-1">Assigned To</label>
                     <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-gray-400" />
+                      <User className="w-4 h-4 text-foreground-tertiary" />
                       <span>{issue.assigned_employee.name}</span>
                     </div>
                   </div>
                 )}
 
-                <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                <div className="flex justify-between items-center pt-4 border-t border-border-primary">
                   {issue.status !== 'Resolved' && (
                     <button
                       type="button"
@@ -226,15 +226,15 @@ export default function StakeholderIssueModal({
               // Create mode
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground-primary mb-1">
                     Stakeholder <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-tertiary" />
                     <select
                       value={formData.stakeholder_id}
                       onChange={(e) => setFormData({ ...formData, stakeholder_id: Number(e.target.value) })}
-                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      className="w-full pl-10 pr-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
                       required
                     >
                       <option value={0}>Select a stakeholder</option>
@@ -248,25 +248,25 @@ export default function StakeholderIssueModal({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground-primary mb-1">
                     Title <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
                     placeholder="Enter issue title"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-foreground-primary mb-1">Description</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
                     placeholder="Enter issue description"
                     rows={4}
                   />
@@ -274,11 +274,11 @@ export default function StakeholderIssueModal({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                    <label className="block text-sm font-medium text-foreground-primary mb-1">Priority</label>
                     <select
                       value={formData.priority}
                       onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
                     >
                       <option value="Low">Low</option>
                       <option value="Medium">Medium</option>
@@ -288,11 +288,11 @@ export default function StakeholderIssueModal({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <label className="block text-sm font-medium text-foreground-primary mb-1">Status</label>
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
                     >
                       <option value="Pending">Pending</option>
                       <option value="In Progress">In Progress</option>
@@ -311,7 +311,7 @@ export default function StakeholderIssueModal({
                         onClose();
                       }
                     }}
-                    className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                    className="px-4 py-2 text-foreground-primary bg-background-tertiary hover:bg-background-secondary rounded-lg transition-colors"
                   >
                     Cancel
                   </button>
@@ -345,10 +345,10 @@ export default function StakeholderIssueModal({
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-lg shadow-xl p-6 max-w-md mx-4"
+              className="bg-surface-primary rounded-lg shadow-xl p-6 max-w-md mx-4"
             >
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Mark as Resolved?</h3>
-              <p className="text-gray-600 mb-6">
+              <h3 className="text-lg font-bold text-foreground-primary mb-2">Mark as Resolved?</h3>
+              <p className="text-foreground-secondary mb-6">
                 Are you sure you want to mark this issue as resolved? This action can be undone later by editing the issue.
               </p>
               <div className="flex justify-end gap-3">
@@ -356,7 +356,7 @@ export default function StakeholderIssueModal({
                   type="button"
                   onClick={() => setShowResolveConfirm(false)}
                   disabled={submitting}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="px-4 py-2 text-foreground-primary bg-background-tertiary hover:bg-background-secondary rounded-lg transition-colors"
                 >
                   Cancel
                 </button>

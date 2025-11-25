@@ -60,7 +60,7 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
   return (
     <>
     <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col overflow-hidden">
+      <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
         <div className="p-5 flex-shrink-0">
           <SectionHeader title="Task List" icon={CheckSquare} />
         </div>
@@ -79,13 +79,13 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
             className="px-5 pb-5 flex-1 overflow-hidden flex flex-col"
           >
             <div className="flex items-center justify-between mb-4 flex-shrink-0">
-              <h3 className="text-sm font-medium text-gray-500">Your Tasks</h3>
+              <h3 className="text-sm font-medium text-foreground-secondary">Your Tasks</h3>
               {canCreateTasks && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleCreateTask}
-                  className="rounded-full p-2 bg-blue-600 hover:bg-blue-700 transition-colors"
+                  className="rounded-full p-2 bg-primary-600 hover:bg-primary-700 transition-colors"
                   title="Create new task"
                 >
                   <Plus size={16} className="text-white" />
@@ -100,18 +100,18 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
                   key={task.id}
                   variants={fadeInUp}
                   onClick={() => task.id && onTaskClick(task.id)}
-                  className="flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-blue-50 rounded-lg transition-colors text-sm font-medium border border-gray-100 cursor-pointer"
+                  className="flex items-center justify-between px-4 py-3 bg-background-secondary hover:bg-surface-hover rounded-lg transition-colors text-sm font-medium border border-border-primary cursor-pointer"
                 >
                   <div className="flex items-center space-x-3">
                     <div className={cn(
                       "w-2 h-2 rounded-full",
                       new Date(task.end_date) < new Date() ? "bg-red-500" : "bg-green-500"
                     )}></div>
-                    <span className="text-gray-900">{task.task_title}</span>
+                    <span className="text-foreground-primary">{task.task_title}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock size={14} className="text-gray-400" />
-                    <span className="whitespace-nowrap text-gray-600">
+                    <Clock size={14} className="text-foreground-tertiary" />
+                    <span className="whitespace-nowrap text-foreground-secondary">
                       {formatDateToDayMonth(task.end_date)}
                     </span>
                   </div>

@@ -106,7 +106,8 @@
 
   /* Base styles */
   body {
-    @apply bg-background-primary text-foreground-primary;
+    background-color: var(--color-bg-primary);
+    color: var(--color-fg-primary);
   }
 }
 

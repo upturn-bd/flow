@@ -79,7 +79,7 @@ export default function ComplaintLogsPage() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <ClipboardList className="text-blue-600" size={26} />
+        <ClipboardList className="text-primary-600" size={26} />
         <h1 className="text-2xl font-semibold">Complaint Logs</h1>
       </div>
 
@@ -93,7 +93,7 @@ export default function ComplaintLogsPage() {
               key: "requests",
               label: "Requests",
               icon: <ClipboardList />,
-              color: "text-blue-500",
+              color: "text-primary-500",
               content: (
                 <>
                   {(requestLoading || loading) && (
@@ -151,7 +151,7 @@ export default function ComplaintLogsPage() {
 
                   {!historyLoading && complaintHistory.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
-                      <div className="bg-gray-100 rounded-full p-4 mb-4">
+                      <div className="bg-background-tertiary rounded-full p-4 mb-4">
                         <Flag className="h-12 w-12 text-gray-400" />
                       </div>
                       <h3 className="text-lg font-medium text-gray-900">No complaint history</h3>

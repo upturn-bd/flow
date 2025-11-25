@@ -97,9 +97,9 @@ export default function StepManager({
 
       {/* Steps List */}
       {steps.length === 0 ? (
-        <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <p className="text-sm text-gray-600">No steps defined yet</p>
-          <p className="text-xs text-gray-500 mt-1">Add at least one step to create the process</p>
+        <div className="text-center py-8 bg-background-secondary rounded-lg border-2 border-dashed border-border-primary">
+          <p className="text-sm text-foreground-secondary">No steps defined yet</p>
+          <p className="text-xs text-foreground-tertiary mt-1">Add at least one step to create the process</p>
         </div>
       ) : (
         <div className="space-y-3">

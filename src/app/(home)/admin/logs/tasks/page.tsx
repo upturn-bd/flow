@@ -110,7 +110,7 @@ export default function CompanyTaskLogsPage() {
 
    const renderTaskList = (tasks: any[], completed: boolean) => {
       if (tasks.length === 0) {
-         return <p className="text-gray-500 text-sm mt-2">No tasks found.</p>;
+         return <p className="text-foreground-tertiary text-sm mt-2">No tasks found.</p>;
       }
 
       return (
@@ -118,7 +118,7 @@ export default function CompanyTaskLogsPage() {
             {tasks.map((task) => (
                <Card
                   key={task.id}
-                  className="border border-gray-200 shadow-sm hover:shadow-lg transition-all rounded-xl"
+                  className="border border-border-primary shadow-sm hover:shadow-lg transition-all rounded-xl"
                >
                   <CardContent className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 gap-3">
                      {/* Task info */}
@@ -129,7 +129,7 @@ export default function CompanyTaskLogsPage() {
 
                         {/* Badges: Created At, Start Date, End Date */}
                         <div className="flex flex-wrap gap-2 text-sm mt-1">
-                           <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                           <span className="bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full">
                               Start: {task.start_date ? task.start_date : "N/A"}
                            </span>
                            <span className={`px-2 py-0.5 rounded-full ${completed ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
@@ -139,11 +139,11 @@ export default function CompanyTaskLogsPage() {
 
 
                         {/* Created by as plain text */}
-                        <p className="text-gray-700 text-sm mt-1">
+                        <p className="text-foreground-secondary text-sm mt-1">
                            Created by: {employeeNames[task.created_by] || "Unknown"}
                         </p>
 
-                        <p className="text-gray-700 text-sm">
+                        <p className="text-foreground-secondary text-sm">
                            Created: {task.created_at ? new Date(task.created_at).toLocaleDateString("en-GB") : "N/A"}
                         </p>
 

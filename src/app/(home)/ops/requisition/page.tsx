@@ -55,7 +55,7 @@ function RequisitionPageContent() {
       icon: <BookOpen className="h-5 w-5" />,
       color: "text-amber-600",
       content: (
-        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+        <div className="flex flex-col items-center justify-center py-12 text-foreground-secondary">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -111,7 +111,7 @@ export default function RequisitionPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
           <ScrollText className="h-8 w-8 text-cyan-600 animate-pulse" />
-          <p className="text-sm text-gray-600">Loading requisition...</p>
+          <p className="text-sm text-foreground-secondary">Loading requisition...</p>
         </div>
       </div>
     }>

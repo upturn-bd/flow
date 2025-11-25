@@ -55,7 +55,7 @@ export default function Sidebar() {
         </Link>
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-2 rounded-md text-gray-300 hover:text-white hover:bg-[#001c4f] transition-colors"
+          className="p-2 rounded-md text-foreground-tertiary hover:text-white hover:bg-surface-hover transition-colors"
         >
           {isCollapsed ? <CaretRight /> : <CaretLeft />}
         </button>
@@ -99,8 +99,8 @@ export default function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
                   isActive
-                    ? "bg-yellow-400 text-black font-medium"
-                    : "text-gray-300 hover:text-white hover:bg-[#001c4f]"
+                    ? "bg-primary-600 text-white font-medium"
+                    : "text-foreground-tertiary hover:text-white hover:bg-surface-hover"
                 )}
                 title={displayLabel}
               >
