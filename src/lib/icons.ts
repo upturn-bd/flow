@@ -258,7 +258,6 @@ import {
   GlobeHemisphereWest,
   NewspaperClipping,
   Note,
-  Receipt,
   ShieldWarning,
   UserGear,
   UsersThree,
@@ -512,6 +511,18 @@ export {
   User2,
   UsersRound,
   Wallet,
+  
+  // Additional icons
+  CalendarCheck,
+  ClockClockwise,
+  Factory,
+  FilePdf,
+  GlobeHemisphereWest,
+  NewspaperClipping,
+  Note,
+  ShieldWarning,
+  UserGear,
+  UsersThree,
 };
 
 // TypeScript type for icon components
@@ -730,7 +741,6 @@ export default {
   GlobeHemisphereWest,
   NewspaperClipping,
   Note,
-  Receipt,
   ShieldWarning,
   UserGear,
   UsersThree,
