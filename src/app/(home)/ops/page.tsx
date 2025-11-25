@@ -13,7 +13,6 @@ import {
   UserPlus, // Onboarding
   File,
   Search,
-  BellDot, // Reports
   Users,
   CreditCard, // Payroll
   Building,
@@ -32,14 +31,14 @@ const sections = [
         path: "/ops/tasks",
         icon: ClipboardList,
         description: "Assign, track and manage day-to-day tasks",
-        color: "bg-indigo-100 text-indigo-700 border-indigo-200"
+        color: "bg-indigo-100 text-indigo-700"
       },
       {
         name: "Project",
         path: "/ops/project",
         icon: BarChart,
         description: "Plan and execute complex projects with milestones",
-        color: "bg-blue-100 text-blue-700 border-blue-200"
+        color: "bg-blue-100 text-blue-700"
       },
     ],
   },
@@ -52,56 +51,56 @@ const sections = [
         path: "/ops/attendance?tab=today",
         icon: LogIn,
         description: "Track and manage your daily attendance",
-        color: "bg-green-100 text-green-700 border-green-200"
+        color: "bg-green-100 text-green-700"
       },
       {
         name: "Leave",
         path: "/ops/leave?tab=apply",
         icon: CalendarX,
         description: "Apply and manage time off and leaves",
-        color: "bg-blue-100 text-blue-700 border-blue-200"
+        color: "bg-blue-100 text-blue-700"
       },
       {
         name: "Notice",
         path: "/ops/notice",
         icon: Bell,
         description: "Important company announcements and notices",
-        color: "bg-amber-100 text-amber-700 border-amber-200"
+        color: "bg-amber-100 text-amber-700"
       },
       {
         name: "Requisition",
         path: "/ops/requisition?tab=create",
         icon: Clipboard,
         description: "Request equipment, supplies and services",
-        color: "bg-cyan-100 text-cyan-700 border-cyan-200"
+        color: "bg-cyan-100 text-cyan-700"
       },
       {
         name: "Settlement",
         path: "/ops/settlement?tab=create",
         icon: DollarSign,
         description: "Manage and track expense reimbursements",
-        color: "bg-emerald-100 text-emerald-700 border-emerald-200"
+        color: "bg-emerald-100 text-emerald-700"
       },
       {
         name: "Complaint",
         path: "/ops/complaint",
         icon: WarningCircle,
         description: "Submit and track workplace issues and concerns",
-        color: "bg-red-100 text-red-700 border-red-200"
+        color: "bg-red-100 text-red-700"
       },
       {
         name: "Payroll",
         path: "/ops/payroll",
         icon: CreditCard,
         description: "View payroll history and manage salary information",
-        color: "bg-indigo-100 text-indigo-700 border-indigo-200"
+        color: "bg-indigo-100 text-indigo-700"
       },
       {
         name: "Stakeholder Issues",
         path: "/ops/stakeholder-issues",
         icon: Building,
         description: "Manage stakeholder relationships and track issues",
-        color: "bg-purple-100 text-purple-700 border-purple-200"
+        color: "bg-purple-100 text-purple-700"
       },
     ],
   },
@@ -114,21 +113,21 @@ const sections = [
         path: "/ops/onboarding",
         icon: UserPlus,
         description: "Employee onboarding workflow and tasks",
-        color: "bg-purple-100 text-purple-700 border-purple-200"
+        color: "bg-purple-100 text-purple-700"
       },
       {
         name: "Offboarding",
         path: "/ops/offboarding",
         icon: UserMinus,
         description: "Employee offboarding workflow and tasks",
-        color: "bg-red-100 text-red-700 border-red-200"
+        color: "bg-red-100 text-red-700"
       },
       {
         name: "HRIS",
         path: "/ops/hris",
         icon: Users,
         description: "Human Resource Information System",
-        color: "bg-blue-100 text-blue-700 border-blue-200"
+        color: "bg-blue-100 text-blue-700"
       }
     ],
   },
@@ -336,7 +335,7 @@ export default function ServicesPage() {
                     >
                       <Link
                         href={item.path}
-                        className={`group flex flex-col sm:flex-row items-start sm:items-center p-3 sm:p-4 bg-surface-primary rounded-lg border ${item.color.includes('border') ? item.color.split(' ').find(c => c.startsWith('border-')) : 'border-border-primary'} shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 block min-h-[100px] sm:h-24`}
+                        className="group flex flex-col sm:flex-row items-start sm:items-center p-3 sm:p-4 bg-surface-primary rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 block min-h-[100px] sm:h-24"
                       >
                         <motion.div 
                           whileHover={{ scale: 1.1 }}
