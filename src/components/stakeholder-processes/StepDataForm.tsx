@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { getEmployeeInfo } from "@/lib/utils/auth";
@@ -10,7 +10,8 @@ import GeolocationPicker, { GeolocationValue } from "@/components/ui/Geolocation
 import DropdownField from "@/components/ui/DropdownField";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 import Toggle from "@/components/ui/Toggle";
-import { calculateFieldValue, formatCalculatedValue,formulaToReadable } from "@/lib/utils/formula-evaluator";
+import { calculateFieldValue, formatCalculatedValue, formulaToReadable } from "@/lib/utils/formula-evaluator";
+import { forEach } from "lodash";
 
 interface StepDataFormProps {
   stakeholderId: number;
@@ -42,6 +43,8 @@ export default function StepDataForm({
   const [uploadingFiles, setUploadingFiles] = useState<Set<string>>(new Set());
   const [filesToDelete, setFilesToDelete] = useState<string[]>([]); // Track files to delete on save
 
+  const calculatedFields = useRef<Map<string, number>>(new Map());
+
   // Safety check: ensure step has required properties
   if (!step || !step.id) {
     return (
@@ -68,17 +71,17 @@ export default function StepDataForm({
     // Initialize form with existing data or empty values
     const initialData: Record<string, any> = {};
     const fields = step.field_definitions?.fields || [];
-    
+
     // Ensure fields is an array
     if (!Array.isArray(fields)) {
       console.error("Invalid fields in step:", { step, field_definitions: step.field_definitions, fields });
       return;
     }
-    
+
     fields.forEach((field) => {
       const existingValue = existingData?.data?.[field.key];
       const hasNestedFields = hasAnyNestedFields(field);
-      
+
       if (existingValue !== undefined && existingValue !== null) {
         // Check if this is new nested format
         if (hasNestedFields && typeof existingValue === 'object' && 'type' in existingValue && 'value' in existingValue) {
@@ -180,13 +183,13 @@ export default function StepDataForm({
         }
       }
     });
-    
+
     // Add status field if enabled
     if (step.status_field?.enabled) {
       const existingStatus = existingData?.data?.["__step_status"];
       initialData["__step_status"] = existingStatus || "";
     }
-    
+
     setFormData(initialData);
   }, [step, existingData]);
 
@@ -231,7 +234,7 @@ export default function StepDataForm({
       nestedData: Record<string, NestedFieldValue> | undefined
     ) => {
       if (!nestedData) return;
-      
+
       selectedValues.forEach((selectedValue) => {
         const option = field.options?.find(opt => opt.value === selectedValue);
         if (option && option.nested && option.nested.length > 0) {
@@ -257,9 +260,13 @@ export default function StepDataForm({
     };
 
     fields.forEach((field) => {
+      if (field.type === 'calculated') {
+        // Skip validation for calculated fields
+        return;
+      }
       const value = formData[field.key];
       const hasNestedFields = field.nested && field.nested.length > 0;
-      
+
       // Skip required validation when saving as draft
       if (field.required && !skipRequired) {
         // Handle nested format
@@ -277,12 +284,12 @@ export default function StepDataForm({
             if (value.nested && field.nested) {
               validateNestedFields(field.nested, value.nested, field.key);
             }
-            
+
             // For dropdown, validate option-specific nested fields
             if (field.type === 'dropdown' && typeof actualValue === 'string' && actualValue) {
               validateOptionNestedFields(field, [actualValue], value.nested);
             }
-            
+
             // For multi-select, validate option-specific nested fields
             if (field.type === 'multi_select' && Array.isArray(actualValue)) {
               validateOptionNestedFields(field, actualValue, value.nested);
@@ -304,12 +311,12 @@ export default function StepDataForm({
         if (value.nested && field.nested) {
           validateNestedFields(field.nested, value.nested, field.key);
         }
-        
+
         // For dropdown, validate option-specific nested fields
         if (field.type === 'dropdown' && typeof value.value === 'string' && value.value) {
           validateOptionNestedFields(field, [value.value], value.nested);
         }
-        
+
         // For multi-select, validate option-specific nested fields
         if (field.type === 'multi_select' && Array.isArray(value.value)) {
           validateOptionNestedFields(field, value.value, value.nested);
@@ -356,7 +363,7 @@ export default function StepDataForm({
       }
       return prev;
     });
-    
+
     // Clear error for nested field
     const errorKey = `${parentFieldName}.${nestedFieldKey}`;
     if (errors[errorKey]) {
@@ -384,7 +391,7 @@ export default function StepDataForm({
         // Ensure parent has nested structure, create if missing
         const existingNested = 'nested' in parentValue ? parentValue.nested : {};
         const currentOptionNested = existingNested?.[optionNestedKey] || {};
-        
+
         return {
           ...prev,
           [parentFieldName]: {
@@ -409,7 +416,7 @@ export default function StepDataForm({
 
   const handleFileRemove = async (fieldName: string) => {
     const currentValue = formData[fieldName];
-    
+
     // Handle nested format
     if (currentValue && typeof currentValue === 'object' && 'value' in currentValue) {
       const fileValue = currentValue.value;
@@ -478,7 +485,11 @@ export default function StepDataForm({
         setFilesToDelete([]);
       }
 
-      await completeStep(stakeholderId, step.id!, formData);
+      const newFormData = { ...formData };
+      calculatedFields.current.forEach((value, key) => {
+        newFormData[key] = value;
+      });
+      await completeStep(stakeholderId, step.id!, newFormData);
       onComplete();
     } catch (error) {
       console.error("Error completing step:", error);
@@ -492,12 +503,12 @@ export default function StepDataForm({
   const renderField = (field: FieldDefinition) => {
     const fieldData = formData[field.key];
     const hasNestedFields = hasAnyNestedFields(field);
-    
+
     // Extract actual value from nested format or use legacy format
     const actualValue = hasNestedFields && typeof fieldData === 'object' && 'value' in fieldData
       ? fieldData.value
       : fieldData;
-    
+
     const hasError = !!errors[field.key];
 
     // Helper to update field value (handles both nested and legacy formats)
@@ -528,16 +539,16 @@ export default function StepDataForm({
     // Helper to render nested fields
     const renderNestedFields = () => {
       if (!hasNestedFields || !field.nested) return null;
-      
+
       const nestedData = typeof fieldData === 'object' && fieldData?.nested ? fieldData.nested : {};
-      
+
       return (
         <div className="mt-3 pl-4 border-l-2 border-gray-200 space-y-3">
           <p className="text-xs font-medium text-gray-600 mb-2">Additional Information:</p>
           {field.nested.map((nestedField) => {
             const nestedValue = nestedData[nestedField.key]?.value;
             const nestedError = errors[`${field.key}.${nestedField.key}`];
-            
+
             return (
               <div key={nestedField.key}>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -571,15 +582,14 @@ export default function StepDataForm({
                 type="text"
                 value={value || ""}
                 onChange={(e) => updateNestedValue(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
-                  error ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${error ? "border-red-500" : "border-gray-300"
+                  }`}
                 placeholder={nestedField.placeholder || nestedField.label}
               />
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </>
           );
-        
+
         case "boolean":
           return (
             <div>
@@ -590,7 +600,7 @@ export default function StepDataForm({
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </div>
           );
-        
+
         case "date":
           return (
             <>
@@ -598,14 +608,13 @@ export default function StepDataForm({
                 type="date"
                 value={value || ""}
                 onChange={(e) => updateNestedValue(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
-                  error ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${error ? "border-red-500" : "border-gray-300"
+                  }`}
               />
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </>
           );
-        
+
         case "number":
           return (
             <>
@@ -613,25 +622,23 @@ export default function StepDataForm({
                 type="number"
                 value={value || ""}
                 onChange={(e) => updateNestedValue(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
-                  error ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${error ? "border-red-500" : "border-gray-300"
+                  }`}
                 placeholder={nestedField.placeholder || nestedField.label}
                 step="any"
               />
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </>
           );
-        
+
         default:
           return (
             <input
               type="text"
               value={value || ""}
               onChange={(e) => updateNestedValue(e.target.value)}
-              className={`w-full px-3 py-2 text-sm border rounded-lg ${
-                error ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-3 py-2 text-sm border rounded-lg ${error ? "border-red-500" : "border-gray-300"
+                }`}
             />
           );
       }
@@ -657,15 +664,14 @@ export default function StepDataForm({
                 type="text"
                 value={value || ""}
                 onChange={(e) => updateNestedValue(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
-                  error ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${error ? "border-red-500" : "border-gray-300"
+                  }`}
                 placeholder={nestedField.placeholder || nestedField.label}
               />
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </>
           );
-        
+
         case "boolean":
           return (
             <div>
@@ -676,7 +682,7 @@ export default function StepDataForm({
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </div>
           );
-        
+
         case "date":
           return (
             <>
@@ -684,14 +690,13 @@ export default function StepDataForm({
                 type="date"
                 value={value || ""}
                 onChange={(e) => updateNestedValue(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
-                  error ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${error ? "border-red-500" : "border-gray-300"
+                  }`}
               />
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </>
           );
-        
+
         case "number":
           return (
             <>
@@ -699,25 +704,23 @@ export default function StepDataForm({
                 type="number"
                 value={value || ""}
                 onChange={(e) => updateNestedValue(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
-                  error ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${error ? "border-red-500" : "border-gray-300"
+                  }`}
                 placeholder={nestedField.placeholder || nestedField.label}
                 step="any"
               />
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </>
           );
-        
+
         default:
           return (
             <input
               type="text"
               value={value || ""}
               onChange={(e) => updateNestedValue(e.target.value)}
-              className={`w-full px-3 py-2 text-sm border rounded-lg ${
-                error ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-3 py-2 text-sm border rounded-lg ${error ? "border-red-500" : "border-gray-300"
+                }`}
             />
           );
       }
@@ -735,9 +738,8 @@ export default function StepDataForm({
               type="text"
               value={actualValue || ""}
               onChange={(e) => updateValue(e.target.value)}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                hasError ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${hasError ? "border-red-500" : "border-gray-300"
+                }`}
               placeholder={field.placeholder || field.label}
             />
             {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
@@ -756,9 +758,8 @@ export default function StepDataForm({
               type="number"
               value={actualValue || ""}
               onChange={(e) => updateValue(e.target.value)}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                hasError ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${hasError ? "border-red-500" : "border-gray-300"
+                }`}
               placeholder={field.placeholder || field.label}
               step="any"
               min={field.validation?.min}
@@ -775,10 +776,13 @@ export default function StepDataForm({
         const calculationResult = field.formula
           ? calculateFieldValue(field.formula, completedStepsData, formData, step.step_order, processSteps)
           : { value: null, error: "No formula defined" };
-        
+
+        if (calculationResult.value !== null)
+          calculatedFields.current.set(field.key, calculationResult.value || 0);
+
         const hasCalculationError = calculationResult.error || calculationResult.value === null;
         const hasMissingRefs = calculationResult.missingRefs && calculationResult.missingRefs.length > 0;
-        
+
         return (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -788,15 +792,14 @@ export default function StepDataForm({
                 Calculated
               </span>
             </label>
-            
+
             {/* Calculation Result Display */}
-            <div className={`w-full px-4 py-3 border rounded-lg ${
-              hasCalculationError 
-                ? 'bg-red-50 border-red-300' 
-                : hasMissingRefs 
-                  ? 'bg-amber-50 border-amber-300' 
-                  : 'bg-gray-50 border-gray-200'
-            }`}>
+            <div className={`w-full px-4 py-3 border rounded-lg ${hasCalculationError
+              ? 'bg-red-50 border-red-300'
+              : hasMissingRefs
+                ? 'bg-amber-50 border-amber-300'
+                : 'bg-gray-50 border-gray-200'
+              }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {hasCalculationError && (
@@ -805,13 +808,12 @@ export default function StepDataForm({
                   {hasMissingRefs && !hasCalculationError && (
                     <AlertCircle className="text-amber-600 flex-shrink-0" size={16} />
                   )}
-                  <span className={`text-lg font-semibold ${
-                    hasCalculationError 
-                      ? 'text-red-700' 
-                      : hasMissingRefs 
-                        ? 'text-amber-700' 
-                        : 'text-gray-900'
-                  }`}>
+                  <span className={`text-lg font-semibold ${hasCalculationError
+                    ? 'text-red-700'
+                    : hasMissingRefs
+                      ? 'text-amber-700'
+                      : 'text-gray-900'
+                    }`}>
                     {calculationResult.value !== null
                       ? formatCalculatedValue(calculationResult.value)
                       : "—"}
@@ -829,7 +831,7 @@ export default function StepDataForm({
                 )}
               </div>
             </div>
-            
+
             {/* Formula Display */}
             {field.formula && (
               <div className="mt-2 p-2 bg-gray-100 rounded">
@@ -837,7 +839,7 @@ export default function StepDataForm({
                 <code className="text-xs text-gray-800 break-all">{formulaToReadable(field.formula, processSteps)}</code>
               </div>
             )}
-            
+
             {/* Error Messages */}
             {calculationResult.error && (
               <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
@@ -847,7 +849,7 @@ export default function StepDataForm({
                 </p>
               </div>
             )}
-            
+
             {/* Missing References Warning */}
             {calculationResult.missingRefs && calculationResult.missingRefs.length > 0 && (
               <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded flex items-start gap-2">
@@ -867,7 +869,7 @@ export default function StepDataForm({
                 </div>
               </div>
             )}
-            
+
             {renderNestedFields()}
           </div>
         );
@@ -899,9 +901,8 @@ export default function StepDataForm({
               type="date"
               value={actualValue || ""}
               onChange={(e) => updateValue(e.target.value)}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                hasError ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${hasError ? "border-red-500" : "border-gray-300"
+                }`}
             />
             {hasError && <p className="text-red-500 text-sm mt-1">{errors[field.key]}</p>}
             {renderNestedFields()}
@@ -911,7 +912,7 @@ export default function StepDataForm({
       case "file":
         const isUploading = uploadingFiles.has(field.key);
         const hasFile = actualValue && (actualValue instanceof File || typeof actualValue === 'string' || (typeof actualValue === 'object' && actualValue !== null));
-        
+
         // Helper to get display filename
         const getFileName = () => {
           if (actualValue instanceof File) {
@@ -933,7 +934,7 @@ export default function StepDataForm({
           }
           return null;
         };
-        
+
         return (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -941,9 +942,8 @@ export default function StepDataForm({
               {field.required && <span className="text-red-500 ml-1">*</span>}
             </label>
             <div
-              className={`border-2 border-dashed rounded-lg p-4 ${
-                hasError ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`border-2 border-dashed rounded-lg p-4 ${hasError ? "border-red-500" : "border-gray-300"
+                }`}
             >
               {hasFile ? (
                 <div className="space-y-2">
@@ -1029,7 +1029,7 @@ export default function StepDataForm({
         // Check if selected option has nested fields
         const selectedOption = field.options?.find(opt => opt.value === actualValue);
         const hasDropdownOptionNested = selectedOption && selectedOption.nested && selectedOption.nested.length > 0;
-        
+
         return (
           <div>
             <DropdownField
@@ -1041,7 +1041,7 @@ export default function StepDataForm({
               required={field.required}
               error={errors[field.key]}
             />
-            
+
             {/* Render option-specific nested fields if selected option has them */}
             {hasDropdownOptionNested && actualValue && (
               <div className="mt-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
@@ -1052,7 +1052,7 @@ export default function StepDataForm({
                     const nestedValue = optionNestedData[nestedField.key]?.value;
                     const optionNestedKey = `${actualValue}_nested`;
                     const nestedError = errors[`${field.key}.${optionNestedKey}.${nestedField.key}`];
-                    
+
                     return (
                       <div key={nestedField.key}>
                         <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -1072,7 +1072,7 @@ export default function StepDataForm({
                 </div>
               </div>
             )}
-            
+
             {/* Render general nested fields (not option-specific) */}
             {renderNestedFields()}
           </div>
@@ -1081,7 +1081,7 @@ export default function StepDataForm({
       case "multi_select":
         // For multi-select with option-specific nested fields, we need to render differently
         const hasOptionNestedFields = field.options?.some(opt => opt.nested && opt.nested.length > 0);
-        
+
         return (
           <div>
             <MultiSelectDropdown
@@ -1093,7 +1093,7 @@ export default function StepDataForm({
               required={field.required}
               error={errors[field.key]}
             />
-            
+
             {/* Render nested fields for each selected option */}
             {hasOptionNestedFields && Array.isArray(actualValue) && actualValue.length > 0 && (
               <div className="mt-4 space-y-3">
@@ -1101,10 +1101,10 @@ export default function StepDataForm({
                 {actualValue.map((selectedValue) => {
                   const option = field.options?.find(opt => opt.value === selectedValue);
                   if (!option || !option.nested || option.nested.length === 0) return null;
-                  
+
                   const optionNestedData = getOptionNestedData(fieldData, selectedValue);
                   const optionNestedKey = `${selectedValue}_nested`;
-                  
+
                   return (
                     <div key={selectedValue} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
                       <p className="text-sm font-medium text-gray-700 mb-2">{option.label}</p>
@@ -1112,7 +1112,7 @@ export default function StepDataForm({
                         {option.nested.map((nestedField) => {
                           const nestedValue = optionNestedData[nestedField.key]?.value;
                           const nestedError = errors[`${field.key}.${optionNestedKey}.${nestedField.key}`];
-                          
+
                           return (
                             <div key={nestedField.key}>
                               <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -1135,7 +1135,7 @@ export default function StepDataForm({
                 })}
               </div>
             )}
-            
+
             {/* Render general nested fields (not option-specific) */}
             {renderNestedFields()}
           </div>
@@ -1168,7 +1168,7 @@ export default function StepDataForm({
     try {
       // Get current employee info for rejected_by
       const employeeInfo = await getEmployeeInfo();
-      
+
       // Reject the stakeholder
       await updateStakeholder(stakeholderId, {
         status: "Rejected",

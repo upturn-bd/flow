@@ -32,6 +32,13 @@ import StakeholderTransactions from "@/components/stakeholders/StakeholderTransa
 import AdditionalDataModal from "@/components/stakeholders/AdditionalDataModal";
 import { toast } from "sonner";
 
+// Helper to convert programming values to human-readable labels
+const toHumanReadable = (value: string): string => {
+  return value
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+};
+
 export default function StakeholderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { id } = use(params);
@@ -783,68 +790,54 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
                                       const fileInfo = isFileField ? getFileInfo() : null;
 
+                                      // Helper to extract actual value from nested format
+                                      const extractActualValue = (val: any) => {
+                                        if (val && typeof val === 'object' && 'value' in val) {
+                                          return val.value;
+                                        }
+                                        return val;
+                                      };
+
+                                      const actualValue = extractActualValue(value);
+
                                       // Helper to format value based on field type
                                       const formatValue = () => {
-                                        if (typeof value === "boolean") {
-                                          return value ? "Yes" : "No";
+                                        if (typeof actualValue === "boolean") {
+                                          return actualValue ? "Yes" : "No";
                                         }
-                                        if (isMultiSelect && Array.isArray(value)) {
-                                          if (value.length === 0) return "None selected";
+                                        if (isMultiSelect && Array.isArray(actualValue)) {
+                                          if (actualValue.length === 0) return "None selected";
                                           // Map values to labels using the field definition options
                                           const options = fieldDef?.options || [];
-                                          const labels = value.map(val => {
+                                          const labels = actualValue.map(val => {
                                             const option = options.find(opt => opt.value === val);
-                                            return option ? option.label : val;
+                                            return option ? option.label : toHumanReadable(val);
                                           });
                                           return labels.join(", ");
                                         }
-                                        if (isGeolocation && typeof value === 'object' && value !== null && 'latitude' in value && 'longitude' in value) {
-                                          return `${value.latitude}, ${value.longitude}`;
+                                        if (fieldDef?.type === 'dropdown' && typeof actualValue === 'string') {
+                                          // Map dropdown value to label
+                                          const options = fieldDef?.options || [];
+                                          const option = options.find(opt => opt.value === actualValue);
+                                          return option ? option.label : toHumanReadable(actualValue);
+                                        }
+                                        if (isGeolocation && typeof actualValue === 'object' && actualValue !== null && 'latitude' in actualValue && 'longitude' in actualValue) {
+                                          return `${actualValue.latitude}, ${actualValue.longitude}`;
                                         }
                                         if (isNumber) {
-                                          return typeof value === 'number' ? value.toFixed(2) : String(value);
+                                          return typeof actualValue === 'number' ? actualValue.toFixed(2) : String(actualValue);
                                         }
-                                        if (isCalculated && fieldDef?.formula) {
-                                          // For calculated fields, compute the value from formula
-                                          const completedStepsData = stepData
-                                            .filter((sd) => {
-                                              const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
-                                              return sdStep && sdStep.step_order < step.step_order;
-                                            })
-                                            .map((sd) => {
-                                              const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
-                                              return {
-                                                step_order: sdStep?.step_order || 0,
-                                                data: sd.data || {},
-                                              };
-                                            });
-                                          
-                                          const result = calculateFieldValue(fieldDef.formula, completedStepsData, undefined, undefined, sortedSteps);
-                                          if (result.value !== null) {
-                                            return formatCalculatedValue(result.value);
-                                          }
-                                          return result.error || "Unable to calculate";
+                                        // For string values, check if they look like programming identifiers and convert to human-readable
+                                        if (typeof actualValue === 'string' && actualValue.includes('_')) {
+                                          return toHumanReadable(actualValue);
                                         }
-                                        return String(value);
+                                        return String(actualValue);
                                       };
 
-                                      // Skip rendering calculated fields - they're computed, not stored
+                                      // Render calculated fields with stored value
                                       if (isCalculated && fieldDef?.formula) {
-                                        // Compute value for display
-                                        const completedStepsData = stepData
-                                          .filter((sd) => {
-                                            const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
-                                            return sdStep && sdStep.step_order < step.step_order;
-                                          })
-                                          .map((sd) => {
-                                            const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
-                                            return {
-                                              step_order: sdStep?.step_order || 0,
-                                              data: sd.data || {},
-                                            };
-                                          });
-                                        
-                                        const result = calculateFieldValue(fieldDef.formula, completedStepsData, undefined, undefined, sortedSteps);
+                                        // Use stored calculated value
+                                        const calculatedValue = extractActualValue(value);
                                         
                                         return (
                                           <div key={key} className="col-span-2">
@@ -857,20 +850,14 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                             </p>
                                             <div className="mt-1 flex items-baseline gap-3">
                                               <p className="text-lg font-semibold text-gray-900">
-                                                {result.value !== null ? formatCalculatedValue(result.value) : "—"}
+                                                {calculatedValue !== null && calculatedValue !== undefined 
+                                                  ? formatCalculatedValue(calculatedValue) 
+                                                  : "—"}
                                               </p>
-                                              {result.error && (
-                                                <span className="text-xs text-red-600">{result.error}</span>
-                                              )}
                                             </div>
                                             <p className="text-xs text-gray-500 mt-1">
                                               Formula: <code className="bg-gray-100 px-1 py-0.5 rounded">{formulaToReadable(fieldDef.formula, sortedSteps)}</code>
                                             </p>
-                                            {result.missingRefs && result.missingRefs.length > 0 && (
-                                              <p className="text-xs text-amber-600 mt-1">
-                                                Missing: {(result.missingLabels || result.missingRefs).join(", ")}
-                                              </p>
-                                            )}
                                           </div>
                                         );
                                       }
@@ -903,14 +890,14 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                                 </p>
                                               )}
                                             </div>
-                                          ) : isGeolocation && typeof value === 'object' && value !== null && 'latitude' in value && 'longitude' in value ? (
+                                          ) : isGeolocation && typeof actualValue === 'object' && actualValue !== null && 'latitude' in actualValue && 'longitude' in actualValue ? (
                                             <div className="mt-1">
                                               <p className="text-sm text-gray-900 flex items-center gap-2">
                                                 <MapPin size={14} className="text-gray-400" />
-                                                {value.latitude.toFixed(6)}, {value.longitude.toFixed(6)}
+                                                {actualValue.latitude.toFixed(6)}, {actualValue.longitude.toFixed(6)}
                                               </p>
                                               <a
-                                                href={`https://www.google.com/maps?q=${value.latitude},${value.longitude}`}
+                                                href={`https://www.google.com/maps?q=${actualValue.latitude},${actualValue.longitude}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-xs text-blue-600 hover:underline mt-1 inline-block"
