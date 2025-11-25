@@ -14,48 +14,48 @@ export const STATUS = {
   REJECTED: 'Rejected',
   ACTIVE: 'Active',
   INACTIVE: 'Inactive',
-  
+
   // Project Status
   ONGOING: 'Ongoing',
   COMPLETED: 'Completed',
   ON_HOLD: 'On Hold',
   CANCELLED: 'Cancelled',
-  
+
   // Task Status
   TODO: 'To Do',
   IN_PROGRESS: 'In Progress',
   UNDER_REVIEW: 'Under Review',
   DONE: 'Done',
-  
+
   // Attendance Status
   PRESENT: 'Present',
   ABSENT: 'Absent',
   LATE: 'Late',
   HALF_DAY: 'Half Day',
-  
+
   // Leave Status
   LEAVE_APPLIED: 'Applied',
   LEAVE_APPROVED: 'Approved',
   LEAVE_REJECTED: 'Rejected',
   LEAVE_CANCELLED: 'Cancelled',
-  
+
   // Complaint Status
   SUBMITTED: 'Submitted',
   INVESTIGATING: 'Investigating',
   RESOLVED: 'Resolved',
   CLOSED: 'Closed',
-  
+
   // Stakeholder Issue Status
   ISSUE_PENDING: 'Pending',
   ISSUE_IN_PROGRESS: 'In Progress',
   ISSUE_RESOLVED: 'Resolved',
-  
+
   // Settlement Status
   REQUESTED: 'Requested',
   PROCESSING: 'Processing',
   PROCESSED: 'Processed',
   PAID: 'Paid',
-  
+
   // Account Status
   COMPLETE: 'Complete',
 } as const;
@@ -144,7 +144,7 @@ export const ROUTES = {
     CHANGE_PASSWORD: '/change-pass',
     AUTH_BASE: '/auth',
   },
-  
+
   // Employee Routes
   EMPLOYEE: {
     HOME: '/home',
@@ -154,7 +154,7 @@ export const ROUTES = {
     ACCOUNT: '/account',
     PROFILE: '/profile',
   },
-  
+
   // Admin Routes
   ADMIN: {
     MANAGEMENT: '/admin',
@@ -182,7 +182,7 @@ export const ROUTES = {
     TEAMS: '/sa/teams',
     USERS: '/sa/users',
   },
-  
+
   // API Routes
   API: {
     BASE: '/api',
@@ -287,6 +287,37 @@ export type FieldType = typeof FIELD_TYPES[keyof typeof FIELD_TYPES];
 
 export const FIELD_TYPE_OPTIONS = Object.values(FIELD_TYPES);
 
+/**
+ * Generate a human-readable field key from a label
+ * Converts "Product Price" to "product_price"
+ * Adds timestamp suffix to ensure uniqueness
+ */
+export function generateFieldKey(label: string, existingKeys: string[] = []): string {
+  // Convert label to snake_case
+  const baseKey = label
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_') // Replace non-alphanumeric chars with underscore
+    .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
+    .replace(/_+/g, '_'); // Replace multiple underscores with single
+
+  // If no valid characters, use default
+  if (!baseKey) {
+    return `field_${Date.now()}`;
+  }
+
+  // Check if key already exists
+  let finalKey = baseKey;
+  let counter = 1;
+
+  while (existingKeys.includes(finalKey)) {
+    finalKey = `${baseKey}_${counter}`;
+    counter++;
+  }
+
+  return finalKey;
+}
+
 // Stakeholder Status
 export const STAKEHOLDER_STATUS = {
   LEAD: 'Lead',
@@ -380,7 +411,7 @@ export const TIME = {
   DAYS_IN_WEEK: 7,
   DAYS_IN_MONTH: 30, // Average
   DAYS_IN_YEAR: 365,
-  
+
   // Cache durations (in seconds)
   CACHE: {
     SHORT: 5 * 60, // 5 minutes
@@ -401,7 +432,7 @@ export const VALIDATION = {
   MAX_NAME_LENGTH: 50,
   MAX_DESCRIPTION_LENGTH: 1000,
   MAX_COMMENT_LENGTH: 500,
-  
+
   // Regex patterns
   EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   PHONE_REGEX: /^[\+]?[1-9][\d]{0,15}$/,
@@ -418,15 +449,15 @@ export const UI = {
     MAX_WIDTH: '600px',
     MIN_WIDTH: '400px',
   },
-  
+
   TOAST: {
     DURATION: 5000,
     MAX_VISIBLE: 3,
   },
-  
+
   DEBOUNCE_DELAY: 300,
   THROTTLE_DELAY: 100,
-  
+
   COLORS: {
     PRIMARY: '#3B82F6',
     SECONDARY: '#64748B',
@@ -462,7 +493,7 @@ export const CURRENCIES = [
 export const ACCOUNT_CATEGORIES = {
   INCOME: 'Income',
   EXPENSE: 'Expense',
-  PAYROLL: 'Payroll', 
+  PAYROLL: 'Payroll',
   OFFICE_SUPPLIES: 'Office Supplies',
   UTILITIES: 'Utilities',
   TRAVEL: 'Travel',
@@ -514,7 +545,7 @@ export const PERMISSION_MODULES = {
   TASKS: 'tasks',
   PROJECTS: 'projects',
   MILESTONES: 'milestones',
-  
+
   // Services
   ATTENDANCE: 'attendance',
   LEAVE: 'leave',
@@ -525,12 +556,12 @@ export const PERMISSION_MODULES = {
   PAYROLL: 'payroll',
   STAKEHOLDERS: 'stakeholders',
   STAKEHOLDER_PROCESSES: 'stakeholder_processes',
-  
+
   // Operations
   ONBOARDING: 'onboarding',
   OFFBOARDING: 'offboarding',
   HRIS: 'hris',
-  
+
   // Admin
   ADMIN_CONFIG: 'admin_config',
   DEPARTMENTS: 'departments',

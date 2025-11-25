@@ -4,6 +4,7 @@
  */
 
 import { supabase } from "@/lib/supabase/client";
+import { Employee } from "@/lib/types/schemas";
 
 // Employee interface for subordinate operations - extends base with supervisor relationship
 interface EmployeeWithSupervisor {
@@ -134,7 +135,14 @@ export async function fetchSubordinates(
       iterations++;
     }
 
-    return subordinates;
+    // Map to Employee interface
+    return subordinates.map(emp => ({
+      id: emp.id,
+      name: `${emp.first_name || ''} ${emp.last_name || ''}`.trim(),
+      email: emp.email || '',
+      department: emp.department,
+      designation: emp.designation,
+    }));
   } catch (error) {
     console.error('Error fetching subordinates:', error);
     return [];
@@ -294,7 +302,14 @@ export async function getSupervisorChain(
       depth++;
     }
 
-    return chain;
+    // Map to Employee interface
+    return chain.map(emp => ({
+      id: emp.id,
+      name: `${emp.first_name || ''} ${emp.last_name || ''}`.trim(),
+      email: emp.email || '',
+      department: emp.department,
+      designation: emp.designation,
+    }));
   } catch (error) {
     console.error('Error fetching supervisor chain:', error);
     return [];

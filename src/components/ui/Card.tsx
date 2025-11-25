@@ -9,6 +9,8 @@ interface CardProps {
   hover?: boolean;
   padding?: "sm" | "md" | "lg";
   variant?: "default" | "outlined" | "elevated";
+  "data-testid"?: string;
+  [key: `data-${string}`]: string | undefined;
 }
 
 interface CardHeaderProps {
@@ -57,7 +59,8 @@ export function Card({
   className = "",
   hover = true,
   padding = "md",
-  variant = "default"
+  variant = "default",
+  ...rest
 }: CardProps) {
   return (
     <motion.div
@@ -73,6 +76,7 @@ export function Card({
         ${hover ? "hover:shadow-md hover:border-border-secondary" : ""}
         ${className}
       `}
+      {...rest}
     >
       {children}
     </motion.div>

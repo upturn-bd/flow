@@ -2,7 +2,7 @@
 import { TaskUpdateModal } from "./shared/TaskModal";
 import { TaskFilters, useTasks } from "@/hooks/useTasks";
 import { Task } from "@/lib/types/schemas";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import TaskDetails from "./shared/TaskDetails";
 import { AnimatePresence } from "framer-motion";
 import {
@@ -40,6 +40,7 @@ interface OngoingTaskPageProps {
   deleteTask: (taskId: string, projectId?: string, milestoneId?: number, adminScoped?: boolean) => Promise<{ success: boolean; error?: any; }>;
   hasMoreOngoingTasks: boolean;
   onLoadMore: () => void;
+  loadMoreLoading: boolean;
 }
 
 export default function OngoingTaskPage({
@@ -49,7 +50,8 @@ export default function OngoingTaskPage({
   updateTask,
   deleteTask,
   hasMoreOngoingTasks,
-  onLoadMore
+  onLoadMore,
+  loadMoreLoading
 }: OngoingTaskPageProps) {
   const router = useRouter();
   const { searchOngoingTasks } = useTasks();
@@ -120,6 +122,21 @@ export default function OngoingTaskPage({
 
   const displayTasks = searchTerm ? searchResults : ongoingTasks;
   const [showEmpty, setShowEmpty] = useState(false);
+  const hasLoadedRef = useRef(false);
+
+  // Track when we've completed the initial load
+  useEffect(() => {
+    // Mark as loaded when we have tasks OR when loading completes and we've waited a bit
+    if (ongoingTasks.length > 0 && !hasLoadedRef.current) {
+      hasLoadedRef.current = true;
+    } else if (!loading && !hasLoadedRef.current) {
+      // Wait 2 seconds to ensure the fetch has actually completed
+      const timer = setTimeout(() => {
+        hasLoadedRef.current = true;
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, ongoingTasks.length]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -127,7 +144,7 @@ export default function OngoingTaskPage({
       // Delay showing empty state by 1 second
       timer = setTimeout(() => {
         setShowEmpty(true);
-      }, 1000);
+      }, 2000);
     } else {
       setShowEmpty(false);
     }
@@ -149,7 +166,7 @@ export default function OngoingTaskPage({
       </div>
 
       {/* Loading / searching spinner */}
-      {!editTask && (loading || searching) ? (
+      {!editTask && (loading || searching || !hasLoadedRef.current) ? (
         <LoadingSpinner text={searching ? "Searching Tasks..." : "Loading Tasks..."} />
       ) : (
         <div className="grid grid-cols-1 gap-4">
@@ -169,7 +186,7 @@ export default function OngoingTaskPage({
             </div>
           ))}
 
-          {showEmpty && (
+          {displayTasks.length === 0 && !loading && !searching && hasLoadedRef.current && (
             <EmptyState
               icon={<ClipboardList className="w-12 h-12" />}
               title="No tasks found"
@@ -177,8 +194,9 @@ export default function OngoingTaskPage({
             />
           )}
 
-          {!searchTerm && (
+          {!searchTerm && (!loading && !searching) && displayTasks.length > 0 && (
             <LoadMore
+              isLoading={loadMoreLoading}
               onLoadMore={onLoadMore}
               hasMore={hasMoreOngoingTasks}
             />
@@ -232,15 +250,16 @@ function TaskCard({
   isDeleting?: boolean;
 }) {
   const { canWrite, canDelete } = useAuth();
-  
+
   // Check if user can edit based on permissions OR ownership
   const canEditTask = canWrite(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && userRole === "Admin");
   const canDeleteTask = canDelete(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && userRole === "Admin");
-  
+
   const actions = (
     <div className="flex items-center gap-2 task-card">
       {canEditTask && (
         <Button
+          data-testid="edit-task-button"
           variant="ghost"
           size="sm"
           onClick={onEdit}
@@ -249,10 +268,11 @@ function TaskCard({
           <Edit size={14} />
         </Button>
       )}
-      
+
       {!canEditTask && (userId === task.created_by || (adminScoped && userRole === "Admin")) && (
         <PermissionTooltip message="You don't have permission to edit tasks">
           <Button
+            data-testid="edit-task-button"
             variant="ghost"
             size="sm"
             disabled
@@ -265,6 +285,7 @@ function TaskCard({
 
       {canDeleteTask && (
         <Button
+          data-testid="delete-task-button"
           variant="ghost"
           size="sm"
           onClick={onDelete}
@@ -274,7 +295,7 @@ function TaskCard({
           <Trash size={14} />
         </Button>
       )}
-      
+
       {!canDeleteTask && (userId === task.created_by || (adminScoped && userRole === "Admin")) && (
         <PermissionTooltip message="You don't have permission to delete tasks">
           <Button
@@ -290,6 +311,7 @@ function TaskCard({
 
       <Link href={`/ops/tasks/${task.id}`}>
         <Button
+          data-testid="view-task-button"
           variant="ghost"
           size="sm"
           onClick={onDetails}
@@ -302,7 +324,7 @@ function TaskCard({
   );
 
   return (
-    <Card>
+    <Card data-testid="task-card">
       <CardHeader
         title={task.task_title}
         subtitle={task.task_description}

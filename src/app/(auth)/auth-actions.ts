@@ -12,11 +12,9 @@ export async function login({
 }: {
   email: string;
   password: string;
-}) : Promise<{ error?: AuthError }> {
+}) : Promise<{ error?: AuthError; success?: boolean }> {
   const supabase = await createClient();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
   const data = {
     email,
     password,
@@ -29,7 +27,7 @@ export async function login({
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
+  return { success: true };
 }
 
 export async function signup({

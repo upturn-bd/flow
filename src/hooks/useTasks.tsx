@@ -177,6 +177,7 @@ export function useTasks() {
 
   const [hasMoreOngoingTasks, setHasMoreOngoingTasks] = useState(true);
   const [lastFetchedOngoingTaskId, setLastFetchedOngoingTaskId] = useState<string | null>(null);
+  const [ongoingTasksLoading, setOngoingTasksLoading] = useState(false);
   const fetchOngoingTasks = useCallback(
     async (companyScopes = false, limit = 10) => {
       try {
@@ -184,8 +185,7 @@ export function useTasks() {
           // Auth context not loaded yet, skip silently
           return;
         }
-        setLoading(true);
-
+        setOngoingTasksLoading(true);
         let query = supabase
           .from("task_records")
           .select("*")
@@ -193,7 +193,7 @@ export function useTasks() {
           .order("id", { ascending: true }) // pagination cursor
           .limit(limit);
 
-        if (!companyScopes) { 
+        if (!companyScopes) {
           query = query.or(`created_by.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}}`);
         }
 
@@ -215,16 +215,15 @@ export function useTasks() {
           });;
           setLastFetchedOngoingTaskId(data[data.length - 1].id);
           setHasMoreOngoingTasks(data.length === limit); // if less than limit, no more tasks
-        } 
+        }
 
         if (data.length === 0) {
           setHasMoreOngoingTasks(false);
         }
-
-        setLoading(false);
+        setOngoingTasksLoading(false);
       } catch (err) {
         console.error("Error fetching ongoing tasks:", err);
-        setLoading(false);
+        setOngoingTasksLoading(false);
       }
     },
     [lastFetchedOngoingTaskId, employeeInfo]
@@ -238,7 +237,7 @@ export function useTasks() {
           // Auth context not loaded yet, skip silently
           return [];
         }
-        setLoading(true);
+        setOngoingTasksLoading(true);
 
         // Base query: ongoing tasks
         let query = supabase
@@ -281,11 +280,11 @@ export function useTasks() {
           setHasMoreOngoingTasks(false);
         }
 
-        setLoading(false);
+        setOngoingTasksLoading(false);
         return data || [];
       } catch (err) {
         console.error("Error searching ongoing tasks:", err);
-        setLoading(false);
+        setOngoingTasksLoading(false);
         return [];
       }
     },
@@ -520,7 +519,7 @@ export function useTasks() {
 
 
       const newTask = data?.[0];
-      setTasks(prev => [newTask, ...prev]);
+      setOngoingTasks(prev => [newTask, ...prev]);
 
       // Notify assignees if any
 
@@ -598,8 +597,8 @@ export function useTasks() {
       //   await fetchTaskStats(task.project_id);
       // }
 
-      setTasks(prev => prev.map(t => t.id === data.id ? data : t));
-      fetchOngoingTasks()
+      setOngoingTasks(prev => prev.map(t => t.id === data.id ? data : t));
+      // fetchOngoingTasks()
       fetchCompletedTasks()
       const recipients = task.assignees;
       if (employeeInfo?.supervisor_id) {
@@ -651,16 +650,17 @@ export function useTasks() {
         await fetchTaskStats(projectId);
       }
 
-      setTasks(prev => prev.filter(t => t.id !== taskId));
+      setOngoingTasks(prev => prev.filter(t => t.id !== taskId));
+      setCompletedTasks(prev => prev.filter(t => t.id !== taskId));
 
-      if (adminScoped) {
-        fetchOngoingTasks(true)
-        fetchCompletedTasks(true)
+      // if (adminScoped) {
+      //   fetchOngoingTasks(true)
+      //   fetchCompletedTasks(true)
 
-      } else {
-        fetchOngoingTasks()
-        fetchCompletedTasks()
-      }
+      // } else {
+      //   fetchOngoingTasks()
+      //   fetchCompletedTasks()
+      // }
 
       return { success: true };
     } catch (err) {
@@ -779,6 +779,7 @@ export function useTasks() {
     // State
     tasks,
     ongoingTasks,
+    ongoingTasksLoading,
     completedTasks,
     loading,
     error,
@@ -820,6 +821,7 @@ export function useTasks() {
     ongoingTasks,
     completedTasks,
     loading,
+    ongoingTasksLoading,
     error,
     stats,
 

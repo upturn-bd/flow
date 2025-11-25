@@ -1,263 +1,259 @@
-# Playwright E2E Tests for Upturn Flow
+# Task Management E2E Test Suite
 
-This directory contains comprehensive End-to-End (E2E) tests for the Upturn Flow HRIS platform using Playwright.
+Comprehensive end-to-end testing for the Task Management system in `/ops/tasks`.
 
-**🎉 Updated Test Suite - All Tests Revised & Routes Corrected!**
+## Overview
 
-## � Test Coverage Summary
+This test suite provides complete coverage of the Task Management functionality including:
 
-| Metric | Value |
-|--------|-------|
-| **Total Test Files** | 10 |
-| **Total Test Cases** | 160+ |
-| **Features Covered** | 14+ modules |
-| **Browsers Tested** | Chromium, Firefox |
-| **Routes Fixed** | All updated to `/ops/*` |
+- ✅ **Navigation & UI Rendering** - Page load, layout, and component visibility
+- ✅ **Tab Navigation** - Switching between Ongoing, Completed, and Archived tabs
+- ✅ **Task Creation** - Creating tasks with validation and error handling
+- ✅ **Task Viewing** - Displaying task lists and individual task details
+- ✅ **Task Updates** - Editing tasks and changing status
+- ✅ **Task Deletion** - Deleting tasks with confirmation
+- ✅ **Filtering & Search** - Finding tasks by various criteria
+- ✅ **Pagination** - Loading more tasks
+- ✅ **Error Handling** - Network errors, validation errors, unauthorized access
+- ✅ **Responsive Design** - Mobile, tablet, and desktop viewports
+- ✅ **Accessibility** - Keyboard navigation and ARIA labels
+- ✅ **Performance** - Load times and responsiveness
 
-## �📁 Test Structure
+## Test Files
 
 ```
 tests/
-├── fixtures/
-│   └── auth.fixture.ts              # ✅ FIXED - Authentication fixtures for Admin/Manager/Employee
+├── task-management.spec.ts    # Main test suite
 ├── helpers/
-│   └── test-utils.ts                # Test utilities and helpers
-├── auth.spec.ts                     # ✅ REVISED - 12 tests for authentication flows
-├── workflow-and-services.spec.ts    # ✨ NEW - 50+ tests for Task, Project, Attendance, Leave, Notice
-├── services-management.spec.ts      # ✨ NEW - 40+ tests for Requisition, Settlement, Complaint, Payroll
-├── operations-hr.spec.ts            # ✨ NEW - 40+ tests for Onboarding, Offboarding, HRIS, Stakeholder Issues
-├── employee-management.spec.ts      # ✅ UPDATED - Routes fixed to /ops/hris
-├── payroll.spec.ts                  # ✅ UPDATED - Routes fixed to /ops/payroll
-├── operations.spec.ts               # ✅ UPDATED - Routes fixed to /ops/complaint
-├── project-management.spec.ts       # ✅ Updated
-├── general.spec.ts                  # ✅ Accessibility & Performance tests
-├── smoke-and-visual.spec.ts         # ✅ Critical user journeys
-├── TEST_COVERAGE_REPORT.md          # 📄 Detailed coverage documentation
-└── README.md                        # This file
+│   ├── auth.ts                # Authentication helpers
+│   └── test-utils.ts          # Common test utilities
+└── README.md                  # This file
 ```
 
-## 🚀 Getting Started
+## Running Tests
 
-### Prerequisites
-
-1. Ensure Playwright is installed:
+### Run All Tests
 ```bash
-npm install -D @playwright/test
+npm test
 ```
 
-2. Install browser binaries:
+### Run Task Management Tests Only
 ```bash
-npx playwright install chromium firefox
+npx playwright test task-management
 ```
 
-### Configuration
+### Run in UI Mode (Interactive)
+```bash
+npm run test:ui
+```
 
-Before running tests, update the test credentials in `tests/fixtures/auth.fixture.ts`:
+### Run in Headed Mode (See Browser)
+```bash
+npm run test:headed
+```
+
+### Run in Debug Mode
+```bash
+npm run test:debug
+```
+
+### View Test Report
+```bash
+npm run test:report
+```
+
+## Test Structure
+
+### 1. Navigation and UI Tests
+- Page loads correctly
+- All tabs are visible
+- Create Task button is present
+- Icons display properly
+
+### 2. Tab Navigation Tests
+- Switch between tabs
+- URL updates correctly
+- Tab state persists on reload
+- Archived tab shows coming soon message
+
+### 3. Task Creation Tests
+- Open/close create modal
+- Form validation
+- Successful task creation
+- Error handling
+- Date validation
+- Form data preservation
+
+### 4. Task Viewing Tests
+- Display task lists
+- Show task details
+- Navigate to/from task details
+- Empty state handling
+
+### 5. Task Update Tests
+- Mark tasks as completed
+- Edit task details
+- Handle update failures
+
+### 6. Task Deletion Tests
+- Delete tasks successfully
+- Confirmation dialogs
+- Handle deletion failures
+
+### 7. Filtering and Search Tests
+- Filter by priority
+- Search by title
+- No results handling
+
+### 8. Pagination Tests
+- Load more functionality
+- Hide button when all loaded
+
+### 9. Error Handling Tests
+- Network failures
+- Unauthorized access
+- Invalid task IDs
+
+### 10. Responsive Design Tests
+- Mobile viewport (375x667)
+- Tablet viewport (768x1024)
+- Desktop viewport (1920x1080)
+
+### 11. Accessibility Tests
+- Keyboard navigation
+- ARIA labels
+- Focus management
+
+### 12. Performance Tests
+- Page load time
+- Interaction responsiveness
+
+## Environment Variables
+
+Create a `.env` file in the project root with test credentials:
+
+```env
+# Test User Credentials
+TEST_USER_EMAIL=user@example.com
+TEST_USER_PASSWORD=password123
+
+TEST_ADMIN_EMAIL=admin@example.com
+TEST_ADMIN_PASSWORD=admin123
+
+TEST_MANAGER_EMAIL=manager@example.com
+TEST_MANAGER_PASSWORD=manager123
+
+# Base URL (optional, defaults to http://localhost:3000)
+BASE_URL=http://localhost:3000
+```
+
+## Prerequisites
+
+Before running tests:
+
+1. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+2. **Ensure database is seeded** with test data (if applicable)
+
+3. **Create test users** in your authentication system
+
+## Test Data
+
+The test suite uses the following test data:
 
 ```typescript
-export const TEST_USERS = {
-  admin: {
-    email: 'your-admin@email.com',
-    password: 'YourPassword',
-    role: 'Admin'
-  },
-  manager: {
-    email: 'your-manager@email.com',
-    password: 'YourPassword',
-    role: 'Manager'
-  },
-  employee: {
-    email: 'your-employee@email.com',
-    password: 'YourPassword',
-    role: 'Employee'
-  }
+const TEST_TASK = {
+  title: 'E2E Test Task',
+  description: 'This is a test task created by automated E2E tests',
+  priority: 'high',
+  startDate: '2024-11-24',
+  endDate: '2024-12-01',
 };
 ```
 
-## 🧪 Running Tests
+## Helper Functions
 
-### Run all tests
-```bash
-npm run test:e2e
-```
+### Authentication (`helpers/auth.ts`)
 
-### Run tests in UI mode (recommended for debugging)
-```bash
-npm run test:e2e:ui
-```
-
-### Run specific test file
-```bash
-npx playwright test tests/auth.spec.ts
-```
-
-### Run tests in headed mode (see browser)
-```bash
-npx playwright test --headed
-```
-
-### Run tests on specific browser
-```bash
-npx playwright test --project=chromium
-npx playwright test --project=firefox
-npx playwright test --project="Mobile Chrome"
-```
-
-### Debug a specific test
-```bash
-npx playwright test --debug
-```
-
-### View test report
-```bash
-npx playwright show-report
-```
-
-## 📋 Test Coverage
-
-### 1. Authentication (`auth.spec.ts`)
-- ✅ Display login page
-- ✅ Validation errors for empty fields
-- ✅ Invalid email format handling
-- ✅ Incorrect credentials handling
-- ✅ Successful login (Admin/Manager/Employee)
-- ✅ Password visibility toggle
-- ✅ Logout functionality
-- ✅ Password reset flow
-- ✅ Registration flow (if available)
-
-### 2. Employee Management (`employee-management.spec.ts`)
-- ✅ Display employee list
-- ✅ Search employees
-- ✅ Filter by department
-- ✅ View employee profile
-- ✅ Attendance dashboard
-- ✅ Mark attendance (check-in/out)
-- ✅ View attendance history
-- ✅ Display leave balance
-- ✅ Submit leave request
-- ✅ Approve leave request (Admin)
-
-### 3. Payroll Management (`payroll.spec.ts`)
-- ✅ Display payroll dashboard (Admin)
-- ✅ Generate payroll
-- ✅ View payroll history
-- ✅ Adjust employee salary
-- ✅ Export payroll report
-- ✅ View own payslip (Employee)
-- ✅ Download payslip
-- ✅ View payroll history (Employee)
-- ✅ Data isolation (employees can't see others' payroll)
-- ✅ View salary change log
-
-### 4. Project Management (`project-management.spec.ts`)
-- ✅ Display project management page
-- ✅ Show create new project tab (Admin only)
-- ✅ Create new project
-- ✅ View ongoing projects
-- ✅ View completed projects
-- ✅ Filter and search projects
-- ✅ View project details
-- ✅ View project milestones
-- ✅ Role-based access control
-
-### 5. Operations (`operations.spec.ts`)
-- **Complaints:**
-  - ✅ Display complaint page
-  - ✅ Submit new complaint
-  - ✅ View complaint details
-  - ✅ Resolve complaint (Admin)
-  
-- **Requisitions:**
-  - ✅ Display requisition page
-  - ✅ Submit new requisition
-  - ✅ Approve requisition (Admin)
-  
-- **Notices:**
-  - ✅ Display notice board
-  - ✅ Create notice (Admin)
-  - ✅ View notice details
-  
-- **Tasks:**
-  - ✅ Display task page
-  - ✅ Create new task
-  - ✅ Mark task as complete
-
-### 6. General Tests (`general.spec.ts`)
-- **Responsive Design:**
-  - ✅ Mobile device display
-  - ✅ Tablet device display
-  - ✅ Mobile navigation menu
-  
-- **Accessibility:**
-  - ✅ Heading hierarchy
-  - ✅ Accessible form labels
-  - ✅ Keyboard navigation
-  
-- **Performance:**
-  - ✅ Page load time
-  - ✅ Console error monitoring
-  
-- **Navigation:**
-  - ✅ Navigate through sections
-  - ✅ State persistence
-  
-- **Error Handling:**
-  - ✅ 404 page handling
-  - ✅ Network error handling
-  
-- **Security:**
-  - ✅ Redirect unauthenticated users
-  - ✅ Secure password input
-  - ✅ XSS prevention
-  
-- **Search:**
-  - ✅ Platform-wide search
-
-## 🎯 Test Fixtures
-
-The `auth.fixture.ts` provides pre-authenticated page contexts for different user roles:
-
-- `authenticatedPage` - Basic authenticated context
-- `adminPage` - Pre-logged in as Admin
-- `managerPage` - Pre-logged in as Manager
-- `employeePage` - Pre-logged in as Employee
-
-Usage:
 ```typescript
-import { test, expect } from './fixtures/auth.fixture';
+import { login, logout, setupAuth } from './helpers/auth';
 
-test('admin only feature', async ({ adminPage }) => {
-  await adminPage.goto('/admin-only-route');
-  // Test admin-specific functionality
-});
+// Login as default user
+await login(page);
+
+// Login as specific user
+await login(page, { email: 'admin@example.com', password: 'admin123' });
+
+// Logout
+await logout(page);
+
+// Setup auth in beforeEach
+await setupAuth(page);
 ```
 
-## 🔧 Configuration
+### Test Utilities (`helpers/test-utils.ts`)
 
-The `playwright.config.ts` file contains:
-- Test directory: `./tests`
-- Base URL: `http://localhost:3000`
-- Browsers: Chromium, Firefox
-- Mobile devices: Pixel 5, iPhone 12
-- Automatic dev server startup
-- Trace collection on failure
-- Screenshots on failure
-- Video recording on failure
+```typescript
+import { 
+  waitForToast, 
+  fillField, 
+  clickElement,
+  waitForLoading 
+} from './helpers/test-utils';
 
-## 📊 CI/CD Integration
+// Wait for success toast
+await waitForToast(page, 'Task created successfully', 'success');
 
-Tests are configured to run in CI environments with:
-- Automatic retries (2 retries on CI)
-- Sequential execution on CI
-- HTML report generation
-- Fail on `test.only` in source code
+// Fill form field
+await fillField(page, 'input[name="title"]', 'My Task');
+
+// Click element
+await clickElement(page, 'button:has-text("Submit")');
+
+// Wait for loading to complete
+await waitForLoading(page);
+```
+
+## Debugging Tests
+
+### Visual Debugging
+```bash
+npm run test:ui
+```
+
+### Debug Mode
+```bash
+npm run test:debug
+```
+
+### Screenshots
+Tests automatically take screenshots on failure. Find them in:
+```
+test-results/
+└── [test-name]/
+    └── test-failed-1.png
+```
+
+### Video Recording
+Playwright automatically records videos of test runs. Find them in:
+```
+test-results/
+└── [test-name]/
+    └── video.webm
+```
+
+## CI/CD Integration
 
 ### GitHub Actions Example
 
 ```yaml
-name: Playwright Tests
+name: E2E Tests
+
 on: [push, pull_request]
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -265,121 +261,157 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: '18'
+      
       - name: Install dependencies
         run: npm ci
+      
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-      - name: Run Playwright tests
-        run: npm run test:e2e
-      - uses: actions/upload-artifact@v3
+      
+      - name: Run E2E tests
+        run: npm test
+        env:
+          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+      
+      - name: Upload test results
         if: always()
+        uses: actions/upload-artifact@v3
         with:
           name: playwright-report
           path: playwright-report/
-          retention-days: 30
 ```
 
-## 🐛 Debugging Tips
+## Best Practices
 
-1. **Use UI Mode:**
+### 1. **Use Data Test IDs**
+Add `data-testid` attributes to important elements:
+```tsx
+<button data-testid="create-task-button">Create Task</button>
+```
+
+### 2. **Avoid Hard-Coded Waits**
+Use Playwright's built-in waiting mechanisms:
+```typescript
+// ❌ Bad
+await page.waitForTimeout(5000);
+
+// ✅ Good
+await expect(page.locator('text=Success')).toBeVisible();
+```
+
+### 3. **Clean Up After Tests**
+Delete test data created during tests:
+```typescript
+test.afterEach(async ({ page }) => {
+  // Clean up test tasks
+  await deleteTestTasks(page);
+});
+```
+
+### 4. **Use Page Object Model**
+For complex pages, create page objects:
+```typescript
+class TaskPage {
+  constructor(private page: Page) {}
+  
+  async createTask(task: Task) {
+    await this.page.click('[data-testid="create-task"]');
+    // ...
+  }
+}
+```
+
+### 5. **Parallel Execution**
+Tests run in parallel by default. Ensure tests are independent:
+```typescript
+test.describe.configure({ mode: 'parallel' });
+```
+
+## Troubleshooting
+
+### Tests Failing Locally
+
+1. **Check if dev server is running**
    ```bash
-   npm run test:e2e:ui
+   npm run dev
    ```
-   This provides a visual interface to step through tests.
 
-2. **Use Playwright Inspector:**
+2. **Verify test user credentials**
+   Check `.env` file has correct credentials
+
+3. **Clear browser data**
    ```bash
-   npx playwright test --debug
+   npx playwright clean
    ```
 
-3. **Generate Code:**
+4. **Update Playwright**
    ```bash
-   npx playwright codegen http://localhost:3000
-   ```
-   This opens a browser and records your actions as test code.
-
-4. **View Traces:**
-   When a test fails, traces are automatically captured. View them with:
-   ```bash
-   npx playwright show-trace trace.zip
+   npm install -D @playwright/test@latest
+   npx playwright install
    ```
 
-5. **Slow Down Tests:**
-   Add `slowMo` in the config to see what's happening:
+### Flaky Tests
+
+If tests are flaky:
+
+1. **Increase timeouts**
    ```typescript
-   use: {
-     slowMo: 1000, // Slow down by 1 second
-   }
+   test.setTimeout(60000); // 60 seconds
    ```
 
-## 📝 Best Practices
-
-1. **Use data-testid attributes** in your components for stable selectors:
-   ```tsx
-   <button data-testid="submit-button">Submit</button>
-   ```
-
-2. **Avoid hard-coded waits** - use Playwright's auto-waiting:
+2. **Add explicit waits**
    ```typescript
-   // Bad
-   await page.waitForTimeout(5000);
-   
-   // Good
-   await page.waitForSelector('[data-testid="result"]');
    await page.waitForLoadState('networkidle');
    ```
 
-3. **Create reusable helpers** for common actions:
+3. **Use retry logic**
    ```typescript
-   async function login(page: Page, email: string, password: string) {
-     await page.fill('input[type="email"]', email);
-     await page.fill('input[type="password"]', password);
-     await page.click('button[type="submit"]');
-   }
+   test.describe.configure({ retries: 2 });
    ```
 
-4. **Test user journeys**, not just individual pages.
+## Coverage Report
 
-5. **Keep tests independent** - each test should be able to run in isolation.
+To see which parts of the application are tested:
 
-## 🔄 Updating Tests
+```bash
+# Run tests with coverage
+npx playwright test --reporter=html
 
-When adding new features to the platform:
+# View report
+npm run test:report
+```
 
-1. Create a new test file or add to existing ones
-2. Use appropriate fixtures for authentication
-3. Follow the existing pattern and naming conventions
-4. Update this README with new test coverage
-5. Run tests locally before committing
-6. Ensure tests pass in CI
+## Contributing
 
-## 📚 Resources
+When adding new tests:
 
-- [Playwright Documentation](https://playwright.dev)
-- [Playwright Best Practices](https://playwright.dev/docs/best-practices)
-- [Playwright API Reference](https://playwright.dev/docs/api/class-playwright)
-- [Next.js Testing Documentation](https://nextjs.org/docs/testing#playwright)
+1. Follow the existing test structure
+2. Add descriptive test names
+3. Include error handling tests
+4. Test both success and failure cases
+5. Update this README if adding new test categories
 
-## 🆘 Troubleshooting
+## Test Metrics
 
-### Tests timing out
-- Increase timeout in `playwright.config.ts`
-- Check if the dev server is running
-- Verify network connectivity
+Current test coverage:
 
-### Browser not launching
-- Run `npx playwright install` to reinstall browsers
-- Check system requirements
+- **Total Tests**: 50+
+- **Test Suites**: 12
+- **Average Duration**: ~2-3 minutes
+- **Success Rate**: Target 100%
 
-### Flaky tests
-- Use proper wait strategies
-- Avoid `waitForTimeout` when possible
-- Enable trace to debug: `trace: 'on'`
-
-## 📞 Support
+## Support
 
 For issues or questions:
-1. Check the Playwright documentation
-2. Review test traces and screenshots
-3. Consult the team lead or senior developer
+
+1. Check the [Playwright Documentation](https://playwright.dev)
+2. Review existing test examples
+3. Contact the QA team
+
+---
+
+**Last Updated**: November 24, 2024
+**Playwright Version**: 1.56.1
+**Node Version**: 20.x

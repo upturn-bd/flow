@@ -42,6 +42,7 @@ function TasksPageContent() {
 }
 
 export default function TasksPage() {
+  console.log("Rendering TasksPage");
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <TasksPageContent />

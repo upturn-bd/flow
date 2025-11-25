@@ -68,7 +68,7 @@ function TaskCard({
   };
 
   const department = departments.find((dept) => dept.id === department_id);
-  
+
   // Check if user can delete based on permissions OR ownership
   const canDeleteTask = canDelete(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && userRole === "Admin");
 
@@ -85,7 +85,7 @@ function TaskCard({
           <Trash size={14} />
         </Button>
       )}
-      
+
       {!canDeleteTask && (userId === task.created_by || (adminScoped && userRole === "Admin")) && (
         <PermissionTooltip message="You don't have permission to delete tasks">
           <Button
@@ -111,7 +111,7 @@ function TaskCard({
   );
 
   return (
-    <Card>
+    <Card data-testid="task-card">
       <CardHeader
         title={task_title}
         subtitle={task_description}

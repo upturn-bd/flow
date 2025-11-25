@@ -124,8 +124,8 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
         requested_to: user.supervisor_id,
       };
 
-      const { error } = await createLeaveRequest(formattedLeave);
-      if (error) throw error;
+      const response = await createLeaveRequest(formattedLeave);
+      if (response?.error) throw response.error;
 
       toast.success("Leave application submitted successfully!");
       setLeaveRecord(initialLeaveRecord);

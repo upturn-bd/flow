@@ -68,6 +68,8 @@ export const TabView = ({
                   : "text-gray-600 hover:text-blue-600 hover:bg-gray-50"
                 }
               `}
+              role="tab"
+              aria-selected={activeTab === tab.key}
             >
               <span
                 className={`${activeTab === tab.key ? tab.color : "text-gray-500"}`}

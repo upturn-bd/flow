@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 interface LoadMoreProps {
   isLoading?: boolean;
   hasMore?: boolean;
-  onLoadMore: () => void;
+  onLoadMore: () => void | Promise<void>;
   className?: string;
 }
 
@@ -22,7 +22,7 @@ const LoadMore: FC<LoadMoreProps> = ({
     <div className={`flex justify-center my-6 ${className}`}>
       <motion.button
         whileTap={{ scale: 0.99 }}
-        whileHover={{ scale: 1.01}}
+        whileHover={{ scale: 1.01 }}
         onClick={onLoadMore}
         disabled={isLoading}
         className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all"

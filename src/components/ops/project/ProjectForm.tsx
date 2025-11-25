@@ -21,14 +21,14 @@ import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import AssigneeSelect from "./AssigneeSelect";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { Project } from "@/lib/types/schemas";
+import { Project, Employee } from "@/lib/types/schemas";
 import { Milestone } from "./milestone/MilestoneForm";
 import MilestoneList from "./milestone/MilestoneList";
 import MilestoneForm from "./milestone/MilestoneForm";
 import { useMilestones } from "@/hooks/useMilestones";
 import { MilestoneUpdateModal } from "./milestone";
 import { fadeInUp } from "@/components/ui/animations";
-import { EmployeeInfo, useEmployeeInfo } from "@/hooks/useEmployeeInfo";
+import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 
 export type ProjectDetails = Project;
 
@@ -100,15 +100,18 @@ export default function ProjectForm({
     assignees: [],
   };
 
-  const filteredEmployees = employees.filter(emp =>
-    projectDetails.department_ids?.includes(emp.department_id)
-  );
+  const filteredEmployees = employees.filter(emp => {
+    const empDept = emp.department || '';
+    return projectDetails.department_ids?.some(deptId => 
+      typeof deptId === 'number' ? String(deptId) === empDept : deptId === empDept
+    );
+  });
 
   // Convert projectDetails.assignees (ids) -> employee objects
-  const selectedAssigneeObjects: EmployeeInfo[] = [
+  const selectedAssigneeObjects: Employee[] = [
     ...(projectDetails.assignees || [])
       .map(id => filteredEmployees.find(emp => emp.id === id))
-      .filter((emp): emp is EmployeeInfo => !!emp),
+      .filter((emp): emp is Employee => !!emp),
 
     // add project lead if found
     ...(projectDetails.project_lead_id

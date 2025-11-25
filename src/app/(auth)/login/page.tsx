@@ -30,11 +30,20 @@ const SignIn = () => {
   const handleSignIn = async (data: SignInFormData) => {
     setGeneralError(null);
     setLoading(true);
-    const { error } = await login({ email: data.email, password: data.password });
-    if (error) {
-      setGeneralError("Login failed. " + error.message);
+    
+    try {
+      const result = await login({ email: data.email, password: data.password });
+      
+      if (result.error) {
+        setGeneralError("Login failed. " + result.error.message);
+        setLoading(false);
+      } else if (result.success) {
+        window.location.href = "/";
+      }
+    } catch (err) {
+      setGeneralError("An unexpected error occurred. Please try again.");
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
@@ -44,7 +53,6 @@ const SignIn = () => {
       await googleSignIn();
     } catch (err) {
       if (err instanceof Error) {
-        console.error("Google Sign-In Error:", err.message);
         setGeneralError("Google sign-in failed. Please try again.");
       }
     } finally {
@@ -68,6 +76,7 @@ const SignIn = () => {
             >
               <div>
                 <input
+                  data-testid="email-input"
                   className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full placeholder:text-gray-500"
                   type="email"
                   placeholder="Email"
@@ -82,6 +91,7 @@ const SignIn = () => {
 
               <div className="relative">
                 <input
+                  data-testid="password-input"
                   className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full pr-12 placeholder:text-gray-500"
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
@@ -109,6 +119,7 @@ const SignIn = () => {
               </div>
 
               <button
+                data-testid="login-button"
                 type="submit"
                 className="px-8 py-3 mt-2 rounded-full bg-amber-400 text-black font-semibold shadow-xl cursor-pointer disabled:opacity-50 transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
                 disabled={loading}

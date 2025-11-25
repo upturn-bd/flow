@@ -189,7 +189,9 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
 
         // Always attempt the update - the hook will handle empty updates gracefully
         const response = await updateBasicInfoApi(changedFields);
-        setInitialData(response.data);
+        if (response) {
+          setInitialData(response.data);
+        }
         setSubmitSuccess(true);
         showNotification({ 
           message: "Basic information updated successfully!", 

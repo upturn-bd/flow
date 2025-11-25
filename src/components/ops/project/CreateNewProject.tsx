@@ -60,7 +60,7 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
       console.log("Step 1", data)
       const projectResult = await createProject({ ...data });
       console.log("Step 3", projectResult)
-      if (!projectResult.success) {
+      if (!projectResult || !projectResult.success) {
         throw new Error("Failed to create project");
       }
 
