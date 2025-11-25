@@ -22,10 +22,12 @@ export function useDepartments() {
   // Manual fetch all departments
   const fetchDepartments = async (company_id?: number | undefined) => {
     // Don't fetch if auth is still loading or user isn't authenticated
-    if (authLoading || !user) {
-      setDepartments([]);
-      return [];
-    }
+    // if (!user) {
+    //   setDepartments([]);
+    //         console.log("Auth loading")
+
+    //   return [];
+    // }
 
     try {
       setLoading(true);

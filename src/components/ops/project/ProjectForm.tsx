@@ -29,6 +29,7 @@ import { useMilestones } from "@/hooks/useMilestones";
 import { MilestoneUpdateModal } from "./milestone";
 import { fadeInUp } from "@/components/ui/animations";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export type ProjectDetails = Project;
 
@@ -80,10 +81,11 @@ export default function ProjectForm({
   const { fetchProjectMilestones, updateMilestone } = useMilestones();
 
   const { employees, fetchEmployeeInfo } = useEmployeeInfo();
+  const { user } = useAuth()
 
   useEffect(() => {
     fetchEmployeeInfo();
-  }, []);
+  }, [fetchEmployeeInfo]);
 
   const getTotalMilestoneWeightage = () => {
     return milestones.reduce((sum, m) => sum + m.weightage, 0);
@@ -101,10 +103,18 @@ export default function ProjectForm({
   };
 
   const filteredEmployees = employees.filter(emp => {
-    const empDept = emp.department || '';
-    return projectDetails.department_ids?.some(deptId => 
-      typeof deptId === 'number' ? String(deptId) === empDept : deptId === empDept
-    );
+    // Only show employees that belong to the selected departments
+    if (!projectDetails.department_ids || projectDetails.department_ids.length === 0) {
+      return false; // No departments selected, so no employees
+    }
+    
+    const empDeptId = emp.department;
+    if (!empDeptId) {
+      return false; // Employee has no department
+    }
+    
+    // Check if employee's department is in the selected departments
+    return projectDetails.department_ids.some(deptId => String(deptId) === empDeptId);
   });
 
   // Convert projectDetails.assignees (ids) -> employee objects
@@ -562,6 +572,7 @@ export default function ProjectForm({
             ? "opacity-50 cursor-not-allowed"
             : "hover:bg-gray-900 active:bg-gray-950"
             }`}
+          data-testid={mode === "create" ? "create-project-button" : "update-project-button"}
         >
           <Check size={16} className="mr-2" />
           {mode === "create" ? "Create Project" : "Update Project"}

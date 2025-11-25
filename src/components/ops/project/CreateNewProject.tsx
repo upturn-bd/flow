@@ -14,6 +14,7 @@ import MilestoneForm, { type Milestone } from "./milestone/MilestoneForm";
 import { supabase } from "@/lib/supabase/client";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth/auth-context";
 
 const initialMilestone: Milestone = {
   milestone_title: "",
@@ -40,6 +41,7 @@ const initialProjectDetails: ProjectDetails = {
 
 export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (key: string) => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth()
   const { departments, fetchDepartments } = useDepartments();
   const { employees, fetchEmployeeInfo } = useEmployeeInfo();
   const { createProject } = useProjects();
@@ -48,7 +50,7 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
   useEffect(() => {
     fetchDepartments();
     fetchEmployeeInfo();
-  }, []);
+  }, [user]);
 
   const handleSubmit = async (
     data: ProjectDetails,
@@ -156,7 +158,7 @@ export function UpdateProjectPage({
   onClose: () => void;
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { createMilestone , updateMilestone} = useMilestones()
+  const { createMilestone, updateMilestone } = useMilestones()
 
   const handleSubmit = async (data: ProjectDetails, milestones: any) => {
     setIsSubmitting(true);
