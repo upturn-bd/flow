@@ -168,6 +168,7 @@ export default function LineageCreateModal({
         <motion.div
           variants={fadeInUp}
           className="bg-surface-primary py-4 w-full max-w-4xl mx-auto"
+          className="bg-surface-primary py-4 w-full max-w-4xl mx-auto"
         >
           <h3 className="text-md font-semibold text-foreground-secondary mb-4">
             Set Hierarchy
@@ -453,6 +454,7 @@ export function LineageUpdateModal({
 
         <motion.div
           variants={fadeInUp}
+          className="bg-surface-primary py-4 w-full max-w-4xl mx-auto"
           className="bg-surface-primary py-4 w-full max-w-4xl mx-auto"
         >
           <h3 className="text-md font-semibold text-foreground-secondary mb-4">

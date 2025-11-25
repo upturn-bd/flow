@@ -134,9 +134,12 @@ export default function AttendanceCreateModal({
         variants={modalVariants}
         onSubmit={handleSubmit}
         className="bg-surface-primary p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-border-primary"
+        className="bg-surface-primary p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-border-primary"
       >
         <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
+            <Buildings size={24} weight="duotone" className="text-foreground-secondary" />
+            <h2 className="text-xl font-semibold text-foreground-primary">Configure Attendance Site</h2>
             <Buildings size={24} weight="duotone" className="text-foreground-secondary" />
             <h2 className="text-xl font-semibold text-foreground-primary">Configure Attendance Site</h2>
           </div>
@@ -152,10 +155,12 @@ export default function AttendanceCreateModal({
         <motion.div variants={fadeInUp} className="space-y-4">
           <div>
             <label className="block font-semibold text-foreground-secondary mb-2">
+            <label className="block font-semibold text-foreground-secondary mb-2">
               Site Name
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Buildings size={18} weight="duotone" className="text-foreground-tertiary" />
                 <Buildings size={18} weight="duotone" className="text-foreground-tertiary" />
               </div>
               <input
@@ -172,10 +177,12 @@ export default function AttendanceCreateModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block font-semibold text-foreground-secondary mb-2">
+              <label className="block font-semibold text-foreground-secondary mb-2">
                 Check In Time
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Clock size={18} weight="duotone" className="text-foreground-tertiary" />
                   <Clock size={18} weight="duotone" className="text-foreground-tertiary" />
                 </div>
                 <input
@@ -193,10 +200,12 @@ export default function AttendanceCreateModal({
 
             <div>
               <label className="block font-semibold text-foreground-secondary mb-2">
+              <label className="block font-semibold text-foreground-secondary mb-2">
                 Check Out Time
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <ClockClockwise size={18} weight="duotone" className="text-foreground-tertiary" />
                   <ClockClockwise size={18} weight="duotone" className="text-foreground-tertiary" />
                 </div>
                 <input
@@ -214,6 +223,8 @@ export default function AttendanceCreateModal({
           </div>
 
           <div className="mt-2">
+            <label className="block font-semibold text-foreground-secondary mb-2 flex items-center gap-2">
+              <MapPin size={18} weight="duotone" className="text-foreground-tertiary" />
             <label className="block font-semibold text-foreground-secondary mb-2 flex items-center gap-2">
               <MapPin size={18} weight="duotone" className="text-foreground-tertiary" />
               Location
@@ -371,9 +382,12 @@ export function AttendanceUpdateModal({
         variants={modalVariants}
         onSubmit={handleSubmit}
         className="bg-surface-primary p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-border-primary"
+        className="bg-surface-primary p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-border-primary"
       >
         <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
+            <Buildings size={24} weight="duotone" className="text-foreground-secondary" />
+            <h2 className="text-xl font-semibold text-foreground-primary">Configure Attendance Site</h2>
             <Buildings size={24} weight="duotone" className="text-foreground-secondary" />
             <h2 className="text-xl font-semibold text-foreground-primary">Configure Attendance Site</h2>
           </div>
@@ -389,10 +403,12 @@ export function AttendanceUpdateModal({
         <motion.div variants={fadeInUp} className="space-y-4">
           <div>
             <label className="block font-semibold text-foreground-secondary mb-2">
+            <label className="block font-semibold text-foreground-secondary mb-2">
               Site Name
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Buildings size={18} weight="duotone" className="text-foreground-tertiary" />
                 <Buildings size={18} weight="duotone" className="text-foreground-tertiary" />
               </div>
               <input
@@ -409,10 +425,12 @@ export function AttendanceUpdateModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block font-semibold text-foreground-secondary mb-2">
+              <label className="block font-semibold text-foreground-secondary mb-2">
                 Check In Time
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Clock size={18} weight="duotone" className="text-foreground-tertiary" />
                   <Clock size={18} weight="duotone" className="text-foreground-tertiary" />
                 </div>
                 <input
@@ -430,10 +448,12 @@ export function AttendanceUpdateModal({
 
             <div>
               <label className="block font-semibold text-foreground-secondary mb-2">
+              <label className="block font-semibold text-foreground-secondary mb-2">
                 Check Out Time
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <ClockClockwise size={18} weight="duotone" className="text-foreground-tertiary" />
                   <ClockClockwise size={18} weight="duotone" className="text-foreground-tertiary" />
                 </div>
                 <input
@@ -451,6 +471,8 @@ export function AttendanceUpdateModal({
           </div>
 
           <div className="mt-2">
+            <label className="block font-semibold text-foreground-secondary mb-2 flex items-center gap-2">
+              <MapPin size={18} weight="duotone" className="text-foreground-tertiary" />
             <label className="block font-semibold text-foreground-secondary mb-2 flex items-center gap-2">
               <MapPin size={18} weight="duotone" className="text-foreground-tertiary" />
               Location
