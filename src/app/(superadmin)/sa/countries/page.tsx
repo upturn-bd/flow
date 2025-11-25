@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Country } from "@/lib/types/schemas";
-import { Plus, Pencil, Trash, MagnifyingGlass } from "@phosphor-icons/react";
+import { Plus, Pencil, Trash, MagnifyingGlass } from "@/lib/icons";
 import { toast } from "sonner";
 
 export default function CountriesPage() {

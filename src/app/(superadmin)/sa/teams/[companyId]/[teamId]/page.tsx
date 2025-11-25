@@ -11,7 +11,7 @@ import {
   MagnifyingGlass, 
   Shield,
   X 
-} from "@phosphor-icons/react";
+} from "@/lib/icons";
 import { filterEmployeesBySearch } from "@/lib/utils/user-search";
 import { toast } from "sonner";
 

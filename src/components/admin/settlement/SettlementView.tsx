@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
-import { TrashSimple, Receipt, Money, Plus, Eye, MoneyIcon, EyeIcon, ReceiptIcon } from "@phosphor-icons/react";
+import { TrashSimple, Receipt, Money, Plus, Eye, MoneyIcon, EyeIcon, ReceiptIcon } from "@/lib/icons";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { ClaimType } from "@/lib/types/schemas";
 import {

@@ -3,7 +3,7 @@ import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField, AssigneeField } from '@/components/forms';
 import { validateTask, type TaskData } from '@/lib/validation';
 import { useEmployees } from '@/hooks/useEmployees';
-import { CheckSquare } from '@phosphor-icons/react';
+import { CheckSquare } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 
 interface TaskUpdateModalProps {

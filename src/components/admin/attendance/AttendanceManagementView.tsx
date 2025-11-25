@@ -6,7 +6,7 @@ import AttendanceCreateModal, {
   AttendanceUpdateModal,
 } from "./AttendanceModal";
 import { Site, useSites } from "@/hooks/useAttendanceManagement";
-import { TrashSimple, Buildings, Plus, MapPin, Clock, Eye } from "@phosphor-icons/react";
+import { TrashSimple, Buildings, Plus, MapPin, Clock, Eye } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 

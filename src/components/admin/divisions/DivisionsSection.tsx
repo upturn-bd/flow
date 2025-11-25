@@ -7,7 +7,7 @@ import DivisionModal from "./DivisionModal";
 import DivisionDetailsModal from "./DivisionDetailsModal";
 import { Layers, Plus, Eye, X } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { TrashSimple } from "@phosphor-icons/react";
+import { TrashSimple } from "@/lib/icons";
 import { getCompanyInfo } from "@/lib/utils/auth";
 
 type DivisionsSectionProps = {

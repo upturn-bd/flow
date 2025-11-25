@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock } from '@phosphor-icons/react';
+import { Clock } from '@/lib/icons';
 
 interface TimeFieldProps {
   name: string;

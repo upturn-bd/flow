@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MagnifyingGlass as Search, X, Check } from '@phosphor-icons/react';
+import { MagnifyingGlass as Search, X, Check } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { matchesEmployeeSearch } from '@/lib/utils/user-search';

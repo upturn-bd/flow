@@ -3,7 +3,7 @@ import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField, NumberField, AssigneeField } from '@/components/forms';
 import { validateMilestone, type MilestoneData } from '@/lib/validation';
 import { useEmployees } from '@/hooks/useEmployees';
-import { Target } from '@phosphor-icons/react';
+import { Target } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 
 interface MilestoneUpdateModalProps {

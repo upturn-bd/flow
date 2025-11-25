@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { MapPin } from '@phosphor-icons/react';
+import { MapPin } from '@/lib/icons';
 
 // Dynamically import the ClientMap to avoid SSR issues
 const ClientMap = dynamic(() => import('@/components/admin/attendance/ClientMap'), { 

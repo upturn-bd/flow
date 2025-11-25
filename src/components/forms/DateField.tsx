@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar } from '@phosphor-icons/react';
+import { Calendar } from '@/lib/icons';
 
 interface DateFieldProps {
   name: string;

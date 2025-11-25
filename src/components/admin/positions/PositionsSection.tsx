@@ -7,7 +7,7 @@ import PositionDetailsModal from "./PositionDetailsModal";
 import PositionModal from "./PositionModal";
 import { BriefcaseBusiness, Plus, Eye } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { TrashSimple } from "@phosphor-icons/react";
+import { TrashSimple } from "@/lib/icons";
 
 type PositionsSectionProps = {
   showNotification: (message: string, isError?: boolean) => void;

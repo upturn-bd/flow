@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Lock, ShieldWarning } from "@phosphor-icons/react";
+import { Lock, ShieldWarning } from "@/lib/icons";
 import { motion } from "framer-motion";
 
 interface PermissionEmptyStateProps {

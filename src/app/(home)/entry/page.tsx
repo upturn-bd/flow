@@ -8,7 +8,7 @@ import {
   FileText as FileTextIcon,
   CurrencyDollar as CurrencyDollarIcon,
   Buildings as BuildingsIcon,
-} from "@phosphor-icons/react/dist/ssr";
+} from "@/lib/icons";
 
 const navItems = [
   {

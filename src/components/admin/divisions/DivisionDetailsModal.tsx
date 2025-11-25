@@ -3,7 +3,7 @@
 "use client";
 
 import { Division } from "@/hooks/useDivisions";
-import { PencilSimple, TrashSimple, User, FileText, X } from "@phosphor-icons/react";
+import { PencilSimple, TrashSimple, User, FileText, X } from "@/lib/icons";
 import { Layers } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";

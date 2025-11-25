@@ -21,7 +21,7 @@ import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/component
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { ArrowArcLeft } from "@phosphor-icons/react";
+import { ArrowArcLeft } from "@/lib/icons";
 
 // Define the structure of a settlement request
 interface SettlementRequest {

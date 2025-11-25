@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
 import NoticesCreateModal from "./NoticeModal";
-import { NewspaperClipping, TrashSimple, Plus } from "@phosphor-icons/react";
+import { NewspaperClipping, TrashSimple, Plus } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 

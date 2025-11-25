@@ -9,7 +9,7 @@ import {
 } from ".";
 import { RequisitionInventory, useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
-import { TrashSimple, Package, Tag, Plus, Eye } from "@phosphor-icons/react";
+import { TrashSimple, Package, Tag, Plus, Eye } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 

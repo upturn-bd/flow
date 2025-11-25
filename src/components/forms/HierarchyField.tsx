@@ -1,7 +1,7 @@
 import React from 'react';
 import SelectField from './SelectField';
 import { Button } from '@/components/ui/button';
-import { Trash, Plus } from '@phosphor-icons/react';
+import { Trash, Plus } from '@/lib/icons';
 import { motion } from 'framer-motion';
 
 interface HierarchyLevel {

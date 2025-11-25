@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Superadmin, Company } from "@/lib/types/schemas";
-import { Plus, Trash, MagnifyingGlass, X } from "@phosphor-icons/react";
+import { Plus, Trash, MagnifyingGlass, X } from "@/lib/icons";
 import { filterEmployeesBySearch } from "@/lib/utils/user-search";
 import { toast } from "sonner";
 

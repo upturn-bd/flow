@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { validateSite, validationErrorsToObject } from "@/lib/utils/validation";
 import { Site } from "@/lib/types";
 import { dirtyValuesChecker } from "@/lib/utils";
-import { MapPin, Clock, ClockClockwise, Buildings, X } from "@phosphor-icons/react";
+import { MapPin, Clock, ClockClockwise, Buildings, X } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";

@@ -18,7 +18,7 @@ import {
 import { Education } from "@/hooks/useProfile";
 import { Experience } from "@/lib/types";
 import { extractFilenameFromUrl } from "@/lib/utils";
-import { FilePdf } from "@phosphor-icons/react";
+import { FilePdf } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useProfile } from "@/hooks/useProfile";
 import { showNotification } from "@/lib/utils/notifications";

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/modals';
 import { FormField, TimeField, MapField } from '@/components/forms';
 import { validateSite, type SiteData } from '@/lib/validation';
-import { Buildings, Clock } from '@phosphor-icons/react';
+import { Buildings, Clock } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 
 interface Coordinates {

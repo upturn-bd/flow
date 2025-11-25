@@ -15,7 +15,7 @@ import {
 } from "@/lib/icons";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PERMISSION_MODULES } from "@/lib/constants";
-import { BookOpen } from "@phosphor-icons/react";
+import { BookOpen } from "@/lib/icons";
 
 function LeavePageContent() {
   const router = useRouter();

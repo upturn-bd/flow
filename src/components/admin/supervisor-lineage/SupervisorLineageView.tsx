@@ -7,7 +7,7 @@ import { Lineage } from "@/lib/types/schemas";
 import LineageCreateModal, {
   LineageUpdateModal,
 } from "./SupervisorLineageModal";
-import { TrashSimple, Plus, Eye, UsersThree } from "@phosphor-icons/react";
+import { TrashSimple, Plus, Eye, UsersThree } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 import {

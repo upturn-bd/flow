@@ -249,6 +249,19 @@ import {
   Users as UsersRound,
   Wallet,
   Archive as ArchiveIcon,
+  
+  // Additional missing icons (only ones not already imported above)
+  CalendarCheck,
+  ClockClockwise,
+  Factory,
+  FilePdf,
+  GlobeHemisphereWest,
+  NewspaperClipping,
+  Note,
+  Receipt,
+  ShieldWarning,
+  UserGear,
+  UsersThree,
 } from '@phosphor-icons/react';
 
 // Re-export with consistent naming
@@ -708,8 +721,33 @@ export default {
   User2,
   UsersRound,
   Wallet,
+  
+  // Additional icons
+  CalendarCheck,
+  ClockClockwise,
+  Factory,
+  FilePdf,
+  GlobeHemisphereWest,
+  NewspaperClipping,
+  Note,
+  Receipt,
+  ShieldWarning,
+  UserGear,
+  UsersThree,
 };
-
 
 // Alias exports for backward compatibility
 export { BookOpen as Book };
+export { Building as Buildings };
+export { Eye as EyeIcon };
+export { DollarSign as Money };
+export { DollarSign as MoneyIcon };
+export { DollarSign as CurrencyDollar };
+export { Receipt as ReceiptIcon };
+export { Layers as Stack };
+export { Layers as StackSimple };
+export { Trash as TrashSimple };
+export { Edit as PencilSimple };
+export { Home as House };
+export { RefreshCw as ArrowsClockwise };
+export { MessageCircle as ChatCircle };

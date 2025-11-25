@@ -9,7 +9,7 @@ import {
   Users,
   UserGear,
   House
-} from "@phosphor-icons/react";
+} from "@/lib/icons";
 import { ROUTES } from "@/lib/constants";
 
 const navItems = [

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Lock, LockOpen, Eye, PencilSimple, Trash, CheckCircle, ChatCircle } from "@phosphor-icons/react";
+import { Lock, LockOpen, Eye, PencilSimple, Trash, CheckCircle, ChatCircle } from "@/lib/icons";
 import { PermissionAction, PERMISSION_ACTIONS } from "@/lib/constants";
 
 interface PermissionBadgeProps {

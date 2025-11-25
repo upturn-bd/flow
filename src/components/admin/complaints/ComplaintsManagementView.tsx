@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
 import ComplaintTypeCreateModal from "./ComplaintsModal";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
-import { Tag, Plus, TrashSimple } from "@phosphor-icons/react";
+import { Tag, Plus, TrashSimple } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 

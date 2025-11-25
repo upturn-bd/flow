@@ -2,7 +2,7 @@
 import { useLineage } from "@/hooks/useSupervisorLineage";
 import { Lineage } from "@/lib/types/schemas";
 import { useEffect, useState } from "react";
-import { Trash, Plus, Buildings } from "@phosphor-icons/react";
+import { Trash, Plus, Buildings } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";

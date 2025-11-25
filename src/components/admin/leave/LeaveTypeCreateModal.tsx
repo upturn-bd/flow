@@ -2,7 +2,7 @@ import React from 'react';
 import { FormModal } from '@/components/ui/modals';
 import { FormField, NumberField, SelectField } from '@/components/forms';
 import { validateLeaveType, type LeaveTypeData } from '@/lib/validation';
-import { Tag } from '@phosphor-icons/react';
+import { Tag } from '@/lib/icons';
 
 interface LeaveTypeCreateModalProps {
   isOpen: boolean;

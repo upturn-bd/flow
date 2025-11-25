@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
-import { Plus } from "@phosphor-icons/react";
+import { Plus } from "@/lib/icons";
 import { useStakeholderTypes } from "@/hooks/useStakeholderTypes";
 import { StakeholderTypeFormData } from "@/hooks/useStakeholderTypes";
 import StakeholderTypeFormModal from "./StakeholderTypeFormModal";
 import Collapsible from "../CollapsibleComponent";
 import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { Tag, TrashSimple, PencilSimple } from "@phosphor-icons/react";
+import { Tag, TrashSimple, PencilSimple } from "@/lib/icons";
 
 export default function StakeholderTypeManagementView() {
   const {

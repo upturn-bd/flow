@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { ChartBar, Buildings, Users, GlobeHemisphereWest, Factory } from "@phosphor-icons/react";
+import { ChartBar, Buildings, Users, GlobeHemisphereWest, Factory } from "@/lib/icons";
 
 interface Stats {
   companies: number;

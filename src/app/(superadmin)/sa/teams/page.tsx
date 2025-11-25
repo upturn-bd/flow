@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Company, Team } from "@/lib/types/schemas";
-import { MagnifyingGlass, Users, Pencil, Trash, Plus } from "@phosphor-icons/react";
+import { MagnifyingGlass, Users, Pencil, Trash, Plus } from "@/lib/icons";
 import { toast } from "sonner";
 
 interface TeamWithDetails extends Team {

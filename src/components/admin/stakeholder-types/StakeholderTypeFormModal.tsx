@@ -2,7 +2,7 @@
 
 import { StakeholderTypeFormData } from "@/hooks/useStakeholderTypes";
 import { validateStakeholderType } from "@/lib/validation/schemas/stakeholders";
-import { Tag } from "@phosphor-icons/react";
+import { Tag } from "@/lib/icons";
 import { FormModal } from "@/components/ui/modals";
 import { FormField } from "@/components/forms";
 
