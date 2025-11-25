@@ -110,8 +110,8 @@ export default function SupervisorLineageView() {
     <Collapsible title="Supervisor Lineage">
       <div className="px-4 space-y-6 py-4">
         <div className="flex items-center gap-3 mb-4">
-          <UsersThree size={22} weight="duotone" className="text-gray-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Supervision Hierarchy</h3>
+          <UsersThree size={22} weight="duotone" className="text-foreground-secondary" />
+          <h3 className="text-lg font-semibold text-foreground-primary">Supervision Hierarchy</h3>
         </div>
 
         {loading ? (
@@ -132,12 +132,12 @@ export default function SupervisorLineageView() {
                   {groupedLineages.map((lineage: any, index: number) => (
                     <div
                       key={lineage.name}
-                      className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+                      className="p-4 bg-surface-primary rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all duration-300"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2 mb-3">
-                          <UsersThree size={20} weight="duotone" className="text-gray-600" />
-                          <h4 className="font-medium text-gray-800">{lineage.name}</h4>
+                          <UsersThree size={20} weight="duotone" className="text-foreground-secondary" />
+                          <h4 className="font-medium text-foreground-primary">{lineage.name}</h4>
                         </div>
                         <Button
                           variant="ghost"
@@ -145,19 +145,19 @@ export default function SupervisorLineageView() {
                           onClick={() => handleDeleteLineage(lineage.name)}
                           isLoading={deleteLoading === lineage.name}
                           disabled={deleteLoading === lineage.name}
-                          className="p-1 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-500"
+                          className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
                         >
                           <TrashSimple size={16} weight="bold" />
                         </Button>
                       </div>
 
-                      <div className="mt-2 pt-2 border-t border-gray-100">
+                      <div className="mt-2 pt-2 border-t border-border-primary">
                         <div className="flex flex-col sm:flex-row gap-2 items-center">
-                          <div className="px-3 py-1.5 rounded-md bg-gray-50 text-gray-600 text-sm border border-gray-200">
+                          <div className="px-3 py-1.5 rounded-md bg-background-secondary dark:bg-background-tertiary text-foreground-secondary text-sm border border-border-primary">
                             {lineage.details.length} position{lineage.details.length !== 1 ? 's' : ''}
                           </div>
-                          <span className="text-gray-400 text-sm hidden sm:inline">•</span>
-                          <div className="text-sm text-gray-500">
+                          <span className="text-foreground-tertiary text-sm hidden sm:inline">•</span>
+                          <div className="text-sm text-foreground-tertiary">
                             {lineage.details.length > 0 ? 'Hierarchy defined' : 'No positions assigned'}
                           </div>
                         </div>
@@ -168,7 +168,7 @@ export default function SupervisorLineageView() {
                           variant="outline"
                           size="sm"
                           onClick={() => setEditLineage(lineage.name)}
-                          className="text-sm flex items-center gap-1 text-gray-600 hover:text-gray-800"
+                          className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
                         >
                           <Eye size={16} weight="bold" />
                           View Details
@@ -180,17 +180,17 @@ export default function SupervisorLineageView() {
               ) : (
                 <div
                   key="empty-state"
-                  className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200"
+                  className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary"
                 >
                   <div className="flex justify-center mb-3">
                     <UsersThree
                       size={40}
                       weight="duotone"
-                      className="text-gray-400"
+                      className="text-foreground-tertiary"
                     />
                   </div>
-                  <p className="text-gray-500 mb-1">No supervision lineages found</p>
-                  <p className="text-gray-400 text-sm mb-4">Define reporting structures for your organization</p>
+                  <p className="text-foreground-tertiary mb-1">No supervision lineages found</p>
+                  <p className="text-foreground-tertiary text-sm mb-4">Define reporting structures for your organization</p>
                 </div>
               )}
             </AnimatePresence>
@@ -201,7 +201,7 @@ export default function SupervisorLineageView() {
           <Button
             variant="primary"
             onClick={() => setIsCreatingLineage(true)}
-            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"
+            className="flex items-center gap-2 bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white"
           >
             <Plus size={16} weight="bold" />
             Add Lineage

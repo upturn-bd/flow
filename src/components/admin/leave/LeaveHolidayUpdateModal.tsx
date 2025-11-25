@@ -24,7 +24,7 @@ export const LeaveHolidayUpdateModal: React.FC<LeaveHolidayUpdateModalProps> = (
   return (
     <FormModal<HolidayConfigData>
       title="Update Holiday"
-      icon={<CalendarBlank size={24} weight="duotone" className="text-gray-600" />}
+      icon={<CalendarBlank size={24} weight="duotone" className="text-foreground-secondary" />}
       initialValues={initialData}
       validationFn={validateHolidayConfig}
       onSubmit={onSubmit}
@@ -44,7 +44,7 @@ export const LeaveHolidayUpdateModal: React.FC<LeaveHolidayUpdateModalProps> = (
             error={errors.name}
             required
             placeholder="Enter holiday name"
-            icon={<CalendarBlank size={18} weight="duotone" className="text-gray-500" />}
+            icon={<CalendarBlank size={18} weight="duotone" className="text-foreground-tertiary" />}
           />
 
           <DateField

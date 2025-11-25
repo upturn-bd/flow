@@ -113,7 +113,7 @@ export default function SupervisorLineageCreateModal({
         size="md"
       >
         <div className="flex justify-center items-center py-8">
-          <div className="text-gray-500">Loading positions...</div>
+          <div className="text-foreground-tertiary">Loading positions...</div>
         </div>
       </BaseModal>
     );

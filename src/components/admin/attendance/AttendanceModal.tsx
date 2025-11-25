@@ -133,17 +133,17 @@ export default function AttendanceCreateModal({
         exit="exit"
         variants={modalVariants}
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-200"
+        className="bg-surface-primary p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-border-primary"
       >
         <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Buildings size={24} weight="duotone" className="text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-800">Configure Attendance Site</h2>
+            <Buildings size={24} weight="duotone" className="text-foreground-secondary" />
+            <h2 className="text-xl font-semibold text-foreground-primary">Configure Attendance Site</h2>
           </div>
           <Button
             variant="ghost"
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500"
+            className="p-1 rounded-full hover:bg-red-50 text-foreground-tertiary hover:text-red-500"
           >
             <X size={20} weight="bold" />
           </Button>
@@ -151,18 +151,18 @@ export default function AttendanceCreateModal({
 
         <motion.div variants={fadeInUp} className="space-y-4">
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="block font-semibold text-foreground-secondary mb-2">
               Site Name
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Buildings size={18} weight="duotone" className="text-gray-500" />
+                <Buildings size={18} weight="duotone" className="text-foreground-tertiary" />
               </div>
               <input
                 name="name"
                 value={formValues.name}
                 onChange={handleChange}
-                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
                 placeholder="Enter Site Name"
               />
             </div>
@@ -171,19 +171,19 @@ export default function AttendanceCreateModal({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold text-gray-700 mb-2">
+              <label className="block font-semibold text-foreground-secondary mb-2">
                 Check In Time
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Clock size={18} weight="duotone" className="text-gray-500" />
+                  <Clock size={18} weight="duotone" className="text-foreground-tertiary" />
                 </div>
                 <input
                   name="check_in"
                   type="time"
                   value={formValues.check_in}
                   onChange={handleChange}
-                  className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                  className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
                 />
               </div>
               {errors.check_in && (
@@ -192,19 +192,19 @@ export default function AttendanceCreateModal({
             </div>
 
             <div>
-              <label className="block font-semibold text-gray-700 mb-2">
+              <label className="block font-semibold text-foreground-secondary mb-2">
                 Check Out Time
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <ClockClockwise size={18} weight="duotone" className="text-gray-500" />
+                  <ClockClockwise size={18} weight="duotone" className="text-foreground-tertiary" />
                 </div>
                 <input
                   name="check_out"
                   type="time"
                   value={formValues.check_out}
                   onChange={handleChange}
-                  className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                  className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
                 />
               </div>
               {errors.check_out && (
@@ -214,8 +214,8 @@ export default function AttendanceCreateModal({
           </div>
 
           <div className="mt-2">
-            <label className="block font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <MapPin size={18} weight="duotone" className="text-gray-500" />
+            <label className="block font-semibold text-foreground-secondary mb-2 flex items-center gap-2">
+              <MapPin size={18} weight="duotone" className="text-foreground-tertiary" />
               Location
             </label>
             <div className="border border-gray-300 rounded-lg overflow-hidden">
@@ -239,7 +239,7 @@ export default function AttendanceCreateModal({
             type="button"
             variant="outline"
             onClick={onClose}
-            className="border border-gray-300 text-gray-700 hover:bg-gray-50"
+            className="border border-gray-300 text-foreground-secondary hover:bg-background-secondary dark:bg-background-tertiary"
           >
             Cancel
           </Button>
@@ -253,7 +253,7 @@ export default function AttendanceCreateModal({
               !isValid ||
               Object.keys(errors).length > 0
             }
-            className="bg-gray-800 hover:bg-gray-900 text-white"
+            className="bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white"
           >
             Create Site
           </Button>
@@ -371,17 +371,17 @@ export function AttendanceUpdateModal({
         exit="exit"
         variants={modalVariants}
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-200"
+        className="bg-surface-primary p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-border-primary"
       >
         <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Buildings size={24} weight="duotone" className="text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-800">Configure Attendance Site</h2>
+            <Buildings size={24} weight="duotone" className="text-foreground-secondary" />
+            <h2 className="text-xl font-semibold text-foreground-primary">Configure Attendance Site</h2>
           </div>
           <Button
             variant="ghost"
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500"
+            className="p-1 rounded-full hover:bg-red-50 text-foreground-tertiary hover:text-red-500"
           >
             <X size={20} weight="bold" />
           </Button>
@@ -389,18 +389,18 @@ export function AttendanceUpdateModal({
 
         <motion.div variants={fadeInUp} className="space-y-4">
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="block font-semibold text-foreground-secondary mb-2">
               Site Name
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Buildings size={18} weight="duotone" className="text-gray-500" />
+                <Buildings size={18} weight="duotone" className="text-foreground-tertiary" />
               </div>
               <input
                 name="name"
                 value={formValues.name}
                 onChange={handleChange}
-                className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
                 placeholder="Enter Site Name"
               />
             </div>
@@ -409,19 +409,19 @@ export function AttendanceUpdateModal({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold text-gray-700 mb-2">
+              <label className="block font-semibold text-foreground-secondary mb-2">
                 Check In Time
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Clock size={18} weight="duotone" className="text-gray-500" />
+                  <Clock size={18} weight="duotone" className="text-foreground-tertiary" />
                 </div>
                 <input
                   name="check_in"
                   type="time"
                   value={formValues.check_in}
                   onChange={handleChange}
-                  className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                  className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
                 />
               </div>
               {errors.check_in && (
@@ -430,19 +430,19 @@ export function AttendanceUpdateModal({
             </div>
 
             <div>
-              <label className="block font-semibold text-gray-700 mb-2">
+              <label className="block font-semibold text-foreground-secondary mb-2">
                 Check Out Time
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <ClockClockwise size={18} weight="duotone" className="text-gray-500" />
+                  <ClockClockwise size={18} weight="duotone" className="text-foreground-tertiary" />
                 </div>
                 <input
                   name="check_out"
                   type="time"
                   value={formValues.check_out}
                   onChange={handleChange}
-                  className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                  className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
                 />
               </div>
               {errors.check_out && (
@@ -452,8 +452,8 @@ export function AttendanceUpdateModal({
           </div>
 
           <div className="mt-2">
-            <label className="block font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <MapPin size={18} weight="duotone" className="text-gray-500" />
+            <label className="block font-semibold text-foreground-secondary mb-2 flex items-center gap-2">
+              <MapPin size={18} weight="duotone" className="text-foreground-tertiary" />
               Location
             </label>
             <div className="border border-gray-300 rounded-lg overflow-hidden">
@@ -477,7 +477,7 @@ export function AttendanceUpdateModal({
             type="button"
             variant="outline"
             onClick={onClose}
-            className="border border-gray-300 text-gray-700 hover:bg-gray-50"
+            className="border border-gray-300 text-foreground-secondary hover:bg-background-secondary dark:bg-background-tertiary"
           >
             Cancel
           </Button>
@@ -492,7 +492,7 @@ export function AttendanceUpdateModal({
               Object.keys(errors).length > 0 ||
               !isDirty
             }
-            className="bg-gray-800 hover:bg-gray-900 text-white"
+            className="bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white"
           >
             Update Site
           </Button>

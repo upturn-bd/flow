@@ -39,7 +39,7 @@ export const LeaveTypeCreateModal: React.FC<LeaveTypeCreateModalProps> = ({
   return (
     <FormModal<LeaveTypeData>
       title="Configure Leave Type"
-      icon={<Tag size={24} weight="duotone" className="text-gray-600" />}
+      icon={<Tag size={24} weight="duotone" className="text-foreground-secondary" />}
       initialValues={defaultData}
       validationFn={validateLeaveType}
       onSubmit={onSubmit}
@@ -59,7 +59,7 @@ export const LeaveTypeCreateModal: React.FC<LeaveTypeCreateModalProps> = ({
             error={errors.name}
             required
             placeholder="Enter leave type name"
-            icon={<Tag size={18} weight="duotone" className="text-gray-500" />}
+            icon={<Tag size={18} weight="duotone" className="text-foreground-tertiary" />}
           />
 
           <NumberField

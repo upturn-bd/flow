@@ -96,8 +96,8 @@ export default function ClaimSettlementView() {
     <Collapsible title="Settlement">
       <div className="px-4 space-y-6 py-4">
         <div className="flex items-center gap-3 mb-4">
-          <Receipt size={22} weight="duotone" className="text-gray-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Settlement Types</h3>
+          <Receipt size={22} weight="duotone" className="text-foreground-secondary" />
+          <h3 className="text-lg font-semibold text-foreground-primary">Settlement Types</h3>
         </div>
 
         {loading ? (
@@ -115,12 +115,12 @@ export default function ClaimSettlementView() {
                   {claimTypes.map((settlementType: SettlementType, idx) => (
                     <div
                       key={settlementType.id || idx}
-                      className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all"
+                      className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2 mb-2">
-                          <Receipt size={20} weight="duotone" className="text-gray-600" />
-                          <h4 className="font-medium text-gray-800">{settlementType.settlement_item}</h4>
+                          <Receipt size={20} weight="duotone" className="text-foreground-secondary" />
+                          <h4 className="font-medium text-foreground-primary">{settlementType.settlement_item}</h4>
                         </div>
                         <Button
                           variant="ghost"
@@ -128,15 +128,15 @@ export default function ClaimSettlementView() {
                           onClick={() => settlementType.id !== undefined && handleDeleteClaimType(settlementType.id)}
                           isLoading={deleteLoading === settlementType.id}
                           disabled={deleteLoading === settlementType.id}
-                          className="p-1 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-500"
+                          className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
                         >
                           <TrashSimple size={16} weight="bold" />
                         </Button>
                       </div>
                       
                       <div className="mt-2">
-                        <span className="flex items-center gap-1.5 text-sm bg-gray-100 px-2 py-1 rounded text-gray-700 w-fit">
-                          <MoneyIcon size={16} weight="duotone" className="text-gray-500" />
+                        <span className="flex items-center gap-1.5 text-sm bg-background-tertiary dark:bg-surface-secondary px-2 py-1 rounded text-foreground-secondary w-fit">
+                          <MoneyIcon size={16} weight="duotone" className="text-foreground-tertiary" />
                           Allowance: {formatCurrency(settlementType.allowance)}
                         </span>
                       </div>
@@ -146,7 +146,7 @@ export default function ClaimSettlementView() {
                           variant="outline"
                           size="sm"
                           onClick={() => settlementType.id !== undefined && setEditClaimType(settlementType.id)}
-                          className="text-sm flex items-center gap-1 text-gray-600 hover:text-gray-800"
+                          className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
                         >
                           <EyeIcon size={16} weight="bold" />
                           View Details
@@ -156,12 +156,12 @@ export default function ClaimSettlementView() {
                   ))}
                 </div>
               ) : (
-                <div className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
+                <div className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary">
                   <div className="flex justify-center mb-3">
-                    <ReceiptIcon size={40} weight="duotone" className="text-gray-400" />
+                    <ReceiptIcon size={40} weight="duotone" className="text-foreground-tertiary" />
                   </div>
-                  <p className="text-gray-500 mb-1">No settlement types found</p>
-                  <p className="text-gray-400 text-sm mb-4">Add settlement types to configure the settlement system</p>
+                  <p className="text-foreground-tertiary mb-1">No settlement types found</p>
+                  <p className="text-foreground-tertiary text-sm mb-4">Add settlement types to configure the settlement system</p>
                 </div>
               )}
             </AnimatePresence>
@@ -172,7 +172,7 @@ export default function ClaimSettlementView() {
           <Button
             variant="primary" 
             onClick={() => setIsCreatingSettlementType(true)}
-            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"
+            className="flex items-center gap-2 bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white"
           >
             <Plus size={16} weight="bold" />
             Add Settlement Type
