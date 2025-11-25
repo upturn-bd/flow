@@ -6,12 +6,11 @@ import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { StakeholderProcessStep, StakeholderStepData, FieldDefinition, NestedFieldValue } from "@/lib/types/schemas";
 import { Upload, X, CheckCircle2, File as FileIcon, Loader2, XCircle, Calculator, AlertCircle } from "lucide-react";
-import GeolocationPicker, { GeolocationValue } from "@/components/ui/GeolocationPicker";
+import GeolocationPicker from "@/components/ui/GeolocationPicker";
 import DropdownField from "@/components/ui/DropdownField";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 import Toggle from "@/components/ui/Toggle";
 import { calculateFieldValue, formatCalculatedValue, formulaToReadable } from "@/lib/utils/formula-evaluator";
-import { forEach } from "lodash";
 
 interface StepDataFormProps {
   stakeholderId: number;
