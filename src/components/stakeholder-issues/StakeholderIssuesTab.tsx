@@ -123,7 +123,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
   if (loading && issues.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
       </div>
     );
   }
@@ -133,8 +133,8 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Issues</h2>
-          <p className="text-xs sm:text-sm text-gray-600 mt-1">
+          <h2 className="text-lg sm:text-xl font-semibold text-foreground-primary">Issues</h2>
+          <p className="text-xs sm:text-sm text-foreground-tertiary mt-1">
             Track and manage issues for this stakeholder
           </p>
         </div>
@@ -143,7 +143,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
             setSelectedIssue(null);
             openCreateModal();
           }}
-          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex-shrink-0"
+          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm flex-shrink-0"
         >
           <Plus size={18} />
           <span className="hidden sm:inline">Add Issue</span>
@@ -160,9 +160,9 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
 
       {/* Empty State */}
       {!loading && issues.length === 0 && (
-        <div className="text-center py-8 sm:py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900">No issues yet</h3>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+        <div className="text-center py-8 sm:py-12 bg-background-secondary rounded-lg border-2 border-dashed border-border-secondary">
+          <h3 className="text-base sm:text-lg font-semibold text-foreground-primary">No issues yet</h3>
+          <p className="text-xs sm:text-sm text-foreground-tertiary mt-1">
             Create an issue to start tracking problems or requests
           </p>
           <button
@@ -170,7 +170,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
               setSelectedIssue(null);
               openCreateModal();
             }}
-            className="mt-4 inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+            className="mt-4 inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm"
           >
             <Plus size={18} />
             <span className="hidden sm:inline">Add Issue</span>
@@ -185,12 +185,12 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
           {issues.map((issue) => (
             <div
               key={issue.id}
-              className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow"
+              className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">{issue.title}</h3>
+                    <h3 className="text-sm sm:text-base font-semibold text-foreground-primary break-words">{issue.title}</h3>
                     <span className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(issue.status)}`}>
                       {getStatusIcon(issue.status)}
                       <span className="hidden sm:inline">{issue.status}</span>
@@ -202,7 +202,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
 
                   {/* Description */}
                   {issue.description && (
-                    <p className="text-xs sm:text-sm text-gray-600 mt-2 break-words">{issue.description}</p>
+                    <p className="text-xs sm:text-sm text-foreground-tertiary mt-2 break-words">{issue.description}</p>
                   )}
 
                   {/* Attachments */}
@@ -212,7 +212,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                         <button
                           key={index}
                           onClick={() => handleDownloadAttachment(attachment.path, attachment.originalName)}
-                          className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                          className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-background-secondary hover:bg-background-tertiary rounded transition-colors"
                         >
                           <Download size={12} />
                           <span className="truncate max-w-[150px] sm:max-w-none">{attachment.originalName}</span>
@@ -222,7 +222,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                   )}
 
                   {/* Metadata */}
-                  <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500">
+                  <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-foreground-tertiary">
                     <span>Created {issue.created_at ? new Date(issue.created_at).toLocaleDateString() : "N/A"}</span>
                     {issue.resolved_at && (
                       <>
@@ -240,14 +240,14 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                       setSelectedIssue(issue);
                       openCreateModal();
                     }}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded transition-colors"
                     title="Edit issue"
                   >
                     <Eye size={18} />
                   </button>
                   <button
                     onClick={() => issue.id && handleDeleteIssue(issue.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
                     title="Delete issue"
                   >
                     <Trash size={18} />

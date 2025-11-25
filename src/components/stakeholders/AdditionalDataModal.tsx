@@ -134,13 +134,13 @@ export default function AdditionalDataModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-surface-primary rounded-lg max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900">{title}</h2>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border-primary">
+          <h2 className="text-lg sm:text-xl font-bold text-foreground-primary">{title}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-foreground-tertiary hover:text-foreground-secondary transition-colors"
           >
             <X size={24} />
           </button>
@@ -151,7 +151,7 @@ export default function AdditionalDataModal({
           {/* Available Fields from Steps */}
           {availableFields.length > 0 && (
             <div>
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground-primary mb-3">
                 Select from Completed Steps
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
@@ -164,14 +164,14 @@ export default function AdditionalDataModal({
                       disabled={isSelected}
                       className={`text-left p-3 rounded-lg border transition-colors ${
                         isSelected
-                          ? "border-green-300 bg-green-50 text-gray-500 cursor-not-allowed"
-                          : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                          ? "border-green-300 bg-green-50 dark:bg-green-900/30 text-foreground-tertiary cursor-not-allowed"
+                          : "border-border-primary hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/30"
                       }`}
                     >
-                      <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">
+                      <p className="text-xs sm:text-sm font-medium text-foreground-secondary truncate">
                         {field.label}
                       </p>
-                      <p className="text-xs sm:text-sm text-gray-600 mt-1 truncate">
+                      <p className="text-xs sm:text-sm text-foreground-tertiary mt-1 truncate">
                         {typeof field.value === "boolean"
                           ? field.value
                             ? "Yes"
@@ -179,7 +179,7 @@ export default function AdditionalDataModal({
                           : String(field.value)}
                       </p>
                       {isSelected && (
-                        <p className="text-xs text-green-600 mt-1">✓ Selected</p>
+                        <p className="text-xs text-green-600 dark:text-green-400 mt-1">✓ Selected</p>
                       )}
                     </button>
                   );
@@ -191,20 +191,20 @@ export default function AdditionalDataModal({
           {/* Selected Fields */}
           {selectedFields.length > 0 && (
             <div>
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground-primary mb-3">
                 Selected Fields ({selectedFields.length})
               </h3>
               <div className="space-y-2">
                 {selectedFields.map((field) => (
                   <div
                     key={field.key}
-                    className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200"
+                    className="flex items-center justify-between p-3 bg-primary-50 dark:bg-primary-900/30 rounded-lg border border-primary-200 dark:border-primary-800"
                   >
                     <div className="flex-1 min-w-0 mr-2">
-                      <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                      <p className="text-xs sm:text-sm font-medium text-foreground-primary truncate">
                         {field.label}
                       </p>
-                      <p className="text-xs sm:text-sm text-gray-600 truncate">
+                      <p className="text-xs sm:text-sm text-foreground-tertiary truncate">
                         {typeof field.value === "boolean"
                           ? field.value
                             ? "Yes"
@@ -214,7 +214,7 @@ export default function AdditionalDataModal({
                     </div>
                     <button
                       onClick={() => handleRemoveField(field.key)}
-                      className="flex-shrink-0 text-red-600 hover:text-red-700 transition-colors"
+                      className="flex-shrink-0 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                     >
                       <Trash size={18} />
                     </button>
@@ -227,12 +227,12 @@ export default function AdditionalDataModal({
           {/* Custom Fields */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground-primary">
                 Custom Fields
               </h3>
               <button
                 onClick={handleAddCustomField}
-                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
                 <Plus size={16} />
                 Add Field
@@ -240,17 +240,17 @@ export default function AdditionalDataModal({
             </div>
             <div className="space-y-3">
               {customFields.length === 0 ? (
-                <p className="text-xs sm:text-sm text-gray-500 text-center py-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                <p className="text-xs sm:text-sm text-foreground-tertiary text-center py-6 bg-background-secondary rounded-lg border-2 border-dashed border-border-secondary">
                   No custom fields added. Click "Add Field" to create one.
                 </p>
               ) : (
                 customFields.map((field, index) => (
                   <div
                     key={field.key}
-                    className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200"
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 p-3 bg-background-secondary rounded-lg border border-border-primary"
                   >
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className="block text-xs font-medium text-foreground-secondary mb-1">
                         Field Label
                       </label>
                       <input
@@ -259,12 +259,12 @@ export default function AdditionalDataModal({
                         onChange={(e) =>
                           handleUpdateCustomField(index, { label: e.target.value })
                         }
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="w-full px-3 py-2 text-sm border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary text-foreground-primary"
                         placeholder="Field name"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className="block text-xs font-medium text-foreground-secondary mb-1">
                         Value
                       </label>
                       <div className="flex gap-2">
@@ -274,12 +274,12 @@ export default function AdditionalDataModal({
                           onChange={(e) =>
                             handleUpdateCustomField(index, { value: e.target.value })
                           }
-                          className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                          className="flex-1 px-3 py-2 text-sm border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary text-foreground-primary"
                           placeholder="Value"
                         />
                         <button
                           onClick={() => handleRemoveCustomField(index)}
-                          className="flex-shrink-0 px-2 text-red-600 hover:text-red-700 transition-colors"
+                          className="flex-shrink-0 px-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                         >
                           <Trash size={18} />
                         </button>
@@ -293,18 +293,18 @@ export default function AdditionalDataModal({
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-3 p-4 sm:p-6 border-t border-gray-200">
+        <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-3 p-4 sm:p-6 border-t border-border-primary">
           <button
             onClick={onClose}
             disabled={saving}
-            className="w-full sm:w-auto px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="w-full sm:w-auto px-4 py-2 text-sm border border-border-secondary text-foreground-secondary rounded-lg hover:bg-surface-hover transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving || (selectedFields.length === 0 && customFields.length === 0)}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save size={16} />
             {saving ? "Saving..." : "Save"}

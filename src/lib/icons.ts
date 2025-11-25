@@ -14,6 +14,7 @@ import {
   PencilSimple as Edit,
   FloppyDisk as Save,
   MagnifyingGlass as Search,
+  MagnifyingGlass,
   ArrowLeft,
   ArrowRight,
   ArrowUp,
@@ -160,7 +161,6 @@ import {
   Sparkle,
   Gift,
   Flag,
-  BookOpen as Book,
   BookOpen,
   Certificate,
   Shield,
@@ -261,7 +261,9 @@ export {
   Trash,
   Edit,
   Save,
+  FloppyDisk,
   Search,
+  MagnifyingGlass,
   ArrowLeft,
   ArrowRight,
   ArrowUp,
@@ -408,7 +410,7 @@ export {
   Sparkle,
   Gift,
   Flag,
-  Book,
+  BookOpen,
   Certificate,
   Shield,
   ShieldCheck,
@@ -511,7 +513,9 @@ export default {
   Trash,
   Edit,
   Save,
+  FloppyDisk,
   Search,
+  MagnifyingGlass,
   ArrowLeft,
   ArrowRight,
   ArrowUp,
@@ -625,7 +629,6 @@ export default {
   Sparkle,
   Gift,
   Flag,
-  Book,
   BookOpen,
   Certificate,
   Shield,
@@ -706,3 +709,7 @@ export default {
   UsersRound,
   Wallet,
 };
+
+
+// Alias exports for backward compatibility
+export { BookOpen as Book };

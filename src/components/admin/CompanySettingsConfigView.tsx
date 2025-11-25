@@ -55,11 +55,11 @@ export default function CompanySettingsConfigView({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="bg-white rounded-xl shadow-sm"
+        className="bg-surface-primary rounded-xl shadow-sm"
       >
-        <div className="border-b border-gray-200 px-3 py-4">
-          <h3 className="text-lg font-semibold text-gray-700 flex items-center">
-            <Activity className="w-5 h-5 mr-2 text-gray-600" />
+        <div className="border-b border-border-primary px-3 py-4">
+          <h3 className="text-lg font-semibold text-foreground-secondary flex items-center">
+            <Activity className="w-5 h-5 mr-2 text-foreground-tertiary" />
             Operations Settings
           </h3>
         </div>
@@ -82,11 +82,11 @@ export default function CompanySettingsConfigView({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
-        className="bg-white rounded-xl shadow-sm"
+        className="bg-surface-primary rounded-xl shadow-sm"
       >
-        <div className="border-b border-gray-200 px-3 py-4">
-          <h3 className="text-lg font-semibold text-gray-700 flex items-center">
-            <Timer className="w-5 h-5 mr-2 text-gray-600" />
+        <div className="border-b border-border-primary px-3 py-4">
+          <h3 className="text-lg font-semibold text-foreground-secondary flex items-center">
+            <Timer className="w-5 h-5 mr-2 text-foreground-tertiary" />
             Time Settings
           </h3>
         </div>

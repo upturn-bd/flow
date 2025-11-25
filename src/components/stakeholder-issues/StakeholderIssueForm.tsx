@@ -164,7 +164,7 @@ export default function StakeholderIssueForm({
       <div className="space-y-4">
         {/* Title */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground-secondary mb-1">
             Title <span className="text-red-500">*</span>
           </label>
           <input
@@ -172,8 +172,8 @@ export default function StakeholderIssueForm({
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-              errors.title ? "border-red-500" : "border-gray-300"
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary text-foreground-primary ${
+              errors.title ? "border-red-500" : "border-border-secondary"
             }`}
             placeholder="Enter issue title"
           />
@@ -184,15 +184,15 @@ export default function StakeholderIssueForm({
 
         {/* Priority */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground-secondary mb-1">
             Priority <span className="text-red-500">*</span>
           </label>
           <select
             name="priority"
             value={formData.priority}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-              errors.priority ? "border-red-500" : "border-gray-300"
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary text-foreground-primary ${
+              errors.priority ? "border-red-500" : "border-border-secondary"
             }`}
           >
             <option value="Low">Low</option>
@@ -207,7 +207,7 @@ export default function StakeholderIssueForm({
 
         {/* Assigned To */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground-secondary mb-1">
             Assign To Employee
           </label>
           <select
@@ -215,8 +215,8 @@ export default function StakeholderIssueForm({
             value={formData.assigned_to}
             onChange={handleChange}
             disabled={loadingEmployees}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-              errors.assigned_to ? "border-red-500" : "border-gray-300"
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary text-foreground-primary ${
+              errors.assigned_to ? "border-red-500" : "border-border-secondary"
             } ${loadingEmployees ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <option value="">-- Select an employee --</option>
@@ -229,22 +229,22 @@ export default function StakeholderIssueForm({
           {errors.assigned_to && (
             <p className="mt-1 text-sm text-red-600">{errors.assigned_to}</p>
           )}
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-foreground-tertiary">
             Optional: Assign this issue to a specific employee
           </p>
         </div>
 
         {/* Status */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground-secondary mb-1">
             Status <span className="text-red-500">*</span>
           </label>
           <select
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-              errors.status ? "border-red-500" : "border-gray-300"
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary text-foreground-primary ${
+              errors.status ? "border-red-500" : "border-border-secondary"
             }`}
           >
             <option value="Pending">Pending</option>
@@ -258,7 +258,7 @@ export default function StakeholderIssueForm({
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground-secondary mb-1">
             Description
           </label>
           <textarea
@@ -266,8 +266,8 @@ export default function StakeholderIssueForm({
             value={formData.description}
             onChange={handleChange}
             rows={4}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none ${
-              errors.description ? "border-red-500" : "border-gray-300"
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none bg-surface-primary text-foreground-primary ${
+              errors.description ? "border-red-500" : "border-border-secondary"
             }`}
             placeholder="Describe the issue in detail..."
           />
@@ -278,26 +278,26 @@ export default function StakeholderIssueForm({
 
         {/* File Attachments */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground-secondary mb-1">
             Attachments
           </label>
           <div className="space-y-3">
             {/* Existing Attachments (for edit mode) */}
             {existingAttachments.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs font-medium text-gray-600">Existing Attachments</p>
+                <p className="text-xs font-medium text-foreground-tertiary">Existing Attachments</p>
                 {existingAttachments.map((attachment, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 bg-blue-50 rounded border border-blue-200"
+                    className="flex items-center justify-between p-3 bg-primary-50 dark:bg-primary-900/30 rounded border border-primary-200 dark:border-primary-800"
                   >
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileText size={16} className="text-blue-600 flex-shrink-0" />
-                      <span className="text-sm text-gray-700 truncate">
+                      <FileText size={16} className="text-primary-600 flex-shrink-0" />
+                      <span className="text-sm text-foreground-secondary truncate">
                         {attachment.originalName}
                       </span>
                       {attachment.size && (
-                        <span className="text-xs text-gray-500 whitespace-nowrap">
+                        <span className="text-xs text-foreground-tertiary whitespace-nowrap">
                           ({(attachment.size / 1024).toFixed(1)} KB)
                         </span>
                       )}
@@ -307,11 +307,11 @@ export default function StakeholderIssueForm({
                         type="button"
                         onClick={() => handleDownloadAttachment(attachment.path, attachment.originalName)}
                         disabled={downloadingAttachment === attachment.path}
-                        className="p-1.5 text-blue-600 hover:bg-blue-100 rounded transition-colors disabled:opacity-50"
+                        className="p-1.5 text-primary-600 hover:bg-primary-100 dark:hover:bg-primary-900/50 rounded transition-colors disabled:opacity-50"
                         title="Download"
                       >
                         {downloadingAttachment === attachment.path ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600"></div>
                         ) : (
                           <Download size={16} />
                         )}
@@ -321,7 +321,7 @@ export default function StakeholderIssueForm({
                           type="button"
                           onClick={() => handleRemoveExistingAttachment(attachment.path)}
                           disabled={deletingAttachment === attachment.path}
-                          className="p-1.5 text-red-600 hover:bg-red-100 rounded transition-colors disabled:opacity-50"
+                          className="p-1.5 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50 rounded transition-colors disabled:opacity-50"
                           title="Delete"
                         >
                           {deletingAttachment === attachment.path ? (
@@ -340,12 +340,12 @@ export default function StakeholderIssueForm({
             {/* File Input for New Uploads */}
             <div>
               {existingAttachments.length > 0 && (
-                <p className="text-xs font-medium text-gray-600 mb-2">Add New Attachments</p>
+                <p className="text-xs font-medium text-foreground-tertiary mb-2">Add New Attachments</p>
               )}
-              <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+              <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-border-secondary rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
                 <div className="flex flex-col items-center gap-2">
-                  <Upload size={24} className="text-gray-400" />
-                  <span className="text-sm text-gray-600">
+                  <Upload size={24} className="text-foreground-tertiary" />
+                  <span className="text-sm text-foreground-tertiary">
                     Click to upload files (max 10MB each, up to 10 files total)
                   </span>
                 </div>
@@ -367,25 +367,25 @@ export default function StakeholderIssueForm({
             {/* New File List */}
             {files.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs font-medium text-gray-600">New Files to Upload</p>
+                <p className="text-xs font-medium text-foreground-tertiary">New Files to Upload</p>
                 {files.map((file, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-2 bg-green-50 rounded border border-green-200"
+                    className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-900/30 rounded border border-green-200 dark:border-green-800"
                   >
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileText size={16} className="text-green-600 flex-shrink-0" />
-                      <span className="text-sm text-gray-700 truncate">
+                      <FileText size={16} className="text-green-600 dark:text-green-400 flex-shrink-0" />
+                      <span className="text-sm text-foreground-secondary truncate">
                         {file.name}
                       </span>
-                      <span className="text-xs text-gray-500 whitespace-nowrap">
+                      <span className="text-xs text-foreground-tertiary whitespace-nowrap">
                         ({(file.size / 1024).toFixed(1)} KB)
                       </span>
                     </div>
                     <button
                       type="button"
                       onClick={() => removeFile(index)}
-                      className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                      className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/50 rounded transition-colors"
                     >
                       <Trash size={16} />
                     </button>
@@ -398,19 +398,19 @@ export default function StakeholderIssueForm({
       </div>
 
       {/* Submit Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-primary">
         <button
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+          className="px-4 py-2 border border-border-secondary text-foreground-secondary rounded-lg hover:bg-surface-hover disabled:opacity-50"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
         >
           {isSubmitting ? "Saving..." : submitLabel}
         </button>
