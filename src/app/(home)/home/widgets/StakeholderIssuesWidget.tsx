@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { AlertCircle, Plus, RefreshCw, FileText } from 'lucide-react';
-import { staggerContainer, fadeInUp } from '@/components/ui/animations';
+
 import SectionHeader from '@/app/(home)/home/components/SectionHeader';
 import SectionContainer from '@/app/(home)/home/components/SectionContainer';
 import LoadingSection from '@/app/(home)/home/components/LoadingSection';
@@ -92,10 +92,7 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
               <LoadingSection text="Loading issues..." icon={AlertCircle} />
             </div>
           ) : (
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              animate="visible"
+            <div
               className="px-5 pb-5 flex-1 overflow-hidden flex flex-col"
             >
               <div className="flex items-center justify-between mb-4 flex-shrink-0">
@@ -128,7 +125,9 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
                   issues.slice(0, 5).map((issue) => (
                     <motion.div
                       key={issue.id}
-                      variants={fadeInUp}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: 0.05 }}
                       onClick={() => handleIssueClick(issue.id!)}
                       className="px-4 py-3 bg-gray-50 hover:bg-red-50 rounded-lg transition-colors border border-gray-100 cursor-pointer"
                     >
@@ -167,7 +166,7 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
                   />
                 )}
               </div>
-            </motion.div>
+            </div>
           )}
         </div>
       </BaseWidget>

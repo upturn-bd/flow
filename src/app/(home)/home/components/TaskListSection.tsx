@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckSquare, Clock } from 'lucide-react';
-import { staggerContainer, fadeInUp } from '@/components/ui/animations';
+
 import { cn } from '@/components/ui/class';
 import { formatDateToDayMonth } from '@/lib/utils';
 import SectionHeader from './SectionHeader';
@@ -35,8 +35,7 @@ export default function TaskListSection({
       {loading ? (
         <LoadingSection text="Loading tasks..." icon={CheckSquare} />
       ) : (
-        <motion.div
-          variants={staggerContainer} 
+        <div
           className="bg-white rounded-xl p-5 shadow-sm border border-gray-100"
         >
           <div className="space-y-3">
@@ -44,7 +43,9 @@ export default function TaskListSection({
               tasks.map((task) => (
                 <motion.div
                   key={task.id}
-                  variants={fadeInUp}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: 0.05 }}
                   onClick={() => task.id && onTaskClick(task.id)}
                   className="flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-blue-50 rounded-lg transition-colors text-sm font-medium border border-gray-100 cursor-pointer"
                 >
@@ -67,7 +68,7 @@ export default function TaskListSection({
               <EmptyState icon={CheckSquare} message="No tasks available at this time" />
             )}
           </div>
-        </motion.div>
+        </div>
       )}
     </>
   );

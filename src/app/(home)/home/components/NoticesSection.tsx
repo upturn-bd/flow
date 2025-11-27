@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Bell, RefreshCw, AlertCircle, Plus } from 'lucide-react';
-import { staggerContainer, fadeInUp } from '@/components/ui/animations';
+
 import SectionHeader from './SectionHeader';
 import EmptyState from './EmptyState';
 import LoadingSection from './LoadingSection';
@@ -159,10 +159,7 @@ export default function NoticesSection({
             <LoadingSection text="Loading notices..." icon={Bell} />
           </div>
         ) : (
-          <motion.ul 
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
+          <ul 
             className="space-y-3 mt-6 flex-1 overflow-y-auto min-h-0"
           >
             {filteredNotices.length > 0 ? (
@@ -171,7 +168,9 @@ export default function NoticesSection({
                 return (
                   <motion.li 
                     key={item.id} 
-                    variants={fadeInUp}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: 0.05 }}
                     onClick={() => item.id && handleNoticeClick(item.id)}
                     className={`flex justify-between items-center p-3 rounded-lg hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer ${
                       isRead ? 'opacity-70' : ''
@@ -222,7 +221,7 @@ export default function NoticesSection({
                 } 
               />
             )}
-          </motion.ul>
+          </ul>
         )}
       </div>
     </div>

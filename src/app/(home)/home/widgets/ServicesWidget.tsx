@@ -13,7 +13,7 @@ import {
   CreditCard,
   ArrowRight
 } from 'lucide-react';
-import { staggerContainer, fadeInUp } from '@/components/ui/animations';
+
 import BaseWidget from './BaseWidget';
 import { WidgetProps } from '@/lib/types/widgets';
 import SectionHeader from '../components/SectionHeader';
@@ -120,17 +120,16 @@ export default function ServicesWidget({ config, isEditMode, onToggle, onSizeCha
           <SectionHeader title="Services" icon={Briefcase} iconColor="text-gray-600" />
         </div>
         
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
+        <div
           className="px-5 pb-5 flex-1 overflow-hidden flex flex-col"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1 overflow-y-auto min-h-0">
             {services.map((service) => (
               <motion.button
                 key={service.route}
-                variants={fadeInUp}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, delay: 0.05 }}
                 onClick={() => handleServiceClick(service.route)}
                 className={cn(
                   'flex items-center justify-between p-4 rounded-lg transition-all text-left border border-gray-100',
@@ -162,7 +161,7 @@ export default function ServicesWidget({ config, isEditMode, onToggle, onSizeCha
               </motion.button>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </BaseWidget>
   );
