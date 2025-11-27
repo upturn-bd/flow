@@ -3,7 +3,6 @@
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { fadeIn } from '@/components/ui/animations';
 
 interface EmptyStateProps {
   icon: LucideIcon;
@@ -18,7 +17,9 @@ export default function EmptyState({
 }: EmptyStateProps) {
   return (
     <motion.div 
-      variants={fadeIn}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
       className="flex flex-col items-center justify-center h-full min-h-[120px] text-gray-500"
     >
       <Icon size={iconSize} className="text-gray-300 mb-3" />

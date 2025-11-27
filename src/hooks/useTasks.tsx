@@ -190,6 +190,7 @@ export function useTasks() {
           .from("task_records")
           .select("*")
           .eq("status", false)
+          .eq("company_id", employeeInfo.company_id) // Always filter by company
           .order("id", { ascending: true }) // pagination cursor
           .limit(limit);
 
@@ -244,6 +245,7 @@ export function useTasks() {
           .from("task_records")
           .select("*")
           .eq("status", false)
+          .eq("company_id", employeeInfo.company_id) // Always filter by company
           .order("id", { ascending: true })
           .limit(limit);
 
@@ -311,6 +313,7 @@ export function useTasks() {
           .from("task_records")
           .select("*")
           .eq("status", true)
+          .eq("company_id", employeeInfo.company_id) // Always filter by company
           .order("id", { ascending: true }) // Order by ID for cursor pagination
           .limit(limit);
 
@@ -364,6 +367,7 @@ export function useTasks() {
           .from("task_records")
           .select("*")
           .eq("status", true) // completed tasks only
+          .eq("company_id", employeeInfo.company_id) // Always filter by company
           .order("id", { ascending: true })
           .limit(limit);
 

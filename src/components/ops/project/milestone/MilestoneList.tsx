@@ -10,6 +10,8 @@ import {
   Plus,
   Target,
   Users,
+  Copy,
+  Scale,
 } from "lucide-react";
 import { type Milestone as MilestoneType } from "./MilestoneForm";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
@@ -22,7 +24,51 @@ interface MilestoneListProps {
   onEdit: (milestone_title: string) => void;
   onDelete: (milestone_title: string) => void;
   onAdd: () => void;
+  onCopy?: (milestone: MilestoneType) => void;
+  onDistributeEvenly?: () => void;
   employees: { id: string; name: string }[];
+}
+
+// Weightage progress bar component
+function WeightageProgressBar({ total }: { total: number }) {
+  const getProgressColor = () => {
+    if (total === 100) return "bg-green-500";
+    if (total > 100) return "bg-red-500";
+    return "bg-blue-500";
+  };
+
+  const getTextColor = () => {
+    if (total === 100) return "text-green-700";
+    if (total > 100) return "text-red-700";
+    return "text-blue-700";
+  };
+
+  const getBgColor = () => {
+    if (total === 100) return "bg-green-50 border-green-200";
+    if (total > 100) return "bg-red-50 border-red-200";
+    return "bg-blue-50 border-blue-200";
+  };
+
+  return (
+    <div className={`p-3 rounded-lg border ${getBgColor()} mb-4`}>
+      <div className="flex items-center justify-between mb-2">
+        <span className={`text-sm font-medium ${getTextColor()}`}>
+          Total Weightage: {total}%
+        </span>
+        <span className={`text-xs ${getTextColor()}`}>
+          {total === 100 ? "✓ Complete" : total > 100 ? "⚠ Over allocated" : `${100 - total}% remaining`}
+        </span>
+      </div>
+      <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${Math.min(total, 100)}%` }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className={`h-2.5 rounded-full ${getProgressColor()}`}
+        />
+      </div>
+    </div>
+  );
 }
 
 export default function MilestoneList({
@@ -30,6 +76,8 @@ export default function MilestoneList({
   onEdit,
   onDelete,
   onAdd,
+  onCopy,
+  onDistributeEvenly,
   employees,
 }: MilestoneListProps) {
   const totalWeightage = milestones.reduce((sum, m) => sum + m.weightage, 0);
@@ -38,12 +86,24 @@ export default function MilestoneList({
     <Card>
       <CardHeader 
         title="Milestones"
-        subtitle={`Total weightage: ${totalWeightage}%`}
+        subtitle={milestones.length > 0 ? `${milestones.length} milestone${milestones.length > 1 ? 's' : ''}` : undefined}
         icon={<Target size={20} />}
         action={
-          totalWeightage < 100 && (
+          <div className="flex items-center gap-2">
+            {milestones.length >= 2 && onDistributeEvenly && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={onDistributeEvenly}
+                title="Distribute weightage evenly"
+              >
+                <Scale size={16} className="mr-1" />
+                Distribute
+              </Button>
+            )}
             <Button
-            type="button"
+              type="button"
               variant="outline"
               size="sm"
               onClick={onAdd}
@@ -51,11 +111,16 @@ export default function MilestoneList({
               <Plus size={16} className="mr-2" />
               Add Milestone
             </Button>
-          )
+          </div>
         }
       />
       
       <CardContent>
+        {/* Weightage Progress Bar - show when there are milestones */}
+        {milestones.length > 0 && (
+          <WeightageProgressBar total={totalWeightage} />
+        )}
+
         {milestones.length > 0 ? (
           <div className="space-y-4">
             <AnimatePresence mode="popLayout">
@@ -76,6 +141,17 @@ export default function MilestoneList({
                         {m.weightage}%
                       </span>
                       <div className="flex gap-1">
+                        {onCopy && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onCopy(m)}
+                            title="Copy milestone"
+                          >
+                            <Copy size={14} />
+                          </Button>
+                        )}
                         <Button
                           type="button"
                           variant="ghost"
@@ -84,6 +160,7 @@ export default function MilestoneList({
                             console.log(m)
                             m.milestone_title && onEdit(m.milestone_title)
                           }}
+                          title="Edit milestone"
                         >
                           <Pencil size={14} />
                         </Button>
@@ -92,6 +169,7 @@ export default function MilestoneList({
                           variant="ghost"
                           size="sm"
                           onClick={() => m.milestone_title && onDelete(m.milestone_title)}
+                          title="Delete milestone"
                         >
                           <Trash2 size={14} />
                         </Button>
@@ -143,14 +221,12 @@ export default function MilestoneList({
           <EmptyState 
             icon={<Target className="h-8 w-8" />}
             title="No milestones yet"
-            description="Add milestones to track project progress and break down work into manageable parts"
-            action={
-              totalWeightage < 100 ? {
-                label: "Add First Milestone",
-                onClick: onAdd,
-                icon: <Plus size={16} />
-              } : undefined
-            }
+            description="Add milestones to track project progress and break down work into manageable parts. Milestones help divide your project into phases with specific weightage."
+            action={{
+              label: "Add First Milestone",
+              onClick: onAdd,
+              icon: <Plus size={16} />
+            }}
           />
         )}
       </CardContent>

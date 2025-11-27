@@ -12,6 +12,8 @@ interface MilestoneUpdateModalProps {
   onSubmit: (data: MilestoneData) => void;
   onClose: () => void;
   isLoading?: boolean;
+  projectStartDate?: string;
+  projectEndDate?: string;
 }
 
 const statusOptions = [
@@ -25,7 +27,9 @@ export default function MilestoneUpdateModal({
   initialData,
   onSubmit,
   onClose,
-  isLoading = false
+  isLoading = false,
+  projectStartDate,
+  projectEndDate,
 }: MilestoneUpdateModalProps) {
   const [formData, setFormData] = useState<MilestoneData>(initialData);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -59,13 +63,20 @@ export default function MilestoneUpdateModal({
 
 
   const handleInputChange = (field: keyof MilestoneData, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      
+      // If start date is set after end date, adjust end date to match
+      if (field === 'start_date' && value && prev.end_date && new Date(value) > new Date(prev.end_date)) {
+        newData.end_date = value;
+      }
+      
+      return newData;
+    });
 
     // Clear error when user starts typing
-    if (errors[field]) {
+    const fieldKey = field as string;
+    if (errors[fieldKey]) {
       setErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors[field];
@@ -106,6 +117,17 @@ export default function MilestoneUpdateModal({
     return 100 - (currentTotalWeightage);
   };
 
+  const getWeightageError = () => {
+    const maxWeightage = getMaxWeightage() + (initialData.weightage || 0);
+    if (formData.weightage != null && formData.weightage > maxWeightage) {
+      return `Weightage cannot exceed ${maxWeightage}% (Available: ${getMaxWeightage()}% + Current: ${initialData.weightage}%)`;
+    }
+    if (formData.weightage != null && formData.weightage < 1) {
+      return 'Weightage must be at least 1%';
+    }
+    return undefined;
+  };
+
 
   return (
     <BaseModal
@@ -134,23 +156,28 @@ export default function MilestoneUpdateModal({
           rows={3}
         />
 
-        <div className="flex flex-wrap gap-2 mt-6">
-          <span className="text-sm font-medium text-blue-700 bg-blue-100 px-4 py-1 rounded-full shadow-sm">
-            Weightage: {formData.weightage}%
-          </span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <NumberField
+            label="Weightage (%)"
+            name="weightage"
+            value={formData.weightage ?? 0}
+            onChange={(value) => handleInputChange('weightage', value)}
+            min={1}
+            max={getMaxWeightage() + (initialData.weightage || 0)}
+            error={errors.weightage || getWeightageError()}
+            placeholder="Enter weightage percentage"
+            required
+          />
 
-          <span
-            className={`text-sm font-medium px-4 py-1 rounded-full shadow-sm ${formData.status === "Not Started"
-              ? "text-red-700 bg-red-100"
-              : formData.status === "In Progress"
-                ? "text-yellow-700 bg-yellow-100"
-                : formData.status === "Completed"
-                  ? "text-green-700 bg-green-100"
-                  : "text-gray-700 bg-gray-100"
-              }`}
-          >
-            Status: {formData.status}
-          </span>
+          <SelectField
+            label="Status"
+            value={formData.status}
+            onChange={(e) => handleInputChange('status', e.target.value)}
+            options={statusOptions}
+            placeholder="Select status"
+            error={errors.status}
+            required
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -161,6 +188,8 @@ export default function MilestoneUpdateModal({
             onChange={(e) => handleInputChange('start_date', e.target.value)}
             error={errors.start_date}
             required
+            min={projectStartDate}
+            max={projectEndDate}
           />
 
           <DateField
@@ -170,8 +199,17 @@ export default function MilestoneUpdateModal({
             onChange={(e) => handleInputChange('end_date', e.target.value)}
             error={errors.end_date}
             required
+            min={formData.start_date || projectStartDate}
+            max={projectEndDate}
           />
         </div>
+
+        {/* Project date hint */}
+        {(projectStartDate || projectEndDate) && (
+          <p className="text-xs text-gray-500 -mt-2">
+            Project timeline: {projectStartDate || 'N/A'} to {projectEndDate || 'N/A'}
+          </p>
+        )}
 
 
 

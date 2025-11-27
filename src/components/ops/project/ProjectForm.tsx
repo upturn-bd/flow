@@ -19,6 +19,7 @@ import {
 import { type MilestoneData } from "@/lib/validation/schemas/advanced";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
+import { SingleEmployeeSelector } from "@/components/forms";
 import AssigneeSelect from "./AssigneeSelect";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { Project, Employee } from "@/lib/types/schemas";
@@ -148,11 +149,38 @@ export default function ProjectForm({
 
 
   const handleAddMilestoneClick = () => {
+    // Smart date defaults:
+    // - First milestone: use project start/end dates
+    // - Subsequent milestones: start from last milestone's end date
+    const isFirstMilestone = milestones.length === 0;
+    
+    let defaultStartDate = "";
+    let defaultEndDate = "";
+    
+    if (isFirstMilestone) {
+      defaultStartDate = projectDetails.start_date || "";
+      defaultEndDate = projectDetails.end_date || "";
+    } else {
+      // Find the latest end date among existing milestones
+      const sortedByEndDate = [...milestones]
+        .filter(m => m.end_date)
+        .sort((a, b) => new Date(b.end_date!).getTime() - new Date(a.end_date!).getTime());
+      
+      if (sortedByEndDate.length > 0) {
+        // Start from the day after the last milestone ends
+        const lastEndDate = new Date(sortedByEndDate[0].end_date!);
+        lastEndDate.setDate(lastEndDate.getDate() + 1);
+        defaultStartDate = lastEndDate.toISOString().split('T')[0];
+        // Default end date to project end date
+        defaultEndDate = projectDetails.end_date || "";
+      }
+    }
+    
     setMilestone({
       milestone_title: "",
       description: "",
-      start_date: "",
-      end_date: "",
+      start_date: defaultStartDate,
+      end_date: defaultEndDate,
       weightage: Math.max(1, 100 - getTotalMilestoneWeightage()),
       status: "Not Started",
       project_id: initialData.id || "",
@@ -273,11 +301,19 @@ export default function ProjectForm({
 
   const handleAddMilestone = (newMilestone: Milestone) => {
     const projectId = initialData.id || ""; // use existing project ID if editing
+    // Generate a unique temporary ID for new milestones
+    const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
     setMilestones((prev) => [
       ...prev,
-      { ...newMilestone, project_id: projectId },
+      { ...newMilestone, project_id: projectId, id: tempId as any },
     ]);
     setIsCreatingMilestone(false);
+    // Clear milestone weightage error when milestone is added
+    setErrors((prev) => {
+      const { milestone_weightage, ...rest } = prev;
+      return rest;
+    });
   };
 
 
@@ -288,18 +324,82 @@ export default function ProjectForm({
       weightage: updatedMilestone.weightage ?? 0
     };
 
+    // Use ID for matching, but handle temp IDs (strings starting with 'temp_')
+    const isTemporaryMilestone = typeof milestoneData.id === 'string' && String(milestoneData.id).startsWith('temp_');
+    
     setMilestones((prev) =>
-      prev.map((m) => (m.id === milestoneData.id ? milestoneData as any : m))
+      prev.map((m) => {
+        // Match by ID (works for both DB IDs and temp IDs)
+        if (m.id === milestoneData.id) {
+          return milestoneData as any;
+        }
+        return m;
+      })
     );
 
-    await updateMilestone(milestoneData.id || 0, milestoneData);
+    // Only call updateMilestone API for real DB milestones (not temp ones)
+    if (!isTemporaryMilestone && milestoneData.id) {
+      await updateMilestone(milestoneData.id as number, milestoneData);
+    }
 
     setSelectedMilestone(null);
+    // Clear milestone weightage error when milestone is updated
+    setErrors((prev) => {
+      const { milestone_weightage, ...rest } = prev;
+      return rest;
+    });
   };
 
 
   const handleDeleteMilestone = (milestone_title: string) => {
     setMilestones((prev) => prev.filter((m) => m.milestone_title !== milestone_title));
+    // Clear milestone weightage error when milestone is deleted
+    setErrors((prev) => {
+      const { milestone_weightage, ...rest } = prev;
+      return rest;
+    });
+  };
+
+  // Distribute weightage evenly among all milestones
+  const handleDistributeEvenly = () => {
+    if (milestones.length === 0) return;
+    
+    const evenWeightage = Math.floor(100 / milestones.length);
+    const remainder = 100 - (evenWeightage * milestones.length);
+    
+    setMilestones((prev) =>
+      prev.map((m, index) => ({
+        ...m,
+        // Give the remainder to the first milestone(s)
+        weightage: evenWeightage + (index < remainder ? 1 : 0),
+      }))
+    );
+    
+    // Clear any weightage errors
+    setErrors((prev) => {
+      const { milestone_weightage, ...rest } = prev;
+      return rest;
+    });
+  };
+
+  // Copy a milestone
+  const handleCopyMilestone = (milestone: Milestone) => {
+    const baseName = milestone.milestone_title?.split(' (Copy')[0] || '';
+    const copyNumber = milestones.filter(m => 
+      m.milestone_title?.startsWith(baseName)
+    ).length;
+    
+    // Generate a unique temporary ID for new milestones (negative to distinguish from DB IDs)
+    const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    const copiedMilestone: Milestone = {
+      ...milestone,
+      id: tempId as any, // Temporary unique ID for local state management
+      milestone_title: `${baseName} (Copy${copyNumber > 0 ? ` ${copyNumber}` : ''})`,
+      weightage: Math.min(milestone.weightage, Math.max(1, 100 - getTotalMilestoneWeightage())),
+    };
+    
+    setMilestones((prev) => [...prev, copiedMilestone]);
   };
 
   return (
@@ -453,18 +553,22 @@ export default function ProjectForm({
         </motion.div>
 
 
-        <FormSelectField
-          name="project_lead_id"
+        <SingleEmployeeSelector
+          value={projectDetails.project_lead_id || ""}
+          onChange={(value) => {
+            setTouched((prev) => ({ ...prev, project_lead_id: true }));
+            setProjectDetails((prev) => ({ ...prev, project_lead_id: value }));
+          }}
+          employees={filteredEmployees}
           label="Project Lead"
-          icon={<UserCircle size={16} className="text-gray-500" />}
-          value={projectDetails.project_lead_id || null}
-          onChange={handleInputChange}
           error={errors.project_lead_id}
-          options={filteredEmployees.map((emp) => ({
-            value: emp.id,
-            label: emp.name,
-          }))}
-          placeholder="Select Project Lead"
+          placeholder={
+            !projectDetails.department_ids || projectDetails.department_ids.length === 0 || projectDetails.department_ids.every(id => id === 0)
+              ? "Select a department first..."
+              : "Search and select project lead..."
+          }
+          disabled={!projectDetails.department_ids || projectDetails.department_ids.length === 0 || projectDetails.department_ids.every(id => id === 0)}
+          required
         />
       </div>
 
@@ -510,9 +614,10 @@ export default function ProjectForm({
             setSelectedMilestone(milestoneToUpdate);
           }
         }}
-
         onDelete={handleDeleteMilestone}
         onAdd={handleAddMilestoneClick}
+        onCopy={handleCopyMilestone}
+        onDistributeEvenly={handleDistributeEvenly}
         employees={selectedAssigneeObjects}
       />
 
@@ -527,6 +632,8 @@ export default function ProjectForm({
           currentWeightage={getTotalMilestoneWeightage()}
           mode="create"
           isSubmitting={isSubmitting}
+          projectStartDate={projectDetails.start_date}
+          projectEndDate={projectDetails.end_date}
         />
       )}
 
@@ -535,7 +642,9 @@ export default function ProjectForm({
           initialData={selectedMilestone}
           onSubmit={handleUpdateMilestone}
           onClose={() => setSelectedMilestone(null)}
-          currentTotalWeightage={getTotalMilestoneWeightage()}
+          currentTotalWeightage={getTotalMilestoneWeightage() - (selectedMilestone.weightage || 0)}
+          projectStartDate={projectDetails.start_date}
+          projectEndDate={projectDetails.end_date}
         />
       )}
 

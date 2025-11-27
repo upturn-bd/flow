@@ -217,7 +217,6 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
       <Card>
         <CardHeader 
           title={taskDetails?.task_title || "Untitled Task"}
-          subtitle={taskDetails?.task_description || "No description available"}
           icon={<Target size={20} />}
           action={
             <StatusBadge 

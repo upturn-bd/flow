@@ -89,7 +89,9 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
       // Create milestones if provided
       if (milestones.length > 0) {
         for (const m of milestones) {
-          const milestoneToCreate = { ...m, project_id: projectId };
+          // Remove temporary ID before sending to database - database will generate real ID
+          const { id: _tempId, ...milestoneWithoutId } = m;
+          const milestoneToCreate = { ...milestoneWithoutId, project_id: projectId };
           const milestoneResult = await createMilestone(milestoneToCreate);
           if (!milestoneResult.success) {
             await supabase.from("project_records").delete().match({ id: projectId });
