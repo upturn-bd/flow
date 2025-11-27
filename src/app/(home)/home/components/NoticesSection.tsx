@@ -11,7 +11,7 @@ import LoadingSection from './LoadingSection';
 interface Notice {
   id?: number;
   title: string;
-  urgency?: string;
+  urgency?: "low" | "normal" | "high" | "urgent";
   valid_from?: string;
   valid_till?: string;
 }
@@ -67,23 +67,21 @@ export default function NoticesSection({
       case 'unread':
         return notices.filter(notice => notice.id && !readNotices.has(notice.id));
       case 'urgent':
-        return notices.filter(notice => notice.urgency === 'High');
+        return notices.filter(notice => notice.urgency === 'high' || notice.urgency === 'urgent');
       case 'all':
       default:
         return notices;
     }
   }, [notices, activeTab, readNotices]);
 
-  useEffect(() => {
-    console.log("filtered notices", filteredNotices);
-  }, [filteredNotices, activeTab]);
+
 
   const getTabCount = (tab: TabType): number => {
     switch (tab) {
       case 'unread':
         return notices.filter(notice => notice.id && !readNotices.has(notice.id)).length;
       case 'urgent':
-        return notices.filter(notice => notice.urgency === 'High').length;
+        return notices.filter(notice => notice.urgency === 'high' || notice.urgency === 'urgent').length;
       case 'all':
       default:
         return notices.length;
@@ -190,19 +188,19 @@ export default function NoticesSection({
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      {item.urgency === "High" && (
+                      {(item.urgency === "high" || item.urgency === "urgent") && (
                         <div className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full flex items-center">
                           <AlertCircle size={12} className="mr-1" />
-                          Urgent
+                          {item.urgency === "urgent" ? "Urgent" : "High"}
                         </div>
                       )}
-                      {item.urgency === "Medium" && (
+                      {item.urgency === "normal" && (
                         <div className="bg-yellow-100 text-yellow-600 text-xs px-2 py-1 rounded-full flex items-center">
                           <AlertCircle size={12} className="mr-1" />
-                          Medium
+                          Normal
                         </div>
                       )}
-                      {item.urgency === "Low" && (
+                      {item.urgency === "low" && (
                         <div className="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full flex items-center">
                           <AlertCircle size={12} className="mr-1" />
                           Low

@@ -113,8 +113,6 @@ export default function AttendanceSection({
     if (attendanceRecord.site_id && !checkInCompleted) {
       getCurrentLocation();
     }
-
-    console.log(checkInCompleted, checkOutCompleted)
   }, [attendanceRecord.site_id, checkInCompleted]);
 
   // Calculate distance to selected site
@@ -144,13 +142,9 @@ export default function AttendanceSection({
         .eq("attendance_date", new Date().toLocaleDateString('sv-SE'))
         .order("attendance_date", { ascending: false });
 
-      console.log(new Date().toLocaleDateString('sv-SE').split('T')[0])
       if (error) throw error;
 
-
       setAttendanceData(data ?? []);
-
-      console.log(data)
 
       if (data[0]) {
         if (data[0].check_in_time !== undefined && data[0].check_in_time !== null) {

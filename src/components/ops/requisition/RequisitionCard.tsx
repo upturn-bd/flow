@@ -14,6 +14,7 @@ import {
   Loader2,
   Check,
   X,
+  Pencil,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -35,7 +36,9 @@ export interface RequisitionCardProps {
     comment?: string
   ) => void;
   processingId?: string | null;
-  canApprove?: boolean
+  canApprove?: boolean;
+  canEdit?: boolean;
+  onEdit?: (req: any) => void;
 }
 
 export const RequisitionCard: React.FC<RequisitionCardProps> = ({
@@ -48,7 +51,9 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
   isGlobal = false,
   handleUpdateRequest,
   processingId,
-  canApprove = true
+  canApprove = true,
+  canEdit = false,
+  onEdit,
 }) => {
   const [comment, setComment] = useState("");
 
@@ -90,19 +95,33 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
         </div>
 
         {mode === "history" ? (
-          <div
-            className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full ${getStatusStyle(
-              req.status
-            )}`}
-          >
-            {req.status === "Approved" ? (
-              <CheckCheck size={12} />
-            ) : req.status === "Rejected" ? (
-              <XCircle size={12} />
-            ) : (
-              <Clock size={12} />
+          <div className="flex items-center gap-2">
+            {/* Edit button - only show for pending requisitions when user can edit */}
+            {canEdit && req.status === "Pending" && onEdit && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => onEdit(req)}
+                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+              >
+                <Pencil size={12} />
+                <span>Edit</span>
+              </motion.button>
             )}
-            <span>{req.status}</span>
+            <div
+              className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full ${getStatusStyle(
+                req.status
+              )}`}
+            >
+              {req.status === "Approved" ? (
+                <CheckCheck size={12} />
+              ) : req.status === "Rejected" ? (
+                <XCircle size={12} />
+              ) : (
+                <Clock size={12} />
+              )}
+              <span>{req.status}</span>
+            </div>
           </div>
         ) : (
           <div
@@ -146,7 +165,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
         <span>
           Requested by:{" "}
           <span className="font-medium">
-            {employees.find((e) => e.id === String(req.employee_id))?.name ||
+            {employees.find((e) => e.id === req.employee_id)?.name ||
               "Unknown"}
           </span>
         </span>
@@ -204,6 +223,18 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
 
           {/* Buttons */}
           <div className="flex flex-wrap justify-end gap-4 pt-4 border-t border-gray-100">
+            {/* Edit button for requests */}
+            {canEdit && onEdit && (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => onEdit(req)}
+                className="flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                <Pencil size={16} />
+                <span>Edit</span>
+              </motion.button>
+            )}
             {canApprove && (
               <>
                 <motion.button

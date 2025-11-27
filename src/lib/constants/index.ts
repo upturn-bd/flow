@@ -89,10 +89,10 @@ export type Priority = typeof PRIORITY[keyof typeof PRIORITY];
 // ==============================================================================
 
 export const URGENCY = {
-  LOW: 'Low',
-  MEDIUM: 'Medium',
-  HIGH: 'High',
-  CRITICAL: 'Critical',
+  LOW: 'low',
+  NORMAL: 'normal',
+  HIGH: 'high',
+  URGENT: 'urgent',
 } as const;
 
 export type Urgency = typeof URGENCY[keyof typeof URGENCY];

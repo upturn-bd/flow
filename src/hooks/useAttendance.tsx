@@ -3,11 +3,12 @@
 import { useState, useCallback } from "react";
 import { useBaseEntity } from "./core/useBaseEntity";
 import { Attendance } from "@/lib/types";
-import { set } from "react-hook-form";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export type { Attendance };
 
 export function useAttendances() {
+  const { employeeInfo } = useAuth();
   const baseAttendance = useBaseEntity<Attendance>({
     tableName: "attendance_records",
     entityName: "attendance",
@@ -19,24 +20,26 @@ export function useAttendances() {
 
   // Get attendance for a specific date
   const getAttendanceForDate = useCallback(async (date: string, employeeId?: string): Promise<Attendance | null> => {
+    // Use provided employeeId or fall back to current user's id
+    const targetEmployeeId = employeeId || employeeInfo?.id;
+    
+    if (!targetEmployeeId) {
+      console.warn('Cannot fetch attendance: No employee ID available');
+      return null;
+    }
+
     setTodayLoading(true);
     try {
       const filters: any = {
         eq: {
-          attendance_date: date, // using correct field name
+          attendance_date: date,
+          employee_id: targetEmployeeId, // Always filter by employee
         }
       };
-
-      // If employeeId is provided, add it to filters
-      if (employeeId) {
-        filters.eq.employee_id = employeeId;
-      }
 
       const result = await baseAttendance.fetchSingleWithQuery({
         filters,
       });
-
-      console.log(result);
       
       setToday(result);
       setTodayLoading(false);
@@ -46,7 +49,7 @@ export function useAttendances() {
       setTodayLoading(false);
       return null;
     }
-  }, [baseAttendance]);
+  }, [baseAttendance, employeeInfo?.id]);
 
   // Get today's attendance
   const getTodaysAttendance = useCallback(async (employeeId?: string): Promise<Attendance | null> => {

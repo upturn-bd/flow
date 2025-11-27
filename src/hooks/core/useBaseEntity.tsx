@@ -46,21 +46,26 @@ export function useBaseEntity<T extends BaseEntity>(
       try {
         const result = await apiFunction();
 
-        if (options.showSuccessMessage) {
-          console.log("API call successful");
-        }
-
         if (options.onSuccess) {
           options.onSuccess();
         }
 
         return result;
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        let errorMessage: string;
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        } else if (typeof error === 'object' && error !== null) {
+          // Handle Supabase errors which may have different structures
+          errorMessage = (error as { message?: string; error_description?: string }).message 
+            || (error as { error_description?: string }).error_description 
+            || JSON.stringify(error);
+        } else {
+          errorMessage = String(error) || "An unknown error occurred";
+        }
 
         if (options.showErrorMessage) {
-          console.error("API call failed:", errorMessage);
+          console.error(`API call failed (${config.tableName}):`, errorMessage);
         }
 
         if (options.onError) {
@@ -71,7 +76,7 @@ export function useBaseEntity<T extends BaseEntity>(
         return null;
       }
     },
-    []
+    [config.tableName]
   );
 
   const clearError = useCallback(() => {

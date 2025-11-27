@@ -29,13 +29,6 @@ export default function BaseWidget({
     animateLayoutChanges: () => false, // Disable layout animations
   });
 
-  // Debug logging
-  React.useEffect(() => {
-    if (isEditMode) {
-      console.log('Widget in edit mode:', config.id, { hasListeners: !!listeners });
-    }
-  }, [isEditMode, config.id, listeners]);
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: transition || 'transform 250ms ease',

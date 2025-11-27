@@ -151,7 +151,7 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
             <PriorityBadge
               priority={
                 (() => {
-                  const u = notice?.urgency ?? "Low";
+                  const u = notice?.urgency ?? "low";
                   const key = String(u).toLowerCase();
                   if (key === "urgent") return "urgent";
                   if (key === "high") return "high";

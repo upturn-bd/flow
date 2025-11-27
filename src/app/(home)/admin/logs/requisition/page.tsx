@@ -1,16 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useRequisitionRequests } from "@/hooks/useRequisition";
+import React, { useEffect, useState, useCallback } from "react";
+import { useRequisitionRequests, RequisitionState } from "@/hooks/useRequisition";
 import { supabase } from "@/lib/supabase/client";
 import {
   Loader2,
   ClipboardList,
   Clock,
   AlertCircle,
+  Plus,
 } from "lucide-react";
 import TabView from "@/components/ui/TabView";
 import { RequisitionCard } from "@/components/ops/requisition/RequisitionCard";
+import RequisitionCreateModal from "@/components/ops/requisition/RequisitionCreateModal";
+import RequisitionEditModal from "@/components/ops/requisition/RequisitionEditModal";
 import { RequisitionType, RequisitionInventory } from "@/lib/types";
 import { useAuth } from "@/lib/auth/auth-context";
 
@@ -20,12 +23,15 @@ export default function RequisitionPage() {
     fetchRequisitionRequests,
     fetchRequisitionHistory,
     updateRequisitionRequest,
+    updateRequisition,
     loading,
     processingId,
   } = useRequisitionRequests();
 
   const {
-    canApprove
+    canApprove,
+    canWrite,
+    employeeInfo,
   } = useAuth()
 
   const MODULE = "Requisition";
@@ -35,6 +41,35 @@ export default function RequisitionPage() {
   const [requisitionInventories, setRequisitionInventories] = useState<RequisitionInventory[]>([]);
   const [employees, setEmployees] = useState<any[]>([]);
   const [filtered, setFiltered] = useState(requisitionRequests);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [editingRequisition, setEditingRequisition] = useState<RequisitionState | null>(null);
+
+  // Check if user can edit a requisition
+  const canEditRequisition = useCallback((req: RequisitionState) => {
+    if (!employeeInfo) return false;
+    
+    const isOwner = req.employee_id === employeeInfo.id;
+    const hasWritePermission = canWrite('requisition');
+    const hasApprovalPermission = canApprove('requisition');
+    
+    return isOwner || hasWritePermission || hasApprovalPermission;
+  }, [employeeInfo, canWrite, canApprove]);
+
+  const handleEditClick = (req: RequisitionState) => {
+    setEditingRequisition(req);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingRequisition(null);
+  };
+
+  const handleUpdateRequisition = async (id: number, data: Partial<RequisitionState>) => {
+    const result = await updateRequisition(id, data);
+    if (result) {
+      refreshData();
+    }
+    return result;
+  };
 
   // Load requisition types, inventories, and requests/history
   useEffect(() => {
@@ -48,8 +83,13 @@ export default function RequisitionPage() {
       const { data: inventories } = await supabase.from("requisition_inventories").select("*");
       setRequisitionInventories(inventories || []);
 
-      const { data: emps } = await supabase.from("employees").select("*");
-      setEmployees(emps || []);
+      const { data: emps } = await supabase.from("employees").select("id, first_name, last_name, email, designation");
+      // Format employees to include name field for RequisitionCard
+      const formattedEmployees = (emps || []).map((emp: any) => ({
+        ...emp,
+        name: `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown'
+      }));
+      setEmployees(formattedEmployees);
     };
     load();
   }, [activeTab]);
@@ -74,12 +114,26 @@ export default function RequisitionPage() {
 
   const extractFileNameFromStoragePath = (path: string) => path.split("/").pop() || path;
 
+  const refreshData = async () => {
+    if (activeTab === "requests") await fetchRequisitionRequests("Pending", true);
+    else await fetchRequisitionHistory(true);
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-2">
-        <ClipboardList className="text-blue-600" size={26} />
-        <h1 className="text-2xl font-semibold">Requisition Logs</h1>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <ClipboardList className="text-blue-600" size={26} />
+          <h1 className="text-2xl font-semibold">Requisition Logs</h1>
+        </div>
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Plus size={18} />
+          <span>Add Requisition</span>
+        </button>
       </div>
 
       <div className="mt-4">
@@ -120,6 +174,8 @@ export default function RequisitionPage() {
                           handleUpdateRequest={handleUpdateRequest}
                           processingId={processingId?.toString()}
                           canApprove={canApprove(MODULE)}
+                          canEdit={canEditRequisition(req as RequisitionState)}
+                          onEdit={handleEditClick}
                         />
                       ))}
                   </div>
@@ -158,6 +214,8 @@ export default function RequisitionPage() {
                           employees={employees}
                           extractFileNameFromStoragePath={extractFileNameFromStoragePath}
                           mode="history"
+                          canEdit={canEditRequisition(req as RequisitionState)}
+                          onEdit={handleEditClick}
                         />
                       ))}
                   </div>
@@ -169,6 +227,23 @@ export default function RequisitionPage() {
           setActiveTab={setActiveTab}
         />
       </div>
+
+      {/* Create Modal */}
+      <RequisitionCreateModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={refreshData}
+      />
+
+      {/* Edit Modal */}
+      {editingRequisition && (
+        <RequisitionEditModal
+          isOpen={!!editingRequisition}
+          requisition={editingRequisition}
+          onClose={handleCloseEditModal}
+          onSubmit={handleUpdateRequisition}
+        />
+      )}
     </div>
   );
 }
