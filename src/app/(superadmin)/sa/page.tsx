@@ -3,7 +3,20 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { ChartBar, Buildings, Users, GlobeHemisphereWest, Factory } from "@phosphor-icons/react";
+import { 
+  ChartBar, 
+  Buildings, 
+  Users, 
+  GlobeHemisphereWest, 
+  Factory,
+  ArrowRight,
+  TrendUp,
+  Clock,
+  CheckCircle,
+  Warning,
+  Spinner
+} from "@phosphor-icons/react";
+import { motion } from "framer-motion";
 
 interface Stats {
   companies: number;
@@ -11,6 +24,15 @@ interface Stats {
   industries: number;
   employees: number;
   superadmins: number;
+  teams: number;
+  pendingApprovals: number;
+}
+
+interface RecentCompany {
+  id: number;
+  name: string;
+  created_at: string;
+  employee_count?: number;
 }
 
 export default function SuperadminDashboard() {
@@ -20,11 +42,15 @@ export default function SuperadminDashboard() {
     industries: 0,
     employees: 0,
     superadmins: 0,
+    teams: 0,
+    pendingApprovals: 0,
   });
+  const [recentCompanies, setRecentCompanies] = useState<RecentCompany[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchStats();
+    fetchRecentCompanies();
   }, []);
 
   const fetchStats = async () => {
@@ -36,12 +62,16 @@ export default function SuperadminDashboard() {
         industriesResult,
         employeesResult,
         superadminsResult,
+        teamsResult,
+        pendingResult,
       ] = await Promise.all([
         supabase.from("companies").select("id", { count: "exact", head: true }),
         supabase.from("countries").select("id", { count: "exact", head: true }),
         supabase.from("industries").select("id", { count: "exact", head: true }),
         supabase.from("employees").select("id", { count: "exact", head: true }),
         supabase.from("superadmins").select("id", { count: "exact", head: true }),
+        supabase.from("teams").select("id", { count: "exact", head: true }),
+        supabase.from("employees").select("id", { count: "exact", head: true }).eq("has_approval", false),
       ]);
 
       setStats({
@@ -50,6 +80,8 @@ export default function SuperadminDashboard() {
         industries: industriesResult.count || 0,
         employees: employeesResult.count || 0,
         superadmins: superadminsResult.count || 0,
+        teams: teamsResult.count || 0,
+        pendingApprovals: pendingResult.count || 0,
       });
     } catch (error) {
       console.error("Error fetching stats:", error);
@@ -58,131 +90,314 @@ export default function SuperadminDashboard() {
     }
   };
 
+  const fetchRecentCompanies = async () => {
+    try {
+      const { data: companies } = await supabase
+        .from("companies")
+        .select("id, name, created_at")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (companies) {
+        // Fetch employee counts for each company
+        const companiesWithCounts = await Promise.all(
+          companies.map(async (company) => {
+            const { count } = await supabase
+              .from("employees")
+              .select("id", { count: "exact", head: true })
+              .eq("company_id", company.id);
+            return { ...company, employee_count: count || 0 };
+          })
+        );
+        setRecentCompanies(companiesWithCounts);
+      }
+    } catch (error) {
+      console.error("Error fetching recent companies:", error);
+    }
+  };
+
   const statCards = [
     {
-      label: "Total Companies",
+      label: "Companies",
       value: stats.companies,
       icon: Buildings,
-      color: "bg-blue-500",
+      color: "from-blue-500 to-blue-600",
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-600",
+      href: "/sa/companies",
     },
     {
-      label: "Total Employees",
+      label: "Employees",
       value: stats.employees,
       icon: Users,
-      color: "bg-green-500",
+      color: "from-emerald-500 to-emerald-600",
+      bgColor: "bg-emerald-50",
+      textColor: "text-emerald-600",
+      href: "/sa/companies",
+    },
+    {
+      label: "Teams",
+      value: stats.teams,
+      icon: Users,
+      color: "from-violet-500 to-violet-600",
+      bgColor: "bg-violet-50",
+      textColor: "text-violet-600",
+      href: "/sa/teams",
     },
     {
       label: "Countries",
       value: stats.countries,
       icon: GlobeHemisphereWest,
-      color: "bg-purple-500",
+      color: "from-amber-500 to-amber-600",
+      bgColor: "bg-amber-50",
+      textColor: "text-amber-600",
+      href: "/sa/countries",
     },
     {
       label: "Industries",
       value: stats.industries,
       icon: Factory,
-      color: "bg-orange-500",
+      color: "from-rose-500 to-rose-600",
+      bgColor: "bg-rose-50",
+      textColor: "text-rose-600",
+      href: "/sa/industries",
     },
     {
       label: "Superadmins",
       value: stats.superadmins,
       icon: ChartBar,
-      color: "bg-red-500",
+      color: "from-slate-500 to-slate-600",
+      bgColor: "bg-slate-50",
+      textColor: "text-slate-600",
+      href: "/sa/users",
     },
   ];
 
+  const quickActions = [
+    {
+      label: "Manage Companies",
+      description: "View, create, and edit companies",
+      icon: Buildings,
+      href: "/sa/companies",
+      color: "blue",
+    },
+    {
+      label: "Manage Teams",
+      description: "Configure team permissions",
+      icon: Users,
+      href: "/sa/teams",
+      color: "violet",
+    },
+    {
+      label: "Manage Countries",
+      description: "Add or edit country data",
+      icon: GlobeHemisphereWest,
+      href: "/sa/countries",
+      color: "amber",
+    },
+    {
+      label: "Manage Industries",
+      description: "Configure industry options",
+      icon: Factory,
+      href: "/sa/industries",
+      color: "rose",
+    },
+    {
+      label: "Superadmin Users",
+      description: "Manage superadmin access",
+      icon: ChartBar,
+      href: "/sa/users",
+      color: "slate",
+    },
+  ];
+
+  const colorClasses: Record<string, { bg: string; hover: string; text: string; border: string }> = {
+    blue: { bg: "bg-blue-50", hover: "hover:bg-blue-100", text: "text-blue-600", border: "border-blue-200" },
+    violet: { bg: "bg-violet-50", hover: "hover:bg-violet-100", text: "text-violet-600", border: "border-violet-200" },
+    amber: { bg: "bg-amber-50", hover: "hover:bg-amber-100", text: "text-amber-600", border: "border-amber-200" },
+    rose: { bg: "bg-rose-50", hover: "hover:bg-rose-100", text: "text-rose-600", border: "border-rose-200" },
+    slate: { bg: "bg-slate-50", hover: "hover:bg-slate-100", text: "text-slate-600", border: "border-slate-200" },
+  };
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">
-          Superadmin Dashboard
-        </h1>
-        <p className="text-gray-600 mt-2">
-          Platform overview and management
-        </p>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-1">Platform overview and management</p>
+        </div>
+        
+        {stats.pendingApprovals > 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg"
+          >
+            <Warning size={20} className="text-amber-600" />
+            <span className="text-sm font-medium text-amber-700">
+              {stats.pendingApprovals} pending approval{stats.pendingApprovals !== 1 ? "s" : ""}
+            </span>
+          </motion.div>
+        )}
       </div>
 
+      {/* Stats Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className="bg-white rounded-lg shadow p-6 animate-pulse"
-            >
-              <div className="h-12 w-12 bg-gray-200 rounded-lg mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-              <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 animate-pulse">
+              <div className="h-10 w-10 bg-gray-200 rounded-lg mb-3"></div>
+              <div className="h-4 bg-gray-200 rounded w-16 mb-2"></div>
+              <div className="h-7 bg-gray-200 rounded w-12"></div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {statCards.map((card) => {
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {statCards.map((card, index) => {
             const Icon = card.icon;
             return (
-              <div
+              <motion.div
                 key={card.label}
-                className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">
-                      {card.label}
-                    </p>
-                    <p className="text-3xl font-bold text-gray-900 mt-2">
+                <Link href={card.href}>
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-gray-300 transition-all group">
+                    <div className={`${card.bgColor} p-2.5 rounded-lg w-fit mb-3 group-hover:scale-110 transition-transform`}>
+                      <Icon size={22} weight="duotone" className={card.textColor} />
+                    </div>
+                    <p className="text-sm text-gray-500 mb-1">{card.label}</p>
+                    <p className="text-2xl font-bold text-gray-900">
                       {card.value.toLocaleString()}
                     </p>
                   </div>
-                  <div className={`${card.color} p-3 rounded-lg`}>
-                    <Icon size={32} weight="bold" className="text-white" />
-                  </div>
-                </div>
-              </div>
+                </Link>
+              </motion.div>
             );
           })}
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Quick Actions
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Link
-            href="/sa/companies"
-            className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
-          >
-            <Buildings size={24} className="text-blue-600" />
-            <span className="text-gray-900 font-medium">Manage Companies</span>
-          </Link>
-          <Link
-            href="/sa/countries"
-            className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors"
-          >
-            <GlobeHemisphereWest size={24} className="text-purple-600" />
-            <span className="text-gray-900 font-medium">Manage Countries</span>
-          </Link>
-          <Link
-            href="/sa/industries"
-            className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors"
-          >
-            <Factory size={24} className="text-orange-600" />
-            <span className="text-gray-900 font-medium">Manage Industries</span>
-          </Link>
-          <Link
-            href="/sa/teams"
-            className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors"
-          >
-            <Users size={24} className="text-green-600" />
-            <span className="text-gray-900 font-medium">Manage Teams</span>
-          </Link>
-          <Link
-            href="/sa/users"
-            className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 transition-colors"
-          >
-            <ChartBar size={24} className="text-red-600" />
-            <span className="text-gray-900 font-medium">Manage Superadmins</span>
-          </Link>
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Quick Actions */}
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="p-5 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
+            <p className="text-sm text-gray-500 mt-0.5">Common management tasks</p>
+          </div>
+          <div className="p-5 grid sm:grid-cols-2 gap-3">
+            {quickActions.map((action) => {
+              const Icon = action.icon;
+              const colors = colorClasses[action.color];
+              return (
+                <Link key={action.href} href={action.href}>
+                  <div className={`p-4 rounded-xl border ${colors.border} ${colors.bg} ${colors.hover} transition-all group flex items-start gap-3`}>
+                    <div className={`p-2 rounded-lg bg-white shadow-sm ${colors.text}`}>
+                      <Icon size={22} weight="duotone" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-gray-900 group-hover:text-gray-700 flex items-center gap-2">
+                        {action.label}
+                        <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-sm text-gray-500 mt-0.5 line-clamp-1">{action.description}</p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Recent Companies */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="p-5 border-b border-gray-200 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Recent Companies</h2>
+              <p className="text-sm text-gray-500 mt-0.5">Latest additions</p>
+            </div>
+            <Link href="/sa/companies" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+              View all
+            </Link>
+          </div>
+          
+          {loading ? (
+            <div className="p-5 space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center gap-3 animate-pulse">
+                  <div className="w-10 h-10 bg-gray-200 rounded-lg"></div>
+                  <div className="flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-24 mb-1"></div>
+                    <div className="h-3 bg-gray-200 rounded w-16"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : recentCompanies.length > 0 ? (
+            <div className="divide-y divide-gray-100">
+              {recentCompanies.map((company) => (
+                <Link key={company.id} href="/sa/companies">
+                  <div className="p-4 hover:bg-gray-50 transition-colors flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                      {company.name.substring(0, 2).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-gray-900 truncate">{company.name}</div>
+                      <div className="text-xs text-gray-500 flex items-center gap-2">
+                        <span className="flex items-center gap-1">
+                          <Users size={12} />
+                          {company.employee_count} employee{company.employee_count !== 1 ? "s" : ""}
+                        </span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <Clock size={12} />
+                          {new Date(company.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 text-center">
+              <Buildings size={40} className="mx-auto text-gray-300 mb-2" />
+              <p className="text-gray-500 text-sm">No companies yet</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* System Status */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="p-5 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">System Status</h2>
+        </div>
+        <div className="p-5 grid sm:grid-cols-3 gap-4">
+          <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+            <CheckCircle size={24} weight="fill" className="text-emerald-600" />
+            <div>
+              <p className="font-medium text-emerald-700">Database</p>
+              <p className="text-sm text-emerald-600">Connected</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+            <CheckCircle size={24} weight="fill" className="text-emerald-600" />
+            <div>
+              <p className="font-medium text-emerald-700">Authentication</p>
+              <p className="text-sm text-emerald-600">Active</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+            <CheckCircle size={24} weight="fill" className="text-emerald-600" />
+            <div>
+              <p className="font-medium text-emerald-700">Storage</p>
+              <p className="text-sm text-emerald-600">Operational</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
