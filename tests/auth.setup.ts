@@ -33,7 +33,7 @@ setup('authenticate', async ({ page }) => {
 
     // Verify we're logged in by checking for a common authenticated element
     const isLoggedIn = await page.locator('[data-testid="user-menu"]')
-        .or(page.locator('text=Task Management'))
+        .or(page.locator('Dashboard'))
         .or(page.locator('button:has-text("Logout")'))
         .isVisible()
         .catch(() => false);
