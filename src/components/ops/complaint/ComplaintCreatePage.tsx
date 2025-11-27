@@ -93,7 +93,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
         attachments: uploadedFilePaths,
         attachment_download_urls: publicUrls,
         anonymous: isAnonymous,
-        complainer_id: isAnonymous ? null : user.id,
+        complainer_id: user.id, // Always store complainer_id for history tracking, anonymous flag controls visibility
         company_id: user.company_id,
         requested_to: user.supervisor_id,
       };
