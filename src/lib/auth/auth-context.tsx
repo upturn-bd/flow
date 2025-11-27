@@ -331,17 +331,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     // Filter nav items based on required permissions
     return navItems.filter(item => {
-      // Backward compatibility: check roles if present
-      if (item.roles && item.roles.length > 0) {
-        return item.roles.includes(employeeInfo.role);
-      }
-      
-      // New permission-based filtering
+      // Permission-based filtering takes priority when defined
       if (item.requiredPermissions && item.requiredPermissions.length > 0) {
         return item.requiredPermissions.some(perm => {
           const [module, action] = perm.split(':');
           return hasPermission(module, action);
         });
+      }
+      
+      // Backward compatibility: check roles if no permissions defined
+      if (item.roles && item.roles.length > 0) {
+        return item.roles.includes(employeeInfo.role);
       }
       
       // If no roles or permissions specified, show to all
