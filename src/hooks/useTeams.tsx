@@ -45,6 +45,8 @@ export function useTeams() {
         .eq("company_id", companyId)
         .order("name", { ascending: true });
 
+        console.log(data)
+
       if (fetchError) throw fetchError;
 
       setTeams(data || []);

@@ -10,6 +10,7 @@ import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Project, useProjects } from "@/hooks/useProjects";
 import { getEmployeeId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 
 import ProjectDetails from "./ProjectDetails";
 import ProjectCard from "./ProjectCard";
@@ -31,6 +32,7 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
 
   const { employees, fetchEmployees } = useEmployees();
   const { departments, fetchDepartments } = useDepartments();
+  const { employeeInfo } = useAuth();
 
   const [projectDetailsId, setProjectDetailsId] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -45,6 +47,9 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
 
   /** Initialize user ID and fetch data */
   useEffect(() => {
+    // Don't fetch if employeeInfo is not available yet
+    if (!employeeInfo) return;
+    
     if (hasFetched.current) return;
     hasFetched.current = true;
 
@@ -57,7 +62,7 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
       setInitialLoadComplete(true);
     };
     initData();
-  }, []);
+  }, [employeeInfo, fetchCompletedProjects, fetchEmployees, fetchDepartments]);
 
   /** Debounced Search */
   const debouncedSearch = useCallback(

@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { ProjectDetails } from "@/components/ops/project/ProjectForm";
 import { slugify } from "@/lib/utils";
+import { set } from "lodash";
 
 export type { Project };
 
@@ -287,6 +288,15 @@ export function useProjects() {
 
       const { data: result, error } = await baseResult.updateItem(projectId, project);
       if (error) throw error;
+
+      const updated = result as ProjectDetails;
+
+      setOngoingProjects((prevProjects) =>
+        prevProjects.map((p) => (p.id === projectId ? (updated ?? p) : p))
+      );
+      setCompletedProjects((prevProjects) =>
+        prevProjects.map((p) => (p.id === projectId ? (updated ?? p) : p))
+      );
 
       const recipients = [...(project.assignees || []), project.project_lead_id, employeeInfo.supervisor_id].filter(Boolean) as string[];
 

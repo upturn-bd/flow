@@ -64,6 +64,7 @@ export default function ProjectCard({
     <div className="flex items-center gap-2">
       {showEdit && (
         <Button
+        data-testid="edit-project-button"
           variant="ghost"
           size="sm"
           onClick={onEdit}
@@ -72,8 +73,10 @@ export default function ProjectCard({
           <Edit size={14} />
         </Button>
       )}
+
       {showDelete && (
         <Button
+        data-testid="delete-project-button"
           variant="ghost"
           size="sm"
           onClick={onDelete}
@@ -86,6 +89,7 @@ export default function ProjectCard({
       {showDetails && (
         <Link href={`/ops/project/${id}`}>
           <Button
+            data-testid="view-project-button"
             variant="ghost"
             size="sm"
             className="p-2 h-8 w-8 hover:bg-gray-50 hover:text-gray-700"
@@ -99,7 +103,7 @@ export default function ProjectCard({
   );
 
   return (
-    <Card>
+    <Card data-testid="project-card">
       <CardHeader
         title={project_title}
         icon={statusIcon}

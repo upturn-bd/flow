@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { Department, useDepartments } from "@/hooks/useDepartments";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { useProjects } from "@/hooks/useProjects";
@@ -40,6 +41,7 @@ const initialProjectDetails: ProjectDetails = {
 };
 
 export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (key: string) => void }) {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth()
   const { departments, fetchDepartments } = useDepartments();
@@ -98,6 +100,8 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
 
       toast.success("Project created successfully!");
 
+      // Explicitly navigate to ongoing tab - this ensures URL updates for tests
+      router.push('/ops/project?tab=ongoing');
       setActiveTab('ongoing')
     } catch (error) {
       console.error("Error creating project:", error);
