@@ -387,33 +387,7 @@ export function usePayroll() {
 
         console.log(`Successfully generated ${insertedPayrolls.length} payroll records as Pending`);
 
-        // 4. Create notifications for employees (accounts sync happens when status changes to Published)
-        try {
-          for (const payroll of insertedPayrolls) {
-            // Get employee name for the notification
-            const employee = employees.find(emp => emp.id === payroll.employee_id);
-            const employeeName = employee 
-              ? `${employee.first_name} ${employee.last_name}`
-              : 'Employee';
-
-            await createPayrollNotification(
-              payroll.employee_id,
-              'generated',
-              {
-                employeeName,
-                amount: payroll.total_amount,
-                date: generationDate
-              },
-              {
-                referenceId: payroll.id,
-                actionUrl: '/ops/payroll'
-              }
-            );
-          }
-        } catch (notifErr) {
-          console.warn('Notification creation failed:', notifErr);
-          failedOperations.push('Failed to send notifications to some employees');
-        }
+        // Note: Employees are notified only when payroll is published or paid, not when generated
 
         setLoading(false);
         

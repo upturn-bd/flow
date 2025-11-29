@@ -75,26 +75,6 @@ export async function createAccountFromPayroll(
 
       if (error) throw error;
 
-      // Send notification for automatic payroll logging
-      try {
-        await createAccountNotification(
-          userId!,
-          'payrollLogged',
-          {
-            employeeName,
-            amount: payrollData.total_amount,
-            date: payrollData.generation_date,
-          },
-          {
-            referenceId: data.id,
-            actionUrl: '/admin?tab=accounts',
-          }
-        );
-      } catch (notificationError) {
-        // Don't fail the account creation if notification fails
-        console.warn('Failed to send payroll account notification:', notificationError);
-      }
-
       return data;
     } catch (error) {
       attempts++;

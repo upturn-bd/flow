@@ -841,41 +841,25 @@ export function useStakeholders() {
 
         if (error) throw error;
 
-        // Send notifications
+        // Send notifications only for status changes (not for every minor update)
         try {
           const kamId = stakeholderData.kam_id || currentStakeholder?.kam_id;
           
-          // Notify KAM about updates
-          if (kamId) {
-            // Check if status changed
-            if (stakeholderData.status && stakeholderData.status !== currentStakeholder?.status) {
-              await createStakeholderNotification(
-                kamId,
-                'statusChanged',
-                {
-                  stakeholderName: currentStakeholder?.name || data.name,
-                  oldStatus: currentStakeholder?.status || 'Unknown',
-                  newStatus: stakeholderData.status,
-                },
-                {
-                  referenceId: stakeholderId,
-                  actionUrl: `/stakeholders/${stakeholderId}`,
-                }
-              );
-            } else {
-              // General update notification
-              await createStakeholderNotification(
-                kamId,
-                'updated',
-                {
-                  stakeholderName: currentStakeholder?.name || data.name,
-                },
-                {
-                  referenceId: stakeholderId,
-                  actionUrl: `/stakeholders/${stakeholderId}`,
-                }
-              );
-            }
+          // Notify KAM only when status changes
+          if (kamId && stakeholderData.status && stakeholderData.status !== currentStakeholder?.status) {
+            await createStakeholderNotification(
+              kamId,
+              'statusChanged',
+              {
+                stakeholderName: currentStakeholder?.name || data.name,
+                oldStatus: currentStakeholder?.status || 'Unknown',
+                newStatus: stakeholderData.status,
+              },
+              {
+                referenceId: stakeholderId,
+                actionUrl: `/stakeholders/${stakeholderId}`,
+              }
+            );
           }
         } catch (notificationError) {
           console.warn('Failed to send stakeholder update notifications:', notificationError);
