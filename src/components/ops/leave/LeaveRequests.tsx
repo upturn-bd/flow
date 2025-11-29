@@ -70,7 +70,7 @@ export default function LeaveRequestsPage() {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="text-red-500 mb-2">Error loading leave requests</div>
-        <p className="text-gray-600">{error}</p>
+        <p className="text-foreground-secondary">{error}</p>
       </div>
     );
   }
@@ -189,7 +189,7 @@ function LeaveRequestCard({
           <StatusBadge status={request.status} />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground-secondary mb-2">
               <MessageCircle size={16} className="inline mr-2" />
               Comment
             </label>

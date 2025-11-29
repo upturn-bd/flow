@@ -69,7 +69,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
       return (
         <div className="flex items-center justify-center py-2">
           <LoadingSpinner className="h-5 w-5 text-blue-500" />
-          <span className="ml-2 text-sm text-gray-500">Loading...</span>
+          <span className="ml-2 text-sm text-foreground-tertiary">Loading...</span>
         </div>
       );
     }
@@ -124,7 +124,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
       return (
         <div className="mb-0">
           {label && (
-            <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldId} className="block text-sm font-medium text-foreground-secondary mb-1">
               {label}
             </label>
           )}
@@ -183,7 +183,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
       return (
         <div className="mb-0">
           {label && (
-            <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldId} className="block text-sm font-medium text-foreground-secondary mb-1">
               {label}
             </label>
           )}
@@ -216,7 +216,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
     return (
       <div className="mb-0">
         {label && (
-          <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor={fieldId} className="block text-sm font-medium text-foreground-secondary mb-1">
             {label}
           </label>
         )}

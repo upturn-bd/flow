@@ -37,9 +37,9 @@ export const MapField: React.FC<MapFieldProps> = ({
 
   return (
     <div className={className}>
-      <label className="block font-semibold text-gray-700 mb-2">
+      <label className="block font-semibold text-foreground-secondary mb-2">
         <div className="flex items-center gap-2">
-          <MapPin size={18} weight="duotone" className="text-gray-500" />
+          <MapPin size={18} weight="duotone" className="text-foreground-tertiary" />
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </div>
@@ -56,15 +56,15 @@ export const MapField: React.FC<MapFieldProps> = ({
           </div>
         ) : (
           <div className="h-64 border border-border-secondary rounded-md bg-background-secondary flex items-center justify-center">
-            <MapPin size={32} weight="duotone" className="text-gray-400" />
-            <span className="ml-2 text-gray-500">Loading map...</span>
+            <MapPin size={32} weight="duotone" className="text-foreground-tertiary" />
+            <span className="ml-2 text-foreground-tertiary">Loading map...</span>
           </div>
         )}
       </div>
       
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       
-      <div className="mt-2 text-sm text-gray-600">
+      <div className="mt-2 text-sm text-foreground-secondary">
         <p>Latitude: {value.lat.toFixed(6)}</p>
         <p>Longitude: {value.lng.toFixed(6)}</p>
       </div>

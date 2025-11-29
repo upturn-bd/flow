@@ -153,7 +153,7 @@ export default function StakeholderIssuesPage() {
       case "Resolved":
         return "bg-green-100 text-green-800";
       default:
-        return "bg-background-tertiary dark:bg-surface-secondary text-gray-800";
+        return "bg-background-tertiary dark:bg-surface-secondary text-foreground-primary";
     }
   };
 
@@ -166,9 +166,9 @@ export default function StakeholderIssuesPage() {
       case "Medium":
         return "bg-blue-100 text-blue-800";
       case "Low":
-        return "bg-background-tertiary dark:bg-surface-secondary text-gray-800";
+        return "bg-background-tertiary dark:bg-surface-secondary text-foreground-primary";
       default:
-        return "bg-background-tertiary dark:bg-surface-secondary text-gray-800";
+        return "bg-background-tertiary dark:bg-surface-secondary text-foreground-primary";
     }
   };
 
@@ -177,8 +177,8 @@ export default function StakeholderIssuesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Stakeholder Issues</h1>
-          <p className="text-sm text-gray-600 mt-1">
+          <h1 className="text-2xl font-bold text-foreground-primary">My Stakeholder Issues</h1>
+          <p className="text-sm text-foreground-secondary mt-1">
             Manage issues for stakeholders you are assigned to handle
           </p>
         </div>
@@ -192,8 +192,8 @@ export default function StakeholderIssuesPage() {
         <div className="bg-surface-primary rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Pending</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{pendingIssues.length}</p>
+              <p className="text-sm text-foreground-secondary">Pending</p>
+              <p className="text-2xl font-bold text-foreground-primary mt-1">{pendingIssues.length}</p>
             </div>
             <div className="p-3 bg-yellow-100 rounded-lg">
               <Clock className="text-yellow-600" size={24} />
@@ -204,8 +204,8 @@ export default function StakeholderIssuesPage() {
         <div className="bg-surface-primary rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">In Progress</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{inProgressIssues.length}</p>
+              <p className="text-sm text-foreground-secondary">In Progress</p>
+              <p className="text-2xl font-bold text-foreground-primary mt-1">{inProgressIssues.length}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
               <WarningCircle className="text-blue-600" size={24} />
@@ -216,8 +216,8 @@ export default function StakeholderIssuesPage() {
         <div className="bg-surface-primary rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Resolved</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{resolvedIssues.length}</p>
+              <p className="text-sm text-foreground-secondary">Resolved</p>
+              <p className="text-2xl font-bold text-foreground-primary mt-1">{resolvedIssues.length}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
               <CheckCircle className="text-green-600" size={24} />
@@ -228,8 +228,8 @@ export default function StakeholderIssuesPage() {
         <div className="bg-surface-primary rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">High Priority</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{highPriorityIssues.length}</p>
+              <p className="text-sm text-foreground-secondary">High Priority</p>
+              <p className="text-2xl font-bold text-foreground-primary mt-1">{highPriorityIssues.length}</p>
             </div>
             <div className="p-3 bg-red-100 rounded-lg">
               <WarningCircle className="text-red-600" size={24} />
@@ -243,7 +243,7 @@ export default function StakeholderIssuesPage() {
         <div className="flex flex-col md:flex-row gap-4">
           {/* Search */}
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-tertiary" size={20} />
             <input
               type="text"
               placeholder="Search issues..."
@@ -297,8 +297,8 @@ export default function StakeholderIssuesPage() {
       {/* Empty State */}
       {!loading && issues.length === 0 && (
         <div className="text-center py-12 bg-background-secondary dark:bg-background-tertiary rounded-lg border-2 border-dashed border-border-secondary">
-          <h3 className="text-lg font-semibold text-gray-900">No issues found</h3>
-          <p className="text-sm text-gray-500 mt-1">
+          <h3 className="text-lg font-semibold text-foreground-primary">No issues found</h3>
+          <p className="text-sm text-foreground-tertiary mt-1">
             {searchTerm || filterStatus !== "all" || filterPriority !== "all"
               ? "Try adjusting your search or filters"
               : "You don't have any stakeholder issues assigned yet"}
@@ -317,7 +317,7 @@ export default function StakeholderIssuesPage() {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{issue.title}</h3>
+                    <h3 className="text-lg font-semibold text-foreground-primary">{issue.title}</h3>
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(issue.status)}`}>
                       {issue.status}
                     </span>
@@ -327,23 +327,23 @@ export default function StakeholderIssuesPage() {
                   </div>
 
                   {/* Stakeholder Info */}
-                  <div className="text-sm text-gray-600 mb-2">
+                  <div className="text-sm text-foreground-secondary mb-2">
                     <span className="font-medium">Stakeholder:</span> {issue.stakeholder?.name}
                   </div>
 
                   {/* Assigned Employee Info */}
                   {issue.assigned_employee && (
-                    <div className="text-sm text-gray-600 mb-2">
+                    <div className="text-sm text-foreground-secondary mb-2">
                       <span className="font-medium">Assigned to:</span> {issue.assigned_employee.name}
                       {issue.assigned_employee.email && (
-                        <span className="text-gray-500"> ({issue.assigned_employee.email})</span>
+                        <span className="text-foreground-tertiary"> ({issue.assigned_employee.email})</span>
                       )}
                     </div>
                   )}
 
                   {/* Description */}
                   {issue.description && (
-                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">{issue.description}</p>
+                    <p className="text-sm text-foreground-secondary mt-2 line-clamp-2">{issue.description}</p>
                   )}
 
                   {/* Attachments */}
@@ -363,7 +363,7 @@ export default function StakeholderIssuesPage() {
                   )}
 
                   {/* Metadata */}
-                  <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
+                  <div className="mt-3 flex items-center gap-4 text-xs text-foreground-tertiary">
                     <span>Created {issue.created_at ? new Date(issue.created_at).toLocaleDateString() : "N/A"}</span>
                     {issue.resolved_at && (
                       <span>Resolved {new Date(issue.resolved_at).toLocaleDateString()}</span>
@@ -388,7 +388,7 @@ export default function StakeholderIssuesPage() {
                     <PermissionTooltip message="You don't have permission to edit issues">
                       <button
                         disabled
-                        className="p-2 text-gray-400 rounded cursor-not-allowed opacity-50"
+                        className="p-2 text-foreground-tertiary rounded cursor-not-allowed opacity-50"
                         title="Edit issue (no permission)"
                       >
                         <Eye size={18} />
@@ -408,7 +408,7 @@ export default function StakeholderIssuesPage() {
                     <PermissionTooltip message="You don't have permission to delete issues">
                       <button
                         disabled
-                        className="p-2 text-gray-400 rounded cursor-not-allowed opacity-50"
+                        className="p-2 text-foreground-tertiary rounded cursor-not-allowed opacity-50"
                         title="Delete issue (no permission)"
                       >
                         <Trash size={18} />

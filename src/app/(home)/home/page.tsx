@@ -351,7 +351,7 @@ export default function HomePage() {
                               e.stopPropagation();
                               handleToggleWidget(widget.id);
                             }}
-                            className="p-2 hover:bg-white/20 rounded transition-colors text-white"
+                            className="p-2 hover:bg-surface-primary/20 rounded transition-colors text-white"
                             title={widget.enabled ? 'Hide widget' : 'Show widget'}
                           >
                             {widget.enabled ? <EyeOff size={20} /> : <Eye size={20} />}

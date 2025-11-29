@@ -33,7 +33,7 @@ const page = () => {
     };
 
     return (
-        <section className='bg-white text-black'>
+        <section className='bg-surface-primary text-foreground-primary'>
             <div className='h-screen grid grid-cols-6 gap-10'>
                 <div className='bg-[#001731] w-full flex items-start justify-start p-8 col-span-2'>
                     <Image src="/Logo.png" width={150} height={150} alt="Company Logo" />
@@ -97,7 +97,7 @@ const page = () => {
                             <input
                                 type="submit"
                                 value="Create Account"
-                                className="px-10 py-4 my-5 rounded-full bg-amber-400 text-black shadow-xl cursor-pointer"/>
+                                className="px-10 py-4 my-5 rounded-full bg-amber-400 text-foreground-primary shadow-xl cursor-pointer"/>
                         </form>
                         <div className="flex justify-between mt-5 items-center">
                             <button className="text-[#002568]">

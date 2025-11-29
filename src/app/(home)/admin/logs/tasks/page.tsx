@@ -239,7 +239,7 @@ export default function CompanyTaskLogsPage() {
                            <>
                               {loading ? (
                                  <div className="flex justify-center items-center h-32">
-                                    <Loader className="animate-spin text-gray-500" />
+                                    <Loader className="animate-spin text-foreground-tertiary" />
                                  </div>
                               ) : error ? (
                                  <p className="text-red-500">
@@ -260,7 +260,7 @@ export default function CompanyTaskLogsPage() {
                            <>
                               {loading ? (
                                  <div className="flex justify-center items-center h-32">
-                                    <Loader className="animate-spin text-gray-500" />
+                                    <Loader className="animate-spin text-foreground-tertiary" />
                                  </div>
                               ) : error ? (
                                  <p className="text-red-500">

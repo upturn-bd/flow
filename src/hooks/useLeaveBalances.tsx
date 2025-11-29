@@ -75,7 +75,7 @@ export function useLeaveBalances(employeeId?: number, companyId?: number) {
         updatedBalances.push({
           ...balance,
           leave_type_name: type.name,
-          color: type.color || "bg-gray-100 border-gray-300 text-gray-800",
+          color: type.color || "bg-background-tertiary border-border-secondary text-foreground-primary",
         });
       }
 

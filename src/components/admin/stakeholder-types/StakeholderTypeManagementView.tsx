@@ -76,8 +76,8 @@ export default function StakeholderTypeManagementView() {
     <Collapsible title="Stakeholder Types">
       <div className="px-4 space-y-4 py-4">
         <div className="flex items-center gap-3 mb-4">
-          <Tag size={22} weight="duotone" className="text-gray-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Stakeholder Types</h3>
+          <Tag size={22} weight="duotone" className="text-foreground-secondary" />
+          <h3 className="text-lg font-semibold text-foreground-primary">Stakeholder Types</h3>
         </div>
 
         {error && (
@@ -100,17 +100,17 @@ export default function StakeholderTypeManagementView() {
                 {stakeholderTypes.map((type, idx) => (
                   <div
                     key={type.id || idx}
-                    className="flex items-center bg-gray-100 rounded-lg px-3 py-2 border border-gray-200 shadow-sm"
+                    className="flex items-center bg-background-tertiary rounded-lg px-3 py-2 border border-border-primary shadow-sm"
                   >
                     <div className="flex flex-col mr-2">
-                      <span className="text-gray-800 font-medium">{type.name}</span>
+                      <span className="text-foreground-primary font-medium">{type.name}</span>
                       {type.description && (
-                        <span className="text-xs text-gray-500">{type.description}</span>
+                        <span className="text-xs text-foreground-tertiary">{type.description}</span>
                       )}
                     </div>
                     <div className="flex items-center gap-1 ml-auto">
                       {!type.is_active && (
-                        <span className="text-xs px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full mr-1">
+                        <span className="text-xs px-2 py-0.5 bg-gray-200 text-foreground-secondary rounded-full mr-1">
                           Inactive
                         </span>
                       )}
@@ -118,7 +118,7 @@ export default function StakeholderTypeManagementView() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(type)}
-                        className="p-1 rounded-full text-gray-500 hover:bg-blue-50 hover:text-blue-500"
+                        className="p-1 rounded-full text-foreground-tertiary hover:bg-blue-50 hover:text-blue-500"
                       >
                         <PencilSimple size={16} weight="bold" />
                       </Button>
@@ -128,7 +128,7 @@ export default function StakeholderTypeManagementView() {
                         onClick={() => type.id !== undefined && handleDelete(type.id)}
                         isLoading={deleteLoading === type.id}
                         disabled={deleteLoading === type.id}
-                        className="p-1 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-500"
+                        className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
                       >
                         <Trash size={16} weight="bold" />
                       </Button>
@@ -137,12 +137,12 @@ export default function StakeholderTypeManagementView() {
                 ))}
               </div>
             ) : (
-              <div className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
+              <div className="bg-background-secondary rounded-lg p-6 text-center border border-border-primary">
                 <div className="flex justify-center mb-3">
-                  <Tag size={40} weight="duotone" className="text-gray-400" />
+                  <Tag size={40} weight="duotone" className="text-foreground-tertiary" />
                 </div>
-                <p className="text-gray-500 mb-1">No stakeholder types found</p>
-                <p className="text-gray-400 text-sm mb-4">Create stakeholder types to categorize stakeholders</p>
+                <p className="text-foreground-tertiary mb-1">No stakeholder types found</p>
+                <p className="text-foreground-tertiary text-sm mb-4">Create stakeholder types to categorize stakeholders</p>
               </div>
             )}
           </div>

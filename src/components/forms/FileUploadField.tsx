@@ -71,7 +71,7 @@ export default function FileUploadField({
 
   return (
     <div className={containerClassName}>
-      <label className="block font-medium text-gray-700 mb-1 text-sm sm:text-base">
+      <label className="block font-medium text-foreground-secondary mb-1 text-sm sm:text-base">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
@@ -90,11 +90,11 @@ export default function FileUploadField({
         onClick={() => fileInputRef.current?.click()}
       >
         <div className="text-center">
-          <CloudUpload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-          <p className="text-sm text-gray-600">
+          <CloudUpload className="mx-auto h-8 w-8 text-foreground-tertiary mb-2" />
+          <p className="text-sm text-foreground-secondary">
             Click to upload or drag and drop files here
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-foreground-tertiary mt-1">
             {multiple ? "Multiple files allowed" : "Single file only"}
           </p>
         </div>
@@ -136,11 +136,11 @@ export default function FileUploadField({
 
           {/* New Files */}
           {files.map((file, index) => (
-            <div key={`new-${index}`} className="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
+            <div key={`new-${index}`} className="flex items-center justify-between bg-background-secondary p-2 rounded-lg">
               <div className="flex items-center space-x-2">
-                <File className="text-gray-500" />
-                <span className="text-sm text-gray-700">{file.name}</span>
-                <span className="text-xs text-gray-500">
+                <File className="text-foreground-tertiary" />
+                <span className="text-sm text-foreground-secondary">{file.name}</span>
+                <span className="text-xs text-foreground-tertiary">
                   ({Math.round(file.size / 1024)} KB)
                 </span>
               </div>

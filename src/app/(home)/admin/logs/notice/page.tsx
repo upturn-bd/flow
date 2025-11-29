@@ -101,7 +101,7 @@ export default function NoticePage() {
       case "urgent":
         return "bg-red-200 text-red-800 font-semibold";
       default:
-        return "bg-background-tertiary dark:bg-surface-secondary text-gray-700";
+        return "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary";
     }
   };
 
@@ -138,7 +138,7 @@ export default function NoticePage() {
 
       {/* Search bar */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />
+        <Search className="absolute left-3 top-2.5 text-foreground-tertiary" size={16} />
         <input
           placeholder="Search notices..."
           className="pl-8 w-full px-3 py-2 border border-border-primary rounded-lg"
@@ -151,7 +151,7 @@ export default function NoticePage() {
 
       {/* Loading */}
       {loading && (
-        <div className="flex justify-center items-center py-20 text-gray-500">
+        <div className="flex justify-center items-center py-20 text-foreground-tertiary">
           <Loader className="animate-spin mr-2" />
           Loading notices...
         </div>
@@ -159,7 +159,7 @@ export default function NoticePage() {
 
       {/* Empty */}
       {!loading && filtered.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+        <div className="flex flex-col items-center justify-center py-20 text-foreground-tertiary">
           <WarningCircle className="mb-2" size={28} />
           <p>No notices found.</p>
         </div>
@@ -179,7 +179,7 @@ export default function NoticePage() {
                 {/* Left section */}
                 <div className="flex-1 w-full space-y-3">
                   {/* Title */}
-                  <h2 className="text-lg font-semibold text-gray-800 tracking-tight">
+                  <h2 className="text-lg font-semibold text-foreground-primary tracking-tight">
                     {notice.title}
                   </h2>
 
@@ -193,26 +193,26 @@ export default function NoticePage() {
                       {notice.urgency}
                     </span>
                     {notice.notice_type_id && (
-                      <span className="inline-flex items-center rounded-full bg-background-tertiary dark:bg-surface-secondary border border-border-secondary px-2 py-0.5 text-xs font-medium text-gray-700">
+                      <span className="inline-flex items-center rounded-full bg-background-tertiary dark:bg-surface-secondary border border-border-secondary px-2 py-0.5 text-xs font-medium text-foreground-secondary">
                         {noticeTypes[notice.notice_type_id] || "General"}
                       </span>
                     )}
                   </div>
 
                   {/* Description */}
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                  <p className="text-sm text-foreground-secondary leading-relaxed">
                     {notice.description}
                   </p>
 
                   {/* Meta info */}
-                  <div className="text-xs text-gray-500 border-t border-border-primary pt-2">
+                  <div className="text-xs text-foreground-tertiary border-t border-border-primary pt-2">
                     <p>
-                      <span className="font-medium text-gray-600">Valid:</span>{" "}
+                      <span className="font-medium text-foreground-secondary">Valid:</span>{" "}
                       {formatDate(notice.valid_from)} →{" "}
                       {formatDate(notice.valid_till)}
                     </p>
                     <p>
-                      <span className="font-medium text-gray-600">Created:</span>{" "}
+                      <span className="font-medium text-foreground-secondary">Created:</span>{" "}
                       {formatDateTime(notice.created_at)}
                     </p>
                   </div>

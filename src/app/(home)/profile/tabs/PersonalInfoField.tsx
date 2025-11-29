@@ -53,7 +53,7 @@ export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
     return (
       <div className="mb-0">
         {label && (
-          <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor={fieldId} className="block text-sm font-medium text-foreground-secondary mb-1">
             {label}
           </label>
         )}
@@ -104,7 +104,7 @@ export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
     return (
       <div className="mb-0">
         {label && (
-          <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor={fieldId} className="block text-sm font-medium text-foreground-secondary mb-1">
             {label}
           </label>
         )}
@@ -138,7 +138,7 @@ export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
   return (
     <div className="mb-0">
       {label && (
-        <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor={fieldId} className="block text-sm font-medium text-foreground-secondary mb-1">
           {label}
         </label>
       )}

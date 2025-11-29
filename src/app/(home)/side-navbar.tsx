@@ -118,7 +118,7 @@ export default function Sidebar() {
           <div
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
-              "text-gray-300 hover:text-white hover:bg-[#001c4f]"
+              "text-foreground-tertiary hover:text-white hover:bg-[#001c4f]"
             )}
           >
             <Settings size={22} />

@@ -209,10 +209,10 @@ export default function MilestoneDetails({
   return (
     <div>
       {!taskDetailsId && (
-        <div className="w-full p-4 sm:p-6 lg:p-10 text-gray-900">
+        <div className="w-full p-4 sm:p-6 lg:p-10 text-foreground-primary">
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-3">
-              <Target size={24} className="text-gray-600" strokeWidth={2} />
+              <Target size={24} className="text-foreground-secondary" strokeWidth={2} />
               <h2 className="text-xl md:text-2xl font-semibold">
                 Milestone Details
               </h2>
@@ -222,7 +222,7 @@ export default function MilestoneDetails({
               whileTap={{ scale: 0.98 }}
               type="button"
               onClick={onClose}
-              className="flex items-center gap-2 px-4 py-2 bg-background-tertiary dark:bg-surface-secondary text-gray-700 rounded-md hover:bg-surface-hover transition-colors duration-150"
+              className="flex items-center gap-2 px-4 py-2 bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary rounded-md hover:bg-surface-hover transition-colors duration-150"
             >
               <CaretLeft size={16} strokeWidth={2} />
               Back
@@ -236,14 +236,14 @@ export default function MilestoneDetails({
           >
             <div className="grid gap-4">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-gray-700">Milestone Name:</span>
-                <span className="text-gray-900">
+                <span className="font-medium text-foreground-secondary">Milestone Name:</span>
+                <span className="text-foreground-primary">
                   {milestoneDetails?.milestone_title || "N/A"}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-medium text-gray-700">Status:</span>
-                {/* <span className="px-2 py-1 rounded-full text-sm bg-background-tertiary dark:bg-surface-secondary text-gray-700">
+                <span className="font-medium text-foreground-secondary">Status:</span>
+                {/* <span className="px-2 py-1 rounded-full text-sm bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary">
                   {milestoneDetails?.status || "N/A"}
                 </span> */}
 
@@ -252,33 +252,33 @@ export default function MilestoneDetails({
                 />
               </div>
               <div className="flex items-start gap-2">
-                <span className="font-medium text-gray-700">Assignees:</span>
+                <span className="font-medium text-foreground-secondary">Assignees:</span>
                 <div className="flex flex-wrap gap-2">
                   {(milestoneDetails?.assignees && milestoneDetails.assignees.length > 0) ? (
                     milestoneDetails.assignees.map((assignee: string, i: number) => (
                       <span
                         key={i}
-                        className="bg-background-tertiary dark:bg-surface-secondary text-gray-700 text-xs px-2 py-1 rounded-full"
+                        className="bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary text-xs px-2 py-1 rounded-full"
                       >
                         {employees.find((employee) => employee.id === assignee)?.name || "N/A"}
                       </span>
                     ))
                   ) : (
-                    <span className="text-gray-500 text-sm">No assignees</span>
+                    <span className="text-foreground-tertiary text-sm">No assignees</span>
                   )}
                 </div>
               </div>
             </div>
 
             <div className="flex gap-6 pt-4 text-sm border-t border-border-primary">
-              <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex items-center gap-2 text-foreground-secondary">
                 <Calendar size={16} strokeWidth={2} />
                 <span>
                   <span className="font-medium">Start:</span>{" "}
                   {formatDate(milestoneDetails?.start_date || "")}
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex items-center gap-2 text-foreground-secondary">
                 <Calendar size={16} strokeWidth={2} />
                 <span>
                   <span className="font-medium">End:</span>{" "}
@@ -289,7 +289,7 @@ export default function MilestoneDetails({
 
             {milestoneDetails?.description && (
               <div className="pt-4 border-t border-border-primary">
-                <p className="text-gray-600">{milestoneDetails.description}</p>
+                <p className="text-foreground-secondary">{milestoneDetails.description}</p>
               </div>
             )}
           </motion.div>
@@ -302,7 +302,7 @@ export default function MilestoneDetails({
           >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <Target size={20} className="text-gray-600" strokeWidth={2} />
+                <Target size={20} className="text-foreground-secondary" strokeWidth={2} />
                 <h3 className="text-lg font-semibold">Task List</h3>
               </div>
 
@@ -331,7 +331,7 @@ export default function MilestoneDetails({
                     whileHover={{ y: -2 }}
                     className="bg-surface-primary rounded-lg border border-border-primary p-4 shadow-sm space-y-3"
                   >
-                    <div className="font-medium text-gray-900">
+                    <div className="font-medium text-foreground-primary">
                       {task.task_title}
                     </div>
                     <div className="flex justify-end items-center gap-2">
@@ -342,7 +342,7 @@ export default function MilestoneDetails({
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => task.id !== null && handleDisplayUpdateTaskModal(task.id!)}
-                            className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-background-tertiary dark:bg-surface-secondary rounded-full transition-colors duration-150"
+                            className="p-1.5 text-foreground-secondary hover:text-foreground-primary hover:bg-background-tertiary dark:bg-surface-secondary rounded-full transition-colors duration-150"
                           >
                             <Pencil size={15} strokeWidth={2} />
                           </motion.button>
@@ -350,7 +350,7 @@ export default function MilestoneDetails({
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => task.id !== null && handleDeleteTask(task.id!)}
-                            className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors duration-150"
+                            className="p-1.5 text-foreground-secondary hover:text-red-600 hover:bg-red-50 rounded-full transition-colors duration-150"
                           >
                             <Trash size={15} strokeWidth={2} />
                           </motion.button>
@@ -361,7 +361,7 @@ export default function MilestoneDetails({
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => task.id !== null && setTaskDetailsId(task.id!)}
-                        className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-background-tertiary dark:bg-surface-secondary rounded-full transition-colors duration-150 ml-2"
+                        className="p-1.5 text-foreground-secondary hover:text-foreground-primary hover:bg-background-tertiary dark:bg-surface-secondary rounded-full transition-colors duration-150 ml-2"
                       >
                         <ArrowUpRight size={15} strokeWidth={2} />
                       </motion.button>
@@ -373,8 +373,8 @@ export default function MilestoneDetails({
                   <LoadingSpinner />
                 </div>
               ) : (
-                <div className="col-span-3 flex flex-col items-center justify-center h-32 text-gray-500">
-                  <Target size={32} strokeWidth={1.5} className="mb-3 text-gray-400" />
+                <div className="col-span-3 flex flex-col items-center justify-center h-32 text-foreground-tertiary">
+                  <Target size={32} strokeWidth={1.5} className="mb-3 text-foreground-tertiary" />
                   <p>No tasks found</p>
                 </div>
               )}

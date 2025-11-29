@@ -64,7 +64,7 @@ export default function SuperadminNav() {
               <div className="bg-gradient-to-br from-blue-600 to-purple-600 text-white px-3 py-1.5 rounded-lg font-bold text-lg shadow-sm">
                 SA
               </div>
-              <span className="text-xl font-semibold text-gray-800 hidden sm:block">
+              <span className="text-xl font-semibold text-foreground-primary hidden sm:block">
                 Flow Superadmin
               </span>
             </Link>

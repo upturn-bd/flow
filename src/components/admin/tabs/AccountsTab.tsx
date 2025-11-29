@@ -73,7 +73,7 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-foreground-secondary">
           Additional Data (Optional)
         </label>
         <button
@@ -87,28 +87,28 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
       </div>
 
       {pairs.length === 0 ? (
-        <div className="text-center py-4 border-2 border-dashed border-gray-200 rounded-lg">
-          <p className="text-sm text-gray-500 italic">No additional data fields</p>
-          <p className="text-xs text-gray-400 mt-1">Click "Add Field" to create key-value pairs</p>
+        <div className="text-center py-4 border-2 border-dashed border-border-primary rounded-lg">
+          <p className="text-sm text-foreground-tertiary italic">No additional data fields</p>
+          <p className="text-xs text-foreground-tertiary mt-1">Click "Add Field" to create key-value pairs</p>
         </div>
       ) : (
         <div className="space-y-2 max-h-48 overflow-y-auto">
           {pairs.map((pair, index) => (
-            <div key={index} className="flex gap-2 items-center p-2 bg-gray-50 rounded-lg">
+            <div key={index} className="flex gap-2 items-center p-2 bg-background-secondary rounded-lg">
               <input
                 type="text"
                 placeholder="Key (e.g., reference)"
                 value={pair.key}
                 onChange={(e) => updatePair(index, 'key', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="flex-1 px-3 py-2 border border-border-secondary rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-surface-primary"
               />
-              <span className="text-gray-400 font-mono">:</span>
+              <span className="text-foreground-tertiary font-mono">:</span>
               <input
                 type="text"
                 placeholder="Value (e.g., REF123)"
                 value={pair.value}
                 onChange={(e) => updatePair(index, 'value', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="flex-1 px-3 py-2 border border-border-secondary rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-surface-primary"
               />
               <button
                 type="button"
@@ -178,7 +178,7 @@ export default function AccountsTab() {
   // Helper function to format additional data for display
   const formatAdditionalData = (data: any) => {
     if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
-      return <span className="text-gray-500 italic text-xs">No additional data</span>;
+      return <span className="text-foreground-tertiary italic text-xs">No additional data</span>;
     }
 
     const entries = Object.entries(data);
@@ -200,7 +200,7 @@ export default function AccountsTab() {
         ))}
         {entries.length > displayCount && (
           <span
-            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 cursor-help"
+            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-foreground-secondary cursor-help"
             title={`Additional fields: ${entries.slice(displayCount).map(([k, v]) => `${k}: ${v}`).join(', ')}`}
           >
             +{entries.length - displayCount} more
@@ -358,10 +358,10 @@ export default function AccountsTab() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm p-6"
+        className="flex flex-col items-center justify-center h-64 bg-surface-primary rounded-xl shadow-sm p-6"
       >
-        <Loader className="w-12 h-12 text-gray-500 animate-spin mb-4" />
-        <p className="text-gray-600">Loading accounts...</p>
+        <Loader className="w-12 h-12 text-foreground-tertiary animate-spin mb-4" />
+        <p className="text-foreground-secondary">Loading accounts...</p>
       </motion.div>
     );
   }
@@ -380,7 +380,7 @@ export default function AccountsTab() {
             </div>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="w-full sm:w-auto bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-surface-primary/20 hover:bg-surface-primary/30 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
             >
               <Plus size={16} />
               Add Transaction
@@ -388,28 +388,28 @@ export default function AccountsTab() {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-white/10 rounded-lg p-3 sm:p-4">
+            <div className="bg-surface-primary/10 rounded-lg p-3 sm:p-4">
               <div className="flex items-center gap-1 sm:gap-2 mb-1">
                 <Building size={14} className="sm:w-4 sm:h-4" />
                 <span className="text-xs sm:text-sm opacity-90">Total</span>
               </div>
               <span className="text-xl sm:text-2xl font-bold">{summary.total}</span>
             </div>
-            <div className="bg-white/10 rounded-lg p-3 sm:p-4">
+            <div className="bg-surface-primary/10 rounded-lg p-3 sm:p-4">
               <div className="flex items-center gap-1 sm:gap-2 mb-1">
                 <CheckCircle size={14} className="sm:w-4 sm:h-4" />
                 <span className="text-xs sm:text-sm opacity-90">Complete</span>
               </div>
               <span className="text-xl sm:text-2xl font-bold">{summary.complete}</span>
             </div>
-            <div className="bg-white/10 rounded-lg p-3 sm:p-4">
+            <div className="bg-surface-primary/10 rounded-lg p-3 sm:p-4">
               <div className="flex items-center gap-1 sm:gap-2 mb-1">
                 <Clock size={14} className="sm:w-4 sm:h-4" />
                 <span className="text-xs sm:text-sm opacity-90">Pending</span>
               </div>
               <span className="text-xl sm:text-2xl font-bold">{summary.pending}</span>
             </div>
-            <div className="bg-white/10 rounded-lg p-3 sm:p-4 col-span-2 lg:col-span-1">
+            <div className="bg-surface-primary/10 rounded-lg p-3 sm:p-4 col-span-2 lg:col-span-1">
               <div className="flex items-center gap-1 sm:gap-2 mb-1">
                 <DollarSign size={14} className="sm:w-4 sm:h-4" />
                 <span className="text-xs sm:text-sm opacity-90">Net Amount</span>
@@ -427,17 +427,17 @@ export default function AccountsTab() {
         {/* Filters and Search */}
         <motion.div
           variants={fadeInUp}
-          className="bg-white rounded-xl shadow-sm p-4 sm:p-6 space-y-4"
+          className="bg-surface-primary rounded-xl shadow-sm p-4 sm:p-6 space-y-4"
         >
           {/* Search Bar */}
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary" />
             <input
               type="text"
               placeholder="Search transactions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
           </div>
 
@@ -445,14 +445,14 @@ export default function AccountsTab() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {/* Status Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Filter size={12} className="inline mr-1" />
                 Status
               </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               >
                 <option value="All">All Status</option>
                 <option value="Complete">Complete</option>
@@ -462,14 +462,14 @@ export default function AccountsTab() {
 
             {/* Payment Method Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <CreditCard size={12} className="inline mr-1" />
                 Payment Method
               </label>
               <select
                 value={methodFilter}
                 onChange={(e) => setMethodFilter(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               >
                 <option value="All">All Methods</option>
                 {PAYMENT_METHODS.map(method => (
@@ -480,7 +480,7 @@ export default function AccountsTab() {
 
             {/* Start Date Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Calendar size={12} className="inline mr-1" />
                 Start Date
               </label>
@@ -488,13 +488,13 @@ export default function AccountsTab() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               />
             </div>
 
             {/* End Date Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Calendar size={12} className="inline mr-1" />
                 End Date
               </label>
@@ -502,20 +502,20 @@ export default function AccountsTab() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               />
             </div>
 
             {/* Stakeholder Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Users size={12} className="inline mr-1" />
                 Stakeholder
               </label>
               <select
                 value={stakeholderFilter}
                 onChange={(e) => setStakeholderFilter(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               >
                 <option value="All">All Stakeholders</option>
                 <option value="none">No Stakeholder</option>
@@ -527,7 +527,7 @@ export default function AccountsTab() {
 
             {/* Min Amount Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <DollarSign size={12} className="inline mr-1" />
                 Min Amount
               </label>
@@ -536,13 +536,13 @@ export default function AccountsTab() {
                 placeholder="Min"
                 value={minAmount}
                 onChange={(e) => setMinAmount(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               />
             </div>
 
             {/* Max Amount Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <DollarSign size={12} className="inline mr-1" />
                 Max Amount
               </label>
@@ -551,7 +551,7 @@ export default function AccountsTab() {
                 placeholder="Max"
                 value={maxAmount}
                 onChange={(e) => setMaxAmount(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               />
             </div>
 
@@ -569,7 +569,7 @@ export default function AccountsTab() {
                   setMaxAmount('');
                   setStakeholderFilter('All');
                 }}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-foreground-secondary px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
               >
                 <X size={14} />
                 Reset to Last 30 Days
@@ -578,7 +578,7 @@ export default function AccountsTab() {
           </div>
 
           {/* Active Filters Summary */}
-          <div className="flex items-center gap-2 text-xs text-gray-600 bg-blue-50 p-3 rounded-lg">
+          <div className="flex items-center gap-2 text-xs text-foreground-secondary bg-blue-50 p-3 rounded-lg">
             <Filter size={12} className="text-blue-600" />
             <span className="font-medium text-blue-900">
               Showing {filteredAccounts.length} transaction{filteredAccounts.length !== 1 ? 's' : ''} from {startDate} to {endDate}
@@ -589,11 +589,11 @@ export default function AccountsTab() {
         {/* Accounts List */}
         <motion.div
           variants={fadeInUp}
-          className="bg-white rounded-xl shadow-sm overflow-hidden"
+          className="bg-surface-primary rounded-xl shadow-sm overflow-hidden"
         >
           {filteredAccounts.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <CreditCard size={48} className="mx-auto mb-4 text-gray-300" />
+            <div className="p-8 text-center text-foreground-tertiary">
+              <CreditCard size={48} className="mx-auto mb-4 text-foreground-tertiary" />
               <p className="text-lg font-medium mb-2">No transactions found</p>
               <p className="text-sm">Create your first transaction to get started</p>
             </div>
@@ -602,22 +602,22 @@ export default function AccountsTab() {
               {/* Desktop Table View */}
               <div className="hidden lg:block overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-background-secondary">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stakeholder</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Title</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Stakeholder</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Method</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">From</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Date</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Amount</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Data</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-surface-primary divide-y divide-gray-200">
                     {filteredAccounts.map((account) => (
-                      <tr key={account.id} className="hover:bg-gray-50">
+                      <tr key={account.id} className="hover:bg-background-secondary">
                         <td className="px-4 py-3">
                           <div className="font-medium text-gray-900 text-sm">{account.title}</div>
                         </td>
@@ -630,18 +630,18 @@ export default function AccountsTab() {
                               </span>
                             </div>
                           ) : (
-                            <span className="text-gray-400 text-xs italic">None</span>
+                            <span className="text-foreground-tertiary text-xs italic">None</span>
                           )}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-foreground-primary">
                             {account.method || 'N/A'}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-xs text-gray-900 max-w-[120px] truncate" title={account.from_source}>
                           {account.from_source}
                         </td>
-                        <td className="px-4 py-3 text-xs text-gray-500">
+                        <td className="px-4 py-3 text-xs text-foreground-tertiary">
                           <div className="flex items-center gap-1">
                             <Calendar size={12} />
                             {formatDate(account.transaction_date)}
@@ -698,12 +698,12 @@ export default function AccountsTab() {
                     key={account.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 hover:bg-gray-50 transition-colors"
+                    className="p-4 hover:bg-background-secondary transition-colors"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">{account.title}</h3>
-                        <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                        <div className="flex items-center gap-2 text-xs text-foreground-tertiary mb-1">
                           <Calendar size={12} />
                           <span>{formatDate(account.transaction_date)}</span>
                         </div>
@@ -722,14 +722,14 @@ export default function AccountsTab() {
 
                     <div className="space-y-2 mb-3">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Amount:</span>
+                        <span className="text-foreground-secondary">Amount:</span>
                         <span className={`font-semibold ${account.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {formatAmount(account.amount, account.currency)}
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">From:</span>
+                        <span className="text-foreground-secondary">From:</span>
                         <span className="text-gray-900 text-xs truncate max-w-[180px]" title={account.from_source}>
                           {account.from_source}
                         </span>
@@ -737,8 +737,8 @@ export default function AccountsTab() {
 
                       {account.method && (
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Method:</span>
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          <span className="text-foreground-secondary">Method:</span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-foreground-primary">
                             {account.method}
                           </span>
                         </div>
@@ -746,7 +746,7 @@ export default function AccountsTab() {
 
                       {account.stakeholder && (
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Stakeholder:</span>
+                          <span className="text-foreground-secondary">Stakeholder:</span>
                           <div className="flex items-center gap-1">
                             <Users size={12} className="text-blue-500" />
                             <span className="text-xs text-gray-900">{account.stakeholder.name}</span>
@@ -756,7 +756,7 @@ export default function AccountsTab() {
 
                       {account.additional_data && Object.keys(account.additional_data).length > 0 && (
                         <div className="pt-2 border-t border-gray-100">
-                          <span className="text-xs text-gray-600 mb-2 block">Additional Data:</span>
+                          <span className="text-xs text-foreground-secondary mb-2 block">Additional Data:</span>
                           {formatAdditionalData(account.additional_data)}
                         </div>
                       )}

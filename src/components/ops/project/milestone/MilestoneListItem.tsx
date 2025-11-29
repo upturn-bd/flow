@@ -32,7 +32,7 @@ const MilestoneListItem: React.FC<MilestoneListItemProps> = ({
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center justify-center gap-3">
-          <h4 className="font-semibold text-gray-900">
+          <h4 className="font-semibold text-foreground-primary">
             {milestone.milestone_title}
           </h4>
           <span className="text-xs font-medium bg-blue-100 px-2 py-1 rounded-full text-blue-600">
@@ -112,9 +112,9 @@ const MilestoneListItem: React.FC<MilestoneListItemProps> = ({
         </div>
       </div>
 
-      <p className="text-sm text-gray-600">{milestone.description}</p>
+      <p className="text-sm text-foreground-secondary">{milestone.description}</p>
 
-      <div className="flex items-center justify-between text-sm text-gray-500">
+      <div className="flex items-center justify-between text-sm text-foreground-tertiary">
         <span>
           {milestone.start_date} - {milestone.end_date}
         </span>

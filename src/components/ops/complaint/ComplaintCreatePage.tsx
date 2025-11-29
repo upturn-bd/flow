@@ -208,7 +208,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
           />
         </div>
-        <span className="text-sm font-medium text-gray-700">
+        <span className="text-sm font-medium text-foreground-secondary">
           Anonymous Complaint
         </span>
       </div>
@@ -220,7 +220,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
         <div className="space-y-4">
           {/* Category */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <Flag size={16} className="mr-2" />
               Category
             </label>
@@ -240,7 +240,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                   ))}
               </select>
               <CaretDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
                 size={16}
               />
             </div>
@@ -254,7 +254,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
 
           {/* Complaint Against */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <User size={16} className="mr-2" />
               Complaint Against
             </label>
@@ -274,7 +274,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                   ))}
               </select>
               <CaretDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
                 size={16}
               />
             </div>
@@ -288,7 +288,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
 
           {/* Description */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <MessageCircle size={16} className="mr-2" />
               Description
             </label>
@@ -310,13 +310,13 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
 
           {/* Attachments */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <Upload size={16} className="mr-2" />
               Attachment
             </label>
             <div className="bg-background-secondary dark:bg-background-tertiary border border-dashed border-border-secondary rounded-lg p-6 text-center">
-              <Upload className="mx-auto mb-4 text-gray-400 h-10 w-10" />
-              <p className="text-sm text-gray-500 mb-4">
+              <Upload className="mx-auto mb-4 text-foreground-tertiary h-10 w-10" />
+              <p className="text-sm text-foreground-tertiary mb-4">
                 Drag and drop files here, or
               </p>
               <label
@@ -366,7 +366,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           type="button"
-                          className="text-gray-400 hover:text-red-500"
+                          className="text-foreground-tertiary hover:text-red-500"
                           onClick={() => removeFile(file.name)}
                         >
                           <X size={16} />

@@ -197,7 +197,7 @@ export default function ClientMap({ value, onChange, type }: ClientMapProps) {
         )}
 
         {suggestions.length > 0 && (
-          <ul className="absolute z-10 mt-1 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+          <ul className="absolute z-10 mt-1 w-full bg-surface-primary border rounded-md shadow-lg max-h-60 overflow-auto">
             {suggestions.map((s, idx) => (
               <li
                 key={idx}

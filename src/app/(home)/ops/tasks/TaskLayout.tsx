@@ -37,7 +37,7 @@ const TABS = [
     key: "archived",
     label: "Archived",
     icon: <ArchiveIcon className="h-5 w-5" />,
-    color: "text-gray-600",
+    color: "text-foreground-secondary",
   },
 ];
 

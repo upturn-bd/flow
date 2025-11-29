@@ -428,7 +428,7 @@ export default function TeamDetailPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <Spinner size={40} className="animate-spin text-blue-600 mx-auto mb-3" />
-          <p className="text-gray-500">Loading team details...</p>
+          <p className="text-foreground-tertiary">Loading team details...</p>
         </div>
       </div>
     );
@@ -439,7 +439,7 @@ export default function TeamDetailPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <Warning size={48} className="text-amber-500 mx-auto mb-3" />
-          <p className="text-gray-600 font-medium">Team not found</p>
+          <p className="text-foreground-secondary font-medium">Team not found</p>
           <button
             onClick={() => router.push("/sa/teams")}
             className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
@@ -458,9 +458,9 @@ export default function TeamDetailPage() {
         <div className="flex items-start gap-4">
           <button
             onClick={() => router.push("/sa/teams")}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors mt-1"
+            className="p-2 hover:bg-background-tertiary rounded-lg transition-colors mt-1"
           >
-            <ArrowLeft size={24} className="text-gray-600" />
+            <ArrowLeft size={24} className="text-foreground-secondary" />
           </button>
           
           {isEditingTeam ? (
@@ -469,14 +469,14 @@ export default function TeamDetailPage() {
                 type="text"
                 value={editedTeam.name}
                 onChange={(e) => setEditedTeam(prev => ({ ...prev, name: e.target.value }))}
-                className="text-2xl font-bold text-gray-900 w-full px-3 py-1 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="text-2xl font-bold text-foreground-primary w-full px-3 py-1 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="Team name"
                 autoFocus
               />
               <textarea
                 value={editedTeam.description}
                 onChange={(e) => setEditedTeam(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-600 resize-none"
+                className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 text-foreground-secondary resize-none"
                 placeholder="Team description (optional)"
                 rows={2}
               />
@@ -486,7 +486,7 @@ export default function TeamDetailPage() {
                     setIsEditingTeam(false);
                     setEditedTeam({ name: team.name, description: team.description || "" });
                   }}
-                  className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="px-3 py-1.5 text-sm text-foreground-secondary hover:bg-background-tertiary rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
@@ -503,7 +503,7 @@ export default function TeamDetailPage() {
           ) : (
             <div className="flex-1">
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-gray-900">{team.name}</h1>
+                <h1 className="text-2xl font-bold text-foreground-primary">{team.name}</h1>
                 {team.is_default && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">
                     <Star size={12} weight="fill" />
@@ -512,13 +512,13 @@ export default function TeamDetailPage() {
                 )}
                 <button
                   onClick={() => setIsEditingTeam(true)}
-                  className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  className="p-1.5 text-foreground-tertiary hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   title="Edit team details"
                 >
                   <Pencil size={18} />
                 </button>
               </div>
-              <p className="text-gray-600 mt-1">{team.description || "No description"}</p>
+              <p className="text-foreground-secondary mt-1">{team.description || "No description"}</p>
             </div>
           )}
         </div>
@@ -526,12 +526,12 @@ export default function TeamDetailPage() {
 
       {/* Team Members Section */}
       <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
-        <div className="p-5 border-b border-border-primary bg-gray-50/50 flex items-center justify-between">
+        <div className="p-5 border-b border-border-primary bg-background-secondary/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Users size={24} className="text-blue-600" />
             <div>
-              <h2 className="font-semibold text-gray-900">Team Members</h2>
-              <p className="text-sm text-gray-500">{members.length} member{members.length !== 1 ? "s" : ""}</p>
+              <h2 className="font-semibold text-foreground-primary">Team Members</h2>
+              <p className="text-sm text-foreground-tertiary">{members.length} member{members.length !== 1 ? "s" : ""}</p>
             </div>
           </div>
           <button
@@ -548,27 +548,27 @@ export default function TeamDetailPage() {
 
         {members.length === 0 ? (
           <div className="p-12 text-center">
-            <Users size={48} className="mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-600 font-medium">No members yet</p>
-            <p className="text-sm text-gray-400 mt-1">Add employees to this team</p>
+            <Users size={48} className="mx-auto text-foreground-tertiary mb-3" />
+            <p className="text-foreground-secondary font-medium">No members yet</p>
+            <p className="text-sm text-foreground-tertiary mt-1">Add employees to this team</p>
           </div>
         ) : (
           <div className="divide-y divide-border-primary">
             {members.map((member) => (
-              <div key={member.id || member.employee_id} className="p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+              <div key={member.id || member.employee_id} className="p-4 flex items-center justify-between hover:bg-background-secondary/50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-medium text-sm">
                     {member.employee?.first_name?.[0]}{member.employee?.last_name?.[0]}
                   </div>
                   <div>
-                    <div className="font-medium text-gray-900">
+                    <div className="font-medium text-foreground-primary">
                       {member.employee ? `${member.employee.first_name} ${member.employee.last_name}` : "Unknown"}
                     </div>
-                    <div className="text-sm text-gray-500 flex items-center gap-2">
+                    <div className="text-sm text-foreground-tertiary flex items-center gap-2">
                       <span>{member.employee?.email}</span>
                       {member.employee?.designation && (
                         <>
-                          <span className="text-gray-300">•</span>
+                          <span className="text-foreground-tertiary">•</span>
                           <span>{member.employee.designation}</span>
                         </>
                       )}
@@ -577,7 +577,7 @@ export default function TeamDetailPage() {
                 </div>
                 <button
                   onClick={() => setMemberToRemove(member)}
-                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  className="p-2 text-foreground-tertiary hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   title="Remove member"
                 >
                   <Trash size={18} />
@@ -590,12 +590,12 @@ export default function TeamDetailPage() {
 
       {/* Team Permissions Section */}
       <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
-        <div className="p-5 border-b border-border-primary bg-gray-50/50 flex items-center justify-between">
+        <div className="p-5 border-b border-border-primary bg-background-secondary/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Shield size={24} className="text-purple-600" />
             <div>
-              <h2 className="font-semibold text-gray-900">Permissions</h2>
-              <p className="text-sm text-gray-500">Configure what this team can access</p>
+              <h2 className="font-semibold text-foreground-primary">Permissions</h2>
+              <p className="text-sm text-foreground-tertiary">Configure what this team can access</p>
             </div>
           </div>
           
@@ -613,7 +613,7 @@ export default function TeamDetailPage() {
             <button
               onClick={resetPermissions}
               disabled={!permissionsDirty || savingPermissions}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-foreground-secondary hover:bg-background-tertiary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ArrowCounterClockwise size={16} />
               Reset
@@ -650,13 +650,13 @@ export default function TeamDetailPage() {
               <div key={category} className="border border-border-primary rounded-lg overflow-hidden">
                 <button
                   onClick={() => setExpandedCategories(prev => ({ ...prev, [category]: !prev[category] }))}
-                  className="w-full p-4 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
+                  className="w-full p-4 flex items-center justify-between bg-background-secondary hover:bg-background-tertiary transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-gray-700 uppercase">{category}</span>
-                    <span className="text-xs text-gray-400">({categoryPermissions.length} permissions)</span>
+                    <span className="text-sm font-semibold text-foreground-secondary uppercase">{category}</span>
+                    <span className="text-xs text-foreground-tertiary">({categoryPermissions.length} permissions)</span>
                   </div>
-                  {isExpanded ? <CaretUp size={20} className="text-gray-400" /> : <CaretDown size={20} className="text-gray-400" />}
+                  {isExpanded ? <CaretUp size={20} className="text-foreground-tertiary" /> : <CaretDown size={20} className="text-foreground-tertiary" />}
                 </button>
 
                 <AnimatePresence>
@@ -668,8 +668,8 @@ export default function TeamDetailPage() {
                       transition={{ duration: 0.2 }}
                     >
                       {/* Category-level toggles */}
-                      <div className="px-4 py-2 bg-gray-50/50 border-b border-border-primary flex items-center justify-end gap-4">
-                        <span className="text-xs text-gray-500 mr-2">Toggle all:</span>
+                      <div className="px-4 py-2 bg-background-secondary/50 border-b border-border-primary flex items-center justify-end gap-4">
+                        <span className="text-xs text-foreground-tertiary mr-2">Toggle all:</span>
                         {actions.map(action => {
                           const state = getCategoryActionState(category, action);
                           return (
@@ -683,7 +683,7 @@ export default function TeamDetailPage() {
                                 onChange={(e) => toggleCategoryPermissions(category, action, e.target.checked)}
                                 className="w-3.5 h-3.5 rounded border-border-secondary text-purple-600 focus:ring-purple-500"
                               />
-                              <span className="text-xs text-gray-500 capitalize">{action.replace("can_", "")}</span>
+                              <span className="text-xs text-foreground-tertiary capitalize">{action.replace("can_", "")}</span>
                             </label>
                           );
                         })}
@@ -691,11 +691,11 @@ export default function TeamDetailPage() {
 
                       <div className="divide-y divide-border-primary">
                         {categoryPermissions.map((permission) => (
-                          <div key={permission.id} className="p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+                          <div key={permission.id} className="p-4 flex items-center justify-between hover:bg-background-secondary/50 transition-colors">
                             <div className="flex-1 min-w-0 mr-4">
-                              <div className="font-medium text-gray-900 text-sm">{permission.display_name}</div>
+                              <div className="font-medium text-foreground-primary text-sm">{permission.display_name}</div>
                               {permission.description && (
-                                <div className="text-xs text-gray-500 mt-0.5 line-clamp-1">{permission.description}</div>
+                                <div className="text-xs text-foreground-tertiary mt-0.5 line-clamp-1">{permission.description}</div>
                               )}
                             </div>
 
@@ -708,7 +708,7 @@ export default function TeamDetailPage() {
                                     onChange={(e) => handleLocalPermissionChange(permission.id!, action, e.target.checked)}
                                     className="w-4 h-4 rounded border-border-secondary text-purple-600 focus:ring-purple-500"
                                   />
-                                  <span className="text-xs text-gray-500 group-hover:text-gray-700 capitalize w-14">
+                                  <span className="text-xs text-foreground-tertiary group-hover:text-foreground-secondary capitalize w-14">
                                     {action.replace("can_", "")}
                                   </span>
                                 </label>
@@ -748,7 +748,7 @@ export default function TeamDetailPage() {
                     <div className="p-2 bg-blue-100 rounded-lg">
                       <UserPlus size={20} className="text-blue-600" />
                     </div>
-                    <h2 className="text-lg font-semibold text-gray-900">Add Team Member</h2>
+                    <h2 className="text-lg font-semibold text-foreground-primary">Add Team Member</h2>
                   </div>
                   <button
                     onClick={() => {
@@ -756,20 +756,20 @@ export default function TeamDetailPage() {
                       setSelectedEmployee(null);
                       setSearchTerm("");
                     }}
-                    className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="p-1.5 hover:bg-background-tertiary rounded-lg transition-colors"
                   >
-                    <X size={20} className="text-gray-400" />
+                    <X size={20} className="text-foreground-tertiary" />
                   </button>
                 </div>
               </div>
 
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
                     Search Employee
                   </label>
                   <div className="relative">
-                    <MagnifyingGlass size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <MagnifyingGlass size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-tertiary" />
                     <input
                       type="text"
                       placeholder="Search by name, email, or designation..."
@@ -787,10 +787,10 @@ export default function TeamDetailPage() {
                         {selectedEmployee.first_name[0]}{selectedEmployee.last_name[0]}
                       </div>
                       <div>
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-foreground-primary">
                           {selectedEmployee.first_name} {selectedEmployee.last_name}
                         </div>
-                        <div className="text-sm text-gray-600">{selectedEmployee.email}</div>
+                        <div className="text-sm text-foreground-secondary">{selectedEmployee.email}</div>
                       </div>
                     </div>
                     <button
@@ -814,34 +814,34 @@ export default function TeamDetailPage() {
                               setSelectedEmployee(employee);
                               setSearchTerm("");
                             }}
-                            className="w-full text-left p-3 hover:bg-gray-50 transition-colors flex items-center gap-3"
+                            className="w-full text-left p-3 hover:bg-background-secondary transition-colors flex items-center gap-3"
                           >
-                            <div className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-medium text-sm">
+                            <div className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-foreground-secondary font-medium text-sm">
                               {employee.first_name[0]}{employee.last_name[0]}
                             </div>
                             <div>
-                              <div className="font-medium text-gray-900 text-sm">
+                              <div className="font-medium text-foreground-primary text-sm">
                                 {employee.first_name} {employee.last_name}
                               </div>
-                              <div className="text-xs text-gray-500">{employee.email}</div>
+                              <div className="text-xs text-foreground-tertiary">{employee.email}</div>
                             </div>
                           </button>
                         );
                       })
                     ) : (
-                      <div className="p-4 text-center text-gray-500 text-sm">No employees found</div>
+                      <div className="p-4 text-center text-foreground-tertiary text-sm">No employees found</div>
                     )}
                   </div>
                 )}
 
                 {!selectedEmployee && !searchTerm && (
-                  <div className="text-center py-4 text-gray-500 text-sm">
+                  <div className="text-center py-4 text-foreground-tertiary text-sm">
                     Start typing to search for employees
                   </div>
                 )}
               </div>
 
-              <div className="p-6 bg-gray-50 border-t border-border-primary flex items-center justify-end gap-3">
+              <div className="p-6 bg-background-secondary border-t border-border-primary flex items-center justify-end gap-3">
                 <button
                   onClick={() => {
                     setShowAddMemberModal(false);
@@ -849,7 +849,7 @@ export default function TeamDetailPage() {
                     setSearchTerm("");
                   }}
                   disabled={addingMember}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-medium text-foreground-secondary hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -897,23 +897,23 @@ export default function TeamDetailPage() {
                   <div className="p-2 bg-red-100 rounded-full">
                     <Trash size={24} className="text-red-600" />
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900">Remove Member</h2>
+                  <h2 className="text-lg font-semibold text-foreground-primary">Remove Member</h2>
                 </div>
                 
-                <p className="text-gray-600">
+                <p className="text-foreground-secondary">
                   Are you sure you want to remove{" "}
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-foreground-primary">
                     {memberToRemove.employee?.first_name} {memberToRemove.employee?.last_name}
                   </span>{" "}
                   from this team?
                 </p>
               </div>
 
-              <div className="p-6 bg-gray-50 border-t border-border-primary flex items-center justify-end gap-3">
+              <div className="p-6 bg-background-secondary border-t border-border-primary flex items-center justify-end gap-3">
                 <button
                   onClick={() => setMemberToRemove(null)}
                   disabled={removingMember}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-medium text-foreground-secondary hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>

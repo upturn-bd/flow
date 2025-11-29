@@ -222,8 +222,8 @@ export default function SuperadminDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Platform overview and management</p>
+          <h1 className="text-3xl font-bold text-foreground-primary">Dashboard</h1>
+          <p className="text-foreground-secondary mt-1">Platform overview and management</p>
         </div>
         
         {stats.pendingApprovals > 0 && (
@@ -267,8 +267,8 @@ export default function SuperadminDashboard() {
                     <div className={`${card.bgColor} p-2.5 rounded-lg w-fit mb-3 group-hover:scale-110 transition-transform`}>
                       <Icon size={22} weight="duotone" className={card.textColor} />
                     </div>
-                    <p className="text-sm text-gray-500 mb-1">{card.label}</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm text-foreground-tertiary mb-1">{card.label}</p>
+                    <p className="text-2xl font-bold text-foreground-primary">
                       {card.value.toLocaleString()}
                     </p>
                   </div>
@@ -283,8 +283,8 @@ export default function SuperadminDashboard() {
         {/* Quick Actions */}
         <div className="lg:col-span-2 bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
           <div className="p-5 border-b border-border-primary">
-            <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
-            <p className="text-sm text-gray-500 mt-0.5">Common management tasks</p>
+            <h2 className="text-lg font-semibold text-foreground-primary">Quick Actions</h2>
+            <p className="text-sm text-foreground-tertiary mt-0.5">Common management tasks</p>
           </div>
           <div className="p-5 grid sm:grid-cols-2 gap-3">
             {quickActions.map((action) => {
@@ -297,11 +297,11 @@ export default function SuperadminDashboard() {
                       <Icon size={22} weight="duotone" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900 group-hover:text-gray-700 flex items-center gap-2">
+                      <div className="font-medium text-foreground-primary group-hover:text-foreground-secondary flex items-center gap-2">
                         {action.label}
                         <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
-                      <p className="text-sm text-gray-500 mt-0.5 line-clamp-1">{action.description}</p>
+                      <p className="text-sm text-foreground-tertiary mt-0.5 line-clamp-1">{action.description}</p>
                     </div>
                   </div>
                 </Link>
@@ -314,8 +314,8 @@ export default function SuperadminDashboard() {
         <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
           <div className="p-5 border-b border-border-primary flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Recent Companies</h2>
-              <p className="text-sm text-gray-500 mt-0.5">Latest additions</p>
+              <h2 className="text-lg font-semibold text-foreground-primary">Recent Companies</h2>
+              <p className="text-sm text-foreground-tertiary mt-0.5">Latest additions</p>
             </div>
             <Link href="/sa/companies" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
               View all
@@ -343,8 +343,8 @@ export default function SuperadminDashboard() {
                       {company.name.substring(0, 2).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900 truncate">{company.name}</div>
-                      <div className="text-xs text-gray-500 flex items-center gap-2">
+                      <div className="font-medium text-foreground-primary truncate">{company.name}</div>
+                      <div className="text-xs text-foreground-tertiary flex items-center gap-2">
                         <span className="flex items-center gap-1">
                           <Users size={12} />
                           {company.employee_count} employee{company.employee_count !== 1 ? "s" : ""}
@@ -362,8 +362,8 @@ export default function SuperadminDashboard() {
             </div>
           ) : (
             <div className="p-8 text-center">
-              <Buildings size={40} className="mx-auto text-gray-300 mb-2" />
-              <p className="text-gray-500 text-sm">No companies yet</p>
+              <Buildings size={40} className="mx-auto text-foreground-tertiary mb-2" />
+              <p className="text-foreground-tertiary text-sm">No companies yet</p>
             </div>
           )}
         </div>
@@ -372,7 +372,7 @@ export default function SuperadminDashboard() {
       {/* System Status */}
       <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
         <div className="p-5 border-b border-border-primary">
-          <h2 className="text-lg font-semibold text-gray-900">System Status</h2>
+          <h2 className="text-lg font-semibold text-foreground-primary">System Status</h2>
         </div>
         <div className="p-5 grid sm:grid-cols-3 gap-4">
           <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">

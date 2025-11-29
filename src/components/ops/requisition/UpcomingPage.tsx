@@ -48,7 +48,7 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
           className="p-4 sm:p-6"
         >
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl font-semibold text-gray-800">Saved Drafts</h1>
+            <h1 className="text-xl font-semibold text-foreground-primary">Saved Drafts</h1>
             <button
               onClick={() => setIsCreatingRequisition(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors shadow-sm"
@@ -65,8 +65,8 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
             </div>
           ) : upcoming.length === 0 ? (
             <div className="mt-10 flex flex-col items-center justify-center p-8 bg-background-secondary dark:bg-background-tertiary rounded-lg border border-border-primary">
-              <Clock className="h-12 w-12 text-gray-400 mb-3" />
-              <p className="text-gray-600 text-center">No saved drafts found.</p>
+              <Clock className="h-12 w-12 text-foreground-tertiary mb-3" />
+              <p className="text-foreground-secondary text-center">No saved drafts found.</p>
               <button
                 onClick={() => setIsCreatingRequisition(true)}
                 className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
@@ -119,12 +119,12 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
                         </div>
                       </div>
 
-                      <div className="mt-3 text-gray-600 text-sm line-clamp-2">
+                      <div className="mt-3 text-foreground-secondary text-sm line-clamp-2">
                         {item.description || "No description provided."}
                       </div>
 
                       <div className="mt-4 pt-3 border-t border-border-primary flex justify-between items-center">
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-foreground-tertiary">
                           {item.is_one_off ? "One-off request" : "Regular request"}
                         </div>
                         <button

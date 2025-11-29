@@ -330,7 +330,7 @@ export default function RequisitionCreatePage({
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
           />
         </div>
-        <span className="text-sm font-medium text-gray-700">
+        <span className="text-sm font-medium text-foreground-secondary">
           One-Off Request
         </span>
       </div>
@@ -341,7 +341,7 @@ export default function RequisitionCreatePage({
       >
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <PackageOpen size={16} className="mr-2" />
               Category
             </label>
@@ -362,7 +362,7 @@ export default function RequisitionCreatePage({
                   ))}
               </select>
               <CaretDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
                 size={16}
               />
               {touchedFields.requisition_category_id && errors.requisition_category_id && (
@@ -375,7 +375,7 @@ export default function RequisitionCreatePage({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-secondary mb-1">
               Item
             </label>
             <div className="relative">
@@ -401,7 +401,7 @@ export default function RequisitionCreatePage({
                     ))}
               </select>
               <CaretDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
                 size={16}
               />
               {touchedFields.item_id && errors.item_id && (
@@ -414,7 +414,7 @@ export default function RequisitionCreatePage({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-secondary mb-1">
               Quantity
             </label>
             <input
@@ -435,12 +435,12 @@ export default function RequisitionCreatePage({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="col-span-1">
-              <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+              <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
                 <Calendar size={16} className="mr-2" />
                 Date
               </label>
               <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
-                <Calendar size={16} className="ml-3 text-gray-500" />
+                <Calendar size={16} className="ml-3 text-foreground-tertiary" />
                 <input
                   type="date"
                   name="date"
@@ -461,12 +461,12 @@ export default function RequisitionCreatePage({
             {!isOneOff && (
               <>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
                     <Clock size={16} className="mr-2" />
                     From
                   </label>
                   <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
-                    <Clock size={16} className="ml-3 text-gray-500" />
+                    <Clock size={16} className="ml-3 text-foreground-tertiary" />
                     <input
                       type="time"
                       name="from_time"
@@ -485,12 +485,12 @@ export default function RequisitionCreatePage({
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
                     <Clock size={16} className="mr-2" />
                     To
                   </label>
                   <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
-                    <Clock size={16} className="ml-3 text-gray-500" />
+                    <Clock size={16} className="ml-3 text-foreground-tertiary" />
                     <input
                       type="time"
                       name="to_time"
@@ -512,7 +512,7 @@ export default function RequisitionCreatePage({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-secondary mb-1">
               Description
             </label>
             <input
@@ -527,13 +527,13 @@ export default function RequisitionCreatePage({
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <Upload size={16} className="mr-2" />
               Attachment
             </label>
             <div className="bg-background-secondary dark:bg-background-tertiary border border-dashed border-border-secondary rounded-lg p-6 text-center">
-              <Upload className="mx-auto mb-4 text-gray-400 h-10 w-10" />
-              <p className="text-sm text-gray-500 mb-4">
+              <Upload className="mx-auto mb-4 text-foreground-tertiary h-10 w-10" />
+              <p className="text-sm text-foreground-tertiary mb-4">
                 Drag and drop files here, or
               </p>
               <label
@@ -583,7 +583,7 @@ export default function RequisitionCreatePage({
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           type="button"
-                          className="text-gray-400 hover:text-red-500"
+                          className="text-foreground-tertiary hover:text-red-500"
                           onClick={() => removeFile(file.name)}
                         >
                           <X size={16} />
@@ -604,7 +604,7 @@ export default function RequisitionCreatePage({
             type="button"
             disabled={isSubmitting}
             onClick={handleSaveDraft}
-            className="flex items-center gap-2 bg-background-tertiary dark:bg-surface-secondary text-gray-700 px-6 py-2 rounded-lg hover:bg-surface-hover transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary px-6 py-2 rounded-lg hover:bg-surface-hover transition-colors disabled:opacity-50"
           >
             <Save size={18} />
             <span>Save as Draft</span>
@@ -886,7 +886,7 @@ export function RequisitionDraftPage({
           {isOneOff ? (
             <ToggleRight size={36} className="text-blue-500" />
           ) : (
-            <ToggleLeft size={36} className="text-gray-400" />
+            <ToggleLeft size={36} className="text-foreground-tertiary" />
           )}
           <span className="text-sm text-blue-600">One-Off</span>
         </div>
@@ -982,7 +982,7 @@ export function RequisitionDraftPage({
           <div className="flex-1">
             <label className="block font-bold text-[#003366] mb-1">Date</label>
             <div className="relative bg-surface-primary shadow px-4 py-2 rounded-md flex items-center gap-2">
-              <Calendar className="text-gray-600" />
+              <Calendar className="text-foreground-secondary" />
               <input
                 type="date"
                 name="date"
@@ -1053,7 +1053,7 @@ export function RequisitionDraftPage({
           <label className="block font-bold text-[#003366] mb-1">
             Attachment
           </label>
-          <div className="bg-background-tertiary dark:bg-surface-secondary rounded-md border border-border-secondary p-6 text-center text-sm text-gray-500">
+          <div className="bg-background-tertiary dark:bg-surface-secondary rounded-md border border-border-secondary p-6 text-center text-sm text-foreground-tertiary">
             <CloudUpload className="mx-auto mb-4 text-2xl" />
             <label
               htmlFor="file_upload"
@@ -1078,7 +1078,7 @@ export function RequisitionDraftPage({
                 ]);
               }}
             />
-            <div className="flex gap-3 mt-8 text-gray-600">
+            <div className="flex gap-3 mt-8 text-foreground-secondary">
               {attachments.length > 0
                 ? attachments.map((file, index) => (
                   <div

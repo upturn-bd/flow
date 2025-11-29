@@ -204,9 +204,9 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
     return (
       <div className="p-6">
         <div className="max-w-2xl mx-auto text-center py-12">
-          <WarningCircle className="mx-auto text-gray-400" size={48} />
-          <h2 className="text-xl font-bold text-gray-900 mt-4">Stakeholder Not Found</h2>
-          <p className="text-gray-600 mt-2">
+          <WarningCircle className="mx-auto text-foreground-tertiary" size={48} />
+          <h2 className="text-xl font-bold text-foreground-primary mt-4">Stakeholder Not Found</h2>
+          <p className="text-foreground-secondary mt-2">
             The stakeholder you're looking for doesn't exist or has been deleted.
           </p>
           <button
@@ -229,7 +229,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
       <div>
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base"
+          className="flex items-center gap-2 text-foreground-secondary hover:text-foreground-primary mb-3 sm:mb-4 text-sm sm:text-base"
         >
           <ArrowLeft size={18} />
           Back
@@ -238,7 +238,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-0">
           <div className="flex-1 min-w-0">
             <div className="flex items-start gap-2 sm:gap-3 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 break-words">{stakeholder.name}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary break-words">{stakeholder.name}</h1>
               {stakeholder.status === "Rejected" ? (
                 <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-red-100 text-red-800 flex-shrink-0">
                   <WarningCircle size={14} />
@@ -256,7 +256,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 </span>
               )}
             </div>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words">
+            <p className="text-xs sm:text-sm text-foreground-secondary mt-1 break-words">
               Process: {stakeholder.process?.name || "N/A"}
             </p>
           </div>
@@ -264,7 +264,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => router.push(`/admin/stakeholders/${stakeholder.id}/edit`)}
-              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 border border-border-secondary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
+              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-foreground-secondary border border-border-secondary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
             >
               <Edit size={14} />
               <span className="hidden sm:inline">Edit</span>
@@ -335,20 +335,20 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
         <div className="lg:col-span-1 space-y-6">
           {/* Basic Information */}
           <div className="bg-surface-primary rounded-lg border border-border-primary p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">Information</h2>
+            <h2 className="text-lg font-semibold text-foreground-primary">Information</h2>
 
             {stakeholder.stakeholder_type && (
               <div className="flex items-start gap-3">
-                <FileText className="text-gray-400 mt-0.5" size={18} />
+                <FileText className="text-foreground-tertiary mt-0.5" size={18} />
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Type</p>
-                  <p className="text-sm text-gray-600 mt-0.5">
+                  <p className="text-sm font-medium text-foreground-secondary">Type</p>
+                  <p className="text-sm text-foreground-secondary mt-0.5">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                       {stakeholder.stakeholder_type.name}
                     </span>
                   </p>
                   {stakeholder.stakeholder_type.description && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-foreground-tertiary mt-1">
                       {stakeholder.stakeholder_type.description}
                     </p>
                   )}
@@ -358,19 +358,19 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
             {stakeholder.address && (
               <div className="flex items-start gap-3">
-                <MapPin className="text-gray-400 mt-0.5" size={18} />
+                <MapPin className="text-foreground-tertiary mt-0.5" size={18} />
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Address</p>
-                  <p className="text-sm text-gray-600 mt-0.5">{stakeholder.address}</p>
+                  <p className="text-sm font-medium text-foreground-secondary">Address</p>
+                  <p className="text-sm text-foreground-secondary mt-0.5">{stakeholder.address}</p>
                 </div>
               </div>
             )}
 
             <div className="flex items-start gap-3">
-              <Calendar className="text-gray-400 mt-0.5" size={18} />
+              <Calendar className="text-foreground-tertiary mt-0.5" size={18} />
               <div>
-                <p className="text-sm font-medium text-gray-700">Created</p>
-                <p className="text-sm text-gray-600 mt-0.5">
+                <p className="text-sm font-medium text-foreground-secondary">Created</p>
+                <p className="text-sm text-foreground-secondary mt-0.5">
                   {stakeholder.created_at
                     ? new Date(stakeholder.created_at).toLocaleDateString()
                     : "N/A"}
@@ -382,8 +382,8 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               <div className="flex items-start gap-3">
                 <CheckCircle className="text-green-500 mt-0.5" size={18} />
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Completed</p>
-                  <p className="text-sm text-gray-600 mt-0.5">
+                  <p className="text-sm font-medium text-foreground-secondary">Completed</p>
+                  <p className="text-sm text-foreground-secondary mt-0.5">
                     {new Date(stakeholder.completed_at).toLocaleDateString()}
                   </p>
                 </div>
@@ -397,8 +397,8 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   <div className="flex items-start gap-3">
                     <WarningCircle className="text-red-500 mt-0.5" size={18} />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Rejected On</p>
-                      <p className="text-sm text-gray-600 mt-0.5">
+                      <p className="text-sm font-medium text-foreground-secondary">Rejected On</p>
+                      <p className="text-sm text-foreground-secondary mt-0.5">
                         {new Date(stakeholder.rejected_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -408,8 +408,8 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   <div className="flex items-start gap-3">
                     <User className="text-red-400 mt-0.5" size={18} />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Rejected By</p>
-                      <p className="text-sm text-gray-600 mt-0.5">
+                      <p className="text-sm font-medium text-foreground-secondary">Rejected By</p>
+                      <p className="text-sm text-foreground-secondary mt-0.5">
                         {stakeholder.rejected_by.name}
                       </p>
                     </div>
@@ -419,8 +419,8 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   <div className="flex items-start gap-3">
                     <FileText className="text-red-400 mt-0.5" size={18} />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Rejection Reason</p>
-                      <p className="text-sm text-gray-600 mt-0.5">
+                      <p className="text-sm font-medium text-foreground-secondary">Rejection Reason</p>
+                      <p className="text-sm text-foreground-secondary mt-0.5">
                         {stakeholder.rejection_reason}
                       </p>
                     </div>
@@ -432,10 +432,10 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
             {/* KAM Information */}
             {stakeholder.kam && (
               <div className="flex items-start gap-3">
-                <User className="text-gray-400 mt-0.5" size={18} />
+                <User className="text-foreground-tertiary mt-0.5" size={18} />
                 <div>
-                  <p className="text-sm font-medium text-gray-700">KAM</p>
-                  <p className="text-sm text-gray-600 mt-0.5">{stakeholder.kam.name}</p>
+                  <p className="text-sm font-medium text-foreground-secondary">KAM</p>
+                  <p className="text-sm text-foreground-secondary mt-0.5">{stakeholder.kam.name}</p>
                 </div>
               </div>
             )}
@@ -444,19 +444,19 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
           {/* Contact Persons */}
           <div className="bg-surface-primary rounded-lg border border-border-primary p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">Contact Persons</h2>
+            <h2 className="text-lg font-semibold text-foreground-primary">Contact Persons</h2>
 
             {stakeholder.contact_persons && stakeholder.contact_persons.length > 0 ? (
               <div className="space-y-4">
                 {stakeholder.contact_persons.map((contact, index) => (
                   <div key={index} className="border-t border-border-primary pt-4 first:border-t-0 first:pt-0">
                     <div className="flex items-start gap-3 mb-2">
-                      <User className="text-gray-400 mt-0.5" size={18} />
-                      <p className="text-sm font-medium text-gray-900">{contact.name}</p>
+                      <User className="text-foreground-tertiary mt-0.5" size={18} />
+                      <p className="text-sm font-medium text-foreground-primary">{contact.name}</p>
                     </div>
                     {contact.email && (
                       <div className="flex items-center gap-3 ml-9 mb-1">
-                        <Mail className="text-gray-400" size={16} />
+                        <Mail className="text-foreground-tertiary" size={16} />
                         <a
                           href={`mailto:${contact.email}`}
                           className="text-sm text-blue-600 hover:underline"
@@ -467,7 +467,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                     )}
                     {contact.phone && (
                       <div className="flex items-center gap-3 ml-9">
-                        <Phone className="text-gray-400" size={16} />
+                        <Phone className="text-foreground-tertiary" size={16} />
                         <a
                           href={`tel:${contact.phone}`}
                           className="text-sm text-blue-600 hover:underline"
@@ -480,7 +480,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">No contact persons added</p>
+              <p className="text-sm text-foreground-tertiary">No contact persons added</p>
             )}
           </div>
 
@@ -488,7 +488,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
           {stakeholder.status === "Permanent" && (
             <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900">Additional Data</h2>
+                <h2 className="text-base sm:text-lg font-semibold text-foreground-primary">Additional Data</h2>
                 <button
                   onClick={() => setShowAdditionalDataModal(true)}
                   className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
@@ -503,10 +503,10 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   {Object.entries(stakeholder.additional_data).map(([key, value]) => (
                     <div key={key} className="border-t border-border-primary pt-3 first:border-t-0 first:pt-0 sm:border-t-0 sm:pt-0">
                       <div className="flex items-start gap-3">
-                        <Database className="text-gray-400 mt-0.5 flex-shrink-0" size={18} />
+                        <Database className="text-foreground-tertiary mt-0.5 flex-shrink-0" size={18} />
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs sm:text-sm font-medium text-gray-700 break-words">{key}</p>
-                          <p className="text-xs sm:text-sm text-gray-600 mt-0.5 break-words">
+                          <p className="text-xs sm:text-sm font-medium text-foreground-secondary break-words">{key}</p>
+                          <p className="text-xs sm:text-sm text-foreground-secondary mt-0.5 break-words">
                             {typeof value === "boolean" ? (value ? "Yes" : "No") : String(value)}
                           </p>
                         </div>
@@ -515,7 +515,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   ))}
                 </div>
               ) : (
-                <p className="text-xs sm:text-sm text-gray-500">
+                <p className="text-xs sm:text-sm text-foreground-tertiary">
                   No additional data added. Click "Edit" to add data.
                 </p>
               )}
@@ -533,7 +533,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   onClick={() => setActiveTab("process")}
                   className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${activeTab === "process"
                       ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary"
+                      : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
                   Process Steps
@@ -542,7 +542,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   onClick={() => setActiveTab("issues")}
                   className={`px-6 py-3 text-sm font-medium transition-colors ${activeTab === "issues"
                       ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary"
+                      : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
                   Issues
@@ -551,7 +551,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   onClick={() => setActiveTab("transactions")}
                   className={`px-6 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "transactions"
                       ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary"
+                      : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
                   <DollarSign size={16} />
@@ -565,10 +565,10 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               {activeTab === "process" ? (
                 // Process Steps Content
                 <>
-                  <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Process Steps</h2>
+                  <h2 className="text-base sm:text-lg font-semibold text-foreground-primary mb-4 sm:mb-6">Process Steps</h2>
 
                   {sortedSteps.length === 0 ? (
-                    <div className="text-center py-8 sm:py-12 text-sm sm:text-base text-gray-500">
+                    <div className="text-center py-8 sm:py-12 text-sm sm:text-base text-foreground-tertiary">
                       No steps configured for this process
                     </div>
                   ) : (
@@ -628,7 +628,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                         ? "bg-green-500 text-white"
                                         : isCurrent
                                           ? "bg-blue-500 text-white"
-                                          : "bg-gray-300 text-gray-600"
+                                          : "bg-gray-300 text-foreground-secondary"
                                       }`}
                                   >
                                     {isCompleted ? (
@@ -638,11 +638,11 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                     )}
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">{step.name}</h3>
+                                    <h3 className="text-sm sm:text-base font-semibold text-foreground-primary break-words">{step.name}</h3>
                                     {step.description && (
-                                      <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words">{step.description}</p>
+                                      <p className="text-xs sm:text-sm text-foreground-secondary mt-1 break-words">{step.description}</p>
                                     )}
-                                    <div className="flex items-center flex-wrap gap-2 sm:gap-4 mt-2 text-xs text-gray-500">
+                                    <div className="flex items-center flex-wrap gap-2 sm:gap-4 mt-2 text-xs text-foreground-tertiary">
                                       <span>
                                         {step.teams && step.teams.length > 1 ? "Teams: " : "Team: "}
                                         {step.teams && step.teams.length > 0 ? (
@@ -672,7 +672,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       </div>
                                     )}
                                     {!isCompleted && hasTeamAccess && isSequential && !isCurrent && (
-                                      <div className="mt-2 text-xs text-gray-600 bg-background-secondary dark:bg-background-tertiary px-2 py-1 rounded break-words">
+                                      <div className="mt-2 text-xs text-foreground-secondary bg-background-secondary dark:bg-background-tertiary px-2 py-1 rounded break-words">
                                         This step will become available after completing the previous steps (sequential process)
                                       </div>
                                     )}
@@ -841,7 +841,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                         
                                         return (
                                           <div key={key} className="col-span-2">
-                                            <p className="text-xs font-medium text-gray-500 uppercase">
+                                            <p className="text-xs font-medium text-foreground-tertiary uppercase">
                                               {fieldLabel}
                                               <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded normal-case">
                                                 <Calculator size={12} />
@@ -849,13 +849,13 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                               </span>
                                             </p>
                                             <div className="mt-1 flex items-baseline gap-3">
-                                              <p className="text-lg font-semibold text-gray-900">
+                                              <p className="text-lg font-semibold text-foreground-primary">
                                                 {calculatedValue !== null && calculatedValue !== undefined 
                                                   ? formatCalculatedValue(calculatedValue) 
                                                   : "—"}
                                               </p>
                                             </div>
-                                            <p className="text-xs text-gray-500 mt-1">
+                                            <p className="text-xs text-foreground-tertiary mt-1">
                                               Formula: <code className="bg-background-tertiary dark:bg-surface-secondary px-1 py-0.5 rounded">{formulaToReadable(fieldDef.formula, sortedSteps)}</code>
                                             </p>
                                           </div>
@@ -864,7 +864,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
                                       return (
                                         <div key={key}>
-                                          <p className="text-xs font-medium text-gray-500 uppercase">
+                                          <p className="text-xs font-medium text-foreground-tertiary uppercase">
                                             {fieldLabel}
                                             {isCalculated && (
                                               <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded normal-case">
@@ -885,15 +885,15 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                                 <Download size={14} />
                                               </a>
                                               {fileInfo.size && (
-                                                <p className="text-xs text-gray-500 mt-1">
+                                                <p className="text-xs text-foreground-tertiary mt-1">
                                                   {(fileInfo.size / 1024).toFixed(2)} KB
                                                 </p>
                                               )}
                                             </div>
                                           ) : isGeolocation && typeof actualValue === 'object' && actualValue !== null && 'latitude' in actualValue && 'longitude' in actualValue ? (
                                             <div className="mt-1">
-                                              <p className="text-sm text-gray-900 flex items-center gap-2">
-                                                <MapPin size={14} className="text-gray-400" />
+                                              <p className="text-sm text-foreground-primary flex items-center gap-2">
+                                                <MapPin size={14} className="text-foreground-tertiary" />
                                                 {actualValue.latitude.toFixed(6)}, {actualValue.longitude.toFixed(6)}
                                               </p>
                                               <a
@@ -906,7 +906,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                               </a>
                                             </div>
                                           ) : (
-                                            <p className="text-sm text-gray-900 mt-1">
+                                            <p className="text-sm text-foreground-primary mt-1">
                                               {formatValue()}
                                             </p>
                                           )}
@@ -915,7 +915,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                     })}
                                   </div>
                                   {stepDataEntry.completed_at && (
-                                    <p className="text-xs text-gray-500 mt-4">
+                                    <p className="text-xs text-foreground-tertiary mt-4">
                                       Completed on{" "}
                                       {new Date(stepDataEntry.completed_at).toLocaleDateString()}
                                     </p>
@@ -948,8 +948,8 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-surface-primary rounded-lg p-4 sm:p-6 max-w-md w-full mx-4">
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2">Delete Stakeholder</h3>
-            <p className="text-sm text-gray-600 mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-bold text-foreground-primary mb-2">Delete Stakeholder</h3>
+            <p className="text-sm text-foreground-secondary mb-4 sm:mb-6">
               Are you sure you want to delete "{stakeholder.name}"? This action cannot be
               undone and will remove all associated step data.
             </p>
@@ -957,7 +957,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={deleting}
-                className="w-full sm:w-auto px-4 py-2 border border-border-secondary text-gray-700 rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
+                className="w-full sm:w-auto px-4 py-2 border border-border-secondary text-foreground-secondary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
               >
                 Cancel
               </button>

@@ -146,7 +146,7 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
     <motion.div initial="hidden" animate="visible" variants={fadeIn} className="p-4 sm:p-6 space-y-8">
       {/* Leave Balance */}
       <section className="bg-surface-primary rounded-xl shadow-sm p-6 border border-border-primary">
-        <h1 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <h1 className="text-xl font-bold text-foreground-primary mb-4 flex items-center">
           <Clock className="mr-2 h-5 w-5 text-blue-600" /> Leave Balance
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 min-h-[100px]">
@@ -172,14 +172,14 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
 
       {/* Leave Form */}
       <section className="bg-surface-primary rounded-xl shadow-sm p-6 border border-border-primary">
-        <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
+        <h2 className="text-xl font-bold text-foreground-primary mb-6 flex items-center">
           <Calendar className="mr-2 h-5 w-5 text-blue-600" /> Leave Application
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Leave Type */}
           <div className="space-y-2">
-            <label className="block font-medium text-gray-700">Leave Type *</label>
+            <label className="block font-medium text-foreground-secondary">Leave Type *</label>
             <div className="relative">
               <select
                 name="type_id"
@@ -203,9 +203,9 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
           {/* Dates */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="block font-medium text-gray-700">From *</label>
+              <label className="block font-medium text-foreground-secondary">From *</label>
               <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-lg overflow-hidden">
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary">
                   <Calendar className="h-5 w-5" />
                 </div>
                 <input
@@ -222,9 +222,9 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
             </div>
 
             <div className="space-y-2">
-              <label className="block font-medium text-gray-700">To *</label>
+              <label className="block font-medium text-foreground-secondary">To *</label>
               <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-lg overflow-hidden">
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary">
                   <Calendar className="h-5 w-5" />
                 </div>
                 <input
@@ -254,7 +254,7 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
 
           {/* Description */}
           <div className="space-y-2">
-            <label className="block font-medium text-gray-700">Reason for Leave</label>
+            <label className="block font-medium text-foreground-secondary">Reason for Leave</label>
             <textarea
               name="description"
               rows={4}
@@ -270,8 +270,8 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
 
           {/* Submit */}
           <div className="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-border-primary">
-            <div className="text-sm text-gray-500 mb-3 sm:mb-0 flex items-center">
-              <CheckCircle className="h-4 w-4 mr-1 text-gray-400" /> All fields with an asterisk (*) are required
+            <div className="text-sm text-foreground-tertiary mb-3 sm:mb-0 flex items-center">
+              <CheckCircle className="h-4 w-4 mr-1 text-foreground-tertiary" /> All fields with an asterisk (*) are required
             </div>
             <button
               type="submit"

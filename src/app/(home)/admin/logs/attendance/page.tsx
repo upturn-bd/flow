@@ -145,7 +145,7 @@ export default function AttendanceLogsPage() {
 
   const renderTable = (records: any[]) => {
     if (records.length === 0) {
-      return <p className="text-gray-500 text-sm mt-2">No attendance records found.</p>;
+      return <p className="text-foreground-tertiary text-sm mt-2">No attendance records found.</p>;
     }
 
     // Tag color styles
@@ -249,7 +249,7 @@ export default function AttendanceLogsPage() {
                 color: "text-blue-500",
                 content: todayLoading ? (
                   <div className="flex justify-center items-center h-32">
-                    <Loader className="animate-spin text-gray-500" />
+                    <Loader className="animate-spin text-foreground-tertiary" />
                   </div>
                 ) : (
                   renderTable(filteredToday)
@@ -274,7 +274,7 @@ export default function AttendanceLogsPage() {
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-surface-primary rounded-lg shadow-lg max-w-md w-full p-6 relative">
             <button
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+              className="absolute top-4 right-4 text-foreground-secondary hover:text-foreground-primary"
               onClick={() => setSelectedAttendance(null)}
             >
               <X size={20} />

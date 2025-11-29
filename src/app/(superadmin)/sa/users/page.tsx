@@ -205,11 +205,11 @@ export default function SuperadminUsersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-foreground-primary flex items-center gap-2">
             <ShieldCheck size={28} weight="duotone" className="text-amber-600" />
             Superadmin Users
           </h1>
-          <p className="text-gray-600 mt-1">Manage users with superadmin privileges</p>
+          <p className="text-foreground-secondary mt-1">Manage users with superadmin privileges</p>
         </div>
         <button
           onClick={() => {
@@ -234,8 +234,8 @@ export default function SuperadminUsersPage() {
               <ShieldCheck size={20} className="text-amber-600" />
             </div>
             <div className="text-left">
-              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-              <p className="text-xs text-gray-500">Total Superadmins</p>
+              <p className="text-2xl font-bold text-foreground-primary">{stats.total}</p>
+              <p className="text-xs text-foreground-tertiary">Total Superadmins</p>
             </div>
           </div>
         </button>
@@ -248,8 +248,8 @@ export default function SuperadminUsersPage() {
               <Power size={20} className="text-green-600" />
             </div>
             <div className="text-left">
-              <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
-              <p className="text-xs text-gray-500">Active</p>
+              <p className="text-2xl font-bold text-foreground-primary">{stats.active}</p>
+              <p className="text-xs text-foreground-tertiary">Active</p>
             </div>
           </div>
         </button>
@@ -258,12 +258,12 @@ export default function SuperadminUsersPage() {
           className={`bg-surface-primary rounded-xl p-4 shadow-sm border transition-all ${filterActive === "inactive" ? "border-border-secondary ring-2 ring-gray-200" : "border-border-primary hover:border-border-primary"}`}
         >
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <Power size={20} className="text-gray-500" />
+            <div className="p-2 bg-background-tertiary rounded-lg">
+              <Power size={20} className="text-foreground-tertiary" />
             </div>
             <div className="text-left">
-              <p className="text-2xl font-bold text-gray-900">{stats.inactive}</p>
-              <p className="text-xs text-gray-500">Inactive</p>
+              <p className="text-2xl font-bold text-foreground-primary">{stats.inactive}</p>
+              <p className="text-xs text-foreground-tertiary">Inactive</p>
             </div>
           </div>
         </button>
@@ -272,7 +272,7 @@ export default function SuperadminUsersPage() {
       {/* Superadmins List */}
       {loading ? (
         <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12">
-          <div className="flex flex-col items-center justify-center text-gray-500">
+          <div className="flex flex-col items-center justify-center text-foreground-tertiary">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-600 mb-4"></div>
             <p>Loading superadmins...</p>
           </div>
@@ -293,12 +293,12 @@ export default function SuperadminUsersPage() {
               >
                 <div className="p-5 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className={`p-3 rounded-xl ${superadmin.is_active ? "bg-amber-100" : "bg-gray-100"}`}>
-                      <Crown size={24} className={superadmin.is_active ? "text-amber-600" : "text-gray-400"} />
+                    <div className={`p-3 rounded-xl ${superadmin.is_active ? "bg-amber-100" : "bg-background-tertiary"}`}>
+                      <Crown size={24} className={superadmin.is_active ? "text-amber-600" : "text-foreground-tertiary"} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-gray-900">
+                        <h3 className="font-semibold text-foreground-primary">
                           {superadmin.employee
                             ? `${superadmin.employee.first_name} ${superadmin.employee.last_name}`
                             : "Unknown User"}
@@ -306,33 +306,33 @@ export default function SuperadminUsersPage() {
                         <span className={`px-2 py-0.5 text-xs rounded-full ${
                           superadmin.is_active 
                             ? "bg-green-100 text-green-700" 
-                            : "bg-gray-100 text-gray-600"
+                            : "bg-background-tertiary text-foreground-secondary"
                         }`}>
                           {superadmin.is_active ? "Active" : "Inactive"}
                         </span>
                       </div>
-                      <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                      <div className="flex items-center gap-4 mt-1 text-sm text-foreground-tertiary">
                         {superadmin.employee?.email && (
                           <span className="flex items-center gap-1">
-                            <User size={14} className="text-gray-400" />
+                            <User size={14} className="text-foreground-tertiary" />
                             {superadmin.employee.email}
                           </span>
                         )}
                         {superadmin.employee?.designation && (
                           <span className="flex items-center gap-1">
-                            <Buildings size={14} className="text-gray-400" />
+                            <Buildings size={14} className="text-foreground-tertiary" />
                             {superadmin.employee.designation}
                           </span>
                         )}
                         {superadmin.granted_at && (
                           <span className="flex items-center gap-1">
-                            <Calendar size={14} className="text-gray-400" />
+                            <Calendar size={14} className="text-foreground-tertiary" />
                             Granted {new Date(superadmin.granted_at).toLocaleDateString()}
                           </span>
                         )}
                       </div>
                       {superadmin.notes && (
-                        <p className="mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg p-2">
+                        <p className="mt-2 text-sm text-foreground-secondary bg-background-secondary rounded-lg p-2">
                           {superadmin.notes}
                         </p>
                       )}
@@ -343,7 +343,7 @@ export default function SuperadminUsersPage() {
                       onClick={() => handleToggleActive(superadmin.id!, superadmin.is_active)}
                       className={`px-3 py-1.5 text-sm rounded-lg transition-colors flex items-center gap-1.5 ${
                         superadmin.is_active
-                          ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          ? "bg-background-tertiary text-foreground-secondary hover:bg-gray-200"
                           : "bg-green-100 text-green-700 hover:bg-green-200"
                       }`}
                     >
@@ -360,7 +360,7 @@ export default function SuperadminUsersPage() {
                         </button>
                         <button
                           onClick={() => setDeleteConfirm(null)}
-                          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-2 text-foreground-tertiary hover:bg-background-tertiary rounded-lg transition-colors"
                         >
                           <X size={18} />
                         </button>
@@ -368,7 +368,7 @@ export default function SuperadminUsersPage() {
                     ) : (
                       <button
                         onClick={() => setDeleteConfirm(superadmin.id!)}
-                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-foreground-tertiary hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         <Trash size={18} />
                       </button>
@@ -383,8 +383,8 @@ export default function SuperadminUsersPage() {
 
       {filteredSuperadmins.length === 0 && !loading && (
         <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12 text-center">
-          <ShieldCheck size={48} className="mx-auto text-gray-300 mb-4" />
-          <p className="text-gray-500">
+          <ShieldCheck size={48} className="mx-auto text-foreground-tertiary mb-4" />
+          <p className="text-foreground-tertiary">
             {filterActive !== "all" 
               ? `No ${filterActive} superadmins found`
               : "No superadmins found"}
@@ -419,8 +419,8 @@ export default function SuperadminUsersPage() {
                       <ShieldCheck size={24} className="text-amber-600" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-semibold text-gray-900">Add Superadmin</h2>
-                      <p className="text-sm text-gray-500">Grant superadmin privileges to an employee</p>
+                      <h2 className="text-xl font-semibold text-foreground-primary">Add Superadmin</h2>
+                      <p className="text-sm text-foreground-tertiary">Grant superadmin privileges to an employee</p>
                     </div>
                   </div>
                   <button
@@ -438,7 +438,7 @@ export default function SuperadminUsersPage() {
               <div className="p-6 space-y-5 overflow-y-auto max-h-[calc(90vh-200px)]">
                 {/* Step 1: Select Company */}
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-foreground-secondary mb-2">
                     <span className="flex items-center justify-center w-6 h-6 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">1</span>
                     Select Company
                   </label>
@@ -459,13 +459,13 @@ export default function SuperadminUsersPage() {
                         </option>
                       ))}
                     </select>
-                    <CaretDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <CaretDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground-tertiary pointer-events-none" />
                   </div>
                 </div>
 
                 {/* Step 2: Search and Select Employee */}
                 <div className={selectedCompany ? "" : "opacity-50 pointer-events-none"}>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-foreground-secondary mb-2">
                     <span className="flex items-center justify-center w-6 h-6 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">2</span>
                     Search and Select Employee
                   </label>
@@ -477,12 +477,12 @@ export default function SuperadminUsersPage() {
                           <User size={20} className="text-amber-600" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium text-foreground-primary">
                             {selectedEmployee.first_name} {selectedEmployee.last_name}
                           </p>
-                          <p className="text-sm text-gray-600">{selectedEmployee.email}</p>
+                          <p className="text-sm text-foreground-secondary">{selectedEmployee.email}</p>
                           {selectedEmployee.designation && (
-                            <p className="text-sm text-gray-500">{selectedEmployee.designation}</p>
+                            <p className="text-sm text-foreground-tertiary">{selectedEmployee.designation}</p>
                           )}
                         </div>
                       </div>
@@ -490,7 +490,7 @@ export default function SuperadminUsersPage() {
                         onClick={() => setSelectedEmployee(null)}
                         className="p-2 hover:bg-amber-100 rounded-lg transition-colors"
                       >
-                        <X size={20} className="text-gray-500" />
+                        <X size={20} className="text-foreground-tertiary" />
                       </button>
                     </div>
                   ) : (
@@ -498,7 +498,7 @@ export default function SuperadminUsersPage() {
                       <div className="relative mb-3">
                         <MagnifyingGlass
                           size={20}
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
                         />
                         <input
                           type="text"
@@ -521,26 +521,26 @@ export default function SuperadminUsersPage() {
                                     setSelectedEmployee(employee);
                                     setSearchTerm("");
                                   }}
-                                  className="w-full text-left p-4 hover:bg-gray-50 transition-colors flex items-center gap-3"
+                                  className="w-full text-left p-4 hover:bg-background-secondary transition-colors flex items-center gap-3"
                                 >
-                                  <div className="p-2 bg-gray-100 rounded-lg">
-                                    <User size={18} className="text-gray-600" />
+                                  <div className="p-2 bg-background-tertiary rounded-lg">
+                                    <User size={18} className="text-foreground-secondary" />
                                   </div>
                                   <div>
-                                    <p className="font-medium text-gray-900">
+                                    <p className="font-medium text-foreground-primary">
                                       {employee.first_name} {employee.last_name}
                                     </p>
-                                    <p className="text-sm text-gray-600">{employee.email}</p>
+                                    <p className="text-sm text-foreground-secondary">{employee.email}</p>
                                     {employee.designation && (
-                                      <p className="text-sm text-gray-500">{employee.designation}</p>
+                                      <p className="text-sm text-foreground-tertiary">{employee.designation}</p>
                                     )}
                                   </div>
                                 </button>
                               );
                             })
                           ) : (
-                            <div className="p-6 text-center text-gray-500">
-                              <User size={32} className="mx-auto text-gray-300 mb-2" />
+                            <div className="p-6 text-center text-foreground-tertiary">
+                              <User size={32} className="mx-auto text-foreground-tertiary mb-2" />
                               <p>No employees found</p>
                             </div>
                           )}
@@ -548,7 +548,7 @@ export default function SuperadminUsersPage() {
                       )}
 
                       {!searchTerm && selectedCompany && (
-                        <p className="text-sm text-gray-500 text-center py-4">
+                        <p className="text-sm text-foreground-tertiary text-center py-4">
                           Start typing to search for employees
                         </p>
                       )}
@@ -558,8 +558,8 @@ export default function SuperadminUsersPage() {
 
                 {/* Step 3: Notes */}
                 <div className={selectedEmployee ? "" : "opacity-50 pointer-events-none"}>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                    <span className="flex items-center justify-center w-6 h-6 bg-gray-200 text-gray-600 rounded-full text-xs font-bold">3</span>
+                  <label className="flex items-center gap-2 text-sm font-medium text-foreground-secondary mb-2">
+                    <span className="flex items-center justify-center w-6 h-6 bg-gray-200 text-foreground-secondary rounded-full text-xs font-bold">3</span>
                     Notes (Optional)
                   </label>
                   <textarea
@@ -581,14 +581,14 @@ export default function SuperadminUsersPage() {
                 </div>
               </div>
 
-              <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
+              <div className="p-6 border-t bg-background-secondary flex justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => {
                     setShowModal(false);
                     resetForm();
                   }}
-                  className="px-4 py-2.5 border border-border-secondary rounded-xl hover:bg-gray-100 transition-colors"
+                  className="px-4 py-2.5 border border-border-secondary rounded-xl hover:bg-background-tertiary transition-colors"
                 >
                   Cancel
                 </button>

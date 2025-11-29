@@ -261,7 +261,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
       {/* Education Section */}
       <motion.div variants={itemVariants}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-800 flex items-center">
+          <h2 className="text-xl font-bold text-foreground-primary flex items-center">
             <GraduationCap className="mr-2 h-6 w-6 text-emerald-600" />
             Education
           </h2>
@@ -288,9 +288,9 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
             />
           ) : educationToShow.length === 0 ? (
             <div className="px-6 py-12 text-center border-t">
-              <BookOpen className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-800 mb-1">No Education Records</h3>
-              <p className="text-gray-500">
+              <BookOpen className="h-12 w-12 mx-auto text-foreground-tertiary mb-4" />
+              <h3 className="text-lg font-medium text-foreground-primary mb-1">No Education Records</h3>
+              <p className="text-foreground-tertiary">
                 {isCurrentUser 
                   ? "Add your academic qualifications to showcase your educational background."
                   : "No education records found for this user."}
@@ -311,17 +311,17 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   key={edu.id}
-                  className="p-6 hover:bg-gray-50 flex flex-col md:flex-row md:items-start gap-4"
+                  className="p-6 hover:bg-background-secondary flex flex-col md:flex-row md:items-start gap-4"
                 >
                   <div className="flex-grow">
-                    <h3 className="font-semibold text-gray-900 mb-1">{edu.institute}</h3>
-                    <p className="text-gray-800">{edu.type}</p>
-                    <div className="flex items-center text-gray-500 text-sm mt-1">
+                    <h3 className="font-semibold text-foreground-primary mb-1">{edu.institute}</h3>
+                    <p className="text-foreground-primary">{edu.type}</p>
+                    <div className="flex items-center text-foreground-tertiary text-sm mt-1">
                       <Calendar className="h-4 w-4 mr-1" />
                       <span>{new Date(edu.from_date).toLocaleDateString()} - {edu.to_date ? new Date(edu.to_date).toLocaleDateString() : 'Present'}</span>
                     </div>
                     {edu.result && (
-                      <p className="mt-2 text-gray-600 text-sm">{edu.result}</p>
+                      <p className="mt-2 text-foreground-secondary text-sm">{edu.result}</p>
                     )}
                     {edu.attachments && edu.attachments.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-3">
@@ -367,7 +367,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
       {/* Experience Section */}
       <motion.div variants={itemVariants}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-800 flex items-center">
+          <h2 className="text-xl font-bold text-foreground-primary flex items-center">
             <Briefcase className="mr-2 h-6 w-6 text-blue-600" />
             Work Experience
           </h2>
@@ -394,9 +394,9 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
             />
           ) : experienceToShow.length === 0 ? (
             <div className="px-6 py-12 text-center border-t">
-              <Building className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-800 mb-1">No Work Experience</h3>
-              <p className="text-gray-500">
+              <Building className="h-12 w-12 mx-auto text-foreground-tertiary mb-4" />
+              <h3 className="text-lg font-medium text-foreground-primary mb-1">No Work Experience</h3>
+              <p className="text-foreground-tertiary">
                 {isCurrentUser
                   ? "Add your professional experience to showcase your career journey."
                   : "No work experience records found for this user."}
@@ -417,12 +417,12 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   key={exp.id}
-                  className="p-6 hover:bg-gray-50 flex flex-col md:flex-row md:items-start gap-4"
+                  className="p-6 hover:bg-background-secondary flex flex-col md:flex-row md:items-start gap-4"
                 >
                   <div className="flex-grow">
-                    <h3 className="font-semibold text-gray-900 mb-1">{exp.company_name}</h3>
-                    <p className="text-gray-800">{exp.designation}</p>
-                    <div className="flex flex-wrap items-center gap-x-4 text-gray-500 text-sm mt-1">
+                    <h3 className="font-semibold text-foreground-primary mb-1">{exp.company_name}</h3>
+                    <p className="text-foreground-primary">{exp.designation}</p>
+                    <div className="flex flex-wrap items-center gap-x-4 text-foreground-tertiary text-sm mt-1">
                       <div className="flex items-center">
                         <Calendar className="h-4 w-4 mr-1" />
                         <span>{new Date(exp.from_date).toLocaleDateString()} - {exp.to_date ? new Date(exp.to_date).toLocaleDateString() : 'Present'}</span>
@@ -435,7 +435,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                       )} */}
                     </div>
                     {exp.description && (
-                      <p className="mt-2 text-gray-600 text-sm">{exp.description}</p>
+                      <p className="mt-2 text-foreground-secondary text-sm">{exp.description}</p>
                     )}
                   </div>
                   {isCurrentUser && (

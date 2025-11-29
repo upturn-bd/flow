@@ -162,7 +162,7 @@ export default function NoticePage() {
               className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
             >
               <div>
-                <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-2">
+                <h1 className="text-2xl font-bold text-foreground-primary flex items-center mb-2">
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0.5 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -173,7 +173,7 @@ export default function NoticePage() {
                   </motion.div>
                   Notices & Announcements
                 </h1>
-                <p className="text-gray-600 max-w-3xl">
+                <p className="text-foreground-secondary max-w-3xl">
                   View and manage company-wide notices and important announcements.
                 </p>
               </div>
@@ -192,7 +192,7 @@ export default function NoticePage() {
                 <PermissionTooltip message="You don't have permission to create notices">
                   <button
                     disabled
-                    className="flex items-center justify-center gap-2 bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-60"
+                    className="flex items-center justify-center gap-2 bg-gray-300 text-foreground-tertiary px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-60"
                   >
                     <Plus className="h-4 w-4" />
                     <span>Create Notice</span>
@@ -218,8 +218,8 @@ export default function NoticePage() {
                 >
                   <Info className="h-16 w-16 text-amber-300 mb-4" />
                 </motion.div>
-                <h3 className="text-xl font-medium text-gray-700 mb-2">No Notices Available</h3>
-                <p className="text-gray-600 text-center max-w-md mb-5">
+                <h3 className="text-xl font-medium text-foreground-secondary mb-2">No Notices Available</h3>
+                <p className="text-foreground-secondary text-center max-w-md mb-5">
                   There are currently no notices or announcements. Create your first notice to keep everyone informed.
                 </p>
                 <motion.button
@@ -250,7 +250,7 @@ export default function NoticePage() {
                   >
                     <div className="p-6">
                       <div className="flex justify-between items-start">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-3">{notice.title}</h2>
+                        <h2 className="text-lg font-semibold text-foreground-primary mb-3">{notice.title}</h2>
                         {notice.created_by === userId && (
                           <div className="flex space-x-1">
                             {canWrite(PERMISSION_MODULES.NOTICE) ? (
@@ -267,7 +267,7 @@ export default function NoticePage() {
                               <PermissionTooltip message="You don't have permission to edit notices">
                                 <button
                                   disabled
-                                  className="p-2 text-gray-400 rounded-full cursor-not-allowed opacity-50"
+                                  className="p-2 text-foreground-tertiary rounded-full cursor-not-allowed opacity-50"
                                   aria-label="Edit notice (disabled)"
                                 >
                                   <Pencil className="h-4 w-4" />
@@ -288,7 +288,7 @@ export default function NoticePage() {
                               <PermissionTooltip message="You don't have permission to delete notices">
                                 <button
                                   disabled
-                                  className="p-2 text-gray-400 rounded-full cursor-not-allowed opacity-50"
+                                  className="p-2 text-foreground-tertiary rounded-full cursor-not-allowed opacity-50"
                                   aria-label="Delete notice (disabled)"
                                 >
                                   <Trash className="h-4 w-4" />
@@ -299,16 +299,16 @@ export default function NoticePage() {
 
                         )}
                       </div>
-                      <p className="text-gray-700 mb-4">{notice.description}</p>
+                      <p className="text-foreground-secondary mb-4">{notice.description}</p>
                       <div className="flex flex-col gap-2 pt-4 border-t border-border-primary">
                         <div className="flex flex-wrap justify-between items-center gap-2">
-                          <div className="flex items-center text-sm text-gray-500">
+                          <div className="flex items-center text-sm text-foreground-tertiary">
                             <Clock className="h-4 w-4 mr-1.5" />
                             <span>
                               Posted on {formatDate(notice.created_at || '')}
                             </span>
                           </div>
-                          <div className="flex items-center text-sm text-gray-600">
+                          <div className="flex items-center text-sm text-foreground-secondary">
                             <CalendarDays className="h-4 w-4 mr-1.5" />
                             <span>
                               Valid: {formatDate(notice.valid_from)} → {formatDate(notice.valid_till)}

@@ -413,7 +413,7 @@ export default function ProjectDetails({
           >
             <div className="flex items-center gap-3">
               <Building size={24} className="text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-foreground-primary">
                 Project Details
               </h1>
             </div>
@@ -484,7 +484,7 @@ export default function ProjectDetails({
                 {projectDetails.assignees &&
                   projectDetails.assignees.length > 0 && (
                     <div className="mt-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">
+                      <p className="text-sm font-medium text-foreground-secondary mb-2">
                         Assigned Team:
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -595,7 +595,7 @@ export default function ProjectDetails({
         >
           <form onSubmit={submitProject} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                 Remarks
               </label>
               <textarea

@@ -192,8 +192,8 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
           className="flex flex-col items-center justify-center py-16"
         >
           <XCircle className="h-12 w-12 text-red-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading Payroll</h3>
-          <p className="text-gray-500 mb-4">{error.message}</p>
+          <h3 className="text-lg font-medium text-foreground-primary mb-2">Error Loading Payroll</h3>
+          <p className="text-foreground-tertiary mb-4">{error.message}</p>
           <button
             onClick={() => fetchPayrollHistory()}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -224,8 +224,8 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                     <CreditCard className="h-8 w-8 text-indigo-600" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Total Records</p>
-                    <p className="text-2xl font-semibold text-gray-900">{payrollStats.total}</p>
+                    <p className="text-sm font-medium text-foreground-secondary">Total Records</p>
+                    <p className="text-2xl font-semibold text-foreground-primary">{payrollStats.total}</p>
                   </div>
                 </div>
               </div>
@@ -235,8 +235,8 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                     <CheckCircle className="h-8 w-8 text-green-600" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Paid</p>
-                    <p className="text-2xl font-semibold text-gray-900">{payrollStats.paid}</p>
+                    <p className="text-sm font-medium text-foreground-secondary">Paid</p>
+                    <p className="text-2xl font-semibold text-foreground-primary">{payrollStats.paid}</p>
                   </div>
                 </div>
               </div>
@@ -246,8 +246,8 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                     <Clock className="h-8 w-8 text-blue-600" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Pending</p>
-                    <p className="text-2xl font-semibold text-gray-900">{payrollStats.pending}</p>
+                    <p className="text-sm font-medium text-foreground-secondary">Pending</p>
+                    <p className="text-2xl font-semibold text-foreground-primary">{payrollStats.pending}</p>
                   </div>
                 </div>
               </div>
@@ -257,8 +257,8 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                         <AlertTriangle className="h-8 w-8 text-amber-600" />
                       </div>
                       <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600">Published</p>
-                        <p className="text-2xl font-semibold text-gray-900">{payrollStats.published}</p>
+                        <p className="text-sm font-medium text-foreground-secondary">Published</p>
+                        <p className="text-2xl font-semibold text-foreground-primary">{payrollStats.published}</p>
                       </div>
                     </div>
                   </div>
@@ -280,8 +280,8 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                     {statusFilter === 'Published' && <AlertTriangle className="h-8 w-8 text-amber-600" />}
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">{statusFilter} Payrolls</p>
-                    <p className="text-2xl font-semibold text-gray-900">{filteredPayrolls.length}</p>
+                    <p className="text-sm font-medium text-foreground-secondary">{statusFilter} Payrolls</p>
+                    <p className="text-2xl font-semibold text-foreground-primary">{filteredPayrolls.length}</p>
                   </div>
                 </div>
               </div>
@@ -295,12 +295,12 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
               className="flex flex-col items-center justify-center py-12 text-center"
             >
               <div className="bg-background-tertiary dark:bg-surface-secondary rounded-full p-4 mb-4">
-                <CreditCard className="h-12 w-12 text-gray-400" />
+                <CreditCard className="h-12 w-12 text-foreground-tertiary" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-lg font-medium text-foreground-primary">
                 {statusFilter ? `No ${statusFilter.toLowerCase()} payrolls` : 'No payroll history'}
               </h3>
-              <p className="mt-1 text-gray-500">
+              <p className="mt-1 text-foreground-tertiary">
                 {statusFilter 
                   ? `${statusFilter} payroll records will appear here`
                   : 'Your payroll records will appear here once generated'
@@ -335,7 +335,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center space-x-2">
-                              <h3 className="text-lg font-semibold text-gray-900">
+                              <h3 className="text-lg font-semibold text-foreground-primary">
                                 {payroll.employee?.first_name} {payroll.employee?.last_name}
                               </h3>
                               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(payroll.status)}`}>
@@ -345,12 +345,12 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                             </div>
                             
                             <div className="mt-2 space-y-1">
-                              <div className="flex items-center text-sm text-gray-600">
+                              <div className="flex items-center text-sm text-foreground-secondary">
                                 <Calendar className="h-4 w-4 mr-2" />
                                 {formatDate(payroll.generation_date)}
                               </div>
                               {payroll.employee && (
-                                <div className="flex items-center text-sm text-gray-600">
+                                <div className="flex items-center text-sm text-foreground-secondary">
                                   <User className="h-4 w-4 mr-2" />
                                   {payroll.employee.first_name} {payroll.employee.last_name}
                                 </div>
@@ -360,7 +360,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                         </div>
                         
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-gray-900">
+                          <div className="text-2xl font-bold text-foreground-primary">
                             {isEditing ? (
                               <span className="text-blue-600">
                                 ৳{calculateNewTotal(payroll.basic_salary).toLocaleString()}
@@ -369,7 +369,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                               <span>৳{payroll.total_amount.toLocaleString()}</span>
                             )}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-foreground-tertiary">
                             Base: ৳{payroll.basic_salary.toLocaleString()}
                           </div>
                           {(adjustmentTotal !== 0 || isEditing) && (
@@ -392,7 +392,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                       {isEditing ? (
                         <div className="mt-6 pt-4 border-t border-border-primary">
                           <div className="flex items-center justify-between mb-4">
-                            <h4 className="text-sm font-medium text-gray-900">Adjustments</h4>
+                            <h4 className="text-sm font-medium text-foreground-primary">Adjustments</h4>
                             <button
                               onClick={handleAddAdjustment}
                               className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 border border-blue-200 rounded hover:bg-blue-50"
@@ -427,14 +427,14 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                               </div>
                             ))}
                             {adjustments.length === 0 && (
-                              <p className="text-sm text-gray-500 italic">No adjustments added</p>
+                              <p className="text-sm text-foreground-tertiary italic">No adjustments added</p>
                             )}
                           </div>
                           <div className="flex items-center justify-end space-x-2 mt-4">
                             <button
                               onClick={handleCancelEdit}
                               disabled={processingUpdate}
-                              className="px-3 py-2 text-sm font-medium text-gray-700 bg-surface-primary border border-border-secondary rounded-md hover:bg-background-secondary dark:bg-background-tertiary focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                              className="px-3 py-2 text-sm font-medium text-foreground-secondary bg-surface-primary border border-border-secondary rounded-md hover:bg-background-secondary dark:bg-background-tertiary focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
                             >
                               Cancel
                             </button>
@@ -462,11 +462,11 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                           {/* Current Adjustments Display */}
                           {payroll.adjustments && payroll.adjustments.length > 0 && (
                             <div className="mt-4 pt-4 border-t border-border-primary">
-                              <h4 className="text-sm font-medium text-gray-900 mb-2">Current Adjustments</h4>
+                              <h4 className="text-sm font-medium text-foreground-primary mb-2">Current Adjustments</h4>
                               <div className="space-y-1">
                                 {payroll.adjustments.map((adjustment, idx) => (
                                   <div key={idx} className="flex items-center justify-between text-sm">
-                                    <span className="text-gray-600">{adjustment.type}</span>
+                                    <span className="text-foreground-secondary">{adjustment.type}</span>
                                     <span className={`font-medium flex items-center ${
                                       adjustment.amount >= 0 ? 'text-green-600' : 'text-red-600'
                                     }`}>

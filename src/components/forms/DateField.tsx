@@ -28,13 +28,13 @@ export const DateField: React.FC<DateFieldProps> = ({
 }) => {
   return (
     <div className={className}>
-      <label className="block font-semibold text-gray-700 mb-2">
+      <label className="block font-semibold text-foreground-secondary mb-2">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Calendar size={18} weight="duotone" className="text-gray-500" />
+          <Calendar size={18} weight="duotone" className="text-foreground-tertiary" />
         </div>
         <input
           type="date"

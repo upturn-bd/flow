@@ -1316,7 +1316,7 @@ function FieldEditor({
                       checked={nestedField.required}
                       onChange={(checked) => updateNestedField(nestedIdx, { required: checked })}
                     />
-                    <span className="text-xs text-gray-700 font-medium">Required</span>
+                    <span className="text-xs text-foreground-secondary font-medium">Required</span>
                   </div>
                   <button
                     type="button"
@@ -1329,7 +1329,7 @@ function FieldEditor({
               </div>
             ))}
             {(!field.nested || field.nested.length === 0) && (
-              <p className="text-xs text-gray-500 italic text-center py-2">
+              <p className="text-xs text-foreground-tertiary italic text-center py-2">
                 No nested fields defined. Click "Add Nested Field" to create one.
               </p>
             )}

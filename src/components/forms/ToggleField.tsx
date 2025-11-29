@@ -71,7 +71,7 @@ export const ToggleField = forwardRef<HTMLButtonElement, ToggleFieldProps>(
           </span>
           <span
             className={`
-              inline-block rounded-full bg-white dark:bg-surface-primary shadow-sm transition-transform duration-200 ease-in-out
+              inline-block rounded-full bg-surface-primary dark:bg-surface-primary shadow-sm transition-transform duration-200 ease-in-out
               ${thumbSizeClasses[size]}
               ${translateClasses[size]}
             `}

@@ -109,7 +109,7 @@ export default function CompanyProjectsPage() {
 
    const renderProjectList = (projectsList: ProjectDetails[]) => {
       if (projectsList.length === 0) {
-         return <p className="text-gray-500 text-sm mt-2">No projects found.</p>;
+         return <p className="text-foreground-tertiary text-sm mt-2">No projects found.</p>;
       }
 
       return (
@@ -124,7 +124,7 @@ export default function CompanyProjectsPage() {
                         <h3 className="font-semibold text-lg break-words">{project.project_title}</h3>
 
                         {/* Desktop badges */}
-                        <div className="hidden sm:flex flex-wrap gap-2 text-sm text-gray-600 mt-1">
+                        <div className="hidden sm:flex flex-wrap gap-2 text-sm text-foreground-secondary mt-1">
                            <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
                               Start: {project.start_date || "N/A"}
                            </span>
@@ -137,18 +137,18 @@ export default function CompanyProjectsPage() {
                         </div>
 
                         {/* Created by plain text */}
-                        <p className="text-gray-700 text-sm mt-1">
+                        <p className="text-foreground-secondary text-sm mt-1">
                            Created by: {employeeNames[project.created_by || 0] || "Unknown"}
                         </p>
 
-                        <p className="text-gray-700 text-sm">
+                        <p className="text-foreground-secondary text-sm">
                            Created: {project.created_at ? new Date(project.created_at).toLocaleDateString("en-GB") : "N/A"}
                         </p>
 
 
 
                         {/* Mobile info */}
-                        <div className="flex flex-col gap-1 text-sm text-gray-600 sm:hidden mt-1">
+                        <div className="flex flex-col gap-1 text-sm text-foreground-secondary sm:hidden mt-1">
                            <p>Start: {project.start_date || "N/A"}</p>
                            <p>End: {project.end_date || "N/A"}</p>
                            <p>Status: {project.status || "N/A"}</p>
@@ -216,7 +216,7 @@ export default function CompanyProjectsPage() {
                            <>
                               {ongoingLoading ? (
                                  <div className="flex justify-center items-center h-32">
-                                    <Loader className="animate-spin text-gray-500" />
+                                    <Loader className="animate-spin text-foreground-tertiary" />
                                  </div>
                               ) : (
                                  renderProjectList(filteredOngoing)
@@ -233,7 +233,7 @@ export default function CompanyProjectsPage() {
                            <>
                               {ongoingLoading ? (
                                  <div className="flex justify-center items-center h-32">
-                                    <Loader className="animate-spin text-gray-500" />
+                                    <Loader className="animate-spin text-foreground-tertiary" />
                                  </div>
                               ) : (
                                  renderProjectList(filteredCompleted)

@@ -42,14 +42,14 @@ const colorMap = {
   'green': 'text-green-500',
   'purple': 'text-purple-500',
   'orange': 'text-orange-500',
-  'gray': 'text-gray-500',
+  'gray': 'text-foreground-tertiary',
 };
 
 const priorityColors = {
   'urgent': 'border-l-red-500 bg-red-50',
   'high': 'border-l-orange-500 bg-orange-50',
-  'normal': 'border-l-blue-500 bg-white',
-  'low': 'border-l-gray-500 bg-gray-50',
+  'normal': 'border-l-blue-500 bg-surface-primary',
+  'low': 'border-l-gray-500 bg-background-secondary',
 };
 
 export default function NotificationDropdown({
@@ -254,7 +254,7 @@ function NotificationItem({
   onDelete
 }: NotificationItemProps) {
   const IconComponent = iconMap[notification.type?.icon as keyof typeof iconMap] || Bell;
-  const iconColor = colorMap[notification.type?.color as keyof typeof colorMap] || 'text-gray-500';
+  const iconColor = colorMap[notification.type?.color as keyof typeof colorMap] || 'text-foreground-tertiary';
   const priorityStyle = priorityColors[notification.priority];
 
   return (

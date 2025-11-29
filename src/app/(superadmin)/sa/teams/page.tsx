@@ -327,8 +327,8 @@ export default function TeamsManagementPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Teams Management</h1>
-          <p className="text-gray-600 mt-1">Manage teams and assign users across companies</p>
+          <h1 className="text-2xl font-bold text-foreground-primary">Teams Management</h1>
+          <p className="text-foreground-secondary mt-1">Manage teams and assign users across companies</p>
         </div>
         {selectedCompany && (
           <button
@@ -348,8 +348,8 @@ export default function TeamsManagementPage() {
             <Buildings size={24} className="text-blue-600" />
           </div>
           <div>
-            <h2 className="font-semibold text-gray-900">Select Company</h2>
-            <p className="text-sm text-gray-500">Choose a company to manage its teams</p>
+            <h2 className="font-semibold text-foreground-primary">Select Company</h2>
+            <p className="text-sm text-foreground-tertiary">Choose a company to manage its teams</p>
           </div>
         </div>
         
@@ -361,7 +361,7 @@ export default function TeamsManagementPage() {
               setSearchTerm("");
               setEditingTeam(null);
             }}
-            className="w-full appearance-none px-4 py-3 pr-10 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-surface-primary text-gray-900 font-medium transition-all"
+            className="w-full appearance-none px-4 py-3 pr-10 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-surface-primary text-foreground-primary font-medium transition-all"
           >
             <option value="">Select a company...</option>
             {companies.map((company) => (
@@ -370,7 +370,7 @@ export default function TeamsManagementPage() {
               </option>
             ))}
           </select>
-          <CaretDown size={20} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <CaretDown size={20} className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-tertiary pointer-events-none" />
         </div>
       </div>
 
@@ -383,7 +383,7 @@ export default function TeamsManagementPage() {
               <div className="relative flex-1">
                 <MagnifyingGlass
                   size={20}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-tertiary"
                 />
                 <input
                   type="text"
@@ -397,16 +397,16 @@ export default function TeamsManagementPage() {
                     onClick={() => setSearchTerm("")}
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-surface-hover rounded-full transition-colors"
                   >
-                    <X size={16} className="text-gray-400" />
+                    <X size={16} className="text-foreground-tertiary" />
                   </button>
                 )}
               </div>
               
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-foreground-secondary">
                 <Users size={18} />
                 <span>{filteredTeams.length} team{filteredTeams.length !== 1 ? "s" : ""}</span>
                 {searchTerm && teams.length !== filteredTeams.length && (
-                  <span className="text-gray-400">of {teams.length}</span>
+                  <span className="text-foreground-tertiary">of {teams.length}</span>
                 )}
               </div>
             </div>
@@ -416,15 +416,15 @@ export default function TeamsManagementPage() {
           {loading ? (
             <div className="p-12 text-center">
               <Spinner size={32} className="animate-spin text-blue-600 mx-auto mb-3" />
-              <p className="text-gray-500">Loading teams...</p>
+              <p className="text-foreground-tertiary">Loading teams...</p>
             </div>
           ) : filteredTeams.length === 0 ? (
             <div className="p-12 text-center">
-              <Users size={48} className="mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-600 font-medium">
+              <Users size={48} className="mx-auto text-foreground-tertiary mb-4" />
+              <p className="text-foreground-secondary font-medium">
                 {searchTerm ? "No teams found" : "No teams yet"}
               </p>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-foreground-tertiary mt-1">
                 {searchTerm 
                   ? "Try a different search term" 
                   : "Create a team to get started"
@@ -492,13 +492,13 @@ export default function TeamsManagementPage() {
                     ) : (
                       // View mode
                       <div className="flex items-start gap-3">
-                        <div className={`p-2 rounded-lg ${team.is_default ? "bg-amber-100" : "bg-gray-100"}`}>
-                          <Users size={20} className={team.is_default ? "text-amber-600" : "text-gray-600"} />
+                        <div className={`p-2 rounded-lg ${team.is_default ? "bg-amber-100" : "bg-background-tertiary"}`}>
+                          <Users size={20} className={team.is_default ? "text-amber-600" : "text-foreground-secondary"} />
                         </div>
                         
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-semibold text-gray-900">{team.name}</h3>
+                            <h3 className="font-semibold text-foreground-primary">{team.name}</h3>
                             {team.is_default && (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">
                                 <Star size={12} weight="fill" />
@@ -506,10 +506,10 @@ export default function TeamsManagementPage() {
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-gray-500 mt-0.5 line-clamp-1">
+                          <p className="text-sm text-foreground-tertiary mt-0.5 line-clamp-1">
                             {team.description || "No description"}
                           </p>
-                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
+                          <div className="flex items-center gap-4 mt-2 text-xs text-foreground-tertiary">
                             <span className="flex items-center gap-1">
                               <Users size={14} />
                               {team.member_count || 0} member{(team.member_count || 0) !== 1 ? "s" : ""}
@@ -525,7 +525,7 @@ export default function TeamsManagementPage() {
                             className={`p-2 rounded-lg transition-colors ${
                               team.is_default 
                                 ? "text-amber-600 hover:bg-amber-50" 
-                                : "text-gray-400 hover:bg-gray-100 hover:text-amber-600"
+                                : "text-foreground-tertiary hover:bg-background-tertiary hover:text-amber-600"
                             }`}
                             title={team.is_default ? "Remove default status" : "Set as default"}
                           >
@@ -540,7 +540,7 @@ export default function TeamsManagementPage() {
                           
                           <button
                             onClick={() => startEditing(team)}
-                            className="p-2 text-gray-400 hover:bg-gray-100 hover:text-blue-600 rounded-lg transition-colors"
+                            className="p-2 text-foreground-tertiary hover:bg-background-tertiary hover:text-blue-600 rounded-lg transition-colors"
                             title="Edit team"
                           >
                             <Pencil size={18} />
@@ -548,7 +548,7 @@ export default function TeamsManagementPage() {
                           
                           <a
                             href={`/sa/teams/${selectedCompany}/${team.id}`}
-                            className="p-2 text-gray-400 hover:bg-gray-100 hover:text-green-600 rounded-lg transition-colors"
+                            className="p-2 text-foreground-tertiary hover:bg-background-tertiary hover:text-green-600 rounded-lg transition-colors"
                             title="Manage members & permissions"
                           >
                             <Users size={18} />
@@ -558,7 +558,7 @@ export default function TeamsManagementPage() {
                             <button
                               onClick={() => setTeamToDelete(team)}
                               disabled={deletingTeamId === team.id}
-                              className="p-2 text-gray-400 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+                              className="p-2 text-foreground-tertiary hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
                               title="Delete team"
                             >
                               {deletingTeamId === team.id ? (
@@ -583,12 +583,12 @@ export default function TeamsManagementPage() {
       {!selectedCompany && (
         <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-12 text-center border border-border-primary">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-surface-primary rounded-full shadow-sm mb-4">
-            <Buildings size={32} className="text-gray-400" />
+            <Buildings size={32} className="text-foreground-tertiary" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-lg font-semibold text-foreground-primary mb-2">
             Select a Company
           </h3>
-          <p className="text-gray-600 max-w-md mx-auto">
+          <p className="text-foreground-secondary max-w-md mx-auto">
             Choose a company from the dropdown above to view and manage its teams, members, and permissions
           </p>
         </div>
@@ -616,25 +616,25 @@ export default function TeamsManagementPage() {
                     <div className="p-2 bg-blue-100 rounded-lg">
                       <Plus size={20} className="text-blue-600" />
                     </div>
-                    <h2 className="text-lg font-semibold text-gray-900">Create New Team</h2>
+                    <h2 className="text-lg font-semibold text-foreground-primary">Create New Team</h2>
                   </div>
                   <button
                     onClick={() => setShowCreateModal(false)}
-                    className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="p-1.5 hover:bg-background-tertiary rounded-lg transition-colors"
                   >
-                    <X size={20} className="text-gray-400" />
+                    <X size={20} className="text-foreground-tertiary" />
                   </button>
                 </div>
                 {selectedCompanyData && (
-                  <p className="text-sm text-gray-500 mt-2">
-                    Creating team for <span className="font-medium text-gray-700">{selectedCompanyData.name}</span>
+                  <p className="text-sm text-foreground-tertiary mt-2">
+                    Creating team for <span className="font-medium text-foreground-secondary">{selectedCompanyData.name}</span>
                   </p>
                 )}
               </div>
 
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
                     Team Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -647,7 +647,7 @@ export default function TeamsManagementPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
                     Description
                   </label>
                   <textarea
@@ -659,7 +659,7 @@ export default function TeamsManagementPage() {
                   />
                 </div>
 
-                <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary cursor-pointer transition-colors">
                   <input
                     type="checkbox"
                     checked={newTeam.isDefault}
@@ -667,19 +667,19 @@ export default function TeamsManagementPage() {
                     className="w-4 h-4 text-blue-600 border-border-secondary rounded focus:ring-blue-500"
                   />
                   <div>
-                    <span className="text-sm font-medium text-gray-900">Set as default team</span>
-                    <p className="text-xs text-gray-500 mt-0.5">New employees will be automatically added to this team</p>
+                    <span className="text-sm font-medium text-foreground-primary">Set as default team</span>
+                    <p className="text-xs text-foreground-tertiary mt-0.5">New employees will be automatically added to this team</p>
                   </div>
                 </label>
               </div>
 
-              <div className="p-6 bg-gray-50 border-t border-border-primary flex items-center justify-end gap-3">
+              <div className="p-6 bg-background-secondary border-t border-border-primary flex items-center justify-end gap-3">
                 <button
                   onClick={() => {
                     setShowCreateModal(false);
                     setNewTeam({ name: "", description: "", isDefault: false });
                   }}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-foreground-secondary hover:bg-gray-200 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
@@ -727,11 +727,11 @@ export default function TeamsManagementPage() {
                   <div className="p-2 bg-red-100 rounded-full">
                     <Trash size={24} className="text-red-600" />
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900">Delete Team</h2>
+                  <h2 className="text-lg font-semibold text-foreground-primary">Delete Team</h2>
                 </div>
                 
-                <p className="text-gray-600 mb-4">
-                  Are you sure you want to delete <span className="font-semibold text-gray-900">{teamToDelete.name}</span>?
+                <p className="text-foreground-secondary mb-4">
+                  Are you sure you want to delete <span className="font-semibold text-foreground-primary">{teamToDelete.name}</span>?
                 </p>
                 
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
@@ -740,10 +740,10 @@ export default function TeamsManagementPage() {
                 </div>
               </div>
 
-              <div className="p-6 bg-gray-50 border-t border-border-primary flex items-center justify-end gap-3">
+              <div className="p-6 bg-background-secondary border-t border-border-primary flex items-center justify-end gap-3">
                 <button
                   onClick={() => setTeamToDelete(null)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-foreground-secondary hover:bg-gray-200 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>

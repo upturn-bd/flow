@@ -170,8 +170,8 @@ export default function MilestoneForm({
         )}
 
         <div className="flex items-center gap-3 mb-6">
-          <Target size={24} className="text-gray-600" strokeWidth={2} />
-          <h2 className="text-xl font-semibold text-gray-900">
+          <Target size={24} className="text-foreground-secondary" strokeWidth={2} />
+          <h2 className="text-xl font-semibold text-foreground-primary">
             {mode === "create" ? "Add Milestone" : "Update Milestone"}
           </h2>
         </div>
@@ -181,14 +181,14 @@ export default function MilestoneForm({
           <FormInputField
             name="milestone_title"
             label="Milestone Title"
-            icon={<Target size={16} className="text-gray-500" strokeWidth={2} />}
+            icon={<Target size={16} className="text-foreground-tertiary" strokeWidth={2} />}
             value={milestoneData.milestone_title || ""}
             onChange={handleChange}
             error={errors.milestone_title}
           />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-secondary mb-1">
               Description
             </label>
             <textarea
@@ -204,7 +204,7 @@ export default function MilestoneForm({
               name="start_date"
               label="Start Date"
               type="date"
-              icon={<Calendar size={16} className="text-gray-500" strokeWidth={2} />}
+              icon={<Calendar size={16} className="text-foreground-tertiary" strokeWidth={2} />}
               value={milestoneData.start_date || ""}
               onChange={handleChange}
               error={errors.start_date}
@@ -216,7 +216,7 @@ export default function MilestoneForm({
               name="end_date"
               label="End Date"
               type="date"
-              icon={<Calendar size={16} className="text-gray-500" strokeWidth={2} />}
+              icon={<Calendar size={16} className="text-foreground-tertiary" strokeWidth={2} />}
               value={milestoneData.end_date || ""}
               onChange={handleChange}
               error={errors.end_date}
@@ -228,7 +228,7 @@ export default function MilestoneForm({
 
           {/* Project date hint */}
           {(projectStartDate || projectEndDate) && (
-            <p className="text-xs text-gray-500 -mt-2">
+            <p className="text-xs text-foreground-tertiary -mt-2">
               Project timeline: {projectStartDate || 'N/A'} to {projectEndDate || 'N/A'}
             </p>
           )}
@@ -236,7 +236,7 @@ export default function MilestoneForm({
           {/* <FormSelectField
             name="status"
             label="Status"
-            icon={<Target size={16} className="text-gray-500" strokeWidth={2} />}
+            icon={<Target size={16} className="text-foreground-tertiary" strokeWidth={2} />}
             value={milestoneData.status || ""}
             onChange={handleChange}
             error={errors.status}
@@ -249,8 +249,8 @@ export default function MilestoneForm({
           /> */}
 
           <div>
-            <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
-              <Target size={14} className="text-gray-500" strokeWidth={2} />
+            <label className="flex items-center gap-1 text-sm font-medium text-foreground-secondary mb-1">
+              <Target size={14} className="text-foreground-tertiary" strokeWidth={2} />
               Weightage (%)
             </label>
             <input
@@ -276,8 +276,8 @@ export default function MilestoneForm({
           </div>
 
           <div>
-            <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
-              <Users size={14} className="text-gray-500" strokeWidth={2} />
+            <label className="flex items-center gap-1 text-sm font-medium text-foreground-secondary mb-1">
+              <Users size={14} className="text-foreground-tertiary" strokeWidth={2} />
               Assignees
             </label>
 
@@ -297,7 +297,7 @@ export default function MilestoneForm({
               />
               <Search
                 size={16}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
                 strokeWidth={2}
               />
 
@@ -314,7 +314,7 @@ export default function MilestoneForm({
                         key={emp.id}
                         onClick={() => handleAddAssignee(emp.id)}
                         whileHover={{ backgroundColor: "#f3f4f6" }}
-                        className="cursor-pointer px-4 py-2 hover:bg-background-secondary dark:bg-background-tertiary text-sm text-gray-700"
+                        className="cursor-pointer px-4 py-2 hover:bg-background-secondary dark:bg-background-tertiary text-sm text-foreground-secondary"
                       >
                         {emp.name}
                       </motion.li>
@@ -334,12 +334,12 @@ export default function MilestoneForm({
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
-                      className="bg-background-tertiary dark:bg-surface-secondary text-gray-700 px-3 py-1 rounded-full text-sm flex items-center"
+                      className="bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary px-3 py-1 rounded-full text-sm flex items-center"
                     >
                       {emp?.name}
                       <button
                         type="button"
-                        className="ml-2 text-gray-500 hover:text-gray-700"
+                        className="ml-2 text-foreground-tertiary hover:text-foreground-secondary"
                         onClick={() => handleRemoveAssignee(assignee)}
                       >
                         <X size={14} strokeWidth={2} />
@@ -356,7 +356,7 @@ export default function MilestoneForm({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="button"
-              className="flex items-center px-4 py-2 bg-background-tertiary dark:bg-surface-secondary border border-border-primary rounded-md text-gray-700 hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm"
+              className="flex items-center px-4 py-2 bg-background-tertiary dark:bg-surface-secondary border border-border-primary rounded-md text-foreground-secondary hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm"
               onClick={onCancel}
             >
               <X size={16} className="mr-2" strokeWidth={2} />

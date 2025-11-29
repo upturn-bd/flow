@@ -49,7 +49,7 @@ export const RequisitionInventoryCreateModal: React.FC<RequisitionInventoryCreat
   return (
     <FormModal<RequisitionInventoryData>
       title="Configure Inventory Item"
-      icon={<Package size={24} weight="duotone" className="text-gray-600" />}
+      icon={<Package size={24} weight="duotone" className="text-foreground-secondary" />}
       initialValues={defaultData}
       validationFn={validateRequisitionInventory}
       onSubmit={onSubmit}
@@ -92,7 +92,7 @@ export const RequisitionInventoryCreateModal: React.FC<RequisitionInventoryCreat
               error={errors.name}
               required
               placeholder="Enter Item Name"
-              icon={<Package size={18} weight="duotone" className="text-gray-500" />}
+              icon={<Package size={18} weight="duotone" className="text-foreground-tertiary" />}
             />
 
             <TextAreaField

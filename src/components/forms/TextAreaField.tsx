@@ -14,7 +14,7 @@ const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
   ({ label, error, required, className = "", containerClassName = "", ...props }, ref) => {
     return (
       <div className={containerClassName}>
-        <label className="block font-medium text-gray-700 mb-1 text-sm sm:text-base">
+        <label className="block font-medium text-foreground-secondary mb-1 text-sm sm:text-base">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>

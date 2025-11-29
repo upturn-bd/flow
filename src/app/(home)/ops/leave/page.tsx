@@ -54,7 +54,7 @@ function LeavePageContent() {
       icon: <BookOpen className="h-5 w-5" />,
       color: "text-purple-600",
       content: (
-        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+        <div className="flex flex-col items-center justify-center py-12 text-foreground-tertiary">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -112,7 +112,7 @@ export default function LeavePage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
           <Calendar className="h-8 w-8 text-blue-600 animate-pulse" />
-          <p className="text-sm text-gray-600">Loading leave management...</p>
+          <p className="text-sm text-foreground-secondary">Loading leave management...</p>
         </div>
       </div>
     }>

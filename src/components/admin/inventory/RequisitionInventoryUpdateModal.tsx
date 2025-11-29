@@ -42,7 +42,7 @@ export const RequisitionInventoryUpdateModal: React.FC<RequisitionInventoryUpdat
   return (
     <FormModal<RequisitionInventoryData>
       title="Update Inventory Item"
-      icon={<Package size={24} weight="duotone" className="text-gray-600" />}
+      icon={<Package size={24} weight="duotone" className="text-foreground-secondary" />}
       initialValues={initialData}
       validationFn={validateRequisitionInventory}
       onSubmit={onSubmit}
@@ -85,7 +85,7 @@ export const RequisitionInventoryUpdateModal: React.FC<RequisitionInventoryUpdat
               error={errors.name}
               required
               placeholder="Enter Item Name"
-              icon={<Package size={18} weight="duotone" className="text-gray-500" />}
+              icon={<Package size={18} weight="duotone" className="text-foreground-tertiary" />}
             />
 
             <TextAreaField

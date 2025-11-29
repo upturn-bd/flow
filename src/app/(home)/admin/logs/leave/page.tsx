@@ -125,13 +125,13 @@ export default function LeaveLogsPage() {
       if (loading) {
          return (
             <div className="flex justify-center items-center h-32">
-               <Loader className="animate-spin text-gray-500" />
+               <Loader className="animate-spin text-foreground-tertiary" />
             </div>
          );
       }
 
       if (leaveRequests.length === 0) {
-         return <p className="text-gray-500 text-sm mt-2">No leave records found.</p>;
+         return <p className="text-foreground-tertiary text-sm mt-2">No leave records found.</p>;
       }
 
       return (
@@ -211,11 +211,11 @@ export default function LeaveLogsPage() {
                {selectedLeave && (
                   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                      <div className="bg-surface-primary rounded-xl shadow-xl max-w-lg w-full p-6 relative">
-                        <button className="absolute top-3 right-3 text-gray-500 hover:text-gray-800" onClick={() => setSelectedLeave(null)}>
+                        <button className="absolute top-3 right-3 text-foreground-tertiary hover:text-foreground-primary" onClick={() => setSelectedLeave(null)}>
                            <CloseIcon size={20} />
                         </button>
                         <h2 className="text-lg font-semibold mb-4">Leave Details</h2>
-                        <div className="space-y-2 text-gray-700">
+                        <div className="space-y-2 text-foreground-secondary">
                            <p><strong>Employee:</strong> {employeeNames[selectedLeave.employee_id] || "Unknown"}</p>
                            <p><strong>Type:</strong> {getLeaveTypeName(selectedLeave.type_id)}</p>
                            <p><strong>Dates:</strong> {selectedLeave.start_date} to {selectedLeave.end_date} ({calculateTotalDays(selectedLeave.start_date, selectedLeave.end_date)} days)</p>

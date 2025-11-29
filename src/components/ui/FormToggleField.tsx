@@ -68,7 +68,7 @@ export default function FormToggleField({
               <span
                 aria-hidden="true"
                 className={`
-                  inline-block h-4 w-4 transform rounded-full bg-white 
+                  inline-block h-4 w-4 transform rounded-full bg-surface-primary 
                   shadow-lg ring-0 transition-transform duration-200 ease-in-out
                   ${checked ? 'translate-x-6' : 'translate-x-1'}
                 `}

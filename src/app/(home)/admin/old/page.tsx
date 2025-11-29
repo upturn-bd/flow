@@ -80,8 +80,8 @@ function AdminManagementContent() {
         animate={{ opacity: 1 }}
         className="flex flex-col items-center justify-center h-64 bg-surface-primary rounded-xl shadow-sm p-6 max-w-6xl mx-auto mt-8"
       >
-        <Loader className="w-12 h-12 text-gray-500 animate-spin mb-4" />
-        <p className="text-gray-600">Loading admin management...</p>
+        <Loader className="w-12 h-12 text-foreground-tertiary animate-spin mb-4" />
+        <p className="text-foreground-secondary">Loading admin management...</p>
       </motion.div>
     );
   }
@@ -110,20 +110,20 @@ function AdminManagementContent() {
           >
             <Settings size={24} />
           </motion.div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Initial Setup Required</h1>
-          <p className="text-gray-600 mb-6">Complete the setup process to access all admin management features</p>
+          <h1 className="text-3xl font-bold text-foreground-primary mb-2">Initial Setup Required</h1>
+          <p className="text-foreground-secondary mb-6">Complete the setup process to access all admin management features</p>
           
           {/* Progress indicators */}
           <div className="flex justify-center items-center gap-4 mb-8">
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
-              currentStep === 1 ? 'bg-blue-100 text-blue-700' : 'bg-background-tertiary dark:bg-surface-secondary text-gray-600'
+              currentStep === 1 ? 'bg-blue-100 text-blue-700' : 'bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary'
             }`}>
               <span className="font-medium">Step 1</span>
               <Building size={16} />
             </div>
-            <CaretRight className="text-gray-400" size={16} />
+            <CaretRight className="text-foreground-tertiary" size={16} />
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
-              currentStep === 2 ? 'bg-blue-100 text-blue-700' : 'bg-background-tertiary dark:bg-surface-secondary text-gray-600'
+              currentStep === 2 ? 'bg-blue-100 text-blue-700' : 'bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary'
             }`}>
               <span className="font-medium">Step 2</span>
               <Settings size={16} />
@@ -186,8 +186,8 @@ function AdminManagementContent() {
             whileTap={{ scale: currentStep === 1 ? 1 : 0.95 }}
             className={`px-6 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all duration-200 ${
               currentStep === 1 
-                ? 'bg-background-tertiary dark:bg-surface-secondary text-gray-400 cursor-not-allowed' 
-                : 'bg-background-tertiary dark:bg-surface-secondary hover:bg-surface-hover text-gray-700'
+                ? 'bg-background-tertiary dark:bg-surface-secondary text-foreground-tertiary cursor-not-allowed' 
+                : 'bg-background-tertiary dark:bg-surface-secondary hover:bg-surface-hover text-foreground-secondary'
             }`}
           >
             <CaretLeft size={18} />
@@ -201,7 +201,7 @@ function AdminManagementContent() {
             whileTap={{ scale: !step1Complete ? 1 : 0.95 }}
             className={`px-6 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all duration-200 ${
               !step1Complete 
-                ? 'bg-background-tertiary dark:bg-surface-secondary text-gray-400 cursor-not-allowed' 
+                ? 'bg-background-tertiary dark:bg-surface-secondary text-foreground-tertiary cursor-not-allowed' 
                 : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
             }`}
           >
@@ -234,13 +234,13 @@ function AdminManagementContent() {
           initial={{ scale: 0.9, opacity: 0.5 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="p-2 rounded-lg bg-background-tertiary dark:bg-surface-secondary text-gray-700 mr-3"
+          className="p-2 rounded-lg bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary mr-3"
         >
           <Building size={24} />
         </motion.div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Admin Management</h1>
-          <p className="text-gray-600">Configure your company details and administrative settings</p>
+          <h1 className="text-2xl font-bold text-foreground-primary">Admin Management</h1>
+          <p className="text-foreground-secondary">Configure your company details and administrative settings</p>
         </div>
       </motion.div>
 
@@ -256,7 +256,7 @@ function AdminManagementContent() {
           className={`px-6 py-3 font-medium text-sm rounded-tl-xl transition-colors duration-200 flex items-center gap-2 ${
             currentTab === 'basic'
               ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary'
+              : 'text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary'
           }`}
         >
           <Building size={16} />
@@ -267,7 +267,7 @@ function AdminManagementContent() {
           className={`px-6 py-3 font-medium text-sm transition-colors duration-200 flex items-center gap-2 ${
             currentTab === 'advanced'
               ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary'
+              : 'text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary'
           }`}
         >
           <Settings size={16} />
@@ -278,7 +278,7 @@ function AdminManagementContent() {
           className={`px-6 py-3 font-medium text-sm transition-colors duration-200 flex items-center gap-2 ${
             currentTab === 'accounts'
               ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary'
+              : 'text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary'
           }`}
         >
           <CreditCard size={16} />
@@ -289,7 +289,7 @@ function AdminManagementContent() {
           className={`px-6 py-3 font-medium text-sm transition-colors duration-200 flex items-center gap-2 ${
             currentTab === 'salaries'
               ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary'
+              : 'text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary'
           }`}
         >
           <DollarSign size={16} />
@@ -300,7 +300,7 @@ function AdminManagementContent() {
           className={`px-6 py-3 font-medium text-sm rounded-tr-xl transition-colors duration-200 flex items-center gap-2 ${
             currentTab === 'roles'
               ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary'
+              : 'text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary'
           }`}
         >
           <Shield size={16} />
@@ -376,8 +376,8 @@ export default function AdminManagement() {
           animate={{ opacity: 1 }}
           className="flex flex-col items-center justify-center h-64 bg-surface-primary rounded-xl shadow-sm p-6 max-w-6xl mx-auto mt-8"
         >
-          <Loader className="w-12 h-12 text-gray-500 animate-spin mb-4" />
-          <p className="text-gray-600">Loading admin management...</p>
+          <Loader className="w-12 h-12 text-foreground-tertiary animate-spin mb-4" />
+          <p className="text-foreground-secondary">Loading admin management...</p>
         </motion.div>
       }>
         <AdminManagementContent />

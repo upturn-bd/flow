@@ -123,7 +123,7 @@ export default function NewStakeholderPage() {
       <div className="p-4 sm:p-6">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 text-sm sm:text-base"
+          className="flex items-center gap-2 text-foreground-secondary hover:text-foreground-primary mb-4 sm:mb-6 text-sm sm:text-base"
         >
           <ArrowLeft size={18} />
           Back
@@ -134,10 +134,10 @@ export default function NewStakeholderPage() {
             <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-yellow-100 rounded-full mb-3 sm:mb-4">
               <WarningCircle className="text-yellow-600" size={24} />
             </div>
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
+            <h2 className="text-lg sm:text-xl font-bold text-foreground-primary mb-2">
               No Stakeholder Processes Found
             </h2>
-            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
+            <p className="text-sm sm:text-base text-foreground-secondary mb-4 sm:mb-6">
               You need to create at least one active stakeholder process before adding leads.
               Processes define the workflow and steps for converting leads into stakeholders.
             </p>
@@ -158,14 +158,14 @@ export default function NewStakeholderPage() {
       {/* Header */}
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 text-sm sm:text-base"
+        className="flex items-center gap-2 text-foreground-secondary hover:text-foreground-primary mb-4 sm:mb-6 text-sm sm:text-base"
       >
         <ArrowLeft size={18} />
         Back
       </button>
 
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary mb-4 sm:mb-6">
           {createAsPermanent ? "Add Permanent Stakeholder" : "Add New Lead"}
         </h1>
 
@@ -185,8 +185,8 @@ export default function NewStakeholderPage() {
               className="w-5 h-5 text-blue-600 border-border-secondary rounded focus:ring-blue-500"
             />
             <div>
-              <span className="font-medium text-gray-900">Create as Permanent Stakeholder</span>
-              <p className="text-sm text-gray-600 mt-1">
+              <span className="font-medium text-foreground-primary">Create as Permanent Stakeholder</span>
+              <p className="text-sm text-foreground-secondary mt-1">
                 {createAsPermanent 
                   ? "Will be created directly as a permanent stakeholder, skipping the lead process workflow"
                   : "Will be created as a lead and must go through the configured process to become permanent"}
@@ -198,10 +198,10 @@ export default function NewStakeholderPage() {
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Basic Information */}
           <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 space-y-3 sm:space-y-4">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Basic Information</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-foreground-primary">Basic Information</h2>
 
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-foreground-secondary mb-1 sm:mb-2">
                 Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -219,7 +219,7 @@ export default function NewStakeholderPage() {
             </div>
 
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-foreground-secondary mb-1 sm:mb-2">
                 Address
               </label>
               <textarea
@@ -232,7 +232,7 @@ export default function NewStakeholderPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                 Stakeholder Type
               </label>
               <select
@@ -247,14 +247,14 @@ export default function NewStakeholderPage() {
                   </option>
                 ))}
               </select>
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-foreground-tertiary text-sm mt-1">
                 Optional categorization (e.g., Client, Vendor, Partner)
               </p>
             </div>
 
             {!createAsPermanent && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground-secondary mb-2">
                   Process <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -274,14 +274,14 @@ export default function NewStakeholderPage() {
                 {errors.process_id && (
                   <p className="text-red-500 text-sm mt-1">{errors.process_id}</p>
                 )}
-                <p className="text-gray-500 text-sm mt-1">
+                <p className="text-foreground-tertiary text-sm mt-1">
                   Select the workflow process this lead will follow
                 </p>
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                 Parent Stakeholder
               </label>
               <select
@@ -296,13 +296,13 @@ export default function NewStakeholderPage() {
                   </option>
                 ))}
               </select>
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-foreground-tertiary text-sm mt-1">
                 Optional parent stakeholder for hierarchical relationships (e.g., subsidiary companies)
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                 Key Accounts Manager (KAM)
               </label>
               <select
@@ -317,7 +317,7 @@ export default function NewStakeholderPage() {
                   </option>
                 ))}
               </select>
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-foreground-tertiary text-sm mt-1">
                 Assign a Key Accounts Manager who will receive notifications for any changes (optional)
               </p>
             </div>
@@ -326,7 +326,7 @@ export default function NewStakeholderPage() {
           {/* Contact Persons */}
           <div className="bg-surface-primary rounded-lg border border-border-primary p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Contact Persons</h2>
+              <h2 className="text-lg font-semibold text-foreground-primary">Contact Persons</h2>
               <button
                 type="button"
                 onClick={handleAddContactPerson}
@@ -338,7 +338,7 @@ export default function NewStakeholderPage() {
             </div>
 
             {contactPersons.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 text-sm">
+              <div className="text-center py-8 text-foreground-tertiary text-sm">
                 No contact persons added yet. Click "Add Contact" to add one.
               </div>
             ) : (
@@ -349,7 +349,7 @@ export default function NewStakeholderPage() {
                     className="border border-border-primary rounded-lg p-4 space-y-3"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-foreground-secondary">
                         Contact Person {index + 1}
                       </span>
                       <button
@@ -363,7 +363,7 @@ export default function NewStakeholderPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
                           Name
                         </label>
                         <input
@@ -378,7 +378,7 @@ export default function NewStakeholderPage() {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
                           Email
                         </label>
                         <input
@@ -402,7 +402,7 @@ export default function NewStakeholderPage() {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
                           Phone
                         </label>
                         <input
@@ -438,7 +438,7 @@ export default function NewStakeholderPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-6 py-2 border border-border-secondary text-gray-700 rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
+              className="px-6 py-2 border border-border-secondary text-foreground-secondary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
               disabled={submitting}
             >
               Cancel

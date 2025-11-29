@@ -288,7 +288,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
           />
           <CardContent>
             <div className="prose prose-sm max-w-none">
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-foreground-secondary leading-relaxed">
                 {taskDetails.task_description}
               </p>
             </div>

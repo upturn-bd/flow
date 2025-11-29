@@ -101,7 +101,7 @@ const ClickableStatusCell = ({
                 <button
                     ref={buttonRef}
                     onClick={toggleMenu}
-                    className="ml-2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-background-tertiary dark:bg-surface-secondary focus:outline-none"
+                    className="ml-2 text-foreground-tertiary hover:text-foreground-secondary transition-colors p-1 rounded-full hover:bg-background-tertiary dark:bg-surface-secondary focus:outline-none"
                     aria-label="Toggle menu"
                 >
                     <DotsThree className="text-sm" />
@@ -124,7 +124,7 @@ const ClickableStatusCell = ({
                             await handleRequest();
                             setIsMenuOpen(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-background-tertiary dark:bg-surface-secondary transition-colors flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 text-sm text-foreground-secondary hover:bg-background-tertiary dark:bg-surface-secondary transition-colors flex items-center gap-2"
                     >
                         Send to Request
                     </button>

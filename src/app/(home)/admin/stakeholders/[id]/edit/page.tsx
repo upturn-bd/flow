@@ -160,9 +160,9 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
     return (
       <div className="p-6">
         <div className="max-w-2xl mx-auto text-center py-12">
-          <WarningCircle className="mx-auto text-gray-400" size={48} />
-          <h2 className="text-xl font-bold text-gray-900 mt-4">Stakeholder Not Found</h2>
-          <p className="text-gray-600 mt-2">
+          <WarningCircle className="mx-auto text-foreground-tertiary" size={48} />
+          <h2 className="text-xl font-bold text-foreground-primary mt-4">Stakeholder Not Found</h2>
+          <p className="text-foreground-secondary mt-2">
             The stakeholder you're trying to edit doesn't exist or has been deleted.
           </p>
           <button
@@ -182,7 +182,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
       <div className="p-6">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+          className="flex items-center gap-2 text-foreground-secondary hover:text-foreground-primary mb-6"
         >
           <ArrowLeft size={20} />
           Back
@@ -193,10 +193,10 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
             <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
               <WarningCircle className="text-yellow-600" size={32} />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl font-bold text-foreground-primary mb-2">
               No Stakeholder Processes Found
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-foreground-secondary mb-6">
               You need to have at least one active stakeholder process to edit this stakeholder.
             </p>
             <button
@@ -216,22 +216,22 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
       {/* Header */}
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+        className="flex items-center gap-2 text-foreground-secondary hover:text-foreground-primary mb-6"
       >
         <ArrowLeft size={20} />
         Back
       </button>
 
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Stakeholder</h1>
+        <h1 className="text-2xl font-bold text-foreground-primary mb-6">Edit Stakeholder</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
           <div className="bg-surface-primary rounded-lg border border-border-primary p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">Basic Information</h2>
+            <h2 className="text-lg font-semibold text-foreground-primary">Basic Information</h2>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                 Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -249,7 +249,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                 Address
               </label>
               <textarea
@@ -262,7 +262,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                 Process <span className="text-red-500">*</span>
               </label>
               <select
@@ -282,13 +282,13 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
               {errors.process_id && (
                 <p className="text-red-500 text-sm mt-1">{errors.process_id}</p>
               )}
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-foreground-tertiary text-sm mt-1">
                 Select the workflow process this stakeholder follows
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                 Parent Stakeholder
               </label>
               <select
@@ -303,13 +303,13 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                   </option>
                 ))}
               </select>
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-foreground-tertiary text-sm mt-1">
                 Optional parent stakeholder for hierarchical relationships
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                 Key Accounts Manager (KAM)
               </label>
               <select
@@ -324,7 +324,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                   </option>
                 ))}
               </select>
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-foreground-tertiary text-sm mt-1">
                 Assign a Key Accounts Manager who will receive notifications for any changes
               </p>
             </div>
@@ -337,10 +337,10 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                 className="w-4 h-4 text-blue-600 rounded border-border-secondary focus:ring-2 focus:ring-blue-500"
               />
-              <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
+              <label htmlFor="is_active" className="text-sm font-medium text-foreground-secondary">
                 Active
               </label>
-              <p className="text-gray-500 text-sm ml-2">
+              <p className="text-foreground-tertiary text-sm ml-2">
                 (Inactive stakeholders are hidden from most views)
               </p>
             </div>
@@ -349,7 +349,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
           {/* Contact Persons */}
           <div className="bg-surface-primary rounded-lg border border-border-primary p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Contact Persons</h2>
+              <h2 className="text-lg font-semibold text-foreground-primary">Contact Persons</h2>
               <button
                 type="button"
                 onClick={handleAddContactPerson}
@@ -361,7 +361,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
             </div>
 
             {contactPersons.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 text-sm">
+              <div className="text-center py-8 text-foreground-tertiary text-sm">
                 No contact persons added yet. Click "Add Contact" to add one.
               </div>
             ) : (
@@ -372,7 +372,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                     className="border border-border-primary rounded-lg p-4 space-y-3"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-foreground-secondary">
                         Contact Person {index + 1}
                       </span>
                       <button
@@ -386,7 +386,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
                           Name
                         </label>
                         <input
@@ -401,7 +401,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                       </div>
 
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
                           Email
                         </label>
                         <input
@@ -425,7 +425,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                       </div>
 
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
                           Phone
                         </label>
                         <input
@@ -461,7 +461,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-6 py-2 border border-border-secondary text-gray-700 rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
+              className="px-6 py-2 border border-border-secondary text-foreground-secondary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
               disabled={submitting}
             >
               Cancel

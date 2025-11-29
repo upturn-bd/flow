@@ -551,7 +551,7 @@ export default function RequisitionEditModal({
               whileTap={{ scale: 0.98 }}
               type="button"
               onClick={onClose}
-              className="flex items-center gap-2 bg-background-tertiary dark:bg-surface-secondary text-gray-700 px-6 py-2 rounded-lg hover:bg-surface-hover transition-colors"
+              className="flex items-center gap-2 bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary px-6 py-2 rounded-lg hover:bg-surface-hover transition-colors"
             >
               Cancel
             </motion.button>

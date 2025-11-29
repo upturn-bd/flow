@@ -99,7 +99,7 @@ export default function AttendanceRecordsPage() {
                {/* Choose Month */}
                <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                     <Calendar className="text-gray-400" />
+                     <Calendar className="text-foreground-tertiary" />
                   </div>
                   <input
                      type="month"
@@ -125,14 +125,14 @@ export default function AttendanceRecordsPage() {
                      <option value="On_Leave">On Leave</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                     <CaretDown className="text-gray-400 text-xs" />
+                     <CaretDown className="text-foreground-tertiary text-xs" />
                   </div>
                </div>
             </div>
 
             {/* Summary Overview */}
             <div className="mb-6">
-               <h3 className="text-base font-semibold text-gray-700 mb-3">
+               <h3 className="text-base font-semibold text-foreground-secondary mb-3">
                   Attendance Overview –{" "}
                   {new Date(selectedMonth + "-01").toLocaleString("default", {
                      month: "long",
@@ -143,7 +143,7 @@ export default function AttendanceRecordsPage() {
                   {Object.entries(currentMonthCounts).map(([tag, count]) => (
                      <div
                         key={tag}
-                        className={`px-3 py-2 rounded-lg text-center text-sm font-semibold ${tagStyles[tag] || "bg-background-tertiary dark:bg-surface-secondary text-gray-800"
+                        className={`px-3 py-2 rounded-lg text-center text-sm font-semibold ${tagStyles[tag] || "bg-background-tertiary dark:bg-surface-secondary text-foreground-primary"
                            }`}
                      >
                         <div>{tag.replace(/_/g, " ")}</div>
@@ -165,16 +165,16 @@ export default function AttendanceRecordsPage() {
                   <table className="min-w-full divide-y divide-border-primary">
                      <thead>
                         <tr className="bg-background-secondary dark:bg-background-tertiary">
-                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                               Date
                            </th>
-                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                               Check-In
                            </th>
-                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                               Check-Out
                            </th>
-                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                               Status
                            </th>
                         </tr>
@@ -186,15 +186,15 @@ export default function AttendanceRecordsPage() {
                                  key={idx}
                                  className="hover:bg-background-secondary dark:bg-background-tertiary transition-colors duration-150"
                               >
-                                 <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                                 <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">
                                     {formatDateToDayMonth(entry.attendance_date)}
                                  </td>
-                                 <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                                 <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">
                                     {entry.check_in_time
                                        ? formatTimeFromISO(entry.check_in_time)
                                        : "N/A"}
                                  </td>
-                                 <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                                 <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">
                                     {entry.check_out_time
                                        ? formatTimeFromISO(entry.check_out_time)
                                        : "N/A"}
@@ -202,7 +202,7 @@ export default function AttendanceRecordsPage() {
                                  <td className="px-4 py-3 text-sm">
                                     <span
                                        className={`px-3 py-1 inline-flex justify-center text-xs leading-5 font-semibold rounded-full w-28 ${tagStyles[entry.tag] ||
-                                          "bg-background-tertiary dark:bg-surface-secondary text-gray-800"
+                                          "bg-background-tertiary dark:bg-surface-secondary text-foreground-primary"
                                           }`}
                                     >
                                        {entry.tag.replace(/_/g, " ")}
@@ -214,7 +214,7 @@ export default function AttendanceRecordsPage() {
                            <tr>
                               <td
                                  colSpan={4}
-                                 className="px-4 py-8 text-sm text-gray-500 text-center"
+                                 className="px-4 py-8 text-sm text-foreground-tertiary text-center"
                               >
                                  No attendance records found for this month.
                               </td>

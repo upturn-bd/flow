@@ -7,7 +7,7 @@ import { PERMISSION_MODULES } from "@/lib/constants";
 export default function AdvancedSettingsPage() {
   return (
     <>
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">
+      <h1 className="text-3xl font-bold text-foreground-primary mb-8">
           Advanced Settings Configuration
       </h1>
       

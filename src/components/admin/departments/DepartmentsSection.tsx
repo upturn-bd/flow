@@ -84,13 +84,13 @@ export default function DepartmentsSection({
   const renderDepartmentCard = (dept: any) => (
     <div
       key={dept.id}
-      className="bg-white rounded-lg border border-gray-200 p-2 sm:p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
+      className="bg-surface-primary rounded-lg border border-border-primary p-2 sm:p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
     >
       <div className="flex items-center mb-2 sm:mb-0">
-        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 mr-2 sm:mr-3">
+        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-background-tertiary rounded-full flex items-center justify-center text-foreground-secondary mr-2 sm:mr-3">
           <Building size={16} />
         </div>
-        <span className="font-medium text-gray-800 text-sm sm:text-base">
+        <span className="font-medium text-foreground-primary text-sm sm:text-base">
           {dept.name}
         </span>
       </div>
@@ -101,7 +101,7 @@ export default function DepartmentsSection({
             setViewDepartment(dept.id ?? null);
             setShowAllDepartments(false);
           }}
-          className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs sm:text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
+          className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-background-tertiary text-foreground-secondary text-xs sm:text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
         >
           <Eye size={14} />
           <span className="hidden xs:inline">Details</span>
@@ -152,13 +152,13 @@ export default function DepartmentsSection({
             departments.map((dept) => (
               <div
                 key={dept.id}
-                className="bg-white rounded-lg border border-gray-200 p-2 sm:p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
+                className="bg-surface-primary rounded-lg border border-border-primary p-2 sm:p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
               >
                 <div className="flex items-center mb-2 sm:mb-0">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 mr-2 sm:mr-3">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-background-tertiary rounded-full flex items-center justify-center text-foreground-secondary mr-2 sm:mr-3">
                     <Building size={16} />
                   </div>
-                  <span className="font-medium text-gray-800 text-sm sm:text-base">
+                  <span className="font-medium text-foreground-primary text-sm sm:text-base">
                     {dept.name}
                   </span>
                 </div>
@@ -166,7 +166,7 @@ export default function DepartmentsSection({
                 <div className="flex gap-2 w-full sm:w-auto justify-end">
                   <button
                     onClick={() => setViewDepartment(dept.id ?? null)}
-                    className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs sm:text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
+                    className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-background-tertiary text-foreground-secondary text-xs sm:text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
                   >
                     <Eye size={14} />
                     <span className="hidden xs:inline">Details</span>
@@ -247,7 +247,7 @@ export default function DepartmentsSection({
           >
             <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
               {departments.length === 0 ? (
-                <div className="p-6 bg-gray-50 rounded-lg text-center text-gray-500">
+                <div className="p-6 bg-background-secondary rounded-lg text-center text-foreground-tertiary">
                   No departments available.
                 </div>
               ) : (

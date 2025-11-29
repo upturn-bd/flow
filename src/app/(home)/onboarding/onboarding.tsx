@@ -264,7 +264,7 @@ export default function EmployeeOnboarding() {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="max-w-lg w-full bg-white rounded-xl shadow-lg overflow-hidden"
+          className="max-w-lg w-full bg-surface-primary rounded-xl shadow-lg overflow-hidden"
         >
           <div className="bg-blue-600 py-4 px-6">
             <h2 className="text-xl font-semibold text-white flex items-center">
@@ -282,7 +282,7 @@ export default function EmployeeOnboarding() {
             
             <h3 className="text-xl font-semibold text-center mb-4">Your information is being reviewed</h3>
             
-            <p className="text-gray-600 text-center mb-6">
+            <p className="text-foreground-secondary text-center mb-6">
               Thank you for submitting your details. Your application is currently under review by the administrative team.
               You will be notified once the review process is complete.
             </p>
@@ -297,7 +297,7 @@ export default function EmployeeOnboarding() {
             <div className="flex justify-center">
               <button
                 onClick={logout}
-                className="flex items-center px-6 py-2 bg-background-tertiary dark:bg-surface-secondary text-gray-700 rounded-lg hover:bg-surface-hover transition-colors"
+                className="flex items-center px-6 py-2 bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary rounded-lg hover:bg-surface-hover transition-colors"
               >
                 <LogOut className="mr-2 h-5 w-5" />
                 Logout
@@ -324,7 +324,7 @@ export default function EmployeeOnboarding() {
           className="mb-8 text-center"
         >
           <h1 className="text-3xl font-bold text-blue-800 mb-2">Employee Onboarding</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-foreground-secondary max-w-2xl mx-auto">
             Complete your employee profile information to get started with our system.
           </p>
         </motion.div>
@@ -410,7 +410,7 @@ export default function EmployeeOnboarding() {
         >
           <button
             onClick={logout}
-            className="flex items-center px-4 py-2 text-sm bg-background-tertiary dark:bg-surface-secondary text-gray-700 rounded-lg hover:bg-surface-hover transition-colors"
+            className="flex items-center px-4 py-2 text-sm bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary rounded-lg hover:bg-surface-hover transition-colors"
           >
             <LogOut className="h-4 w-4 mr-2" />
             Logout
@@ -418,7 +418,7 @@ export default function EmployeeOnboarding() {
         </motion.div>
 
         {/* Form Container */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <div className="bg-surface-primary rounded-xl shadow-lg overflow-hidden mb-8">
           <form onSubmit={handleSubmit}>
             <AnimatePresence mode="wait">
               {/* Company Information Section */}
@@ -433,7 +433,7 @@ export default function EmployeeOnboarding() {
                 >
                   <div className="flex items-center mb-6">
                     <Building className="h-6 w-6 text-blue-600 mr-2" />
-                    <h2 className="text-xl font-semibold text-gray-800">Company Information</h2>
+                    <h2 className="text-xl font-semibold text-foreground-primary">Company Information</h2>
                   </div>
                   
                   <motion.div 
@@ -511,7 +511,7 @@ export default function EmployeeOnboarding() {
                 >
                   <div className="flex items-center mb-6">
                     <User className="h-6 w-6 text-blue-600 mr-2" />
-                    <h2 className="text-xl font-semibold text-gray-800">Personal Information</h2>
+                    <h2 className="text-xl font-semibold text-foreground-primary">Personal Information</h2>
                   </div>
                   
                   <motion.div 

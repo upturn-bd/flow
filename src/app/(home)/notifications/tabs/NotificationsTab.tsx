@@ -32,7 +32,7 @@ const colorMap = {
   'green': 'text-green-500',
   'purple': 'text-purple-500',
   'orange': 'text-orange-500',
-  'gray': 'text-gray-500',
+  'gray': 'text-foreground-tertiary',
 };
 
 const priorityStyles = {
@@ -108,8 +108,8 @@ export default function NotificationsTab() {
       {/* Header with actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Bell className="h-5 w-5 text-gray-600" />
-          <h2 className="text-lg font-semibold text-gray-900">All Notifications</h2>
+          <Bell className="h-5 w-5 text-foreground-secondary" />
+          <h2 className="text-lg font-semibold text-foreground-primary">All Notifications</h2>
           {unreadNotifications.length > 0 && (
             <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
               {unreadNotifications.length} unread
@@ -129,9 +129,9 @@ export default function NotificationsTab() {
 
       {/* Notifications list */}
       {notifications.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          <Bell className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications</h3>
+        <div className="text-center py-12 text-foreground-tertiary">
+          <Bell className="h-12 w-12 mx-auto mb-4 text-foreground-tertiary" />
+          <h3 className="text-lg font-medium text-foreground-primary mb-2">No notifications</h3>
           <p>You&apos;re all caught up! New notifications will appear here.</p>
         </div>
       ) : (
@@ -164,7 +164,7 @@ interface NotificationItemProps {
 
 function NotificationItem({ notification, onMarkAsRead, onDelete }: NotificationItemProps) {
   const IconComponent = iconMap[notification.type?.icon as keyof typeof iconMap] || Bell;
-  const iconColor = colorMap[notification.type?.color as keyof typeof colorMap] || 'text-gray-500';
+  const iconColor = colorMap[notification.type?.color as keyof typeof colorMap] || 'text-foreground-tertiary';
   const priorityStyle = priorityStyles[notification.priority as keyof typeof priorityStyles] || priorityStyles.normal;
 
   return (
@@ -177,7 +177,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h4 className={`font-medium truncate ${!notification.is_read ? 'text-gray-900' : 'text-gray-700'}`}>
+              <h4 className={`font-medium truncate ${!notification.is_read ? 'text-foreground-primary' : 'text-foreground-secondary'}`}>
                 {notification.title}
               </h4>
               {!notification.is_read && (
@@ -185,17 +185,17 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
               )}
             </div>
 
-            <p className={`text-sm mb-2 ${!notification.is_read ? 'text-gray-700' : 'text-gray-600'}`}>
+            <p className={`text-sm mb-2 ${!notification.is_read ? 'text-foreground-secondary' : 'text-foreground-secondary'}`}>
               {notification.message}
             </p>
 
-            <div className="flex items-center gap-4 text-xs text-gray-500">
+            <div className="flex items-center gap-4 text-xs text-foreground-tertiary">
               <span className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
                 {formatRelativeTime(notification.created_at || '')}
               </span>
               {notification.context && (
-                <span className="px-2 py-0.5 bg-background-tertiary dark:bg-surface-secondary rounded text-gray-600">
+                <span className="px-2 py-0.5 bg-background-tertiary dark:bg-surface-secondary rounded text-foreground-secondary">
                   {notification.context.replace('_', ' ')}
                 </span>
               )}

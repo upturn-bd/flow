@@ -469,8 +469,8 @@ export default function DataExportPage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Data Export Center</h1>
-          <p className="text-sm text-gray-600 mt-1">
+          <h1 className="text-2xl font-bold text-foreground-primary">Data Export Center</h1>
+          <p className="text-sm text-foreground-secondary mt-1">
             Export company data to CSV format for analysis and reporting
           </p>
         </div>
@@ -530,10 +530,10 @@ export default function DataExportPage() {
                   </div>
                 </div>
 
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-foreground-primary mb-2">
                   {option.title}
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-foreground-secondary mb-4">
                   {option.description}
                 </p>
 
@@ -542,10 +542,10 @@ export default function DataExportPage() {
                     {option.loading || (isSelected && isLoadingData) ? (
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 border-2 border-border-secondary border-t-blue-600 rounded-full animate-spin"></div>
-                        <span className="text-gray-500">Loading...</span>
+                        <span className="text-foreground-tertiary">Loading...</span>
                       </div>
                     ) : (
-                      <span className="font-semibold text-gray-900">
+                      <span className="font-semibold text-foreground-primary">
                         {option.count} records
                       </span>
                     )}
@@ -603,7 +603,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Email Address</span>
+                        <span className="text-sm font-medium text-foreground-primary">Email Address</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -618,7 +618,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Phone Number</span>
+                        <span className="text-sm font-medium text-foreground-primary">Phone Number</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -633,7 +633,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Department</span>
+                        <span className="text-sm font-medium text-foreground-primary">Department</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -648,7 +648,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Designation</span>
+                        <span className="text-sm font-medium text-foreground-primary">Designation</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -663,7 +663,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Join Date</span>
+                        <span className="text-sm font-medium text-foreground-primary">Join Date</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-red-200 rounded-lg hover:bg-red-50 cursor-pointer bg-red-50/50">
@@ -712,7 +712,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Address</span>
+                        <span className="text-sm font-medium text-foreground-primary">Address</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -727,7 +727,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Contact Persons</span>
+                        <span className="text-sm font-medium text-foreground-primary">Contact Persons</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -742,7 +742,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Status</span>
+                        <span className="text-sm font-medium text-foreground-primary">Status</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -757,7 +757,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Process</span>
+                        <span className="text-sm font-medium text-foreground-primary">Process</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -772,7 +772,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Key Account Manager</span>
+                        <span className="text-sm font-medium text-foreground-primary">Key Account Manager</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -787,7 +787,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Stakeholder Type</span>
+                        <span className="text-sm font-medium text-foreground-primary">Stakeholder Type</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-green-200 rounded-lg hover:bg-green-50 cursor-pointer bg-green-50/50">
@@ -834,7 +834,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Description</span>
+                        <span className="text-sm font-medium text-foreground-primary">Description</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -849,7 +849,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Start & End Dates</span>
+                        <span className="text-sm font-medium text-foreground-primary">Start & End Dates</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -864,7 +864,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Status</span>
+                        <span className="text-sm font-medium text-foreground-primary">Status</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -879,7 +879,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Progress</span>
+                        <span className="text-sm font-medium text-foreground-primary">Progress</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -894,7 +894,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Goal</span>
+                        <span className="text-sm font-medium text-foreground-primary">Goal</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -909,7 +909,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Assignees</span>
+                        <span className="text-sm font-medium text-foreground-primary">Assignees</span>
                       </label>
                     </div>
 
@@ -941,7 +941,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Description</span>
+                        <span className="text-sm font-medium text-foreground-primary">Description</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -956,7 +956,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Start & End Dates</span>
+                        <span className="text-sm font-medium text-foreground-primary">Start & End Dates</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -971,7 +971,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Priority</span>
+                        <span className="text-sm font-medium text-foreground-primary">Priority</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -986,7 +986,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Status</span>
+                        <span className="text-sm font-medium text-foreground-primary">Status</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -1001,7 +1001,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Project ID</span>
+                        <span className="text-sm font-medium text-foreground-primary">Project ID</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -1016,7 +1016,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Assignees</span>
+                        <span className="text-sm font-medium text-foreground-primary">Assignees</span>
                       </label>
                     </div>
 
@@ -1048,7 +1048,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Start & End Dates</span>
+                        <span className="text-sm font-medium text-foreground-primary">Start & End Dates</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -1063,7 +1063,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Status</span>
+                        <span className="text-sm font-medium text-foreground-primary">Status</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -1078,7 +1078,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Leave Type</span>
+                        <span className="text-sm font-medium text-foreground-primary">Leave Type</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -1093,7 +1093,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Remarks</span>
+                        <span className="text-sm font-medium text-foreground-primary">Remarks</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -1108,7 +1108,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Employee ID</span>
+                        <span className="text-sm font-medium text-foreground-primary">Employee ID</span>
                       </label>
                     </div>
 
@@ -1140,7 +1140,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Check In Time</span>
+                        <span className="text-sm font-medium text-foreground-primary">Check In Time</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -1155,7 +1155,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Check Out Time</span>
+                        <span className="text-sm font-medium text-foreground-primary">Check Out Time</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -1170,7 +1170,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Tag/Status</span>
+                        <span className="text-sm font-medium text-foreground-primary">Tag/Status</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -1185,7 +1185,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Site Name</span>
+                        <span className="text-sm font-medium text-foreground-primary">Site Name</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
@@ -1200,7 +1200,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Site Timings</span>
+                        <span className="text-sm font-medium text-foreground-primary">Site Timings</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-green-200 rounded-lg hover:bg-green-50 cursor-pointer bg-green-50/50">
@@ -1245,7 +1245,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">GPS Coordinates</span>
+                        <span className="text-sm font-medium text-foreground-primary">GPS Coordinates</span>
                       </label>
                     </div>
 

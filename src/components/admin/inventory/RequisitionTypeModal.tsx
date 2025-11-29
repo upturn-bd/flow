@@ -26,7 +26,7 @@ export const RequisitionTypeModal: React.FC<RequisitionTypeModalProps> = ({
   return (
     <FormModal<RequisitionTypeData>
       title="Create Category"
-      icon={<Tag size={24} weight="duotone" className="text-gray-600" />}
+      icon={<Tag size={24} weight="duotone" className="text-foreground-secondary" />}
       initialValues={defaultData}
       validationFn={validateRequisitionType}
       onSubmit={onSubmit}
@@ -46,7 +46,7 @@ export const RequisitionTypeModal: React.FC<RequisitionTypeModalProps> = ({
             error={errors.name}
             required
             placeholder="Enter category name"
-            icon={<Tag size={18} weight="duotone" className="text-gray-500" />}
+            icon={<Tag size={18} weight="duotone" className="text-foreground-tertiary" />}
           />
         </>
       )}

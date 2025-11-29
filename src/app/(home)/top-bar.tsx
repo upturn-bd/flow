@@ -203,7 +203,7 @@ export default function TopBar() {
 
                 {/* <Link 
                   href="/account/settings" 
-                  className=" px-4 py-2 text-sm text-gray-700 hover:bg-background-tertiary dark:bg-surface-secondary flex items-center"
+                  className=" px-4 py-2 text-sm text-foreground-secondary hover:bg-background-tertiary dark:bg-surface-secondary flex items-center"
                   onClick={() => setUserMenuOpen(false)}
                 >
                   <Settings className="h-4 w-4 mr-2" />

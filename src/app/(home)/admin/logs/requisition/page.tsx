@@ -148,14 +148,14 @@ export default function RequisitionPage() {
               content: (
                 <>
                   {loading && (
-                    <div className="flex justify-center items-center py-20 text-gray-500">
+                    <div className="flex justify-center items-center py-20 text-foreground-tertiary">
                       <Loader className="animate-spin mr-2" />
                       Loading requisitions...
                     </div>
                   )}
 
                   {!loading && filtered.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+                    <div className="flex flex-col items-center justify-center py-20 text-foreground-tertiary">
                       <WarningCircle className="mb-2" size={28} />
                       <p>No pending requisition requests found.</p>
                     </div>
@@ -187,18 +187,18 @@ export default function RequisitionPage() {
               key: "history",
               label: "History",
               icon: <Clock />,
-              color: "text-gray-500",
+              color: "text-foreground-tertiary",
               content: (
                 <>
                   {loading && (
-                    <div className="flex justify-center items-center py-20 text-gray-500">
+                    <div className="flex justify-center items-center py-20 text-foreground-tertiary">
                       <Loader className="animate-spin mr-2" />
                       Loading history...
                     </div>
                   )}
 
                   {!loading && filtered.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+                    <div className="flex flex-col items-center justify-center py-20 text-foreground-tertiary">
                       <WarningCircle className="mb-2" size={28} />
                       <p>No past requisitions found.</p>
                     </div>

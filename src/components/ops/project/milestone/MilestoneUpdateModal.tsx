@@ -206,7 +206,7 @@ export default function MilestoneUpdateModal({
 
         {/* Project date hint */}
         {(projectStartDate || projectEndDate) && (
-          <p className="text-xs text-gray-500 -mt-2">
+          <p className="text-xs text-foreground-tertiary -mt-2">
             Project timeline: {projectStartDate || 'N/A'} to {projectEndDate || 'N/A'}
           </p>
         )}

@@ -111,7 +111,7 @@ export default function SettlementPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
           <DollarSign className="h-8 w-8 text-emerald-600 animate-pulse" />
-          <p className="text-sm text-gray-600">Loading settlement...</p>
+          <p className="text-sm text-foreground-secondary">Loading settlement...</p>
         </div>
       </div>
     }>

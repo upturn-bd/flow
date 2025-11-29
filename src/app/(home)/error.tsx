@@ -33,15 +33,15 @@ export default function Error({
             />
           </svg>
         </div>
-        <h2 className="mb-2 text-2xl font-bold text-gray-900">
+        <h2 className="mb-2 text-2xl font-bold text-foreground-primary">
           Something went wrong
         </h2>
-        <p className="mb-6 text-gray-600">
+        <p className="mb-6 text-foreground-secondary">
           We encountered an unexpected error. Our team has been notified and is
           working on a fix.
         </p>
         {error.digest && (
-          <p className="mb-6 font-mono text-xs text-gray-400">
+          <p className="mb-6 font-mono text-xs text-foreground-tertiary">
             Error ID: {error.digest}
           </p>
         )}

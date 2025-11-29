@@ -78,10 +78,10 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
         <div className="flex items-start gap-2">
           <Flag className="text-blue-600 mt-1" size={18} />
           <div>
-            <h3 className="font-medium text-gray-900">
+            <h3 className="font-medium text-foreground-primary">
               {type?.name || "Unknown Complaint Type"}
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-foreground-secondary">
               {complaint.anonymous ? "Anonymous Complaint" : "Named Complaint"}
             </p>
           </div>
@@ -105,7 +105,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
 
       {/* Complaint Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-        <div className="flex items-center gap-2 text-sm text-gray-700">
+        <div className="flex items-center gap-2 text-sm text-foreground-secondary">
           <User size={14} />
           <span>
             Requested by:{" "}
@@ -115,7 +115,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
           </span>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-gray-700">
+        <div className="flex items-center gap-2 text-sm text-foreground-secondary">
           <User size={14} />
           <span>
             Against: <span className="font-medium">{against?.name || "Unknown"}</span>
@@ -169,7 +169,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
           <div className="mt-4 space-y-4">
             {canComment && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground-secondary mb-2">
                   <MessageCircle size={16} className="inline mr-2" />
                   Add Comment
                 </label>

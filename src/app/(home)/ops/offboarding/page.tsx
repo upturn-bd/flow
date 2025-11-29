@@ -230,7 +230,7 @@ export default function OffboardingPage() {
 
       {/* Header */}
       <motion.div variants={fadeInUp} className="flex items-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center">
+        <h1 className="text-2xl font-bold text-foreground-primary flex items-center">
           <UserMinus className="mr-2 h-7 w-7 text-red-600" />
           Employee Offboarding
         </h1>
@@ -249,7 +249,7 @@ export default function OffboardingPage() {
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   activeTab === "active"
                     ? "bg-red-600 text-white"
-                    : "bg-background-tertiary dark:bg-surface-secondary text-gray-600 hover:bg-surface-hover"
+                    : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
                 }`}
               >
                 Active Employees ({activeEmployees.length})
@@ -259,7 +259,7 @@ export default function OffboardingPage() {
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   activeTab === "offboarded"
                     ? "bg-red-600 text-white"
-                    : "bg-background-tertiary dark:bg-surface-secondary text-gray-600 hover:bg-surface-hover"
+                    : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
                 }`}
               >
                 Offboarded ({offboardedEmployees.length})
@@ -304,10 +304,10 @@ export default function OffboardingPage() {
           >
             <Users className="h-16 w-16 text-red-300 mb-4" />
           </motion.div>
-          <h3 className="text-xl font-medium text-gray-700 mb-2">
+          <h3 className="text-xl font-medium text-foreground-secondary mb-2">
             No {activeTab === "active" ? "Active" : "Offboarded"} Employees Found
           </h3>
-          <p className="text-gray-600 text-center max-w-md">
+          <p className="text-foreground-secondary text-center max-w-md">
             {searchQuery
               ? "Try adjusting your search criteria"
               : `There are no ${activeTab === "active" ? "active" : "offboarded"} employees to display.`}
@@ -317,7 +317,7 @@ export default function OffboardingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Employee Cards */}
           <motion.div variants={staggerContainer} className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-800">
+            <h2 className="text-lg font-semibold text-foreground-primary">
               {activeTab === "active" ? "Active" : "Offboarded"} Employees ({displayedEmployees.length})
             </h2>
             {displayedEmployees.map((emp: OffboardingEmployee) => (
@@ -343,10 +343,10 @@ export default function OffboardingPage() {
                       <User className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-800">
+                      <h3 className="font-semibold text-foreground-primary">
                         {emp.first_name} {emp.last_name}
                       </h3>
-                      <p className="text-sm text-gray-500">{emp.designation}</p>
+                      <p className="text-sm text-foreground-tertiary">{emp.designation}</p>
                     </div>
                   </div>
                   {activeTab === "offboarded" && (
@@ -359,19 +359,19 @@ export default function OffboardingPage() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-2 text-sm">
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-foreground-secondary">
                     <Mail className="h-4 w-4" />
                     <span>{emp.email}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-foreground-secondary">
                     <Phone className="h-4 w-4" />
                     <span>{emp.phone_number}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-foreground-secondary">
                     <Building className="h-4 w-4" />
                     <span>{emp.department_name}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-foreground-secondary">
                     <Calendar className="h-4 w-4" />
                     <span>
                       Joined:{" "}
@@ -393,7 +393,7 @@ export default function OffboardingPage() {
                         <PermissionTooltip message="You don't have permission to reactivate employees">
                           <button
                             disabled
-                            className="w-full bg-gray-300 text-gray-500 rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center justify-center gap-2"
+                            className="w-full bg-gray-300 text-foreground-tertiary rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center justify-center gap-2"
                           >
                             <RotateCcw className="h-4 w-4" />
                             Reactivate Employee
@@ -419,7 +419,7 @@ export default function OffboardingPage() {
           {/* Offboarding Form */}
           {activeTab === "active" && (
             <motion.div variants={fadeInUp} className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-800">
+              <h2 className="text-lg font-semibold text-foreground-primary">
                 Offboarding Details
               </h2>
               {selectedEmployee ? (
@@ -429,17 +429,17 @@ export default function OffboardingPage() {
                       <User className="h-6 w-6" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-800">
+                      <h3 className="font-semibold text-foreground-primary">
                         {selectedEmployee.first_name} {selectedEmployee.last_name}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-foreground-tertiary">
                         {selectedEmployee.designation}
                       </p>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground-secondary mb-2">
                       Offboarding Type
                     </label>
                     <select
@@ -452,7 +452,7 @@ export default function OffboardingPage() {
                             | "Terminated",
                         })
                       }
-                      className="w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-gray-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      className="w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-foreground-secondary focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
                       <option value="Resigned">Resignation</option>
                       <option value="Terminated">Termination</option>
@@ -460,7 +460,7 @@ export default function OffboardingPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground-secondary mb-2">
                       Offboarding Date
                     </label>
                     <input
@@ -472,12 +472,12 @@ export default function OffboardingPage() {
                           offboarding_date: e.target.value,
                         })
                       }
-                      className="w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-gray-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      className="w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-foreground-secondary focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground-secondary mb-2">
                       Reason for Offboarding *
                     </label>
                     <Textarea
@@ -491,7 +491,7 @@ export default function OffboardingPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground-secondary mb-2">
                       Additional Notes
                     </label>
                     <Textarea
@@ -521,7 +521,7 @@ export default function OffboardingPage() {
                           <div className="flex-1">
                             <button
                               disabled
-                              className="w-full bg-gray-300 text-gray-500 rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center justify-center gap-2"
+                              className="w-full bg-gray-300 text-foreground-tertiary rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center justify-center gap-2"
                             >
                               <Check className="h-4 w-4" />
                               Confirm Offboarding
@@ -543,11 +543,11 @@ export default function OffboardingPage() {
                 </div>
               ) : (
                 <div className="bg-surface-primary rounded-xl p-10 shadow-sm border border-border-primary flex flex-col items-center justify-center text-center">
-                  <AlertTriangle className="h-12 w-12 text-gray-300 mb-3" />
-                  <h3 className="text-lg font-medium text-gray-700 mb-2">
+                  <AlertTriangle className="h-12 w-12 text-foreground-tertiary mb-3" />
+                  <h3 className="text-lg font-medium text-foreground-secondary mb-2">
                     No Employee Selected
                   </h3>
-                  <p className="text-gray-600 max-w-sm">
+                  <p className="text-foreground-secondary max-w-sm">
                     Select an employee from the list to begin the offboarding
                     process
                   </p>

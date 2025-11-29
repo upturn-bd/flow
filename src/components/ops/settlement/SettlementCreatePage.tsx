@@ -368,7 +368,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
         {/* Action Buttons */}
         {/* Allowance info
         {allowance && (
-          <div className="text-sm text-gray-600 ml-4">
+          <div className="text-sm text-foreground-secondary ml-4">
             Maximum allowance:{" "}
             <span className="font-semibold">
               ${allowance.toLocaleString()}

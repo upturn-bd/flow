@@ -66,7 +66,7 @@ export default function AttendanceLatePage() {
         <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Calendar className="text-gray-400" />
+              <Calendar className="text-foreground-tertiary" />
             </div>
             <input
               type="date"
@@ -78,7 +78,7 @@ export default function AttendanceLatePage() {
 
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Calendar className="text-gray-400" />
+              <Calendar className="text-foreground-tertiary" />
             </div>
             <input
               type="date"
@@ -100,7 +100,7 @@ export default function AttendanceLatePage() {
               ))}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <CaretDown className="text-gray-400 text-xs" />
+              <CaretDown className="text-foreground-tertiary text-xs" />
             </div>
           </div>
 
@@ -121,25 +121,25 @@ export default function AttendanceLatePage() {
             <table className="min-w-full divide-y divide-border-primary">
               <thead>
                 <tr className="bg-background-secondary dark:bg-background-tertiary">
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Site</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-In</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-Out</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Date</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Site</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Check-In</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Check-Out</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="bg-background-primary divide-y divide-border-primary">
                 {attendanceData.length > 0 ? (
                   attendanceData.map((entry, idx) => (
                     <tr key={idx} className="hover:bg-background-secondary dark:bg-background-tertiary transition-colors duration-150">
-                      <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{formatDateToDayMonth(entry.attendance_date)}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">
+                      <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">{formatDateToDayMonth(entry.attendance_date)}</td>
+                      <td className="px-4 py-3 text-sm text-foreground-primary">
                         {sites.find((s) => s.id === entry.site_id)?.name || "Unknown Site"}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">
                         {entry.check_in_time ? formatTimeFromISO(entry.check_in_time) : "N/A"}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">
                         {entry.check_out_time ? formatTimeFromISO(entry.check_out_time) : "N/A"}
                       </td>
                       <td className="px-4 py-3 text-sm">
@@ -149,7 +149,7 @@ export default function AttendanceLatePage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-sm text-gray-500 text-center">
+                    <td colSpan={5} className="px-4 py-8 text-sm text-foreground-tertiary text-center">
                       No attendance records found.
                     </td>
                   </tr>

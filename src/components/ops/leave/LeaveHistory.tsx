@@ -79,7 +79,7 @@ export default function LeaveHistoryPage() {
     <div className="p-4 sm:p-6 space-y-6">
       <div className="flex items-center gap-3">
         <Calendar size={24} className="text-blue-600" />
-        <h1 className="text-2xl font-bold text-gray-900">Leave History</h1>
+        <h1 className="text-2xl font-bold text-foreground-primary">Leave History</h1>
       </div>
 
       {leaveRequests.length > 0 ? (
@@ -129,10 +129,10 @@ export default function LeaveHistoryPage() {
                     {req.description && (
                       <div className="mt-4 p-3 bg-background-secondary dark:bg-background-tertiary rounded-md">
                         <div className="flex items-start gap-2">
-                          <FileText size={16} className="text-gray-500 mt-0.5" />
+                          <FileText size={16} className="text-foreground-tertiary mt-0.5" />
                           <div>
-                            <p className="font-medium text-sm text-gray-700 mb-1">Description:</p>
-                            <p className="text-sm text-gray-600">{req.description}</p>
+                            <p className="font-medium text-sm text-foreground-secondary mb-1">Description:</p>
+                            <p className="text-sm text-foreground-secondary">{req.description}</p>
                           </div>
                         </div>
                       </div>

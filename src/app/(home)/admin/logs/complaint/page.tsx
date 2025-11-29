@@ -138,7 +138,7 @@ export default function ComplaintLogsPage() {
               key: "history",
               label: "History",
               icon: <Clock />,
-              color: "text-gray-500",
+              color: "text-foreground-tertiary",
               content: (
                 <>
                   {historyLoading && (
@@ -152,10 +152,10 @@ export default function ComplaintLogsPage() {
                   {!historyLoading && complaintHistory.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
                       <div className="bg-background-tertiary rounded-full p-4 mb-4">
-                        <Flag className="h-12 w-12 text-gray-400" />
+                        <Flag className="h-12 w-12 text-foreground-tertiary" />
                       </div>
-                      <h3 className="text-lg font-medium text-gray-900">No complaint history</h3>
-                      <p className="mt-1 text-gray-500">Completed complaint requests will appear here</p>
+                      <h3 className="text-lg font-medium text-foreground-primary">No complaint history</h3>
+                      <p className="mt-1 text-foreground-tertiary">Completed complaint requests will appear here</p>
                     </div>
                   )}
 
