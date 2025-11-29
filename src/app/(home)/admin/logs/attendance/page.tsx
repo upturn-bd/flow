@@ -272,7 +272,7 @@ export default function AttendanceLogsPage() {
       {/* Edit Modal */}
       {selectedAttendance && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
+          <div className="bg-surface-primary rounded-lg shadow-lg max-w-md w-full p-6 relative">
             <button
               className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
               onClick={() => setSelectedAttendance(null)}

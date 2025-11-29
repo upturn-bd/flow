@@ -67,7 +67,7 @@ export default function StakeholderProcessesPage() {
 
       {/* Empty State */}
       {!loading && processes.length === 0 && (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-border-secondary">
+        <div className="text-center py-12 bg-background-secondary dark:bg-background-tertiary rounded-lg border-2 border-dashed border-border-secondary">
           <Settings className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-semibold text-gray-900">No processes</h3>
           <p className="mt-1 text-sm text-gray-500">
@@ -91,7 +91,7 @@ export default function StakeholderProcessesPage() {
           {processes.map((process) => (
             <div
               key={process.id}
-              className="bg-white rounded-lg border border-border-primary p-6 hover:shadow-md transition-shadow"
+              className="bg-surface-primary rounded-lg border border-border-primary p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -102,7 +102,7 @@ export default function StakeholderProcessesPage() {
                         Active
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-800 rounded">
+                      <span className="px-2 py-0.5 text-xs font-medium bg-background-tertiary dark:bg-surface-secondary text-gray-800 rounded">
                         Inactive
                       </span>
                     )}

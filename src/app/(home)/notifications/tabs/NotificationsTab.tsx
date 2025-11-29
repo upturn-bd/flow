@@ -195,7 +195,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
                 {formatRelativeTime(notification.created_at || '')}
               </span>
               {notification.context && (
-                <span className="px-2 py-0.5 bg-gray-100 rounded text-gray-600">
+                <span className="px-2 py-0.5 bg-background-tertiary dark:bg-surface-secondary rounded text-gray-600">
                   {notification.context.replace('_', ' ')}
                 </span>
               )}

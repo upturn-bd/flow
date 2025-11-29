@@ -84,7 +84,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
           <button
             onClick={() => router.back()}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+            className="p-2 hover:bg-surface-hover rounded-lg transition-colors flex-shrink-0"
             aria-label="Go back"
           >
             <ArrowLeft size={20} />
@@ -97,7 +97,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
                   Active
                 </span>
               ) : (
-                <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded whitespace-nowrap">
+                <span className="px-2 py-1 text-xs font-medium bg-background-tertiary dark:bg-surface-secondary text-gray-800 rounded whitespace-nowrap">
                   Inactive
                 </span>
               )}
@@ -132,7 +132,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           <button
             onClick={handleToggleActive}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 border border-border-secondary rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 border border-border-secondary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary transition-colors font-medium"
           >
             {process.is_active ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
             {process.is_active ? "Deactivate" : "Activate"}
@@ -148,7 +148,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* Step Manager */}
-      <div className="bg-white rounded-lg border border-border-primary p-4 sm:p-6 shadow-sm">
+      <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 shadow-sm">
         <StepManager
           processId={processId}
           steps={steps}

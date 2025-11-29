@@ -58,7 +58,7 @@ export default function AttendanceAbsentPage() {
   }, [fetchSites]);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="bg-surface-primary rounded-lg shadow-sm">
       <div className="p-4 sm:p-6">
 
         {/* Filters */}
@@ -119,7 +119,7 @@ export default function AttendanceAbsentPage() {
           <div className="overflow-x-auto rounded-lg border border-border-primary">
             <table className="min-w-full divide-y divide-border-primary">
               <thead>
-                <tr className="bg-gray-50">
+                <tr className="bg-background-secondary dark:bg-background-tertiary">
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Site</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-In</th>
@@ -130,7 +130,7 @@ export default function AttendanceAbsentPage() {
               <tbody className="bg-background-primary divide-y divide-border-primary">
                 {attendanceData.length > 0 ? (
                   attendanceData.map((entry, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50 transition-colors duration-150">
+                    <tr key={idx} className="hover:bg-background-secondary dark:bg-background-tertiary transition-colors duration-150">
                       <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{formatDateToDayMonth(entry.attendance_date)}</td>
                       <td className="px-4 py-3 text-sm text-gray-900">
                         {sites.find((s) => s.id === entry.site_id)?.name || "Unknown Site"}

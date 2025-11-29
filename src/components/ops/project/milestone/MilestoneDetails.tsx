@@ -222,7 +222,7 @@ export default function MilestoneDetails({
               whileTap={{ scale: 0.98 }}
               type="button"
               onClick={onClose}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors duration-150"
+              className="flex items-center gap-2 px-4 py-2 bg-background-tertiary dark:bg-surface-secondary text-gray-700 rounded-md hover:bg-surface-hover transition-colors duration-150"
             >
               <CaretLeft size={16} strokeWidth={2} />
               Back
@@ -232,7 +232,7 @@ export default function MilestoneDetails({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-lg border border-border-primary p-6 shadow-sm space-y-4"
+            className="bg-surface-primary rounded-lg border border-border-primary p-6 shadow-sm space-y-4"
           >
             <div className="grid gap-4">
               <div className="flex items-center gap-2">
@@ -243,7 +243,7 @@ export default function MilestoneDetails({
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-medium text-gray-700">Status:</span>
-                {/* <span className="px-2 py-1 rounded-full text-sm bg-gray-100 text-gray-700">
+                {/* <span className="px-2 py-1 rounded-full text-sm bg-background-tertiary dark:bg-surface-secondary text-gray-700">
                   {milestoneDetails?.status || "N/A"}
                 </span> */}
 
@@ -258,7 +258,7 @@ export default function MilestoneDetails({
                     milestoneDetails.assignees.map((assignee: string, i: number) => (
                       <span
                         key={i}
-                        className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full"
+                        className="bg-background-tertiary dark:bg-surface-secondary text-gray-700 text-xs px-2 py-1 rounded-full"
                       >
                         {employees.find((employee) => employee.id === assignee)?.name || "N/A"}
                       </span>
@@ -329,7 +329,7 @@ export default function MilestoneDetails({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     whileHover={{ y: -2 }}
-                    className="bg-white rounded-lg border border-border-primary p-4 shadow-sm space-y-3"
+                    className="bg-surface-primary rounded-lg border border-border-primary p-4 shadow-sm space-y-3"
                   >
                     <div className="font-medium text-gray-900">
                       {task.task_title}
@@ -342,7 +342,7 @@ export default function MilestoneDetails({
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => task.id !== null && handleDisplayUpdateTaskModal(task.id!)}
-                            className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-150"
+                            className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-background-tertiary dark:bg-surface-secondary rounded-full transition-colors duration-150"
                           >
                             <Pencil size={15} strokeWidth={2} />
                           </motion.button>
@@ -361,7 +361,7 @@ export default function MilestoneDetails({
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => task.id !== null && setTaskDetailsId(task.id!)}
-                        className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-150 ml-2"
+                        className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-background-tertiary dark:bg-surface-secondary rounded-full transition-colors duration-150 ml-2"
                       >
                         <ArrowUpRight size={15} strokeWidth={2} />
                       </motion.button>

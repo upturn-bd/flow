@@ -143,7 +143,7 @@ export default function StakeholdersPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 lg:gap-4">
-        <div className="bg-white rounded-lg border border-border-primary p-3.5 sm:p-4 lg:p-6">
+        <div className="bg-surface-primary rounded-lg border border-border-primary p-3.5 sm:p-4 lg:p-6">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
               <p className="text-xs text-gray-600 truncate">Active Leads</p>
@@ -155,7 +155,7 @@ export default function StakeholdersPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-border-primary p-3.5 sm:p-4 lg:p-6">
+        <div className="bg-surface-primary rounded-lg border border-border-primary p-3.5 sm:p-4 lg:p-6">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
               <p className="text-xs text-gray-600 truncate">Stakeholders</p>
@@ -169,7 +169,7 @@ export default function StakeholdersPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-border-primary p-3.5 sm:p-4 lg:p-6">
+        <div className="bg-surface-primary rounded-lg border border-border-primary p-3.5 sm:p-4 lg:p-6">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
               <p className="text-xs text-gray-600 truncate">Total Records</p>
@@ -185,7 +185,7 @@ export default function StakeholdersPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg border border-border-primary p-3 sm:p-4">
+      <div className="bg-surface-primary rounded-lg border border-border-primary p-3 sm:p-4">
         <div className="flex flex-col gap-2.5 sm:gap-3">
           {/* Search */}
           <div className="relative">
@@ -206,7 +206,7 @@ export default function StakeholdersPage() {
               className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 filterStatus === "all"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300"
+                  : "bg-background-tertiary dark:bg-surface-secondary text-gray-700 hover:bg-surface-hover active:bg-surface-hover"
               }`}
             >
               All ({searchResult?.totalCount || 0})
@@ -216,7 +216,7 @@ export default function StakeholdersPage() {
               className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 filterStatus === "Lead"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300"
+                  : "bg-background-tertiary dark:bg-surface-secondary text-gray-700 hover:bg-surface-hover active:bg-surface-hover"
               }`}
             >
               Leads ({leads.length})
@@ -226,7 +226,7 @@ export default function StakeholdersPage() {
               className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 filterStatus === "Permanent"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300"
+                  : "bg-background-tertiary dark:bg-surface-secondary text-gray-700 hover:bg-surface-hover active:bg-surface-hover"
               }`}
             >
               Permanent ({completedStakeholders.length})
@@ -236,7 +236,7 @@ export default function StakeholdersPage() {
               className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 filterStatus === "Rejected"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300"
+                  : "bg-background-tertiary dark:bg-surface-secondary text-gray-700 hover:bg-surface-hover active:bg-surface-hover"
               }`}
             >
               Rejected
@@ -261,7 +261,7 @@ export default function StakeholdersPage() {
 
       {/* Empty State */}
       {!loading && stakeholders.length === 0 && (
-        <div className="text-center py-8 sm:py-12 bg-gray-50 rounded-lg border-2 border-dashed border-border-secondary px-4">
+        <div className="text-center py-8 sm:py-12 bg-background-secondary dark:bg-background-tertiary rounded-lg border-2 border-dashed border-border-secondary px-4">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900">No stakeholders found</h3>
           <p className="text-xs sm:text-sm text-gray-500 mt-1">
             {searchTerm
@@ -284,9 +284,9 @@ export default function StakeholdersPage() {
       {!loading && stakeholders.length > 0 && (
         <>
           {/* Desktop Table View */}
-          <div className="hidden md:block bg-white rounded-lg border border-border-primary overflow-hidden">
+          <div className="hidden md:block bg-surface-primary rounded-lg border border-border-primary overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-border-primary">
+              <thead className="bg-background-secondary dark:bg-background-tertiary border-b border-border-primary">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Name
@@ -315,7 +315,7 @@ export default function StakeholdersPage() {
                 {stakeholders.map((stakeholder) => (
                   <tr
                     key={stakeholder.id}
-                    className="hover:bg-gray-50 transition-colors cursor-pointer"
+                    className="hover:bg-background-secondary dark:bg-background-tertiary transition-colors cursor-pointer"
                     onClick={() => router.push(`/admin/stakeholders/${stakeholder.id}`)}
                   >
                     <td className="px-6 py-4">
@@ -423,7 +423,7 @@ export default function StakeholdersPage() {
               <div
                 key={stakeholder.id}
                 onClick={() => router.push(`/admin/stakeholders/${stakeholder.id}`)}
-                className="bg-white rounded-lg border border-border-primary p-3 space-y-2.5 active:shadow-md transition-shadow cursor-pointer"
+                className="bg-surface-primary rounded-lg border border-border-primary p-3 space-y-2.5 active:shadow-md transition-shadow cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">

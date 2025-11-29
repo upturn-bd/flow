@@ -92,7 +92,7 @@ export default function AttendanceRecordsPage() {
    }, [attendanceData, selectedMonth]);
 
    return (
-      <div className="bg-white rounded-lg shadow-sm">
+      <div className="bg-surface-primary rounded-lg shadow-sm">
          <div className="p-4 sm:p-6">
             {/* Filters */}
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6">
@@ -143,7 +143,7 @@ export default function AttendanceRecordsPage() {
                   {Object.entries(currentMonthCounts).map(([tag, count]) => (
                      <div
                         key={tag}
-                        className={`px-3 py-2 rounded-lg text-center text-sm font-semibold ${tagStyles[tag] || "bg-gray-100 text-gray-800"
+                        className={`px-3 py-2 rounded-lg text-center text-sm font-semibold ${tagStyles[tag] || "bg-background-tertiary dark:bg-surface-secondary text-gray-800"
                            }`}
                      >
                         <div>{tag.replace(/_/g, " ")}</div>
@@ -164,7 +164,7 @@ export default function AttendanceRecordsPage() {
                <div className="overflow-x-auto rounded-lg border border-border-primary">
                   <table className="min-w-full divide-y divide-border-primary">
                      <thead>
-                        <tr className="bg-gray-50">
+                        <tr className="bg-background-secondary dark:bg-background-tertiary">
                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Date
                            </th>
@@ -184,7 +184,7 @@ export default function AttendanceRecordsPage() {
                            attendanceData.map((entry, idx) => (
                               <tr
                                  key={idx}
-                                 className="hover:bg-gray-50 transition-colors duration-150"
+                                 className="hover:bg-background-secondary dark:bg-background-tertiary transition-colors duration-150"
                               >
                                  <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                                     {formatDateToDayMonth(entry.attendance_date)}
@@ -202,7 +202,7 @@ export default function AttendanceRecordsPage() {
                                  <td className="px-4 py-3 text-sm">
                                     <span
                                        className={`px-3 py-1 inline-flex justify-center text-xs leading-5 font-semibold rounded-full w-28 ${tagStyles[entry.tag] ||
-                                          "bg-gray-100 text-gray-800"
+                                          "bg-background-tertiary dark:bg-surface-secondary text-gray-800"
                                           }`}
                                     >
                                        {entry.tag.replace(/_/g, " ")}

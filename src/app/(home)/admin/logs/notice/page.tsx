@@ -101,7 +101,7 @@ export default function NoticePage() {
       case "urgent":
         return "bg-red-200 text-red-800 font-semibold";
       default:
-        return "bg-gray-100 text-gray-700";
+        return "bg-background-tertiary dark:bg-surface-secondary text-gray-700";
     }
   };
 
@@ -193,7 +193,7 @@ export default function NoticePage() {
                       {notice.urgency}
                     </span>
                     {notice.notice_type_id && (
-                      <span className="inline-flex items-center rounded-full bg-gray-100 border border-border-secondary px-2 py-0.5 text-xs font-medium text-gray-700">
+                      <span className="inline-flex items-center rounded-full bg-background-tertiary dark:bg-surface-secondary border border-border-secondary px-2 py-0.5 text-xs font-medium text-gray-700">
                         {noticeTypes[notice.notice_type_id] || "General"}
                       </span>
                     )}

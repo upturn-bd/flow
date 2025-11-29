@@ -153,7 +153,7 @@ export default function StakeholderIssuesPage() {
       case "Resolved":
         return "bg-green-100 text-green-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-background-tertiary dark:bg-surface-secondary text-gray-800";
     }
   };
 
@@ -166,9 +166,9 @@ export default function StakeholderIssuesPage() {
       case "Medium":
         return "bg-blue-100 text-blue-800";
       case "Low":
-        return "bg-gray-100 text-gray-800";
+        return "bg-background-tertiary dark:bg-surface-secondary text-gray-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-background-tertiary dark:bg-surface-secondary text-gray-800";
     }
   };
 
@@ -189,7 +189,7 @@ export default function StakeholderIssuesPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg border border-border-primary p-6">
+        <div className="bg-surface-primary rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Pending</p>
@@ -201,7 +201,7 @@ export default function StakeholderIssuesPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-border-primary p-6">
+        <div className="bg-surface-primary rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">In Progress</p>
@@ -213,7 +213,7 @@ export default function StakeholderIssuesPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-border-primary p-6">
+        <div className="bg-surface-primary rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Resolved</p>
@@ -225,7 +225,7 @@ export default function StakeholderIssuesPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-border-primary p-6">
+        <div className="bg-surface-primary rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">High Priority</p>
@@ -239,7 +239,7 @@ export default function StakeholderIssuesPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg border border-border-primary p-4">
+      <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Search */}
           <div className="flex-1 relative">
@@ -296,7 +296,7 @@ export default function StakeholderIssuesPage() {
 
       {/* Empty State */}
       {!loading && issues.length === 0 && (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-border-secondary">
+        <div className="text-center py-12 bg-background-secondary dark:bg-background-tertiary rounded-lg border-2 border-dashed border-border-secondary">
           <h3 className="text-lg font-semibold text-gray-900">No issues found</h3>
           <p className="text-sm text-gray-500 mt-1">
             {searchTerm || filterStatus !== "all" || filterPriority !== "all"
@@ -312,7 +312,7 @@ export default function StakeholderIssuesPage() {
           {issues.map((issue) => (
             <div
               key={issue.id}
-              className="bg-white rounded-lg border border-border-primary p-6 hover:shadow-md transition-shadow"
+              className="bg-surface-primary rounded-lg border border-border-primary p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -353,7 +353,7 @@ export default function StakeholderIssuesPage() {
                         <button
                           key={index}
                           onClick={() => handleDownloadAttachment(attachment.path, attachment.originalName)}
-                          className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                          className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-background-tertiary dark:bg-surface-secondary hover:bg-surface-hover rounded transition-colors"
                         >
                           <Download size={12} />
                           {attachment.originalName}

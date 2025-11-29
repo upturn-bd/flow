@@ -218,7 +218,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
               animate={{ opacity: 1, y: 0 }}
               className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
             >
-              <div className="bg-white rounded-lg border border-border-primary p-4">
+              <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <CreditCard className="h-8 w-8 text-indigo-600" />
@@ -229,7 +229,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg border border-border-primary p-4">
+              <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <CheckCircle className="h-8 w-8 text-green-600" />
@@ -240,7 +240,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg border border-border-primary p-4">
+              <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <Clock className="h-8 w-8 text-blue-600" />
@@ -251,7 +251,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                   </div>
                 </div>
               </div>
-                  <div className="bg-white rounded-lg border border-border-primary p-4">
+                  <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
                         <AlertTriangle className="h-8 w-8 text-amber-600" />
@@ -272,7 +272,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
               animate={{ opacity: 1, y: 0 }}
               className="mb-6"
             >
-              <div className="bg-white rounded-lg border border-border-primary p-4">
+              <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     {statusFilter === 'Paid' && <CheckCircle className="h-8 w-8 text-green-600" />}
@@ -294,7 +294,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center py-12 text-center"
             >
-              <div className="bg-gray-100 rounded-full p-4 mb-4">
+              <div className="bg-background-tertiary dark:bg-surface-secondary rounded-full p-4 mb-4">
                 <CreditCard className="h-12 w-12 text-gray-400" />
               </div>
               <h3 className="text-lg font-medium text-gray-900">
@@ -323,7 +323,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-white rounded-lg border border-border-primary hover:shadow-md transition-shadow"
+                    className="bg-surface-primary rounded-lg border border-border-primary hover:shadow-md transition-shadow"
                   >
                     <div className="p-6">
                       <div className="flex items-start justify-between">
@@ -434,7 +434,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                             <button
                               onClick={handleCancelEdit}
                               disabled={processingUpdate}
-                              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-border-secondary rounded-md hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                              className="px-3 py-2 text-sm font-medium text-gray-700 bg-surface-primary border border-border-secondary rounded-md hover:bg-background-secondary dark:bg-background-tertiary focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
                             >
                               Cancel
                             </button>

@@ -297,7 +297,7 @@ export default function EmployeeOnboarding() {
             <div className="flex justify-center">
               <button
                 onClick={logout}
-                className="flex items-center px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="flex items-center px-6 py-2 bg-background-tertiary dark:bg-surface-secondary text-gray-700 rounded-lg hover:bg-surface-hover transition-colors"
               >
                 <LogOut className="mr-2 h-5 w-5" />
                 Logout
@@ -410,7 +410,7 @@ export default function EmployeeOnboarding() {
         >
           <button
             onClick={logout}
-            className="flex items-center px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center px-4 py-2 text-sm bg-background-tertiary dark:bg-surface-secondary text-gray-700 rounded-lg hover:bg-surface-hover transition-colors"
           >
             <LogOut className="h-4 w-4 mr-2" />
             Logout

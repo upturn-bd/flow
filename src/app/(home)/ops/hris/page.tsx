@@ -152,7 +152,7 @@ useEffect(() => {
       <ModulePermissionsBanner module={PERMISSION_MODULES.HRIS} title="HRIS" compact />
 
       {/* Search and Filters */}
-      <motion.div variants={fadeIn} className="bg-white rounded-xl shadow-sm mb-8">
+      <motion.div variants={fadeIn} className="bg-surface-primary rounded-xl shadow-sm mb-8">
         <div className="border-b border-border-primary px-6 py-4 flex justify-between items-center">
           <h2 className="text-lg font-semibold text-indigo-700 flex items-center">
             <Search className="w-5 h-5 mr-2" />
@@ -265,7 +265,7 @@ useEffect(() => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm p-6"
+              className="flex flex-col items-center justify-center h-64 bg-surface-primary rounded-xl shadow-sm p-6"
             >
               <Loader className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
               <p className="text-gray-600">Loading employee data...</p>
@@ -275,7 +275,7 @@ useEffect(() => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="bg-white rounded-xl shadow-sm p-8 text-center"
+              className="bg-surface-primary rounded-xl shadow-sm p-8 text-center"
             >
               <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-700 mb-2">
@@ -290,7 +290,7 @@ useEffect(() => {
             <>
               {/* ✅ Table for large screens */}
               <div className="hidden lg:block overflow-x-auto">
-                <table className="min-w-full bg-white rounded-xl shadow-sm border border-border-primary">
+                <table className="min-w-full bg-surface-primary rounded-xl shadow-sm border border-border-primary">
                   <thead>
                     <tr className="bg-indigo-50 text-indigo-700 text-left text-sm font-medium">
                       <th className="px-6 py-3 truncate">Name</th>
@@ -306,7 +306,7 @@ useEffect(() => {
                     {filteredEmployees.map((employee) => (
                       <tr
                         key={employee.id}
-                        className="hover:bg-gray-50 transition-colors"
+                        className="hover:bg-background-secondary dark:bg-background-tertiary transition-colors"
                       >
                         <td className="px-6 py-3 font-medium text-gray-800 flex items-center gap-2">
                           <User className="w-5 h-5 text-indigo-500" />
@@ -354,11 +354,11 @@ useEffect(() => {
                       boxShadow:
                         "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                     }}
-                    className="bg-white rounded-xl shadow-sm overflow-hidden border border-border-primary transition-all duration-200"
+                    className="bg-surface-primary rounded-xl shadow-sm overflow-hidden border border-border-primary transition-all duration-200"
                   >
                     <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-4">
                       <div className="flex items-center">
-                        <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-indigo-600 mr-4">
+                        <div className="w-14 h-14 bg-surface-primary rounded-full flex items-center justify-center text-indigo-600 mr-4">
                           <User size={28} />
                         </div>
                         <div>

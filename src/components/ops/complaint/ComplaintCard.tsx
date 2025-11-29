@@ -71,7 +71,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.2 }}
-      className="bg-white border border-border-primary rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"
+      className="bg-surface-primary border border-border-primary rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"
     >
       {/* Header */}
       <div className="flex justify-between items-start">

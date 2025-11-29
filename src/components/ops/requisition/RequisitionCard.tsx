@@ -75,7 +75,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 1, y: -20 }}
       transition={{ duration: 0.2 }}
-      className="bg-white border border-border-primary rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"
+      className="bg-surface-primary border border-border-primary rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"
     >
       {/* Header */}
       <div className="flex justify-between items-start">
@@ -173,7 +173,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
 
       {/* Description */}
       {req.description && (
-        <div className="mt-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-md">
+        <div className="mt-3 text-sm text-gray-700 bg-background-secondary dark:bg-background-tertiary p-3 rounded-md">
           <p className="font-medium mb-1">Description:</p>
           <p>{req.description}</p>
         </div>
@@ -190,7 +190,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                 href={req.attachment_download_urls?.[index]}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 text-xs px-2 py-1 rounded"
+                className="flex items-center gap-1 bg-background-tertiary dark:bg-surface-secondary hover:bg-surface-hover transition-colors text-gray-700 text-xs px-2 py-1 rounded"
               >
                 <FileText size={12} />
                 <span>{extractFileNameFromStoragePath(attachment)}</span>
@@ -216,7 +216,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Add your feedback here..."
                 value={comment}
-                className="w-full px-4 py-2 rounded-md border border-border-secondary bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="w-full px-4 py-2 rounded-md border border-border-secondary bg-surface-primary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
               />
             </div>
           </div>

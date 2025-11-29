@@ -204,7 +204,7 @@ export default function MilestoneList({
                           return employee ? (
                             <span 
                               key={assigneeId}
-                              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
+                              className="text-xs bg-background-tertiary dark:bg-surface-secondary text-gray-700 px-2 py-1 rounded-full"
                             >
                               {employee.name}
                             </span>

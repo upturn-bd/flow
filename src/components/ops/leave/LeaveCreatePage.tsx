@@ -145,7 +145,7 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
   return (
     <motion.div initial="hidden" animate="visible" variants={fadeIn} className="p-4 sm:p-6 space-y-8">
       {/* Leave Balance */}
-      <section className="bg-white rounded-xl shadow-sm p-6 border border-border-primary">
+      <section className="bg-surface-primary rounded-xl shadow-sm p-6 border border-border-primary">
         <h1 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
           <Clock className="mr-2 h-5 w-5 text-blue-600" /> Leave Balance
         </h1>
@@ -171,7 +171,7 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
 
 
       {/* Leave Form */}
-      <section className="bg-white rounded-xl shadow-sm p-6 border border-border-primary">
+      <section className="bg-surface-primary rounded-xl shadow-sm p-6 border border-border-primary">
         <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
           <Calendar className="mr-2 h-5 w-5 text-blue-600" /> Leave Application
         </h2>
@@ -185,7 +185,7 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
                 name="type_id"
                 value={leaveRecord.type_id ?? ""}
                 onChange={handleChange}
-                className={`w-full bg-gray-50 border ${touched.type_id && errors.type_id ? "border-red-300" : "border-border-secondary"} rounded-lg p-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
+                className={`w-full bg-background-secondary dark:bg-background-tertiary border ${touched.type_id && errors.type_id ? "border-red-300" : "border-border-secondary"} rounded-lg p-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
               >
                 <option value="">Select leave type</option>
                 {isLoading ? (
@@ -204,7 +204,7 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="block font-medium text-gray-700">From *</label>
-              <div className="relative bg-gray-50 border border-border-secondary rounded-lg overflow-hidden">
+              <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-lg overflow-hidden">
                 <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                   <Calendar className="h-5 w-5" />
                 </div>
@@ -223,7 +223,7 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
 
             <div className="space-y-2">
               <label className="block font-medium text-gray-700">To *</label>
-              <div className="relative bg-gray-50 border border-border-secondary rounded-lg overflow-hidden">
+              <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-lg overflow-hidden">
                 <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                   <Calendar className="h-5 w-5" />
                 </div>
@@ -261,7 +261,7 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
               value={leaveRecord.description}
               onChange={handleChange}
               placeholder="Please provide details about your leave request..."
-              className={`w-full bg-gray-50 border ${touched.description && errors.description ? "border-red-300" : "border-border-secondary"} rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
+              className={`w-full bg-background-secondary dark:bg-background-tertiary border ${touched.description && errors.description ? "border-red-300" : "border-border-secondary"} rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
             />
             {touched.description && errors.description && (
               <p className="text-red-500 text-sm">{errors.description}</p>

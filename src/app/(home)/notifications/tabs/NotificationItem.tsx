@@ -12,7 +12,7 @@ export default function NotificationItem({ message }: NotificationItemProps) {
   };
 
   return (
-    <div className={`bg-gray-100 p-3 rounded-md shadow-sm flex justify-between items-center ${isRead ? 'opacity-50' : ''}`}>
+    <div className={`bg-background-tertiary dark:bg-surface-secondary p-3 rounded-md shadow-sm flex justify-between items-center ${isRead ? 'opacity-50' : ''}`}>
       <li>{message}</li>
       {!isRead && (
         <button

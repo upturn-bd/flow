@@ -420,7 +420,7 @@ export default function ProjectDetails({
             <Button
               variant="ghost"
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full"
+              className="p-2 hover:bg-background-tertiary dark:bg-surface-secondary rounded-full"
             >
               <X size={20} />
             </Button>

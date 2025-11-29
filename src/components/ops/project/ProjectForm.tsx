@@ -410,7 +410,7 @@ export default function ProjectForm({
       }
     }} className="space-y-6 relative">
       {isSubmitting && (
-        <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-50">
+        <div className="absolute inset-0 bg-surface-primary/50 flex items-center justify-center z-50">
           <LoadingSpinner />
         </div>
       )}

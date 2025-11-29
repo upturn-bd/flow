@@ -246,7 +246,7 @@ export default function NoticePage() {
                       boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)"
                     }}
                     transition={{ layout: { duration: 0.3 } }}
-                    className="bg-white shadow-sm rounded-xl overflow-hidden border border-border-primary"
+                    className="bg-surface-primary shadow-sm rounded-xl overflow-hidden border border-border-primary"
                   >
                     <div className="p-6">
                       <div className="flex justify-between items-start">

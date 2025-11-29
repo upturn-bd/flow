@@ -251,7 +251,7 @@ export default function CompanyProjectsPage() {
          {/* Update Modal */}
          {isEditing && selectedProject && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 overflow-y-auto">
-               <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl max-h-[95vh] overflow-y-auto relative p-6">
+               <div className="bg-surface-primary rounded-xl shadow-lg w-full max-w-3xl max-h-[95vh] overflow-y-auto relative p-6">
                   <UpdateProjectPage
                      initialData={selectedProject}
                      employees={employees}

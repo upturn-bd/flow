@@ -251,7 +251,7 @@ export default function RequisitionEditModal({
             } transition-colors duration-300`}
           >
             <motion.div
-              className="w-5 h-5 bg-white rounded-full absolute top-0.5"
+              className="w-5 h-5 bg-surface-primary rounded-full absolute top-0.5"
               animate={{
                 left: isOneOff ? "calc(100% - 1.25rem - 0.125rem)" : "0.125rem",
               }}
@@ -551,7 +551,7 @@ export default function RequisitionEditModal({
               whileTap={{ scale: 0.98 }}
               type="button"
               onClick={onClose}
-              className="flex items-center gap-2 bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+              className="flex items-center gap-2 bg-background-tertiary dark:bg-surface-secondary text-gray-700 px-6 py-2 rounded-lg hover:bg-surface-hover transition-colors"
             >
               Cancel
             </motion.button>

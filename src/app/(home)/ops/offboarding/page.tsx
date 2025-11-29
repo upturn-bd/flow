@@ -240,7 +240,7 @@ export default function OffboardingPage() {
       <ModulePermissionsBanner module={PERMISSION_MODULES.OFFBOARDING} title="Offboarding" compact />
 
       {/* Search and Tabs */}
-      <motion.div variants={fadeIn} className="bg-white rounded-xl shadow-sm mb-6">
+      <motion.div variants={fadeIn} className="bg-surface-primary rounded-xl shadow-sm mb-6">
         <div className="border-b border-border-primary px-6 py-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex gap-2">
@@ -249,7 +249,7 @@ export default function OffboardingPage() {
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   activeTab === "active"
                     ? "bg-red-600 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    : "bg-background-tertiary dark:bg-surface-secondary text-gray-600 hover:bg-surface-hover"
                 }`}
               >
                 Active Employees ({activeEmployees.length})
@@ -259,7 +259,7 @@ export default function OffboardingPage() {
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   activeTab === "offboarded"
                     ? "bg-red-600 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    : "bg-background-tertiary dark:bg-surface-secondary text-gray-600 hover:bg-surface-hover"
                 }`}
               >
                 Offboarded ({offboardedEmployees.length})
@@ -330,7 +330,7 @@ export default function OffboardingPage() {
                   boxShadow:
                     "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
                 }}
-                className={`bg-white rounded-xl p-4 shadow-sm border ${
+                className={`bg-surface-primary rounded-xl p-4 shadow-sm border ${
                   selectedEmployee?.id === emp.id
                     ? "border-red-500 ring-2 ring-red-200"
                     : "border-border-primary"
@@ -423,7 +423,7 @@ export default function OffboardingPage() {
                 Offboarding Details
               </h2>
               {selectedEmployee ? (
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-border-primary space-y-4">
+                <div className="bg-surface-primary rounded-xl p-6 shadow-sm border border-border-primary space-y-4">
                   <div className="flex items-center gap-3 pb-4 border-b border-border-primary">
                     <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600">
                       <User className="h-6 w-6" />
@@ -452,7 +452,7 @@ export default function OffboardingPage() {
                             | "Terminated",
                         })
                       }
-                      className="w-full rounded-lg border border-border-secondary bg-white px-3 py-2 text-gray-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      className="w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-gray-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
                       <option value="Resigned">Resignation</option>
                       <option value="Terminated">Termination</option>
@@ -472,7 +472,7 @@ export default function OffboardingPage() {
                           offboarding_date: e.target.value,
                         })
                       }
-                      className="w-full rounded-lg border border-border-secondary bg-white px-3 py-2 text-gray-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      className="w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-gray-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                     />
                   </div>
 
@@ -506,7 +506,7 @@ export default function OffboardingPage() {
 
                   <div className="flex gap-4 pt-4">
                     <Button
-                      className="flex-1 bg-gray-400 hover:bg-gray-500 flex items-center justify-center gap-2"
+                      className="flex-1 bg-foreground-tertiary hover:bg-surface-hover flex items-center justify-center gap-2"
                       onClick={() => setSelectedEmployee(null)}
                       disabled={loading}
                     >
@@ -542,7 +542,7 @@ export default function OffboardingPage() {
                   </div>
                 </div>
               ) : (
-                <div className="bg-white rounded-xl p-10 shadow-sm border border-border-primary flex flex-col items-center justify-center text-center">
+                <div className="bg-surface-primary rounded-xl p-10 shadow-sm border border-border-primary flex flex-col items-center justify-center text-center">
                   <AlertTriangle className="h-12 w-12 text-gray-300 mb-3" />
                   <h3 className="text-lg font-medium text-gray-700 mb-2">
                     No Employee Selected

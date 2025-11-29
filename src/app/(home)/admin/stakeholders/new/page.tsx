@@ -197,7 +197,7 @@ export default function NewStakeholderPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Basic Information */}
-          <div className="bg-white rounded-lg border border-border-primary p-4 sm:p-6 space-y-3 sm:space-y-4">
+          <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 space-y-3 sm:space-y-4">
             <h2 className="text-base sm:text-lg font-semibold text-gray-900">Basic Information</h2>
 
             <div>
@@ -324,7 +324,7 @@ export default function NewStakeholderPage() {
           </div>
 
           {/* Contact Persons */}
-          <div className="bg-white rounded-lg border border-border-primary p-6 space-y-4">
+          <div className="bg-surface-primary rounded-lg border border-border-primary p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">Contact Persons</h2>
               <button
@@ -438,7 +438,7 @@ export default function NewStakeholderPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-6 py-2 border border-border-secondary text-gray-700 rounded-lg hover:bg-gray-50"
+              className="px-6 py-2 border border-border-secondary text-gray-700 rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
               disabled={submitting}
             >
               Cancel

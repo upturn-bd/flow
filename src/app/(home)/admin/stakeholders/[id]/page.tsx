@@ -264,7 +264,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => router.push(`/admin/stakeholders/${stakeholder.id}/edit`)}
-              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 border border-border-secondary rounded-lg hover:bg-gray-50"
+              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 border border-border-secondary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
             >
               <Edit size={14} />
               <span className="hidden sm:inline">Edit</span>
@@ -334,7 +334,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
         {/* Left Column - Details */}
         <div className="lg:col-span-1 space-y-6">
           {/* Basic Information */}
-          <div className="bg-white rounded-lg border border-border-primary p-6 space-y-4">
+          <div className="bg-surface-primary rounded-lg border border-border-primary p-6 space-y-4">
             <h2 className="text-lg font-semibold text-gray-900">Information</h2>
 
             {stakeholder.stakeholder_type && (
@@ -443,7 +443,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
           </div>
 
           {/* Contact Persons */}
-          <div className="bg-white rounded-lg border border-border-primary p-6 space-y-4">
+          <div className="bg-surface-primary rounded-lg border border-border-primary p-6 space-y-4">
             <h2 className="text-lg font-semibold text-gray-900">Contact Persons</h2>
 
             {stakeholder.contact_persons && stakeholder.contact_persons.length > 0 ? (
@@ -486,7 +486,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
           {/* Additional Data - Only show for Permanent stakeholders */}
           {stakeholder.status === "Permanent" && (
-            <div className="bg-white rounded-lg border border-border-primary p-4 sm:p-6 space-y-4">
+            <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-base sm:text-lg font-semibold text-gray-900">Additional Data</h2>
                 <button
@@ -526,14 +526,14 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
         {/* Right Column - Process Steps */}
         <div className="lg:col-span-2">
           {/* Tabs */}
-          <div className="bg-white rounded-lg border border-border-primary overflow-hidden">
+          <div className="bg-surface-primary rounded-lg border border-border-primary overflow-hidden">
             <div className="border-b border-border-primary">
               <div className="flex overflow-x-auto">
                 <button
                   onClick={() => setActiveTab("process")}
                   className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${activeTab === "process"
                       ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
                   Process Steps
@@ -542,7 +542,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   onClick={() => setActiveTab("issues")}
                   className={`px-6 py-3 text-sm font-medium transition-colors ${activeTab === "issues"
                       ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
                   Issues
@@ -551,7 +551,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   onClick={() => setActiveTab("transactions")}
                   className={`px-6 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "transactions"
                       ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
                   <DollarSign size={16} />
@@ -672,7 +672,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       </div>
                                     )}
                                     {!isCompleted && hasTeamAccess && isSequential && !isCurrent && (
-                                      <div className="mt-2 text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded break-words">
+                                      <div className="mt-2 text-xs text-gray-600 bg-background-secondary dark:bg-background-tertiary px-2 py-1 rounded break-words">
                                         This step will become available after completing the previous steps (sequential process)
                                       </div>
                                     )}
@@ -856,7 +856,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                               </p>
                                             </div>
                                             <p className="text-xs text-gray-500 mt-1">
-                                              Formula: <code className="bg-gray-100 px-1 py-0.5 rounded">{formulaToReadable(fieldDef.formula, sortedSteps)}</code>
+                                              Formula: <code className="bg-background-tertiary dark:bg-surface-secondary px-1 py-0.5 rounded">{formulaToReadable(fieldDef.formula, sortedSteps)}</code>
                                             </p>
                                           </div>
                                         );
@@ -947,7 +947,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-4">
+          <div className="bg-surface-primary rounded-lg p-4 sm:p-6 max-w-md w-full mx-4">
             <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2">Delete Stakeholder</h3>
             <p className="text-sm text-gray-600 mb-4 sm:mb-6">
               Are you sure you want to delete "{stakeholder.name}"? This action cannot be
@@ -957,7 +957,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={deleting}
-                className="w-full sm:w-auto px-4 py-2 border border-border-secondary text-gray-700 rounded-lg hover:bg-gray-50"
+                className="w-full sm:w-auto px-4 py-2 border border-border-secondary text-gray-700 rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
               >
                 Cancel
               </button>

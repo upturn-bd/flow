@@ -127,7 +127,7 @@ export default function LeaveHistoryPage() {
                     </div>
                     
                     {req.description && (
-                      <div className="mt-4 p-3 bg-gray-50 rounded-md">
+                      <div className="mt-4 p-3 bg-background-secondary dark:bg-background-tertiary rounded-md">
                         <div className="flex items-start gap-2">
                           <FileText size={16} className="text-gray-500 mt-0.5" />
                           <div>

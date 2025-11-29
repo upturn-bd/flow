@@ -64,7 +64,7 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
           ) : upcoming.length === 0 ? (
-            <div className="mt-10 flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg border border-border-primary">
+            <div className="mt-10 flex flex-col items-center justify-center p-8 bg-background-secondary dark:bg-background-tertiary rounded-lg border border-border-primary">
               <Clock className="h-12 w-12 text-gray-400 mb-3" />
               <p className="text-gray-600 text-center">No saved drafts found.</p>
               <button
@@ -87,7 +87,7 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-white shadow-sm hover:shadow-md transition-shadow rounded-lg overflow-hidden border border-border-primary"
+                    className="bg-surface-primary shadow-sm hover:shadow-md transition-shadow rounded-lg overflow-hidden border border-border-primary"
                   >
                     <div className="p-4">
                       <div className="flex justify-between items-start">

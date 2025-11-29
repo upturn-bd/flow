@@ -161,10 +161,10 @@ export default function MilestoneForm({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto relative shadow-xl"
+        className="bg-surface-primary p-6 rounded-lg w-full max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto relative shadow-xl"
       >
         {isSubmitting && (
-          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-surface-primary/50 backdrop-blur-sm flex items-center justify-center z-50">
             <LoadingSpinner />
           </div>
         )}
@@ -195,7 +195,7 @@ export default function MilestoneForm({
               name="description"
               onChange={handleChange}
               value={milestoneData.description || ""}
-              className="w-full h-32 rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+              className="w-full h-32 rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-background-secondary dark:bg-background-tertiary p-3"
             />
           </div>
 
@@ -265,7 +265,7 @@ export default function MilestoneForm({
                   .filter((m) => m.project_id !== milestoneData.project_id)
                   .reduce((sum, m) => sum + m.weightage, 0)
               }
-              className="w-full rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+              className="w-full rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-background-secondary dark:bg-background-tertiary p-3"
             />
             {errors.weightage && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
@@ -293,7 +293,7 @@ export default function MilestoneForm({
                 onFocus={() => setDropdownOpen(true)}
                 onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
                 placeholder="Search for assignees..."
-                className="w-full rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3 pr-10"
+                className="w-full rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-background-secondary dark:bg-background-tertiary p-3 pr-10"
               />
               <Search
                 size={16}
@@ -307,14 +307,14 @@ export default function MilestoneForm({
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute z-10 mt-1 w-full bg-white border border-border-primary rounded-md shadow-lg max-h-60 overflow-y-auto"
+                    className="absolute z-10 mt-1 w-full bg-surface-primary border border-border-primary rounded-md shadow-lg max-h-60 overflow-y-auto"
                   >
                     {filteredEmployees.map((emp) => (
                       <motion.li
                         key={emp.id}
                         onClick={() => handleAddAssignee(emp.id)}
                         whileHover={{ backgroundColor: "#f3f4f6" }}
-                        className="cursor-pointer px-4 py-2 hover:bg-gray-50 text-sm text-gray-700"
+                        className="cursor-pointer px-4 py-2 hover:bg-background-secondary dark:bg-background-tertiary text-sm text-gray-700"
                       >
                         {emp.name}
                       </motion.li>
@@ -334,7 +334,7 @@ export default function MilestoneForm({
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
-                      className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm flex items-center"
+                      className="bg-background-tertiary dark:bg-surface-secondary text-gray-700 px-3 py-1 rounded-full text-sm flex items-center"
                     >
                       {emp?.name}
                       <button
@@ -356,7 +356,7 @@ export default function MilestoneForm({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="button"
-              className="flex items-center px-4 py-2 bg-gray-100 border border-border-primary rounded-md text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm"
+              className="flex items-center px-4 py-2 bg-background-tertiary dark:bg-surface-secondary border border-border-primary rounded-md text-gray-700 hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm"
               onClick={onCancel}
             >
               <X size={16} className="mr-2" strokeWidth={2} />

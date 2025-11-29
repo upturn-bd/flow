@@ -208,7 +208,7 @@ export default function TeamsPage() {
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-surface-hover rounded-full transition-colors"
                 aria-label="Clear search"
               >
                 <X className="h-4 w-4 text-gray-400" />
@@ -220,7 +220,7 @@ export default function TeamsPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg text-sm"
+              className="flex items-center gap-2 px-3 py-2 bg-background-tertiary dark:bg-surface-secondary rounded-lg text-sm"
             >
               <span className="text-gray-600">
                 {filteredTeams.length} result{filteredTeams.length !== 1 ? 's' : ''}
@@ -246,14 +246,14 @@ export default function TeamsPage() {
               {filteredTeams.map((team) => (
                 <div
                   key={team.id}
-                  className="bg-white rounded-xl border border-border-primary p-5 hover:shadow-lg hover:border-indigo-200 transition-all duration-200 group flex flex-col h-full"
+                  className="bg-surface-primary rounded-xl border border-border-primary p-5 hover:shadow-lg hover:border-indigo-200 transition-all duration-200 group flex flex-col h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className={`p-2 rounded-lg transition-colors ${
                         team.is_default 
                           ? 'bg-indigo-100 group-hover:bg-indigo-200' 
-                          : 'bg-gray-100 group-hover:bg-gray-200'
+                          : 'bg-background-tertiary dark:bg-surface-secondary group-hover:bg-surface-hover'
                       }`}>
                         <Users className={`h-5 w-5 ${
                           team.is_default 
@@ -273,7 +273,7 @@ export default function TeamsPage() {
                       <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity ml-2">
                         <button
                           onClick={() => handleEditTeam(team)}
-                          className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors"
                           title="Edit team"
                         >
                           <Edit className="h-4 w-4 text-gray-600" />
@@ -322,7 +322,7 @@ export default function TeamsPage() {
             </div>
           ) : searchQuery ? (
             <div className="text-center py-16 px-4">
-              <div className="bg-gray-100 rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+              <div className="bg-background-tertiary dark:bg-surface-secondary rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                 <Search className="h-10 w-10 text-gray-400" />
               </div>
               <p className="text-gray-700 text-lg font-semibold">No teams found</p>
@@ -339,7 +339,7 @@ export default function TeamsPage() {
               </Button>
             </div>
           ) : (
-            <div className="text-center py-16 px-4 bg-white rounded-xl border-2 border-dashed border-border-secondary">
+            <div className="text-center py-16 px-4 bg-surface-primary rounded-xl border-2 border-dashed border-border-secondary">
               <div className="bg-indigo-50 rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                 <Users className="h-10 w-10 text-indigo-400" />
               </div>

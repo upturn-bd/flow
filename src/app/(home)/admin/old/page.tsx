@@ -78,7 +78,7 @@ function AdminManagementContent() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm p-6 max-w-6xl mx-auto mt-8"
+        className="flex flex-col items-center justify-center h-64 bg-surface-primary rounded-xl shadow-sm p-6 max-w-6xl mx-auto mt-8"
       >
         <Loader className="w-12 h-12 text-gray-500 animate-spin mb-4" />
         <p className="text-gray-600">Loading admin management...</p>
@@ -116,14 +116,14 @@ function AdminManagementContent() {
           {/* Progress indicators */}
           <div className="flex justify-center items-center gap-4 mb-8">
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
-              currentStep === 1 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+              currentStep === 1 ? 'bg-blue-100 text-blue-700' : 'bg-background-tertiary dark:bg-surface-secondary text-gray-600'
             }`}>
               <span className="font-medium">Step 1</span>
               <Building size={16} />
             </div>
             <CaretRight className="text-gray-400" size={16} />
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
-              currentStep === 2 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+              currentStep === 2 ? 'bg-blue-100 text-blue-700' : 'bg-background-tertiary dark:bg-surface-secondary text-gray-600'
             }`}>
               <span className="font-medium">Step 2</span>
               <Settings size={16} />
@@ -133,7 +133,7 @@ function AdminManagementContent() {
           {/* Entity status */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {Object.entries(entityStatus).map(([entity, complete]) => (
-              <div key={entity} className="flex items-center justify-center gap-2 p-2 bg-gray-50 rounded-lg">
+              <div key={entity} className="flex items-center justify-center gap-2 p-2 bg-background-secondary dark:bg-background-tertiary rounded-lg">
                 {complete ? (
                   <CheckCircle className="text-green-500" size={16} />
                 ) : (
@@ -186,8 +186,8 @@ function AdminManagementContent() {
             whileTap={{ scale: currentStep === 1 ? 1 : 0.95 }}
             className={`px-6 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all duration-200 ${
               currentStep === 1 
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                ? 'bg-background-tertiary dark:bg-surface-secondary text-gray-400 cursor-not-allowed' 
+                : 'bg-background-tertiary dark:bg-surface-secondary hover:bg-surface-hover text-gray-700'
             }`}
           >
             <CaretLeft size={18} />
@@ -201,7 +201,7 @@ function AdminManagementContent() {
             whileTap={{ scale: !step1Complete ? 1 : 0.95 }}
             className={`px-6 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all duration-200 ${
               !step1Complete 
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                ? 'bg-background-tertiary dark:bg-surface-secondary text-gray-400 cursor-not-allowed' 
                 : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
             }`}
           >
@@ -234,7 +234,7 @@ function AdminManagementContent() {
           initial={{ scale: 0.9, opacity: 0.5 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="p-2 rounded-lg bg-gray-100 text-gray-700 mr-3"
+          className="p-2 rounded-lg bg-background-tertiary dark:bg-surface-secondary text-gray-700 mr-3"
         >
           <Building size={24} />
         </motion.div>
@@ -249,14 +249,14 @@ function AdminManagementContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
-        className="flex border-b border-border-primary mb-6 bg-white rounded-t-xl shadow-sm"
+        className="flex border-b border-border-primary mb-6 bg-surface-primary rounded-t-xl shadow-sm"
       >
         <button
           onClick={() => handleTabChange('basic')}
           className={`px-6 py-3 font-medium text-sm rounded-tl-xl transition-colors duration-200 flex items-center gap-2 ${
             currentTab === 'basic'
               ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary'
           }`}
         >
           <Building size={16} />
@@ -267,7 +267,7 @@ function AdminManagementContent() {
           className={`px-6 py-3 font-medium text-sm transition-colors duration-200 flex items-center gap-2 ${
             currentTab === 'advanced'
               ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary'
           }`}
         >
           <Settings size={16} />
@@ -278,7 +278,7 @@ function AdminManagementContent() {
           className={`px-6 py-3 font-medium text-sm transition-colors duration-200 flex items-center gap-2 ${
             currentTab === 'accounts'
               ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary'
           }`}
         >
           <CreditCard size={16} />
@@ -289,7 +289,7 @@ function AdminManagementContent() {
           className={`px-6 py-3 font-medium text-sm transition-colors duration-200 flex items-center gap-2 ${
             currentTab === 'salaries'
               ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary'
           }`}
         >
           <DollarSign size={16} />
@@ -300,7 +300,7 @@ function AdminManagementContent() {
           className={`px-6 py-3 font-medium text-sm rounded-tr-xl transition-colors duration-200 flex items-center gap-2 ${
             currentTab === 'roles'
               ? 'text-blue-700 bg-blue-50 border-b-2 border-blue-700'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-background-secondary dark:bg-background-tertiary'
           }`}
         >
           <Shield size={16} />
@@ -374,7 +374,7 @@ export default function AdminManagement() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm p-6 max-w-6xl mx-auto mt-8"
+          className="flex flex-col items-center justify-center h-64 bg-surface-primary rounded-xl shadow-sm p-6 max-w-6xl mx-auto mt-8"
         >
           <Loader className="w-12 h-12 text-gray-500 animate-spin mb-4" />
           <p className="text-gray-600">Loading admin management...</p>
