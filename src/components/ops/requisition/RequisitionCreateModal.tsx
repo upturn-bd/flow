@@ -249,7 +249,7 @@ export default function RequisitionCreateModal({
     >
       <div className="space-y-6">
         <div
-          className="flex items-center cursor-pointer gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200"
+          className="flex items-center cursor-pointer gap-2 bg-gray-50 p-3 rounded-lg border border-border-primary"
           onClick={() => setIsOneOff(!isOneOff)}
         >
           <div
@@ -282,7 +282,7 @@ export default function RequisitionCreateModal({
                 value={formState.requisition_category_id ?? ""}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur("requisition_category_id")}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value="">Select category</option>
                 {requisitionTypes.length > 0 &&
@@ -316,7 +316,7 @@ export default function RequisitionCreateModal({
                 value={formState.item_id ?? ""}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur("item_id")}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value="">Select item</option>
                 {requisitionInventories.length > 0 &&
@@ -355,7 +355,7 @@ export default function RequisitionCreateModal({
               value={formState.quantity ?? ""}
               onChange={handleInputChange}
               onBlur={() => handleFieldBlur("quantity")}
-              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
             {touchedFields.quantity && errors.quantity && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
@@ -371,7 +371,7 @@ export default function RequisitionCreateModal({
                 <Calendar size={16} className="mr-2" />
                 Date
               </label>
-              <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+              <div className="relative bg-gray-50 border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
                 <Calendar size={16} className="ml-3 text-gray-500" />
                 <input
                   type="date"
@@ -397,7 +397,7 @@ export default function RequisitionCreateModal({
                     <Clock size={16} className="mr-2" />
                     From
                   </label>
-                  <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+                  <div className="relative bg-gray-50 border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
                     <Clock size={16} className="ml-3 text-gray-500" />
                     <input
                       type="time"
@@ -421,7 +421,7 @@ export default function RequisitionCreateModal({
                     <Clock size={16} className="mr-2" />
                     To
                   </label>
-                  <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+                  <div className="relative bg-gray-50 border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
                     <Clock size={16} className="ml-3 text-gray-500" />
                     <input
                       type="time"
@@ -454,7 +454,7 @@ export default function RequisitionCreateModal({
               value={formState.description}
               onChange={handleInputChange}
               placeholder="Max 35 characters"
-              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
           </div>
 
@@ -464,7 +464,7 @@ export default function RequisitionCreateModal({
               <Upload size={16} className="mr-2" />
               Attachments
             </label>
-            <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4 text-center">
+            <div className="bg-gray-50 border border-dashed border-border-secondary rounded-lg p-4 text-center">
               <label
                 htmlFor="create_file_upload"
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg cursor-pointer hover:bg-blue-700 transition-colors"
@@ -504,7 +504,7 @@ export default function RequisitionCreateModal({
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
-                        className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm"
+                        className="flex items-center gap-2 bg-white border border-border-primary px-3 py-2 rounded-lg text-sm"
                       >
                         <FileText size={14} className="text-blue-500" />
                         <span className="truncate max-w-xs">{file.name}</span>

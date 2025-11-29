@@ -58,7 +58,7 @@ const Textarea = ({
   ...props
 }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
   <textarea
-    className={`w-full p-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${className}`}
+    className={`w-full p-3 text-sm border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${className}`}
     {...props}
   />
 );
@@ -241,7 +241,7 @@ export default function OffboardingPage() {
 
       {/* Search and Tabs */}
       <motion.div variants={fadeIn} className="bg-white rounded-xl shadow-sm mb-6">
-        <div className="border-b border-gray-200 px-6 py-4">
+        <div className="border-b border-border-primary px-6 py-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex gap-2">
               <button
@@ -333,7 +333,7 @@ export default function OffboardingPage() {
                 className={`bg-white rounded-xl p-4 shadow-sm border ${
                   selectedEmployee?.id === emp.id
                     ? "border-red-500 ring-2 ring-red-200"
-                    : "border-gray-100"
+                    : "border-border-primary"
                 } cursor-pointer transition-all`}
                 onClick={() => activeTab === "active" && setSelectedEmployee(emp)}
               >
@@ -385,7 +385,7 @@ export default function OffboardingPage() {
                 </div>
 
                 {activeTab === "offboarded" && (
-                  <div className="mt-3 pt-3 border-t border-gray-100">
+                  <div className="mt-3 pt-3 border-t border-border-primary">
                     <PermissionGate 
                       module={PERMISSION_MODULES.OFFBOARDING} 
                       action="can_write"
@@ -423,8 +423,8 @@ export default function OffboardingPage() {
                 Offboarding Details
               </h2>
               {selectedEmployee ? (
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4">
-                  <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-border-primary space-y-4">
+                  <div className="flex items-center gap-3 pb-4 border-b border-border-primary">
                     <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600">
                       <User className="h-6 w-6" />
                     </div>
@@ -452,7 +452,7 @@ export default function OffboardingPage() {
                             | "Terminated",
                         })
                       }
-                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      className="w-full rounded-lg border border-border-secondary bg-white px-3 py-2 text-gray-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
                       <option value="Resigned">Resignation</option>
                       <option value="Terminated">Termination</option>
@@ -472,7 +472,7 @@ export default function OffboardingPage() {
                           offboarding_date: e.target.value,
                         })
                       }
-                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      className="w-full rounded-lg border border-border-secondary bg-white px-3 py-2 text-gray-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                     />
                   </div>
 
@@ -542,7 +542,7 @@ export default function OffboardingPage() {
                   </div>
                 </div>
               ) : (
-                <div className="bg-white rounded-xl p-10 shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
+                <div className="bg-white rounded-xl p-10 shadow-sm border border-border-primary flex flex-col items-center justify-center text-center">
                   <AlertTriangle className="h-12 w-12 text-gray-300 mb-3" />
                   <h3 className="text-lg font-medium text-gray-700 mb-2">
                     No Employee Selected

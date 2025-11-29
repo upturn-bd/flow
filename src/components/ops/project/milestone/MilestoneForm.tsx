@@ -195,7 +195,7 @@ export default function MilestoneForm({
               name="description"
               onChange={handleChange}
               value={milestoneData.description || ""}
-              className="w-full h-32 rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+              className="w-full h-32 rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
             />
           </div>
 
@@ -265,7 +265,7 @@ export default function MilestoneForm({
                   .filter((m) => m.project_id !== milestoneData.project_id)
                   .reduce((sum, m) => sum + m.weightage, 0)
               }
-              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
+              className="w-full rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3"
             />
             {errors.weightage && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
@@ -293,7 +293,7 @@ export default function MilestoneForm({
                 onFocus={() => setDropdownOpen(true)}
                 onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
                 placeholder="Search for assignees..."
-                className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3 pr-10"
+                className="w-full rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3 pr-10"
               />
               <Search
                 size={16}
@@ -307,7 +307,7 @@ export default function MilestoneForm({
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                    className="absolute z-10 mt-1 w-full bg-white border border-border-primary rounded-md shadow-lg max-h-60 overflow-y-auto"
                   >
                     {filteredEmployees.map((emp) => (
                       <motion.li
@@ -356,7 +356,7 @@ export default function MilestoneForm({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="button"
-              className="flex items-center px-4 py-2 bg-gray-100 border border-gray-200 rounded-md text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm"
+              className="flex items-center px-4 py-2 bg-gray-100 border border-border-primary rounded-md text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 shadow-sm"
               onClick={onCancel}
             >
               <X size={16} className="mr-2" strokeWidth={2} />

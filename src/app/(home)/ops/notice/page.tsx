@@ -246,7 +246,7 @@ export default function NoticePage() {
                       boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)"
                     }}
                     transition={{ layout: { duration: 0.3 } }}
-                    className="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-100"
+                    className="bg-white shadow-sm rounded-xl overflow-hidden border border-border-primary"
                   >
                     <div className="p-6">
                       <div className="flex justify-between items-start">
@@ -300,7 +300,7 @@ export default function NoticePage() {
                         )}
                       </div>
                       <p className="text-gray-700 mb-4">{notice.description}</p>
-                      <div className="flex flex-col gap-2 pt-4 border-t border-gray-100">
+                      <div className="flex flex-col gap-2 pt-4 border-t border-border-primary">
                         <div className="flex flex-wrap justify-between items-center gap-2">
                           <div className="flex items-center text-sm text-gray-500">
                             <Clock className="h-4 w-4 mr-1.5" />

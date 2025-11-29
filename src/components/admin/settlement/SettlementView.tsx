@@ -128,7 +128,7 @@ export default function ClaimSettlementView() {
                           onClick={() => settlementType.id !== undefined && handleDeleteClaimType(settlementType.id)}
                           isLoading={deleteLoading === settlementType.id}
                           disabled={deleteLoading === settlementType.id}
-                          className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
+                          className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500"
                         >
                           <TrashSimple size={16} weight="bold" />
                         </Button>

@@ -342,7 +342,7 @@ export default function TeamsManagementPage() {
       </div>
 
       {/* Company Selection Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 bg-blue-100 rounded-lg">
             <Buildings size={24} className="text-blue-600" />
@@ -361,7 +361,7 @@ export default function TeamsManagementPage() {
               setSearchTerm("");
               setEditingTeam(null);
             }}
-            className="w-full appearance-none px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 font-medium transition-all"
+            className="w-full appearance-none px-4 py-3 pr-10 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-surface-primary text-gray-900 font-medium transition-all"
           >
             <option value="">Select a company...</option>
             {companies.map((company) => (
@@ -376,9 +376,9 @@ export default function TeamsManagementPage() {
 
       {/* Teams Section */}
       {selectedCompany && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
           {/* Search Header */}
-          <div className="p-4 border-b border-gray-200 bg-gray-50/50">
+          <div className="p-4 border-b border-border-primary bg-background-secondary dark:bg-background-tertiary">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <div className="relative flex-1">
                 <MagnifyingGlass
@@ -390,12 +390,12 @@ export default function TeamsManagementPage() {
                   placeholder="Search teams by name or description..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 />
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 rounded-full transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-surface-hover rounded-full transition-colors"
                   >
                     <X size={16} className="text-gray-400" />
                   </button>
@@ -432,7 +432,7 @@ export default function TeamsManagementPage() {
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border-primary">
               <AnimatePresence mode="popLayout">
                 {filteredTeams.map((team) => (
                   <motion.div
@@ -441,7 +441,7 @@ export default function TeamsManagementPage() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: -100 }}
-                    className="p-4 hover:bg-gray-50/50 transition-colors"
+                    className="p-4 hover:bg-surface-hover transition-colors"
                   >
                     {editingTeam?.id === team.id && editingTeam ? (
                       // Editing mode
@@ -455,14 +455,14 @@ export default function TeamsManagementPage() {
                               type="text"
                               value={editingTeam.name}
                               onChange={(e) => setEditingTeam(prev => prev ? { ...prev, name: e.target.value } : null)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+                              className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
                               placeholder="Team name"
                               autoFocus
                             />
                             <textarea
                               value={editingTeam.description}
                               onChange={(e) => setEditingTeam(prev => prev ? { ...prev, description: e.target.value } : null)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
+                              className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
                               placeholder="Team description (optional)"
                               rows={2}
                             />
@@ -471,7 +471,7 @@ export default function TeamsManagementPage() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={cancelEditing}
-                            className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="px-3 py-1.5 text-sm text-foreground-secondary hover:bg-surface-hover rounded-lg transition-colors"
                           >
                             Cancel
                           </button>
@@ -581,8 +581,8 @@ export default function TeamsManagementPage() {
 
       {/* Empty State - No Company Selected */}
       {!selectedCompany && (
-        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-12 text-center border border-gray-200">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-sm mb-4">
+        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-12 text-center border border-border-primary">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-surface-primary rounded-full shadow-sm mb-4">
             <Buildings size={32} className="text-gray-400" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -608,9 +608,9 @@ export default function TeamsManagementPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden"
+              className="bg-surface-primary rounded-xl shadow-xl max-w-md w-full overflow-hidden"
             >
-              <div className="p-6 border-b border-gray-200">
+              <div className="p-6 border-b border-border-primary">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100 rounded-lg">
@@ -641,7 +641,7 @@ export default function TeamsManagementPage() {
                     type="text"
                     value={newTeam.name}
                     onChange={(e) => setNewTeam(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    className="w-full px-3 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                     placeholder="e.g., Engineering, Marketing, HR"
                   />
                 </div>
@@ -653,18 +653,18 @@ export default function TeamsManagementPage() {
                   <textarea
                     value={newTeam.description}
                     onChange={(e) => setNewTeam(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
+                    className="w-full px-3 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
                     placeholder="Brief description of this team's purpose"
                     rows={3}
                   />
                 </div>
 
-                <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                   <input
                     type="checkbox"
                     checked={newTeam.isDefault}
                     onChange={(e) => setNewTeam(prev => ({ ...prev, isDefault: e.target.checked }))}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 text-blue-600 border-border-secondary rounded focus:ring-blue-500"
                   />
                   <div>
                     <span className="text-sm font-medium text-gray-900">Set as default team</span>
@@ -673,7 +673,7 @@ export default function TeamsManagementPage() {
                 </label>
               </div>
 
-              <div className="p-6 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+              <div className="p-6 bg-gray-50 border-t border-border-primary flex items-center justify-end gap-3">
                 <button
                   onClick={() => {
                     setShowCreateModal(false);
@@ -720,7 +720,7 @@ export default function TeamsManagementPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden"
+              className="bg-surface-primary rounded-xl shadow-xl max-w-md w-full overflow-hidden"
             >
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -740,7 +740,7 @@ export default function TeamsManagementPage() {
                 </div>
               </div>
 
-              <div className="p-6 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+              <div className="p-6 bg-gray-50 border-t border-border-primary flex items-center justify-end gap-3">
                 <button
                   onClick={() => setTeamToDelete(null)}
                   className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"

@@ -227,7 +227,7 @@ export default function SuperadminUsersPage() {
       <div className="grid grid-cols-3 gap-4">
         <button
           onClick={() => setFilterActive("all")}
-          className={`bg-white rounded-xl p-4 shadow-sm border transition-all ${filterActive === "all" ? "border-amber-300 ring-2 ring-amber-100" : "border-gray-100 hover:border-gray-200"}`}
+          className={`bg-surface-primary rounded-xl p-4 shadow-sm border transition-all ${filterActive === "all" ? "border-amber-300 ring-2 ring-amber-100" : "border-border-primary hover:border-border-primary"}`}
         >
           <div className="flex items-center gap-3">
             <div className="p-2 bg-amber-100 rounded-lg">
@@ -241,7 +241,7 @@ export default function SuperadminUsersPage() {
         </button>
         <button
           onClick={() => setFilterActive("active")}
-          className={`bg-white rounded-xl p-4 shadow-sm border transition-all ${filterActive === "active" ? "border-green-300 ring-2 ring-green-100" : "border-gray-100 hover:border-gray-200"}`}
+          className={`bg-surface-primary rounded-xl p-4 shadow-sm border transition-all ${filterActive === "active" ? "border-green-300 ring-2 ring-green-100" : "border-border-primary hover:border-border-primary"}`}
         >
           <div className="flex items-center gap-3">
             <div className="p-2 bg-green-100 rounded-lg">
@@ -255,7 +255,7 @@ export default function SuperadminUsersPage() {
         </button>
         <button
           onClick={() => setFilterActive("inactive")}
-          className={`bg-white rounded-xl p-4 shadow-sm border transition-all ${filterActive === "inactive" ? "border-gray-400 ring-2 ring-gray-200" : "border-gray-100 hover:border-gray-200"}`}
+          className={`bg-surface-primary rounded-xl p-4 shadow-sm border transition-all ${filterActive === "inactive" ? "border-border-secondary ring-2 ring-gray-200" : "border-border-primary hover:border-border-primary"}`}
         >
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gray-100 rounded-lg">
@@ -271,7 +271,7 @@ export default function SuperadminUsersPage() {
 
       {/* Superadmins List */}
       {loading ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12">
+        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12">
           <div className="flex flex-col items-center justify-center text-gray-500">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-600 mb-4"></div>
             <p>Loading superadmins...</p>
@@ -287,8 +287,8 @@ export default function SuperadminUsersPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className={`bg-white rounded-xl shadow-sm border overflow-hidden transition-all ${
-                  superadmin.is_active ? "border-gray-100 hover:border-amber-200" : "border-gray-200 opacity-75"
+                className={`bg-surface-primary rounded-xl shadow-sm border overflow-hidden transition-all ${
+                  superadmin.is_active ? "border-border-primary hover:border-amber-200" : "border-border-primary opacity-75"
                 }`}
               >
                 <div className="p-5 flex items-center justify-between gap-4">
@@ -382,7 +382,7 @@ export default function SuperadminUsersPage() {
       )}
 
       {filteredSuperadmins.length === 0 && !loading && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12 text-center">
           <ShieldCheck size={48} className="mx-auto text-gray-300 mb-4" />
           <p className="text-gray-500">
             {filterActive !== "all" 
@@ -410,7 +410,7 @@ export default function SuperadminUsersPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
+              className="bg-surface-primary rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
             >
               <div className="p-6 border-b bg-gradient-to-r from-amber-50 to-orange-50">
                 <div className="flex items-center justify-between">
@@ -428,7 +428,7 @@ export default function SuperadminUsersPage() {
                       setShowModal(false);
                       resetForm();
                     }}
-                    className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+                    className="p-2 hover:bg-surface-primary/50 rounded-lg transition-colors"
                   >
                     <X size={20} />
                   </button>
@@ -450,7 +450,7 @@ export default function SuperadminUsersPage() {
                         setSelectedEmployee(null);
                         setSearchTerm("");
                       }}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all appearance-none bg-white"
+                      className="w-full px-4 py-3 border border-border-primary rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all appearance-none bg-surface-primary"
                     >
                       <option value="">Select a company</option>
                       {companies.map((company) => (
@@ -505,12 +505,12 @@ export default function SuperadminUsersPage() {
                           placeholder="Search by name, email, or designation..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                          className="w-full pl-12 pr-4 py-3 border border-border-primary rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                         />
                       </div>
 
                       {searchTerm && (
-                        <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-xl divide-y divide-gray-100">
+                        <div className="max-h-60 overflow-y-auto border border-border-primary rounded-xl divide-y divide-border-primary">
                           {filteredEmployees.length > 0 ? (
                             filteredEmployees.map((emp) => {
                               const employee = employees.find(e => e.id === emp.id)!;
@@ -566,7 +566,7 @@ export default function SuperadminUsersPage() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all resize-none"
+                    className="w-full px-4 py-3 border border-border-primary rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all resize-none"
                     placeholder="Add any notes about this superadmin grant..."
                   />
                 </div>
@@ -588,7 +588,7 @@ export default function SuperadminUsersPage() {
                     setShowModal(false);
                     resetForm();
                   }}
-                  className="px-4 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="px-4 py-2.5 border border-border-secondary rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   Cancel
                 </button>

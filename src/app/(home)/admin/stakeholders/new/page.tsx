@@ -182,7 +182,7 @@ export default function NewStakeholderPage() {
                   setFormData({ ...formData, process_id: "" });
                 }
               }}
-              className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-5 h-5 text-blue-600 border-border-secondary rounded focus:ring-blue-500"
             />
             <div>
               <span className="font-medium text-gray-900">Create as Permanent Stakeholder</span>
@@ -197,7 +197,7 @@ export default function NewStakeholderPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Basic Information */}
-          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 space-y-3 sm:space-y-4">
+          <div className="bg-white rounded-lg border border-border-primary p-4 sm:p-6 space-y-3 sm:space-y-4">
             <h2 className="text-base sm:text-lg font-semibold text-gray-900">Basic Information</h2>
 
             <div>
@@ -209,7 +209,7 @@ export default function NewStakeholderPage() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className={`w-full px-3 sm:px-4 py-2 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                  errors.name ? "border-red-500" : "border-gray-300"
+                  errors.name ? "border-red-500" : "border-border-secondary"
                 }`}
                 placeholder="Enter stakeholder/company name"
               />
@@ -226,7 +226,7 @@ export default function NewStakeholderPage() {
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 rows={3}
-                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                 placeholder="Enter full address (optional)"
               />
             </div>
@@ -238,7 +238,7 @@ export default function NewStakeholderPage() {
               <select
                 value={formData.stakeholder_type_id}
                 onChange={(e) => setFormData({ ...formData, stakeholder_type_id: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               >
                 <option value="">None (No type selected)</option>
                 {activeStakeholderTypes.map((type) => (
@@ -261,7 +261,7 @@ export default function NewStakeholderPage() {
                   value={formData.process_id}
                   onChange={(e) => setFormData({ ...formData, process_id: e.target.value })}
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                    errors.process_id ? "border-red-500" : "border-gray-300"
+                    errors.process_id ? "border-red-500" : "border-border-secondary"
                   }`}
                 >
                   <option value="">Select a process</option>
@@ -287,7 +287,7 @@ export default function NewStakeholderPage() {
               <select
                 value={formData.parent_stakeholder_id}
                 onChange={(e) => setFormData({ ...formData, parent_stakeholder_id: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               >
                 <option value="">None (No parent stakeholder)</option>
                 {stakeholders.filter(s => s.status !== 'Rejected').map((stakeholder) => (
@@ -308,7 +308,7 @@ export default function NewStakeholderPage() {
               <select
                 value={formData.kam_id}
                 onChange={(e) => setFormData({ ...formData, kam_id: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               >
                 <option value="">None (No KAM assigned)</option>
                 {employees.map((employee) => (
@@ -324,7 +324,7 @@ export default function NewStakeholderPage() {
           </div>
 
           {/* Contact Persons */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+          <div className="bg-white rounded-lg border border-border-primary p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">Contact Persons</h2>
               <button
@@ -346,7 +346,7 @@ export default function NewStakeholderPage() {
                 {contactPersons.map((contact, index) => (
                   <div
                     key={index}
-                    className="border border-gray-200 rounded-lg p-4 space-y-3"
+                    className="border border-border-primary rounded-lg p-4 space-y-3"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-700">
@@ -372,7 +372,7 @@ export default function NewStakeholderPage() {
                           onChange={(e) =>
                             handleContactPersonChange(index, "name", e.target.value)
                           }
-                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                          className="w-full px-3 py-2 text-sm border border-border-secondary rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                           placeholder="Full name"
                         />
                       </div>
@@ -390,7 +390,7 @@ export default function NewStakeholderPage() {
                           className={`w-full px-3 py-2 text-sm border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
                             errors[`contact_${index}_email`]
                               ? "border-red-500"
-                              : "border-gray-300"
+                              : "border-border-secondary"
                           }`}
                           placeholder="email@example.com"
                         />
@@ -411,7 +411,7 @@ export default function NewStakeholderPage() {
                           onChange={(e) =>
                             handleContactPersonChange(index, "phone", e.target.value)
                           }
-                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                          className="w-full px-3 py-2 text-sm border border-border-secondary rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                           placeholder="+1234567890"
                         />
                       </div>
@@ -438,7 +438,7 @@ export default function NewStakeholderPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              className="px-6 py-2 border border-border-secondary text-gray-700 rounded-lg hover:bg-gray-50"
               disabled={submitting}
             >
               Cancel

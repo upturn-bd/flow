@@ -96,7 +96,7 @@ export default function AccountPage() {
           <button 
             onClick={handleRefresh}
             disabled={refreshing}
-            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 bg-background-primary border border-border-secondary text-foreground-secondary rounded-lg hover:bg-surface-hover transition-colors"
           >
             {refreshing ? (
               <>
@@ -138,7 +138,7 @@ export default function AccountPage() {
         </div>
       )}
       
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 mb-8">
+      <div className="bg-background-primary rounded-xl shadow-sm overflow-hidden border border-border-primary mb-8">
         <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 p-6 sm:p-8 text-white">
           <div className="flex flex-col md:flex-row items-start md:items-center">
             <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-indigo-600 mr-6 mb-4 md:mb-0">
@@ -235,7 +235,7 @@ export default function AccountPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Link 
           href="/home/profile" 
-          className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:border-indigo-200 hover:shadow transition-all"
+          className="bg-background-primary p-6 rounded-xl shadow-sm border border-border-primary hover:border-primary-300 hover:shadow transition-all"
         >
           <div className="flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-3">
@@ -248,7 +248,7 @@ export default function AccountPage() {
         
         <Link 
           href="/hris" 
-          className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:border-indigo-200 hover:shadow transition-all"
+          className="bg-background-primary p-6 rounded-xl shadow-sm border border-border-primary hover:border-primary-300 hover:shadow transition-all"
         >
           <div className="flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-3">
@@ -259,7 +259,7 @@ export default function AccountPage() {
           </div>
         </Link>
         
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:border-indigo-200 hover:shadow transition-all">
+        <div className="bg-background-primary p-6 rounded-xl shadow-sm border border-border-primary hover:border-primary-300 hover:shadow transition-all">
           <div className="flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-3">
               <Settings className="w-6 h-6" />

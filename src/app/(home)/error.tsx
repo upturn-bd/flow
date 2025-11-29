@@ -54,7 +54,7 @@ export default function Error({
           </button>
           <button
             onClick={() => (window.location.href = "/")}
-            className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="rounded-lg border border-border-secondary bg-background-primary px-6 py-3 font-medium text-foreground-secondary transition-colors hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
           >
             Go home
           </button>

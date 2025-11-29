@@ -19,7 +19,7 @@ export default function EmptyState({
   return (
     <motion.div 
       variants={fadeIn}
-      className="flex flex-col items-center justify-center h-full min-h-[120px] text-gray-500"
+      className="flex flex-col items-center justify-center h-full min-h-[120px] text-foreground-secondary"
     >
       <Icon size={iconSize} weight="duotone" className="text-foreground-tertiary opacity-50 mb-3" />
       <p className="text-sm text-center px-4">{message}</p>

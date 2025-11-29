@@ -36,10 +36,10 @@ const colorMap = {
 };
 
 const priorityStyles = {
-  'urgent': 'border-l-red-500 bg-red-50',
-  'high': 'border-l-orange-500 bg-orange-50',
-  'normal': 'border-l-blue-500 bg-white',
-  'low': 'border-l-gray-500 bg-gray-50',
+  'urgent': 'border-l-red-500 bg-red-50 dark:bg-red-900/30',
+  'high': 'border-l-orange-500 bg-orange-50 dark:bg-orange-900/30',
+  'normal': 'border-l-primary-500 bg-surface-primary',
+  'low': 'border-l-border-secondary bg-background-secondary dark:bg-background-tertiary',
 };
 
 export default function NotificationsTab() {

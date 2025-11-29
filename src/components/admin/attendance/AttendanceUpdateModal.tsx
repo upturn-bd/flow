@@ -146,7 +146,7 @@ export const AttendanceUpdateModal: React.FC<AttendanceUpdateModalProps> = ({
             type="button"
             variant="outline"
             onClick={onClose}
-            className="border border-gray-300 text-foreground-secondary hover:bg-background-secondary dark:bg-background-tertiary"
+            className="border border-border-secondary text-foreground-secondary hover:bg-background-secondary dark:bg-background-tertiary"
           >
             Cancel
           </Button>

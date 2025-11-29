@@ -203,7 +203,7 @@ export default function TeamsPage() {
               placeholder="Search teams..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm sm:text-base"
+              className="w-full pl-10 pr-10 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm sm:text-base"
             />
             {searchQuery && (
               <button
@@ -246,7 +246,7 @@ export default function TeamsPage() {
               {filteredTeams.map((team) => (
                 <div
                   key={team.id}
-                  className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg hover:border-indigo-200 transition-all duration-200 group flex flex-col h-full"
+                  className="bg-white rounded-xl border border-border-primary p-5 hover:shadow-lg hover:border-indigo-200 transition-all duration-200 group flex flex-col h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -339,7 +339,7 @@ export default function TeamsPage() {
               </Button>
             </div>
           ) : (
-            <div className="text-center py-16 px-4 bg-white rounded-xl border-2 border-dashed border-gray-300">
+            <div className="text-center py-16 px-4 bg-white rounded-xl border-2 border-dashed border-border-secondary">
               <div className="bg-indigo-50 rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                 <Users className="h-10 w-10 text-indigo-400" />
               </div>

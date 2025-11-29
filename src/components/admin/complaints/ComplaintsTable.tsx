@@ -15,33 +15,33 @@ export default function ComplaintsTable({
 }: ComplaintsTableProps) {
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+      <table className="min-w-full divide-y divide-border-primary">
+        <thead className="bg-background-secondary dark:bg-background-tertiary">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
               Name
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
               Actions
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-surface-primary divide-y divide-border-primary">
           {complaints.map((complaint) => (
             <tr key={complaint.id}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground-tertiary">
                 {complaint.name}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 space-x-2">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground-tertiary space-x-2">
                 <button
                   onClick={() => onEdit(complaint.id)}
-                  className="text-blue-600 hover:text-blue-900"
+                  className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => onDelete(complaint.id)}
-                  className="text-red-600 hover:text-red-900"
+                  className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                 >
                   Delete
                 </button>

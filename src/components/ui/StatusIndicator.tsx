@@ -72,19 +72,19 @@ export function StatusIndicator({
     if (statusLower.includes("draft")) {
       return {
         icon: FileText,
-        bgColor: "bg-gray-100",
-        textColor: "text-gray-800",
-        borderColor: "border-gray-200",
-        dotColor: "bg-gray-500"
+        bgColor: "bg-background-tertiary dark:bg-surface-secondary",
+        textColor: "text-foreground-secondary",
+        borderColor: "border-border-primary",
+        dotColor: "bg-foreground-tertiary"
       };
     }
     
     if (statusLower.includes("review")) {
       return {
         icon: WarningCircle,
-        bgColor: "bg-orange-100",
-        textColor: "text-orange-800",
-        borderColor: "border-orange-200",
+        bgColor: "bg-orange-100 dark:bg-orange-900/30",
+        textColor: "text-orange-800 dark:text-orange-300",
+        borderColor: "border-orange-200 dark:border-orange-800",
         dotColor: "bg-orange-500"
       };
     }
@@ -92,10 +92,10 @@ export function StatusIndicator({
     // Default case
     return {
       icon: Circle,
-      bgColor: "bg-gray-100",
-      textColor: "text-gray-800",
-      borderColor: "border-gray-200",
-      dotColor: "bg-gray-500"
+      bgColor: "bg-background-tertiary dark:bg-surface-secondary",
+      textColor: "text-foreground-secondary",
+      borderColor: "border-border-primary",
+      dotColor: "bg-foreground-tertiary"
     };
   };
 

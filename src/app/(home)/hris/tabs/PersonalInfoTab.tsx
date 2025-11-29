@@ -320,9 +320,9 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
               </h3>
             </div>
 
-            <div className="rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <tbody className="bg-white divide-y divide-gray-200">
+            <div className="rounded-xl shadow-sm border border-border-primary overflow-hidden">
+              <table className="min-w-full divide-y divide-border-primary">
+                <tbody className="bg-background-primary divide-y divide-border-primary">
                   {section.fields.map((field, fieldIndex) => (
                     <motion.tr
                       key={field.name}

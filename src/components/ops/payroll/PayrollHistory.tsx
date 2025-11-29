@@ -62,12 +62,12 @@ const getStatusIcon = (status: string) => {
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'Paid':
-      return 'bg-green-50 text-green-700 border-green-200';
+      return 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800';
     case 'Published': // Updated from 'Adjusted'
-      return 'bg-amber-50 text-amber-700 border-amber-200';
+      return 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800';
     case 'Pending':
     default:
-      return 'bg-blue-50 text-blue-700 border-blue-200';
+      return 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-primary-200 dark:border-primary-800';
   }
 };
 
@@ -218,7 +218,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
               animate={{ opacity: 1, y: 0 }}
               className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
             >
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <CreditCard className="h-8 w-8 text-indigo-600" />
@@ -229,7 +229,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <CheckCircle className="h-8 w-8 text-green-600" />
@@ -240,7 +240,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <Clock className="h-8 w-8 text-blue-600" />
@@ -251,7 +251,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                   </div>
                 </div>
               </div>
-                  <div className="bg-white rounded-lg border border-gray-200 p-4">
+                  <div className="bg-white rounded-lg border border-border-primary p-4">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
                         <AlertTriangle className="h-8 w-8 text-amber-600" />
@@ -272,7 +272,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
               animate={{ opacity: 1, y: 0 }}
               className="mb-6"
             >
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     {statusFilter === 'Paid' && <CheckCircle className="h-8 w-8 text-green-600" />}
@@ -323,7 +323,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+                    className="bg-white rounded-lg border border-border-primary hover:shadow-md transition-shadow"
                   >
                     <div className="p-6">
                       <div className="flex items-start justify-between">
@@ -390,7 +390,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
 
                       {/* Adjustments Section */}
                       {isEditing ? (
-                        <div className="mt-6 pt-4 border-t border-gray-100">
+                        <div className="mt-6 pt-4 border-t border-border-primary">
                           <div className="flex items-center justify-between mb-4">
                             <h4 className="text-sm font-medium text-gray-900">Adjustments</h4>
                             <button
@@ -409,14 +409,14 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                                   placeholder="Adjustment type (e.g., Bonus, Deduction)"
                                   value={adjustment.type}
                                   onChange={(e) => handleAdjustmentChange(idx, 'type', e.target.value)}
-                                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                                  className="flex-1 px-3 py-2 border border-border-secondary rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
                                 />
                                 <input
                                   type="number"
                                   placeholder="Amount"
                                   value={adjustment.amount}
                                   onChange={(e) => handleAdjustmentChange(idx, 'amount', e.target.value)}
-                                  className="w-24 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                                  className="w-24 px-3 py-2 border border-border-secondary rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
                                 />
                                 <button
                                   onClick={() => handleRemoveAdjustment(idx)}
@@ -434,7 +434,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                             <button
                               onClick={handleCancelEdit}
                               disabled={processingUpdate}
-                              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-border-secondary rounded-md hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
                             >
                               Cancel
                             </button>
@@ -461,7 +461,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                         <>
                           {/* Current Adjustments Display */}
                           {payroll.adjustments && payroll.adjustments.length > 0 && (
-                            <div className="mt-4 pt-4 border-t border-gray-100">
+                            <div className="mt-4 pt-4 border-t border-border-primary">
                               <h4 className="text-sm font-medium text-gray-900 mb-2">Current Adjustments</h4>
                               <div className="space-y-1">
                                 {payroll.adjustments.map((adjustment, idx) => (
@@ -484,7 +484,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                           )}
                           
                           {/* Action Buttons */}
-                          <div className="mt-4 pt-4 border-t border-gray-100">
+                          <div className="mt-4 pt-4 border-t border-border-primary">
                             <div className="flex justify-end space-x-3">
                               {payroll.status === 'Pending' && (
                                 <>

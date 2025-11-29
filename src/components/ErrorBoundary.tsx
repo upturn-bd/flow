@@ -60,9 +60,9 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-6">
+        <div className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 p-6">
           <svg
-            className="mb-4 h-12 w-12 text-red-500"
+            className="mb-4 h-12 w-12 text-red-500 dark:text-red-400"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -74,14 +74,14 @@ export class ErrorBoundary extends Component<Props, State> {
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
-          <h3 className="mb-2 text-lg font-semibold text-gray-900">
+          <h3 className="mb-2 text-lg font-semibold text-foreground-primary">
             Something went wrong
           </h3>
-          <p className="mb-4 text-center text-sm text-gray-600">
+          <p className="mb-4 text-center text-sm text-foreground-secondary">
             This section encountered an error. Our team has been notified.
           </p>
           {this.state.eventId && (
-            <p className="mb-4 font-mono text-xs text-gray-400">
+            <p className="mb-4 font-mono text-xs text-foreground-tertiary">
               Error ID: {this.state.eventId}
             </p>
           )}
@@ -112,9 +112,9 @@ export function ErrorFallback({
   onRetry?: () => void;
 }) {
   return (
-    <div className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border border-gray-200 bg-gray-50 p-6">
+    <div className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border border-border-primary bg-background-secondary dark:bg-background-tertiary p-6">
       <svg
-        className="mb-4 h-10 w-10 text-gray-400"
+        className="mb-4 h-10 w-10 text-foreground-tertiary"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -126,12 +126,12 @@ export function ErrorFallback({
           d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
-      <h3 className="mb-2 text-lg font-medium text-gray-900">{title}</h3>
-      <p className="mb-4 text-center text-sm text-gray-500">{message}</p>
+      <h3 className="mb-2 text-lg font-medium text-foreground-primary">{title}</h3>
+      <p className="mb-4 text-center text-sm text-foreground-secondary">{message}</p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700"
         >
           Try again
         </button>

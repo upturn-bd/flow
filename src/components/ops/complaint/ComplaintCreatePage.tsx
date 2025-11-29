@@ -192,7 +192,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
       </div>
 
       <div
-        className="flex items-center cursor-pointer gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200"
+        className="flex items-center cursor-pointer gap-2 bg-gray-50 p-3 rounded-lg border border-border-primary"
         onClick={() => setIsAnonymous(!isAnonymous)}
       >
         <div
@@ -215,7 +215,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200"
+        className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-border-primary"
       >
         <div className="space-y-4">
           {/* Category */}
@@ -229,7 +229,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                 name="complaint_type_id"
                 value={complaintState.complaint_type_id}
                 onChange={handleInputChange}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value={""}>Select category</option>
                 {complaintTypes.length > 0 &&
@@ -263,7 +263,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                 name="against_whom"
                 value={complaintState.against_whom}
                 onChange={handleInputChange}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value="">Select a person</option>
                 {employees.length > 0 &&
@@ -297,7 +297,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
               value={complaintState.description}
               onChange={handleInputChange}
               rows={4}
-              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
               placeholder="Describe your complaint..."
             />
             {touched.description && errors.description && (
@@ -314,7 +314,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
               <Upload size={16} className="mr-2" />
               Attachment
             </label>
-            <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <div className="bg-gray-50 border border-dashed border-border-secondary rounded-lg p-6 text-center">
               <Upload className="mx-auto mb-4 text-gray-400 h-10 w-10" />
               <p className="text-sm text-gray-500 mb-4">
                 Drag and drop files here, or
@@ -358,7 +358,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
-                        className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm"
+                        className="flex items-center gap-2 bg-white border border-border-primary px-3 py-2 rounded-lg text-sm"
                       >
                         <FileText size={14} className="text-blue-500" />
                         <span className="truncate max-w-xs">{file.name}</span>

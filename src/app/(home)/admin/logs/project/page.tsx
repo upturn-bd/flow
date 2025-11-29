@@ -117,7 +117,7 @@ export default function CompanyProjectsPage() {
             {projectsList.map((project) => (
                <Card
                   key={project.id}
-                  className="border border-gray-200 shadow-sm hover:shadow-lg transition-all rounded-xl"
+                  className="border border-border-primary shadow-sm hover:shadow-lg transition-all rounded-xl"
                >
                   <CardContent className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 gap-3">
                      <div className="flex flex-col gap-2 w-full sm:w-2/3">
@@ -201,7 +201,7 @@ export default function CompanyProjectsPage() {
                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setSearch(e.target.value)
                      }
-                     className="w-full sm:w-1/3 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                     className="w-full sm:w-1/3 px-3 py-2 border border-border-secondary rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                   />
                </div>
 

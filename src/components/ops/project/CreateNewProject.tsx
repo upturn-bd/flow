@@ -127,8 +127,8 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
         className="flex items-center justify-between mb-6"
       >
         <div className="flex items-center gap-3">
-          <Building size={24} className="text-gray-600" strokeWidth={1.5} />
-          <h2 className="text-xl font-semibold text-gray-800">
+          <Building size={24} className="text-foreground-secondary dark:text-foreground-secondary" strokeWidth={1.5} />
+          <h2 className="text-xl font-semibold text-foreground-primary dark:text-foreground-primary">
             Create New Project
           </h2>
         </div>
@@ -206,13 +206,13 @@ export function UpdateProjectPage({
     >
       <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Building size={24} className="text-gray-600" strokeWidth={1.5} />
-          <h2 className="text-xl font-semibold text-gray-800">Update Project</h2>
+          <Building size={24} className="text-foreground-secondary dark:text-foreground-secondary" strokeWidth={1.5} />
+          <h2 className="text-xl font-semibold text-foreground-primary dark:text-foreground-primary">Update Project</h2>
         </div>
         <Button
           variant="ghost"
           onClick={onClose}
-          className="p-1 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500"
+          className="p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-foreground-tertiary dark:text-foreground-tertiary hover:text-red-500 dark:hover:text-red-400"
         >
           <X size={20} strokeWidth={2} />
         </Button>

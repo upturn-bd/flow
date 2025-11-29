@@ -164,9 +164,9 @@ export default function SuperadminDashboard() {
       label: "Superadmins",
       value: stats.superadmins,
       icon: ChartBar,
-      color: "from-slate-500 to-slate-600",
-      bgColor: "bg-slate-50",
-      textColor: "text-slate-600",
+      color: "from-foreground-tertiary to-foreground-secondary",
+      bgColor: "bg-background-tertiary dark:bg-surface-secondary",
+      textColor: "text-foreground-secondary",
       href: "/sa/users",
     },
   ];
@@ -214,7 +214,7 @@ export default function SuperadminDashboard() {
     violet: { bg: "bg-violet-50", hover: "hover:bg-violet-100", text: "text-violet-600", border: "border-violet-200" },
     amber: { bg: "bg-amber-50", hover: "hover:bg-amber-100", text: "text-amber-600", border: "border-amber-200" },
     rose: { bg: "bg-rose-50", hover: "hover:bg-rose-100", text: "text-rose-600", border: "border-rose-200" },
-    slate: { bg: "bg-slate-50", hover: "hover:bg-slate-100", text: "text-slate-600", border: "border-slate-200" },
+    slate: { bg: "bg-background-tertiary dark:bg-surface-secondary", hover: "hover:bg-surface-hover", text: "text-foreground-secondary", border: "border-border-primary" },
   };
 
   return (
@@ -244,10 +244,10 @@ export default function SuperadminDashboard() {
       {loading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 animate-pulse">
-              <div className="h-10 w-10 bg-gray-200 rounded-lg mb-3"></div>
-              <div className="h-4 bg-gray-200 rounded w-16 mb-2"></div>
-              <div className="h-7 bg-gray-200 rounded w-12"></div>
+            <div key={i} className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-5 animate-pulse">
+              <div className="h-10 w-10 bg-background-tertiary dark:bg-surface-secondary rounded-lg mb-3"></div>
+              <div className="h-4 bg-background-tertiary dark:bg-surface-secondary rounded w-16 mb-2"></div>
+              <div className="h-7 bg-background-tertiary dark:bg-surface-secondary rounded w-12"></div>
             </div>
           ))}
         </div>
@@ -263,7 +263,7 @@ export default function SuperadminDashboard() {
                 transition={{ delay: index * 0.05 }}
               >
                 <Link href={card.href}>
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-gray-300 transition-all group">
+                  <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-5 hover:shadow-md hover:border-border-secondary transition-all group">
                     <div className={`${card.bgColor} p-2.5 rounded-lg w-fit mb-3 group-hover:scale-110 transition-transform`}>
                       <Icon size={22} weight="duotone" className={card.textColor} />
                     </div>
@@ -281,8 +281,8 @@ export default function SuperadminDashboard() {
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Quick Actions */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-5 border-b border-gray-200">
+        <div className="lg:col-span-2 bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
+          <div className="p-5 border-b border-border-primary">
             <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
             <p className="text-sm text-gray-500 mt-0.5">Common management tasks</p>
           </div>
@@ -293,7 +293,7 @@ export default function SuperadminDashboard() {
               return (
                 <Link key={action.href} href={action.href}>
                   <div className={`p-4 rounded-xl border ${colors.border} ${colors.bg} ${colors.hover} transition-all group flex items-start gap-3`}>
-                    <div className={`p-2 rounded-lg bg-white shadow-sm ${colors.text}`}>
+                    <div className={`p-2 rounded-lg bg-surface-primary shadow-sm ${colors.text}`}>
                       <Icon size={22} weight="duotone" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -311,8 +311,8 @@ export default function SuperadminDashboard() {
         </div>
 
         {/* Recent Companies */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-5 border-b border-gray-200 flex items-center justify-between">
+        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
+          <div className="p-5 border-b border-border-primary flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Recent Companies</h2>
               <p className="text-sm text-gray-500 mt-0.5">Latest additions</p>
@@ -326,19 +326,19 @@ export default function SuperadminDashboard() {
             <div className="p-5 space-y-3">
               {[...Array(5)].map((_, i) => (
                 <div key={i} className="flex items-center gap-3 animate-pulse">
-                  <div className="w-10 h-10 bg-gray-200 rounded-lg"></div>
+                  <div className="w-10 h-10 bg-background-tertiary dark:bg-surface-secondary rounded-lg"></div>
                   <div className="flex-1">
-                    <div className="h-4 bg-gray-200 rounded w-24 mb-1"></div>
-                    <div className="h-3 bg-gray-200 rounded w-16"></div>
+                    <div className="h-4 bg-background-tertiary dark:bg-surface-secondary rounded w-24 mb-1"></div>
+                    <div className="h-3 bg-background-tertiary dark:bg-surface-secondary rounded w-16"></div>
                   </div>
                 </div>
               ))}
             </div>
           ) : recentCompanies.length > 0 ? (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border-primary">
               {recentCompanies.map((company) => (
                 <Link key={company.id} href="/sa/companies">
-                  <div className="p-4 hover:bg-gray-50 transition-colors flex items-center gap-3">
+                  <div className="p-4 hover:bg-surface-hover transition-colors flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
                       {company.name.substring(0, 2).toUpperCase()}
                     </div>
@@ -370,8 +370,8 @@ export default function SuperadminDashboard() {
       </div>
 
       {/* System Status */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-5 border-b border-gray-200">
+      <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
+        <div className="p-5 border-b border-border-primary">
           <h2 className="text-lg font-semibold text-gray-900">System Status</h2>
         </div>
         <div className="p-5 grid sm:grid-cols-3 gap-4">

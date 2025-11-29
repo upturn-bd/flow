@@ -264,7 +264,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => router.push(`/admin/stakeholders/${stakeholder.id}/edit`)}
-              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 border border-border-secondary rounded-lg hover:bg-gray-50"
             >
               <Edit size={14} />
               <span className="hidden sm:inline">Edit</span>
@@ -334,7 +334,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
         {/* Left Column - Details */}
         <div className="lg:col-span-1 space-y-6">
           {/* Basic Information */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+          <div className="bg-white rounded-lg border border-border-primary p-6 space-y-4">
             <h2 className="text-lg font-semibold text-gray-900">Information</h2>
 
             {stakeholder.stakeholder_type && (
@@ -443,13 +443,13 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
           </div>
 
           {/* Contact Persons */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+          <div className="bg-white rounded-lg border border-border-primary p-6 space-y-4">
             <h2 className="text-lg font-semibold text-gray-900">Contact Persons</h2>
 
             {stakeholder.contact_persons && stakeholder.contact_persons.length > 0 ? (
               <div className="space-y-4">
                 {stakeholder.contact_persons.map((contact, index) => (
-                  <div key={index} className="border-t border-gray-200 pt-4 first:border-t-0 first:pt-0">
+                  <div key={index} className="border-t border-border-primary pt-4 first:border-t-0 first:pt-0">
                     <div className="flex items-start gap-3 mb-2">
                       <User className="text-gray-400 mt-0.5" size={18} />
                       <p className="text-sm font-medium text-gray-900">{contact.name}</p>
@@ -486,7 +486,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
           {/* Additional Data - Only show for Permanent stakeholders */}
           {stakeholder.status === "Permanent" && (
-            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 space-y-4">
+            <div className="bg-white rounded-lg border border-border-primary p-4 sm:p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-base sm:text-lg font-semibold text-gray-900">Additional Data</h2>
                 <button
@@ -501,7 +501,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               {stakeholder.additional_data && Object.keys(stakeholder.additional_data).length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {Object.entries(stakeholder.additional_data).map(([key, value]) => (
-                    <div key={key} className="border-t border-gray-200 pt-3 first:border-t-0 first:pt-0 sm:border-t-0 sm:pt-0">
+                    <div key={key} className="border-t border-border-primary pt-3 first:border-t-0 first:pt-0 sm:border-t-0 sm:pt-0">
                       <div className="flex items-start gap-3">
                         <Database className="text-gray-400 mt-0.5 flex-shrink-0" size={18} />
                         <div className="min-w-0 flex-1">
@@ -526,8 +526,8 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
         {/* Right Column - Process Steps */}
         <div className="lg:col-span-2">
           {/* Tabs */}
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-            <div className="border-b border-gray-200">
+          <div className="bg-white rounded-lg border border-border-primary overflow-hidden">
+            <div className="border-b border-border-primary">
               <div className="flex overflow-x-auto">
                 <button
                   onClick={() => setActiveTab("process")}
@@ -617,7 +617,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                   ? "border-blue-300 bg-blue-50"
                                   : canEdit && !isSequential
                                     ? "border-blue-200 bg-blue-25"
-                                    : "border-gray-200 bg-gray-50"
+                                    : "border-border-primary bg-surface-secondary"
                               }`}
                           >
                             <div className="p-3 sm:p-4">
@@ -728,7 +728,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
                               {/* Step Data Form */}
                               {activeStepId === step.id && canEdit && step.id && (
-                                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+                                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border-primary">
                                   <StepDataForm
                                     stakeholderId={stakeholderId}
                                     step={step}
@@ -755,7 +755,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
                               {/* Display Completed Data */}
                               {isCompleted && stepDataEntry && (
-                                <div className="mt-4 pt-4 border-t border-gray-200">
+                                <div className="mt-4 pt-4 border-t border-border-primary">
                                   <div className="grid grid-cols-2 gap-4">
                                     {Object.entries(stepDataEntry.data).map(([key, value]) => {
                                       // Check if this is a file field by looking at the field definitions
@@ -957,7 +957,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={deleting}
-                className="w-full sm:w-auto px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="w-full sm:w-auto px-4 py-2 border border-border-secondary text-gray-700 rounded-lg hover:bg-gray-50"
               >
                 Cancel
               </button>

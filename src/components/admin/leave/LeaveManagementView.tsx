@@ -248,8 +248,8 @@ export default function LeaveManagementView() {
                 <div
                   key={day}
                   className={`cursor-pointer select-none rounded-lg py-2 text-center font-medium border ${isSelected
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-background-secondary dark:bg-background-tertiary text-foreground-secondary border-border-primary hover:bg-background-tertiary dark:bg-surface-secondary"
+                    ? "bg-primary-600 text-white border-primary-600"
+                    : "bg-background-secondary dark:bg-background-tertiary text-foreground-secondary border-border-primary hover:bg-background-tertiary dark:hover:bg-surface-secondary"
                     }`}
                   onClick={() => toggleWeekday(idx)}
                 >
@@ -302,7 +302,7 @@ export default function LeaveManagementView() {
                             onClick={() => holiday.id !== undefined && handleDeleteHolidayConfig(holiday.id)}
                             isLoading={deleteHolidayLoading === holiday.id}
                             disabled={deleteHolidayLoading === holiday.id}
-                            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
+                            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500 dark:hover:text-red-400"
                           >
                             <TrashSimple size={16} weight="bold" />
                           </Button>
@@ -394,7 +394,7 @@ export default function LeaveManagementView() {
                             onClick={() => type.id !== undefined && handleDeleteLeaveType(type.id)}
                             isLoading={deleteTypeLoading === type.id}
                             disabled={deleteTypeLoading === type.id}
-                            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
+                            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500 dark:hover:text-red-400"
                           >
                             <TrashSimple size={16} weight="bold" />
                           </Button>

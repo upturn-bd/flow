@@ -161,43 +161,43 @@ export default function AttendanceLogsPage() {
 
     return (
       <div className="overflow-x-auto mt-3">
-        <table className="w-full table-auto border border-gray-200 rounded-lg shadow-sm">
-          <thead className="bg-gray-100 text-gray-700 uppercase text-sm">
+        <table className="w-full table-auto border border-border-primary rounded-lg shadow-sm">
+          <thead className="bg-background-secondary dark:bg-background-tertiary text-foreground-secondary uppercase text-sm">
             <tr>
-              <th className="px-4 py-3 border-b">Employee</th>
-              <th className="px-4 py-3 border-b">Date</th>
-              <th className="px-4 py-3 border-b">Status</th>
-              <th className="px-4 py-3 border-b">Check In</th>
-              <th className="px-4 py-3 border-b">Check Out</th>
-              <th className="px-4 py-3 border-b">Actions</th>
+              <th className="px-4 py-3 border-b border-border-primary">Employee</th>
+              <th className="px-4 py-3 border-b border-border-primary">Date</th>
+              <th className="px-4 py-3 border-b border-border-primary">Status</th>
+              <th className="px-4 py-3 border-b border-border-primary">Check In</th>
+              <th className="px-4 py-3 border-b border-border-primary">Check Out</th>
+              <th className="px-4 py-3 border-b border-border-primary">Actions</th>
             </tr>
           </thead>
           <tbody>
             {records.map((att, idx) => (
-              <tr key={att.id} className={`transition-all hover:bg-gray-50 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
-                <td className="px-4 py-3 border-b font-medium text-gray-800">{employeeNames[att.employee_id] || "Unknown"}</td>
-                <td className="px-4 py-3 border-b text-gray-600">{att.attendance_date || "N/A"}</td>
-                <td className="px-4 py-3 border-b text-gray-600">
+              <tr key={att.id} className={`transition-all hover:bg-surface-hover dark:hover:bg-surface-hover ${idx % 2 === 0 ? "bg-surface-primary" : "bg-background-secondary dark:bg-background-tertiary"}`}>
+                <td className="px-4 py-3 border-b border-border-primary font-medium text-foreground-primary">{employeeNames[att.employee_id] || "Unknown"}</td>
+                <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">{att.attendance_date || "N/A"}</td>
+                <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">
                   {att.tag ? (
                     <span
-                      className={`px-3 py-1 text-sm font-medium rounded-full ${tagStyles[att.tag] || "bg-gray-100 text-gray-700"
+                      className={`px-3 py-1 text-sm font-medium rounded-full ${tagStyles[att.tag] || "bg-background-secondary dark:bg-background-tertiary text-foreground-secondary"
                         }`}
                     >
                       {att.tag.replace(/_/g, " ")}
                     </span>
                   ) : (
-                    <span className="text-gray-400">N/A</span>
+                    <span className="text-foreground-tertiary">N/A</span>
                   )}
                 </td>
 
-                <td className="px-4 py-3 border-b text-gray-600">{att.check_in_time ? new Date(att.check_in_time).toLocaleTimeString() : "N/A"}</td>
-                <td className="px-4 py-3 border-b text-gray-600">{att.check_out_time ? new Date(att.check_out_time).toLocaleTimeString() : "N/A"}</td>
-                <td className="px-4 py-3 border-b flex gap-2">
+                <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">{att.check_in_time ? new Date(att.check_in_time).toLocaleTimeString() : "N/A"}</td>
+                <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">{att.check_out_time ? new Date(att.check_out_time).toLocaleTimeString() : "N/A"}</td>
+                <td className="px-4 py-3 border-b border-border-primary flex gap-2">
                   {canWrite(MODULE) && (
                     <Button
                       size="sm"
                       variant="secondary"
-                      className="p-2 hover:bg-blue-100 transition-colors"
+                      className="p-2 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
                       onClick={() => handleEdit(att)}
                     >
                       <Edit2 size={16} />
@@ -236,7 +236,7 @@ export default function AttendanceLogsPage() {
               placeholder="Search by employee..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full sm:w-1/3 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full sm:w-1/3 px-4 py-2 border border-border-secondary rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
 

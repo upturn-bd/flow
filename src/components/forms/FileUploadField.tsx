@@ -80,7 +80,7 @@ export default function FileUploadField({
       <div
         className={`
           border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer
-          ${dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}
+          ${dragOver ? 'border-primary-500 bg-primary-50' : 'border-border-secondary hover:border-border-primary'}
           ${error ? 'border-red-500' : ''}
           ${className}
         `}

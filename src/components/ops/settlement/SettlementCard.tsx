@@ -75,7 +75,7 @@ export default function SettlementCard({
           variant="ghost"
           size="sm"
           onClick={onEdit}
-          className="p-2 h-8 w-8 hover:bg-blue-50 hover:text-blue-600"
+          className="p-2 h-8 w-8 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400"
         >
           <Edit size={14} />
         </Button>
@@ -86,7 +86,7 @@ export default function SettlementCard({
           size="sm"
           onClick={onDelete}
           isLoading={isDeleting}
-          className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
+          className="p-2 h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600"
         >
           <Trash size={14} />
         </Button>
@@ -96,7 +96,7 @@ export default function SettlementCard({
           variant="ghost"
           size="sm"
           onClick={onDetails}
-          className="p-2 h-8 w-8 hover:bg-gray-50 hover:text-gray-700"
+          className="p-2 h-8 w-8 hover:bg-background-secondary dark:hover:bg-background-tertiary hover:text-foreground-primary"
         >
           <ExternalLink size={14} />
         </Button>

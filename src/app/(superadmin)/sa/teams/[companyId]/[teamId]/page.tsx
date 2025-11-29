@@ -469,14 +469,14 @@ export default function TeamDetailPage() {
                 type="text"
                 value={editedTeam.name}
                 onChange={(e) => setEditedTeam(prev => ({ ...prev, name: e.target.value }))}
-                className="text-2xl font-bold text-gray-900 w-full px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="text-2xl font-bold text-gray-900 w-full px-3 py-1 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="Team name"
                 autoFocus
               />
               <textarea
                 value={editedTeam.description}
                 onChange={(e) => setEditedTeam(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-600 resize-none"
+                className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-600 resize-none"
                 placeholder="Team description (optional)"
                 rows={2}
               />
@@ -525,8 +525,8 @@ export default function TeamDetailPage() {
       </div>
 
       {/* Team Members Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-5 border-b border-gray-200 bg-gray-50/50 flex items-center justify-between">
+      <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
+        <div className="p-5 border-b border-border-primary bg-gray-50/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Users size={24} className="text-blue-600" />
             <div>
@@ -553,7 +553,7 @@ export default function TeamDetailPage() {
             <p className="text-sm text-gray-400 mt-1">Add employees to this team</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-border-primary">
             {members.map((member) => (
               <div key={member.id || member.employee_id} className="p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
                 <div className="flex items-center gap-3">
@@ -589,8 +589,8 @@ export default function TeamDetailPage() {
       </div>
 
       {/* Team Permissions Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-5 border-b border-gray-200 bg-gray-50/50 flex items-center justify-between">
+      <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
+        <div className="p-5 border-b border-border-primary bg-gray-50/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Shield size={24} className="text-purple-600" />
             <div>
@@ -647,7 +647,7 @@ export default function TeamDetailPage() {
             const actions = ["can_read", "can_write", "can_delete", "can_approve", "can_comment"];
 
             return (
-              <div key={category} className="border border-gray-200 rounded-lg overflow-hidden">
+              <div key={category} className="border border-border-primary rounded-lg overflow-hidden">
                 <button
                   onClick={() => setExpandedCategories(prev => ({ ...prev, [category]: !prev[category] }))}
                   className="w-full p-4 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
@@ -668,7 +668,7 @@ export default function TeamDetailPage() {
                       transition={{ duration: 0.2 }}
                     >
                       {/* Category-level toggles */}
-                      <div className="px-4 py-2 bg-gray-50/50 border-b border-gray-200 flex items-center justify-end gap-4">
+                      <div className="px-4 py-2 bg-gray-50/50 border-b border-border-primary flex items-center justify-end gap-4">
                         <span className="text-xs text-gray-500 mr-2">Toggle all:</span>
                         {actions.map(action => {
                           const state = getCategoryActionState(category, action);
@@ -681,7 +681,7 @@ export default function TeamDetailPage() {
                                   if (el) el.indeterminate = state === 'indeterminate';
                                 }}
                                 onChange={(e) => toggleCategoryPermissions(category, action, e.target.checked)}
-                                className="w-3.5 h-3.5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                                className="w-3.5 h-3.5 rounded border-border-secondary text-purple-600 focus:ring-purple-500"
                               />
                               <span className="text-xs text-gray-500 capitalize">{action.replace("can_", "")}</span>
                             </label>
@@ -689,7 +689,7 @@ export default function TeamDetailPage() {
                         })}
                       </div>
 
-                      <div className="divide-y divide-gray-100">
+                      <div className="divide-y divide-border-primary">
                         {categoryPermissions.map((permission) => (
                           <div key={permission.id} className="p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
                             <div className="flex-1 min-w-0 mr-4">
@@ -706,7 +706,7 @@ export default function TeamDetailPage() {
                                     type="checkbox"
                                     checked={localPermissions[permission.id!]?.[action as keyof typeof localPermissions[number]] ?? false}
                                     onChange={(e) => handleLocalPermissionChange(permission.id!, action, e.target.checked)}
-                                    className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                                    className="w-4 h-4 rounded border-border-secondary text-purple-600 focus:ring-purple-500"
                                   />
                                   <span className="text-xs text-gray-500 group-hover:text-gray-700 capitalize w-14">
                                     {action.replace("can_", "")}
@@ -740,9 +740,9 @@ export default function TeamDetailPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-xl shadow-xl max-w-lg w-full overflow-hidden"
+              className="bg-surface-primary rounded-xl shadow-xl max-w-lg w-full overflow-hidden"
             >
-              <div className="p-6 border-b border-gray-200">
+              <div className="p-6 border-b border-border-primary">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100 rounded-lg">
@@ -775,7 +775,7 @@ export default function TeamDetailPage() {
                       placeholder="Search by name, email, or designation..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                     />
                   </div>
                 </div>
@@ -803,7 +803,7 @@ export default function TeamDetailPage() {
                 )}
 
                 {!selectedEmployee && searchTerm && (
-                  <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
+                  <div className="max-h-60 overflow-y-auto border border-border-primary rounded-lg divide-y divide-border-primary">
                     {filteredEmployees.length > 0 ? (
                       filteredEmployees.map((emp) => {
                         const employee = employees.find(e => e.id === emp.id)!;
@@ -841,7 +841,7 @@ export default function TeamDetailPage() {
                 )}
               </div>
 
-              <div className="p-6 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+              <div className="p-6 bg-gray-50 border-t border-border-primary flex items-center justify-end gap-3">
                 <button
                   onClick={() => {
                     setShowAddMemberModal(false);
@@ -890,7 +890,7 @@ export default function TeamDetailPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden"
+              className="bg-surface-primary rounded-xl shadow-xl max-w-md w-full overflow-hidden"
             >
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -909,7 +909,7 @@ export default function TeamDetailPage() {
                 </p>
               </div>
 
-              <div className="p-6 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+              <div className="p-6 bg-gray-50 border-t border-border-primary flex items-center justify-end gap-3">
                 <button
                   onClick={() => setMemberToRemove(null)}
                   disabled={removingMember}

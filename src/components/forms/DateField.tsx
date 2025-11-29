@@ -44,7 +44,7 @@ export const DateField: React.FC<DateFieldProps> = ({
           min={min}
           max={max}
           placeholder={placeholder}
-          className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+          className="w-full pl-10 rounded-md bg-background-secondary p-2.5 border border-border-secondary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
         />
       </div>
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}

@@ -224,7 +224,7 @@ export default function CompanyTaskLogsPage() {
                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setSearch(e.target.value)
                      }
-                     className="w-full sm:w-1/3 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                     className="w-full sm:w-1/3 px-3 py-2 border border-border-secondary rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                   />
                </div>
 

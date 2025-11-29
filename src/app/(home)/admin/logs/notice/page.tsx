@@ -141,7 +141,7 @@ export default function NoticePage() {
         <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />
         <input
           placeholder="Search notices..."
-          className="pl-8 w-full px-3 py-2 border border-gray-200 rounded-lg"
+          className="pl-8 w-full px-3 py-2 border border-border-primary rounded-lg"
           value={searchTerm}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setSearchTerm(e.target.value)
@@ -175,7 +175,7 @@ export default function NoticePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.15 }}
             >
-              <Card className="flex flex-col md:flex-row items-start md:items-stretch justify-between p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-lg hover:border-blue-100 transition-all duration-200">
+              <Card className="flex flex-col md:flex-row items-start md:items-stretch justify-between p-5 rounded-xl border border-border-primary shadow-sm hover:shadow-lg hover:border-blue-100 transition-all duration-200">
                 {/* Left section */}
                 <div className="flex-1 w-full space-y-3">
                   {/* Title */}
@@ -193,7 +193,7 @@ export default function NoticePage() {
                       {notice.urgency}
                     </span>
                     {notice.notice_type_id && (
-                      <span className="inline-flex items-center rounded-full bg-gray-100 border border-gray-300 px-2 py-0.5 text-xs font-medium text-gray-700">
+                      <span className="inline-flex items-center rounded-full bg-gray-100 border border-border-secondary px-2 py-0.5 text-xs font-medium text-gray-700">
                         {noticeTypes[notice.notice_type_id] || "General"}
                       </span>
                     )}
@@ -205,7 +205,7 @@ export default function NoticePage() {
                   </p>
 
                   {/* Meta info */}
-                  <div className="text-xs text-gray-500 border-t border-gray-100 pt-2">
+                  <div className="text-xs text-gray-500 border-t border-border-primary pt-2">
                     <p>
                       <span className="font-medium text-gray-600">Valid:</span>{" "}
                       {formatDate(notice.valid_from)} →{" "}
@@ -224,7 +224,7 @@ export default function NoticePage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-gray-300 hover:bg-blue-50 hover:text-blue-600"
+                      className="border-border-secondary hover:bg-blue-50 hover:text-blue-600"
                       title="Edit Notice"
                       onClick={() => setEditingNotice(notice)}
                     >

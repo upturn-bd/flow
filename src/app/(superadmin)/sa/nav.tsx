@@ -56,7 +56,7 @@ export default function SuperadminNav() {
 
   return (
     <>
-      <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+      <nav className="bg-background-primary shadow-sm border-b border-border-primary sticky top-0 z-40">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -85,8 +85,8 @@ export default function SuperadminNav() {
                       transition-all duration-200 text-sm font-medium
                       ${
                         isActive
-                          ? "bg-blue-50 text-blue-600"
-                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                          ? "bg-primary-50 dark:bg-primary-900/30 text-primary-600"
+                          : "text-foreground-secondary hover:bg-surface-hover hover:text-foreground-primary"
                       }
                     `}
                   >
@@ -101,7 +101,7 @@ export default function SuperadminNav() {
             <div className="flex items-center gap-3">
               <Link
                 href="/home"
-                className="hidden sm:flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 font-medium px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="hidden sm:flex items-center gap-2 text-sm text-foreground-secondary hover:text-foreground-primary font-medium px-3 py-2 rounded-lg hover:bg-surface-hover transition-colors"
               >
                 <SignOut size={18} />
                 <span>Exit to App</span>
@@ -110,7 +110,7 @@ export default function SuperadminNav() {
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="lg:hidden p-2 rounded-lg hover:bg-surface-hover transition-colors"
               >
                 {mobileMenuOpen ? <X size={24} /> : <List size={24} />}
               </button>
@@ -134,7 +134,7 @@ export default function SuperadminNav() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="fixed top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-30 lg:hidden"
+              className="fixed top-16 left-0 right-0 bg-background-primary border-b border-border-primary shadow-lg z-30 lg:hidden"
             >
               <div className="container mx-auto px-4 py-3 space-y-1">
                 {navItems.map((item) => {
@@ -152,8 +152,8 @@ export default function SuperadminNav() {
                         transition-all duration-200 font-medium
                         ${
                           isActive
-                            ? "bg-blue-50 text-blue-600"
-                            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            ? "bg-primary-50 dark:bg-primary-900/30 text-primary-600"
+                            : "text-foreground-secondary hover:bg-surface-hover hover:text-foreground-primary"
                         }
                       `}
                     >
@@ -163,11 +163,11 @@ export default function SuperadminNav() {
                   );
                 })}
                 
-                <div className="border-t border-gray-200 pt-2 mt-2">
+                <div className="border-t border-border-primary pt-2 mt-2">
                   <Link
                     href="/home"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors font-medium"
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground-secondary hover:bg-surface-hover hover:text-foreground-primary transition-colors font-medium"
                   >
                     <SignOut size={22} />
                     <span>Exit to App</span>

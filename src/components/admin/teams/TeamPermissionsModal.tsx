@@ -218,13 +218,13 @@ export default function TeamPermissionsModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-surface-primary rounded-2xl shadow-2xl max-w-7xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border-primary bg-gradient-to-r from-purple-50 to-primary-50 dark:from-purple-900/30 dark:to-primary-900/30">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border-primary bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-900/50">
           <div>
             <h2 className="text-2xl font-bold text-foreground-primary">
               Configure Permissions
             </h2>
             <p className="text-sm text-foreground-tertiary mt-1 flex items-center gap-2">
-              <span className="font-medium text-purple-600 dark:text-purple-400">{team.name}</span>
+              <span className="font-medium text-primary-600 dark:text-primary-400">{team.name}</span>
               <span className="text-foreground-tertiary">•</span>
               <span>Set granular access controls</span>
             </p>
@@ -242,7 +242,7 @@ export default function TeamPermissionsModal({
         <div className="p-6 overflow-y-auto flex-1">
           {loadingPermissions ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
               <div className="text-foreground-secondary font-medium">Loading permissions...</div>
             </div>
           ) : (
@@ -385,7 +385,7 @@ export default function TeamPermissionsModal({
             <button
               onClick={handleSave}
               disabled={isSaving || loading}
-              className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-lg hover:from-primary-700 hover:to-purple-700 active:scale-[0.98] transition-all disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed font-medium shadow-md hover:shadow-lg"
+              className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 active:scale-[0.98] transition-all disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed font-medium shadow-md hover:shadow-lg"
             >
               <FloppyDisk size={20} />
               {isSaving ? 'Saving...' : 'Save Permissions'}

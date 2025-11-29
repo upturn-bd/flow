@@ -1296,12 +1296,12 @@ function FieldEditor({
                       updateNestedField(nestedIdx, updates);
                     }}
                     placeholder="Field Label"
-                    className="flex-1 px-2 py-1.5 sm:py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none"
+                    className="flex-1 px-2 py-1.5 sm:py-1 text-xs border border-border-secondary rounded focus:ring-1 focus:ring-blue-500 outline-none"
                   />
                   <select
                     value={nestedField.type}
                     onChange={(e) => updateNestedField(nestedIdx, { type: e.target.value as FieldType })}
-                    className="w-full sm:w-auto px-2 py-1.5 sm:py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none"
+                    className="w-full sm:w-auto px-2 py-1.5 sm:py-1 text-xs border border-border-secondary rounded focus:ring-1 focus:ring-blue-500 outline-none"
                   >
                     {Object.values(FIELD_TYPES).map((type) => (
                       <option key={type} value={type}>

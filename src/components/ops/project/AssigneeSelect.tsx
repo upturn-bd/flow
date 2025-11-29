@@ -54,8 +54,8 @@ export default function AssigneeSelect({
 
   return (
     <div>
-      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
-        <Users size={16} className="text-gray-500" strokeWidth={2} />
+      <label className="flex items-center gap-2 text-sm font-medium text-foreground-secondary mb-1">
+        <Users size={16} className="text-foreground-tertiary" strokeWidth={2} />
         Assignees
       </label>
 
@@ -71,11 +71,11 @@ export default function AssigneeSelect({
           onFocus={() => setDropdownOpen(true)}
           onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
           placeholder="Search for assignees..."
-          className="w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-gray-50 p-3 pr-10"
+          className="w-full rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-background-secondary p-3 pr-10 text-foreground-primary"
         />
         <Search 
           size={16} 
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
           strokeWidth={2}
         />
 
@@ -85,14 +85,14 @@ export default function AssigneeSelect({
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto"
+              className="absolute z-10 mt-1 w-full bg-surface-primary border border-border-primary rounded-md shadow-lg max-h-60 overflow-y-auto"
             >
               {filteredEmployees.map((emp) => (
                 <motion.li
                   key={emp.id}
                   onClick={() => handleAddAssignee(emp.id)}
-                  whileHover={{ backgroundColor: "#f3f4f6" }}
-                  className="cursor-pointer px-4 py-2 hover:bg-gray-50 text-sm text-gray-700"
+                  whileHover={{ backgroundColor: "var(--color-background-secondary)" }}
+                  className="cursor-pointer px-4 py-2 hover:bg-background-secondary text-sm text-foreground-primary"
                 >
                   {emp.name}
                 </motion.li>
@@ -112,12 +112,12 @@ export default function AssigneeSelect({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm flex items-center"
+                className="bg-background-secondary text-foreground-primary px-3 py-1 rounded-full text-sm flex items-center"
               >
                 {emp.name}
                 <button
                   type="button"
-                  className="ml-2 text-gray-500 hover:text-gray-700"
+                  className="ml-2 text-foreground-tertiary hover:text-foreground-primary"
                   onClick={() => onRemoveAssignee(assignee)}
                 >
                   <X size={14} strokeWidth={2} />

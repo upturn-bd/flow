@@ -53,7 +53,7 @@ export const TabView = ({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.4 }}
-        className="hidden sm:flex flex-wrap justify-start gap-2 bg-white rounded-xl shadow-sm mb-8 p-1.5 border border-gray-200 sticky top-0 z-10 overflow-x-auto"
+        className="hidden sm:flex flex-wrap justify-start gap-2 bg-surface-primary rounded-xl shadow-sm mb-8 p-1.5 border border-border-primary sticky top-0 z-10 overflow-x-auto"
       >
         {tabs.map((tab) => {
           const tabButton = (
@@ -62,17 +62,17 @@ export const TabView = ({
               onClick={() => setActiveTab(tab.key)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={`relative px-4 py-2.5 text-sm font-medium transition-all duration-200 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 flex items-center gap-2
+              className={`relative px-4 py-2.5 text-sm font-medium transition-all duration-200 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 flex items-center gap-2
                 ${activeTab === tab.key
-                  ? `bg-blue-50 ${tab.color} shadow-sm`
-                  : "text-gray-600 hover:text-blue-600 hover:bg-gray-50"
+                  ? `bg-primary-50 dark:bg-primary-900/30 ${tab.color} shadow-sm`
+                  : "text-foreground-secondary hover:text-primary-600 dark:hover:text-primary-400 hover:bg-background-secondary dark:hover:bg-background-tertiary"
                 }
               `}
               role="tab"
               aria-selected={activeTab === tab.key}
             >
               <span
-                className={`${activeTab === tab.key ? tab.color : "text-gray-500"}`}
+                className={`${activeTab === tab.key ? tab.color : "text-foreground-tertiary"}`}
               >
                 {tab.icon}
               </span>
@@ -80,7 +80,7 @@ export const TabView = ({
               {activeTab === tab.key && (
                 <motion.span
                   layoutId="active-tab-indicator"
-                  className="absolute left-2 right-2 -bottom-1 h-0.5 rounded-full bg-blue-500"
+                  className="absolute left-2 right-2 -bottom-1 h-0.5 rounded-full bg-primary-500"
                 />
               )}
             </motion.button>
@@ -101,7 +101,7 @@ export const TabView = ({
         <select
           value={activeTab}
           onChange={(e) => setActiveTab(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg text-gray-700 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full p-3 border border-border-primary rounded-lg text-foreground-primary bg-surface-primary shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         >
           {tabs.map((tab) => (
             <option key={tab.key} value={tab.key}>
@@ -113,7 +113,7 @@ export const TabView = ({
 
       {/* Tab Content */}
       {(tabs.find((tab) => tab.key === activeTab)?.content && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-surface-primary rounded-xl shadow-sm p-6">
           {(() => {
             const activeTabData = tabs.find((tab) => tab.key === activeTab);
             return activeTabData ? activeTabData.content : null;

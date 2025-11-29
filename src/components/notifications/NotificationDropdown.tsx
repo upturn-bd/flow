@@ -162,7 +162,7 @@ export default function NotificationDropdown({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          className="fixed w-96 bg-white rounded-lg shadow-lg border border-gray-200 max-h-96 overflow-hidden"
+          className="fixed w-96 bg-surface-primary dark:bg-surface-primary rounded-lg shadow-lg border border-border-primary dark:border-border-primary max-h-96 overflow-hidden"
           style={{
             top: position.top,
             right: position.right,
@@ -170,10 +170,10 @@ export default function NotificationDropdown({
           }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border-primary dark:border-border-primary">
             <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-gray-600" />
-              <h3 className="font-semibold text-gray-900">Notifications</h3>
+              <Bell className="h-5 w-5 text-foreground-secondary dark:text-foreground-secondary" />
+              <h3 className="font-semibold text-foreground-primary dark:text-foreground-primary">Notifications</h3>
               {unreadNotifications.length > 0 && (
                 <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
                   {unreadNotifications.length}
@@ -184,7 +184,7 @@ export default function NotificationDropdown({
               {unreadNotifications.length > 0 && (
                 <button
                   onClick={handleMarkAllAsRead}
-                  className="text-blue-600 hover:bg-blue-50 p-1 rounded"
+                  className="text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 p-1 rounded"
                   title="Mark all as read"
                 >
                   <CheckCheck className="h-4 w-4" />
@@ -192,7 +192,7 @@ export default function NotificationDropdown({
               )}
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:bg-gray-100 p-1 rounded"
+                className="text-foreground-tertiary dark:text-foreground-tertiary hover:bg-surface-hover dark:hover:bg-surface-hover p-1 rounded"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -203,15 +203,15 @@ export default function NotificationDropdown({
           <div className="max-h-80 overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
               </div>
             ) : notifications.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Bell className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+              <div className="text-center py-8 text-foreground-secondary dark:text-foreground-secondary">
+                <Bell className="h-8 w-8 mx-auto mb-2 text-foreground-tertiary dark:text-foreground-tertiary" />
                 <p>No notifications yet</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-border-primary dark:divide-border-primary">
                 {notifications.map((notification) => (
                   <NotificationItem
                     key={notification.id}
@@ -226,7 +226,7 @@ export default function NotificationDropdown({
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="border-t border-gray-100 px-4 py-2">
+            <div className="border-t border-border-primary px-4 py-2">
               <Link
                 href="/notifications"
                 className="text-blue-600 hover:text-blue-700 text-sm font-medium"
@@ -271,20 +271,20 @@ function NotificationItem({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
-              <p className={`text-sm font-medium ${!notification.is_read ? 'text-gray-900' : 'text-gray-700'}`}>
+              <p className={`text-sm font-medium ${!notification.is_read ? 'text-foreground-primary dark:text-foreground-primary' : 'text-foreground-secondary dark:text-foreground-secondary'}`}>
                 {notification.title}
               </p>
-              <p className={`text-sm mt-1 ${!notification.is_read ? 'text-gray-700' : 'text-gray-500'}`}>
+              <p className={`text-sm mt-1 ${!notification.is_read ? 'text-foreground-secondary dark:text-foreground-secondary' : 'text-foreground-tertiary dark:text-foreground-tertiary'}`}>
                 {notification.message}
               </p>
 
-              <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+              <div className="flex items-center gap-3 mt-2 text-xs text-foreground-tertiary dark:text-foreground-tertiary">
                 <span className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
                   {formatRelativeTime(notification.created_at || '')}
                 </span>
                 {notification.context && (
-                  <span className="px-2 py-1 bg-gray-100 rounded-full">
+                  <span className="px-2 py-1 bg-background-tertiary dark:bg-background-tertiary rounded-full">
                     {notification.context.replace('_', ' ')}
                   </span>
                 )}
@@ -292,7 +292,7 @@ function NotificationItem({
             </div>
 
             {!notification.is_read && (
-              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></div>
+              <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-1"></div>
             )}
           </div>
 
@@ -301,7 +301,7 @@ function NotificationItem({
             {!notification.is_read && (
               <button
                 onClick={() => onMarkAsRead(notification.id!)}
-                className="text-blue-600 hover:bg-blue-100 p-1 rounded text-xs flex items-center gap-1"
+                className="text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/20 p-1 rounded text-xs flex items-center gap-1"
                 title="Mark as read"
               >
                 <Check className="h-3 w-3" />

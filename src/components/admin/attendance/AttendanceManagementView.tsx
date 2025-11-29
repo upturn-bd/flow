@@ -109,7 +109,7 @@ export default function AttendanceManagementView() {
                           onClick={() => site.id !== undefined && handleDeleteSite(site.id)}
                           isLoading={deleteLoading === site.id}
                           disabled={deleteLoading === site.id}
-                          className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
+                          className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500"
                         >
                           <TrashSimple size={16} weight="bold" />
                         </Button>

@@ -189,7 +189,7 @@ export default function StakeholderIssuesPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Pending</p>
@@ -201,7 +201,7 @@ export default function StakeholderIssuesPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">In Progress</p>
@@ -213,7 +213,7 @@ export default function StakeholderIssuesPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Resolved</p>
@@ -225,7 +225,7 @@ export default function StakeholderIssuesPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">High Priority</p>
@@ -239,7 +239,7 @@ export default function StakeholderIssuesPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white rounded-lg border border-border-primary p-4">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Search */}
           <div className="flex-1 relative">
@@ -249,7 +249,7 @@ export default function StakeholderIssuesPage() {
               placeholder="Search issues..."
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="w-full pl-10 pr-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
 
@@ -257,7 +257,7 @@ export default function StakeholderIssuesPage() {
           <select
             value={filterStatus}
             onChange={(e) => handleStatusFilterChange(e.target.value as any)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            className="px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
           >
             <option value="all">All Statuses</option>
             <option value="Pending">Pending</option>
@@ -269,7 +269,7 @@ export default function StakeholderIssuesPage() {
           <select
             value={filterPriority}
             onChange={(e) => handlePriorityFilterChange(e.target.value as any)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            className="px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
           >
             <option value="all">All Priorities</option>
             <option value="Low">Low</option>
@@ -296,7 +296,7 @@ export default function StakeholderIssuesPage() {
 
       {/* Empty State */}
       {!loading && issues.length === 0 && (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-border-secondary">
           <h3 className="text-lg font-semibold text-gray-900">No issues found</h3>
           <p className="text-sm text-gray-500 mt-1">
             {searchTerm || filterStatus !== "all" || filterPriority !== "all"
@@ -312,7 +312,7 @@ export default function StakeholderIssuesPage() {
           {issues.map((issue) => (
             <div
               key={issue.id}
-              className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              className="bg-white rounded-lg border border-border-primary p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">

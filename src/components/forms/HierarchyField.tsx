@@ -91,11 +91,11 @@ export default function HierarchyField({
 
   return (
     <div className="space-y-4">
-      <label className="block font-semibold text-gray-700 mb-2">
+      <label className="block font-semibold text-foreground-primary dark:text-foreground-primary mb-2">
         {label}
       </label>
       
-      <div className="bg-white py-4 w-full max-w-4xl mx-auto">
+      <div className="bg-surface-primary dark:bg-surface-primary py-4 w-full max-w-4xl mx-auto">
         <div className="flex flex-col items-center justify-center w-full">
           <div className="flex flex-col w-full max-w-md pr-6">
             {positions.length > 0 &&

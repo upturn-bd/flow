@@ -137,8 +137,8 @@ export default function InventoryManagementView() {
         {/* Categories Section */}
         <section>
           <div className="flex items-center gap-3 mb-4">
-            <Tag size={22} weight="duotone" className="text-gray-600" />
-            <h3 className="text-lg font-semibold text-gray-800">Categories</h3>
+            <Tag size={22} weight="duotone" className="text-foreground-secondary" />
+            <h3 className="text-lg font-semibold text-foreground-primary">Categories</h3>
           </div>
 
           {typesLoading ? (
@@ -156,16 +156,16 @@ export default function InventoryManagementView() {
                     {requisitionTypes.map((type, idx) => (
                       <div
                         key={type.id || idx}
-                        className="flex items-center bg-gray-100 rounded-lg px-3 py-2 border border-gray-200 shadow-sm"
+                        className="flex items-center bg-background-secondary dark:bg-background-tertiary rounded-lg px-3 py-2 border border-border-primary shadow-sm"
                       >
-                        <span className="text-gray-800 font-medium">{type.name}</span>
+                        <span className="text-foreground-primary font-medium">{type.name}</span>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => type.id !== undefined && handleDeleteRequisitionType(type.id)}
                           isLoading={deleteLoading === type.id}
                           disabled={deleteLoading === type.id}
-                          className="ml-2 p-1 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-500"
+                          className="ml-2 p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500"
                         >
                           <TrashSimple size={16} weight="bold" />
                         </Button>
@@ -173,12 +173,12 @@ export default function InventoryManagementView() {
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
+                  <div className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary">
                     <div className="flex justify-center mb-3">
-                      <Tag size={40} weight="duotone" className="text-gray-400" />
+                      <Tag size={40} weight="duotone" className="text-foreground-tertiary" />
                     </div>
-                    <p className="text-gray-500 mb-1">No categories found</p>
-                    <p className="text-gray-400 text-sm mb-4">Create categories to organize your inventory items</p>
+                    <p className="text-foreground-secondary mb-1">No categories found</p>
+                    <p className="text-foreground-tertiary text-sm mb-4">Create categories to organize your inventory items</p>
                   </div>
                 )}
               </AnimatePresence>
@@ -189,7 +189,7 @@ export default function InventoryManagementView() {
             <Button
               variant="primary" 
               onClick={() => setIsCreatingRequisitionType(true)}
-              className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"
+              className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white"
             >
               <Plus size={16} weight="bold" />
               Add Category
@@ -211,8 +211,8 @@ export default function InventoryManagementView() {
         {/* Inventory Items Section */}
         <section className="mt-8">
           <div className="flex items-center gap-3 mb-4">
-            <Package size={22} weight="duotone" className="text-gray-600" />
-            <h3 className="text-lg font-semibold text-gray-800">Inventory Items</h3>
+            <Package size={22} weight="duotone" className="text-foreground-secondary" />
+            <h3 className="text-lg font-semibold text-foreground-primary">Inventory Items</h3>
           </div>
 
           {inventoriesLoading ? (
@@ -230,12 +230,12 @@ export default function InventoryManagementView() {
                     {requisitionInventories.map((item: RequisitionInventory, idx) => (
                       <div
                         key={item.id || idx}
-                        className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all"
+                        className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-2 mb-2">
-                            <Package size={20} weight="duotone" className="text-gray-600" />
-                            <h4 className="font-medium text-gray-800">{item.name}</h4>
+                            <Package size={20} weight="duotone" className="text-foreground-secondary" />
+                            <h4 className="font-medium text-foreground-primary">{item.name}</h4>
                           </div>
                           <Button
                             variant="ghost"
@@ -243,25 +243,25 @@ export default function InventoryManagementView() {
                             onClick={() => item.id !== undefined && handleDeleteRequisitionInventory(item.id)}
                             isLoading={inventoryDeleteLoading === item.id}
                             disabled={inventoryDeleteLoading === item.id}
-                            className="p-1 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-500"
+                            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500"
                           >
                             <TrashSimple size={16} weight="bold" />
                           </Button>
                         </div>
                         
                         {item.description && (
-                          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{item.description}</p>
+                          <p className="text-foreground-secondary text-sm mb-3 line-clamp-2">{item.description}</p>
                         )}
                         
                         <div className="flex items-center justify-between mt-2">
-                          <span className="text-sm bg-gray-100 px-2 py-1 rounded text-gray-700">
+                          <span className="text-sm bg-background-secondary dark:bg-background-tertiary px-2 py-1 rounded text-foreground-primary">
                             Qty: {item.quantity}
                           </span>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => setEditRequisitionInventory(item.id!)}
-                            className="text-sm flex items-center gap-1 text-gray-600 hover:text-gray-800"
+                            className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
                           >
                             <Eye size={16} weight="bold" />
                             View Details
@@ -271,12 +271,12 @@ export default function InventoryManagementView() {
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
+                  <div className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary">
                     <div className="flex justify-center mb-3">
-                      <Package size={40} weight="duotone" className="text-gray-400" />
+                      <Package size={40} weight="duotone" className="text-foreground-tertiary" />
                     </div>
-                    <p className="text-gray-500 mb-1">No inventory items found</p>
-                    <p className="text-gray-400 text-sm mb-4">Add items to your inventory to keep track of your supplies</p>
+                    <p className="text-foreground-secondary mb-1">No inventory items found</p>
+                    <p className="text-foreground-tertiary text-sm mb-4">Add items to your inventory to keep track of your supplies</p>
                   </div>
                 )}
               </AnimatePresence>
@@ -287,7 +287,7 @@ export default function InventoryManagementView() {
             <Button
               variant="primary" 
               onClick={() => setIsCreatingRequisitionInventory(true)}
-              className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"
+              className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white"
             >
               <Plus size={16} weight="bold" />
               Add Inventory Item

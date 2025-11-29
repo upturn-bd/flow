@@ -190,19 +190,19 @@ export default function ClientMap({ value, onChange, type }: ClientMapProps) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search for a location..."
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-border-primary rounded-lg bg-surface-primary text-foreground-primary focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
         {loading && (
-          <div className="absolute right-3 top-2.5 w-4 h-4 animate-spin border-2 border-blue-500 border-t-transparent rounded-full" />
+          <div className="absolute right-3 top-2.5 w-4 h-4 animate-spin border-2 border-primary-500 border-t-transparent rounded-full" />
         )}
 
         {suggestions.length > 0 && (
-          <ul className="absolute z-10 mt-1 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+          <ul className="absolute z-10 mt-1 w-full bg-surface-primary border border-border-primary rounded-md shadow-lg max-h-60 overflow-auto">
             {suggestions.map((s, idx) => (
               <li
                 key={idx}
                 onClick={() => handleSelectSuggestion(s)}
-                className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm"
+                className="px-4 py-2 hover:bg-primary-50 dark:hover:bg-primary-900/30 cursor-pointer text-sm text-foreground-primary"
               >
                 {s.display_name}
               </li>

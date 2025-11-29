@@ -153,7 +153,7 @@ useEffect(() => {
 
       {/* Search and Filters */}
       <motion.div variants={fadeIn} className="bg-white rounded-xl shadow-sm mb-8">
-        <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+        <div className="border-b border-border-primary px-6 py-4 flex justify-between items-center">
           <h2 className="text-lg font-semibold text-indigo-700 flex items-center">
             <Search className="w-5 h-5 mr-2" />
             Search Employees
@@ -189,7 +189,7 @@ useEffect(() => {
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden"
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-border-primary">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Department
@@ -199,7 +199,7 @@ useEffect(() => {
                       onChange={(e) =>
                         setFilters({ ...filters, department: e.target.value })
                       }
-                      className="w-full rounded-lg border border-gray-300 bg-[#EAF4FF] px-3 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full rounded-lg border border-border-secondary bg-[#EAF4FF] px-3 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     >
                       <option value="">All Departments</option>
                       {departments.map((dept) => (
@@ -218,7 +218,7 @@ useEffect(() => {
                       onChange={(e) =>
                         setFilters({ ...filters, designation: e.target.value })
                       }
-                      className="w-full rounded-lg border border-gray-300 bg-[#EAF4FF] px-3 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full rounded-lg border border-border-secondary bg-[#EAF4FF] px-3 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     >
                       <option value="">All Positions</option>
                       {positions.map((position) => (
@@ -290,7 +290,7 @@ useEffect(() => {
             <>
               {/* ✅ Table for large screens */}
               <div className="hidden lg:block overflow-x-auto">
-                <table className="min-w-full bg-white rounded-xl shadow-sm border border-gray-100">
+                <table className="min-w-full bg-white rounded-xl shadow-sm border border-border-primary">
                   <thead>
                     <tr className="bg-indigo-50 text-indigo-700 text-left text-sm font-medium">
                       <th className="px-6 py-3 truncate">Name</th>
@@ -302,7 +302,7 @@ useEffect(() => {
                       <th className="px-6 py-3 text-center">Profile</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-border-primary">
                     {filteredEmployees.map((employee) => (
                       <tr
                         key={employee.id}
@@ -354,7 +354,7 @@ useEffect(() => {
                       boxShadow:
                         "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                     }}
-                    className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 transition-all duration-200"
+                    className="bg-white rounded-xl shadow-sm overflow-hidden border border-border-primary transition-all duration-200"
                   >
                     <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-4">
                       <div className="flex items-center">
@@ -400,7 +400,7 @@ useEffect(() => {
                       </div>
                     </div>
 
-                    <div className="border-t border-gray-100 p-4">
+                    <div className="border-t border-border-primary p-4">
                       <motion.a
                         href={`/hris?uid=${employee.id}`}
                         whileHover={{ scale: 1.03 }}

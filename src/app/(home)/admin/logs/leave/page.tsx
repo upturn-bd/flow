@@ -136,34 +136,34 @@ export default function LeaveLogsPage() {
 
       return (
          <div className="overflow-x-auto">
-            <table className="w-full table-auto border border-gray-200 rounded-lg shadow-sm">
-               <thead className="bg-gray-100 text-gray-700 uppercase text-sm">
+            <table className="w-full table-auto border border-border-primary rounded-lg shadow-sm">
+               <thead className="bg-background-secondary dark:bg-background-tertiary text-foreground-secondary uppercase text-sm">
                   <tr>
-                     <th className="px-4 py-3 border-b">Employee</th>
-                     <th className="px-4 py-3 border-b">Leave Type</th>
-                     <th className="px-4 py-3 border-b">Dates</th>
-                     <th className="px-4 py-3 border-b">Total Days</th>
-                     <th className="px-4 py-3 border-b">Status</th>
-                     <th className="px-4 py-3 border-b">Actions</th>
+                     <th className="px-4 py-3 border-b border-border-primary">Employee</th>
+                     <th className="px-4 py-3 border-b border-border-primary">Leave Type</th>
+                     <th className="px-4 py-3 border-b border-border-primary">Dates</th>
+                     <th className="px-4 py-3 border-b border-border-primary">Total Days</th>
+                     <th className="px-4 py-3 border-b border-border-primary">Status</th>
+                     <th className="px-4 py-3 border-b border-border-primary">Actions</th>
                   </tr>
                </thead>
                <tbody>
                   {leaveRequests.map((leave, idx) => (
                      <tr
                         key={leave.id}
-                        className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 transition-all cursor-pointer`}
+                        className={`${idx % 2 === 0 ? "bg-surface-primary" : "bg-background-secondary dark:bg-background-tertiary"} hover:bg-surface-hover dark:hover:bg-surface-hover transition-all cursor-pointer`}
                         onClick={() => setSelectedLeave(leave)}
                      >
-                        <td className="px-4 py-3 border-b font-medium text-gray-800">
+                        <td className="px-4 py-3 border-b border-border-primary font-medium text-foreground-primary">
                            {employeeNames[leave.employee_id] || "Unknown"}
                         </td>
-                        <td className="px-4 py-3 border-b text-gray-600">{getLeaveTypeName(leave.type_id)}</td>
-                        <td className="px-4 py-3 border-b text-gray-600">
+                        <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">{getLeaveTypeName(leave.type_id)}</td>
+                        <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">
                            {leave.start_date} to {leave.end_date}
                         </td>
-                        <td className="px-4 py-3 border-b text-gray-600">{calculateTotalDays(leave.start_date, leave.end_date)}</td>
-                        <td className="px-4 py-3 border-b">
-                           <span className={`px-3 py-1 text-sm font-medium rounded-full ${statusStyles[leave.status] || "bg-gray-100 text-gray-700"}`}>
+                        <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">{calculateTotalDays(leave.start_date, leave.end_date)}</td>
+                        <td className="px-4 py-3 border-b border-border-primary">
+                           <span className={`px-3 py-1 text-sm font-medium rounded-full ${statusStyles[leave.status] || "bg-background-secondary dark:bg-background-tertiary text-foreground-secondary"}`}>
                               {leave.status}
                            </span>
                         </td>

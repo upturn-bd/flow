@@ -159,14 +159,14 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
           <motion.div variants={fadeInUp} className="relative mb-4">
             <Search
               size={16}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
             />
             <input
               type="text"
               value={searchTerm}
               onChange={handleSearchChange}
               placeholder="Search completed projects..."
-              className="w-full border rounded pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring focus:border-blue-300"
+              className="w-full border border-border-primary rounded pl-9 pr-3 py-2 text-sm bg-surface-primary text-foreground-primary focus:outline-none focus:ring focus:border-primary-300"
             />
           </motion.div>
 

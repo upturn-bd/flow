@@ -278,7 +278,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
           )}
         </div>
         
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+        <div className="bg-background-primary rounded-lg border border-border-primary overflow-hidden shadow-sm">
           {isDataLoading ? (
             <LoadingSpinner 
               color="emerald"
@@ -305,7 +305,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
               )}
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border-primary">
               {educationToShow.map((edu) => (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -384,7 +384,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
           )}
         </div>
         
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+        <div className="bg-background-primary rounded-lg border border-border-primary overflow-hidden shadow-sm">
           {isDataLoading ? (
             <LoadingSpinner 
               color="blue"
@@ -411,7 +411,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
               )}
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border-primary">
               {experienceToShow.map((exp) => (
                 <motion.div
                   initial={{ opacity: 0 }}

@@ -21,8 +21,8 @@ const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
         <textarea
           ref={ref}
           className={`
-            w-full rounded-lg border-gray-300 border p-2.5 
-            focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+            w-full rounded-lg border-border-secondary border p-2.5 
+            focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
             transition-all shadow-sm text-sm sm:text-base resize-vertical
             ${error ? 'border-red-500 focus:ring-red-500' : ''}
             ${className}

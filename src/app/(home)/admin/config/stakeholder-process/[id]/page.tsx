@@ -132,7 +132,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           <button
             onClick={handleToggleActive}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 border border-border-secondary rounded-lg hover:bg-gray-50 transition-colors font-medium"
           >
             {process.is_active ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
             {process.is_active ? "Deactivate" : "Activate"}
@@ -148,7 +148,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* Step Manager */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+      <div className="bg-white rounded-lg border border-border-primary p-4 sm:p-6 shadow-sm">
         <StepManager
           processId={processId}
           steps={steps}

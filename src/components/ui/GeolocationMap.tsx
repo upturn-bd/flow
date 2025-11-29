@@ -76,7 +76,7 @@ export default function GeolocationMap({ value, onChange }: GeolocationMapProps)
 
   if (!mounted) {
     return (
-      <div className="w-full h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
+      <div className="w-full h-[400px] bg-background-secondary dark:bg-background-secondary rounded-lg flex items-center justify-center">
         Loading map...
       </div>
     );
@@ -85,7 +85,7 @@ export default function GeolocationMap({ value, onChange }: GeolocationMapProps)
   const center = value || DEFAULT_POSITION;
 
   return (
-    <div className="w-full h-[400px] rounded-lg overflow-hidden border border-gray-300">
+    <div className="w-full h-[400px] rounded-lg overflow-hidden border border-border-primary dark:border-border-primary">
       <MapContainer
         center={[center.latitude, center.longitude]}
         zoom={13}

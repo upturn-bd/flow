@@ -130,7 +130,7 @@ export default function MilestoneList({
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="border border-gray-200 rounded-lg p-4 space-y-3 hover:shadow-sm transition-shadow"
+                  className="border border-border-primary rounded-lg p-4 space-y-3 hover:shadow-sm transition-shadow"
                 >
                   <div className="flex items-center justify-between">
                     <h4 className="font-semibold text-lg text-gray-900">
@@ -193,7 +193,7 @@ export default function MilestoneList({
                   </div>
                   
                   {m.assignees && m.assignees.length > 0 && (
-                    <div className="pt-2 border-t border-gray-100">
+                    <div className="pt-2 border-t border-border-primary">
                       <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                         <Users size={14} />
                         <span>Assigned to:</span>

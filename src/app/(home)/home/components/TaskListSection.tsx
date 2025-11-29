@@ -37,7 +37,7 @@ export default function TaskListSection({
       ) : (
         <motion.div
           variants={staggerContainer} 
-          className="bg-white rounded-xl p-5 shadow-sm border border-gray-100"
+          className="bg-surface-primary rounded-xl p-5 shadow-sm border border-border-primary"
         >
           <div className="space-y-3">
             {tasks.length > 0 ? (

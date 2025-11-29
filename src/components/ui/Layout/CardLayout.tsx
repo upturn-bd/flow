@@ -62,8 +62,8 @@ export function CardLayout({
   ...props
 }: CardLayoutProps) {
   const cardClasses = `
-    bg-white
-    ${border ? "border border-gray-200" : ""}
+    bg-background-primary
+    ${border ? "border border-border-primary" : ""}
     ${shadowClasses[shadow]}
     ${roundedClasses[rounded]}
     ${clickable ? "cursor-pointer" : ""}
@@ -81,19 +81,19 @@ export function CardLayout({
       {/* Header */}
       {(title || subtitle || headerAction) && (
         <div className={`
-          border-b border-gray-200 pb-4 mb-4
+          border-b border-border-primary pb-4 mb-4
           ${paddingClasses[padding]} 
           ${padding === "none" ? "pb-4 mb-4" : ""}
         `}>
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
               {title && (
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                <h3 className="text-lg font-semibold text-foreground-primary mb-1">
                   {title}
                 </h3>
               )}
               {subtitle && (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-foreground-secondary">
                   {subtitle}
                 </p>
               )}
@@ -115,7 +115,7 @@ export function CardLayout({
       {/* Footer */}
       {footer && (
         <div className={`
-          border-t border-gray-200 pt-4 mt-4
+          border-t border-border-primary pt-4 mt-4
           ${paddingClasses[padding]}
           ${padding === "none" ? "pt-4 mt-4" : ""}
         `}>

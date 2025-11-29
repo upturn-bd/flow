@@ -34,9 +34,9 @@ export function EmptyState({
         initial={{ scale: 0.8, opacity: 0.5 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4"
+        className="w-16 h-16 bg-background-secondary dark:bg-background-tertiary rounded-full flex items-center justify-center mb-4"
       >
-        <div className="text-gray-400 text-2xl">
+        <div className="text-foreground-tertiary text-2xl">
           {icon}
         </div>
       </motion.div>
@@ -45,7 +45,7 @@ export function EmptyState({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="text-lg font-semibold text-gray-900 mb-2"
+        className="text-lg font-semibold text-foreground-primary mb-2"
       >
         {title}
       </motion.h3>
@@ -54,7 +54,7 @@ export function EmptyState({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="text-gray-600 mb-6 max-w-md"
+        className="text-foreground-secondary mb-6 max-w-md"
       >
         {description}
       </motion.p>

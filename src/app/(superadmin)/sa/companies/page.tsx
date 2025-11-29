@@ -245,13 +245,13 @@ export default function CompaniesPage() {
           <div className="flex items-center bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-md transition-colors ${viewMode === "grid" ? "bg-white shadow text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+              className={`p-2 rounded-md transition-colors ${viewMode === "grid" ? "bg-surface-primary shadow text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
             >
               <SquaresFour size={20} />
             </button>
             <button
               onClick={() => setViewMode("table")}
-              className={`p-2 rounded-md transition-colors ${viewMode === "table" ? "bg-white shadow text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+              className={`p-2 rounded-md transition-colors ${viewMode === "table" ? "bg-surface-primary shadow text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
             >
               <List size={20} />
             </button>
@@ -271,7 +271,7 @@ export default function CompaniesPage() {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-100 rounded-lg">
               <Buildings size={20} className="text-blue-600" />
@@ -282,7 +282,7 @@ export default function CompaniesPage() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-green-100 rounded-lg">
               <Users size={20} className="text-green-600" />
@@ -295,7 +295,7 @@ export default function CompaniesPage() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-purple-100 rounded-lg">
               <UsersThree size={20} className="text-purple-600" />
@@ -308,7 +308,7 @@ export default function CompaniesPage() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-orange-100 rounded-lg">
               <Lightning size={20} className="text-orange-600" />
@@ -324,7 +324,7 @@ export default function CompaniesPage() {
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-4">
         <div className="relative">
           <MagnifyingGlass
             size={20}
@@ -335,14 +335,14 @@ export default function CompaniesPage() {
             placeholder="Search companies by name or code..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-4 py-2.5 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
         </div>
       </div>
 
       {/* Companies Grid/Table */}
       {loading ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12">
+        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12">
           <div className="flex flex-col items-center justify-center text-gray-500">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
             <p>Loading companies...</p>
@@ -358,7 +358,7 @@ export default function CompaniesPage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                className="bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden hover:shadow-md transition-shadow"
               >
                 <div className="p-5">
                   <div className="flex items-start justify-between mb-3">
@@ -455,7 +455,7 @@ export default function CompaniesPage() {
                               type="checkbox"
                               checked={company.live_absent_enabled}
                               onChange={() => toggleFeature(company, 'live_absent_enabled')}
-                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="rounded border-border-secondary text-blue-600 focus:ring-blue-500"
                             />
                           </label>
                           <label className="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
@@ -467,7 +467,7 @@ export default function CompaniesPage() {
                               type="checkbox"
                               checked={company.live_payroll_enabled}
                               onChange={() => toggleFeature(company, 'live_payroll_enabled')}
-                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="rounded border-border-secondary text-blue-600 focus:ring-blue-500"
                             />
                           </label>
                           <label className="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
@@ -479,7 +479,7 @@ export default function CompaniesPage() {
                               type="checkbox"
                               checked={company.has_division}
                               onChange={() => toggleFeature(company, 'has_division')}
-                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="rounded border-border-secondary text-blue-600 focus:ring-blue-500"
                             />
                           </label>
                         </div>
@@ -508,7 +508,7 @@ export default function CompaniesPage() {
           </AnimatePresence>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
@@ -521,7 +521,7 @@ export default function CompaniesPage() {
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border-primary">
                 {filteredCompanies.map((company) => (
                   <tr key={company.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -608,7 +608,7 @@ export default function CompaniesPage() {
       )}
 
       {filteredCompanies.length === 0 && !loading && viewMode === "grid" && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12 text-center">
           <Buildings size={48} className="mx-auto text-gray-300 mb-4" />
           <p className="text-gray-500">No companies found</p>
         </div>
@@ -632,7 +632,7 @@ export default function CompaniesPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
+              className="bg-surface-primary rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
             >
               <div className="p-6 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
                 <div className="flex items-center justify-between">
@@ -654,7 +654,7 @@ export default function CompaniesPage() {
                       setShowModal(false);
                       resetForm();
                     }}
-                    className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+                    className="p-2 hover:bg-surface-primary/50 rounded-lg transition-colors"
                   >
                     <X size={20} />
                   </button>
@@ -672,7 +672,7 @@ export default function CompaniesPage() {
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       placeholder="Enter company name"
                     />
                   </div>
@@ -696,7 +696,7 @@ export default function CompaniesPage() {
                       }}
                       placeholder="e.g., MyCompany@2024"
                       className={`w-full px-3 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all ${
-                        codeError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-200'
+                        codeError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-border-primary'
                       }`}
                     />
                     {codeError ? (
@@ -719,7 +719,7 @@ export default function CompaniesPage() {
                       required
                       value={formData.industry_id}
                       onChange={(e) => setFormData({ ...formData, industry_id: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     >
                       <option value="">Select Industry</option>
                       {industries.map((industry) => (
@@ -738,7 +738,7 @@ export default function CompaniesPage() {
                       required
                       value={formData.country_id}
                       onChange={(e) => setFormData({ ...formData, country_id: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     >
                       <option value="">Select Country</option>
                       {countries.map((country) => (
@@ -759,7 +759,7 @@ export default function CompaniesPage() {
                       max="31"
                       value={formData.payroll_generation_day}
                       onChange={(e) => setFormData({ ...formData, payroll_generation_day: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
                   </div>
 
@@ -771,14 +771,14 @@ export default function CompaniesPage() {
                       type="date"
                       value={formData.fiscal_year_start}
                       onChange={(e) => setFormData({ ...formData, fiscal_year_start: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
                   </div>
                 </div>
 
                 <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Feature Settings</h3>
-                  <label className="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                  <label className="flex items-center justify-between p-3 bg-surface-primary rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="p-1.5 bg-green-100 rounded-lg">
                         <Lightning size={18} className="text-green-600" />
@@ -792,11 +792,11 @@ export default function CompaniesPage() {
                       type="checkbox"
                       checked={formData.live_absent_enabled}
                       onChange={(e) => setFormData({ ...formData, live_absent_enabled: e.target.checked })}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-border-secondary text-blue-600 focus:ring-blue-500"
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                  <label className="flex items-center justify-between p-3 bg-surface-primary rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="p-1.5 bg-blue-100 rounded-lg">
                         <CurrencyDollar size={18} className="text-blue-600" />
@@ -810,11 +810,11 @@ export default function CompaniesPage() {
                       type="checkbox"
                       checked={formData.live_payroll_enabled}
                       onChange={(e) => setFormData({ ...formData, live_payroll_enabled: e.target.checked })}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-border-secondary text-blue-600 focus:ring-blue-500"
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                  <label className="flex items-center justify-between p-3 bg-surface-primary rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="p-1.5 bg-purple-100 rounded-lg">
                         <TreeStructure size={18} className="text-purple-600" />
@@ -828,7 +828,7 @@ export default function CompaniesPage() {
                       type="checkbox"
                       checked={formData.has_division}
                       onChange={(e) => setFormData({ ...formData, has_division: e.target.checked })}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-border-secondary text-blue-600 focus:ring-blue-500"
                     />
                   </label>
                 </div>
@@ -841,7 +841,7 @@ export default function CompaniesPage() {
                     setShowModal(false);
                     resetForm();
                   }}
-                  className="px-4 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="px-4 py-2.5 border border-border-secondary rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   Cancel
                 </button>

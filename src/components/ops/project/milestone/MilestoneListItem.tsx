@@ -28,7 +28,7 @@ const MilestoneListItem: React.FC<MilestoneListItemProps> = ({
       key={milestone.id ?? index}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="border border-gray-200 rounded-lg p-4 space-y-3"
+      className="border border-border-primary rounded-lg p-4 space-y-3"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center justify-center gap-3">

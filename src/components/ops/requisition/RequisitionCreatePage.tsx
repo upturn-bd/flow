@@ -315,7 +315,7 @@ export default function RequisitionCreatePage({
       </div>
 
       <div
-        className="flex items-center cursor-pointer gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200"
+        className="flex items-center cursor-pointer gap-2 bg-gray-50 p-3 rounded-lg border border-border-primary"
         onClick={() => setIsOneOff(!isOneOff)}
       >
         <div
@@ -337,7 +337,7 @@ export default function RequisitionCreatePage({
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200"
+        className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-border-primary"
       >
         <div className="space-y-4">
           <div>
@@ -351,7 +351,7 @@ export default function RequisitionCreatePage({
                 value={requisitionState.requisition_category_id}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur('requisition_category_id')}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value={undefined}>Select category</option>
                 {requisitionTypes.length > 0 &&
@@ -384,7 +384,7 @@ export default function RequisitionCreatePage({
                 value={requisitionState.item_id}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur('item_id')}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value={undefined}>Select item</option>
                 {requisitionInventories.length > 0 &&
@@ -423,7 +423,7 @@ export default function RequisitionCreatePage({
               value={requisitionState.quantity || ""}
               onChange={handleInputChange}
               onBlur={() => handleFieldBlur('quantity')}
-              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
             {touchedFields.quantity && errors.quantity && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
@@ -439,7 +439,7 @@ export default function RequisitionCreatePage({
                 <Calendar size={16} className="mr-2" />
                 Date
               </label>
-              <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+              <div className="relative bg-gray-50 border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
                 <Calendar size={16} className="ml-3 text-gray-500" />
                 <input
                   type="date"
@@ -465,7 +465,7 @@ export default function RequisitionCreatePage({
                     <Clock size={16} className="mr-2" />
                     From
                   </label>
-                  <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+                  <div className="relative bg-gray-50 border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
                     <Clock size={16} className="ml-3 text-gray-500" />
                     <input
                       type="time"
@@ -489,7 +489,7 @@ export default function RequisitionCreatePage({
                     <Clock size={16} className="mr-2" />
                     To
                   </label>
-                  <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+                  <div className="relative bg-gray-50 border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
                     <Clock size={16} className="ml-3 text-gray-500" />
                     <input
                       type="time"
@@ -522,7 +522,7 @@ export default function RequisitionCreatePage({
               value={requisitionState.description}
               onChange={handleInputChange}
               placeholder="Max 35 characters"
-              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
           </div>
 
@@ -531,7 +531,7 @@ export default function RequisitionCreatePage({
               <Upload size={16} className="mr-2" />
               Attachment
             </label>
-            <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <div className="bg-gray-50 border border-dashed border-border-secondary rounded-lg p-6 text-center">
               <Upload className="mx-auto mb-4 text-gray-400 h-10 w-10" />
               <p className="text-sm text-gray-500 mb-4">
                 Drag and drop files here, or
@@ -575,7 +575,7 @@ export default function RequisitionCreatePage({
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
-                        className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm"
+                        className="flex items-center gap-2 bg-white border border-border-primary px-3 py-2 rounded-lg text-sm"
                       >
                         <FileText size={14} className="text-blue-500" />
                         <span className="truncate max-w-xs">{file.name}</span>
@@ -1053,11 +1053,11 @@ export function RequisitionDraftPage({
           <label className="block font-bold text-[#003366] mb-1">
             Attachment
           </label>
-          <div className="bg-gray-100 rounded-md border border-gray-300 p-6 text-center text-sm text-gray-500">
+          <div className="bg-gray-100 rounded-md border border-border-secondary p-6 text-center text-sm text-gray-500">
             <CloudUpload className="mx-auto mb-4 text-2xl" />
             <label
               htmlFor="file_upload"
-              className="px-4 py-2 bg-white border border-gray-400 text-sm rounded-md cursor-pointer hover:bg-gray-200 transition"
+              className="px-4 py-2 bg-white border border-border-secondary text-sm rounded-md cursor-pointer hover:bg-gray-200 transition"
             >
               Browse File
             </label>

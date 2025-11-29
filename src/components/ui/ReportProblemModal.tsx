@@ -159,19 +159,19 @@ export default function ReportProblemModal({
             animate="visible"
             exit="hidden"
           >
-            <div className="bg-white rounded-xl w-full max-h-[calc(100vh-2rem)] overflow-y-auto shadow-2xl">
+            <div className="bg-surface-primary dark:bg-surface-primary rounded-xl w-full max-h-[calc(100vh-2rem)] overflow-y-auto shadow-2xl">
               {/* Header */}
-              <div className="flex items-center justify-between p-5 sm:p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between p-5 sm:p-6 border-b border-border-primary dark:border-border-primary">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-red-100 rounded-lg">
-                    <Bug size={20} className="text-red-600" />
+                  <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                    <Bug size={20} className="text-red-600 dark:text-red-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-[#192D46]">
+                    <h2 className="text-xl font-bold text-foreground-primary dark:text-foreground-primary">
                       Report a Problem
                     </h2>
                     {(moduleName || moduleCategory) && (
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-foreground-secondary dark:text-foreground-secondary">
                         {[moduleCategory, moduleName].filter(Boolean).join(" • ")}
                       </p>
                     )}
@@ -180,10 +180,10 @@ export default function ReportProblemModal({
                 <button
                   onClick={onClose}
                   disabled={isSubmitting}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:opacity-50"
+                  className="p-2 hover:bg-surface-hover dark:hover:bg-surface-hover rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 disabled:opacity-50"
                   aria-label="Close modal"
                 >
-                  <X size={20} className="text-gray-500" />
+                  <X size={20} className="text-foreground-secondary dark:text-foreground-secondary" />
                 </button>
               </div>
 
@@ -195,13 +195,13 @@ export default function ReportProblemModal({
                     animate={{ opacity: 1, scale: 1 }}
                     className="flex flex-col items-center justify-center py-8 text-center"
                   >
-                    <div className="p-3 bg-green-100 rounded-full mb-4">
-                      <CheckCircle size={40} className="text-green-600" />
+                    <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
+                      <CheckCircle size={40} className="text-green-600 dark:text-green-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg font-semibold text-foreground-primary dark:text-foreground-primary mb-2">
                       Thank you for your feedback!
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-foreground-secondary dark:text-foreground-secondary">
                       Your report has been submitted and our team will review it.
                     </p>
                   </motion.div>
@@ -209,7 +209,7 @@ export default function ReportProblemModal({
                   <form onSubmit={handleSubmit} className="space-y-5">
                     {/* Feedback Type */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground-primary dark:text-foreground-primary mb-2">
                         What type of feedback?
                       </label>
                       <div className="grid grid-cols-2 gap-2">
@@ -220,16 +220,16 @@ export default function ReportProblemModal({
                             onClick={() => setFeedbackType(type.value)}
                             className={`p-3 rounded-lg border-2 text-left transition-all ${
                               feedbackType === type.value
-                                ? "border-blue-500 bg-blue-50"
-                                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                                ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
+                                : "border-border-primary dark:border-border-primary hover:border-border-secondary hover:bg-surface-hover dark:hover:bg-surface-hover"
                             }`}
                           >
                             <span className={`block font-medium text-sm ${
-                              feedbackType === type.value ? "text-blue-700" : "text-gray-800"
+                              feedbackType === type.value ? "text-primary-700 dark:text-primary-300" : "text-foreground-primary dark:text-foreground-primary"
                             }`}>
                               {type.label}
                             </span>
-                            <span className="block text-xs text-gray-500 mt-0.5">
+                            <span className="block text-xs text-foreground-tertiary dark:text-foreground-tertiary mt-0.5">
                               {type.description}
                             </span>
                           </button>
@@ -239,7 +239,7 @@ export default function ReportProblemModal({
 
                     {/* Title */}
                     <div>
-                      <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="title" className="block text-sm font-medium text-foreground-primary dark:text-foreground-primary mb-1">
                         Title <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -248,7 +248,7 @@ export default function ReportProblemModal({
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="Brief summary of the issue"
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                        className="w-full px-4 py-2.5 border border-border-primary dark:border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all bg-surface-primary dark:bg-surface-primary text-foreground-primary dark:text-foreground-primary"
                         disabled={isSubmitting}
                         maxLength={100}
                       />
@@ -256,7 +256,7 @@ export default function ReportProblemModal({
 
                     {/* Description */}
                     <div>
-                      <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="description" className="block text-sm font-medium text-foreground-primary dark:text-foreground-primary mb-1">
                         Description <span className="text-red-500">*</span>
                       </label>
                       <textarea
@@ -265,11 +265,11 @@ export default function ReportProblemModal({
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="Please describe the issue in detail. What were you trying to do? What happened instead? Any steps to reproduce?"
                         rows={5}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
+                        className="w-full px-4 py-2.5 border border-border-primary dark:border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all resize-none bg-surface-primary dark:bg-surface-primary text-foreground-primary dark:text-foreground-primary"
                         disabled={isSubmitting}
                         maxLength={2000}
                       />
-                      <p className="text-xs text-gray-400 mt-1 text-right">
+                      <p className="text-xs text-foreground-tertiary dark:text-foreground-tertiary mt-1 text-right">
                         {description.length}/2000
                       </p>
                     </div>
@@ -279,14 +279,14 @@ export default function ReportProblemModal({
                       <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+                        className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm"
                       >
                         {error}
                       </motion.div>
                     )}
 
                     {/* Info Note */}
-                    <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">
+                    <div className="p-3 bg-background-secondary dark:bg-background-secondary border border-border-primary dark:border-border-primary rounded-lg text-sm text-foreground-secondary dark:text-foreground-secondary">
                       <p>
                         <strong>Note:</strong> Your feedback will include your name, email, and current page context to help us investigate the issue.
                       </p>
@@ -298,14 +298,14 @@ export default function ReportProblemModal({
                         type="button"
                         onClick={onClose}
                         disabled={isSubmitting}
-                        className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                        className="flex-1 px-4 py-2.5 border border-border-primary dark:border-border-primary text-foreground-primary dark:text-foreground-primary font-medium rounded-lg hover:bg-surface-hover dark:hover:bg-surface-hover transition-colors disabled:opacity-50"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
                         disabled={isSubmitting || !title.trim() || !description.trim()}
-                        className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="flex-1 px-4 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
                         {isSubmitting ? (
                           <>

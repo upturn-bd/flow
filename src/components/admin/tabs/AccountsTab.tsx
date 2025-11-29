@@ -73,13 +73,13 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-foreground-secondary">
           Additional Data (Optional)
         </label>
         <button
           type="button"
           onClick={addPair}
-          className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+          className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-primary-600 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-md hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors"
         >
           <Plus size={14} className="mr-1" />
           Add Field
@@ -87,33 +87,33 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
       </div>
 
       {pairs.length === 0 ? (
-        <div className="text-center py-4 border-2 border-dashed border-gray-200 rounded-lg">
-          <p className="text-sm text-gray-500 italic">No additional data fields</p>
-          <p className="text-xs text-gray-400 mt-1">Click "Add Field" to create key-value pairs</p>
+        <div className="text-center py-4 border-2 border-dashed border-border-primary rounded-lg">
+          <p className="text-sm text-foreground-tertiary italic">No additional data fields</p>
+          <p className="text-xs text-foreground-tertiary mt-1">Click "Add Field" to create key-value pairs</p>
         </div>
       ) : (
         <div className="space-y-2 max-h-48 overflow-y-auto">
           {pairs.map((pair, index) => (
-            <div key={index} className="flex gap-2 items-center p-2 bg-gray-50 rounded-lg">
+            <div key={index} className="flex gap-2 items-center p-2 bg-background-secondary rounded-lg">
               <input
                 type="text"
                 placeholder="Key (e.g., reference)"
                 value={pair.key}
                 onChange={(e) => updatePair(index, 'key', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="flex-1 px-3 py-2 border border-border-primary rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary text-foreground-primary"
               />
-              <span className="text-gray-400 font-mono">:</span>
+              <span className="text-foreground-tertiary font-mono">:</span>
               <input
                 type="text"
                 placeholder="Value (e.g., REF123)"
                 value={pair.value}
                 onChange={(e) => updatePair(index, 'value', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="flex-1 px-3 py-2 border border-border-primary rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary text-foreground-primary"
               />
               <button
                 type="button"
                 onClick={() => removePair(index)}
-                className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+                className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
                 title="Remove field"
               >
                 <X size={16} />
@@ -178,7 +178,7 @@ export default function AccountsTab() {
   // Helper function to format additional data for display
   const formatAdditionalData = (data: any) => {
     if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
-      return <span className="text-gray-500 italic text-xs">No additional data</span>;
+      return <span className="text-foreground-tertiary italic text-xs">No additional data</span>;
     }
 
     const entries = Object.entries(data);
@@ -189,7 +189,7 @@ export default function AccountsTab() {
         {entries.slice(0, displayCount).map(([key, value]) => (
           <span
             key={key}
-            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border max-w-32"
+            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 border max-w-32"
             title={`${key}: ${value}`}
           >
             <span className="font-semibold">{key}:</span>
@@ -200,7 +200,7 @@ export default function AccountsTab() {
         ))}
         {entries.length > displayCount && (
           <span
-            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 cursor-help"
+            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-background-secondary text-foreground-secondary cursor-help"
             title={`Additional fields: ${entries.slice(displayCount).map(([k, v]) => `${k}: ${v}`).join(', ')}`}
           >
             +{entries.length - displayCount} more
@@ -358,10 +358,10 @@ export default function AccountsTab() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm p-6"
+        className="flex flex-col items-center justify-center h-64 bg-surface-primary rounded-xl shadow-sm p-6"
       >
-        <Loader className="w-12 h-12 text-gray-500 animate-spin mb-4" />
-        <p className="text-gray-600">Loading accounts...</p>
+        <Loader className="w-12 h-12 text-foreground-tertiary animate-spin mb-4" />
+        <p className="text-foreground-secondary">Loading accounts...</p>
       </motion.div>
     );
   }
@@ -371,7 +371,7 @@ export default function AccountsTab() {
         {/* Header with Summary */}
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 sm:p-6 text-white"
+          className="bg-gradient-to-r from-primary-500 to-primary-600 dark:from-primary-600 dark:to-primary-700 rounded-xl p-4 sm:p-6 text-white"
         >
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
             <div className="flex items-center gap-2 sm:gap-3">
@@ -427,17 +427,17 @@ export default function AccountsTab() {
         {/* Filters and Search */}
         <motion.div
           variants={fadeInUp}
-          className="bg-white rounded-xl shadow-sm p-4 sm:p-6 space-y-4"
+          className="bg-surface-primary rounded-xl shadow-sm p-4 sm:p-6 space-y-4"
         >
           {/* Search Bar */}
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary" />
             <input
               type="text"
               placeholder="Search transactions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-border-primary bg-surface-primary text-foreground-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
             />
           </div>
 
@@ -445,14 +445,14 @@ export default function AccountsTab() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {/* Status Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Filter size={12} className="inline mr-1" />
                 Status
               </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-primary bg-surface-primary text-foreground-primary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               >
                 <option value="All">All Status</option>
                 <option value="Complete">Complete</option>
@@ -462,14 +462,14 @@ export default function AccountsTab() {
 
             {/* Payment Method Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <CreditCard size={12} className="inline mr-1" />
                 Payment Method
               </label>
               <select
                 value={methodFilter}
                 onChange={(e) => setMethodFilter(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-primary bg-surface-primary text-foreground-primary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               >
                 <option value="All">All Methods</option>
                 {PAYMENT_METHODS.map(method => (
@@ -480,7 +480,7 @@ export default function AccountsTab() {
 
             {/* Start Date Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Calendar size={12} className="inline mr-1" />
                 Start Date
               </label>
@@ -488,13 +488,13 @@ export default function AccountsTab() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-primary bg-surface-primary text-foreground-primary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               />
             </div>
 
             {/* End Date Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Calendar size={12} className="inline mr-1" />
                 End Date
               </label>
@@ -502,20 +502,20 @@ export default function AccountsTab() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-primary bg-surface-primary text-foreground-primary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               />
             </div>
 
             {/* Stakeholder Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Users size={12} className="inline mr-1" />
                 Stakeholder
               </label>
               <select
                 value={stakeholderFilter}
                 onChange={(e) => setStakeholderFilter(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-primary bg-surface-primary text-foreground-primary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               >
                 <option value="All">All Stakeholders</option>
                 <option value="none">No Stakeholder</option>
@@ -527,7 +527,7 @@ export default function AccountsTab() {
 
             {/* Min Amount Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <DollarSign size={12} className="inline mr-1" />
                 Min Amount
               </label>
@@ -536,13 +536,13 @@ export default function AccountsTab() {
                 placeholder="Min"
                 value={minAmount}
                 onChange={(e) => setMinAmount(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-primary bg-surface-primary text-foreground-primary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               />
             </div>
 
             {/* Max Amount Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <DollarSign size={12} className="inline mr-1" />
                 Max Amount
               </label>
@@ -551,7 +551,7 @@ export default function AccountsTab() {
                 placeholder="Max"
                 value={maxAmount}
                 onChange={(e) => setMaxAmount(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-primary bg-surface-primary text-foreground-primary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               />
             </div>
 
@@ -569,7 +569,7 @@ export default function AccountsTab() {
                   setMaxAmount('');
                   setStakeholderFilter('All');
                 }}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
+                className="w-full bg-background-secondary hover:bg-background-tertiary text-foreground-secondary px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
               >
                 <X size={14} />
                 Reset to Last 30 Days
@@ -578,9 +578,9 @@ export default function AccountsTab() {
           </div>
 
           {/* Active Filters Summary */}
-          <div className="flex items-center gap-2 text-xs text-gray-600 bg-blue-50 p-3 rounded-lg">
-            <Filter size={12} className="text-blue-600" />
-            <span className="font-medium text-blue-900">
+          <div className="flex items-center gap-2 text-xs text-foreground-secondary bg-primary-50 dark:bg-primary-900/20 p-3 rounded-lg">
+            <Filter size={12} className="text-primary-600" />
+            <span className="font-medium text-primary-900 dark:text-primary-200">
               Showing {filteredAccounts.length} transaction{filteredAccounts.length !== 1 ? 's' : ''} from {startDate} to {endDate}
             </span>
           </div>
@@ -589,11 +589,11 @@ export default function AccountsTab() {
         {/* Accounts List */}
         <motion.div
           variants={fadeInUp}
-          className="bg-white rounded-xl shadow-sm overflow-hidden"
+          className="bg-surface-primary rounded-xl shadow-sm overflow-hidden"
         >
           {filteredAccounts.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <CreditCard size={48} className="mx-auto mb-4 text-gray-300" />
+            <div className="p-8 text-center text-foreground-tertiary">
+              <CreditCard size={48} className="mx-auto mb-4 text-foreground-tertiary" />
               <p className="text-lg font-medium mb-2">No transactions found</p>
               <p className="text-sm">Create your first transaction to get started</p>
             </div>
@@ -602,46 +602,46 @@ export default function AccountsTab() {
               {/* Desktop Table View */}
               <div className="hidden lg:block overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-background-secondary dark:bg-background-tertiary">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stakeholder</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Title</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Stakeholder</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Method</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">From</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Date</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Amount</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Data</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-surface-primary divide-y divide-border-primary">
                     {filteredAccounts.map((account) => (
-                      <tr key={account.id} className="hover:bg-gray-50">
+                      <tr key={account.id} className="hover:bg-background-secondary dark:hover:bg-background-tertiary">
                         <td className="px-4 py-3">
-                          <div className="font-medium text-gray-900 text-sm">{account.title}</div>
+                          <div className="font-medium text-foreground-primary text-sm">{account.title}</div>
                         </td>
                         <td className="px-4 py-3">
                           {account.stakeholder ? (
                             <div className="flex items-center gap-1">
-                              <Users size={12} className="text-blue-500 flex-shrink-0" />
-                              <span className="text-xs text-gray-900 truncate max-w-[100px]" title={account.stakeholder.name}>
+                              <Users size={12} className="text-primary-500 flex-shrink-0" />
+                              <span className="text-xs text-foreground-primary truncate max-w-[100px]" title={account.stakeholder.name}>
                                 {account.stakeholder.name}
                               </span>
                             </div>
                           ) : (
-                            <span className="text-gray-400 text-xs italic">None</span>
+                            <span className="text-foreground-tertiary text-xs italic">None</span>
                           )}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-background-secondary text-foreground-primary">
                             {account.method || 'N/A'}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-xs text-gray-900 max-w-[120px] truncate" title={account.from_source}>
+                        <td className="px-4 py-3 text-xs text-foreground-primary max-w-[120px] truncate" title={account.from_source}>
                           {account.from_source}
                         </td>
-                        <td className="px-4 py-3 text-xs text-gray-500">
+                        <td className="px-4 py-3 text-xs text-foreground-tertiary">
                           <div className="flex items-center gap-1">
                             <Calendar size={12} />
                             {formatDate(account.transaction_date)}
@@ -654,8 +654,8 @@ export default function AccountsTab() {
                         </td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${account.status === 'Complete'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
+                            : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
                             }`}>
                             {account.status === 'Complete' ? (
                               <><CheckCircle size={10} className="mr-1" />Complete</>
@@ -671,14 +671,14 @@ export default function AccountsTab() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleEditClick(account)}
-                              className="text-blue-600 hover:text-blue-800 transition-colors"
+                              className="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
                               title="Edit"
                             >
                               <Edit size={14} />
                             </button>
                             <button
                               onClick={() => handleDeleteClick(account)}
-                              className="text-red-600 hover:text-red-800 transition-colors"
+                              className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                               title="Delete"
                             >
                               <Trash size={14} />
@@ -692,25 +692,25 @@ export default function AccountsTab() {
               </div>
 
               {/* Mobile Card View */}
-              <div className="lg:hidden divide-y divide-gray-200">
+              <div className="lg:hidden divide-y divide-border-primary">
                 {filteredAccounts.map((account) => (
                   <motion.div
                     key={account.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 hover:bg-gray-50 transition-colors"
+                    className="p-4 hover:bg-background-secondary dark:hover:bg-background-tertiary transition-colors"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">{account.title}</h3>
-                        <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                        <h3 className="font-semibold text-foreground-primary text-sm mb-1 truncate">{account.title}</h3>
+                        <div className="flex items-center gap-2 text-xs text-foreground-tertiary mb-1">
                           <Calendar size={12} />
                           <span>{formatDate(account.transaction_date)}</span>
                         </div>
                       </div>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ml-2 ${account.status === 'Complete'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
+                        : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
                         }`}>
                         {account.status === 'Complete' ? (
                           <><CheckCircle size={10} className="mr-1" />Complete</>
@@ -722,23 +722,23 @@ export default function AccountsTab() {
 
                     <div className="space-y-2 mb-3">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Amount:</span>
-                        <span className={`font-semibold ${account.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <span className="text-foreground-secondary">Amount:</span>
+                        <span className={`font-semibold ${account.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                           {formatAmount(account.amount, account.currency)}
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">From:</span>
-                        <span className="text-gray-900 text-xs truncate max-w-[180px]" title={account.from_source}>
+                        <span className="text-foreground-secondary">From:</span>
+                        <span className="text-foreground-primary text-xs truncate max-w-[180px]" title={account.from_source}>
                           {account.from_source}
                         </span>
                       </div>
 
                       {account.method && (
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Method:</span>
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          <span className="text-foreground-secondary">Method:</span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-background-secondary text-foreground-primary">
                             {account.method}
                           </span>
                         </div>
@@ -746,33 +746,33 @@ export default function AccountsTab() {
 
                       {account.stakeholder && (
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Stakeholder:</span>
+                          <span className="text-foreground-secondary">Stakeholder:</span>
                           <div className="flex items-center gap-1">
-                            <Users size={12} className="text-blue-500" />
-                            <span className="text-xs text-gray-900">{account.stakeholder.name}</span>
+                            <Users size={12} className="text-primary-500" />
+                            <span className="text-xs text-foreground-primary">{account.stakeholder.name}</span>
                           </div>
                         </div>
                       )}
 
                       {account.additional_data && Object.keys(account.additional_data).length > 0 && (
-                        <div className="pt-2 border-t border-gray-100">
-                          <span className="text-xs text-gray-600 mb-2 block">Additional Data:</span>
+                        <div className="pt-2 border-t border-border-primary">
+                          <span className="text-xs text-foreground-secondary mb-2 block">Additional Data:</span>
                           {formatAdditionalData(account.additional_data)}
                         </div>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                    <div className="flex items-center gap-2 pt-3 border-t border-border-primary">
                       <button
                         onClick={() => handleEditClick(account)}
-                        className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 bg-primary-50 dark:bg-primary-900/30 hover:bg-primary-100 dark:hover:bg-primary-900/50 text-primary-700 dark:text-primary-300 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
                       >
                         <Edit size={14} />
                         Edit
                       </button>
                       <button
                         onClick={() => handleDeleteClick(account)}
-                        className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
                       >
                         <Trash size={14} />
                         Delete

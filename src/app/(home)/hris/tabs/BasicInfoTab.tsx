@@ -362,9 +362,9 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                 <h3 className="font-medium text-lg text-gray-800">{group.title}</h3>
               </div>
               
-              <div className="overflow-hidden border border-gray-200 rounded-lg shadow-sm">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <tbody className="bg-white divide-y divide-gray-200">
+              <div className="overflow-hidden border border-border-primary rounded-lg shadow-sm">
+                <table className="min-w-full divide-y divide-border-primary">
+                  <tbody className="bg-background-primary divide-y divide-border-primary">
                     {group.fields
                       .filter((field: any) => {
                         // Show admin-only fields only to Admin/Manager or for viewing

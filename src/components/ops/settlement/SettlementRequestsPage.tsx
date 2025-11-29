@@ -88,7 +88,7 @@ export default function SettlementRequestsPage() {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <div className="text-red-500 mb-2">Error loading settlement requests</div>
-        <p className="text-gray-600">{error}</p>
+        <p className="text-foreground-secondary">{error}</p>
       </div>
     );
   }
@@ -201,15 +201,15 @@ function SettlementRequestCard({
         </div>
 
         {settlement.description && (
-          <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Description:</h4>
-            <p className="text-sm text-gray-600">{settlement.description}</p>
+          <div className="mb-4 p-3 bg-background-secondary dark:bg-background-tertiary border border-border-primary rounded-lg">
+            <h4 className="text-sm font-medium text-foreground-primary mb-2">Description:</h4>
+            <p className="text-sm text-foreground-secondary">{settlement.description}</p>
           </div>
         )}
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground-primary mb-2">
               <MessageCircle size={16} className="inline mr-2" />
               Add Comment
             </label>
@@ -218,13 +218,13 @@ function SettlementRequestCard({
               onChange={(e) => setComment(e.target.value)}
               placeholder="Add your feedback here..."
               rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full border border-border-primary rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary text-foreground-primary"
             />
           </div>
 
           {settlement.attachments && settlement.attachments.length > 0 && (
             <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+              <h4 className="text-sm font-medium text-foreground-primary mb-2 flex items-center gap-2">
                 <FileText size={16} />
                 Attachments
               </h4>
@@ -235,7 +235,7 @@ function SettlementRequestCard({
                     href={settlement.attachment_download_urls ? settlement.attachment_download_urls[idx] : '#'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 text-xs px-3 py-2 rounded-md"
+                    className="flex items-center gap-2 bg-background-secondary dark:bg-background-tertiary hover:bg-background-tertiary dark:hover:bg-surface-primary transition-colors text-foreground-primary text-xs px-3 py-2 rounded-md"
                   >
                     <FileText size={12} />
                     {extractFileNameFromStoragePath(attachment)}

@@ -47,7 +47,7 @@ export const MapField: React.FC<MapFieldProps> = ({
       
       <div className="relative">
         {isClient ? (
-          <div className="h-64 border border-gray-300 rounded-md overflow-hidden">
+          <div className="h-64 border border-border-secondary rounded-md overflow-hidden">
             <ClientMap
               value={value}
               onChange={onChange}
@@ -55,7 +55,7 @@ export const MapField: React.FC<MapFieldProps> = ({
             />
           </div>
         ) : (
-          <div className="h-64 border border-gray-300 rounded-md bg-gray-100 flex items-center justify-center">
+          <div className="h-64 border border-border-secondary rounded-md bg-background-secondary flex items-center justify-center">
             <MapPin size={32} weight="duotone" className="text-gray-400" />
             <span className="ml-2 text-gray-500">Loading map...</span>
           </div>

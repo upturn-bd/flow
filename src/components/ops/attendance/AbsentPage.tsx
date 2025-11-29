@@ -71,7 +71,7 @@ export default function AttendanceAbsentPage() {
               type="date"
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
-              className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
+              className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
             />
           </div>
 
@@ -83,7 +83,7 @@ export default function AttendanceAbsentPage() {
               type="date"
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
-              className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
+              className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
             />
           </div>
 
@@ -91,7 +91,7 @@ export default function AttendanceAbsentPage() {
             <select
               value={siteId}
               onChange={(e) => setSiteId(e.target.value)}
-              className="appearance-none pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full text-sm"
+              className="appearance-none pl-4 pr-10 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-full text-sm"
             >
               <option value="">Select Site</option>
               {sites.map((site) => (
@@ -116,8 +116,8 @@ export default function AttendanceAbsentPage() {
         {loading ? (
           <LoadingSection text="Loading attendance records..." icon={Ban} color="blue" />
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-gray-200">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="overflow-x-auto rounded-lg border border-border-primary">
+            <table className="min-w-full divide-y divide-border-primary">
               <thead>
                 <tr className="bg-gray-50">
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
@@ -127,7 +127,7 @@ export default function AttendanceAbsentPage() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-background-primary divide-y divide-border-primary">
                 {attendanceData.length > 0 ? (
                   attendanceData.map((entry, idx) => (
                     <tr key={idx} className="hover:bg-gray-50 transition-colors duration-150">

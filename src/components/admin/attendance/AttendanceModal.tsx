@@ -143,7 +143,7 @@ export default function AttendanceCreateModal({
           <Button
             variant="ghost"
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-red-50 text-foreground-tertiary hover:text-red-500"
+            className="p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 text-foreground-tertiary hover:text-red-500"
           >
             <X size={20} weight="bold" />
           </Button>
@@ -162,7 +162,7 @@ export default function AttendanceCreateModal({
                 name="name"
                 value={formValues.name}
                 onChange={handleChange}
-                className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-border-secondary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
                 placeholder="Enter Site Name"
               />
             </div>
@@ -183,7 +183,7 @@ export default function AttendanceCreateModal({
                   type="time"
                   value={formValues.check_in}
                   onChange={handleChange}
-                  className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                  className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-border-secondary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
                 />
               </div>
               {errors.check_in && (
@@ -204,7 +204,7 @@ export default function AttendanceCreateModal({
                   type="time"
                   value={formValues.check_out}
                   onChange={handleChange}
-                  className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                  className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-border-secondary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
                 />
               </div>
               {errors.check_out && (
@@ -218,7 +218,7 @@ export default function AttendanceCreateModal({
               <MapPin size={18} weight="duotone" className="text-foreground-tertiary" />
               Location
             </label>
-            <div className="border border-gray-300 rounded-lg overflow-hidden">
+            <div className="border border-border-secondary rounded-lg overflow-hidden">
               <ClientMap
                 type="create"
                 value={coordinates!}
@@ -239,7 +239,7 @@ export default function AttendanceCreateModal({
             type="button"
             variant="outline"
             onClick={onClose}
-            className="border border-gray-300 text-foreground-secondary hover:bg-background-secondary dark:bg-background-tertiary"
+            className="border border-border-primary text-foreground-secondary hover:bg-background-secondary"
           >
             Cancel
           </Button>
@@ -253,7 +253,6 @@ export default function AttendanceCreateModal({
               !isValid ||
               Object.keys(errors).length > 0
             }
-            className="bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white"
           >
             Create Site
           </Button>
@@ -381,7 +380,7 @@ export function AttendanceUpdateModal({
           <Button
             variant="ghost"
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-red-50 text-foreground-tertiary hover:text-red-500"
+            className="p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 text-foreground-tertiary hover:text-red-500"
           >
             <X size={20} weight="bold" />
           </Button>
@@ -400,7 +399,7 @@ export function AttendanceUpdateModal({
                 name="name"
                 value={formValues.name}
                 onChange={handleChange}
-                className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-border-secondary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
                 placeholder="Enter Site Name"
               />
             </div>
@@ -421,7 +420,7 @@ export function AttendanceUpdateModal({
                   type="time"
                   value={formValues.check_in}
                   onChange={handleChange}
-                  className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                  className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-border-secondary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
                 />
               </div>
               {errors.check_in && (
@@ -442,7 +441,7 @@ export function AttendanceUpdateModal({
                   type="time"
                   value={formValues.check_out}
                   onChange={handleChange}
-                  className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+                  className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-tertiary p-2.5 border border-border-secondary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
                 />
               </div>
               {errors.check_out && (
@@ -456,7 +455,7 @@ export function AttendanceUpdateModal({
               <MapPin size={18} weight="duotone" className="text-foreground-tertiary" />
               Location
             </label>
-            <div className="border border-gray-300 rounded-lg overflow-hidden">
+            <div className="border border-border-secondary rounded-lg overflow-hidden">
               <ClientMap
                 type="update"
                 value={coordinates!}
@@ -477,7 +476,7 @@ export function AttendanceUpdateModal({
             type="button"
             variant="outline"
             onClick={onClose}
-            className="border border-gray-300 text-foreground-secondary hover:bg-background-secondary dark:bg-background-tertiary"
+            className="border border-border-primary text-foreground-secondary hover:bg-background-secondary"
           >
             Cancel
           </Button>
@@ -492,7 +491,6 @@ export function AttendanceUpdateModal({
               Object.keys(errors).length > 0 ||
               !isDirty
             }
-            className="bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white"
           >
             Update Site
           </Button>

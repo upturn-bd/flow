@@ -31,8 +31,8 @@ export default function Toggle({
         className={`
           relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full
           border-2 border-transparent transition-colors duration-200 ease-in-out
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-          ${checked ? "bg-blue-600" : "bg-gray-200"}
+          focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+          ${checked ? "bg-primary-600" : "bg-background-tertiary"}
           ${disabled ? "opacity-50 cursor-not-allowed" : ""}
         `}
       >
@@ -49,13 +49,13 @@ export default function Toggle({
           {label && (
             <label
               htmlFor={id}
-              className="block text-sm font-medium text-gray-700 cursor-pointer"
+              className="block text-sm font-medium text-foreground-primary cursor-pointer"
             >
               {label}
             </label>
           )}
           {description && (
-            <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+            <p className="text-xs text-foreground-secondary mt-0.5">{description}</p>
           )}
         </div>
       )}

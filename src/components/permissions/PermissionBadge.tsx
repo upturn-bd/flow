@@ -19,32 +19,32 @@ const actionConfig = {
   [PERMISSION_ACTIONS.READ]: {
     icon: Eye,
     label: "View",
-    colorGranted: "bg-blue-100 text-blue-700 border-blue-200",
-    colorDenied: "bg-gray-100 text-gray-400 border-gray-200",
+    colorGranted: "bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-primary-200 dark:border-primary-800",
+    colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   },
   [PERMISSION_ACTIONS.WRITE]: {
     icon: PencilSimple,
     label: "Edit",
-    colorGranted: "bg-green-100 text-green-700 border-green-200",
-    colorDenied: "bg-gray-100 text-gray-400 border-gray-200",
+    colorGranted: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800",
+    colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   },
   [PERMISSION_ACTIONS.DELETE]: {
     icon: Trash,
     label: "Delete",
-    colorGranted: "bg-red-100 text-red-700 border-red-200",
-    colorDenied: "bg-gray-100 text-gray-400 border-gray-200",
+    colorGranted: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800",
+    colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   },
   [PERMISSION_ACTIONS.APPROVE]: {
     icon: CheckCircle,
     label: "Approve",
-    colorGranted: "bg-purple-100 text-purple-700 border-purple-200",
-    colorDenied: "bg-gray-100 text-gray-400 border-gray-200",
+    colorGranted: "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800",
+    colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   },
   [PERMISSION_ACTIONS.COMMENT]: {
     icon: ChatCircle,
     label: "Comment",
-    colorGranted: "bg-orange-100 text-orange-700 border-orange-200",
-    colorDenied: "bg-gray-100 text-gray-400 border-gray-200",
+    colorGranted: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800",
+    colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   },
 };
 
@@ -84,8 +84,8 @@ export function PermissionBadge({
   const config = actionConfig[action as keyof typeof actionConfig] || {
     icon: Lock,
     label: "Unknown",
-    colorGranted: "bg-gray-100 text-gray-700 border-gray-200",
-    colorDenied: "bg-gray-100 text-gray-400 border-gray-200",
+    colorGranted: "bg-background-secondary dark:bg-background-tertiary text-foreground-primary border-border-primary",
+    colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   };
 
   const sizeSettings = sizeConfig[size];

@@ -15,7 +15,7 @@ export default function ClaimSettlementTable({
 }: ClaimSettlementTableProps) {
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
+      <table className="min-w-full divide-y divide-border-primary">
         <thead className="bg-background-secondary dark:bg-background-tertiary">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
@@ -29,7 +29,7 @@ export default function ClaimSettlementTable({
             </th>
           </tr>
         </thead>
-        <tbody className="bg-surface-primary divide-y divide-gray-200">
+        <tbody className="bg-surface-primary divide-y divide-border-primary">
           {claimSettlements.map((claim) => (
             <tr key={claim.id}>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground-tertiary">
@@ -41,13 +41,13 @@ export default function ClaimSettlementTable({
               <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground-tertiary space-x-2">
                 <button
                   onClick={() => onEdit(claim.id)}
-                  className="text-blue-600 hover:text-blue-900"
+                  className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => onDelete(claim.id)}
-                  className="text-red-600 hover:text-red-900"
+                  className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                 >
                   Delete
                 </button>

@@ -75,7 +75,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 1, y: -20 }}
       transition={{ duration: 0.2 }}
-      className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"
+      className="bg-white border border-border-primary rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"
     >
       {/* Header */}
       <div className="flex justify-between items-start">
@@ -216,13 +216,13 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Add your feedback here..."
                 value={comment}
-                className="w-full px-4 py-2 rounded-md border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="w-full px-4 py-2 rounded-md border border-border-secondary bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
               />
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex flex-wrap justify-end gap-4 pt-4 border-t border-gray-100">
+          <div className="flex flex-wrap justify-end gap-4 pt-4 border-t border-border-primary">
             {/* Edit button for requests */}
             {canEdit && onEdit && (
               <motion.button

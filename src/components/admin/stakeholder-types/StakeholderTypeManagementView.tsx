@@ -76,12 +76,12 @@ export default function StakeholderTypeManagementView() {
     <Collapsible title="Stakeholder Types">
       <div className="px-4 space-y-4 py-4">
         <div className="flex items-center gap-3 mb-4">
-          <Tag size={22} weight="duotone" className="text-gray-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Stakeholder Types</h3>
+          <Tag size={22} weight="duotone" className="text-foreground-secondary" />
+          <h3 className="text-lg font-semibold text-foreground-primary">Stakeholder Types</h3>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
             {error}
           </div>
         )}
@@ -100,17 +100,17 @@ export default function StakeholderTypeManagementView() {
                 {stakeholderTypes.map((type, idx) => (
                   <div
                     key={type.id || idx}
-                    className="flex items-center bg-gray-100 rounded-lg px-3 py-2 border border-gray-200 shadow-sm"
+                    className="flex items-center bg-background-secondary dark:bg-background-tertiary rounded-lg px-3 py-2 border border-border-primary shadow-sm"
                   >
                     <div className="flex flex-col mr-2">
-                      <span className="text-gray-800 font-medium">{type.name}</span>
+                      <span className="text-foreground-primary font-medium">{type.name}</span>
                       {type.description && (
-                        <span className="text-xs text-gray-500">{type.description}</span>
+                        <span className="text-xs text-foreground-tertiary">{type.description}</span>
                       )}
                     </div>
                     <div className="flex items-center gap-1 ml-auto">
                       {!type.is_active && (
-                        <span className="text-xs px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full mr-1">
+                        <span className="text-xs px-2 py-0.5 bg-background-tertiary dark:bg-surface-primary text-foreground-tertiary rounded-full mr-1">
                           Inactive
                         </span>
                       )}
@@ -118,7 +118,7 @@ export default function StakeholderTypeManagementView() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(type)}
-                        className="p-1 rounded-full text-gray-500 hover:bg-blue-50 hover:text-blue-500"
+                        className="p-1 rounded-full text-foreground-tertiary hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-500"
                       >
                         <PencilSimple size={16} weight="bold" />
                       </Button>
@@ -128,7 +128,7 @@ export default function StakeholderTypeManagementView() {
                         onClick={() => type.id !== undefined && handleDelete(type.id)}
                         isLoading={deleteLoading === type.id}
                         disabled={deleteLoading === type.id}
-                        className="p-1 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-500"
+                        className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500"
                       >
                         <TrashSimple size={16} weight="bold" />
                       </Button>
@@ -137,12 +137,12 @@ export default function StakeholderTypeManagementView() {
                 ))}
               </div>
             ) : (
-              <div className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
+              <div className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary">
                 <div className="flex justify-center mb-3">
-                  <Tag size={40} weight="duotone" className="text-gray-400" />
+                  <Tag size={40} weight="duotone" className="text-foreground-tertiary" />
                 </div>
-                <p className="text-gray-500 mb-1">No stakeholder types found</p>
-                <p className="text-gray-400 text-sm mb-4">Create stakeholder types to categorize stakeholders</p>
+                <p className="text-foreground-secondary mb-1">No stakeholder types found</p>
+                <p className="text-foreground-tertiary text-sm mb-4">Create stakeholder types to categorize stakeholders</p>
               </div>
             )}
           </div>
@@ -152,7 +152,7 @@ export default function StakeholderTypeManagementView() {
           <Button
             variant="primary"
             onClick={handleAdd}
-            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"
+            className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white"
           >
             <Plus size={16} weight="bold" />
             Add Type

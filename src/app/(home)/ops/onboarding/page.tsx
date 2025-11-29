@@ -32,7 +32,7 @@ const Textarea = ({
   ...props
 }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
   <textarea
-    className={`w-full p-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${className}`}
+    className={`w-full p-3 text-sm border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${className}`}
     {...props}
   />
 );
@@ -220,7 +220,7 @@ export default function OnboardingApprovalPage() {
                 y: -4,
                 boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)" 
               }}
-              className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4"
+              className="bg-white rounded-xl p-6 shadow-sm border border-border-primary space-y-4"
             >
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">

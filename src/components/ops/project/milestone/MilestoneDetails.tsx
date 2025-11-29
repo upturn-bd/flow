@@ -232,7 +232,7 @@ export default function MilestoneDetails({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm space-y-4"
+            className="bg-white rounded-lg border border-border-primary p-6 shadow-sm space-y-4"
           >
             <div className="grid gap-4">
               <div className="flex items-center gap-2">
@@ -270,7 +270,7 @@ export default function MilestoneDetails({
               </div>
             </div>
 
-            <div className="flex gap-6 pt-4 text-sm border-t border-gray-100">
+            <div className="flex gap-6 pt-4 text-sm border-t border-border-primary">
               <div className="flex items-center gap-2 text-gray-600">
                 <Calendar size={16} strokeWidth={2} />
                 <span>
@@ -288,7 +288,7 @@ export default function MilestoneDetails({
             </div>
 
             {milestoneDetails?.description && (
-              <div className="pt-4 border-t border-gray-100">
+              <div className="pt-4 border-t border-border-primary">
                 <p className="text-gray-600">{milestoneDetails.description}</p>
               </div>
             )}
@@ -329,7 +329,7 @@ export default function MilestoneDetails({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     whileHover={{ y: -2 }}
-                    className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm space-y-3"
+                    className="bg-white rounded-lg border border-border-primary p-4 shadow-sm space-y-3"
                   >
                     <div className="font-medium text-gray-900">
                       {task.task_title}

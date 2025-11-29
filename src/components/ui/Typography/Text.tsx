@@ -21,8 +21,8 @@ export interface TextProps {
 const variantClasses = {
   body1: "text-base font-normal leading-relaxed",
   body2: "text-sm font-normal leading-normal",
-  caption: "text-xs font-normal leading-tight text-gray-500",
-  overline: "text-xs font-semibold uppercase tracking-wide text-gray-500",
+  caption: "text-xs font-normal leading-tight text-foreground-tertiary",
+  overline: "text-xs font-semibold uppercase tracking-wide text-foreground-tertiary",
   subtitle1: "text-lg font-medium leading-normal",
   subtitle2: "text-base font-medium leading-normal"
 };
@@ -44,12 +44,12 @@ const weightClasses = {
 };
 
 const colorClasses = {
-  primary: "text-gray-900",
-  secondary: "text-gray-600",
-  success: "text-green-600",
-  warning: "text-yellow-600",
-  error: "text-red-600",
-  muted: "text-gray-500",
+  primary: "text-foreground-primary",
+  secondary: "text-foreground-secondary",
+  success: "text-green-600 dark:text-green-400",
+  warning: "text-yellow-600 dark:text-yellow-400",
+  error: "text-red-600 dark:text-red-400",
+  muted: "text-foreground-tertiary",
   white: "text-white"
 };
 

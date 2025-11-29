@@ -87,7 +87,7 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
         ) : (
           <div className="px-5 pb-5 flex-1 overflow-hidden flex flex-col">
             <div className="flex items-center justify-between mb-4 flex-shrink-0">
-              <h3 className="text-sm font-medium text-gray-500">Your Tasks</h3>
+              <h3 className="text-sm font-medium text-foreground-secondary">Your Tasks</h3>
               {canCreateTasks && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -110,14 +110,14 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.2, delay: index * 0.05 }}
                   onClick={() => task.id && onTaskClick(task.id)}
-                  className="flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-blue-50 rounded-lg transition-colors text-sm font-medium border border-gray-100 cursor-pointer"
+                  className="flex items-center justify-between px-4 py-3 bg-background-secondary dark:bg-background-tertiary hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors text-sm font-medium border border-border-primary cursor-pointer"
                 >
                   <div className="flex items-center space-x-3">
                     <div className={cn(
                       "w-2 h-2 rounded-full",
                       new Date(task.end_date) < new Date() ? "bg-red-500" : "bg-green-500"
                     )}></div>
-                    <span className="text-gray-900">{task.task_title}</span>
+                    <span className="text-foreground-primary">{task.task_title}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock size={14} className="text-foreground-tertiary" />

@@ -54,7 +54,7 @@ export const EntityForm: React.FC<EntityFormProps> = ({
           variant="outline"
           onClick={onCancel}
           disabled={isLoading}
-          className="border border-gray-300 text-gray-700 hover:bg-gray-50"
+          className="border border-border-primary dark:border-border-primary text-foreground-primary dark:text-foreground-primary hover:bg-surface-hover dark:hover:bg-surface-hover"
         >
           {cancelLabel}
         </Button>
@@ -63,7 +63,7 @@ export const EntityForm: React.FC<EntityFormProps> = ({
           variant="primary"
           isLoading={isLoading}
           disabled={isSubmitDisabled}
-          className="bg-gray-800 hover:bg-gray-900 text-white"
+          className="bg-primary-800 hover:bg-primary-900 text-white"
         >
           {finalSubmitLabel}
         </Button>

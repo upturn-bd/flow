@@ -70,11 +70,11 @@ export function ModulePermissionsBanner({
           exit={{ opacity: 0, y: -10 }}
           className="mb-4"
         >
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg px-4 py-2">
+          <div className="bg-gradient-to-r from-primary-50 to-indigo-50 dark:from-primary-900/20 dark:to-indigo-900/20 border border-primary-100 dark:border-primary-800 rounded-lg px-4 py-2">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
-                <Info size={18} className="text-blue-600 flex-shrink-0" />
-                <span className="text-sm font-medium text-blue-900 truncate">
+                <Info size={18} className="text-primary-600 dark:text-primary-400 flex-shrink-0" />
+                <span className="text-sm font-medium text-primary-900 dark:text-primary-100 truncate">
                   Your {moduleName} Permissions:
                 </span>
               </div>
@@ -83,7 +83,7 @@ export function ModulePermissionsBanner({
                 {dismissible && (
                   <button
                     onClick={() => setIsDismissed(true)}
-                    className="text-blue-600 hover:text-blue-800 ml-2"
+                    className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 ml-2"
                     aria-label="Dismiss"
                   >
                     ×
@@ -105,15 +105,15 @@ export function ModulePermissionsBanner({
         exit={{ opacity: 0, y: -10 }}
         className="mb-6"
       >
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg p-4">
+        <div className="bg-gradient-to-r from-primary-50 to-indigo-50 dark:from-primary-900/20 dark:to-indigo-900/20 border border-primary-100 dark:border-primary-800 rounded-lg p-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
-              <Info size={24} weight="duotone" className="text-blue-600 flex-shrink-0 mt-0.5" />
+              <Info size={24} weight="duotone" className="text-primary-600 dark:text-primary-400 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-sm font-semibold text-blue-900 mb-1">
+                <h3 className="text-sm font-semibold text-primary-900 dark:text-primary-100 mb-1">
                   Your {moduleName} Access Level
                 </h3>
-                <p className="text-xs text-blue-700">
+                <p className="text-xs text-primary-700 dark:text-primary-300">
                   These are the actions you can perform in this module
                 </p>
               </div>
@@ -123,7 +123,7 @@ export function ModulePermissionsBanner({
               {dismissible && (
                 <button
                   onClick={() => setIsDismissed(true)}
-                  className="text-blue-600 hover:text-blue-800 text-xl font-bold ml-2"
+                  className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 text-xl font-bold ml-2"
                   aria-label="Dismiss"
                 >
                   ×

@@ -327,13 +327,13 @@ export default function HomePage() {
                     <div className={`absolute inset-0 border-2 rounded-lg z-10 transition-all pointer-events-none ${
                       widget.enabled 
                         ? 'bg-primary-500/10 border-primary-400' 
-                        : 'bg-gray-500/20 border-gray-400'
+                        : 'bg-foreground-tertiary/20 border-foreground-tertiary'
                     }`}>
                       {/* Control bar at top */}
                       <div className={`absolute top-0 left-0 right-0 backdrop-blur-sm px-4 py-3 flex items-center justify-between rounded-t-md pointer-events-auto ${
                         widget.enabled 
                           ? 'bg-primary-500/90' 
-                          : 'bg-gray-500/90'
+                          : 'bg-foreground-tertiary/90'
                       }`}>
                         <div className="flex items-center gap-3">
                           <GripVertical size={20} className="text-white cursor-grab active:cursor-grabbing" />

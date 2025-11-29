@@ -52,15 +52,15 @@ export const ToggleField = forwardRef<HTMLButtonElement, ToggleFieldProps>(
           disabled={disabled}
           className={`
             relative inline-flex items-center rounded-full transition-colors duration-200 ease-in-out
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+            focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
             disabled:cursor-not-allowed disabled:opacity-50
             ${sizeClasses[size]}
             ${checked 
-              ? 'bg-blue-600 hover:bg-blue-700' 
-              : 'bg-gray-200 hover:bg-gray-300'
+              ? 'bg-primary-600 hover:bg-primary-700' 
+              : 'bg-background-tertiary dark:bg-background-tertiary hover:bg-border-primary dark:hover:bg-border-secondary'
             }
             ${disabled 
-              ? (checked ? 'bg-blue-400' : 'bg-gray-100') 
+              ? (checked ? 'bg-primary-400' : 'bg-background-secondary dark:bg-background-secondary') 
               : ''
             }
           `}
@@ -71,7 +71,7 @@ export const ToggleField = forwardRef<HTMLButtonElement, ToggleFieldProps>(
           </span>
           <span
             className={`
-              inline-block rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out
+              inline-block rounded-full bg-white dark:bg-surface-primary shadow-sm transition-transform duration-200 ease-in-out
               ${thumbSizeClasses[size]}
               ${translateClasses[size]}
             `}
@@ -84,7 +84,7 @@ export const ToggleField = forwardRef<HTMLButtonElement, ToggleFieldProps>(
               <label 
                 className={`
                   block text-sm font-medium cursor-pointer
-                  ${disabled ? 'text-gray-400' : 'text-gray-700'}
+                  ${disabled ? 'text-foreground-tertiary dark:text-foreground-tertiary' : 'text-foreground-primary dark:text-foreground-primary'}
                   ${error ? 'text-red-600' : ''}
                 `}
                 onClick={() => !disabled && onChange(!checked)}
@@ -95,7 +95,7 @@ export const ToggleField = forwardRef<HTMLButtonElement, ToggleFieldProps>(
             {description && (
               <p className={`
                 text-sm mt-1
-                ${disabled ? 'text-gray-400' : 'text-gray-500'}
+                ${disabled ? 'text-foreground-tertiary dark:text-foreground-tertiary' : 'text-foreground-secondary dark:text-foreground-secondary'}
               `}>
                 {description}
               </p>

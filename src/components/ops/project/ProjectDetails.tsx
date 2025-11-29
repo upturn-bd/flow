@@ -506,7 +506,7 @@ export default function ProjectDetails({
                   )}
 
                 {projectDetails.status !== "Completed" && (projectDetails.created_by === currentUserId || projectDetails.project_lead_id === currentUserId) && (
-                  <div className="pt-4 border-t border-gray-100">
+                  <div className="pt-4 border-t border-border-primary">
                     <Button
                       onClick={() => setDisplaySubmissionModal(true)}
                       className="flex items-center justify-center gap-2"
@@ -603,7 +603,7 @@ export default function ProjectDetails({
                 value={remark}
                 onChange={(e) => setRemark(e.target.value)}
                 placeholder="Add your final remarks about the project..."
-                className="w-full h-32 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full h-32 rounded-md border border-border-secondary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />
             </div>

@@ -31,23 +31,23 @@ export default function FormToggleField({
     <div className="mb-4">
       <label 
         htmlFor={name} 
-        className="block text-sm font-semibold text-gray-700 mb-2"
+        className="block text-sm font-semibold text-foreground-primary dark:text-foreground-primary mb-2"
       >
         {label}
       </label>
       <div className={`flex items-center gap-3 p-3 rounded-lg border ${
         hasError 
           ? "border-red-300 bg-red-50" 
-          : "border-gray-200 bg-gray-50"
+          : "border-border-primary dark:border-border-primary bg-background-secondary dark:bg-background-secondary"
       }`}>
-        <div className="text-gray-400">
+        <div className="text-foreground-tertiary dark:text-foreground-tertiary">
           {icon}
         </div>
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <div>
               {description && (
-                <p className="text-sm text-gray-600">{description}</p>
+                <p className="text-sm text-foreground-secondary dark:text-foreground-secondary">{description}</p>
               )}
             </div>
             <button
@@ -60,8 +60,8 @@ export default function FormToggleField({
               className={`
                 relative inline-flex h-6 w-11 items-center rounded-full
                 transition-colors duration-200 ease-in-out focus:outline-none 
-                focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                ${checked ? 'bg-blue-600' : 'bg-gray-300'}
+                focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+                ${checked ? 'bg-primary-600' : 'bg-background-tertiary dark:bg-background-tertiary'}
                 ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
               `}
             >

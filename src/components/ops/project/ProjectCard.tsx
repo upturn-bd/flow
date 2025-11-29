@@ -68,7 +68,7 @@ export default function ProjectCard({
           variant="ghost"
           size="sm"
           onClick={onEdit}
-          className="p-2 h-8 w-8 hover:bg-blue-50 hover:text-blue-600"
+          className="p-2 h-8 w-8 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600"
         >
           <Edit size={14} />
         </Button>
@@ -81,7 +81,7 @@ export default function ProjectCard({
           size="sm"
           onClick={onDelete}
           isLoading={isDeleting}
-          className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
+          className="p-2 h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600"
         >
           <Trash size={14} />
         </Button>
@@ -92,7 +92,7 @@ export default function ProjectCard({
             data-testid="view-project-button"
             variant="ghost"
             size="sm"
-            className="p-2 h-8 w-8 hover:bg-gray-50 hover:text-gray-700"
+            className="p-2 h-8 w-8 hover:bg-surface-hover hover:text-foreground-primary"
           >
             <ExternalLink size={14} />
           </Button>
@@ -147,8 +147,8 @@ export default function ProjectCard({
         </div>
 
         {description && (
-          <div className="mt-4 p-3 bg-gray-50 rounded-md">
-            <p className="text-sm text-gray-700 line-clamp-3">{description}</p>
+          <div className="mt-4 p-3 bg-background-secondary dark:bg-background-tertiary rounded-md">
+            <p className="text-sm text-foreground-secondary line-clamp-3">{description}</p>
           </div>
         )}
       </CardContent>
