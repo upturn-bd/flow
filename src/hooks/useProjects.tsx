@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase/client";
 import { ProjectDetails } from "@/components/ops/project/ProjectForm";
 import { slugify } from "@/lib/utils";
 import { set } from "lodash";
+import { captureSupabaseError } from "@/lib/sentry";
 
 export type { Project };
 
@@ -81,6 +82,11 @@ export function useProjects() {
 
         return data;
       } catch (error) {
+        captureSupabaseError(
+          { message: error instanceof Error ? error.message : String(error) },
+          "fetchOngoingProjects",
+          { companyId: employeeInfo?.company_id }
+        );
         console.error("Error fetching ongoing projects:", error);
         throw error;
       } finally {
@@ -132,6 +138,11 @@ export function useProjects() {
 
         return data;
       } catch (error) {
+        captureSupabaseError(
+          { message: error instanceof Error ? error.message : String(error) },
+          "fetchCompletedProjects",
+          { companyId: employeeInfo?.company_id }
+        );
         console.error("Error fetching completed projects:", error);
         throw error;
       } finally {
@@ -175,6 +186,11 @@ export function useProjects() {
         setOngoingProjects(data || []);
         return data || [];
       } catch (err) {
+        captureSupabaseError(
+          { message: err instanceof Error ? err.message : String(err) },
+          "searchOngoingProjects",
+          { searchTerm }
+        );
         console.error("Error searching ongoing projects:", err);
         return [];
       } finally {
@@ -217,6 +233,11 @@ export function useProjects() {
         setCompletedProjects(data || []);
         return data || [];
       } catch (err) {
+        captureSupabaseError(
+          { message: err instanceof Error ? err.message : String(err) },
+          "searchCompletedProjects",
+          { searchTerm }
+        );
         console.error("Error searching completed projects:", err);
         return [];
       } finally {
@@ -271,6 +292,11 @@ export function useProjects() {
 
       return result;
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "createProject",
+        { companyId: employeeInfo.company_id, projectTitle: project.project_title }
+      );
       console.error("Error creating project:", error);
       throw error;
     }
@@ -312,6 +338,11 @@ export function useProjects() {
 
       return result;
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "updateProject",
+        { projectId, companyId: employeeInfo.company_id }
+      );
       console.error("Error updating project:", error);
       throw error;
     }

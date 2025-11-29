@@ -8,6 +8,7 @@ import { useLeaveBalances } from "./useLeaveBalances";
 import { useNotifications } from "./useNotifications";
 import { HolidayConfig, LeaveType } from "@/lib/types";
 import { usePermissions } from "./usePermissions";
+import { captureSupabaseError } from "@/lib/sentry";
 
 
 export type { LeaveType, HolidayConfig };
@@ -86,6 +87,11 @@ export function useLeaveRequests() {
 
       return result;
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "createLeaveRequest",
+        { companyId: employeeInfo.company_id }
+      );
       console.error("Error creating leave request:", error);
       throw error;
     }
@@ -146,6 +152,11 @@ export function useLeaveRequests() {
 
       return result;
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "updateLeaveRequest",
+        { leaveId, companyId: employeeInfo.company_id }
+      );
       console.error("Error updating leave request:", error);
       throw error;
     }
@@ -183,6 +194,11 @@ export function useLeaveRequests() {
       setLeaveRequests(data);
       setLoading(false);
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "fetchLeaveRequests",
+        { employeeId: employeeInfo?.id }
+      );
       console.error("Error fetching leave requests:", error);
       setLoading(false);
       throw error;
@@ -221,6 +237,11 @@ export function useLeaveRequests() {
       setLeaveRequests(data);
       setLoading(false);
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "fetchGlobalLeaveRequests",
+        { companyId: employeeInfo?.company_id }
+      );
       console.error("Error fetching global leave requests:", error);
       setLoading(false);
       throw error;
@@ -247,6 +268,11 @@ export function useLeaveRequests() {
       setLeaveRequests(data);
       setLoading(false);
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "fetchLeaveHistory",
+        { employeeId: employeeInfo?.id }
+      );
       console.error("Error fetching leave history:", error);
       setLoading(false);
       throw error;
@@ -267,6 +293,11 @@ export function useLeaveRequests() {
       setLeaveRequests(data);
       setLoading(false);
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "fetchGlobalLeaveHistory",
+        {}
+      );
       console.error("Error fetching global leave history:", error);
       setLoading(false);
       throw error;

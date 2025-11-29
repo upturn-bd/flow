@@ -6,6 +6,7 @@ import { Task } from "@/lib/types/schemas";
 import { useState, useCallback, useMemo, useRef } from "react";
 import { useNotifications } from "./useNotifications";
 import { slugify } from "@/lib/utils";
+import { captureSupabaseError } from "@/lib/sentry";
 
 // Task status variants
 export enum TaskStatus {
@@ -161,8 +162,13 @@ export function useTasks() {
       });
       return result;
     } catch (err) {
-      console.error("Error fetching tasks:", err);
       const errorObj = err instanceof Error ? err : new Error(String(err));
+      captureSupabaseError(
+        { message: errorObj.message },
+        "fetchTasks",
+        { companyId, scope: filters.scope }
+      );
+      console.error("Error fetching tasks:", err);
       setError(errorObj);
       return { tasks: [], totalCount: 0, completedCount: 0, pendingCount: 0 };
     } finally {
@@ -223,6 +229,11 @@ export function useTasks() {
         }
         setOngoingTasksLoading(false);
       } catch (err) {
+        captureSupabaseError(
+          { message: err instanceof Error ? err.message : String(err) },
+          "fetchOngoingTasks",
+          { companyId: employeeInfo?.company_id, companyScopes }
+        );
         console.error("Error fetching ongoing tasks:", err);
         setOngoingTasksLoading(false);
       }
@@ -285,6 +296,11 @@ export function useTasks() {
         setOngoingTasksLoading(false);
         return data || [];
       } catch (err) {
+        captureSupabaseError(
+          { message: err instanceof Error ? err.message : String(err) },
+          "searchOngoingTasks",
+          { companyId: employeeInfo?.company_id, searchTerm }
+        );
         console.error("Error searching ongoing tasks:", err);
         setOngoingTasksLoading(false);
         return [];
@@ -345,6 +361,11 @@ export function useTasks() {
 
         setLoading(false);
       } catch (err) {
+        captureSupabaseError(
+          { message: err instanceof Error ? err.message : String(err) },
+          "fetchCompletedTasks",
+          { companyId: employeeInfo?.company_id, companyScopes }
+        );
         console.error("Error fetching completed tasks:", err);
         setLoading(false);
       }
@@ -407,6 +428,11 @@ export function useTasks() {
         setLoading(false);
         return data || [];
       } catch (err) {
+        captureSupabaseError(
+          { message: err instanceof Error ? err.message : String(err) },
+          "searchCompletedTasks",
+          { companyId: employeeInfo?.company_id, searchTerm }
+        );
         console.error("Error searching completed tasks:", err);
         setLoading(false);
         return [];
@@ -453,6 +479,11 @@ export function useTasks() {
       setStats(statsData);
       return statsData;
     } catch (err) {
+      captureSupabaseError(
+        { message: err instanceof Error ? err.message : String(err) },
+        "fetchTaskStats",
+        { projectId }
+      );
       console.error("Error fetching task stats:", err);
       return null;
     }
@@ -477,6 +508,11 @@ export function useTasks() {
       if (error) throw error;
       return data;
     } catch (err) {
+      captureSupabaseError(
+        { message: err instanceof Error ? err.message : String(err) },
+        "getTaskById",
+        { taskId, companyId }
+      );
       console.error("Error fetching task by ID:", err);
       throw err;
     }
@@ -554,6 +590,11 @@ export function useTasks() {
 
       return { success: true, data };
     } catch (err) {
+      captureSupabaseError(
+        { message: err instanceof Error ? err.message : String(err) },
+        "createTask",
+        { companyId, taskTitle: task.task_title }
+      );
       console.error("Error creating task:", err);
       return { success: false, error: err };
     }
@@ -622,6 +663,11 @@ export function useTasks() {
 
       return { success: true, data };
     } catch (err) {
+      captureSupabaseError(
+        { message: err instanceof Error ? err.message : String(err) },
+        "updateTask",
+        { taskId: task.id, companyId }
+      );
       console.error("Error updating task:", err);
       return { success: false, error: err };
     }
@@ -668,6 +714,11 @@ export function useTasks() {
 
       return { success: true };
     } catch (err) {
+      captureSupabaseError(
+        { message: err instanceof Error ? err.message : String(err) },
+        "deleteTask",
+        { taskId, companyId }
+      );
       console.error("Error deleting task:", err);
       return { success: false, error: err };
     }
@@ -704,6 +755,11 @@ export function useTasks() {
 
       return { success: true, data };
     } catch (err) {
+      captureSupabaseError(
+        { message: err instanceof Error ? err.message : String(err) },
+        "completeTask",
+        { taskId, companyId }
+      );
       console.error("Error completing task:", err);
       return { success: false, error: err };
     }
@@ -740,6 +796,11 @@ export function useTasks() {
 
       return { success: true, data };
     } catch (err) {
+      captureSupabaseError(
+        { message: err instanceof Error ? err.message : String(err) },
+        "reopenTask",
+        { taskId, companyId }
+      );
       console.error("Error reopening task:", err);
       return { success: false, error: err };
     }
@@ -774,6 +835,11 @@ export function useTasks() {
 
       return { success: true, data };
     } catch (err) {
+      captureSupabaseError(
+        { message: err instanceof Error ? err.message : String(err) },
+        "updateMilestone",
+        { taskIds, milestoneId, projectId, companyId }
+      );
       console.error("Error updating task milestone:", err);
       return { success: false, error: err };
     }

@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
 import { Employee } from "@/lib/types/schemas";
+import { captureSupabaseError } from "@/lib/sentry";
 
 export interface ExtendedEmployee extends Employee {
   role?: string;
@@ -36,8 +37,8 @@ export function useEmployees() {
   const fetchEmployees = useCallback(async (company_id?: number) => {
     setLoading(true);
     setError(null);
+    const companyId = company_id ?? employeeInfo?.company_id;
     try {
-      const companyId = company_id ?? employeeInfo?.company_id;
       if (!companyId) {
         setLoading(false);
         return [];
@@ -64,12 +65,17 @@ export function useEmployees() {
     } catch (err) {
       const errorObj = err instanceof Error ? err : new Error(String(err));
       setError(errorObj);
+      captureSupabaseError(
+        { message: errorObj.message },
+        "fetchEmployees",
+        { companyId }
+      );
       console.error("Error fetching employees:", errorObj);
       return [];
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.company_id]);
 
   const fetchExtendedEmployees = useCallback(async () => {
     setLoading(true);
@@ -104,6 +110,11 @@ export function useEmployees() {
     } catch (err) {
       const errorObj = err instanceof Error ? err : new Error(String(err));
       setError(errorObj);
+      captureSupabaseError(
+        { message: errorObj.message },
+        "fetchExtendedEmployees",
+        { companyId: employeeInfo?.company_id }
+      );
       console.error("Error fetching employees:", errorObj);
       return [];
     } finally {
@@ -179,6 +190,11 @@ export function useEmployees() {
     } catch (err) {
       const errorObj = err instanceof Error ? err : new Error(String(err));
       setError(errorObj);
+      captureSupabaseError(
+        { message: errorObj.message },
+        "searchEmployeesForRoleManagement",
+        { companyId: employeeInfo?.company_id, searchQuery, page }
+      );
       console.error("Error searching employees for role management:", errorObj);
       return {
         employees: [],
@@ -214,6 +230,11 @@ export function useEmployees() {
     } catch (err) {
       const errorObj = err instanceof Error ? err : new Error(String(err));
       setError(errorObj);
+      captureSupabaseError(
+        { message: errorObj.message },
+        "updateEmployeeRole",
+        { companyId: employeeInfo?.company_id, employeeId, newRole }
+      );
       console.error("Error updating employee role:", errorObj);
       throw errorObj;
     } finally {

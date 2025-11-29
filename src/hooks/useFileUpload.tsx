@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { uploadManyFiles, uploadFile as uploadSingleFile } from "@/lib/utils/files";
+import { captureError } from "@/lib/sentry";
 
 export function useFileUpload() {
   const [uploading, setUploading] = useState(false);
@@ -18,6 +19,7 @@ export function useFileUpload() {
       }
       return { success: true, fileUrls: result.uploadedFilePaths };
     } catch (err) {
+      captureError(err, { operation: "uploadFiles", bucketName, fileCount: files.length });
       console.log(err);
       setError(err instanceof Error ? err : new Error(String(err)));
       return { success: false, error: err };
@@ -41,6 +43,7 @@ export function useFileUpload() {
       }
       return { success: true };
     } catch (err) {
+      captureError(err, { operation: "uploadEducationFile", fileName: file.name });
       console.error("Error uploading education file:", err);
       setError(err instanceof Error ? err : new Error(String(err)));
       return { success: false, error: err };
