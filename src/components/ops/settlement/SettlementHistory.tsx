@@ -84,7 +84,7 @@ export default function SettlementHistoryPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="p-6 max-w-5xl mx-auto space-y-6"
+          className="p-4 sm:p-6 space-y-6"
         >
           <h1 className="text-xl font-bold text-blue-700">Settlement History</h1>
 

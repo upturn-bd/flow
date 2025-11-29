@@ -224,7 +224,7 @@ export default function AttendanceLogsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
+    <div className="w-full">
       <Card className="shadow-lg rounded-xl">
         <CardHeader
           title="Company Attendance Logs"

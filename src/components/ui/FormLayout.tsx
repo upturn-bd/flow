@@ -41,7 +41,7 @@ export function FormLayout({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className={`max-w-4xl mx-auto ${className}`}
+      className={`w-full ${className}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">

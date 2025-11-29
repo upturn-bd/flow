@@ -89,7 +89,7 @@ export default function FinderPage() {
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      className="max-w-6xl mx-auto p-4 sm:p-6 pb-12"
+      className="w-full p-4 sm:p-6 lg:p-8 pb-12"
     >
       {/* Header */}
       <motion.div

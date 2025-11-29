@@ -92,7 +92,7 @@ export default function ServicePageTemplate({
       animate="visible"
       exit="exit"
       variants={pageVariants}
-      className="max-w-6xl mx-auto p-4 sm:p-6"
+      className="w-full p-4 sm:p-6 lg:p-8"
     >
       <motion.div
         initial={{ opacity: 0, y: -10 }}

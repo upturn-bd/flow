@@ -120,7 +120,7 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6"
+      className="w-full p-4 sm:p-6 lg:p-10 space-y-6"
     >
       <motion.div
         variants={fadeInUp}
@@ -202,7 +202,7 @@ export function UpdateProjectPage({
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6"
+      className="w-full p-4 sm:p-6 lg:p-10 space-y-6"
     >
       <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">

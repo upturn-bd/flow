@@ -45,7 +45,7 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
           initial="hidden"
           animate="visible"
           variants={fadeIn}
-          className="p-4 sm:p-6 max-w-4xl mx-auto"
+          className="p-4 sm:p-6"
         >
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-xl font-semibold text-gray-800">Saved Drafts</h1>

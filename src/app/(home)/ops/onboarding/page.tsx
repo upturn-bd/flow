@@ -151,7 +151,7 @@ export default function OnboardingApprovalPage() {
       initial="hidden"
       animate="visible"
       variants={pageVariants}
-      className="max-w-6xl mx-auto p-4 sm:p-6"
+      className="w-full p-4 sm:p-6 lg:p-8"
     >
       <Toaster position="top-right" />
       

@@ -133,7 +133,7 @@ export default function NoticePage() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto p-4 sm:p-6 min-h-[70vh] flex items-center justify-center">
+      <div className="w-full p-4 sm:p-6 lg:p-8 min-h-[70vh] flex items-center justify-center">
         <LoadingSpinner
           text="Loading notices..."
           icon={Bell}
@@ -153,7 +153,7 @@ export default function NoticePage() {
             animate="visible"
             exit="exit"
             variants={pageVariants}
-            className="max-w-6xl mx-auto p-4 sm:p-6"
+            className="w-full p-4 sm:p-6 lg:p-8"
           >
             <motion.div
               initial={{ opacity: 0, y: -10 }}

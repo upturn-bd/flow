@@ -109,7 +109,7 @@ export default function RequisitionHistoryPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="p-6 max-w-5xl mx-auto space-y-6"
+            className="p-4 sm:p-6 space-y-6"
           >
             <div className="flex justify-between items-center">
               <h1 className="text-xl font-bold text-blue-700">Requisition History</h1>

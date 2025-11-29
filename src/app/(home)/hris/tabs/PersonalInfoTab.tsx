@@ -274,7 +274,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
       initial="hidden"
       animate="visible"
       variants={fadeIn}
-      className="max-w-6xl mx-auto"
+      className="w-full"
     >
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-800 flex items-center">

@@ -301,7 +301,7 @@ export default function RequisitionCreatePage({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="p-6 space-y-6 max-w-4xl mx-auto"
+      className="p-4 sm:p-6 space-y-6"
     >
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-bold text-blue-700">Create Requisition</h1>
@@ -870,7 +870,7 @@ export function RequisitionDraftPage({
   }, [fetchRequisitionTypes, fetchRequisitionInventories, fetchEmployees]);
 
   return (
-    <div className="p-6 space-y-6 max-w-4xl mx-auto lg:mx-20">
+    <div className="p-4 sm:p-6 space-y-6">
       <div>
         <div className="flex justify-between">
           <h1 className="text-xl font-bold text-blue-600">Requisition</h1>

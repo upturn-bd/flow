@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from "@/lib/auth/auth-context";
 import { useSentryUser } from "@/lib/sentry";
 import Sidebar from "./side-navbar";
 import TopBar from "./top-bar";
+import FloatingReportButton from "@/components/ui/FloatingReportButton";
 
 export default function HomeLayout({
   children,
@@ -32,6 +33,7 @@ function ApprovalLayout({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+      {isApproved && <FloatingReportButton />}
     </div>
   );
 }

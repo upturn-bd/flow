@@ -12,6 +12,11 @@ export * from './Typography';
 // Modal Components
 export * from './modals';
 
+// Feedback Components
+export { default as ReportProblemModal } from './ReportProblemModal';
+export { default as ReportProblemButton } from './ReportProblemButton';
+export { default as FloatingReportButton } from './FloatingReportButton';
+
 // Utilities
 export * as animations from './animations';
 

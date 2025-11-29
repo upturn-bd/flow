@@ -101,7 +101,7 @@ export default function RequisitionRequestsPage() {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       <h1 className="text-xl font-bold text-blue-700">Requisition Requests</h1>
 
       {loading && (

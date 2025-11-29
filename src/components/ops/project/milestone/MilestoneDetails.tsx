@@ -209,7 +209,7 @@ export default function MilestoneDetails({
   return (
     <div>
       {!taskDetailsId && (
-        <div className="md:max-w-6xl mx-auto p-6 md:p-10 text-gray-900">
+        <div className="w-full p-4 sm:p-6 lg:p-10 text-gray-900">
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-3">
               <Target size={24} className="text-gray-600" strokeWidth={2} />
