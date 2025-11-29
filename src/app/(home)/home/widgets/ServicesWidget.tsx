@@ -11,21 +11,21 @@ import {
   UserPlus,
   UserMinus,
   CreditCard,
-  ArrowRight
-} from 'lucide-react';
+  ArrowRight,
+  IconType,
+} from '@/lib/icons';
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import BaseWidget from './BaseWidget';
 import { WidgetProps } from '@/lib/types/widgets';
 import SectionHeader from '../components/SectionHeader';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/components/ui/class';
-import { Icon } from '@/lib/icons';
 
 // Service definitions
 interface Service {
   name: string;
   description: string;
-  icon: Icon;
+  icon: IconType;
   route: string;
   color: string;
   bgColor: string;

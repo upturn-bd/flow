@@ -10,7 +10,9 @@ import {
   Plus,
   Target,
   Users,
-} from "lucide-react";
+  Scale,
+  Copy,
+} from "@/lib/icons";
 import { type Milestone as MilestoneType } from "./MilestoneForm";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";

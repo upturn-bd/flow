@@ -5,9 +5,8 @@ import { AnimatePresence } from "framer-motion";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import PositionDetailsModal from "./PositionDetailsModal";
 import PositionModal from "./PositionModal";
-import { BriefcaseBusiness, Plus, Eye } from "@/lib/icons";
+import { BriefcaseBusiness, Plus, Eye, TrashSimple } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { TrashSimple } from "@phosphor-icons/react";
 
 type PositionsSectionProps = {
   showNotification: (message: string, isError?: boolean) => void;
@@ -182,25 +181,6 @@ export default function PositionsSection({
             onClose={() => setEditPosition(null)}
             isOpen={!!selectedPositionEdit}
           />
-        )}
-        {showAllPositions && (
-          <BaseModal
-            isOpen={showAllPositions}
-            onClose={() => setShowAllPositions(false)}
-            title="All Positions"
-            icon={<BriefcaseBusiness className="w-5 h-5" />}
-            size="lg"
-          >
-            <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-              {positions.length === 0 ? (
-                <div className="p-6 bg-gray-50 rounded-lg text-center text-gray-500">
-                  No positions available.
-                </div>
-              ) : (
-                positions.map((position) => renderPositionCard(position))
-              )}
-            </div>
-          </BaseModal>
         )}
       </AnimatePresence>
     </section>

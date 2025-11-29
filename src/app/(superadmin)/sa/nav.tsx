@@ -9,8 +9,11 @@ import {
   Factory,
   Users,
   UserGear,
-  House
-} from "@phosphor-icons/react";
+  Home as House,
+  SignOut,
+  X,
+  List,
+} from "@/lib/icons";
 import { ROUTES } from "@/lib/constants";
 import { motion, AnimatePresence } from "framer-motion";
 

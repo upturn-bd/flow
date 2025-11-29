@@ -8,6 +8,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useNotifications, Notification } from "@/hooks/useNotifications";
 import NotificationDropdown from "@/components/notifications/NotificationDropdown";
+import NewNotificationModal from "@/components/notifications/NewNotificationModal";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function TopBar() {
   const { employeeInfo, isApproved } = useAuth();
@@ -101,6 +103,7 @@ export default function TopBar() {
   if (!isAuthorized) return null;
 
   return (
+    <>
     <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-[50] h-16">
       <div className="pr-4 md:pr-6 h-full flex items-center justify-between">
         {/* Left side */}

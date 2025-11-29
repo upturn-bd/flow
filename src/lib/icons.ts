@@ -261,6 +261,16 @@ import {
   ShieldWarning,
   UserGear,
   UsersThree,
+  Buildings,
+  Circle,
+  Scales as Scale,
+  LinkSimple as LinkIcon,
+  Prohibit as Ban,
+  UserCheck,
+  UserMinus as UserX,
+  ArrowBendUpLeft as ArrowArcLeft,
+  FloppyDisk,
+  TrashSimple,
 } from '@phosphor-icons/react';
 
 // Re-export with consistent naming
@@ -273,7 +283,6 @@ export {
   Trash,
   Edit,
   Save,
-  FloppyDisk,
   Search,
   MagnifyingGlass,
   ArrowLeft,
@@ -523,10 +532,19 @@ export {
   ShieldWarning,
   UserGear,
   UsersThree,
+  Circle,
+  Scale,
+  LinkIcon,
+  Ban,
+  UserCheck,
+  UserX,
+  ArrowArcLeft,
+  FloppyDisk,
 };
 
 // TypeScript type for icon components
 export type IconType = typeof Plus;
+export type Icon = typeof Plus;
 
 // Default export with all icons
 export default {
@@ -537,7 +555,6 @@ export default {
   Trash,
   Edit,
   Save,
-  FloppyDisk,
   Search,
   MagnifyingGlass,
   ArrowLeft,

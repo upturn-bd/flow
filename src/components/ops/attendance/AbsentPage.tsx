@@ -3,11 +3,10 @@
 import { Attendance } from "@/hooks/useAttendance";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { CaretDown, Calendar, Search } from "@/lib/icons";
+import { CaretDown, Calendar, Search, Ban } from "@/lib/icons";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { Ban } from "@/lib/icons";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function AttendanceAbsentPage() {

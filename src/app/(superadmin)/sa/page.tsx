@@ -3,7 +3,18 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { ChartBar, Buildings, Users, GlobeHemisphereWest, Factory } from "@phosphor-icons/react";
+import { 
+  ChartBar, 
+  Buildings, 
+  Users, 
+  GlobeHemisphereWest, 
+  Factory,
+  AlertTriangle as Warning,
+  ArrowRight,
+  Clock,
+  CheckCircle,
+} from "@/lib/icons";
+import { motion } from "framer-motion";
 
 interface Stats {
   companies: number;

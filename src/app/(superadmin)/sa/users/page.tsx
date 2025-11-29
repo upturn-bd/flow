@@ -2,8 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import type { Superadmin, Company } from "@/lib/types/schemas";
-import { Plus, Trash, MagnifyingGlass, X } from "@phosphor-icons/react";
+import type { Company } from "@/lib/types/schemas";
 import { filterEmployeesBySearch } from "@/lib/utils/user-search";
 import { 
   Plus, 
@@ -15,11 +14,11 @@ import {
   User,
   Buildings,
   Calendar,
-  Power,
-  Warning,
-  Crown,
+  Lightning as Power,
+  AlertTriangle as Warning,
+  Star as Crown,
   CaretDown
-} from "@phosphor-icons/react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 

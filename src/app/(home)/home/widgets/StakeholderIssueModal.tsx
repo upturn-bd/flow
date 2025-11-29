@@ -8,6 +8,9 @@ import { useStakeholders } from '@/hooks/useStakeholders';
 import { useAuth } from '@/lib/auth/auth-context';
 import { cn } from '@/components/ui/class';
 
+// Alias for backward compatibility
+const Building2 = Building;
+
 interface StakeholderIssueModalProps {
   issueId?: number | null;
   onClose: () => void;

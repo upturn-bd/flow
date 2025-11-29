@@ -355,7 +355,7 @@ export function EmployeeSalaryList() {
                           onClick={() => handleEditSalary(employee)}
                           className="inline-flex items-center px-3 py-1 border border-blue-300 rounded-md text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                          <Edit3 className="h-3 w-3 mr-1" />
+                          <Edit className="h-3 w-3 mr-1" />
                           Edit Salary
                         </button>
                       </td>

@@ -7,7 +7,8 @@ import {
   XCircle,
   PackageOpen,
   Calendar,
-} from "lucide-react";
+  Plus,
+} from "@/lib/icons";
 import { extractFileNameFromStoragePath } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";

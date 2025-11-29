@@ -10,7 +10,18 @@ import {
   Trash, 
   MagnifyingGlass, 
   Shield,
-  X 
+  X, 
+  FloppyDisk,
+  Spinner,
+  Check,
+  Warning,
+  Star,
+  ArrowCounterClockwise,
+  CaretDown,
+  CaretUp,
+  CheckCircle,
+  Pencil,
+  Users
 } from "@phosphor-icons/react";
 import { filterEmployeesBySearch } from "@/lib/utils/user-search";
 import { toast } from "sonner";

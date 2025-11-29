@@ -189,7 +189,7 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
               className="text-center space-y-4"
             >
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
-                <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+                <Loader className="h-6 w-6 text-blue-600 animate-spin" />
               </div>
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">

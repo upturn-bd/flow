@@ -3,7 +3,28 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Company, Country, Industry } from "@/lib/types/schemas";
-import { Plus, Pencil, Trash, MagnifyingGlass } from "@phosphor-icons/react";
+import { 
+  Plus, 
+  Pencil, 
+  Trash, 
+  MagnifyingGlass,
+  Buildings,
+  Users,
+  UsersThree,
+  X,
+  Check,
+  Factory,
+  Globe,
+  Lightning,
+  DollarSign as CurrencyDollar,
+  LayoutGrid as TreeStructure,
+  List,
+  LayoutGrid as SquaresFour,
+  Settings as Gear,
+  CaretUp,
+  CaretDown,
+  AlertTriangle as Warning,
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 

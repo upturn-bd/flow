@@ -3,6 +3,7 @@
 import React from 'react';
 import { IconType } from '@/lib/icons';
 import { motion } from 'framer-motion';
+import { fadeIn } from '@/components/ui/animations';
 
 interface EmptyStateProps {
   icon: IconType;

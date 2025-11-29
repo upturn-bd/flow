@@ -14,7 +14,8 @@ import {
   Loader,
   Check,
   X,
-} from "lucide-react";
+  Pencil,
+} from "@/lib/icons";
 import { motion } from "framer-motion";
 
 import { RequisitionType, RequisitionInventory } from "@/lib/types";

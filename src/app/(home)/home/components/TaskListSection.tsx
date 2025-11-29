@@ -69,7 +69,7 @@ export default function TaskListSection({
               <EmptyState icon={CheckSquare} message="No tasks available at this time" />
             )}
           </div>
-        </div>
+        </motion.div>
       )}
     </>
   );

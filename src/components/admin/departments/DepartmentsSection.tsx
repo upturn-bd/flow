@@ -5,7 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import DepartmentModal from "./DepartmentModal";
 import DepartmentDetailsModal from "./DepartmentDetailsModal";
-import { Building, Plus, Eye, X, Trash } from "@/lib/icons";
+import { Building, Plus, Eye, X, Trash, TrashSimple } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { getCompanyInfo } from "@/lib/utils/auth";
 import BaseModal from "@/components/ui/modals/BaseModal";

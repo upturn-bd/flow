@@ -3,7 +3,16 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Country } from "@/lib/types/schemas";
-import { Plus, Pencil, Trash, MagnifyingGlass } from "@phosphor-icons/react";
+import { 
+  Plus, 
+  Pencil, 
+  Trash, 
+  MagnifyingGlass,
+  GlobeHemisphereWest,
+  Buildings,
+  X,
+  Check,
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 

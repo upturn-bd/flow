@@ -3,7 +3,20 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Company, Team } from "@/lib/types/schemas";
-import { MagnifyingGlass, Users, Pencil, Trash, Plus } from "@phosphor-icons/react";
+import { 
+  MagnifyingGlass, 
+  Users, 
+  Pencil, 
+  Trash, 
+  Plus,
+  Buildings,
+  CaretDown,
+  X,
+  Spinner,
+  Check,
+  Star,
+  Star as StarHalf,
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 

@@ -8,7 +8,9 @@ import {
   ClipboardList,
   Clock,
   AlertCircle,
-} from "lucide-react";
+  Plus,
+  WarningCircle,
+} from "@/lib/icons";
 import TabView from "@/components/ui/TabView";
 import { RequisitionCard } from "@/components/ops/requisition/RequisitionCard";
 import RequisitionCreateModal from "@/components/ops/requisition/RequisitionCreateModal";
