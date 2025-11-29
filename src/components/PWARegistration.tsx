@@ -12,15 +12,15 @@ export default function PWARegistration() {
       const wb = window.workbox;
       
       // Add event listeners for service worker lifecycle events
-      wb.addEventListener("installed", (event: Event) => {
+      wb.addEventListener("installed", (event) => {
         console.log("Service Worker installed:", event);
       });
 
-      wb.addEventListener("controlling", (event: Event) => {
+      wb.addEventListener("controlling", (event) => {
         console.log("Service Worker controlling:", event);
       });
 
-      wb.addEventListener("activated", (event: Event) => {
+      wb.addEventListener("activated", (event) => {
         console.log("Service Worker activated:", event);
       });
 
