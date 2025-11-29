@@ -107,7 +107,6 @@ export const AttendanceCreateModal: React.FC<AttendanceCreateModalProps> = ({
       onClose={onClose}
       title="Configure Attendance Site"
       icon={<Buildings size={24} weight="duotone" className="text-foreground-secondary" />}
-      icon={<Buildings size={24} weight="duotone" className="text-foreground-secondary" />}
       size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -120,7 +119,6 @@ export const AttendanceCreateModal: React.FC<AttendanceCreateModalProps> = ({
           required
           placeholder="Enter site name"
           icon={<Buildings size={18} weight="duotone" className="text-foreground-tertiary" />}
-          icon={<Buildings size={18} weight="duotone" className="text-foreground-tertiary" />}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -132,7 +130,6 @@ export const AttendanceCreateModal: React.FC<AttendanceCreateModalProps> = ({
             error={errors.check_in}
             required
             icon={<Clock size={18} weight="duotone" className="text-foreground-tertiary" />}
-            icon={<Clock size={18} weight="duotone" className="text-foreground-tertiary" />}
           />
 
           <TimeField
@@ -142,7 +139,6 @@ export const AttendanceCreateModal: React.FC<AttendanceCreateModalProps> = ({
             onChange={handleChange}
             error={errors.check_out}
             required
-            icon={<Clock size={18} weight="duotone" className="text-foreground-tertiary" />}
             icon={<Clock size={18} weight="duotone" className="text-foreground-tertiary" />}
           />
         </div>
@@ -160,7 +156,7 @@ export const AttendanceCreateModal: React.FC<AttendanceCreateModalProps> = ({
             type="button"
             variant="outline"
             onClick={onClose}
-            className="border border-border-secondary text-foreground-secondary hover:bg-background-secondary dark:bg-background-tertiary"
+            className="border border-gray-300 text-foreground-secondary hover:bg-background-secondary dark:bg-background-tertiary"
           >
             Cancel
           </Button>
@@ -168,7 +164,6 @@ export const AttendanceCreateModal: React.FC<AttendanceCreateModalProps> = ({
             type="submit"
             variant="primary"
             disabled={!isValid || !hasChanges || isLoading}
-            className="bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white disabled:opacity-50"
             className="bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white disabled:opacity-50"
           >
             {isLoading ? 'Creating...' : 'Create Site'}

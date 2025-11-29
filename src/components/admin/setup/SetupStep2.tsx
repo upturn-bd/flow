@@ -17,12 +17,12 @@ import ComplaintsManagementView from "@/components/admin/complaints/ComplaintsMa
 // Simple component to show while loading or when components can't be found
 function PlaceholderCard({ title, message }: { title: string; message: string }) {
   return (
-    <div className="bg-surface-primary p-6 rounded-lg border border-border-primary shadow-sm mb-6">
-      <div className="border-b border-border-primary pb-4 mb-4">
-        <h3 className="text-lg font-semibold text-foreground-primary">{title}</h3>
+    <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm mb-6">
+      <div className="border-b border-gray-200 pb-4 mb-4">
+        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
       </div>
-      <div className="flex items-center justify-center p-8 bg-background-secondary dark:bg-background-tertiary rounded-lg">
-        <p className="text-foreground-secondary">{message}</p>
+      <div className="flex items-center justify-center p-8 bg-gray-50 rounded-lg">
+        <p className="text-gray-500">{message}</p>
       </div>
     </div>
   );
@@ -57,8 +57,8 @@ export default function SetupStep2() {
         variants={fadeInUp}
         className="text-center mb-8"
       >
-        <h2 className="text-2xl font-bold text-foreground-primary mb-2">Step 2: Administrative Configuration</h2>
-        <p className="text-foreground-secondary">Configure administrative settings and employee management rules</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Step 2: Administrative Configuration</h2>
+        <p className="text-gray-600">Configure administrative settings and employee management rules</p>
       </motion.div>
       
       <Suspense fallback={

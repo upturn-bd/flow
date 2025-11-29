@@ -53,7 +53,7 @@ export default function StakeholderTypeFormModal({
           />
 
           <div>
-            <label className="block font-medium text-foreground-primary mb-1 text-sm sm:text-base">
+            <label className="block font-medium text-gray-700 mb-1 text-sm sm:text-base">
               Description
             </label>
             <textarea
@@ -61,8 +61,8 @@ export default function StakeholderTypeFormModal({
               value={values.description || ""}
               onChange={handleChange}
               rows={3}
-              className={`w-full rounded-lg border p-2.5 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all shadow-sm text-sm sm:text-base bg-surface-primary text-foreground-primary ${
-                errors.description ? "border-red-500 focus:ring-red-500" : "border-border-primary"
+              className={`w-full rounded-lg border p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm text-sm sm:text-base ${
+                errors.description ? "border-red-500 focus:ring-red-500" : "border-gray-300"
               }`}
               placeholder="Optional description of this stakeholder type"
             />
@@ -82,9 +82,9 @@ export default function StakeholderTypeFormModal({
                   target: { name: "is_active", value: e.target.checked },
                 } as any)
               }
-              className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
             />
-            <label htmlFor="is_active" className="text-sm font-medium text-foreground-primary">
+            <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
               Active
             </label>
           </div>

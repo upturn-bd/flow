@@ -143,24 +143,24 @@ export default function LineageCreateModal({
         animate="visible"
         exit="exit"
         variants={modalVariants}
-        className="bg-surface-primary p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-border-primary"
+        className="bg-surface-primary p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-blue-100"
       >
         <motion.div variants={fadeInUp} className="flex items-center gap-3">
-          <Buildings size={24} weight="duotone" className="text-primary-600" />
-          <h2 className="text-xl font-semibold text-foreground-primary">
+          <Buildings size={24} weight="duotone" className="text-blue-600" />
+          <h2 className="text-xl font-semibold text-blue-800">
             Create Lineage
           </h2>
         </motion.div>
 
         <motion.div variants={fadeInUp} className="mb-4">
-          <label className="block font-semibold text-foreground-primary mb-2">
+          <label className="block font-semibold text-blue-800 mb-2">
             Lineage Name
           </label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-md bg-background-secondary p-2 border border-border-primary focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none transition-all text-foreground-primary"
+            className="w-full rounded-md bg-blue-50 p-2 border border-blue-200 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 outline-none transition-all"
             placeholder="Enter Lineage Name"
           />
         </motion.div>
@@ -168,9 +168,8 @@ export default function LineageCreateModal({
         <motion.div
           variants={fadeInUp}
           className="bg-surface-primary py-4 w-full max-w-4xl mx-auto"
-          className="bg-surface-primary py-4 w-full max-w-4xl mx-auto"
         >
-          <h3 className="text-md font-semibold text-foreground-secondary mb-4">
+          <h3 className="text-md font-semibold text-blue-700 mb-4">
             Set Hierarchy
           </h3>
 
@@ -201,7 +200,7 @@ export default function LineageCreateModal({
                               parseInt(e.target.value)
                             )
                           }
-                          className="w-full rounded-md bg-primary-50 dark:bg-primary-900/30 px-4 py-2 border border-primary-200 dark:border-primary-800 text-foreground-primary focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+                          className="w-full rounded-md bg-blue-50 px-4 py-2 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                         >
                           <option>
                             Select position for Level {level.level}
@@ -217,7 +216,7 @@ export default function LineageCreateModal({
                             onClick={() => removeLevel(index)}
                             variant="danger"
                             size="sm"
-                            className="bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800"
+                            className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200"
                           >
                             <Trash size={16} weight="duotone" />
                           </Button>
@@ -225,7 +224,7 @@ export default function LineageCreateModal({
                       </div>
                       {index < hierarchy.length - 1 && (
                         <div className="flex justify-center">
-                          <div className="h-6 w-0.5 bg-primary-300 dark:bg-primary-700 absolute left-1/2 transform -translate-x-1/2"></div>
+                          <div className="h-6 w-0.5 bg-blue-300 absolute left-1/2 transform -translate-x-1/2"></div>
                         </div>
                       )}
                     </motion.div>
@@ -237,7 +236,7 @@ export default function LineageCreateModal({
                   variant="primary"
                   size="sm"
                   onClick={addNewLevel}
-                  className="mt-2 flex items-center gap-1"
+                  className="mt-2 flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Plus size={16} weight="bold" />
                   Add Level
@@ -250,7 +249,7 @@ export default function LineageCreateModal({
             <Button
               variant="outline"
               onClick={onClose}
-              className="border border-border-primary text-foreground-secondary hover:bg-background-secondary"
+              className="border border-blue-200 text-blue-700 hover:bg-blue-50"
             >
               Cancel
             </Button>
@@ -268,6 +267,7 @@ export default function LineageCreateModal({
                     Number.isNaN(level.position_id)
                 )
               }
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Save
             </Button>
@@ -432,22 +432,22 @@ export function LineageUpdateModal({
         initial="hidden"
         animate="visible"
         exit="exit"
-        className="bg-surface-primary p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-border-primary"
+        className="bg-surface-primary p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-blue-100"
       >
         <motion.div variants={fadeInUp} className="flex items-center gap-3">
-          <Buildings size={24} weight="duotone" className="text-primary-600" />
-          <h2 className="text-xl font-semibold text-foreground-primary">Edit Lineage</h2>
+          <Buildings size={24} weight="duotone" className="text-blue-600" />
+          <h2 className="text-xl font-semibold text-blue-800">Edit Lineage</h2>
         </motion.div>
 
         <motion.div variants={fadeInUp} className="mb-4">
-          <label className="block font-semibold text-foreground-primary mb-2">
+          <label className="block font-semibold text-blue-800 mb-2">
             Lineage Name
           </label>
           <input
             type="text"
             value={name}
             readOnly
-            className="w-full rounded-md bg-background-secondary p-2 border border-border-primary focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none transition-all cursor-not-allowed text-foreground-primary"
+            className="w-full rounded-md bg-blue-50 p-2 border border-blue-200 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 outline-none transition-all cursor-not-allowed"
             placeholder="Enter Lineage Name"
           />
         </motion.div>
@@ -455,9 +455,8 @@ export function LineageUpdateModal({
         <motion.div
           variants={fadeInUp}
           className="bg-surface-primary py-4 w-full max-w-4xl mx-auto"
-          className="bg-surface-primary py-4 w-full max-w-4xl mx-auto"
         >
-          <h3 className="text-md font-semibold text-foreground-secondary mb-4">
+          <h3 className="text-md font-semibold text-blue-700 mb-4">
             Update Hierarchy
           </h3>
 
@@ -488,7 +487,7 @@ export function LineageUpdateModal({
                               parseInt(e.target.value)
                             )
                           }
-                          className="w-full rounded-md bg-primary-50 dark:bg-primary-900/30 px-4 py-2 border border-primary-200 dark:border-primary-800 text-foreground-primary focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+                          className="w-full rounded-md bg-blue-50 px-4 py-2 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                         >
                           <option>
                             Select position for Level {level.level}
@@ -504,7 +503,7 @@ export function LineageUpdateModal({
                             onClick={() => removeLevel(index)}
                             variant="danger"
                             size="sm"
-                            className="bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800"
+                            className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200"
                           >
                             <Trash size={16} weight="duotone" />
                           </Button>
@@ -512,7 +511,7 @@ export function LineageUpdateModal({
                       </div>
                       {index < hierarchy.length - 1 && (
                         <div className="flex justify-center">
-                          <div className="h-6 w-0.5 bg-primary-300 dark:bg-primary-700 absolute left-1/2 transform -translate-x-1/2"></div>
+                          <div className="h-6 w-0.5 bg-blue-300 absolute left-1/2 transform -translate-x-1/2"></div>
                         </div>
                       )}
                     </motion.div>
@@ -524,7 +523,7 @@ export function LineageUpdateModal({
                   variant="primary"
                   size="sm"
                   onClick={addNewLevelUpdate}
-                  className="mt-2 flex items-center gap-1"
+                  className="mt-2 flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Plus size={16} weight="bold" />
                   Add Level
@@ -537,7 +536,7 @@ export function LineageUpdateModal({
             <Button
               variant="outline"
               onClick={onClose}
-              className="border border-border-primary text-foreground-secondary hover:bg-background-secondary"
+              className="border border-blue-200 text-blue-700 hover:bg-blue-50"
             >
               Cancel
             </Button>
@@ -561,6 +560,7 @@ export function LineageUpdateModal({
                   compareLineages(initialData, hierarchy)
                 )
               }
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Save
             </Button>

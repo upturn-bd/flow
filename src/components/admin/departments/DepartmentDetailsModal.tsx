@@ -4,7 +4,7 @@
 
 import { Department } from "@/hooks/useDepartments";
 import { Division } from "@/hooks/useDivisions";
-import { PencilSimple, TrashSimple, Building, User, StackSimple, FileText, X } from "@/lib/icons";
+import { PencilSimple, Trash, Building, User, StackSimple, FileText, X } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
@@ -122,7 +122,7 @@ export default function DepartmentDetailsModal({
             onClick={deleteDepartment}
             className="flex items-center gap-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:border-red-300"
           >
-            <TrashSimple size={18} weight="bold" />
+            <Trash size={18} weight="bold" />
             Delete
           </Button>
         </motion.div>

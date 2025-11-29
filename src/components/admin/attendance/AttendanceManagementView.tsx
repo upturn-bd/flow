@@ -6,7 +6,7 @@ import AttendanceCreateModal, {
   AttendanceUpdateModal,
 } from "./AttendanceModal";
 import { Site, useSites } from "@/hooks/useAttendanceManagement";
-import { TrashSimple, Buildings, Plus, MapPin, Clock, Eye } from "@/lib/icons";
+import { Trash, Buildings, Plus, MapPin, Clock, Eye } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 
@@ -79,8 +79,6 @@ export default function AttendanceManagementView() {
         <div className="flex items-center gap-3 mb-4">
           <Buildings size={22} weight="duotone" className="text-foreground-secondary" />
           <h3 className="text-lg font-semibold text-foreground-primary">Attendance Sites</h3>
-          <Buildings size={22} weight="duotone" className="text-foreground-secondary" />
-          <h3 className="text-lg font-semibold text-foreground-primary">Attendance Sites</h3>
         </div>
 
         {loading ? (
@@ -99,12 +97,9 @@ export default function AttendanceManagementView() {
                     <div
                       key={site.id || idx}
                       className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
-                      className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2 mb-2">
-                          <Buildings size={20} weight="duotone" className="text-foreground-secondary" />
-                          <h4 className="font-medium text-foreground-primary">{site.name}</h4>
                           <Buildings size={20} weight="duotone" className="text-foreground-secondary" />
                           <h4 className="font-medium text-foreground-primary">{site.name}</h4>
                         </div>
@@ -114,23 +109,19 @@ export default function AttendanceManagementView() {
                           onClick={() => site.id !== undefined && handleDeleteSite(site.id)}
                           isLoading={deleteLoading === site.id}
                           disabled={deleteLoading === site.id}
-                          className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500"
+                          className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
                         >
-                          <TrashSimple size={16} weight="bold" />
+                          <Trash size={16} weight="bold" />
                         </Button>
                       </div>
                       
                       <div className="mt-2 space-y-1.5">
                         <div className="flex items-center gap-1.5 text-sm text-foreground-secondary">
                           <MapPin size={16} weight="duotone" className="text-foreground-tertiary" />
-                        <div className="flex items-center gap-1.5 text-sm text-foreground-secondary">
-                          <MapPin size={16} weight="duotone" className="text-foreground-tertiary" />
                           <span className="truncate">
                             {parseFloat(site.latitude.toString()).toFixed(5)}, {parseFloat(site.longitude.toString()).toFixed(5)}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-sm text-foreground-secondary">
-                          <Clock size={16} weight="duotone" className="text-foreground-tertiary" />
                         <div className="flex items-center gap-1.5 text-sm text-foreground-secondary">
                           <Clock size={16} weight="duotone" className="text-foreground-tertiary" />
                           <span>
@@ -145,7 +136,6 @@ export default function AttendanceManagementView() {
                           size="sm"
                           onClick={() => setEditSite(site.id!)}
                           className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
-                          className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
                         >
                           <Eye size={16} weight="bold" />
                           View Details
@@ -156,13 +146,9 @@ export default function AttendanceManagementView() {
                 </div>
               ) : (
                 <div className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary">
-                <div className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary">
                   <div className="flex justify-center mb-3">
                     <Buildings size={40} weight="duotone" className="text-foreground-tertiary" />
-                    <Buildings size={40} weight="duotone" className="text-foreground-tertiary" />
                   </div>
-                  <p className="text-foreground-tertiary mb-1">No attendance sites found</p>
-                  <p className="text-foreground-tertiary text-sm mb-4">Add sites to manage attendance locations</p>
                   <p className="text-foreground-tertiary mb-1">No attendance sites found</p>
                   <p className="text-foreground-tertiary text-sm mb-4">Add sites to manage attendance locations</p>
                 </div>
@@ -175,7 +161,6 @@ export default function AttendanceManagementView() {
           <Button
             variant="primary" 
             onClick={() => setIsCreatingSite(true)}
-            className="flex items-center gap-2 bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white"
             className="flex items-center gap-2 bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white"
           >
             <Plus size={16} weight="bold" />

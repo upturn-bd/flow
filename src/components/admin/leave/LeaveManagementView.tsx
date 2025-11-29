@@ -9,7 +9,7 @@ import {
   LeaveTypeUpdateModal,
 } from ".";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
-import { TrashSimple, Tag, CalendarCheck, CalendarBlank, Plus, Clock, Eye } from "@/lib/icons";
+import { Trash, Tag, CalendarCheck, CalendarBlank, Plus, Clock, Eye } from "@/lib/icons";
 import { useHolidayConfigs, useWeeklyHolidayConfigs } from "@/hooks/useLeaveManagement";
 import { HolidayConfig, LeaveType } from "@/hooks/useLeaveManagement";
 import { Button } from "@/components/ui/button";
@@ -239,8 +239,6 @@ export default function LeaveManagementView() {
           <div className="flex items-center gap-3 mb-4">
             <CalendarBlank size={22} weight="duotone" className="text-foreground-secondary" />
             <h3 className="text-lg font-semibold text-foreground-primary">Weekly Holidays</h3>
-            <CalendarBlank size={22} weight="duotone" className="text-foreground-secondary" />
-            <h3 className="text-lg font-semibold text-foreground-primary">Weekly Holidays</h3>
           </div>
 
           <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
@@ -250,8 +248,8 @@ export default function LeaveManagementView() {
                 <div
                   key={day}
                   className={`cursor-pointer select-none rounded-lg py-2 text-center font-medium border ${isSelected
-                    ? "bg-primary-600 text-white border-primary-600"
-                    : "bg-background-secondary dark:bg-background-tertiary text-foreground-secondary border-border-primary hover:bg-background-tertiary dark:hover:bg-surface-secondary"
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-background-secondary dark:bg-background-tertiary text-foreground-secondary border-border-primary hover:bg-background-tertiary dark:bg-surface-secondary"
                     }`}
                   onClick={() => toggleWeekday(idx)}
                 >
@@ -264,7 +262,6 @@ export default function LeaveManagementView() {
 
           {weeklyHolidays.length > 0 && (
             <p className="mt-2 text-sm text-foreground-tertiary">
-            <p className="mt-2 text-sm text-foreground-tertiary">
               Selected: {weeklyHolidays.map(d => weekdays[d]).join(", ")}
             </p>
           )}
@@ -273,8 +270,6 @@ export default function LeaveManagementView() {
         {/* Holidays Section */}
         <section>
           <div className="flex items-center gap-3 mb-4">
-            <CalendarCheck size={22} weight="duotone" className="text-foreground-secondary" />
-            <h3 className="text-lg font-semibold text-foreground-primary">Other Holidays</h3>
             <CalendarCheck size={22} weight="duotone" className="text-foreground-secondary" />
             <h3 className="text-lg font-semibold text-foreground-primary">Other Holidays</h3>
           </div>
@@ -295,12 +290,9 @@ export default function LeaveManagementView() {
                       <div
                         key={holiday.id || idx}
                         className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
-                        className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-2 mb-2">
-                            <CalendarCheck size={20} weight="duotone" className="text-foreground-secondary" />
-                            <h4 className="font-medium text-foreground-primary">{holiday.name}</h4>
                             <CalendarCheck size={20} weight="duotone" className="text-foreground-secondary" />
                             <h4 className="font-medium text-foreground-primary">{holiday.name}</h4>
                           </div>
@@ -310,15 +302,13 @@ export default function LeaveManagementView() {
                             onClick={() => holiday.id !== undefined && handleDeleteHolidayConfig(holiday.id)}
                             isLoading={deleteHolidayLoading === holiday.id}
                             disabled={deleteHolidayLoading === holiday.id}
-                            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500 dark:hover:text-red-400"
+                            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
                           >
-                            <TrashSimple size={16} weight="bold" />
+                            <Trash size={16} weight="bold" />
                           </Button>
                         </div>
 
                         <div className="mt-2">
-                          <span className="flex items-center gap-1.5 text-sm text-foreground-secondary">
-                            <CalendarBlank size={16} weight="duotone" className="text-foreground-tertiary" />
                           <span className="flex items-center gap-1.5 text-sm text-foreground-secondary">
                             <CalendarBlank size={16} weight="duotone" className="text-foreground-tertiary" />
                             {holiday.start_day == holiday.end_day ? formatDate(holiday.start_day) : `${formatDate(holiday.start_day)} - ${formatDate(holiday.end_day)}`}
@@ -330,7 +320,6 @@ export default function LeaveManagementView() {
                             variant="outline"
                             size="sm"
                             onClick={() => setEditHolidayConfig(holiday.id!)}
-                            className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
                             className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
                           >
                             <Eye size={16} weight="bold" />
@@ -344,16 +333,12 @@ export default function LeaveManagementView() {
                   <div
                     
                     className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary"
-                    className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary"
                   >
                     <div
                       className="flex justify-center mb-3"
                     >
                       <CalendarCheck size={40} weight="duotone" className="text-foreground-tertiary" />
-                      <CalendarCheck size={40} weight="duotone" className="text-foreground-tertiary" />
                     </div>
-                    <p className="text-foreground-tertiary mb-1">No holidays found</p>
-                    <p className="text-foreground-tertiary text-sm mb-4">Add holidays to the calendar</p>
                     <p className="text-foreground-tertiary mb-1">No holidays found</p>
                     <p className="text-foreground-tertiary text-sm mb-4">Add holidays to the calendar</p>
                   </div>
@@ -367,7 +352,6 @@ export default function LeaveManagementView() {
               variant="primary"
               onClick={() => setIsCreatingHolidayConfig(true)}
               className="flex items-center gap-2 bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white"
-              className="flex items-center gap-2 bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white"
             >
               <Plus size={16} weight="bold" />
               Add Holiday
@@ -378,8 +362,6 @@ export default function LeaveManagementView() {
         {/* Leave Types Section */}
         <section className="mt-8">
           <div className="flex items-center gap-3 mb-4">
-            <Tag size={22} weight="duotone" className="text-foreground-secondary" />
-            <h3 className="text-lg font-semibold text-foreground-primary">Leave Types</h3>
             <Tag size={22} weight="duotone" className="text-foreground-secondary" />
             <h3 className="text-lg font-semibold text-foreground-primary">Leave Types</h3>
           </div>
@@ -400,12 +382,9 @@ export default function LeaveManagementView() {
                       <div
                         key={type.id || idx}
                         className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
-                        className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-2 mb-2">
-                            <Tag size={20} weight="duotone" className="text-foreground-secondary" />
-                            <h4 className="font-medium text-foreground-primary">{type.name}</h4>
                             <Tag size={20} weight="duotone" className="text-foreground-secondary" />
                             <h4 className="font-medium text-foreground-primary">{type.name}</h4>
                           </div>
@@ -415,15 +394,13 @@ export default function LeaveManagementView() {
                             onClick={() => type.id !== undefined && handleDeleteLeaveType(type.id)}
                             isLoading={deleteTypeLoading === type.id}
                             disabled={deleteTypeLoading === type.id}
-                            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500 dark:hover:text-red-400"
+                            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
                           >
-                            <TrashSimple size={16} weight="bold" />
+                            <Trash size={16} weight="bold" />
                           </Button>
                         </div>
 
                         <div className="mt-2">
-                          <span className="flex items-center gap-1.5 text-sm bg-background-tertiary dark:bg-surface-secondary px-2 py-1 rounded text-foreground-secondary w-fit">
-                            <Clock size={16} weight="duotone" className="text-foreground-tertiary" />
                           <span className="flex items-center gap-1.5 text-sm bg-background-tertiary dark:bg-surface-secondary px-2 py-1 rounded text-foreground-secondary w-fit">
                             <Clock size={16} weight="duotone" className="text-foreground-tertiary" />
                             Annual quota: {type.annual_quota} days
@@ -435,7 +412,6 @@ export default function LeaveManagementView() {
                             variant="outline"
                             size="sm"
                             onClick={() => setEditLeaveType(type.id!)}
-                            className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
                             className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
                           >
                             <Eye size={16} weight="bold" />
@@ -449,16 +425,12 @@ export default function LeaveManagementView() {
                   <div
                     
                     className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary"
-                    className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary"
                   >
                     <div
                       className="flex justify-center mb-3"
                     >
                       <Tag size={40} weight="duotone" className="text-foreground-tertiary" />
-                      <Tag size={40} weight="duotone" className="text-foreground-tertiary" />
                     </div>
-                    <p className="text-foreground-tertiary mb-1">No leave types found</p>
-                    <p className="text-foreground-tertiary text-sm mb-4">Add leave types to configure the leave system</p>
                     <p className="text-foreground-tertiary mb-1">No leave types found</p>
                     <p className="text-foreground-tertiary text-sm mb-4">Add leave types to configure the leave system</p>
                   </div>
@@ -471,7 +443,6 @@ export default function LeaveManagementView() {
             <Button
               variant="primary"
               onClick={() => setIsCreatingLeaveType(true)}
-              className="flex items-center gap-2 bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white"
               className="flex items-center gap-2 bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white"
             >
               <Plus size={16} weight="bold" />

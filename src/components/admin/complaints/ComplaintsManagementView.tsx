@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
 import ComplaintTypeCreateModal from "./ComplaintsModal";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
-import { Tag, Plus, TrashSimple } from "@/lib/icons";
+import { Tag, Plus, Trash } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 
@@ -56,8 +56,8 @@ export default function ComplaintsView() {
     <Collapsible title="Complaints">
       <div className="px-4 space-y-4 py-4">
         <div className="flex items-center gap-3 mb-4">
-          <Tag size={22} weight="duotone" className="text-foreground-secondary" />
-          <h3 className="text-lg font-semibold text-foreground-primary">Complaint Types</h3>
+          <Tag size={22} weight="duotone" className="text-gray-600" />
+          <h3 className="text-lg font-semibold text-gray-800">Complaint Types</h3>
         </div>
 
         {loading ? (
@@ -75,29 +75,29 @@ export default function ComplaintsView() {
                   {complaintTypes.map((type, idx) => (
                     <div
                       key={type.id || idx}
-                      className="flex items-center bg-background-secondary dark:bg-background-tertiary rounded-lg px-3 py-2 border border-border-primary shadow-sm"
+                      className="flex items-center bg-gray-100 rounded-lg px-3 py-2 border border-gray-200 shadow-sm"
                     >
-                      <span className="text-foreground-primary font-medium">{type.name}</span>
+                      <span className="text-gray-800 font-medium">{type.name}</span>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => type.id !== undefined && handleDeleteComplaintType(type.id)}
                         isLoading={deleteLoading === type.id}
                         disabled={deleteLoading === type.id}
-                        className="ml-2 p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500"
+                        className="ml-2 p-1 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-500"
                       >
-                        <TrashSimple size={16} weight="bold" />
+                        <Trash size={16} weight="bold" />
                       </Button>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary">
+                <div className="bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
                   <div className="flex justify-center mb-3">
-                    <Tag size={40} weight="duotone" className="text-foreground-tertiary" />
+                    <Tag size={40} weight="duotone" className="text-gray-400" />
                   </div>
-                  <p className="text-foreground-secondary mb-1">No complaint types found</p>
-                  <p className="text-foreground-tertiary text-sm mb-4">Create complaint types to categorize issues</p>
+                  <p className="text-gray-500 mb-1">No complaint types found</p>
+                  <p className="text-gray-400 text-sm mb-4">Create complaint types to categorize issues</p>
                 </div>
               )}
             </AnimatePresence>
@@ -108,7 +108,7 @@ export default function ComplaintsView() {
           <Button
             variant="primary" 
             onClick={() => setIsCreatingComplaintType(true)}
-            className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white"
+            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"
           >
             <Plus size={16} weight="bold" />
             Add Type

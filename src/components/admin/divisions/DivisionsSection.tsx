@@ -7,7 +7,7 @@ import DivisionModal from "./DivisionModal";
 import DivisionDetailsModal from "./DivisionDetailsModal";
 import { Layers, Plus, Eye, X } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { TrashSimple } from "@/lib/icons";
+import { Trash } from "@/lib/icons";
 import { getCompanyInfo } from "@/lib/utils/auth";
 
 type DivisionsSectionProps = {
@@ -116,7 +116,7 @@ export default function DivisionsSection({ showNotification }: DivisionsSectionP
                     disabled={divisionDeleteLoading === div.id}
                     className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs sm:text-sm flex items-center gap-1 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors ${divisionDeleteLoading === div.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    <TrashSimple size={14} />
+                    <Trash size={14} />
                     <span className="hidden xs:inline">
                       {divisionDeleteLoading === div.id ? 'Deleting...' : 'Delete'}
                     </span>

@@ -88,7 +88,7 @@ export default function TeamMembersModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-surface-primary rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border-primary bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-900/50">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border-primary bg-gradient-to-r from-primary-50 to-purple-50 dark:from-primary-900/30 dark:to-purple-900/30">
           <div>
             <h2 className="text-2xl font-bold text-foreground-primary">
               Team Members
@@ -205,7 +205,7 @@ export default function TeamMembersModal({
               <button
                 onClick={handleAddMember}
                 disabled={!selectedEmployeeId || teamLoading}
-                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:scale-[0.98] disabled:bg-background-tertiary dark:disabled:bg-background-tertiary disabled:cursor-not-allowed transition-all font-medium shadow-md hover:shadow-lg"
+                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:scale-[0.98] disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-all font-medium shadow-md hover:shadow-lg"
               >
                 <UserPlus size={20} />
                 {teamLoading ? 'Adding...' : 'Add to Team'}
@@ -217,14 +217,14 @@ export default function TeamMembersModal({
             <div className="lg:col-span-3">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-primary-100 dark:bg-primary-900/50 rounded-lg">
-                    <Users size={20} className="text-primary-600 dark:text-primary-400" />
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-lg">
+                    <Users size={20} className="text-purple-600 dark:text-purple-400" />
                   </div>
                   <h3 className="text-lg font-semibold text-foreground-primary">
                     Current Members
                   </h3>
                 </div>
-                <span className="px-3 py-1 bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-400 text-sm font-medium rounded-full">
+                <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-400 text-sm font-medium rounded-full">
                   {teamMembers.length}
                 </span>
               </div>
@@ -244,11 +244,11 @@ export default function TeamMembersModal({
                       {teamMembers.map((member) => (
                         <div
                           key={member.employee_id}
-                          className="flex items-center justify-between p-4 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors group"
+                          className="flex items-center justify-between p-4 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors group"
                         >
                           <div className="flex-1 min-w-0 pr-4">
                             <div className="flex items-center gap-2">
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 dark:from-primary-400 dark:to-primary-500 flex items-center justify-center text-white font-semibold shadow-md">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-white font-semibold shadow-md">
                                 {(member.employee_name || 'U').charAt(0).toUpperCase()}
                               </div>
                               <div className="flex-1 min-w-0">
