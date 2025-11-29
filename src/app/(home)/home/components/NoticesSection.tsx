@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, RefreshCw, AlertCircle, Plus } from '@/lib/icons';
+import { Bell, RefreshCw, AlertCircle, Plus } from 'lucide-react';
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import SectionHeader from './SectionHeader';
 import EmptyState from './EmptyState';
@@ -11,7 +11,7 @@ import LoadingSection from './LoadingSection';
 interface Notice {
   id?: number;
   title: string;
-  urgency?: string;
+  urgency?: "low" | "normal" | "high" | "urgent";
   valid_from?: string;
   valid_till?: string;
 }
@@ -67,23 +67,21 @@ export default function NoticesSection({
       case 'unread':
         return notices.filter(notice => notice.id && !readNotices.has(notice.id));
       case 'urgent':
-        return notices.filter(notice => notice.urgency === 'High');
+        return notices.filter(notice => notice.urgency === 'high' || notice.urgency === 'urgent');
       case 'all':
       default:
         return notices;
     }
   }, [notices, activeTab, readNotices]);
 
-  useEffect(() => {
-    console.log("filtered notices", filteredNotices);
-  }, [filteredNotices, activeTab]);
+
 
   const getTabCount = (tab: TabType): number => {
     switch (tab) {
       case 'unread':
         return notices.filter(notice => notice.id && !readNotices.has(notice.id)).length;
       case 'urgent':
-        return notices.filter(notice => notice.urgency === 'High').length;
+        return notices.filter(notice => notice.urgency === 'high' || notice.urgency === 'urgent').length;
       case 'all':
       default:
         return notices.length;
@@ -161,10 +159,7 @@ export default function NoticesSection({
             <LoadingSection text="Loading notices..." icon={Bell} />
           </div>
         ) : (
-          <motion.ul 
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
+          <ul 
             className="space-y-3 mt-6 flex-1 overflow-y-auto min-h-0"
           >
             {filteredNotices.length > 0 ? (
@@ -173,7 +168,9 @@ export default function NoticesSection({
                 return (
                   <motion.li 
                     key={item.id} 
-                    variants={fadeInUp}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: 0.05 }}
                     onClick={() => item.id && handleNoticeClick(item.id)}
                     className={`flex justify-between items-center p-3 rounded-lg hover:bg-primary-50 transition-colors border-b border-border-primary last:border-b-0 cursor-pointer ${
                       isRead ? 'opacity-70' : ''
@@ -190,19 +187,19 @@ export default function NoticesSection({
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      {item.urgency === "High" && (
+                      {(item.urgency === "high" || item.urgency === "urgent") && (
                         <div className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full flex items-center">
                           <AlertCircle size={12} className="mr-1" />
-                          Urgent
+                          {item.urgency === "urgent" ? "Urgent" : "High"}
                         </div>
                       )}
-                      {item.urgency === "Medium" && (
+                      {item.urgency === "normal" && (
                         <div className="bg-yellow-100 text-yellow-600 text-xs px-2 py-1 rounded-full flex items-center">
                           <AlertCircle size={12} className="mr-1" />
-                          Medium
+                          Normal
                         </div>
                       )}
-                      {item.urgency === "Low" && (
+                      {item.urgency === "low" && (
                         <div className="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full flex items-center">
                           <AlertCircle size={12} className="mr-1" />
                           Low
@@ -224,7 +221,7 @@ export default function NoticesSection({
                 } 
               />
             )}
-          </motion.ul>
+          </ul>
         )}
       </div>
     </div>

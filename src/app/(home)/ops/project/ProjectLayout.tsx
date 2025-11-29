@@ -143,7 +143,7 @@ export default function ProjectLayout({
             animate="visible"
             exit="exit"
             variants={fadeInUp}
-            className="bg-white p-4 sm:p-6 rounded-lg max-w-6xl mx-auto"
+            className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg w-full"
         >
             <div className="border-b border-gray-200 pb-4 mb-4">
                 <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-1">

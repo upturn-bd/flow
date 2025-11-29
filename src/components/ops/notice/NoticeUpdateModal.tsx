@@ -7,7 +7,7 @@ import { validateNotice, type NoticeData } from '@/lib/validation';
 import { useDepartments } from '@/hooks/useDepartments';
 import { Bell } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
-import { Notice, useNotices } from '@/hooks/useNotice';
+import { Notice, useNoticeTypes } from '@/hooks/useNotice';
 
 interface NoticeUpdateModalProps {
   initialData: Notice;
@@ -18,7 +18,7 @@ interface NoticeUpdateModalProps {
 
 const urgencyOptions = [
   { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
+  { value: 'normal', label: 'Normal' },
   { value: 'high', label: 'High' },
   { value: 'urgent', label: 'Urgent' }
 ];
@@ -33,7 +33,7 @@ export default function NoticeUpdateModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const { items: departments, fetchItems: fetchDepartments } = useDepartments();
-  const { items: noticeTypes, fetchItems: fetchNoticeTypes } = useNotices();
+  const { items: noticeTypes, fetchItems: fetchNoticeTypes } = useNoticeTypes();
 
   // Fetch once on mount
   useEffect(() => {

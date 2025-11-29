@@ -189,7 +189,7 @@ export default function TaskLayout({
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="max-w-6xl mx-auto p-4 sm:p-6"
+      className="w-full p-4 sm:p-6 lg:p-8"
     >
       <motion.div className="mb-8 flex justify-between items-center">
         <div>

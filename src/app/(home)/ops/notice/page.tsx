@@ -10,6 +10,7 @@ import { getEmployeeId } from "@/lib/utils/auth";
 import { useAuth } from "@/lib/auth/auth-context";
 import { PERMISSION_MODULES } from "@/lib/constants";
 import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from "@/components/permissions";
+import { formatDate } from "@/lib/utils";
 
 export default function NoticePage() {
   const {
@@ -132,7 +133,7 @@ export default function NoticePage() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto p-4 sm:p-6 min-h-[70vh] flex items-center justify-center">
+      <div className="w-full p-4 sm:p-6 lg:p-8 min-h-[70vh] flex items-center justify-center">
         <LoadingSpinner
           text="Loading notices..."
           icon={Bell}
@@ -152,7 +153,7 @@ export default function NoticePage() {
             animate="visible"
             exit="exit"
             variants={pageVariants}
-            className="max-w-6xl mx-auto p-4 sm:p-6"
+            className="w-full p-4 sm:p-6 lg:p-8"
           >
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -299,21 +300,21 @@ export default function NoticePage() {
                         )}
                       </div>
                       <p className="text-gray-700 mb-4">{notice.description}</p>
-                      <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Clock className="h-4 w-4 mr-1.5" />
-                          <span>
-                            Posted on {new Date(notice.valid_from).toLocaleDateString()}
-                          </span>
-                        </div>
-                        {notice.valid_till && (
-                          <div className="flex items-center text-sm text-amber-600">
-                            <CalendarDays className="h-4 w-4 mr-1.5" />
+                      <div className="flex flex-col gap-2 pt-4 border-t border-gray-100">
+                        <div className="flex flex-wrap justify-between items-center gap-2">
+                          <div className="flex items-center text-sm text-gray-500">
+                            <Clock className="h-4 w-4 mr-1.5" />
                             <span>
-                              Expires on {new Date(notice.valid_till).toLocaleDateString()}
+                              Posted on {formatDate(notice.created_at || '')}
                             </span>
                           </div>
-                        )}
+                          <div className="flex items-center text-sm text-gray-600">
+                            <CalendarDays className="h-4 w-4 mr-1.5" />
+                            <span>
+                              Valid: {formatDate(notice.valid_from)} → {formatDate(notice.valid_till)}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </motion.div>

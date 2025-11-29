@@ -8,6 +8,7 @@ import DepartmentDetailsModal from "./DepartmentDetailsModal";
 import { Building, Plus, Eye, X, Trash } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { getCompanyInfo } from "@/lib/utils/auth";
+import BaseModal from "@/components/ui/modals/BaseModal";
 
 type DepartmentsSectionProps = {
   showNotification: (message: string, isError?: boolean) => void;
@@ -29,6 +30,7 @@ export default function DepartmentsSection({
   const [viewDepartment, setViewDepartment] = useState<number | null>(null);
   const [editDepartment, setEditDepartment] = useState<number | null>(null);
   const [isCreatingDepartment, setIsCreatingDepartment] = useState(false);
+  const [showAllDepartments, setShowAllDepartments] = useState(false);
   const [departmentDeleteLoading, setDepartmentDeleteLoading] = useState<
     number | null
   >(null);
@@ -75,6 +77,54 @@ export default function DepartmentsSection({
     (d) => d.id === editDepartment
   );
 
+  // Show only first 10 departments in main view
+  const displayedDepartments = departments.slice(0, 10);
+  const hasMoreDepartments = departments.length > 10;
+
+  const renderDepartmentCard = (dept: any) => (
+    <div
+      key={dept.id}
+      className="bg-white rounded-lg border border-gray-200 p-2 sm:p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
+    >
+      <div className="flex items-center mb-2 sm:mb-0">
+        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 mr-2 sm:mr-3">
+          <Building size={16} />
+        </div>
+        <span className="font-medium text-gray-800 text-sm sm:text-base">
+          {dept.name}
+        </span>
+      </div>
+
+      <div className="flex gap-2 w-full sm:w-auto justify-end">
+        <button
+          onClick={() => {
+            setViewDepartment(dept.id ?? null);
+            setShowAllDepartments(false);
+          }}
+          className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs sm:text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
+        >
+          <Eye size={14} />
+          <span className="hidden xs:inline">Details</span>
+        </button>
+        <button
+          onClick={() => handleDeleteDepartment(dept.id ?? 0)}
+          disabled={departmentDeleteLoading === dept.id}
+          className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-red-50 text-red-600 text-xs sm:text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${departmentDeleteLoading === dept.id
+            ? "opacity-50 cursor-not-allowed"
+            : ""
+            }`}
+        >
+          <TrashSimple size={14} />
+          <span className="hidden xs:inline">
+            {departmentDeleteLoading === dept.id
+              ? "Deleting..."
+              : "Delete"}
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <section className="bg-surface-primary p-4 sm:p-6 rounded-lg border border-border-primary shadow-sm">
       <div className="border-b border-border-primary pb-4 mb-4">
@@ -102,13 +152,13 @@ export default function DepartmentsSection({
             departments.map((dept) => (
               <div
                 key={dept.id}
-                className="bg-surface-primary rounded-lg border border-border-primary p-2 sm:p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
+                className="bg-white rounded-lg border border-gray-200 p-2 sm:p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
               >
                 <div className="flex items-center mb-2 sm:mb-0">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-background-secondary rounded-full flex items-center justify-center text-foreground-tertiary mr-2 sm:mr-3">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 mr-2 sm:mr-3">
                     <Building size={16} />
                   </div>
-                  <span className="font-medium text-foreground-primary text-sm sm:text-base">
+                  <span className="font-medium text-gray-800 text-sm sm:text-base">
                     {dept.name}
                   </span>
                 </div>
@@ -116,7 +166,7 @@ export default function DepartmentsSection({
                 <div className="flex gap-2 w-full sm:w-auto justify-end">
                   <button
                     onClick={() => setViewDepartment(dept.id ?? null)}
-                    className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-background-secondary text-foreground-secondary text-xs sm:text-sm flex items-center gap-1 hover:bg-background-tertiary transition-colors"
+                    className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs sm:text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
                   >
                     <Eye size={14} />
                     <span className="hidden xs:inline">Details</span>
@@ -124,12 +174,12 @@ export default function DepartmentsSection({
                   <button
                     onClick={() => handleDeleteDepartment(dept.id ?? 0)}
                     disabled={departmentDeleteLoading === dept.id}
-                    className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs sm:text-sm flex items-center gap-1 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors ${departmentDeleteLoading === dept.id
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-red-50 text-red-600 text-xs sm:text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${departmentDeleteLoading === dept.id
                       ? "opacity-50 cursor-not-allowed"
                       : ""
                       }`}
                   >
-                    <Trash size={14} />
+                    <TrashSimple size={14} />
                     <span className="hidden xs:inline">
                       {departmentDeleteLoading === dept.id
                         ? "Deleting..."
@@ -186,6 +236,25 @@ export default function DepartmentsSection({
             onSubmit={handleUpdateDepartment}
             onClose={() => setEditDepartment(null)}
           />
+        )}
+        {showAllDepartments && (
+          <BaseModal
+            isOpen={showAllDepartments}
+            onClose={() => setShowAllDepartments(false)}
+            title="All Departments"
+            icon={<Building className="w-5 h-5" />}
+            size="lg"
+          >
+            <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+              {departments.length === 0 ? (
+                <div className="p-6 bg-gray-50 rounded-lg text-center text-gray-500">
+                  No departments available.
+                </div>
+              ) : (
+                departments.map((dept) => renderDepartmentCard(dept))
+              )}
+            </div>
+          </BaseModal>
         )}
       </AnimatePresence>
     </section>

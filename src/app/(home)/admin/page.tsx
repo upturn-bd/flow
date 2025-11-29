@@ -139,14 +139,14 @@ const sections = [
                 path: "/admin/transaction",
                 icon: DollarSign,
                 description: "Define and manage financial transaction types and flows",
-                color: "bg-emerald-100 text-emerald-700"
+                color: "bg-emerald-100 text-emerald-700 border-emerald-200"
             },
             {
                 name: "Onboarding",
                 path: "/admin/logs/onboarding",
                 icon: UserPlus,
                 description: "Archive of all employee onboarding processes",
-                color: "bg-purple-100 text-purple-700"
+                color: "bg-purple-100 text-purple-700 border-purple-200"
             },
         ],
     }

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FolderKanban, Clock, RefreshCw, Plus } from '@/lib/icons';
+import { FolderKanban, Clock, RefreshCw, Plus } from 'lucide-react';
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import SectionHeader from '@/app/(home)/home/components/SectionHeader';
 import LoadingSection from '@/app/(home)/home/components/LoadingSection';
@@ -17,7 +17,7 @@ import NoPermissionMessage from '@/components/ui/NoPermissionMessage';
 
 export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeChange }: WidgetProps) {
   const router = useRouter();
-  const { canRead, canWrite } = useAuth();
+  const { canRead, canWrite, employeeInfo } = useAuth();
   const { fetchOngoingProjects, ongoingProjects, ongoingLoading } = useProjects();
   const [loading, setLoading] = useState(true);
 
@@ -27,6 +27,10 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
 
   useEffect(() => {
     const loadProjects = async () => {
+      // Wait for employeeInfo to be available before fetching
+      if (!employeeInfo) {
+        return; // Keep loading state until employeeInfo is available
+      }
       if (!canViewProjects) {
         setLoading(false);
         return;
@@ -36,7 +40,7 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
       setLoading(false);
     };
     loadProjects();
-  }, [fetchOngoingProjects, canViewProjects]);
+  }, [fetchOngoingProjects, canViewProjects, employeeInfo]);
 
   const handleRefresh = async () => {
     await fetchOngoingProjects(5, true);
@@ -64,10 +68,7 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
             <LoadingSection text="Loading projects..." icon={FolderKanban} />
           </div>
         ) : (
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
+          <div
             className="px-5 pb-5 flex-1 overflow-hidden flex flex-col"
           >
             <div className="flex items-center justify-between mb-4 flex-shrink-0">
@@ -100,7 +101,9 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
                 ongoingProjects.slice(0, 5).map((project) => (
                   <motion.div
                     key={project.id}
-                    variants={fadeInUp}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: 0.05 }}
                     onClick={handleProjectClick}
                     className="flex items-center justify-between px-4 py-3 bg-background-secondary hover:bg-primary-50 rounded-lg transition-colors text-sm font-medium border border-border-primary cursor-pointer"
                   >
@@ -134,7 +137,7 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
                 </button>
               </div>
             )}
-          </motion.div>
+          </div>
         )}
       </div>
     </BaseWidget>

@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckSquare, Clock, Plus } from '@/lib/icons';
+import { CheckSquare, Clock, Plus } from 'lucide-react';
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import { cn } from '@/components/ui/class';
 import { formatDateToDayMonth } from '@/lib/utils';
 import BaseWidget from './BaseWidget';
 import { WidgetProps } from '@/lib/types/widgets';
-import { useTasks, TaskStatus } from '@/hooks/useTasks';
+import { useTasks } from '@/hooks/useTasks';
 import SectionHeader from '../components/SectionHeader';
 import LoadingSection from '../components/LoadingSection';
 import EmptyState from '../components/EmptyState';
@@ -24,8 +24,17 @@ interface TasksWidgetProps extends WidgetProps {
 
 export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange, onTaskClick }: TasksWidgetProps) {
   const { canRead, canWrite } = useAuth();
-  const { tasks, loading, getUserTasks, createTask } = useTasks();
+  const { 
+    ongoingTasks, 
+    completedTasks, 
+    ongoingTasksLoading, 
+    loading, 
+    fetchOngoingTasks, 
+    fetchCompletedTasks, 
+    createTask 
+  } = useTasks();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'ongoing' | 'completed'>('ongoing');
 
   // Check permissions
   const canViewTasks = canRead('tasks');
@@ -33,7 +42,8 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
 
   useEffect(() => {
     if (canViewTasks) {
-      getUserTasks(TaskStatus.INCOMPLETE);
+      fetchOngoingTasks();
+      fetchCompletedTasks();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canViewTasks]);
@@ -50,12 +60,15 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
     const result = await createTask(data);
     if (result?.success) {
       toast.success('Task created successfully!');
-      getUserTasks(TaskStatus.INCOMPLETE);
+      fetchOngoingTasks();
       handleCloseModal();
     } else {
       toast.error((result?.error as string) || 'Failed to create task');
     }
   };
+
+  const isLoading = ongoingTasksLoading || loading;
+  const currentTasks = activeTab === 'ongoing' ? ongoingTasks : completedTasks;
 
   return (
     <>
@@ -67,19 +80,14 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
         
         {!canViewTasks ? (
           <NoPermissionMessage moduleName="tasks" />
-        ) : loading ? (
+        ) : isLoading ? (
           <div className="flex-1 flex items-center justify-center overflow-hidden">
             <LoadingSection text="Loading tasks..." icon={CheckSquare} />
           </div>
         ) : (
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="px-5 pb-5 flex-1 overflow-hidden flex flex-col"
-          >
+          <div className="px-5 pb-5 flex-1 overflow-hidden flex flex-col">
             <div className="flex items-center justify-between mb-4 flex-shrink-0">
-              <h3 className="text-sm font-medium text-foreground-secondary">Your Tasks</h3>
+              <h3 className="text-sm font-medium text-gray-500">Your Tasks</h3>
               {canCreateTasks && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -94,20 +102,22 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
             </div>
 
             <div className="space-y-3 flex-1 overflow-y-auto min-h-0">
-            {tasks.length > 0 ? (
-              tasks.map((task) => (
+            {currentTasks.length > 0 ? (
+              currentTasks.map((task, index) => (
                 <motion.div
-                  key={task.id}
-                  variants={fadeInUp}
+                  key={`${activeTab}-${task.id}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: index * 0.05 }}
                   onClick={() => task.id && onTaskClick(task.id)}
-                  className="flex items-center justify-between px-4 py-3 bg-background-secondary hover:bg-surface-hover rounded-lg transition-colors text-sm font-medium border border-border-primary cursor-pointer"
+                  className="flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-blue-50 rounded-lg transition-colors text-sm font-medium border border-gray-100 cursor-pointer"
                 >
                   <div className="flex items-center space-x-3">
                     <div className={cn(
                       "w-2 h-2 rounded-full",
                       new Date(task.end_date) < new Date() ? "bg-red-500" : "bg-green-500"
                     )}></div>
-                    <span className="text-foreground-primary">{task.task_title}</span>
+                    <span className="text-gray-900">{task.task_title}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock size={14} className="text-foreground-tertiary" />
@@ -118,10 +128,13 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
                 </motion.div>
               ))
             ) : (
-              <EmptyState icon={CheckSquare} message="No tasks available at this time" />
+              <EmptyState 
+                icon={CheckSquare} 
+                message={activeTab === 'ongoing' ? "No ongoing tasks" : "No completed tasks"} 
+              />
               )}
             </div>
-          </motion.div>
+          </div>
         )}
       </div>
     </BaseWidget>

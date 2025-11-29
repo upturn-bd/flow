@@ -117,8 +117,10 @@ export function useComplaints() {
   const fetchComplaintHistory = async (isGlobal: boolean = false) => {
     try {
       console.log("Fetching complaint history...");
+      console.log("isGlobal:", isGlobal);
       setHistoryLoading(true);
       const user = await getEmployeeInfo();
+      console.log("User info:", { userId: user.id, companyId: user.company_id });
 
       // Start the query
       let query = supabase
@@ -129,12 +131,23 @@ export function useComplaints() {
 
       // Apply filter only if not global
       if (!isGlobal) {
+        console.log("Applying complainer_id filter:", user.id);
         query = query.eq("complainer_id", user.id);
       }
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      console.log("Complaint history query result:", {
+        totalCount: data?.length || 0,
+        anonymousCount: data?.filter(c => c.anonymous)?.length || 0,
+        nonAnonymousCount: data?.filter(c => !c.anonymous)?.length || 0,
+        complaints: data?.map(c => ({ id: c.id, anonymous: c.anonymous, status: c.status, complainer_id: c.complainer_id }))
+      });
+
+      if (error) {
+        console.error("Complaint history query error:", error);
+        throw error;
+      }
 
       setComplaintHistory(data || []);
       return data;

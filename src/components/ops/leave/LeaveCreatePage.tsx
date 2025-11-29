@@ -143,7 +143,7 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
   const fadeIn = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={fadeIn} className="p-6 space-y-8 max-w-4xl mx-auto">
+    <motion.div initial="hidden" animate="visible" variants={fadeIn} className="p-4 sm:p-6 space-y-8">
       {/* Leave Balance */}
       <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
         <h1 className="text-xl font-bold text-gray-800 mb-4 flex items-center">

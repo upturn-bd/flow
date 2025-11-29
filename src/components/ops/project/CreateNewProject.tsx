@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { Department, useDepartments } from "@/hooks/useDepartments";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { useProjects } from "@/hooks/useProjects";
@@ -14,6 +15,7 @@ import MilestoneForm, { type Milestone } from "./milestone/MilestoneForm";
 import { supabase } from "@/lib/supabase/client";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth/auth-context";
 
 const initialMilestone: Milestone = {
   milestone_title: "",
@@ -39,7 +41,9 @@ const initialProjectDetails: ProjectDetails = {
 };
 
 export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (key: string) => void }) {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth()
   const { departments, fetchDepartments } = useDepartments();
   const { employees, fetchEmployeeInfo } = useEmployeeInfo();
   const { createProject } = useProjects();
@@ -48,7 +52,7 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
   useEffect(() => {
     fetchDepartments();
     fetchEmployeeInfo();
-  }, []);
+  }, [user]);
 
   const handleSubmit = async (
     data: ProjectDetails,
@@ -85,7 +89,9 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
       // Create milestones if provided
       if (milestones.length > 0) {
         for (const m of milestones) {
-          const milestoneToCreate = { ...m, project_id: projectId };
+          // Remove temporary ID before sending to database - database will generate real ID
+          const { id: _tempId, ...milestoneWithoutId } = m;
+          const milestoneToCreate = { ...milestoneWithoutId, project_id: projectId };
           const milestoneResult = await createMilestone(milestoneToCreate);
           if (!milestoneResult.success) {
             await supabase.from("project_records").delete().match({ id: projectId });
@@ -96,6 +102,8 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
 
       toast.success("Project created successfully!");
 
+      // Explicitly navigate to ongoing tab - this ensures URL updates for tests
+      router.push('/ops/project?tab=ongoing');
       setActiveTab('ongoing')
     } catch (error) {
       console.error("Error creating project:", error);
@@ -112,7 +120,7 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6"
+      className="w-full p-4 sm:p-6 lg:p-10 space-y-6"
     >
       <motion.div
         variants={fadeInUp}
@@ -156,7 +164,7 @@ export function UpdateProjectPage({
   onClose: () => void;
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { createMilestone , updateMilestone} = useMilestones()
+  const { createMilestone, updateMilestone } = useMilestones()
 
   const handleSubmit = async (data: ProjectDetails, milestones: any) => {
     setIsSubmitting(true);
@@ -194,7 +202,7 @@ export function UpdateProjectPage({
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      className="md:max-w-6xl mx-auto p-6 md:p-10 space-y-6"
+      className="w-full p-4 sm:p-6 lg:p-10 space-y-6"
     >
       <motion.div variants={fadeInUp} className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">

@@ -28,6 +28,8 @@ interface MilestoneFormProps {
   currentMilestones: Milestone[];
   mode: "create" | "edit";
   currentWeightage: number;
+  projectStartDate?: string;
+  projectEndDate?: string;
 }
 
 export const validateMilestone = (
@@ -72,6 +74,8 @@ export default function MilestoneForm({
   currentMilestones,
   mode,
   currentWeightage,
+  projectStartDate,
+  projectEndDate,
 }: MilestoneFormProps) {
   const [milestoneData, setMilestoneData] = useState<Milestone>(milestone);
   const [milestoneAssignees, setMilestoneAssignees] = useState<string[]>(
@@ -89,10 +93,19 @@ export default function MilestoneForm({
     >
   ) => {
     const { name, value } = e.target;
-    if (name === "start_date" || name === "end_date") {
+    if (name === "start_date") {
+      setMilestoneData((prev) => {
+        const newData = { ...prev, start_date: value };
+        // If start date is after end date, adjust end date to match
+        if (value && prev.end_date && new Date(value) > new Date(prev.end_date)) {
+          newData.end_date = value;
+        }
+        return newData;
+      });
+    } else if (name === "end_date") {
       setMilestoneData((prev) => ({
         ...prev,
-        [name]: value,
+        end_date: value,
       }));
     } else if (name === "weightage") {
       setMilestoneData((prev) => ({
@@ -195,6 +208,8 @@ export default function MilestoneForm({
               value={milestoneData.start_date || ""}
               onChange={handleChange}
               error={errors.start_date}
+              min={projectStartDate || undefined}
+              max={projectEndDate || undefined}
             />
 
             <FormInputField
@@ -205,10 +220,18 @@ export default function MilestoneForm({
               value={milestoneData.end_date || ""}
               onChange={handleChange}
               error={errors.end_date}
-              min={milestoneData.start_date || undefined}
+              min={milestoneData.start_date || projectStartDate || undefined}
+              max={projectEndDate || undefined}
               readOnly={!milestoneData.start_date}
             />
           </div>
+
+          {/* Project date hint */}
+          {(projectStartDate || projectEndDate) && (
+            <p className="text-xs text-gray-500 -mt-2">
+              Project timeline: {projectStartDate || 'N/A'} to {projectEndDate || 'N/A'}
+            </p>
+          )}
 
           {/* <FormSelectField
             name="status"

@@ -210,7 +210,7 @@ export default function CompanyTaskLogsPage() {
    };
 
    return (
-      <div className="max-w-6xl mx-auto py-8 px-4">
+      <div className="w-full">
          <Card>
             <CardHeader
                title="Company Task Logs"

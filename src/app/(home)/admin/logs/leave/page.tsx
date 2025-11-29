@@ -201,7 +201,7 @@ export default function LeaveLogsPage() {
    ];
 
    return (
-      <div className="max-w-7xl mx-auto py-8 px-4">
+      <div className="w-full">
          <Card className="shadow-lg rounded-xl">
             <CardHeader title="Company Leave Management" subtitle="View and manage employee leave requests and history." />
             <CardContent>

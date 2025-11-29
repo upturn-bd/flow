@@ -12,6 +12,7 @@ import {
 } from "./types";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
+import { captureSupabaseError } from "@/lib/sentry";
 
 interface BaseEntityHookConfig<T> {
   tableName: string;
@@ -46,21 +47,34 @@ export function useBaseEntity<T extends BaseEntity>(
       try {
         const result = await apiFunction();
 
-        if (options.showSuccessMessage) {
-          console.log("API call successful");
-        }
-
         if (options.onSuccess) {
           options.onSuccess();
         }
 
         return result;
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        let errorMessage: string;
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        } else if (typeof error === 'object' && error !== null) {
+          // Handle Supabase errors which may have different structures
+          const errorObj = error as { message?: string; error_description?: string; code?: string; details?: string; hint?: string };
+          errorMessage = errorObj.message 
+            || errorObj.error_description 
+            || JSON.stringify(error);
+          
+          // Capture Supabase error to Sentry with context
+          captureSupabaseError(
+            { code: errorObj.code, message: errorObj.message, details: errorObj.details, hint: errorObj.hint },
+            `${config.tableName}_operation`,
+            { entityName: config.entityName }
+          );
+        } else {
+          errorMessage = String(error) || "An unknown error occurred";
+        }
 
         if (options.showErrorMessage) {
-          console.error("API call failed:", errorMessage);
+          console.error(`API call failed (${config.tableName}):`, errorMessage);
         }
 
         if (options.onError) {
@@ -71,7 +85,7 @@ export function useBaseEntity<T extends BaseEntity>(
         return null;
       }
     },
-    []
+    [config.tableName, config.entityName]
   );
 
   const clearError = useCallback(() => {

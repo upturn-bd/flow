@@ -7,7 +7,7 @@ import { ROUTE_PERMISSION_MAP } from "./lib/constants/permissions";
 // Add /verify to excluded paths at runtime (in case it's not inside path-utils)
 const UPDATED_EXCLUDE_PATHS = [...excludePaths, "/verify"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Initialize Supabase client for session management
   let response = NextResponse.next({
     request,

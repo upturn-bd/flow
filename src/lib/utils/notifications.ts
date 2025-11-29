@@ -38,20 +38,20 @@ export const NotificationTemplates = {
   // Leave request notifications
   leaveRequest: {
     submitted: (employeeName: string, leaveType: string, startDate: string, endDate: string) => ({
-      title: "Leave Request Submitted",
-      message: `${employeeName} has submitted a ${leaveType} request from ${startDate} to ${endDate}`,
+      title: "Leave Request Needs Review",
+      message: `${employeeName} requested ${leaveType} leave (${startDate} - ${endDate}). Please review and respond.`,
       context: "leave_request",
       priority: "normal" as const,
     }),
     approved: (leaveType: string, startDate: string, endDate: string) => ({
-      title: "Leave Request Approved",
-      message: `Your ${leaveType} request from ${startDate} to ${endDate} has been approved`,
+      title: "Leave Approved",
+      message: `Good news! Your ${leaveType} leave from ${startDate} to ${endDate} has been approved. Enjoy your time off!`,
       context: "leave_request",
       priority: "high" as const,
     }),
     rejected: (leaveType: string, reason: string) => ({
-      title: "Leave Request Rejected",
-      message: `Your ${leaveType} request has been rejected. Reason: ${reason}`,
+      title: "Leave Request Not Approved",
+      message: `Your ${leaveType} leave request was not approved. Reason: ${reason}. Please contact your supervisor if you have questions.`,
       context: "leave_request",
       priority: "high" as const,
     }),
@@ -60,20 +60,22 @@ export const NotificationTemplates = {
   // Project notifications
   project: {
     assigned: (projectName: string, role: string) => ({
-      title: "Project Assignment",
-      message: `You have been assigned as ${role} to project "${projectName}"`,
+      title: "You've Been Added to a Project",
+      message: `You're now the ${role} on "${projectName}". Check the project details to get started.`,
       context: "project_update",
       priority: "normal" as const,
     }),
     milestone: (projectName: string, milestoneName: string) => ({
-      title: "Milestone Completed",
-      message: `Milestone "${milestoneName}" in project "${projectName}" has been completed`,
+      title: "Milestone Achieved",
+      message: `"${milestoneName}" is complete in "${projectName}". Great progress!`,
       context: "project_update",
       priority: "normal" as const,
     }),
     deadline: (projectName: string, daysLeft: number) => ({
-      title: "Project Deadline Approaching",
-      message: `Project "${projectName}" deadline is in ${daysLeft} days`,
+      title: daysLeft <= 1 ? "Project Due Tomorrow" : "Project Deadline Reminder",
+      message: daysLeft <= 1 
+        ? `"${projectName}" is due tomorrow! Make sure all tasks are completed.`
+        : `"${projectName}" is due in ${daysLeft} days. Review your pending tasks.`,
       context: "project_update",
       priority: daysLeft <= 3 ? "urgent" as const : "high" as const,
     }),
@@ -82,20 +84,20 @@ export const NotificationTemplates = {
   // Employee notifications
   employee: {
     welcome: (employeeName: string) => ({
-      title: "Welcome to the Team!",
-      message: `Welcome ${employeeName}! Your account has been approved and you can now access all HRIS features.`,
+      title: "Welcome Aboard",
+      message: `Hi ${employeeName}! Your account is now active. Explore your dashboard to get started with the HRIS system.`,
       context: "employee_update",
       priority: "normal" as const,
     }),
     profileUpdate: (field: string) => ({
       title: "Profile Updated",
-      message: `Your ${field} has been successfully updated`,
+      message: `Your ${field} has been saved successfully.`,
       context: "employee_update",
       priority: "low" as const,
     }),
     documentRequired: (documentType: string) => ({
-      title: "Document Required",
-      message: `Please upload your ${documentType} to complete your profile`,
+      title: "Action Required: Missing Document",
+      message: `Please upload your ${documentType} to complete your profile setup. This is required for HR compliance.`,
       context: "employee_update",
       priority: "high" as const,
     }),
@@ -104,14 +106,14 @@ export const NotificationTemplates = {
   // Attendance notifications
   attendance: {
     lateCheckIn: (siteName: string, time: string) => ({
-      title: "Late Check-in Recorded",
-      message: `You checked in late at ${siteName} at ${time}`,
+      title: "Late Arrival Recorded",
+      message: `You checked in at ${time} at ${siteName}. If this was due to an approved reason, please notify your supervisor.`,
       context: "attendance",
       priority: "normal" as const,
     }),
     missedCheckOut: (siteName: string) => ({
-      title: "Missed Check-out",
-      message: `You forgot to check out from ${siteName}. Please contact your supervisor.`,
+      title: "Missing Check-out",
+      message: `You didn't check out from ${siteName} yesterday. Please contact HR to correct your attendance record.`,
       context: "attendance",
       priority: "high" as const,
     }),
@@ -120,14 +122,14 @@ export const NotificationTemplates = {
   // System notifications
   system: {
     maintenance: (startTime: string, duration: string) => ({
-      title: "System Maintenance",
-      message: `System maintenance scheduled at ${startTime} for ${duration}. Some features may be unavailable.`,
+      title: "Scheduled Maintenance",
+      message: `The system will be under maintenance on ${startTime} for approximately ${duration}. Please save your work before this time.`,
       context: "system_alert",
       priority: "high" as const,
     }),
     update: (version: string, features: string) => ({
-      title: "System Update",
-      message: `System updated to version ${version}. New features: ${features}`,
+      title: "New Features Available",
+      message: `We've updated to version ${version} with new features: ${features}. Check them out!`,
       context: "system_alert",
       priority: "normal" as const,
     }),
@@ -137,25 +139,25 @@ export const NotificationTemplates = {
   payroll: {
     generated: (employeeName: string, amount: number, date: string) => ({
       title: "Payroll Generated",
-      message: `Your payroll (৳${amount.toLocaleString()}) has been generated for ${date}`,
+      message: `Your payroll for ${date} (৳${amount.toLocaleString()}) has been generated and is pending approval.`,
       context: "payroll",
       priority: "normal" as const,
     }),
     published: (employeeName: string, newAmount: number, adjustmentReason: string) => ({
-      title: "Payroll Published",
-      message: `Your payroll has been published with amount ৳${newAmount.toLocaleString()}. ${adjustmentReason ? `Reason: ${adjustmentReason}` : ''}`,
+      title: "Payroll Ready for Review",
+      message: `Your payroll (৳${newAmount.toLocaleString()}) has been finalized${adjustmentReason ? ` with adjustments: ${adjustmentReason}` : ''}. Review your payslip for details.`,
       context: "payroll",
       priority: "high" as const,
     }),
     paid: (employeeName: string, amount: number, date: string) => ({
-      title: "Payroll Processed",
-      message: `Your payroll payment (৳${amount.toLocaleString()}) has been processed for ${date}`,
+      title: "Payment Processed",
+      message: `Your salary of ৳${amount.toLocaleString()} for ${date} has been transferred to your account.`,
       context: "payroll",
       priority: "normal" as const,
     }),
     supervisorPending: (employeeName: string, amount: number, date: string) => ({
-      title: "Payroll Pending Approval",
-      message: `Payroll for ${employeeName} (৳${amount.toLocaleString()}) is pending your approval for ${date}`,
+      title: "Payroll Awaiting Your Approval",
+      message: `${employeeName}'s payroll (৳${amount.toLocaleString()}) for ${date} needs your review and approval.`,
       context: "payroll",
       priority: "normal" as const,
     }),
@@ -164,38 +166,38 @@ export const NotificationTemplates = {
   // Account-related notifications  
   account: {
     transactionCreated: (title: string, amount: number, currency: string) => ({
-      title: "New Transaction Created",
-      message: `A new transaction "${title}" for ${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency} has been added`,
+      title: "Transaction Recorded",
+      message: `"${title}" (${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency}) has been added to accounts.`,
       context: "account",
       priority: "normal" as const,
     }),
     stakeholderTransaction: (title: string, amount: number, currency: string, stakeholderName: string) => ({
-      title: "Stakeholder Transaction Created",
-      message: `A new transaction "${title}" for ${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency} has been created for stakeholder "${stakeholderName}"`,
+      title: `Transaction for ${stakeholderName}`,
+      message: `"${title}" (${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency}) recorded for ${stakeholderName}.`,
       context: "stakeholder_account",
       priority: "normal" as const,
     }),
     payrollLogged: (employeeName: string, amount: number, date: string) => ({
-      title: "Payroll Logged to Accounts",
-      message: `Payroll payment for ${employeeName} (৳${Math.abs(amount).toLocaleString()}) has been automatically logged to accounts for ${date}`,
+      title: "Payroll Entry Added",
+      message: `${employeeName}'s salary (৳${Math.abs(amount).toLocaleString()}) for ${date} logged to accounts.`,
       context: "account",
       priority: "low" as const,
     }),
     largeTransaction: (title: string, amount: number, currency: string) => ({
       title: "Large Transaction Alert",
-      message: `A large transaction "${title}" for ${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency} requires attention`,
+      message: `"${title}" for ${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency} exceeds the threshold. Please verify this transaction.`,
       context: "account", 
       priority: "high" as const,
     }),
     stakeholderLargeTransaction: (title: string, amount: number, currency: string, stakeholderName: string) => ({
-      title: "Large Stakeholder Transaction Alert",
-      message: `A large transaction "${title}" for ${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency} requires attention for stakeholder "${stakeholderName}"`,
+      title: `Large Transaction: ${stakeholderName}`,
+      message: `"${title}" (${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ${currency}) for ${stakeholderName} exceeds the threshold. Please verify.`,
       context: "stakeholder_account",
       priority: "high" as const,
     }),
     statusChanged: (title: string, oldStatus: string, newStatus: string) => ({
-      title: "Transaction Status Updated",
-      message: `Transaction "${title}" status changed from ${oldStatus} to ${newStatus}`,
+      title: "Transaction Updated",
+      message: `"${title}" moved from ${oldStatus} to ${newStatus}.`,
       context: "account",
       priority: "normal" as const,
     }),
@@ -204,56 +206,56 @@ export const NotificationTemplates = {
   // Stakeholder-related notifications
   stakeholder: {
     created: (stakeholderName: string, processName: string) => ({
-      title: "New Stakeholder Added",
-      message: `New stakeholder "${stakeholderName}" has been added with process "${processName}"`,
+      title: "New Stakeholder Assigned to You",
+      message: `You've been assigned as KAM for "${stakeholderName}" (${processName}). Review their details to begin the process.`,
       context: "stakeholder",
       priority: "normal" as const,
     }),
     updated: (stakeholderName: string) => ({
-      title: "Stakeholder Updated",
-      message: `Stakeholder "${stakeholderName}" information has been updated`,
+      title: "Stakeholder Info Updated",
+      message: `Details for "${stakeholderName}" have been modified. Review the changes if needed.`,
       context: "stakeholder",
       priority: "normal" as const,
     }),
     statusChanged: (stakeholderName: string, oldStatus: string, newStatus: string) => ({
-      title: "Stakeholder Status Changed",
-      message: `Stakeholder "${stakeholderName}" status changed from ${oldStatus} to ${newStatus}`,
+      title: `${stakeholderName}: Status Changed`,
+      message: `"${stakeholderName}" has moved from ${oldStatus} to ${newStatus}. ${newStatus === 'Permanent' ? 'Congratulations on the conversion!' : 'Check if any action is needed.'}`,
       context: "stakeholder",
       priority: "high" as const,
     }),
     rejected: (stakeholderName: string, reason: string) => ({
-      title: "Stakeholder Rejected",
-      message: `Stakeholder "${stakeholderName}" has been rejected. Reason: ${reason}`,
+      title: `Stakeholder Rejected: ${stakeholderName}`,
+      message: `"${stakeholderName}" has been rejected. Reason: ${reason}. Contact your supervisor for next steps.`,
       context: "stakeholder",
       priority: "high" as const,
     }),
     completed: (stakeholderName: string) => ({
-      title: "Stakeholder Process Completed",
-      message: `All process steps for stakeholder "${stakeholderName}" have been completed`,
+      title: "Process Complete",
+      message: `All steps for "${stakeholderName}" are done! They're now a permanent stakeholder.`,
       context: "stakeholder",
       priority: "high" as const,
     }),
     stepCompleted: (stakeholderName: string, stepName: string) => ({
-      title: "Process Step Completed",
-      message: `Step "${stepName}" has been completed for stakeholder "${stakeholderName}"`,
+      title: `Step Complete: ${stepName}`,
+      message: `"${stepName}" is done for "${stakeholderName}". The process moves to the next stage.`,
       context: "stakeholder_step",
       priority: "normal" as const,
     }),
     stepUpdated: (stakeholderName: string, stepName: string) => ({
-      title: "Process Step Updated",
-      message: `Step "${stepName}" has been updated for stakeholder "${stakeholderName}"`,
+      title: `Step Updated: ${stepName}`,
+      message: `New information added to "${stepName}" for "${stakeholderName}". Review the updates.`,
       context: "stakeholder_step",
       priority: "normal" as const,
     }),
     stepRolledBack: (stakeholderName: string, stepName: string) => ({
-      title: "Process Step Rolled Back",
-      message: `Step "${stepName}" has been rolled back for stakeholder "${stakeholderName}"`,
+      title: `Step Rolled Back: ${stepName}`,
+      message: `"${stepName}" for "${stakeholderName}" has been reverted and needs to be redone. Check the reason and take action.`,
       context: "stakeholder_step",
       priority: "high" as const,
     }),
     assignedToTeam: (stakeholderName: string, stepName: string, teamName: string) => ({
-      title: "New Stakeholder Assignment",
-      message: `Stakeholder "${stakeholderName}" is now at step "${stepName}" assigned to your team "${teamName}"`,
+      title: "New Work Assigned to Your Team",
+      message: `"${stakeholderName}" is ready for "${stepName}". Your team (${teamName}) can now work on this step.`,
       context: "stakeholder_step",
       priority: "normal" as const,
     }),
@@ -264,27 +266,27 @@ export const NotificationTemplates = {
     created: (stakeholderName: string, issueTitle: string, priority: string) => {
       const notificationPriority = (priority === 'High' || priority === 'Urgent' ? "high" : "normal") as 'high' | 'normal';
       return {
-        title: "New Stakeholder Issue",
-        message: `New ${priority} priority issue "${issueTitle}" reported for stakeholder "${stakeholderName}"`,
+        title: `Issue Reported: ${stakeholderName}`,
+        message: `${priority} priority issue "${issueTitle}" needs attention for "${stakeholderName}".`,
         context: "stakeholder_issue",
         priority: notificationPriority,
       };
     },
     assigned: (stakeholderName: string, issueTitle: string) => ({
       title: "Issue Assigned to You",
-      message: `Issue "${issueTitle}" for stakeholder "${stakeholderName}" has been assigned to you`,
+      message: `You've been assigned to resolve "${issueTitle}" for "${stakeholderName}". Please review and take action.`,
       context: "stakeholder_issue",
       priority: "high" as const,
     }),
     statusChanged: (stakeholderName: string, issueTitle: string, newStatus: string) => ({
-      title: "Issue Status Updated",
-      message: `Issue "${issueTitle}" for stakeholder "${stakeholderName}" is now ${newStatus}`,
+      title: `Issue Update: ${issueTitle}`,
+      message: `"${issueTitle}" for "${stakeholderName}" is now ${newStatus}.`,
       context: "stakeholder_issue",
       priority: "normal" as const,
     }),
     resolved: (stakeholderName: string, issueTitle: string) => ({
       title: "Issue Resolved",
-      message: `Issue "${issueTitle}" for stakeholder "${stakeholderName}" has been resolved`,
+      message: `"${issueTitle}" for "${stakeholderName}" has been resolved. The process can continue.`,
       context: "stakeholder_issue",
       priority: "normal" as const,
     }),

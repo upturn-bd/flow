@@ -1,9 +1,9 @@
 "use client";
 
 import { AuthProvider, useAuth } from "@/lib/auth/auth-context";
+import { useSentryUser } from "@/lib/sentry";
 import Sidebar from "./side-navbar";
 import TopBar from "./top-bar";
-import { Loader } from "@/lib/icons";
 
 export default function HomeLayout({
   children,
@@ -18,18 +18,7 @@ export default function HomeLayout({
 }
 
 function ApprovalLayout({ children }: { children: React.ReactNode }) {
-  const { isApproved, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="flex h-dvh w-full items-center justify-center bg-background-primary">
-        <div className="flex flex-col items-center gap-4">
-          <Loader className="text-primary-600 animate-spin" size={48} />
-          <p className="text-foreground-secondary text-sm">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  const { isApproved } = useAuth();
 
   return (
     <div className="flex h-dvh w-full overflow-x-hidden">
@@ -40,6 +29,7 @@ function ApprovalLayout({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+      {isApproved && <FloatingReportButton />}
     </div>
   );
 }

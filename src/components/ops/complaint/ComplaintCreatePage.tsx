@@ -93,7 +93,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
         attachments: uploadedFilePaths,
         attachment_download_urls: publicUrls,
         anonymous: isAnonymous,
-        complainer_id: isAnonymous ? null : user.id,
+        complainer_id: user.id, // Always store complainer_id for history tracking, anonymous flag controls visibility
         company_id: user.company_id,
         requested_to: user.supervisor_id,
       };
@@ -176,7 +176,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="p-6 space-y-6 max-w-4xl mx-auto"
+      className="p-4 sm:p-6 space-y-6"
     >
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-bold text-blue-700">Create Complaint</h1>

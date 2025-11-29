@@ -6,6 +6,7 @@ import { Session, User } from "@supabase/supabase-js";
 import { navItems } from "@/app/(home)/nav-items";
 import { getEmployeeInfo } from "../utils/auth";
 import type { UserPermissions } from "@/lib/types/schemas";
+import { captureSupabaseError } from "@/lib/sentry";
 
 export type EmployeeInfo = {
   id: string;
@@ -118,6 +119,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data = await getEmployeeInfo();
         setEmployeeInfo(data);
       } catch (error) {
+        captureSupabaseError(
+          { message: error instanceof Error ? error.message : String(error) },
+          "getEmployeeInfo",
+          { userId: user?.id }
+        );
         console.error('Failed to get employee info', error);
         setEmployeeInfo(null);
       } finally {
@@ -158,6 +164,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setPermissions(permissionsMap);
       } catch (error) {
+        captureSupabaseError(
+          { message: error instanceof Error ? error.message : String(error) },
+          "fetchUserPermissions",
+          { userId: user?.id }
+        );
         console.error('Failed to fetch permissions:', error);
         setPermissions({});
       } finally {
@@ -231,6 +242,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setPermissions(permissionsMap);
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "refreshPermissions",
+        { userId: user?.id }
+      );
       console.error('Failed to refresh permissions:', error);
     } finally {
       setPermissionsLoading(false);
@@ -331,17 +347,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     // Filter nav items based on required permissions
     return navItems.filter(item => {
-      // Backward compatibility: check roles if present
-      if (item.roles && item.roles.length > 0) {
-        return item.roles.includes(employeeInfo.role);
-      }
-      
-      // New permission-based filtering
+      // Permission-based filtering takes priority when defined
       if (item.requiredPermissions && item.requiredPermissions.length > 0) {
         return item.requiredPermissions.some(perm => {
           const [module, action] = perm.split(':');
           return hasPermission(module, action);
         });
+      }
+      
+      // Backward compatibility: check roles if no permissions defined
+      if (item.roles && item.roles.length > 0) {
+        return item.roles.includes(employeeInfo.role);
       }
       
       // If no roles or permissions specified, show to all

@@ -12,6 +12,8 @@ export function useEmployeeInfo() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+
+
   const fetchEmployeeInfo = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -24,7 +26,7 @@ export function useEmployeeInfo() {
 
       const { data, error } = await supabase
         .from("employees")
-        .select("id, first_name, last_name, email, designation, department_id(name)")
+        .select("id, first_name, last_name, email, designation, department_id")
         .eq("company_id", companyId);
 
       if (error) {
@@ -36,7 +38,7 @@ export function useEmployeeInfo() {
         name: `${employee.first_name} ${employee.last_name}`,
         email: employee.email,
         designation: employee.designation || undefined,
-        department: (employee.department_id as unknown as { name: string })?.name || undefined
+        department: employee.department_id ? String(employee.department_id) : undefined
       })) || [];
 
       setEmployees(employees);

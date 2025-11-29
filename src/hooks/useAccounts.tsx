@@ -148,7 +148,7 @@ export function useAccounts() {
       // Update local state
       setAccounts(prev => [data, ...prev]); // Add to beginning (newest first)
       
-      // Send notification for transaction creation
+      // Send notification only for stakeholder transactions and large transactions
       try {
         if (stakeholder && stakeholder.kam_id) {
           // Notify KAM about stakeholder transaction
@@ -184,11 +184,11 @@ export function useAccounts() {
               }
             );
           }
-        } else {
-          // Regular transaction notification
+        } else if (Math.abs(data.amount) > 50000) {
+          // Only send notification for large non-stakeholder transactions
           await createAccountNotification(
             userId!,
-            'transactionCreated',
+            'largeTransaction',
             {
               title: data.title,
               amount: data.amount,
@@ -199,23 +199,6 @@ export function useAccounts() {
               actionUrl: '/admin?tab=accounts',
             }
           );
-
-          // Send alert for large transactions (over 50,000 BDT or equivalent)
-          if (Math.abs(data.amount) > 50000) {
-            await createAccountNotification(
-              userId!,
-              'largeTransaction',
-              {
-                title: data.title,
-                amount: data.amount,
-                currency: data.currency,
-              },
-              {
-                referenceId: data.id,
-                actionUrl: '/admin?tab=accounts',
-              }
-            );
-          }
         }
       } catch (notificationError) {
         // Don't fail the transaction creation if notification fails

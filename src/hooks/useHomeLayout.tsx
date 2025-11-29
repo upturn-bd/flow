@@ -117,7 +117,6 @@ export function useHomeLayout() {
       if (error) throw error;
 
       setLayout(data);
-      console.log('Home page layout saved successfully');
     } catch (error) {
       console.error('Error saving home layout:', error);
       throw error; // Re-throw to handle in UI

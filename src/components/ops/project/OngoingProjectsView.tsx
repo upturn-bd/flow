@@ -11,6 +11,7 @@ import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Project, useProjects } from "@/hooks/useProjects";
 import { getEmployeeId } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/auth/auth-context";
 
 import ProjectDetails from "./ProjectDetails";
 import { UpdateProjectPage } from "./CreateNewProject";
@@ -33,6 +34,7 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
 
   const { employees, fetchEmployees } = useEmployees();
   const { departments, fetchDepartments } = useDepartments();
+  const { employeeInfo } = useAuth();
   const router = useRouter();
 
   const [projectDetailsId, setProjectDetailsId] = useState<string | null>(null);
@@ -48,6 +50,9 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
 
   /** Initialize user ID and fetch data */
   useEffect(() => {
+    // Don't fetch if employeeInfo is not available yet
+    if (!employeeInfo) return;
+    
     if (hasFetched.current) return;
     hasFetched.current = true;
 
@@ -60,7 +65,7 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
       setInitialLoadComplete(true);
     };
     initData();
-  }, []);
+  }, [employeeInfo, fetchOngoingProjects, fetchEmployees, fetchDepartments]);
 
   /** Debounced Search */
   const debouncedSearch = useCallback(
@@ -141,7 +146,7 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
       toast.success("Project updated successfully");
       setSelectedProject(null);
       if (values.status === "Completed") setActiveTab("completed");
-      await fetchOngoingProjects(10, true);
+      // await fetchOngoingProjects(10, true);
     } catch (error) {
       toast.error("Error updating project");
       console.error(error);

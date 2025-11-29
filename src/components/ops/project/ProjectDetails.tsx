@@ -398,7 +398,7 @@ export default function ProjectDetails({
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="w-full p-4 sm:p-6 space-y-6">
       {!milestoneDetailsId && (
         <motion.div
           initial="hidden"

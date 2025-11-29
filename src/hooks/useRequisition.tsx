@@ -23,6 +23,7 @@ export interface RequisitionState {
   approved_by_id?: number;
   comment?: string;
   asset_owner: number;
+  is_one_off?: boolean;
 }
 
 export function useRequisitionRequests() {
@@ -179,6 +180,75 @@ export function useRequisitionRequests() {
     [fetchRequisitionRequests, canApprove, isSupervisorOf]
   );
 
+  const updateRequisition = useCallback(
+    async (
+      id: number,
+      updatedData: Partial<Omit<RequisitionState, 'id' | 'company_id' | 'employee_id' | 'status' | 'approved_by_id'>>
+    ) => {
+      setProcessingId(id);
+      setError(null);
+
+      try {
+        const user = await getEmployeeInfo();
+        const company_id = await getCompanyId();
+
+        // Get the existing requisition to check ownership
+        const { data: existingReq, error: fetchError } = await supabase
+          .from("requisition_records")
+          .select("*")
+          .eq("id", id)
+          .eq("company_id", company_id)
+          .single();
+
+        if (fetchError || !existingReq) {
+          setError("Failed to find requisition");
+          throw new Error("Requisition not found");
+        }
+
+        // Check permission: user must be the owner OR have requisition write permission OR be supervisor
+        const isOwner = existingReq.employee_id === user.id;
+        const hasWritePermission = canApprove('requisition');
+        const isSupervisor = await isSupervisorOf(existingReq.employee_id);
+
+        // Only allow edit if status is Pending
+        if (existingReq.status !== 'Pending') {
+          setError("Can only edit requisitions with Pending status");
+          throw new Error("Cannot edit non-pending requisition");
+        }
+
+        if (!isOwner && !hasWritePermission && !isSupervisor) {
+          setError("You do not have permission to edit this requisition");
+          throw new Error("Permission denied");
+        }
+
+        const { data, error } = await supabase
+          .from("requisition_records")
+          .update(updatedData)
+          .eq("company_id", company_id)
+          .eq("id", id)
+          .select()
+          .single();
+
+        if (error) {
+          setError("Failed to update requisition");
+          throw error;
+        }
+
+        // Refresh the history
+        await fetchRequisitionHistory();
+
+        return data;
+      } catch (error) {
+        setError("Failed to update requisition");
+        console.error(error);
+        return null;
+      } finally {
+        setProcessingId(null);
+      }
+    },
+    [fetchRequisitionHistory, canApprove, isSupervisorOf]
+  );
+
   return {
     requisitionRequests,
     loading,
@@ -187,5 +257,6 @@ export function useRequisitionRequests() {
     fetchRequisitionRequests,
     fetchRequisitionHistory,
     updateRequisitionRequest,
+    updateRequisition,
   };
 }

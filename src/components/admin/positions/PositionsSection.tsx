@@ -7,7 +7,7 @@ import PositionDetailsModal from "./PositionDetailsModal";
 import PositionModal from "./PositionModal";
 import { BriefcaseBusiness, Plus, Eye } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { TrashSimple } from "@/lib/icons";
+import { TrashSimple } from "@phosphor-icons/react";
 
 type PositionsSectionProps = {
   showNotification: (message: string, isError?: boolean) => void;
@@ -30,6 +30,7 @@ export default function PositionsSection({
   const [viewPosition, setViewPosition] = useState<number | null>(null);
   const [editPosition, setEditPosition] = useState<number | null>(null);
   const [isCreatingPosition, setIsCreatingPosition] = useState(false);
+  const [showAllPositions, setShowAllPositions] = useState(false);
   const [positionDeleteLoading, setPositionDeleteLoading] = useState<
     number | null
   >(null);
@@ -72,13 +73,13 @@ export default function PositionsSection({
   const selectedPositionEdit = positions.find((d) => d.id === editPosition);
 
   return (
-    <section className="bg-surface-primary p-4 sm:p-6 rounded-lg border border-border-primary shadow-sm">
-      <div className="border-b border-border-primary pb-4 mb-4">
-        <h3 className="text-lg font-semibold text-foreground-primary flex items-center">
-          <BriefcaseBusiness className="w-5 h-5 mr-2 text-foreground-secondary" />
+    <section className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm">
+      <div className="border-b border-gray-200 pb-4 mb-4">
+        <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+          <BriefcaseBusiness className="w-5 h-5 mr-2 text-gray-600" />
           Positions
         </h3>
-        <p className="text-sm text-foreground-secondary">Manage job positions and roles</p>
+        <p className="text-sm text-gray-600">Manage job positions and roles</p>
       </div>
 
       {positionsLoading ? (
@@ -91,20 +92,20 @@ export default function PositionsSection({
       ) : (
         <div className="space-y-3">
           {positions.length === 0 ? (
-            <div className="p-4 sm:p-6 bg-background-secondary dark:bg-background-tertiary rounded-lg text-center text-foreground-tertiary">
+            <div className="p-4 sm:p-6 bg-gray-50 rounded-lg text-center text-gray-500">
               No positions added yet. Click the plus button to add one.
             </div>
           ) : (
             positions.map((position) => (
               <div
                 key={position.id}
-                className="bg-surface-primary rounded-lg border border-border-primary p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
+                className="bg-white rounded-lg border border-gray-200 p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
               >
                 <div className="flex items-center mb-2 sm:mb-0">
-                  <div className="w-8 h-8 bg-background-secondary dark:bg-background-tertiary rounded-full flex items-center justify-center text-foreground-secondary mr-3">
+                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 mr-3">
                     <BriefcaseBusiness size={16} />
                   </div>
-                  <span className="font-medium text-foreground-primary">
+                  <span className="font-medium text-gray-800">
                     {position.name}
                   </span>
                 </div>
@@ -112,7 +113,7 @@ export default function PositionsSection({
                 <div className="flex gap-2 w-full sm:w-auto justify-end">
                   <button
                     onClick={() => setViewPosition(position.id ?? null)}
-                    className="px-3 py-1.5 rounded-md bg-background-secondary dark:bg-background-tertiary text-foreground-secondary text-sm flex items-center gap-1 hover:bg-background-tertiary dark:hover:bg-surface-secondary transition-colors"
+                    className="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
                   >
                     <Eye size={14} />
                     <span className="hidden sm:inline">Details</span>
@@ -120,7 +121,7 @@ export default function PositionsSection({
                   <button
                     onClick={() => handleDeletePosition(position.id ?? 0)}
                     disabled={positionDeleteLoading === position.id}
-                    className={`px-3 py-1.5 rounded-md bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm flex items-center gap-1 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors ${
+                    className={`px-3 py-1.5 rounded-md bg-red-50 text-red-600 text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${
                       positionDeleteLoading === position.id
                         ? "opacity-50 cursor-not-allowed"
                         : ""
@@ -181,6 +182,25 @@ export default function PositionsSection({
             onClose={() => setEditPosition(null)}
             isOpen={!!selectedPositionEdit}
           />
+        )}
+        {showAllPositions && (
+          <BaseModal
+            isOpen={showAllPositions}
+            onClose={() => setShowAllPositions(false)}
+            title="All Positions"
+            icon={<BriefcaseBusiness className="w-5 h-5" />}
+            size="lg"
+          >
+            <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+              {positions.length === 0 ? (
+                <div className="p-6 bg-gray-50 rounded-lg text-center text-gray-500">
+                  No positions available.
+                </div>
+              ) : (
+                positions.map((position) => renderPositionCard(position))
+              )}
+            </div>
+          </BaseModal>
         )}
       </AnimatePresence>
     </section>

@@ -15,6 +15,7 @@ type FormInputFieldProps = {
   readOnly?: boolean;
   error?: string;
   min?: string;
+  max?: string;
 };
 
 export default function FormInputField({
@@ -27,6 +28,7 @@ export default function FormInputField({
   readOnly = false,
   error,
   min,
+  max,
 }: FormInputFieldProps) {
   const hasError = !!error;
   
@@ -51,6 +53,7 @@ export default function FormInputField({
           readOnly={readOnly}
           aria-invalid={hasError}
           min={min}
+          max={max}
           aria-describedby={hasError ? `${name}-error` : undefined}
           className={`w-full pl-10 pr-4 py-2.5 text-foreground-primary rounded-lg border shadow-sm ${
             hasError 

@@ -58,3 +58,6 @@ next-env.d.ts
 /blob-report/
 /playwright/.auth/
 /.auth/
+
+# Sentry Config File
+.env.sentry-build-plugin

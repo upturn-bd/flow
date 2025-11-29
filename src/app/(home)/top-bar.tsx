@@ -6,31 +6,64 @@ import { Bell, User, Search, LogOut, UserCircle, ShieldAlert, Moon, Sun } from "
 import { supabase } from "@/lib/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotifications, Notification } from "@/hooks/useNotifications";
 import NotificationDropdown from "@/components/notifications/NotificationDropdown";
-import { useTheme } from "@/contexts/ThemeContext";
 
 export default function TopBar() {
   const { employeeInfo, isApproved } = useAuth();
   const { mode, toggleMode } = useTheme();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
+  const [newNotificationModal, setNewNotificationModal] = useState(false);
+  const [latestNotification, setLatestNotification] = useState<Notification | null>(null);
+  const [previousUnreadCount, setPreviousUnreadCount] = useState(0);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notificationButtonRef = useRef<HTMLButtonElement>(null!);
   const router = useRouter();
   const pathname = usePathname();
   
   // Notification hook
-  const { fetchUnreadCount, unreadCount } = useNotifications();
+  const { 
+    fetchUnreadCount, 
+    unreadCount, 
+    fetchUserNotifications,
+    markAsRead,
+    deleteNotification 
+  } = useNotifications();
 
-  // Fetch unread count on mount and every 30 seconds
+  // Check for new notifications
+  const checkForNewNotifications = async () => {
+    const currentCount = await fetchUnreadCount();
+    
+    // If count increased, fetch the latest notification
+    if (currentCount > previousUnreadCount && previousUnreadCount > 0) {
+      const notifications = await fetchUserNotifications(1);
+      if (notifications && notifications.length > 0) {
+        const newest = notifications[0];
+        // Only show if it's unread
+        if (!newest.is_read) {
+          setLatestNotification(newest);
+          setNewNotificationModal(true);
+        }
+      }
+    }
+    
+    setPreviousUnreadCount(currentCount);
+  };
+
+  // Initial fetch and polling
   useEffect(() => {
     if (isApproved) {
-      fetchUnreadCount();
-      const interval = setInterval(fetchUnreadCount, 30000);
+      const initFetch = async () => {
+        const count = await fetchUnreadCount();
+        setPreviousUnreadCount(count);
+      };
+      
+      initFetch();
+      const interval = setInterval(checkForNewNotifications, 30000);
       return () => clearInterval(interval);
     }
-  }, [isApproved, fetchUnreadCount]);
+  }, [isApproved, fetchUnreadCount, previousUnreadCount]);
 
   // Close user menu on outside click
   useEffect(() => {
@@ -55,10 +88,20 @@ export default function TopBar() {
   const basePath = `/${pathname.split('/')[1]}`;
   const isAuthorized = isApproved || basePath === "/account";
 
+  const handleMarkAsRead = async (id: number) => {
+    await markAsRead(id);
+    await fetchUnreadCount();
+  };
+
+  const handleDeleteNotification = async (id: number) => {
+    await deleteNotification(id);
+    await fetchUnreadCount();
+  };
+
   if (!isAuthorized) return null;
 
   return (
-    <header className="bg-surface-primary border-b border-border-primary shadow-sm sticky top-0 z-[50] h-16">
+    <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-[50] h-16">
       <div className="pr-4 md:pr-6 h-full flex items-center justify-between">
         {/* Left side */}
         <div className="flex items-center">
@@ -182,5 +225,15 @@ export default function TopBar() {
         </div>
       </div>
     </header>
+
+    {/* New Notification Modal */}
+    <NewNotificationModal
+      notification={latestNotification}
+      isOpen={newNotificationModal}
+      onClose={() => setNewNotificationModal(false)}
+      onMarkAsRead={handleMarkAsRead}
+      onDelete={handleDeleteNotification}
+    />
+    </>
   );
 }

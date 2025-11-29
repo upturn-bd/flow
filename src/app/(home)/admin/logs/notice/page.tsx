@@ -94,7 +94,7 @@ export default function NoticePage() {
     switch (urgency) {
       case "high":
         return "bg-red-100 text-red-700";
-      case "medium":
+      case "normal":
         return "bg-yellow-100 text-yellow-700";
       case "low":
         return "bg-green-100 text-green-700";

@@ -187,7 +187,7 @@ export default function CompanyProjectsPage() {
    };
 
    return (
-      <div className="max-w-6xl mx-auto py-8 px-4">
+      <div className="w-full">
          <Card>
             <CardHeader
                title="Company Projects"

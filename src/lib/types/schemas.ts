@@ -263,6 +263,7 @@ export interface Notice {
   company_id?: number;
   department_id?: number;
   created_by?: string;
+  created_at?: string;
 }
 
 // Notification System Interfaces (separate from Notice system)
