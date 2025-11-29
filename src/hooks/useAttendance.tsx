@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useBaseEntity } from "./core/useBaseEntity";
 import { Attendance } from "@/lib/types";
 import { useAuth } from "@/lib/auth/auth-context";
+import { captureSupabaseError } from "@/lib/sentry";
 
 export type { Attendance };
 
@@ -45,6 +46,11 @@ export function useAttendances() {
       setTodayLoading(false);
       return result;
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "getAttendanceForDate",
+        { date, targetEmployeeId }
+      );
       console.error('Error fetching attendance for date:', error);
       setTodayLoading(false);
       return null;
@@ -88,6 +94,11 @@ export function useAttendances() {
 
       return result;
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "getAttendanceForDateRange",
+        { startDate, endDate, employeeId }
+      );
       console.error('Error fetching attendance for date range:', error);
       return [];
     }
@@ -118,6 +129,11 @@ export function useAttendances() {
 
       return result;
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "getAttendanceByTag",
+        { tag, startDate, endDate }
+      );
       console.error('Error fetching attendance by tag:', error);
       return [];
     }

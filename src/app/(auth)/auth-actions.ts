@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import * as Sentry from "@sentry/nextjs";
 
 import { createClient } from "@/lib/supabase/server";
 import { AuthError } from "@supabase/supabase-js";
@@ -23,6 +24,17 @@ export async function login({
   const { error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
+    Sentry.withScope((scope) => {
+      scope.setTag("auth_action", "login");
+      scope.setTag("error_code", error.code || "unknown");
+      scope.setContext("auth_error", {
+        message: error.message,
+        status: error.status,
+        code: error.code,
+      });
+      // Don't include email for privacy
+      Sentry.captureException(error);
+    });
     return { error };
   }
 
@@ -49,6 +61,16 @@ export async function signup({
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
+    Sentry.withScope((scope) => {
+      scope.setTag("auth_action", "signup");
+      scope.setTag("error_code", error.code || "unknown");
+      scope.setContext("auth_error", {
+        message: error.message,
+        status: error.status,
+        code: error.code,
+      });
+      Sentry.captureException(error);
+    });
     redirect("/error");
   }
 
@@ -76,6 +98,16 @@ export async function googleSignIn(){
   const error = response.error;
 
   if (error) {
+    Sentry.withScope((scope) => {
+      scope.setTag("auth_action", "google_signin");
+      scope.setTag("error_code", error.code || "unknown");
+      scope.setContext("auth_error", {
+        message: error.message,
+        status: error.status,
+        code: error.code,
+      });
+      Sentry.captureException(error);
+    });
     throw error;
   }
 
@@ -86,6 +118,18 @@ export async function googleSignIn(){
 export async function logout(){
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();
-  if (error) throw error;
+  if (error) {
+    Sentry.withScope((scope) => {
+      scope.setTag("auth_action", "logout");
+      scope.setTag("error_code", error.code || "unknown");
+      scope.setContext("auth_error", {
+        message: error.message,
+        status: error.status,
+        code: error.code,
+      });
+      Sentry.captureException(error);
+    });
+    throw error;
+  }
   redirect("/login");
 }

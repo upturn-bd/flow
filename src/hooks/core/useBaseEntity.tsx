@@ -12,6 +12,7 @@ import {
 } from "./types";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
+import { captureSupabaseError } from "@/lib/sentry";
 
 interface BaseEntityHookConfig<T> {
   tableName: string;
@@ -57,9 +58,17 @@ export function useBaseEntity<T extends BaseEntity>(
           errorMessage = error.message;
         } else if (typeof error === 'object' && error !== null) {
           // Handle Supabase errors which may have different structures
-          errorMessage = (error as { message?: string; error_description?: string }).message 
-            || (error as { error_description?: string }).error_description 
+          const errorObj = error as { message?: string; error_description?: string; code?: string; details?: string; hint?: string };
+          errorMessage = errorObj.message 
+            || errorObj.error_description 
             || JSON.stringify(error);
+          
+          // Capture Supabase error to Sentry with context
+          captureSupabaseError(
+            { code: errorObj.code, message: errorObj.message, details: errorObj.details, hint: errorObj.hint },
+            `${config.tableName}_operation`,
+            { entityName: config.entityName }
+          );
         } else {
           errorMessage = String(error) || "An unknown error occurred";
         }
@@ -76,7 +85,7 @@ export function useBaseEntity<T extends BaseEntity>(
         return null;
       }
     },
-    [config.tableName]
+    [config.tableName, config.entityName]
   );
 
   const clearError = useCallback(() => {

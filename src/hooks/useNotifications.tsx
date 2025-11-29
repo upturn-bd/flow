@@ -5,6 +5,7 @@ import { Notification, NotificationType } from "@/lib/types/schemas";
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
+import { captureSupabaseError, captureApiError } from "@/lib/sentry";
 
 export type { Notification, NotificationType };
 
@@ -68,6 +69,11 @@ export function useNotifications() {
 
       return data || [];
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "fetchUserNotifications",
+        { companyId: employeeInfo?.company_id, userId: employeeInfo?.id }
+      );
       console.error('Error fetching user notifications:', error);
       return [];
     }
@@ -99,6 +105,11 @@ export function useNotifications() {
       setUnreadCount(unreadCount);
       return unreadCount;
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "fetchUnreadCount",
+        { companyId: employeeInfo?.company_id, userId: employeeInfo?.id }
+      );
       console.error('Error fetching unread count:', error);
       setUnreadCount(0);
       return 0;
@@ -124,6 +135,11 @@ export function useNotifications() {
       await fetchUnreadCount();
       return { success: true };
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "markAsRead",
+        { notificationId }
+      );
       console.error('Error marking notification as read:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
@@ -156,6 +172,11 @@ export function useNotifications() {
       setUnreadCount(0);
       return { success: true };
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "markAllAsRead",
+        { companyId: employeeInfo?.company_id, userId: employeeInfo?.id }
+      );
       console.error('Error marking all notifications as read:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
@@ -180,10 +201,20 @@ export function useNotifications() {
         body: JSON.stringify({ notificationData }),
       });
 
+      if (!res.ok) {
+        captureApiError(res, "POST /functions/v1/create_notification", { companyId });
+        return { success: false, error: `HTTP error: ${res.status}` };
+      }
+
       return await res.json(); // waits for server 
 
 
     } catch (error) {
+      captureApiError(
+        error,
+        "POST /functions/v1/create_notification",
+        { companyId }
+      );
       console.error('Error creating notification:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
@@ -205,6 +236,11 @@ export function useNotifications() {
       await fetchUnreadCount();
       return { success: true };
     } catch (error) {
+      captureSupabaseError(
+        { message: error instanceof Error ? error.message : String(error) },
+        "deleteNotification",
+        { notificationId }
+      );
       console.error('Error deleting notification:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
@@ -285,6 +321,11 @@ export const createSystemNotification = async (
 
     return { success: true, data };
   } catch (error) {
+    captureSupabaseError(
+      { message: error instanceof Error ? error.message : String(error) },
+      "createSystemNotification",
+      { recipientId, companyId, title }
+    );
     console.error('Error creating system notification:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
