@@ -8,13 +8,23 @@ import * as Sentry from "@sentry/nextjs";
 Sentry.init({
   dsn: "https://bd10d9b181809060ba3bd0491d689356@o4510448453615616.ingest.de.sentry.io/4510448455188560",
 
-  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
-  tracesSampleRate: 1,
+  // Edge functions run frequently (middleware on every request)
+  // Sample at low rate to avoid high costs
+  tracesSampleRate: 0.05, // 5% of edge transactions
 
-  // Enable logs to be sent to Sentry
-  enableLogs: true,
+  // Smart sampling for edge
+  tracesSampler: (samplingContext) => {
+    // Respect parent sampling
+    if (samplingContext.parentSampled !== undefined) {
+      return samplingContext.parentSampled;
+    }
+    // Low sample rate for middleware (runs on every request)
+    return 0.05;
+  },
 
-  // Enable sending user PII (Personally Identifiable Information)
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
+  // Enable sending user PII for user identification
   sendDefaultPii: true,
+
+  // Limit breadcrumbs in edge (limited memory)
+  maxBreadcrumbs: 20,
 });

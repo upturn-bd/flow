@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthProvider, useAuth } from "@/lib/auth/auth-context";
+import { useSentryUser } from "@/lib/sentry";
 import Sidebar from "./side-navbar";
 import TopBar from "./top-bar";
 
@@ -18,6 +19,9 @@ export default function HomeLayout({
 
 function ApprovalLayout({ children }: { children: React.ReactNode }) {
   const { isApproved } = useAuth();
+  
+  // Set Sentry user context for error tracking
+  useSentryUser();
 
   return (
     <div className="flex h-dvh w-full overflow-x-hidden">

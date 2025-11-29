@@ -4,75 +4,103 @@
 
 | Category | Status | Priority |
 |----------|--------|----------|
-| Error monitoring | ✅ Sentry configured | High |
+| Error monitoring | ✅ Sentry fully configured | High |
 | Database backups | ❌ Need to configure | High |
 
 ---
 
-## Error Monitoring (Sentry) - Setup Instructions
+## Error Monitoring (Sentry) - ✅ FULLY CONFIGURED
 
-### 1. Create Sentry Account & Project
-1. Go to [sentry.io](https://sentry.io) and create an account
-2. Create a new project → Select **Next.js**
-3. Note down your **DSN** from the project settings
+### Project Details
+- **Organization**: upturn-bd
+- **Project**: javascript-nextjs
+- **Dashboard**: [sentry.io/organizations/upturn-bd](https://sentry.io/organizations/upturn-bd/projects/javascript-nextjs/)
 
-### 2. Set Environment Variables
-Add these to your `.env.local` (development) and your hosting platform (production):
+### Environment Variables for CI/CD
+Add this to your hosting platform (Vercel, etc.):
 
 ```env
-NEXT_PUBLIC_SENTRY_DSN=https://xxxxx@o123456.ingest.sentry.io/123456
-SENTRY_ORG=your-organization-slug
-SENTRY_PROJECT=your-project-name
-SENTRY_AUTH_TOKEN=your-auth-token  # Get from Settings > Auth Tokens
+SENTRY_AUTH_TOKEN=<your-auth-token-from-ci-setup>
 ```
 
-### 3. What's Tracked
-- **Client-side errors**: JavaScript errors, unhandled promise rejections
-- **Server-side errors**: API route errors, SSR errors
-- **User context**: User ID, email, company, role (for identifying affected users)
-- **Session replay**: 10% of sessions, 100% of error sessions (anonymized)
-- **Performance**: Page load times, API response times
+### Error Types Captured
 
-### 4. Using Sentry in Code
+| Error Type | Status | Description |
+|------------|--------|-------------|
+| Client JS errors | ✅ | Unhandled exceptions, promise rejections |
+| Server errors | ✅ | API routes, SSR, server actions |
+| React component crashes | ✅ | Error boundaries in place |
+| Supabase/DB errors | ✅ | Tagged with `error_type: supabase` |
+| API/fetch errors | ✅ | Captured with endpoint context |
+| 404 Not Found | ✅ | Custom page at `/not-found.tsx` |
+| Console errors | ✅ | `console.error` captured as breadcrumbs |
+| User context | ✅ | User ID, email, company, role on all errors |
+| Session replay | ✅ | Video replay on error sessions |
+| Performance | ✅ | Page loads, API response times |
+
+### Error Pages Created
+- `src/app/global-error.tsx` - Catches all unhandled errors
+- `src/app/(home)/error.tsx` - Route-level error boundary
+- `src/app/not-found.tsx` - 404 page
+- `src/components/ErrorBoundary.tsx` - Reusable component error boundary
+
+### Sentry Utilities (`src/lib/sentry.ts`)
 
 ```typescript
-// Import the utilities
-import { captureError, captureMessage, addBreadcrumb } from "@/lib/sentry";
+// Capture any error with context
+captureError(error, { operation: "createEmployee", userId: id });
 
-// Capture a custom error with context
-try {
-  await riskyOperation();
-} catch (error) {
-  captureError(error as Error, { 
-    operation: "riskyOperation",
-    userId: user.id 
-  });
-}
+// Capture Supabase errors specifically
+captureSupabaseError(supabaseError, "fetchEmployees", { companyId });
+
+// Capture API errors
+captureApiError(response, "POST /api/employees");
 
 // Add breadcrumbs for debugging
-addBreadcrumb("User clicked submit", "user-action", { formId: "leave-request" });
+addBreadcrumb("User clicked submit", "user-action", { formId: "leave" });
 
-// Capture informational messages
-captureMessage("Large file upload completed", { fileSize: "50MB" });
+// Wrap expensive operations with performance tracking
+const result = await withSpan("loadDashboard", "db.query", async () => {
+  return await fetchDashboardData();
+});
+
+// Safe error logging (logs + sends to Sentry)
+logError("Error fetching employees", error, { companyId });
 ```
 
-### 5. Enable User Context (Recommended)
-In your main app layout, add the Sentry user hook:
+### Using ErrorBoundary Component
 
-```typescript
-import { useSentryUser } from "@/lib/sentry";
+```tsx
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
-function AppContent({ children }) {
-  useSentryUser(); // Sets user context for all errors
-  return <>{children}</>;
-}
+// Wrap components that might fail
+<ErrorBoundary componentName="EmployeeTable">
+  <EmployeeTable />
+</ErrorBoundary>
+
+// With custom fallback
+<ErrorBoundary 
+  componentName="Dashboard"
+  fallback={<DashboardSkeleton />}
+>
+  <Dashboard />
+</ErrorBoundary>
 ```
 
-### 6. Sentry Dashboard Features
-- **Issues**: View all errors grouped by type
-- **Performance**: Monitor slow pages and API calls
-- **Session Replay**: Watch user sessions that led to errors
-- **Alerts**: Set up Slack/email notifications for new errors
-- **Release Tracking**: Track which deploy introduced bugs
+### Clean Up Before Production
+- [ ] Remove `/sentry-example-page` after testing
+- [ ] Remove `/api/sentry-example-api` after testing
+- [x] ~~Reduce `tracesSampleRate` to 0.1-0.2~~ ✅ Done (10% client, 10-20% server, 5% edge)
+- [x] ~~Reduce `replaysSessionSampleRate`~~ ✅ Done (1% normal, 100% on error)
+- [ ] Set up Slack/Email alerts in Sentry dashboard
+- [ ] Create alert rules for critical errors
+
+### Current Sample Rates (Optimized for Cost)
+
+| Config | Traces | Replays | Notes |
+|--------|--------|---------|-------|
+| Client | 10% | 1% normal, 100% on error | Smart sampling enabled |
+| Server | 10% base, 20% API routes | N/A | Health checks excluded |
+| Edge | 5% | N/A | Low rate for middleware |
 
 ---
