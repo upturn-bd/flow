@@ -203,6 +203,7 @@ export function useNotifications() {
 
       if (!res.ok) {
         captureApiError(res, "POST /functions/v1/create_notification", { companyId });
+        return { success: false, error: `HTTP error: ${res.status}` };
       }
 
       return await res.json(); // waits for server 
@@ -212,7 +213,7 @@ export function useNotifications() {
       captureApiError(
         error,
         "POST /functions/v1/create_notification",
-        { companyId: employeeInfo?.company_id }
+        { companyId }
       );
       console.error('Error creating notification:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
