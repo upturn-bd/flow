@@ -33,7 +33,7 @@ export async function sendEmail(
     subject,
     html,
     text,
-    from = "Flow HRIS <noreply@yourdomain.com>", // Update with your verified domain
+    from = "Flow <noreply@upturn.com.bd>", // Update with your verified domain
     replyTo,
     cc,
     bcc,
