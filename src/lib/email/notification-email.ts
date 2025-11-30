@@ -11,11 +11,30 @@ export interface NotificationEmailData {
 }
 
 /**
+ * Escape HTML special characters to prevent XSS
+ */
+function escapeHtml(text: string): string {
+  const htmlEscapes: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  };
+  return text.replace(/[&<>"']/g, (char) => htmlEscapes[char] || char);
+}
+
+/**
  * Generate HTML content for a notification email
  */
 function generateNotificationEmailHtml(data: NotificationEmailData): string {
   const priorityColor = data.priority === 'urgent' ? '#dc2626' : '#ea580c';
   const priorityLabel = data.priority === 'urgent' ? 'Urgent' : 'High Priority';
+  
+  // Escape user-provided content
+  const safeTitle = escapeHtml(data.title);
+  const safeMessage = escapeHtml(data.message);
+  const safeRecipientName = data.recipientName ? escapeHtml(data.recipientName) : undefined;
   
   return `
 <!DOCTYPE html>
@@ -23,7 +42,7 @@ function generateNotificationEmailHtml(data: NotificationEmailData): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${data.title}</title>
+  <title>${safeTitle}</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -37,16 +56,16 @@ function generateNotificationEmailHtml(data: NotificationEmailData): string {
         </div>
         
         <!-- Greeting -->
-        ${data.recipientName ? `<p style="margin: 0 0 16px 0; color: #374151; font-size: 14px;">Hi ${data.recipientName},</p>` : ''}
+        ${safeRecipientName ? `<p style="margin: 0 0 16px 0; color: #374151; font-size: 14px;">Hi ${safeRecipientName},</p>` : ''}
         
         <!-- Title -->
         <h1 style="margin: 0 0 16px 0; color: #111827; font-size: 20px; font-weight: 600;">
-          ${data.title}
+          ${safeTitle}
         </h1>
         
         <!-- Message -->
         <p style="margin: 0 0 24px 0; color: #4b5563; font-size: 14px; line-height: 1.6;">
-          ${data.message}
+          ${safeMessage}
         </p>
         
         <!-- Action Button -->

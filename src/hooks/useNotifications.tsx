@@ -325,13 +325,15 @@ export const createSystemNotification = async (
       const { sendNotificationEmail } = await import('@/lib/email/notification-email');
       
       // Fetch recipient email from employees table
-      const { data: employee } = await supabase
+      const { data: employee, error: employeeError } = await supabase
         .from('employees')
         .select('email, name')
         .eq('id', recipientId)
         .single();
 
-      if (employee?.email) {
+      if (employeeError) {
+        console.error('Failed to fetch employee for notification email:', employeeError);
+      } else if (employee?.email) {
         // Send email asynchronously without blocking the notification creation
         sendNotificationEmail({
           recipientEmail: employee.email,
