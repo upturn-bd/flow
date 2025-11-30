@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, RotateCcw, Eye, EyeOff, GripVertical, CaretUp as ChevronUp, CaretDown as ChevronDown } from '@/lib/icons';
 import { WidgetConfig, WidgetSize } from '@/lib/types/widgets';
@@ -12,13 +12,22 @@ interface WidgetCustomizationPanelProps {
   onCancel: () => void;
   onReset: () => void;
   saving: boolean;
+  isMobile?: boolean;
 }
 
-const sizeOptions: { value: WidgetSize; label: string }[] = [
+// Desktop size options (affects width and positioning)
+const desktopSizeOptions: { value: WidgetSize; label: string }[] = [
   { value: 'small', label: 'Small' },
   { value: 'medium', label: 'Medium' },
   { value: 'large', label: 'Large' },
   { value: 'full', label: 'Full Width' },
+];
+
+// Mobile size options (only affects height, no "Full Width")
+const mobileSizeOptions: { value: WidgetSize; label: string }[] = [
+  { value: 'small', label: 'Compact' },
+  { value: 'medium', label: 'Normal' },
+  { value: 'large', label: 'Expanded' },
 ];
 
 export default function WidgetCustomizationPanel({
@@ -27,9 +36,15 @@ export default function WidgetCustomizationPanel({
   onCancel,
   onReset,
   saving,
+  isMobile = false,
 }: WidgetCustomizationPanelProps) {
   const [localWidgets, setLocalWidgets] = useState<WidgetConfig[]>(widgets);
   const [hasChanges, setHasChanges] = useState(false);
+
+  // Select appropriate size options based on device
+  const sizeOptions = useMemo(() => 
+    isMobile ? mobileSizeOptions : desktopSizeOptions
+  , [isMobile]);
 
   useEffect(() => {
     setLocalWidgets(widgets);
@@ -40,7 +55,7 @@ export default function WidgetCustomizationPanel({
     setHasChanges(changed);
   }, [localWidgets, widgets]);
 
-  // Handle ESC key to close panel
+  // Handle ESC key to close panel and set modal state on body
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -55,7 +70,14 @@ export default function WidgetCustomizationPanel({
     };
 
     window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+    document.body.style.overflow = 'hidden';
+    document.body.setAttribute('data-modal-open', 'true');
+    
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+      document.body.removeAttribute('data-modal-open');
+    };
   }, [hasChanges, onCancel]);
 
   const toggleWidget = (widgetId: string) => {
@@ -66,11 +88,51 @@ export default function WidgetCustomizationPanel({
     );
   };
 
+  // Get height for a given size
+  const getSizeHeight = (size: WidgetSize): number => {
+    switch (size) {
+      case 'small': return 5;
+      case 'medium': return 5;
+      case 'large': return 5;
+      case 'full': return 6;
+      default: return 5;
+    }
+  };
+
+  // Get width for a given size
+  const getSizeWidth = (size: WidgetSize): number => {
+    switch (size) {
+      case 'small': return 4;
+      case 'medium': return 6;
+      case 'large': return 12;
+      case 'full': return 12;
+      default: return 6;
+    }
+  };
+
   const updateWidgetSize = (widgetId: string, size: WidgetSize) => {
     setLocalWidgets(prev =>
-      prev.map(w =>
-        w.id === widgetId ? { ...w, size } : w
-      )
+      prev.map(w => {
+        if (w.id !== widgetId) return w;
+        
+        // On mobile, only update the mobileSize property (affects mobile height only)
+        // This doesn't impact desktop layout which uses size and position dimensions
+        if (isMobile) {
+          return { ...w, mobileSize: size };
+        }
+        
+        // On desktop, update both size and position dimensions to keep them in sync
+        const newHeight = getSizeHeight(size);
+        const newWidth = getSizeWidth(size);
+        
+        return {
+          ...w,
+          size,
+          position: w.position 
+            ? { ...w.position, width: newWidth, height: newHeight }
+            : { row: 0, col: 0, width: newWidth, height: newHeight }
+        };
+      })
     );
   };
 
@@ -184,7 +246,62 @@ export default function WidgetCustomizationPanel({
                       : 'border-border-primary bg-background-secondary opacity-60'
                   }`}
                 >
-                  <div className="flex items-center gap-2 sm:gap-4">
+                  {/* Mobile Layout: Two rows for better visibility */}
+                  <div className="sm:hidden">
+                    {/* Top row: Icon, Name, Toggle */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`p-2 rounded-lg flex-shrink-0 ${widget.enabled ? 'bg-primary-50 dark:bg-primary-950/20' : 'bg-background-tertiary'}`}>
+                        <Icon size={20} className={widget.enabled ? 'text-primary-600 dark:text-primary-400' : 'text-foreground-tertiary'} />
+                      </div>
+                      <h3 className="font-medium text-sm text-foreground-primary flex-1">{definition.name}</h3>
+                      <button
+                        onClick={() => toggleWidget(widget.id)}
+                        className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
+                          widget.enabled
+                            ? 'bg-success/10 hover:bg-success/20 text-success dark:bg-success/20 dark:hover:bg-success/30'
+                            : 'bg-background-tertiary hover:bg-surface-hover text-foreground-tertiary'
+                        }`}
+                        aria-label={widget.enabled ? 'Hide widget' : 'Show widget'}
+                      >
+                        {widget.enabled ? <Eye size={18} /> : <EyeOff size={18} />}
+                      </button>
+                    </div>
+                    {/* Bottom row: Reorder buttons, Size selector */}
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-border-secondary">
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => moveWidgetUp(index)}
+                          disabled={index === 0}
+                          className="p-1.5 hover:bg-surface-hover rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <ChevronUp size={18} className="text-foreground-tertiary" />
+                        </button>
+                        <button
+                          onClick={() => moveWidgetDown(index)}
+                          disabled={index === localWidgets.length - 1}
+                          className="p-1.5 hover:bg-surface-hover rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <ChevronDown size={18} className="text-foreground-tertiary" />
+                        </button>
+                        <span className="text-xs text-foreground-tertiary ml-1">Reorder</span>
+                      </div>
+                      <select
+                        value={widget.mobileSize || widget.size}
+                        onChange={(e) => updateWidgetSize(widget.id, e.target.value as WidgetSize)}
+                        disabled={!widget.enabled}
+                        className="px-3 py-1.5 border border-border-secondary rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed bg-surface-primary"
+                      >
+                        {sizeOptions.map(option => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Desktop Layout: Single row */}
+                  <div className="hidden sm:flex items-center gap-4">
                     {/* Drag Handle & Reorder Buttons */}
                     <div className="flex flex-col gap-1 flex-shrink-0">
                       <button
@@ -205,13 +322,13 @@ export default function WidgetCustomizationPanel({
                     </div>
 
                     {/* Widget Info */}
-                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                      <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${widget.enabled ? 'bg-primary-50 dark:bg-primary-950/20' : 'bg-background-tertiary'}`}>
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className={`p-2 rounded-lg flex-shrink-0 ${widget.enabled ? 'bg-primary-50 dark:bg-primary-950/20' : 'bg-background-tertiary'}`}>
                         <Icon size={18} className={widget.enabled ? 'text-primary-600 dark:text-primary-400' : 'text-foreground-tertiary'} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-sm sm:text-base text-foreground-primary truncate">{definition.name}</h3>
-                        <p className="text-xs sm:text-sm text-foreground-tertiary hidden sm:block truncate">{definition.description}</p>
+                        <h3 className="font-medium text-base text-foreground-primary truncate">{definition.name}</h3>
+                        <p className="text-sm text-foreground-tertiary truncate">{definition.description}</p>
                       </div>
                     </div>
 
@@ -220,7 +337,7 @@ export default function WidgetCustomizationPanel({
                       value={widget.size}
                       onChange={(e) => updateWidgetSize(widget.id, e.target.value as WidgetSize)}
                       disabled={!widget.enabled}
-                      className="px-2 sm:px-3 py-1.5 sm:py-2 border border-border-secondary rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 bg-surface-primary"
+                      className="px-3 py-2 border border-border-secondary rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 bg-surface-primary"
                     >
                       {sizeOptions.map(option => (
                         <option key={option.value} value={option.value}>
@@ -232,7 +349,7 @@ export default function WidgetCustomizationPanel({
                     {/* Toggle Button */}
                     <button
                       onClick={() => toggleWidget(widget.id)}
-                      className={`p-1.5 sm:p-2 rounded-lg transition-colors flex-shrink-0 ${
+                      className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
                         widget.enabled
                           ? 'bg-success/10 hover:bg-success/20 text-success dark:bg-success/20 dark:hover:bg-success/30'
                           : 'bg-background-tertiary hover:bg-surface-hover text-foreground-tertiary'

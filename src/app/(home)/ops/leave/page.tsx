@@ -54,24 +54,24 @@ function LeavePageContent() {
       icon: <BookOpen className="h-5 w-5" />,
       color: "text-purple-600",
       content: (
-        <div className="flex flex-col items-center justify-center py-12 text-foreground-tertiary">
+        <div className="flex flex-col items-center justify-center py-6 sm:py-12 text-foreground-tertiary">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <BookOpen className="h-16 w-16 text-blue-200 mb-4" />
+            <BookOpen className="h-12 w-12 sm:h-16 sm:w-16 text-blue-200 mb-4" />
           </motion.div>
-          <h3 className="text-xl font-medium mb-2">Leave Policy</h3>
-          <p className="mt-2 text-center max-w-md mb-6">
+          <h3 className="text-lg sm:text-xl font-medium mb-2">Leave Policy</h3>
+          <p className="mt-2 text-center max-w-md mb-6 text-sm sm:text-base px-2">
             Company leave policies and guidelines will appear here. Please check back later or contact HR for more information.
           </p>
-          <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 max-w-md">
-            <div className="flex gap-3">
+          <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 sm:p-4 max-w-md mx-2">
+            <div className="flex gap-2 sm:gap-3">
               <WarningCircle className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-sm font-semibold text-blue-800 mb-1">Policy Information</h4>
-                <p className="text-sm text-blue-700">
+                <p className="text-xs sm:text-sm text-blue-700">
                   Leave policies typically include annual leave allowance, sick leave limits, maternity/paternity leave, and other special leave arrangements.
                 </p>
               </div>

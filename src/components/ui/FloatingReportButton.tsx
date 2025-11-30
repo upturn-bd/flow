@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Bug } from "lucide-react";
+import { Bug } from "@/lib/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import ReportProblemModal from "./ReportProblemModal";
 

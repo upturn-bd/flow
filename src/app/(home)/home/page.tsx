@@ -1,6 +1,6 @@
 "use client";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { pageVariants } from "@/app/(home)/home/components/animations";
 import { useHomeLayout } from "@/hooks/useHomeLayout";
 import AttendanceWidget from "@/app/(home)/home/widgets/AttendanceWidget";
@@ -10,6 +10,7 @@ import ProjectsWidget from "@/app/(home)/home/widgets/ProjectsWidget";
 import StakeholderIssuesWidget from "@/app/(home)/home/widgets/StakeholderIssuesWidget";
 import ServicesWidget from "@/app/(home)/home/widgets/ServicesWidget";
 import DetailModals from "@/app/(home)/home/components/DetailModals";
+import WidgetCustomizationPanel from "@/app/(home)/home/components/WidgetCustomizationPanel";
 import Portal from "@/components/ui/Portal";
 import { Settings, GripVertical, Eye, EyeOff, ArrowDownRight } from "@/lib/icons";
 import GridLayout from "react-grid-layout";
@@ -22,8 +23,9 @@ const MOBILE_COLS = 1;
 const ROW_HEIGHT = 80;
 
 export default function HomePage() {
-  const { layout: homeLayout, loading: layoutLoading, saveLayout, updateAllWidgets } = useHomeLayout();
+  const { layout: homeLayout, loading: layoutLoading, saving: savingLayout, saveLayout, updateAllWidgets, resetToDefault } = useHomeLayout();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showMobileCustomization, setShowMobileCustomization] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -76,6 +78,17 @@ export default function HomePage() {
     }
   };
 
+  // Mobile-specific heights (more variation for better UX)
+  const getMobileWidgetHeight = (size: string) => {
+    switch (size) {
+      case 'small': return 4;   // Compact
+      case 'medium': return 5;  // Normal
+      case 'large': return 7;   // Expanded
+      case 'full': return 5;    // Treat as medium on mobile
+      default: return 5;
+    }
+  };
+
   // Create grid layout from widgets
   const gridLayout = useMemo(() => {
     if (!homeLayout?.widgets) return [];
@@ -85,26 +98,42 @@ export default function HomePage() {
       ? homeLayout.widgets 
       : homeLayout.widgets.filter(w => w.enabled);
     
+    // Calculate cumulative Y positions for mobile layout
+    let mobileYOffset = 0;
+    
     return visibleWidgets.map((widget, index) => {
-      // Use stored dimensions if available, otherwise use size-based defaults
-      const gridSize = widget.position?.width && widget.position?.height
-        ? { w: widget.position.width, h: widget.position.height }
-        : getWidgetGridSize(widget.size);
+      // Get size-based dimensions for desktop
+      const sizeBasedDimensions = getWidgetGridSize(widget.size);
+      
+      // Get mobile-specific height based on mobileSize (fallback to size if not set)
+      const mobileHeight = getMobileWidgetHeight(widget.mobileSize || widget.size);
+      
+      // On mobile, use mobile-specific height
+      // On desktop, use stored dimensions if available
+      const gridSize = isMobile 
+        ? { w: 1, h: mobileHeight }
+        : (widget.position?.width && widget.position?.height
+            ? { w: widget.position.width, h: widget.position.height }
+            : sizeBasedDimensions);
       
       // On mobile, force single column layout
       const responsiveWidth = isMobile ? 1 : gridSize.w;
       const responsiveX = isMobile ? 0 : (widget.position?.col ?? 0);
+      
+      // Calculate Y position for mobile (stack widgets vertically)
+      const currentMobileY = mobileYOffset;
+      mobileYOffset += mobileHeight;
       
       // If widget has stored position, use it
       if (widget.position?.col !== undefined && widget.position?.row !== undefined) {
         return {
           i: widget.id,
           x: responsiveX,
-          y: isMobile ? index * gridSize.h : widget.position.row,
+          y: isMobile ? currentMobileY : widget.position.row,
           w: responsiveWidth,
           h: gridSize.h,
           minW: isMobile ? 1 : 4,
-          minH: 5,
+          minH: isMobile ? 3 : 5,
         };
       }
       
@@ -151,11 +180,11 @@ export default function HomePage() {
       return {
         i: widget.id,
         x: isMobile ? 0 : x,
-        y: isMobile ? index * gridSize.h : y,
+        y: isMobile ? currentMobileY : y,
         w: responsiveWidth,
         h: gridSize.h,
         minW: isMobile ? 1 : 4,
-        minH: 5,
+        minH: isMobile ? 3 : 5,
       };
     });
   }, [homeLayout?.widgets, isMobile, isEditMode]);
@@ -258,6 +287,25 @@ export default function HomePage() {
     }
   };
 
+  // Mobile customization panel handlers
+  const handleMobileSave = async (widgets: WidgetConfig[]) => {
+    if (saveLayout) {
+      await saveLayout(widgets);
+      setShowMobileCustomization(false);
+    }
+  };
+
+  const handleMobileCancel = () => {
+    setShowMobileCustomization(false);
+  };
+
+  const handleMobileReset = async () => {
+    if (resetToDefault) {
+      await resetToDefault();
+      setShowMobileCustomization(false);
+    }
+  };
+
   return (
     <>
     <motion.div
@@ -271,7 +319,7 @@ export default function HomePage() {
         <div className="flex justify-between items-center mb-4 sm:mb-6">
           <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary">Dashboard</h1>
           <div className="flex gap-2">
-            {isEditMode ? (
+            {isEditMode && !isMobile ? (
               <>
                 <button
                   onClick={() => setIsEditMode(false)}
@@ -288,7 +336,7 @@ export default function HomePage() {
               </>
             ) : (
               <button
-                onClick={() => setIsEditMode(true)}
+                onClick={() => isMobile ? setShowMobileCustomization(true) : setIsEditMode(true)}
                 className="flex items-center gap-2 px-3 py-2 sm:px-4 text-sm sm:text-base text-foreground-primary bg-surface-primary border border-border-primary rounded-lg hover:bg-surface-hover transition-colors"
               >
                 <Settings size={18} />
@@ -386,6 +434,20 @@ export default function HomePage() {
           />
         </Portal>
       )}
+
+      {/* Mobile Widget Customization Panel */}
+      <AnimatePresence>
+        {showMobileCustomization && homeLayout?.widgets && (
+          <WidgetCustomizationPanel
+            widgets={homeLayout.widgets}
+            onSave={handleMobileSave}
+            onCancel={handleMobileCancel}
+            onReset={handleMobileReset}
+            saving={savingLayout}
+            isMobile={true}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
     </>
   );

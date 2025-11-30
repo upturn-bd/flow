@@ -36,11 +36,13 @@ export default function BaseModal({
       document.addEventListener("keydown", handleEscape);
       // Prevent body scroll when modal is open
       document.body.style.overflow = "hidden";
+      document.body.setAttribute("data-modal-open", "true");
     }
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "unset";
+      document.body.removeAttribute("data-modal-open");
     };
   }, [isOpen, onClose]);
 

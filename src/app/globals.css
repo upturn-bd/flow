@@ -358,3 +358,9 @@ input,select{
   opacity: 1 !important;
   background-color: #2563eb !important;
 }
+
+/* Hide mobile hamburger button when modals are open */
+body[data-modal-open="true"] [data-mobile-hamburger] {
+  visibility: hidden;
+  pointer-events: none;
+}

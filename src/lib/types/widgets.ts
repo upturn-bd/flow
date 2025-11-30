@@ -32,6 +32,7 @@ export interface WidgetConfig {
   enabled: boolean;
   position: WidgetPosition;
   size: WidgetSize;
+  mobileSize?: WidgetSize; // Separate size for mobile view (affects height only)
   order: number; // Display order
   settings?: Record<string, unknown>; // Widget-specific settings
 }

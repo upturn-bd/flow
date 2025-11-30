@@ -113,7 +113,7 @@ export const TabView = ({
 
       {/* Tab Content */}
       {(tabs.find((tab) => tab.key === activeTab)?.content && (
-        <div className="bg-surface-primary rounded-xl shadow-sm p-6">
+        <div className="bg-surface-primary rounded-xl shadow-sm p-3 sm:p-6">
           {(() => {
             const activeTabData = tabs.find((tab) => tab.key === activeTab);
             return activeTabData ? activeTabData.content : null;

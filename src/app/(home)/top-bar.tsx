@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { Bell, User, Search, LogOut, UserCircle, ShieldAlert, Moon, Sun } from "@/lib/icons";
+import { Bell, User, Search, LogOut, UserCircle, ShieldAlert, Moon, Sun, Bug } from "@/lib/icons";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -10,6 +10,41 @@ import { useNotifications, Notification } from "@/hooks/useNotifications";
 import NotificationDropdown from "@/components/notifications/NotificationDropdown";
 import NewNotificationModal from "@/components/notifications/NewNotificationModal";
 import { useTheme } from "@/contexts/ThemeContext";
+import ReportProblemModal from "@/components/ui/ReportProblemModal";
+import GlobalSearch from "@/components/search/GlobalSearch";
+
+// Get module info from pathname for report problem context
+function getModuleInfo(pathname: string): { moduleName: string; moduleCategory: string } {
+  const segments = pathname.split("/").filter(Boolean);
+  
+  if (segments[0] === "ops") {
+    const moduleName = segments[1] 
+      ? segments[1].split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+      : "Operations";
+    return { moduleName, moduleCategory: "Operations" };
+  }
+  
+  if (segments[0] === "admin") {
+    if (segments[1] === "logs" && segments[2]) {
+      const moduleName = segments[2].split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ") + " Log";
+      return { moduleName, moduleCategory: "Admin Logs" };
+    }
+    if (segments[1] === "config" && segments[2]) {
+      const moduleName = segments[2].split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+      return { moduleName, moduleCategory: "Admin Config" };
+    }
+    if (segments[1]) {
+      const moduleName = segments[1].split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+      return { moduleName, moduleCategory: "Admin" };
+    }
+    return { moduleName: "Admin", moduleCategory: "Admin" };
+  }
+  
+  return { moduleName: "General", moduleCategory: "General" };
+}
+
+// Routes where the report problem button should appear
+const REPORT_ENABLED_ROUTES = ["/ops", "/admin"];
 
 export default function TopBar() {
   const { employeeInfo, isApproved } = useAuth();
@@ -17,12 +52,18 @@ export default function TopBar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
   const [newNotificationModal, setNewNotificationModal] = useState(false);
+  const [reportProblemModalOpen, setReportProblemModalOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [latestNotification, setLatestNotification] = useState<Notification | null>(null);
   const [previousUnreadCount, setPreviousUnreadCount] = useState(0);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notificationButtonRef = useRef<HTMLButtonElement>(null!);
   const router = useRouter();
   const pathname = usePathname();
+  
+  // Get module info for report problem context
+  const { moduleName, moduleCategory } = getModuleInfo(pathname);
+  const showReportProblem = REPORT_ENABLED_ROUTES.some(route => pathname.startsWith(route));
   
   // Notification hook
   const { 
@@ -32,6 +73,18 @@ export default function TopBar() {
     markAsRead,
     deleteNotification 
   } = useNotifications();
+
+  // Keyboard shortcut for search (Cmd/Ctrl + K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Check for new notifications
   const checkForNewNotifications = async () => {
@@ -104,7 +157,7 @@ export default function TopBar() {
 
   return (
     <>
-    <header className="bg-background-primary border-b border-border-primary shadow-sm sticky top-0 z-[50] h-16">
+    <header className="bg-background-primary border-b border-border-primary shadow-sm sticky top-0 z-40 h-16">
       <div className="pr-4 md:pr-6 h-full flex items-center justify-between">
         {/* Left side */}
         <div className="flex items-center">
@@ -120,11 +173,20 @@ export default function TopBar() {
         <div className="flex items-center space-x-1 md:space-x-3">
           {isApproved && (
             <>
-              <div className="relative">
-                <button className="p-2 rounded-full hover:bg-surface-hover text-foreground-tertiary transition-colors">
-                  <Search className="h-5 w-5" />
-                </button>
-              </div>
+              {/* Search button */}
+              <button 
+                onClick={() => setSearchOpen(true)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-primary hover:bg-surface-hover text-foreground-tertiary transition-colors"
+                title="Search (Ctrl+K)"
+              >
+                <Search className="h-4 w-4" />
+                <span className="hidden md:inline text-sm">Search...</span>
+                <div className="hidden lg:inline-flex items-center gap-0.5">
+                  <kbd className="px-1.5 py-0.5 text-[11px] font-medium bg-surface-secondary rounded border border-border-primary shadow-sm">Ctrl</kbd>
+                  <span className="text-[10px] text-foreground-tertiary">+</span>
+                  <kbd className="px-1.5 py-0.5 text-[11px] font-medium bg-surface-secondary rounded border border-border-primary shadow-sm">K</kbd>
+                </div>
+              </button>
               
               <div className="relative">
                 <button 
@@ -139,6 +201,19 @@ export default function TopBar() {
                   )}
                 </button>
               </div>
+
+              {/* Report Problem Button */}
+              {showReportProblem && (
+                <div className="relative">
+                  <button 
+                    onClick={() => setReportProblemModalOpen(true)}
+                    className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 dark:text-red-400 transition-colors"
+                    title="Report a problem"
+                  >
+                    <Bug className="h-5 w-5" />
+                  </button>
+                </div>
+              )}
               
               <div className="relative">
                 <button 
@@ -153,18 +228,14 @@ export default function TopBar() {
                     </span>
                   )}
                 </button>
-
-                {/* Notification dropdown */}
-                {notificationDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-80 bg-surface-primary rounded-md shadow-lg py-2 z-[1100] border border-border-primary">
-                    <NotificationDropdown
-                      isOpen={notificationDropdownOpen}
-                      onClose={() => setNotificationDropdownOpen(false)}
-                      triggerRef={notificationButtonRef}
-                    />
-                  </div>
-                )}
               </div>
+
+              {/* Notification dropdown - renders via Portal */}
+              <NotificationDropdown
+                isOpen={notificationDropdownOpen}
+                onClose={() => setNotificationDropdownOpen(false)}
+                triggerRef={notificationButtonRef}
+              />
             </>
           )}
 
@@ -236,6 +307,20 @@ export default function TopBar() {
       onClose={() => setNewNotificationModal(false)}
       onMarkAsRead={handleMarkAsRead}
       onDelete={handleDeleteNotification}
+    />
+
+    {/* Report Problem Modal */}
+    <ReportProblemModal
+      isOpen={reportProblemModalOpen}
+      onClose={() => setReportProblemModalOpen(false)}
+      moduleName={moduleName}
+      moduleCategory={moduleCategory}
+    />
+
+    {/* Global Search Modal */}
+    <GlobalSearch
+      isOpen={searchOpen}
+      onClose={() => setSearchOpen(false)}
     />
     </>
   );

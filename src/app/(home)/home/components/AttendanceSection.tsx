@@ -187,7 +187,7 @@ export default function AttendanceSection({
       </div>
       <div className="px-5 pb-5 flex-1 overflow-y-auto min-h-0">
         {loading || attendanceLoading ? (
-          <div className="flex items-center justify-center h-full min-h-[200px]">
+          <div className="flex items-center justify-center h-full">
             <LoadingSection text="Loading attendance status..." icon={Calendar} />
           </div>
         ) : (

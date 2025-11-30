@@ -138,7 +138,7 @@ export default function NotificationsTab() {
         <div className="space-y-2">
           {notifications.map((notification, index) => (
             <motion.div
-              key={notification.id}
+              key={notification.id ?? `notification-${index}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}

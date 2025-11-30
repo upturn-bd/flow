@@ -20,6 +20,7 @@ import { formatRelativeTime } from "@/lib/utils";
 import { Z_INDEX } from "@/lib/theme";
 import Portal from "@/components/ui/Portal";
 import Link from "next/link";
+import { cn } from "@/components/ui/class";
 
 interface NotificationDropdownProps {
   isOpen: boolean;
@@ -38,7 +39,7 @@ const iconMap = {
 
 const colorMap = {
   'red': 'text-red-500',
-  'blue': 'text-blue-500',
+  'blue': 'text-primary-500',
   'green': 'text-green-500',
   'purple': 'text-purple-500',
   'orange': 'text-orange-500',
@@ -46,10 +47,10 @@ const colorMap = {
 };
 
 const priorityColors = {
-  'urgent': 'border-l-red-500 bg-red-50',
-  'high': 'border-l-orange-500 bg-orange-50',
-  'normal': 'border-l-blue-500 bg-surface-primary',
-  'low': 'border-l-gray-500 bg-background-secondary',
+  'urgent': 'border-l-red-500 bg-red-50 dark:bg-red-950/30',
+  'high': 'border-l-orange-500 bg-black-50 dark:bg-orange-950/30',
+  'normal': 'border-l-primary-500 bg-primary-50 dark:bg-primary-950/30',
+  'low': 'border-l-border-secondary bg-background-secondary',
 };
 
 export default function NotificationDropdown({
@@ -151,26 +152,58 @@ export default function NotificationDropdown({
 
   const unreadNotifications = notifications.filter(n => !n.is_read);
 
+  // Calculate if we're on mobile
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   if (!isOpen) return null;
 
   return (
     <Portal>
+      {/* Mobile backdrop */}
       <AnimatePresence>
-        <motion.div
-          ref={dropdownRef}
-          initial={{ opacity: 0, y: -10, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -10, scale: 0.95 }}
-          transition={{ duration: 0.2 }}
-          className="fixed w-96 bg-surface-primary dark:bg-surface-primary rounded-lg shadow-lg border border-border-primary dark:border-border-primary max-h-96 overflow-hidden"
-          style={{
-            top: position.top,
-            right: position.right,
-            zIndex: Z_INDEX.DROPDOWN,
-          }}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border-primary dark:border-border-primary">
+        {isMobile && isOpen && (
+          <motion.div
+            key="notification-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/40 sm:hidden"
+            style={{ zIndex: Z_INDEX.DROPDOWN - 1 }}
+            onClick={onClose}
+          />
+        )}
+      </AnimatePresence>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            key="notification-dropdown"
+            ref={dropdownRef}
+            initial={{ opacity: 0, y: isMobile ? 20 : -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: isMobile ? 20 : -10, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className={cn(
+              "fixed bg-surface-primary rounded-lg shadow-xl border border-border-primary overflow-hidden",
+              // Desktop: positioned relative to trigger
+              !isMobile && "w-96 max-h-[28rem]",
+              // Mobile: full width modal at top
+              isMobile && "inset-x-4 top-20 max-h-[70vh]"
+            )}
+            style={{
+              ...(!isMobile ? { top: position.top, right: position.right } : {}),
+              zIndex: Z_INDEX.DROPDOWN,
+            }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border-primary">
             <div className="flex items-center gap-2">
               <Bell className="h-5 w-5 text-foreground-secondary dark:text-foreground-secondary" />
               <h3 className="font-semibold text-foreground-primary dark:text-foreground-primary">Notifications</h3>
@@ -212,9 +245,9 @@ export default function NotificationDropdown({
               </div>
             ) : (
               <div className="divide-y divide-border-primary dark:divide-border-primary">
-                {notifications.map((notification) => (
+                {notifications.map((notification, index) => (
                   <NotificationItem
-                    key={notification.id}
+                    key={notification.id ?? `notification-${index}`}
                     notification={notification}
                     onMarkAsRead={handleMarkAsRead}
                     onDelete={handleDeleteNotification}
@@ -237,6 +270,7 @@ export default function NotificationDropdown({
             </div>
           )}
         </motion.div>
+        )}
       </AnimatePresence>
     </Portal>
   );

@@ -2,7 +2,7 @@
 
 import { cn } from "@/components/ui/class";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -19,158 +19,260 @@ export default function Sidebar() {
   const pathname = usePathname();
   const navItems = getAuthorizedNavItems();
 
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Close mobile sidebar when route changes
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  // Close mobile sidebar on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, []);
+
+  // Prevent body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  const toggleMobile = useCallback(() => {
+    setMobileOpen((prev) => !prev);
+  }, []);
+
+  const toggleCollapse = useCallback(() => {
+    setIsCollapsed((prev) => !prev);
+  }, []);
+
   if (!isApproved) return null;
 
-  const HamburgerButton = () => (
-    <button
-      className="md:hidden fixed top-4 left-4 z-[1001] p-2 rounded-md bg-[#001731] text-white"
-      onClick={() => {
-        setMobileOpen(!mobileOpen)
-        setIsCollapsed(false)
-      }}
-    >
-      {mobileOpen ? <X size={24} /> : <List size={24} />}
-    </button>
-  );
+  const getDisplayLabel = (label: string) => {
+    switch (label) {
+      case "home":
+        return "Dashboard";
+      case "profile":
+        return "My Profile";
+      case "operations-and-services":
+        return "Operations";
+      case "admin":
+        return "Admin";
+      default:
+        return label.charAt(0).toUpperCase() + label.slice(1).replace(/-/g, " ");
+    }
+  };
 
-  const SidebarContent = (
+  const NavLink = ({ item, collapsed }: { item: typeof navItems[0]; collapsed: boolean }) => {
+    const displayLabel = getDisplayLabel(item.label);
+    const Icon = item.icon;
+    const isActive = pathname.startsWith(item.href);
+
+    return (
+      <Link
+        href={item.href}
+        onClick={() => setMobileOpen(false)}
+        className={cn(
+          "group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500",
+          isActive
+            ? "bg-primary-600 text-white shadow-sm"
+            : "text-foreground-secondary hover:bg-surface-hover hover:text-foreground-primary"
+        )}
+        title={collapsed ? displayLabel : undefined}
+      >
+        <span className={cn(
+          "flex-shrink-0 transition-transform duration-200",
+          !isActive && "group-hover:scale-110"
+        )}>
+          <Icon size={20} weight={isActive ? "fill" : "regular"} />
+        </span>
+        
+        <AnimatePresence mode="wait">
+          {!collapsed && (
+            <motion.span
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: "auto" }}
+              exit={{ opacity: 0, width: 0 }}
+              transition={{ duration: 0.15 }}
+              className="text-sm font-medium whitespace-nowrap overflow-hidden"
+            >
+              {displayLabel}
+            </motion.span>
+          )}
+        </AnimatePresence>
+
+        {/* Tooltip for collapsed state */}
+        {collapsed && (
+          <div className="absolute left-full ml-2 px-2 py-1 bg-foreground-primary text-background-primary text-xs font-medium rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none">
+            {displayLabel}
+          </div>
+        )}
+      </Link>
+    );
+  };
+
+  const SidebarContent = ({ collapsed, showCollapseButton = true }: { collapsed: boolean; showCollapseButton?: boolean }) => (
     <div className="flex flex-col h-full">
-      {/* Logo Section */}
-      <div className="flex items-center justify-between px-4 py-6">
-        <Link href="/home" className="flex items-center space-x-3">
-          <Image
-            src="/nav-logo.png"
-            width={40}
-            height={40}
-            alt="Logo"
-            className="object-contain"
-          />
-          {!isCollapsed && (
-            <span className="text-white text-lg font-semibold tracking-wide px-2">
+      {/* Header */}
+      <div className={cn(
+        "flex items-center h-16 border-b border-border-primary",
+        collapsed ? "justify-start" : "justify-between pr-3"
+      )}>
+        <Link href="/home" className="flex items-center gap-2">
+          <div className="w-16 h-16 bg-primary-600 dark:bg-primary-800 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <Image
+              src="/nav-logo.png"
+              width={14}
+              height={14}
+              alt="Logo"
+              className="object-cover w-8 h-8"
+            />
+          </div>
+          {!collapsed && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-foreground-primary font-semibold text-base truncate"
+            >
               Upturn Flow
-            </span>
+            </motion.span>
           )}
         </Link>
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-2 rounded-md text-foreground-tertiary hover:text-white hover:bg-surface-hover transition-colors"
-        >
-          {isCollapsed ? <CaretRight /> : <CaretLeft />}
-        </button>
+        
+        {showCollapseButton && !collapsed && (
+          <button
+            onClick={toggleCollapse}
+            className="p-1.5 rounded-md text-foreground-tertiary hover:text-foreground-primary hover:bg-surface-hover transition-colors flex-shrink-0"
+            aria-label="Collapse sidebar"
+          >
+            <CaretLeft size={18} />
+          </button>
+        )}
       </div>
 
+      {/* Expand button when collapsed */}
+      {showCollapseButton && collapsed && (
+        <div className="flex justify-center py-3">
+          <button
+            onClick={toggleCollapse}
+            className="p-1.5 rounded-md text-foreground-tertiary hover:text-foreground-primary hover:bg-surface-hover transition-colors"
+            aria-label="Expand sidebar"
+          >
+            <CaretRight size={18} />
+          </button>
+        </div>
+      )}
+
       {/* Navigation */}
-      <nav className="flex flex-col mt-4 space-y-2 px-2 flex-1 overflow-y-auto sidebar-scrollbar">
-        {navItems.map((item) => {
-          let displayLabel;
-          switch (item.label) {
-            case "home":
-              displayLabel = "Dashboard";
-              break;
-            case "profile":
-              displayLabel = "My Profile";
-              break;
-            case "operations-and-services":
-              displayLabel = "Operations & Services";
-              break;
-            case "admin":
-              displayLabel = "Admin Management";
-              break;
-            default:
-              displayLabel =
-                item.label.charAt(0).toUpperCase() +
-                item.label.slice(1).replace(/-/g, " ");
-          }
-
-          const Icon = item.icon;
-          const isActive = pathname.startsWith(item.href);
-
-          return (
-            <motion.div
-              key={item.label}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="relative"
-            >
-              <Link
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-                  isActive
-                    ? "bg-primary-600 text-white font-medium"
-                    : "text-foreground-tertiary hover:text-white hover:bg-surface-hover"
-                )}
-                title={displayLabel}
-              >
-                <Icon size={22} />
-                {!isCollapsed && <span>{displayLabel}</span>}
-              </Link>
-            </motion.div>
-          );
-        })}
+      <nav className={cn(
+        "flex-1 overflow-y-auto overflow-x-hidden py-4",
+        collapsed ? "px-2" : "px-3"
+      )}>
+        <div className="space-y-1">
+          {navItems.map((item) => (
+            <NavLink key={item.label} item={item} collapsed={collapsed} />
+          ))}
+        </div>
       </nav>
 
-      {/* Footer */}
-      <div className="mt-auto mb-6 px-4">
-        {/* <Link href={"/settings"}>
-          <div
-            className={cn(
-              "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
-              "text-foreground-tertiary hover:text-white hover:bg-[#001c4f]"
-            )}
-          >
-            <Settings size={22} />
-            {!isCollapsed && <span className="text-sm">Settings</span>}
-          </div>
-        </Link> */}
+      {/* Footer area - can be used for user info or settings */}
+      <div className={cn(
+        "border-t border-border-primary py-3",
+        collapsed ? "px-2" : "px-3"
+      )}>
+        {/* Placeholder for future footer content */}
       </div>
     </div>
   );
 
   return (
     <>
-      <HamburgerButton />
+      {/* Mobile hamburger button - positioned above top bar but below modals */}
+      <button
+        data-mobile-hamburger
+        className={cn(
+          "md:hidden fixed top-4 left-4 z-45 p-2 rounded-lg transition-all duration-200",
+          "bg-surface-primary border border-border-primary shadow-md",
+          "text-foreground-secondary hover:text-foreground-primary hover:bg-surface-hover",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        )}
+        onClick={toggleMobile}
+        aria-label={mobileOpen ? "Close menu" : "Open menu"}
+        aria-expanded={mobileOpen}
+      >
+        {mobileOpen ? <X size={20} /> : <List size={20} />}
+      </button>
 
-      {/* Mobile sidebar with overlay */}
+      {/* Mobile sidebar overlay and panel */}
       <AnimatePresence>
         {mobileOpen && (
           <>
+            {/* Backdrop */}
             <motion.div
-              className="fixed inset-0 bg-black/30 md:hidden z-40"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm md:hidden z-40"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               onClick={() => setMobileOpen(false)}
+              aria-hidden="true"
             />
+            
+            {/* Mobile sidebar panel */}
             <motion.aside
-              initial={{ x: -300 }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: -300 }}
-              transition={{ duration: 0.3 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className={cn(
-                "fixed top-0 left-0 h-full z-50 shadow-xl",
-                "bg-gradient-to-b from-[#001731] to-[#002363]",
-                isCollapsed ? "w-20" : "w-64"
+                "fixed top-0 left-0 h-full w-72 z-50",
+                "bg-background-primary border-r border-border-primary shadow-2xl"
               )}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navigation menu"
             >
-              {SidebarContent}
+              {/* Close button inside mobile sidebar */}
+              <button
+                className="absolute top-4 right-4 p-2 rounded-lg text-foreground-tertiary hover:text-foreground-primary hover:bg-surface-hover transition-colors"
+                onClick={() => setMobileOpen(false)}
+                aria-label="Close menu"
+              >
+                <X size={20} />
+              </button>
+              
+              <SidebarContent collapsed={false} showCollapseButton={false} />
             </motion.aside>
           </>
         )}
       </AnimatePresence>
 
       {/* Desktop sidebar */}
-      <aside
+      <motion.aside
+        initial={false}
+        animate={{ width: isCollapsed ? 64 : 240 }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
         className={cn(
-          "hidden md:flex md:flex-col md:h-screen md:sticky md:top-0 shadow-xl",
-          "bg-gradient-to-b from-[#001731] to-[#002363]",
-          isCollapsed ? "w-20" : "w-64"
+          "hidden md:flex md:flex-col md:h-screen md:sticky md:top-0",
+          "bg-background-primary border-r border-border-primary",
+          "flex-shrink-0"
         )}
       >
-        {SidebarContent}
-      </aside>
+        <SidebarContent collapsed={isCollapsed} />
+      </motion.aside>
     </>
   );
 }
