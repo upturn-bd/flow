@@ -11,7 +11,7 @@ import { captureSupabaseError } from "@/lib/sentry";
 export type EmployeeInfo = {
   id: string;
   name: string;
-  role: string; // Deprecated: kept for backward compatibility during transition
+  role: string;
   has_approval: string;
   company_id?: string | number;
   supervisor_id?: string | null;
@@ -347,7 +347,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     // Filter nav items based on required permissions
     return navItems.filter(item => {
-      // Permission-based filtering takes priority when defined
+      // Permission-based filtering
       if (item.requiredPermissions && item.requiredPermissions.length > 0) {
         return item.requiredPermissions.some(perm => {
           const [module, action] = perm.split(':');
@@ -355,12 +355,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       }
       
-      // Backward compatibility: check roles if no permissions defined
-      if (item.roles && item.roles.length > 0) {
-        return item.roles.includes(employeeInfo.role);
-      }
-      
-      // If no roles or permissions specified, show to all
+      // If no permissions specified, show to all approved users
       return true;
     });
   };

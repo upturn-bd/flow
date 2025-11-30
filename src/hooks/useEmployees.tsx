@@ -13,24 +13,10 @@ export interface ExtendedEmployee extends Employee {
   basic_salary?: number;
 }
 
-export interface EmployeeSearchOptions {
-  searchQuery?: string;
-  page?: number;
-  pageSize?: number;
-}
-
-export interface EmployeeSearchResult {
-  employees: ExtendedEmployee[];
-  totalCount: number;
-  totalPages: number;
-  currentPage: number;
-}
-
 export function useEmployees() {
   const { employeeInfo } = useAuth();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [extendedEmployees, setExtendedEmployees] = useState<ExtendedEmployee[]>([]);
-  const [searchResult, setSearchResult] = useState<EmployeeSearchResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -122,135 +108,12 @@ export function useEmployees() {
     }
   }, [employeeInfo?.company_id]);
 
-  // New method for role management with pagination and search
-  const searchEmployeesForRoleManagement = useCallback(async (options: EmployeeSearchOptions = {}) => {
-    const { searchQuery = "", page = 1, pageSize = 25 } = options;
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const companyId = employeeInfo?.company_id;
-      if (!companyId) {
-        const emptyResult: EmployeeSearchResult = {
-          employees: [],
-          totalCount: 0,
-          totalPages: 0,
-          currentPage: page,
-        };
-        setLoading(false);
-        setSearchResult(emptyResult);
-        return emptyResult;
-      }
-      
-      // Build query
-      let query = supabase
-        .from("employees")
-        .select("id, first_name, last_name, email, role", { count: 'exact' })
-        .eq("company_id", companyId);
-      
-      // Add search filter if provided
-      if (searchQuery.trim()) {
-        const searchTerm = `%${searchQuery.trim()}%`;
-        query = query.or(`first_name.ilike.${searchTerm},last_name.ilike.${searchTerm},email.ilike.${searchTerm}`);
-      }
-      
-      // Add pagination
-      const startIndex = (page - 1) * pageSize;
-      query = query.range(startIndex, startIndex + pageSize - 1);
-      
-      // Order by name for consistent results
-      query = query.order('first_name').order('last_name');
-      
-      const { data, error, count } = await query;
-      
-      if (error) throw error;
-      
-      const employees: ExtendedEmployee[] = data?.map((employee) => ({
-        id: employee.id,
-        name: `${employee.first_name} ${employee.last_name}`,
-        email: employee.email,
-        designation: undefined,
-        department: undefined,
-        role: employee.role,
-      })) || [];
-      
-      const totalCount = count || 0;
-      const totalPages = Math.ceil(totalCount / pageSize);
-      
-      const result: EmployeeSearchResult = {
-        employees,
-        totalCount,
-        totalPages,
-        currentPage: page,
-      };
-      
-      setSearchResult(result);
-      return result;
-    } catch (err) {
-      const errorObj = err instanceof Error ? err : new Error(String(err));
-      setError(errorObj);
-      captureSupabaseError(
-        { message: errorObj.message },
-        "searchEmployeesForRoleManagement",
-        { companyId: employeeInfo?.company_id, searchQuery, page }
-      );
-      console.error("Error searching employees for role management:", errorObj);
-      return {
-        employees: [],
-        totalCount: 0,
-        totalPages: 0,
-        currentPage: page,
-      };
-    } finally {
-      setLoading(false);
-    }
-  }, [employeeInfo?.company_id]);
-
-  // Method to update employee role
-  const updateEmployeeRole = useCallback(async (employeeId: string, newRole: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const companyId = employeeInfo?.company_id;
-      if (!companyId) {
-        throw new Error('Company ID not available');
-      }
-      
-      const { error } = await supabase
-        .from("employees")
-        .update({ role: newRole })
-        .eq("id", employeeId)
-        .eq("company_id", companyId);
-      
-      if (error) throw error;
-      
-      return true;
-    } catch (err) {
-      const errorObj = err instanceof Error ? err : new Error(String(err));
-      setError(errorObj);
-      captureSupabaseError(
-        { message: errorObj.message },
-        "updateEmployeeRole",
-        { companyId: employeeInfo?.company_id, employeeId, newRole }
-      );
-      console.error("Error updating employee role:", errorObj);
-      throw errorObj;
-    } finally {
-      setLoading(false);
-    }
-  }, [employeeInfo?.company_id]);
-
   return useMemo(() => ({
     employees,
     extendedEmployees,
-    searchResult,
     loading,
     error,
     fetchEmployees,
     fetchExtendedEmployees,
-    searchEmployeesForRoleManagement,
-    updateEmployeeRole
-  }), [employees, extendedEmployees, searchResult, loading, error, fetchEmployees, fetchExtendedEmployees, searchEmployeesForRoleManagement, updateEmployeeRole]);
+  }), [employees, extendedEmployees, loading, error, fetchEmployees, fetchExtendedEmployees]);
 }

@@ -31,7 +31,6 @@ import { PermissionTooltip } from "@/components/permissions";
 function TaskCard({
   adminScoped,
   userId,
-  userRole,
   task,
   setTaskDetailsId,
   deleteTask,
@@ -40,7 +39,6 @@ function TaskCard({
 }: {
   adminScoped: boolean,
   userId?: string,
-  userRole?: string,
   task: Task;
   setTaskDetailsId?: (id: string) => void;
   deleteTask: (id: string) => void;
@@ -48,7 +46,7 @@ function TaskCard({
   onDetails: () => void
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { canDelete } = useAuth();
+  const { canDelete, isAdmin } = useAuth();
 
   const { id, task_title, department_id, task_description, updated_at } = task;
 
@@ -70,7 +68,7 @@ function TaskCard({
   const department = departments.find((dept) => dept.id === department_id);
 
   // Check if user can delete based on permissions OR ownership
-  const canDeleteTask = canDelete(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && userRole === "Admin");
+  const canDeleteTask = canDelete(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && isAdmin());
 
   const actions = (
     <div className="flex items-center gap-2">
@@ -86,7 +84,7 @@ function TaskCard({
         </Button>
       )}
 
-      {!canDeleteTask && (userId === task.created_by || (adminScoped && userRole === "Admin")) && (
+      {!canDeleteTask && (userId === task.created_by || (adminScoped && isAdmin())) && (
         <PermissionTooltip message="You don't have permission to delete tasks">
           <Button
             variant="ghost"
@@ -162,7 +160,6 @@ const CompletedTasksList = memo(({
   const { searchCompletedTasks } = useTasks();
 
   const [userId, setUserId] = useState<string>('');
-  const [userRole, setUserRole] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Task[]>([]);
   const [searching, setSearching] = useState(false);
@@ -172,7 +169,6 @@ const CompletedTasksList = memo(({
   const userIdInit = async () => {
     const user = await getEmployeeInfo();
     setUserId(user.id);
-    setUserRole(user.role);
   }
 
   useEffect(() => {
@@ -258,7 +254,6 @@ const CompletedTasksList = memo(({
               <TaskCard
                 adminScoped={adminScoped}
                 userId={userId}
-                userRole={userRole}
                 deleteTask={handleDeleteTask}
                 task={task}
                 departments={departments}

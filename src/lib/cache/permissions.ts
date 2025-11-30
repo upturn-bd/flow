@@ -3,12 +3,19 @@
  * 
  * Provides in-memory caching for user permissions to reduce database load in middleware.
  * Uses Edge-compatible in-memory cache with TTL (Time To Live).
+ * 
+ * IMPORTANT: This cache is per-process/per-instance. In serverless environments,
+ * different requests may hit different instances with different cache states.
+ * The short TTL ensures eventual consistency while reducing DB load.
  */
 
 import type { Permission } from "@/lib/constants/permissions";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-const PERMISSION_CACHE_TTL = 300000; // 5 minutes in milliseconds
+// Short TTL to balance performance with freshness
+// In serverless, cache invalidation across instances isn't possible,
+// so we rely on short TTL for eventual consistency
+const PERMISSION_CACHE_TTL = 60000; // 1 minute in milliseconds
 
 interface CacheEntry {
   data: Permission[] | null;

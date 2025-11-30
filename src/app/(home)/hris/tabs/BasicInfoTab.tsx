@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useSalaryManagement } from "@/hooks/useSalaryManagement";
-import { getEmployeeInfo } from "@/lib/utils/auth";
 import {
   BasicInfoFormData,
   JOB_STATUS_OPTIONS,
@@ -19,6 +18,8 @@ import { useFormState } from "@/hooks/useFormState";
 import ValidationFeedback from "@/components/ui/ValidationFeedback";
 import SubmitActions from "@/components/ui/SubmitActions";
 import { showNotification } from "@/lib/utils/notifications";
+import { useAuth } from "@/lib/auth/auth-context";
+import { PERMISSION_MODULES } from "@/lib/constants";
 
 const initialFormState: BasicInfoFormData = {
   first_name: "",
@@ -68,8 +69,10 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [currentUserRole, setCurrentUserRole] = useState<string>("");
   const [targetEmployeeId, setTargetEmployeeId] = useState<string>("");
+  
+  const { canWrite } = useAuth();
+  const canEditSalary = canWrite(PERMISSION_MODULES.PAYROLL) || canWrite(PERMISSION_MODULES.HRIS);
   
   const { departments, fetchDepartments } = useDepartments();
   const { updateEmployeeSalary } = useSalaryManagement();
@@ -135,7 +138,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
         const oldSalary = initialData?.basic_salary || 0;
         const newSalary = result.data.basic_salary || 0;
         
-        if (oldSalary !== newSalary && (currentUserRole === 'Admin' || currentUserRole === 'Manager')) {
+        if (oldSalary !== newSalary && canEditSalary) {
           // Update salary separately with audit logging
           await updateEmployeeSalary(
             targetEmployeeId || uid || '', 
@@ -222,7 +225,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
         setIsSubmitting(false);
       }
     },
-    [formValues, updateBasicInfoApi, initialData, currentUserRole, updateEmployeeSalary, targetEmployeeId, uid]
+    [formValues, updateBasicInfoApi, initialData, canEditSalary, updateEmployeeSalary, targetEmployeeId, uid]
   );
 
   const handleEditToggle = useCallback(() => {
@@ -236,17 +239,6 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
   }, [isEditMode, resetForm]);
 
   useEffect(() => {
-    const fetchUserRole = async () => {
-      try {
-        const employeeInfo = await getEmployeeInfo();
-        setCurrentUserRole(employeeInfo.role);
-      } catch (error) {
-        console.error('Failed to fetch user role:', error);
-      }
-    };
-
-    fetchUserRole();
-    
     setLoadingDepartments(true);
     fetchDepartments().finally(() => setLoadingDepartments(false));
   }, [fetchDepartments]);
@@ -367,15 +359,15 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                   <tbody className="bg-background-primary divide-y divide-border-primary">
                     {group.fields
                       .filter((field: any) => {
-                        // Show admin-only fields only to Admin/Manager or for viewing
+                        // Show admin-only fields only to those with salary permission or for viewing
                         if (field.adminOnly) {
-                          return currentUserRole === 'Admin' || currentUserRole === 'Manager' || !isEditMode;
+                          return canEditSalary || !isEditMode;
                         }
                         return true;
                       })
                       .map((field: any, fieldIndex) => {
                         const canEditField = field.adminOnly 
-                          ? (currentUserRole === 'Admin' || currentUserRole === 'Manager')
+                          ? canEditSalary
                           : isCurrentUser;
                         
                         return (
@@ -422,11 +414,11 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                                       }))
                                     : undefined
                                 }
-                                readOnly={field.adminOnly && !(currentUserRole === 'Admin' || currentUserRole === 'Manager')}
+                                readOnly={field.adminOnly && !canEditSalary}
                                 disabled={!canEditField}
                                 loading={field.name === "department_id" ? loadingDepartments : false}
                               />
-                              {field.adminOnly && (currentUserRole !== 'Admin' && currentUserRole !== 'Manager') && (
+                              {field.adminOnly && !canEditSalary && (
                                 <p className="text-xs text-amber-600 mt-1">Only administrators can edit this field</p>
                               )}
                             </div>

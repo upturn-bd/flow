@@ -59,15 +59,14 @@ export default function OngoingTaskPage({
   const [editTask, setEditTask] = useState<Task | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string>('');
-  const [userRole, setUserRole] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Task[]>([]);
   const [searching, setSearching] = useState(false);
+  const { isAdmin } = useAuth();
 
   const userIdInit = async () => {
     const user = await getEmployeeInfo();
     setUserId(user.id);
-    setUserRole(user.role);
   };
 
   useEffect(() => {
@@ -174,7 +173,6 @@ export default function OngoingTaskPage({
             <div key={task.id}>
               <TaskCard
                 userId={userId}
-                userRole={userRole}
                 adminScoped={adminScoped}
                 task={task}
                 onEdit={() => setEditTask(task)}
@@ -242,18 +240,17 @@ function TaskCard({
 }: {
   adminScoped: boolean,
   userId: string;
-  userRole?: string;
   task: Task;
   onEdit: () => void;
   onDelete: () => void;
   onDetails?: () => void;
   isDeleting?: boolean;
 }) {
-  const { canWrite, canDelete } = useAuth();
+  const { canWrite, canDelete, isAdmin } = useAuth();
 
   // Check if user can edit based on permissions OR ownership
-  const canEditTask = canWrite(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && userRole === "Admin");
-  const canDeleteTask = canDelete(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && userRole === "Admin");
+  const canEditTask = canWrite(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && isAdmin());
+  const canDeleteTask = canDelete(PERMISSION_MODULES.TASKS) || userId === task.created_by || (adminScoped && isAdmin());
 
   const actions = (
     <div className="flex items-center gap-2 task-card">
@@ -269,7 +266,7 @@ function TaskCard({
         </Button>
       )}
 
-      {!canEditTask && (userId === task.created_by || (adminScoped && userRole === "Admin")) && (
+      {!canEditTask && (userId === task.created_by || (adminScoped && isAdmin())) && (
         <PermissionTooltip message="You don't have permission to edit tasks">
           <Button
             data-testid="edit-task-button"
@@ -296,7 +293,7 @@ function TaskCard({
         </Button>
       )}
 
-      {!canDeleteTask && (userId === task.created_by || (adminScoped && userRole === "Admin")) && (
+      {!canDeleteTask && (userId === task.created_by || (adminScoped && isAdmin())) && (
         <PermissionTooltip message="You don't have permission to delete tasks">
           <Button
             variant="ghost"

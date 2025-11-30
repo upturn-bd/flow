@@ -16,7 +16,7 @@ import type {
  * Follows the same pattern as useEmployees for consistency
  */
 export function useTeams() {
-  const { employeeInfo } = useAuth();
+  const { employeeInfo, refreshPermissions } = useAuth();
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -429,6 +429,11 @@ export function useTeams() {
 
       if (addError) throw addError;
 
+      // Refresh client-side permissions if adding self
+      if (employeeId === employeeInfo?.id) {
+        await refreshPermissions();
+      }
+
       return { success: true, data };
     } catch (err: any) {
       const errorMessage = err.message || "Failed to add team member";
@@ -438,7 +443,7 @@ export function useTeams() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.id, refreshPermissions]);
 
   /**
    * Remove a member from a team
@@ -459,6 +464,11 @@ export function useTeams() {
 
       if (removeError) throw removeError;
 
+      // Refresh client-side permissions if removing self
+      if (employeeId === employeeInfo?.id) {
+        await refreshPermissions();
+      }
+
       return { success: true };
     } catch (err: any) {
       const errorMessage = err.message || "Failed to remove team member";
@@ -468,7 +478,7 @@ export function useTeams() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.id, refreshPermissions]);
 
   /**
    * Bulk add members to a team
@@ -498,6 +508,11 @@ export function useTeams() {
 
       if (addError) throw addError;
 
+      // Refresh client-side permissions if adding self
+      if (employeeIds.includes(employeeInfo?.id || '')) {
+        await refreshPermissions();
+      }
+
       return { success: true };
     } catch (err: any) {
       const errorMessage = err.message || "Failed to add team members";
@@ -507,7 +522,7 @@ export function useTeams() {
     } finally {
       setLoading(false);
     }
-  }, [employeeInfo?.id]);
+  }, [employeeInfo?.id, refreshPermissions]);
 
   // ==============================================================================
   // Team Permission Management
@@ -537,6 +552,16 @@ export function useTeams() {
 
       if (updateError) throw updateError;
 
+      // Refresh client-side permissions if current user is in this team
+      const { data: members } = await supabase
+        .from("team_members")
+        .select("employee_id")
+        .eq("team_id", teamId);
+      
+      if (members?.some(m => m.employee_id === employeeInfo?.id)) {
+        await refreshPermissions();
+      }
+
       return { success: true };
     } catch (err: any) {
       const errorMessage = err.message || "Failed to update team permission";
@@ -546,7 +571,7 @@ export function useTeams() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.id, refreshPermissions]);
 
   /**
    * Bulk update team permissions
@@ -579,6 +604,16 @@ export function useTeams() {
 
       if (updateError) throw updateError;
 
+      // Refresh client-side permissions if current user is in this team
+      const { data: members } = await supabase
+        .from("team_members")
+        .select("employee_id")
+        .eq("team_id", teamId);
+      
+      if (members?.some(m => m.employee_id === employeeInfo?.id)) {
+        await refreshPermissions();
+      }
+
       return { success: true };
     } catch (err: any) {
       const errorMessage = err.message || "Failed to update team permissions";
@@ -588,7 +623,7 @@ export function useTeams() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [employeeInfo?.id, refreshPermissions]);
 
   // ==============================================================================
   // Utility Functions
