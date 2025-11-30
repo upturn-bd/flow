@@ -4,17 +4,17 @@ import React, { useEffect, useState, ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload,
-  ChevronLeft,
-  ChevronDown,
-  AlertCircle,
+  CaretLeft,
+  CaretDown,
+  WarningCircle,
   Check,
-  Loader2,
+  Loader,
   X,
   FileText,
-  MessageSquare,
+  MessageCircle,
   User,
   Flag
-} from "lucide-react";
+} from "@/lib/icons";
 import { supabase } from "@/lib/supabase/client";
 import { ComplaintRecord } from "@/lib/types/schemas";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -186,13 +186,13 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
           onClick={onClose}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
         >
-          <ChevronLeft size={16} />
+          <CaretLeft size={16} />
           <span>Back</span>
         </motion.button>
       </div>
 
       <div
-        className="flex items-center cursor-pointer gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200"
+        className="flex items-center cursor-pointer gap-2 bg-background-secondary dark:bg-background-tertiary p-3 rounded-lg border border-border-primary"
         onClick={() => setIsAnonymous(!isAnonymous)}
       >
         <div
@@ -201,26 +201,26 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
           } transition-colors duration-300`}
         >
           <motion.div
-            className="w-5 h-5 bg-white rounded-full absolute top-0.5"
+            className="w-5 h-5 bg-surface-primary rounded-full absolute top-0.5"
             animate={{
               left: isAnonymous ? "calc(100% - 1.25rem - 0.125rem)" : "0.125rem",
             }}
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
           />
         </div>
-        <span className="text-sm font-medium text-gray-700">
+        <span className="text-sm font-medium text-foreground-secondary">
           Anonymous Complaint
         </span>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200"
+        className="space-y-6 bg-surface-primary shadow-sm rounded-lg p-6 border border-border-primary"
       >
         <div className="space-y-4">
           {/* Category */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <Flag size={16} className="mr-2" />
               Category
             </label>
@@ -229,7 +229,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                 name="complaint_type_id"
                 value={complaintState.complaint_type_id}
                 onChange={handleInputChange}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value={""}>Select category</option>
                 {complaintTypes.length > 0 &&
@@ -239,14 +239,14 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                     </option>
                   ))}
               </select>
-              <ChevronDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+              <CaretDown
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
                 size={16}
               />
             </div>
             {touched.complaint_type_id && errors.complaint_type_id && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
-                <AlertCircle size={14} className="mr-1" />
+                <WarningCircle size={14} className="mr-1" />
                 {errors.complaint_type_id}
               </p>
             )}
@@ -254,7 +254,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
 
           {/* Complaint Against */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <User size={16} className="mr-2" />
               Complaint Against
             </label>
@@ -263,7 +263,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                 name="against_whom"
                 value={complaintState.against_whom}
                 onChange={handleInputChange}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value="">Select a person</option>
                 {employees.length > 0 &&
@@ -273,14 +273,14 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                     </option>
                   ))}
               </select>
-              <ChevronDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+              <CaretDown
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
                 size={16}
               />
             </div>
             {touched.against_whom && errors.against_whom && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
-                <AlertCircle size={14} className="mr-1" />
+                <WarningCircle size={14} className="mr-1" />
                 {errors.against_whom}
               </p>
             )}
@@ -288,8 +288,8 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
 
           {/* Description */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
-              <MessageSquare size={16} className="mr-2" />
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
+              <MessageCircle size={16} className="mr-2" />
               Description
             </label>
             <textarea
@@ -297,12 +297,12 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
               value={complaintState.description}
               onChange={handleInputChange}
               rows={4}
-              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
               placeholder="Describe your complaint..."
             />
             {touched.description && errors.description && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
-                <AlertCircle size={14} className="mr-1" />
+                <WarningCircle size={14} className="mr-1" />
                 {errors.description}
               </p>
             )}
@@ -310,13 +310,13 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
 
           {/* Attachments */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <Upload size={16} className="mr-2" />
               Attachment
             </label>
-            <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <Upload className="mx-auto mb-4 text-gray-400 h-10 w-10" />
-              <p className="text-sm text-gray-500 mb-4">
+            <div className="bg-background-secondary dark:bg-background-tertiary border border-dashed border-border-secondary rounded-lg p-6 text-center">
+              <Upload className="mx-auto mb-4 text-foreground-tertiary h-10 w-10" />
+              <p className="text-sm text-foreground-tertiary mb-4">
                 Drag and drop files here, or
               </p>
               <label
@@ -358,7 +358,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
-                        className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm"
+                        className="flex items-center gap-2 bg-surface-primary border border-border-primary px-3 py-2 rounded-lg text-sm"
                       >
                         <FileText size={14} className="text-blue-500" />
                         <span className="truncate max-w-xs">{file.name}</span>
@@ -366,7 +366,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           type="button"
-                          className="text-gray-400 hover:text-red-500"
+                          className="text-foreground-tertiary hover:text-red-500"
                           onClick={() => removeFile(file.name)}
                         >
                           <X size={16} />
@@ -391,7 +391,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
           >
             {isSubmitting ? (
               <>
-                <Loader2 size={18} className="animate-spin" />
+                <Loader size={18} className="animate-spin" />
                 <span>Submitting...</span>
               </>
             ) : (

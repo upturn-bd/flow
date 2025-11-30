@@ -4,7 +4,7 @@
 import { AdminDataProvider } from "@/contexts/AdminDataContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation"; // Hook to get the current URL
-import { Home, ChevronRight, Settings } from "lucide-react";
+import { Home, CaretRight, Settings } from "@/lib/icons";
 import { motion } from "framer-motion";
 
 // Helper function to capitalize and format the path segment
@@ -35,7 +35,7 @@ const ConfigurationBreadcrumbs = () => {
     const currentPageLabel = formatSegment(currentSegment) + " Settings";
     
     return (
-        <nav className="flex mb-6 text-sm font-medium text-gray-500" aria-label="Breadcrumb">
+        <nav className="flex mb-6 text-sm font-medium text-foreground-tertiary" aria-label="Breadcrumb">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
                 
                 {/* 1. Render Base Breadcrumbs (Home, Admin Management, Company Configurations) */}
@@ -43,16 +43,16 @@ const ConfigurationBreadcrumbs = () => {
                     <li key={index} className="inline-flex items-center">
                         {/* Corrected Logic: 
                             - Always show the link.
-                            - Only show the ChevronRight separator for items after the first one (i.e., index > 0). 
+                            - Only show the CaretRight separator for items after the first one (i.e., index > 0). 
                         */}
                         <div className="flex items-center">
                             {/* Check if it's not the first item to render the separator */}
-                            {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
+                            {index > 0 && <CaretRight className="w-4 h-4 text-foreground-tertiary" />}
                             
                             <Link 
                                 href={item.href} 
                                 // Adjust margin for items after Home
-                                className={`ml-1 ${index > 0 ? 'md:ml-3' : 'md:ml-0'} text-gray-500 hover:text-blue-600 transition-colors inline-flex items-center`}
+                                className={`ml-1 ${index > 0 ? 'md:ml-3' : 'md:ml-0'} text-foreground-tertiary hover:text-blue-600 transition-colors inline-flex items-center`}
                             >
                                 {item.label}
                             </Link>
@@ -63,7 +63,7 @@ const ConfigurationBreadcrumbs = () => {
                 {/* 2. Current Active Page */}
                 <li aria-current="page">
                     <div className="flex items-center">
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                        <CaretRight className="w-4 h-4 text-foreground-tertiary" />
                         <span className="ml-1 text-blue-600 md:ml-3 flex items-center">
                             <Settings className="w-4 h-4 mr-1.5" />
                             {currentPageLabel}
@@ -88,7 +88,7 @@ export default function CompanyConfigurationsLayout({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="p-3 bg-gray-50 sm:p-6 pb-12"
+        className="p-3 bg-background-primary dark:bg-background-primary sm:p-6 pb-12"
       >
         {/* 2. ADD BREADCRUMBS ONCE */}
         <ConfigurationBreadcrumbs />

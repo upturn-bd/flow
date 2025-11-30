@@ -7,7 +7,7 @@ import {
   CheckSquare,
   ArchiveIcon,
   PlusSquare
-} from "lucide-react";
+} from "@/lib/icons";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import OngoingTaskPage from "@/components/ops/tasks/OngoingTasks";
 import CompletedTasksList from "@/components/ops/tasks/CompletedTasks";
@@ -37,7 +37,7 @@ const TABS = [
     key: "archived",
     label: "Archived",
     icon: <ArchiveIcon className="h-5 w-5" />,
-    color: "text-gray-600",
+    color: "text-foreground-secondary",
   },
 ];
 
@@ -127,15 +127,15 @@ export default function TaskLayout({
 
   const archivedContent = useMemo(
     () => (
-      <div className="flex flex-col items-center justify-center p-12 bg-gray-50/50 rounded-xl border border-gray-200 text-center">
-        <ArchiveIcon className="h-16 w-16 text-gray-300 mb-4" />
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+      <div className="flex flex-col items-center justify-center p-12 bg-background-secondary rounded-xl border border-border-primary text-center">
+        <ArchiveIcon className="h-16 w-16 text-foreground-tertiary mb-4" />
+        <h3 className="text-xl font-semibold text-foreground-primary mb-2">
           Archived Tasks
         </h3>
-        <p className="text-gray-500 max-w-md mb-6">
+        <p className="text-foreground-secondary max-w-md mb-6">
           This section will store your archived tasks that are no longer active but you want to keep for reference.
         </p>
-        <p className="text-gray-400 text-sm">Feature coming soon...</p>
+        <p className="text-foreground-tertiary text-sm">Feature coming soon...</p>
       </div>
     ),
     []
@@ -193,17 +193,17 @@ export default function TaskLayout({
     >
       <motion.div className="mb-8 flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-2">
+          <h1 className="text-2xl font-bold text-foreground-primary flex items-center mb-2">
             <ClipboardList className="mr-2 h-6 w-6 text-indigo-500" />
             Task Management
           </h1>
-          <p className="text-gray-600 max-w-3xl">
+          <p className="text-foreground-secondary max-w-3xl">
             Manage and track your tasks efficiently. Create, assign, and monitor progress to ensure timely completion of all your activities.
           </p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           <PlusSquare className="h-5 w-5" />
           Create Task

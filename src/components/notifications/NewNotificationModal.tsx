@@ -25,19 +25,19 @@ const iconMap = {
 };
 
 const colorMap = {
-  'red': 'text-red-500 bg-red-50',
-  'blue': 'text-blue-500 bg-blue-50',
-  'green': 'text-green-500 bg-green-50',
-  'purple': 'text-purple-500 bg-purple-50',
-  'orange': 'text-orange-500 bg-orange-50',
-  'gray': 'text-gray-500 bg-gray-50',
+  'red': 'text-red-500 bg-red-50 dark:bg-red-900/30',
+  'blue': 'text-blue-500 bg-blue-50 dark:bg-blue-900/30',
+  'green': 'text-green-500 bg-green-50 dark:bg-green-900/30',
+  'purple': 'text-purple-500 bg-purple-50 dark:bg-purple-900/30',
+  'orange': 'text-orange-500 bg-orange-50 dark:bg-orange-900/30',
+  'gray': 'text-foreground-tertiary bg-background-secondary dark:bg-background-tertiary',
 };
 
 const priorityColors = {
   'urgent': 'border-red-500 bg-red-50',
   'high': 'border-orange-500 bg-orange-50',
   'normal': 'border-blue-500 bg-blue-50',
-  'low': 'border-gray-500 bg-gray-50',
+  'low': 'border-border-secondary bg-surface-secondary',
 };
 
 const priorityLabels = {
@@ -103,7 +103,7 @@ export default function NewNotificationModal({
             initial="hidden"
             animate="visible"
             exit="hidden"
-            className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden"
+            className="bg-surface-primary dark:bg-surface-primary rounded-xl shadow-2xl w-full max-w-lg overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -115,21 +115,21 @@ export default function NewNotificationModal({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-gray-900 text-base">
+                      <h3 className="font-semibold text-foreground-primary dark:text-foreground-primary text-base">
                         {notification.title}
                       </h3>
                       {!notification.is_read && (
-                        <span className="inline-block w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
+                        <span className="inline-block w-2 h-2 bg-primary-500 rounded-full flex-shrink-0"></span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-foreground-secondary dark:text-foreground-secondary">
                       {priorityLabels[notification.priority]} · {formatRelativeTime(notification.created_at!)}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1.5 rounded-lg transition-colors flex-shrink-0"
+                  className="text-foreground-tertiary dark:text-foreground-tertiary hover:text-foreground-secondary dark:hover:text-foreground-secondary hover:bg-surface-hover dark:hover:bg-surface-hover p-1.5 rounded-lg transition-colors flex-shrink-0"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -138,23 +138,23 @@ export default function NewNotificationModal({
 
             {/* Body */}
             <div className="px-6 py-5">
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">
+              <p className="text-foreground-primary dark:text-foreground-primary leading-relaxed whitespace-pre-wrap text-sm">
                 {notification.message}
               </p>
               
               {notification.context && (
-                <div className="mt-4 text-xs text-gray-500 bg-gray-50 px-3 py-2.5 rounded-lg border border-gray-200">
+                <div className="mt-4 text-xs text-foreground-secondary dark:text-foreground-secondary bg-background-secondary dark:bg-background-secondary px-3 py-2.5 rounded-lg border border-border-primary dark:border-border-primary">
                   <span className="font-medium">Context:</span> {notification.context}
                 </div>
               )}
             </div>
 
             {/* Footer with Actions */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-wrap gap-3">
+            <div className="px-6 py-4 bg-background-secondary dark:bg-background-secondary border-t border-border-primary dark:border-border-primary flex flex-wrap gap-3">
               {notification.action_url && (
                 <button
                   onClick={handleView}
-                  className="flex-1 min-w-[120px] flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm shadow-sm"
+                  className="flex-1 min-w-[120px] flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium text-sm shadow-sm"
                 >
                   <Eye className="h-4 w-4" />
                   View

@@ -7,11 +7,11 @@ import TaskDetails from "./shared/TaskDetails";
 import { AnimatePresence } from "framer-motion";
 import {
   Edit,
-  Trash2,
+  Trash,
   ExternalLink,
   ClipboardList,
   Calendar,
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import {
   Card,
@@ -161,7 +161,7 @@ export default function OngoingTaskPage({
           value={searchTerm}
           onChange={handleSearchChange}
           placeholder="Search tasks..."
-          className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+          className="w-full border border-border-primary rounded px-3 py-2 focus:outline-none focus:ring focus:border-primary-300 bg-surface-primary text-foreground-primary"
         />
       </div>
 
@@ -263,7 +263,7 @@ function TaskCard({
           variant="ghost"
           size="sm"
           onClick={onEdit}
-          className="p-2 h-8 w-8 hover:bg-blue-50 hover:text-blue-600"
+          className="p-2 h-8 w-8 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400"
         >
           <Edit size={14} />
         </Button>
@@ -290,9 +290,9 @@ function TaskCard({
           size="sm"
           onClick={onDelete}
           isLoading={isDeleting}
-          className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
+          className="p-2 h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600"
         >
-          <Trash2 size={14} />
+          <Trash size={14} />
         </Button>
       )}
 
@@ -304,7 +304,7 @@ function TaskCard({
             disabled
             className="p-2 h-8 w-8 opacity-50 cursor-not-allowed"
           >
-            <Trash2 size={14} />
+            <Trash size={14} />
           </Button>
         </PermissionTooltip>
       )}
@@ -315,7 +315,7 @@ function TaskCard({
           variant="ghost"
           size="sm"
           onClick={onDetails}
-          className="p-2 h-8 w-8 hover:bg-gray-50 hover:text-gray-700 view-button"
+          className="p-2 h-8 w-8 hover:bg-background-secondary dark:hover:bg-background-tertiary hover:text-foreground-primary view-button"
         >
           <ExternalLink size={14} />
         </Button>

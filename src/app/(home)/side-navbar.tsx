@@ -8,11 +8,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
 import {
-  ChevronLeft,
-  ChevronRight,
+  CaretLeft,
+  CaretRight,
   List,
   X,
-} from "lucide-react";
+} from "@/lib/icons";
 
 export default function Sidebar() {
   const { isApproved, getAuthorizedNavItems } = useAuth();
@@ -55,9 +55,9 @@ export default function Sidebar() {
         </Link>
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-2 rounded-md text-gray-300 hover:text-white hover:bg-[#001c4f] transition-colors"
+          className="p-2 rounded-md text-foreground-tertiary hover:text-white hover:bg-surface-hover transition-colors"
         >
-          {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
+          {isCollapsed ? <CaretRight /> : <CaretLeft />}
         </button>
       </div>
 
@@ -99,8 +99,8 @@ export default function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
                   isActive
-                    ? "bg-yellow-400 text-black font-medium"
-                    : "text-gray-300 hover:text-white hover:bg-[#001c4f]"
+                    ? "bg-primary-600 text-white font-medium"
+                    : "text-foreground-tertiary hover:text-white hover:bg-surface-hover"
                 )}
                 title={displayLabel}
               >
@@ -118,7 +118,7 @@ export default function Sidebar() {
           <div
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
-              "text-gray-300 hover:text-white hover:bg-[#001c4f]"
+              "text-foreground-tertiary hover:text-white hover:bg-[#001c4f]"
             )}
           >
             <Settings size={22} />

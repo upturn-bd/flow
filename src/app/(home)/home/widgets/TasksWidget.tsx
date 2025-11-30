@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckSquare, Clock, Plus, CheckCircle2, Circle } from 'lucide-react';
+import { CheckSquare, Clock, Plus, CheckCircle, Circle } from '@/lib/icons';
 import { cn } from '@/components/ui/class';
 import { formatDateToDayMonth } from '@/lib/utils';
 import BaseWidget from './BaseWidget';
@@ -72,7 +72,7 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
   return (
     <>
     <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col overflow-hidden">
+      <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
         <div className="p-5 flex-shrink-0">
           <SectionHeader title="Task List" icon={CheckSquare} />
         </div>
@@ -87,14 +87,14 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
           <div className="px-5 pb-5 flex-1 overflow-hidden flex flex-col">
             <div className="flex items-center justify-between mb-4 flex-shrink-0">
               {/* Tab buttons */}
-              <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+              <div className="flex items-center gap-1 bg-background-secondary dark:bg-background-tertiary rounded-lg p-1">
                 <button
                   onClick={() => setActiveTab('ongoing')}
                   className={cn(
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
                     activeTab === 'ongoing' 
-                      ? "bg-white text-blue-600 shadow-sm" 
-                      : "text-gray-600 hover:text-gray-900"
+                      ? "bg-surface-primary text-primary-600 shadow-sm" 
+                      : "text-foreground-secondary hover:text-foreground-primary"
                   )}
                 >
                   <Circle size={12} />
@@ -105,11 +105,11 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
                   className={cn(
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
                     activeTab === 'completed' 
-                      ? "bg-white text-green-600 shadow-sm" 
-                      : "text-gray-600 hover:text-gray-900"
+                      ? "bg-surface-primary text-success shadow-sm" 
+                      : "text-foreground-secondary hover:text-foreground-primary"
                   )}
                 >
-                  <CheckCircle2 size={12} />
+                  <CheckCircle size={12} />
                   Completed ({completedTasks.length})
                 </button>
               </div>
@@ -119,7 +119,7 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleCreateTask}
-                  className="rounded-full p-2 bg-blue-600 hover:bg-blue-700 transition-colors"
+                  className="rounded-full p-2 bg-primary-600 hover:bg-primary-700 transition-colors"
                   title="Create new task"
                 >
                   <Plus size={16} className="text-white" />
@@ -139,28 +139,28 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
                   className={cn(
                     "flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-sm font-medium border cursor-pointer",
                     activeTab === 'completed'
-                      ? "bg-green-50 hover:bg-green-100 border-green-100"
-                      : "bg-gray-50 hover:bg-blue-50 border-gray-100"
+                      ? "bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 border-green-100 dark:border-green-800"
+                      : "bg-background-secondary dark:bg-background-tertiary hover:bg-primary-50 dark:hover:bg-primary-900/30 border-border-primary"
                   )}
                 >
                   <div className="flex items-center space-x-3">
                     {activeTab === 'completed' ? (
-                      <CheckCircle2 size={16} className="text-green-500" />
+                      <CheckCircle size={16} className="text-success" weight="fill" />
                     ) : (
                       <div className={cn(
                         "w-2 h-2 rounded-full",
-                        new Date(task.end_date) < new Date() ? "bg-red-500" : "bg-blue-500"
+                        new Date(task.end_date) < new Date() ? "bg-error" : "bg-primary-500"
                       )}></div>
                     )}
                     <span className={cn(
-                      activeTab === 'completed' ? "text-gray-600 line-through" : "text-gray-900"
+                      activeTab === 'completed' ? "text-foreground-secondary line-through" : "text-foreground-primary"
                     )}>
                       {task.task_title}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock size={14} className="text-gray-400" />
-                    <span className="whitespace-nowrap text-gray-600">
+                    <Clock size={14} className="text-foreground-tertiary" />
+                    <span className="whitespace-nowrap text-foreground-secondary">
                       {formatDateToDayMonth(task.end_date)}
                     </span>
                   </div>

@@ -4,7 +4,7 @@ import { Position } from "@/lib/types/schemas";
 import { validatePosition } from "@/lib/utils/validation";
 import { FormModal } from "@/components/ui/modals";
 import { FormField, SelectField, TextAreaField } from "@/components/forms";
-import { Briefcase } from "@phosphor-icons/react";
+import { Briefcase } from "@/lib/icons";
 
 interface PositionModalProps {
   initialData?: Position | null;

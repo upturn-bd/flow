@@ -23,7 +23,7 @@ import {
   Users,
   PhoneCall,
   MapPin,
-} from "lucide-react";
+} from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { fadeIn } from "@/components/ui/animations";
 import { useProfile } from "@/hooks/useProfile";
@@ -277,7 +277,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
       className="w-full"
     >
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+        <h2 className="text-2xl font-bold text-foreground-primary flex items-center">
           <Heart className="mr-2 h-6 w-6 text-blue-600" />
           Personal Information
         </h2>
@@ -292,12 +292,12 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
               aria-checked={isEditMode}
             >
               <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                className={`inline-block h-5 w-5 transform rounded-full bg-surface-primary shadow transition-transform ${
                   isEditMode ? "translate-x-6" : "translate-x-1"
                 }`}
               />
             </button>
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-foreground-secondary">
               {isEditMode ? "Edit Mode On" : "Edit Mode Off"}
             </span>
           </div>
@@ -315,14 +315,14 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
           >
             <div className="flex items-center mb-4">
               <div className="mr-3">{section.icon}</div>
-              <h3 className="font-medium text-lg text-gray-800">
+              <h3 className="font-medium text-lg text-foreground-primary">
                 {section.title}
               </h3>
             </div>
 
-            <div className="rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <tbody className="bg-white divide-y divide-gray-200">
+            <div className="rounded-xl shadow-sm border border-border-primary overflow-hidden">
+              <table className="min-w-full divide-y divide-border-primary">
+                <tbody className="bg-background-primary divide-y divide-border-primary">
                   {section.fields.map((field, fieldIndex) => (
                     <motion.tr
                       key={field.name}
@@ -335,10 +335,10 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
                         delay: fieldIndex * 0.05 + sectionIndex * 0.1,
                       }}
                     >
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal sm:whitespace-nowrap text-sm font-medium text-gray-800 bg-gray-50 w-1/3">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal sm:whitespace-nowrap text-sm font-medium text-foreground-primary bg-background-secondary w-1/3">
                         {field.label}
                       </td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal text-sm text-gray-600">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal text-sm text-foreground-secondary">
                         {isEditMode && isCurrentUser ? (
                           <div className="max-w-full overflow-hidden">
                             <PersonalInfoField

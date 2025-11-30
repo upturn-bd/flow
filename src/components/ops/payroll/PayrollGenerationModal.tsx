@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, AlertTriangle, CheckCircle, XCircle, Loader2, Users, DollarSign } from 'lucide-react';
+import { Calendar, AlertTriangle, CheckCircle, XCircle, Loader, Users, DollarSign } from '@/lib/icons';
 import { usePayroll } from '@/hooks/usePayroll';
 import { formatDate } from '@/lib/utils';
 
@@ -84,19 +84,19 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto"
+        className="bg-surface-primary rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto"
       >
         <div className="p-6">
           <div className="flex items-center mb-4">
-            <Users className="h-6 w-6 text-blue-600 mr-2" />
-            <h2 className="text-xl font-semibold text-gray-900">Generate Payroll</h2>
+            <Users className="h-6 w-6 text-primary-600 mr-2" />
+            <h2 className="text-xl font-semibold text-foreground-primary">Generate Payroll</h2>
           </div>
 
           {/* Date Selection */}
           {!results && !showConfirmation && !isGenerating && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground-secondary mb-2">
                   Generation Date
                 </label>
                 <div className="relative">
@@ -104,9 +104,9 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
                     type="date"
                     value={selectedDate}
                     onChange={handleDateChange}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full rounded-md border border-border-secondary px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
-                  <Calendar className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
+                  <Calendar className="absolute right-3 top-2.5 h-4 w-4 text-foreground-tertiary pointer-events-none" />
                 </div>
               </div>
 
@@ -127,13 +127,13 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
               <div className="flex space-x-3 pt-4">
                 <button
                   onClick={handleClose}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="flex-1 px-4 py-2 text-sm font-medium text-foreground-secondary bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md hover:bg-background-tertiary dark:hover:bg-surface-secondary focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleInitiateGeneration}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   Generate Payroll
                 </button>
@@ -151,13 +151,13 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
                 className="space-y-4"
               >
                 <div className="text-center">
-                  <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-amber-100 mb-4">
-                    <AlertTriangle className="h-6 w-6 text-amber-600" />
+                  <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/30 mb-4">
+                    <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <h3 className="text-lg font-medium text-foreground-primary mb-2">
                     Confirm Payroll Generation
                   </h3>
-                  <p className="text-sm text-gray-500 mb-4">
+                  <p className="text-sm text-foreground-tertiary mb-4">
                     This will generate payroll records for all employees with basic salary &gt; 0 on {formatDate(selectedDate)}. 
                     The payrolls will be automatically published and synced with the accounts system.
                   </p>
@@ -166,13 +166,13 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
                 <div className="flex space-x-3">
                   <button
                     onClick={() => setShowConfirmation(false)}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="flex-1 px-4 py-2 text-sm font-medium text-foreground-secondary bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md hover:bg-background-tertiary dark:hover:bg-surface-secondary focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleConfirmGeneration}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     Confirm Generate
                   </button>
@@ -188,14 +188,14 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
               animate={{ opacity: 1 }}
               className="text-center space-y-4"
             >
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
-                <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary-100 dark:bg-primary-900/30">
+                <Loader className="h-6 w-6 text-primary-600 dark:text-primary-400 animate-spin" />
               </div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <h3 className="text-lg font-medium text-foreground-primary mb-2">
                   Generating Payroll...
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-foreground-tertiary">
                   Creating payroll records for eligible employees and syncing with accounts system.
                   This may take a few moments depending on the number of employees.
                 </p>
@@ -221,33 +221,33 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
                   )}
                 </div>
                 <h3 className={`text-lg font-medium mb-2 ${
-                  results.success ? 'text-green-900' : 'text-red-900'
+                  results.success ? 'text-green-900 dark:text-green-300' : 'text-red-900 dark:text-red-300'
                 }`}>
                   {results.success ? 'Payroll Generated Successfully!' : 'Payroll Generation Failed'}
                 </h3>
                 
                 {results.success ? (
                   <div className="space-y-2">
-                    <p className="text-sm text-gray-600">
-                      Payroll records have been generated as <span className="font-medium text-blue-600">Pending</span> for {formatDate(selectedDate)}. 
+                    <p className="text-sm text-foreground-secondary">
+                      Payroll records have been generated as <span className="font-medium text-primary-600 dark:text-primary-400">Pending</span> for {formatDate(selectedDate)}. 
                       You can review and publish them in the Pending tab.
                     </p>
                     
                     {/* Show generation statistics */}
                     {results.data && (
-                      <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-3">
+                      <div className="bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-md p-3 mt-3">
                         <div className="grid grid-cols-3 gap-4 text-center">
                           <div>
-                            <p className="text-sm font-medium text-blue-800">{results.data.generated || 0}</p>
-                            <p className="text-xs text-blue-600">Generated</p>
+                            <p className="text-sm font-medium text-primary-800 dark:text-primary-300">{results.data.generated || 0}</p>
+                            <p className="text-xs text-primary-600 dark:text-primary-400">Generated</p>
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-blue-800">{results.data.status || 'Pending'}</p>
-                            <p className="text-xs text-blue-600">Status</p>
+                            <p className="text-sm font-medium text-primary-800 dark:text-primary-300">{results.data.status || 'Pending'}</p>
+                            <p className="text-xs text-primary-600 dark:text-primary-400">Status</p>
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-blue-800">{results.data.employees || 0}</p>
-                            <p className="text-xs text-blue-600">Eligible Employees</p>
+                            <p className="text-sm font-medium text-primary-800 dark:text-primary-300">{results.data.employees || 0}</p>
+                            <p className="text-xs text-primary-600 dark:text-primary-400">Eligible Employees</p>
                           </div>
                         </div>
                       </div>

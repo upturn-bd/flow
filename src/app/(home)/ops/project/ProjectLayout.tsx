@@ -8,7 +8,7 @@ import {
     FolderCheck,
     FolderOpen,
     Folder,
-} from "lucide-react";
+} from "@/lib/icons";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import { fadeInUp } from "@/components/ui/animations";
 import { getEmployeeInfo } from "@/lib/utils/auth";
@@ -28,7 +28,7 @@ const TABS = [
         key: "ongoing",
         label: "Ongoing",
         icon: <FolderOpen size={16} />,
-        color: "text-blue-600",
+        color: "text-primary-600 dark:text-primary-400",
     },
     {
         key: "completed",
@@ -40,13 +40,13 @@ const TABS = [
         key: "create",
         label: "Create New",
         icon: <FolderPlus size={16} />,
-        color: "text-indigo-600",
+        color: "text-indigo-600 dark:text-indigo-400",
     },
     {
         key: "archived",
         label: "Archived",
         icon: <FolderArchive size={16} />,
-        color: "text-gray-600",
+        color: "text-foreground-secondary",
     },
 ];
 
@@ -120,16 +120,16 @@ export default function ProjectLayout({
                 return <CompletedProjectsList setActiveTab={setActiveTab} />;
             case "archived":
                 return (
-                    <div className="flex flex-col items-center justify-center p-12 bg-gray-50/50 rounded-xl border border-gray-200 text-center">
-                        <FolderArchive className="h-16 w-16 text-gray-300 mb-4" />
-                        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                    <div className="flex flex-col items-center justify-center p-12 bg-background-secondary dark:bg-background-tertiary rounded-xl border border-border-primary text-center">
+                        <FolderArchive className="h-16 w-16 text-foreground-tertiary mb-4" />
+                        <h3 className="text-xl font-semibold text-foreground-primary mb-2">
                             Archived Projects
                         </h3>
-                        <p className="text-gray-500 max-w-md mb-6">
+                        <p className="text-foreground-secondary max-w-md mb-6">
                             This section stores projects that are no longer active but kept
                             for reference purposes.
                         </p>
-                        <p className="text-gray-400 text-sm">Feature coming soon...</p>
+                        <p className="text-foreground-tertiary text-sm">Feature coming soon...</p>
                     </div>
                 );
             default:
@@ -143,14 +143,14 @@ export default function ProjectLayout({
             animate="visible"
             exit="exit"
             variants={fadeInUp}
-            className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg w-full"
+            className="bg-surface-primary p-4 sm:p-6 lg:p-8 rounded-lg w-full"
         >
-            <div className="border-b border-gray-200 pb-4 mb-4">
-                <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-1">
-                    <Folder className="mr-2 h-6 w-6 text-blue-500" />
+            <div className="border-b border-border-primary pb-4 mb-4">
+                <h1 className="text-2xl font-bold text-foreground-primary flex items-center mb-1">
+                    <Folder className="mr-2 h-6 w-6 text-primary-500" />
                     Project Management
                 </h1>
-                <p className="max-w-3xl text-gray-600">
+                <p className="max-w-3xl text-foreground-secondary">
                     Efficiently manage your projects from start to finish. Create, assign,
                     and track progress to ensure successful completion of all project
                     milestones.

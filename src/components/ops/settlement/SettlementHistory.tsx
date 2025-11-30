@@ -14,9 +14,9 @@ import {
   CheckCheck, 
   XCircle,
   Clock,
-  MessageSquare,
+  MessageCircle,
   FormInput
-} from "lucide-react";
+} from "@/lib/icons";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 
 // Define the structure of a settlement request
@@ -97,16 +97,16 @@ export default function SettlementHistoryPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 1, y: -20 }}
                     transition={{ duration: 0.2 }}
-                    className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"
+                    className="bg-surface-primary border border-border-primary rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex items-start gap-2">
                         <DollarSign size={18} className="text-green-600 mt-1 flex-shrink-0" />
                         <div>
-                          <h3 className="font-medium text-gray-900">
+                          <h3 className="font-medium text-foreground-primary">
                             {claimTypes.find(type => type.id === settlement.settlement_type_id)?.settlement_item || "Unknown"}
                           </h3>
-                          <p className="text-sm text-gray-600 font-medium">
+                          <p className="text-sm text-foreground-secondary font-medium">
                             Amount: {settlement.amount} BDT
                           </p>
                         </div>
@@ -132,13 +132,13 @@ export default function SettlementHistoryPage() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
                       {settlement.event_date && (
-                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <div className="flex items-center gap-2 text-sm text-foreground-secondary">
                           <Calendar size={14} />
                           <span>{settlement.event_date}</span>
                         </div>
                       )}
                       
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <div className="flex items-center gap-2 text-sm text-foreground-secondary">
                         <User size={14} />
                         <span>Requested by: <span className="font-medium">
                           {employees.find(employee => employee.id === settlement.claimant_id)?.name || "Unknown"}
@@ -154,16 +154,16 @@ export default function SettlementHistoryPage() {
                     </div>
                     
                     {settlement.description && (
-                      <div className="mt-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-md">
+                      <div className="mt-3 text-sm text-foreground-secondary bg-background-secondary dark:bg-background-tertiary p-3 rounded-md">
                         <p className="font-medium mb-1">Description:</p>
                         <p>{settlement.description}</p>
                       </div>
                     )}
                     
                     {settlement.comment && (
-                      <div className="mt-3 text-sm text-gray-700 bg-blue-50 p-3 rounded-md">
+                      <div className="mt-3 text-sm text-foreground-secondary bg-primary-50 dark:bg-primary-900/30 p-3 rounded-md">
                         <div className="flex items-center gap-2 mb-1">
-                          <MessageSquare size={14} />
+                          <MessageCircle size={14} />
                           <p className="font-medium">Feedback:</p>
                         </div>
                         <p>{settlement.comment}</p>
@@ -172,7 +172,7 @@ export default function SettlementHistoryPage() {
 
                     {settlement.attachments && settlement.attachments.length > 0 && (
                       <div className="mt-2">
-                        <p className="text-xs text-gray-500 mb-1">Attachments:</p>
+                        <p className="text-xs text-foreground-tertiary mb-1">Attachments:</p>
                         <div className="flex flex-wrap gap-2">
                           {settlement.attachments.map((attachment:string, idx:number) => (
                             <a
@@ -180,7 +180,7 @@ export default function SettlementHistoryPage() {
                               href={settlement.attachment_download_urls[idx]}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 text-xs px-2 py-1 rounded"
+                              className="flex items-center gap-1 bg-background-secondary dark:bg-background-tertiary hover:bg-background-tertiary dark:hover:bg-surface-secondary transition-colors text-foreground-secondary text-xs px-2 py-1 rounded"
                             >
                               <FileText size={12} />
                               <span>{extractFileNameFromStoragePath(attachment)}</span>
@@ -198,11 +198,11 @@ export default function SettlementHistoryPage() {
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center py-12 text-center"
             >
-              <div className="bg-gray-100 rounded-full p-4 mb-4">
-                <DollarSign className="h-12 w-12 text-gray-400" />
+              <div className="bg-background-secondary dark:bg-background-tertiary rounded-full p-4 mb-4">
+                <DollarSign className="h-12 w-12 text-foreground-tertiary" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900">No settlement history</h3>
-              <p className="mt-1 text-gray-500">Completed settlement requests will appear here</p>
+              <h3 className="text-lg font-medium text-foreground-primary">No settlement history</h3>
+              <p className="mt-1 text-foreground-tertiary">Completed settlement requests will appear here</p>
             </motion.div>
           )}
         </motion.div>

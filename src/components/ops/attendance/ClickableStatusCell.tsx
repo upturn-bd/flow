@@ -5,7 +5,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useState, useRef, useEffect } from "react";
-import { FaEllipsisV } from "react-icons/fa";
+import { DotsThree } from "@/lib/icons";
 
 const ClickableStatusCell = ({
     tag, id }: {
@@ -101,10 +101,10 @@ const ClickableStatusCell = ({
                 <button
                     ref={buttonRef}
                     onClick={toggleMenu}
-                    className="ml-2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100 focus:outline-none"
+                    className="ml-2 text-foreground-tertiary hover:text-foreground-secondary transition-colors p-1 rounded-full hover:bg-background-tertiary dark:bg-surface-secondary focus:outline-none"
                     aria-label="Toggle menu"
                 >
-                    <FaEllipsisV className="text-sm" />
+                    <DotsThree className="text-sm" />
                 </button>
             )}
 
@@ -113,7 +113,7 @@ const ClickableStatusCell = ({
             {isMenuOpen && (
                 <div
                     ref={dropdownRef}
-                    className="fixed z-50 bg-white border shadow-lg rounded-md py-1 w-40"
+                    className="fixed z-50 bg-surface-primary border shadow-lg rounded-md py-1 w-40"
                     style={{
                         top: menuPosition.top,
                         right: menuPosition.right,
@@ -124,7 +124,7 @@ const ClickableStatusCell = ({
                             await handleRequest();
                             setIsMenuOpen(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 text-sm text-foreground-secondary hover:bg-background-tertiary dark:bg-surface-secondary transition-colors flex items-center gap-2"
                     >
                         Send to Request
                     </button>

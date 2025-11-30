@@ -13,8 +13,8 @@ import {
   BarChart2,
   FileCheck,
   ArrowLeft,
-  Loader2,
-} from "lucide-react";
+  Loader,
+} from "@/lib/icons";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import Link from "next/link";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -101,7 +101,7 @@ function ProfileContent() {
         icon: <BarChart2 className="h-5 w-5" />,
         color: "text-amber-600",
         content: (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-16 text-foreground-tertiary">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -125,7 +125,7 @@ function ProfileContent() {
         icon: <FileCheck className="h-5 w-5" />,
         color: "text-indigo-600",
         content: (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-16 text-foreground-tertiary">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -148,8 +148,8 @@ function ProfileContent() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-96">
-        <Loader2 className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
-        <p className="text-gray-600">Loading profile information...</p>
+        <Loader className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
+        <p className="text-foreground-secondary">Loading profile information...</p>
       </div>
     );
   }
@@ -204,10 +204,10 @@ function ProfileContent() {
         transition={{ duration: 0.3 }}
         className="mb-8"
       >
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground-primary">
           {uid && !isCurrentUser ? `${userName}'s Profile` : "My Profile"}
         </h1>
-        <p className="text-sm sm:text-base text-gray-500 mt-1">
+        <p className="text-sm sm:text-base text-foreground-tertiary mt-1">
           {uid && !isCurrentUser
             ? `Viewing ${userName}'s profile information`
             : "View and update your profile information"}
@@ -225,8 +225,8 @@ export default function ProfilePage() {
     <Suspense
       fallback={
         <div className="flex flex-col items-center justify-center h-96">
-          <Loader2 className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
-          <p className="text-gray-600">Loading profile data...</p>
+          <Loader className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
+          <p className="text-foreground-secondary">Loading profile data...</p>
         </div>
       }
     >

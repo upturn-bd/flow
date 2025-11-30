@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock } from '@phosphor-icons/react';
+import { Clock } from '@/lib/icons';
 
 interface TimeFieldProps {
   name: string;
@@ -24,11 +24,11 @@ export const TimeField: React.FC<TimeFieldProps> = ({
   icon,
   className = "",
 }) => {
-  const IconComponent = icon || <Clock size={18} weight="duotone" className="text-gray-500" />;
+  const IconComponent = icon || <Clock size={18} weight="duotone" className="text-foreground-secondary dark:text-foreground-secondary" />;
 
   return (
     <div className={className}>
-      <label className="block font-semibold text-gray-700 mb-2">
+      <label className="block font-semibold text-foreground-primary dark:text-foreground-primary mb-2">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
@@ -42,7 +42,7 @@ export const TimeField: React.FC<TimeFieldProps> = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+          className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-secondary p-2.5 border border-border-primary dark:border-border-primary focus:ring-2 focus:ring-primary-400 focus:border-primary-400 outline-none transition-all text-foreground-primary dark:text-foreground-primary"
         />
       </div>
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}

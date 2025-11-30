@@ -10,7 +10,7 @@ import {
   DollarSign,
   AlertTriangle,
   FilePlus
-} from "lucide-react";
+} from "@/lib/icons";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
 import SettlementHistoryPage from "@/components/ops/settlement/SettlementHistory";
@@ -39,7 +39,7 @@ function SettlementPageContent() {
       key: "history",
       label: "History",
       icon: <History className="h-5 w-5" />,
-      color: "text-blue-600",
+      color: "text-primary-600",
       content: <SettlementHistoryPage />,
       link: "/ops/settlement?tab=history",
     },
@@ -57,7 +57,7 @@ function SettlementPageContent() {
       icon: <BookOpen className="h-5 w-5" />,
       color: "text-purple-600",
       content: (
-        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+        <div className="flex flex-col items-center justify-center py-12 text-foreground-secondary">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -111,7 +111,7 @@ export default function SettlementPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
           <DollarSign className="h-8 w-8 text-emerald-600 animate-pulse" />
-          <p className="text-sm text-gray-600">Loading settlement...</p>
+          <p className="text-sm text-foreground-secondary">Loading settlement...</p>
         </div>
       </div>
     }>

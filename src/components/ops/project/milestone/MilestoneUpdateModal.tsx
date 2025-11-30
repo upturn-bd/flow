@@ -3,7 +3,7 @@ import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField, NumberField, AssigneeField } from '@/components/forms';
 import { validateMilestone, type MilestoneData } from '@/lib/validation';
 import { useEmployees } from '@/hooks/useEmployees';
-import { Target } from '@phosphor-icons/react';
+import { Target } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 
 interface MilestoneUpdateModalProps {
@@ -206,7 +206,7 @@ export default function MilestoneUpdateModal({
 
         {/* Project date hint */}
         {(projectStartDate || projectEndDate) && (
-          <p className="text-xs text-gray-500 -mt-2">
+          <p className="text-xs text-foreground-tertiary -mt-2">
             Project timeline: {projectStartDate || 'N/A'} to {projectEndDate || 'N/A'}
           </p>
         )}

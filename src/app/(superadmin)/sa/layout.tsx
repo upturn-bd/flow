@@ -13,7 +13,7 @@ export default function SuperadminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background-secondary dark:bg-background-primary">
       <SuperadminNav />
       <main className="container mx-auto px-4 py-8">
         {children}

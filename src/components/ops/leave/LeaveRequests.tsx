@@ -6,7 +6,7 @@ import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, FileText, MessageSquare, Check, X, CalendarDays } from "lucide-react";
+import { Calendar, User, FileText, MessageCircle, Check, X, CalendarDays } from "@/lib/icons";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
 import { set } from "react-hook-form";
@@ -70,7 +70,7 @@ export default function LeaveRequestsPage() {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="text-red-500 mb-2">Error loading leave requests</div>
-        <p className="text-gray-600">{error}</p>
+        <p className="text-foreground-secondary">{error}</p>
       </div>
     );
   }
@@ -189,8 +189,8 @@ function LeaveRequestCard({
           <StatusBadge status={request.status} />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <MessageSquare size={16} className="inline mr-2" />
+            <label className="block text-sm font-medium text-foreground-secondary mb-2">
+              <MessageCircle size={16} className="inline mr-2" />
               Comment
             </label>
             <textarea
@@ -198,7 +198,7 @@ function LeaveRequestCard({
               onChange={(e) => setComment(e.target.value)}
               placeholder="Add a comment for this decision..."
               rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full border border-border-secondary rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { X, MagnifyingGlass, UserPlus, Trash, Users } from '@phosphor-icons/react';
+import { X, MagnifyingGlass, UserPlus, Trash, Users } from '@/lib/icons';
 import { TeamWithMembers } from '@/lib/types';
 import { useEmployees, ExtendedEmployee } from '@/hooks/useEmployees';
 import { useTeams } from '@/hooks/useTeams';
@@ -86,25 +86,25 @@ export default function TeamMembersModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-surface-primary rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-purple-50">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border-primary bg-gradient-to-r from-primary-50 to-purple-50 dark:from-primary-900/30 dark:to-purple-900/30">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-foreground-primary">
               Team Members
             </h2>
-            <p className="text-sm text-gray-600 mt-1 flex items-center gap-2">
-              <span className="font-medium text-indigo-600">{team.name}</span>
-              <span className="text-gray-400">•</span>
+            <p className="text-sm text-foreground-tertiary mt-1 flex items-center gap-2">
+              <span className="font-medium text-primary-600">{team.name}</span>
+              <span className="text-foreground-tertiary">•</span>
               <span>{teamMembers.length} member{teamMembers.length !== 1 ? 's' : ''}</span>
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+            className="p-2 hover:bg-surface-hover rounded-lg transition-colors"
             aria-label="Close"
           >
-            <X size={24} className="text-gray-600" />
+            <X size={24} className="text-foreground-tertiary" />
           </button>
         </div>
 
@@ -115,10 +115,10 @@ export default function TeamMembersModal({
             <div className="lg:col-span-2">
               <div className="sticky top-0">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="p-2 bg-indigo-100 rounded-lg">
-                    <UserPlus size={20} className="text-indigo-600" />
+                  <div className="p-2 bg-primary-100 dark:bg-primary-900/50 rounded-lg">
+                    <UserPlus size={20} className="text-primary-600" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-foreground-primary">
                     Add New Member
                   </h3>
                 </div>
@@ -127,47 +127,47 @@ export default function TeamMembersModal({
               <div className="relative mb-4">
                 <MagnifyingGlass
                   size={20}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-tertiary"
                 />
                 <input
                   type="text"
                   placeholder="Search by name, email, or designation..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+                  className="w-full pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm bg-surface-primary text-foreground-primary"
                 />
               </div>
 
               {/* Employee Selection */}
-              <div className="border-2 border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+              <div className="border-2 border-border-primary rounded-xl overflow-hidden bg-surface-primary shadow-sm">
                 <div className="max-h-[350px] overflow-y-auto">
                   {employeesLoading ? (
-                    <div className="p-8 text-center text-gray-500">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-2"></div>
+                    <div className="p-8 text-center text-foreground-tertiary">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
                       <p className="text-sm">Loading employees...</p>
                     </div>
                   ) : filteredEmployees.length === 0 ? (
                     <div className="p-8 text-center">
-                      <div className="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
-                        <MagnifyingGlass size={24} className="text-gray-400" />
+                      <div className="bg-background-secondary rounded-full p-4 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
+                        <MagnifyingGlass size={24} className="text-foreground-tertiary" />
                       </div>
-                      <p className="text-gray-600 font-medium">
+                      <p className="text-foreground-secondary font-medium">
                         {searchTerm
                           ? 'No employees found'
                           : 'All employees are members'}
                       </p>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-foreground-tertiary mt-1">
                         {searchTerm
                           ? 'Try a different search term'
                           : 'Everyone is already on this team'}
                       </p>
                     </div>
                   ) : (
-                    <div className="divide-y divide-gray-100">
+                    <div className="divide-y divide-border-primary">
                       {filteredEmployees.map((employee) => (
                         <label
                           key={employee.id}
-                          className="flex gap-3 p-4 hover:bg-indigo-50 cursor-pointer transition-colors group"
+                          className="flex gap-3 p-4 hover:bg-primary-50 dark:hover:bg-primary-900/30 cursor-pointer transition-colors group"
                         >
                           <div className="items-center flex">
                             <input
@@ -176,20 +176,20 @@ export default function TeamMembersModal({
                               value={employee.id}
                               checked={selectedEmployeeId === employee.id}
                               onChange={(e) => setSelectedEmployeeId(e.target.value)}
-                              className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 focus:ring-2"
+                              className="w-4 h-4 text-primary-600 border-border-secondary focus:ring-primary-500 focus:ring-2"
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium text-gray-900 truncate">
+                            <div className="font-medium text-foreground-primary truncate">
                               {employee.name}
                             </div>
                             {(employee as ExtendedEmployee).email && (
-                              <div className="text-sm text-gray-500 truncate">
+                              <div className="text-sm text-foreground-tertiary truncate">
                                 {(employee as ExtendedEmployee).email}
                               </div>
                             )}
                             {(employee as ExtendedEmployee).designation && (
-                              <div className="text-xs text-gray-400 mt-0.5 truncate">
+                              <div className="text-xs text-foreground-tertiary mt-0.5 truncate">
                                 {(employee as ExtendedEmployee).designation}
                               </div>
                             )}
@@ -205,7 +205,7 @@ export default function TeamMembersModal({
               <button
                 onClick={handleAddMember}
                 disabled={!selectedEmployeeId || teamLoading}
-                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 active:scale-[0.98] disabled:bg-gray-300 disabled:cursor-not-allowed transition-all font-medium shadow-md hover:shadow-lg"
+                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:scale-[0.98] disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-all font-medium shadow-md hover:shadow-lg"
               >
                 <UserPlus size={20} />
                 {teamLoading ? 'Adding...' : 'Add to Team'}
@@ -217,53 +217,53 @@ export default function TeamMembersModal({
             <div className="lg:col-span-3">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Users size={20} className="text-purple-600" />
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-lg">
+                    <Users size={20} className="text-purple-600 dark:text-purple-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-foreground-primary">
                     Current Members
                   </h3>
                 </div>
-                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-medium rounded-full">
+                <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-400 text-sm font-medium rounded-full">
                   {teamMembers.length}
                 </span>
               </div>
 
-              <div className="border-2 border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+              <div className="border-2 border-border-primary rounded-xl overflow-hidden bg-surface-primary shadow-sm">
                 <div className="max-h-[500px] overflow-y-auto">
                   {teamMembers.length === 0 ? (
                     <div className="p-12 text-center">
-                      <div className="bg-gray-100 rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                        <Users size={32} className="text-gray-400" />
+                      <div className="bg-background-secondary rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                        <Users size={32} className="text-foreground-tertiary" />
                       </div>
-                      <p className="text-gray-600 font-medium text-lg">No members yet</p>
-                      <p className="text-sm text-gray-500 mt-2">Start by adding team members from the left</p>
+                      <p className="text-foreground-secondary font-medium text-lg">No members yet</p>
+                      <p className="text-sm text-foreground-tertiary mt-2">Start by adding team members from the left</p>
                     </div>
                   ) : (
-                    <div className="divide-y divide-gray-100">
+                    <div className="divide-y divide-border-primary">
                       {teamMembers.map((member) => (
                         <div
                           key={member.employee_id}
-                          className="flex items-center justify-between p-4 hover:bg-purple-50 transition-colors group"
+                          className="flex items-center justify-between p-4 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors group"
                         >
                           <div className="flex-1 min-w-0 pr-4">
                             <div className="flex items-center gap-2">
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-semibold shadow-md">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-white font-semibold shadow-md">
                                 {(member.employee_name || 'U').charAt(0).toUpperCase()}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="font-medium text-gray-900 truncate">
+                                <div className="font-medium text-foreground-primary truncate">
                                   {member.employee_name || 'Unknown Employee'}
                                 </div>
                                 {member.employee_email && (
-                                  <div className="text-sm text-gray-500 truncate">
+                                  <div className="text-sm text-foreground-tertiary truncate">
                                     {member.employee_email}
                                   </div>
                                 )}
                               </div>
                             </div>
                             {member.joined_at && (
-                              <div className="text-xs text-gray-400 mt-2 ml-12">
+                              <div className="text-xs text-foreground-tertiary mt-2 ml-12">
                                 Added {new Date(member.joined_at).toLocaleDateString('en-US', { 
                                   month: 'short', 
                                   day: 'numeric', 
@@ -275,7 +275,7 @@ export default function TeamMembersModal({
                           <button
                             onClick={() => handleRemoveMember(member.employee_id)}
                             disabled={teamLoading}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 flex-shrink-0"
+                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 flex-shrink-0"
                             title="Remove from team"
                           >
                             <Trash size={20} />
@@ -291,10 +291,10 @@ export default function TeamMembersModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50">
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-border-primary bg-background-secondary">
           <button
             onClick={onClose}
-            className="px-6 py-2.5 text-gray-700 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 active:scale-[0.98] transition-all font-medium"
+            className="px-6 py-2.5 text-foreground-secondary bg-surface-primary border-2 border-border-secondary rounded-lg hover:bg-surface-hover active:scale-[0.98] transition-all font-medium"
           >
             Close
           </button>

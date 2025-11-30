@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, ChangeEvent } from "react";
-import { FiUploadCloud } from "react-icons/fi";
-import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
-import { IoMdCalendar } from "react-icons/io";
+import { CloudUpload, ToggleLeft, ToggleRight } from "@/lib/icons";
 import { useEmployees } from "@/hooks/useEmployees";
 import { supabase } from "@/lib/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,16 +9,16 @@ import {
   Upload,
   Calendar,
   Clock,
-  ChevronLeft,
-  ChevronDown,
+  CaretLeft,
+  CaretDown,
   PackageOpen,
-  AlertCircle,
+  WarningCircle,
   Save,
   Check,
-  Loader2,
+  Loader,
   X,
   FileText,
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
@@ -311,13 +309,13 @@ export default function RequisitionCreatePage({
           onClick={onClose}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
         >
-          <ChevronLeft size={16} />
+          <CaretLeft size={16} />
           <span>Back</span>
         </motion.button>
       </div>
 
       <div
-        className="flex items-center cursor-pointer gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200"
+        className="flex items-center cursor-pointer gap-2 bg-background-secondary dark:bg-background-tertiary p-3 rounded-lg border border-border-primary"
         onClick={() => setIsOneOff(!isOneOff)}
       >
         <div
@@ -325,25 +323,25 @@ export default function RequisitionCreatePage({
             } transition-colors duration-300`}
         >
           <motion.div
-            className="w-5 h-5 bg-white rounded-full absolute top-0.5"
+            className="w-5 h-5 bg-surface-primary rounded-full absolute top-0.5"
             animate={{
               left: isOneOff ? "calc(100% - 1.25rem - 0.125rem)" : "0.125rem",
             }}
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
           />
         </div>
-        <span className="text-sm font-medium text-gray-700">
+        <span className="text-sm font-medium text-foreground-secondary">
           One-Off Request
         </span>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 bg-white shadow-sm rounded-lg p-6 border border-gray-200"
+        className="space-y-6 bg-surface-primary shadow-sm rounded-lg p-6 border border-border-primary"
       >
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <PackageOpen size={16} className="mr-2" />
               Category
             </label>
@@ -353,7 +351,7 @@ export default function RequisitionCreatePage({
                 value={requisitionState.requisition_category_id}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur('requisition_category_id')}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value={undefined}>Select category</option>
                 {requisitionTypes.length > 0 &&
@@ -363,13 +361,13 @@ export default function RequisitionCreatePage({
                     </option>
                   ))}
               </select>
-              <ChevronDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+              <CaretDown
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
                 size={16}
               />
               {touchedFields.requisition_category_id && errors.requisition_category_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
-                  <AlertCircle size={14} className="mr-1" />
+                  <WarningCircle size={14} className="mr-1" />
                   {errors.requisition_category_id}
                 </p>
               )}
@@ -377,7 +375,7 @@ export default function RequisitionCreatePage({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-secondary mb-1">
               Item
             </label>
             <div className="relative">
@@ -386,7 +384,7 @@ export default function RequisitionCreatePage({
                 value={requisitionState.item_id}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur('item_id')}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value={undefined}>Select item</option>
                 {requisitionInventories.length > 0 &&
@@ -402,13 +400,13 @@ export default function RequisitionCreatePage({
                       </option>
                     ))}
               </select>
-              <ChevronDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+              <CaretDown
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
                 size={16}
               />
               {touchedFields.item_id && errors.item_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
-                  <AlertCircle size={14} className="mr-1" />
+                  <WarningCircle size={14} className="mr-1" />
                   {errors.item_id}
                 </p>
               )}
@@ -416,7 +414,7 @@ export default function RequisitionCreatePage({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-secondary mb-1">
               Quantity
             </label>
             <input
@@ -425,11 +423,11 @@ export default function RequisitionCreatePage({
               value={requisitionState.quantity || ""}
               onChange={handleInputChange}
               onBlur={() => handleFieldBlur('quantity')}
-              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
             {touchedFields.quantity && errors.quantity && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
-                <AlertCircle size={14} className="mr-1" />
+                <WarningCircle size={14} className="mr-1" />
                 {errors.quantity}
               </p>
             )}
@@ -437,12 +435,12 @@ export default function RequisitionCreatePage({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="col-span-1">
-              <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+              <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
                 <Calendar size={16} className="mr-2" />
                 Date
               </label>
-              <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
-                <Calendar size={16} className="ml-3 text-gray-500" />
+              <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+                <Calendar size={16} className="ml-3 text-foreground-tertiary" />
                 <input
                   type="date"
                   name="date"
@@ -454,7 +452,7 @@ export default function RequisitionCreatePage({
               </div>
               {touchedFields.date && errors.date && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
-                  <AlertCircle size={14} className="mr-1" />
+                  <WarningCircle size={14} className="mr-1" />
                   {errors.date}
                 </p>
               )}
@@ -463,12 +461,12 @@ export default function RequisitionCreatePage({
             {!isOneOff && (
               <>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
                     <Clock size={16} className="mr-2" />
                     From
                   </label>
-                  <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
-                    <Clock size={16} className="ml-3 text-gray-500" />
+                  <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+                    <Clock size={16} className="ml-3 text-foreground-tertiary" />
                     <input
                       type="time"
                       name="from_time"
@@ -480,19 +478,19 @@ export default function RequisitionCreatePage({
                   </div>
                   {touchedFields.from_time && errors.from_time && (
                     <p className="mt-1 text-red-500 text-sm flex items-center">
-                      <AlertCircle size={14} className="mr-1" />
+                      <WarningCircle size={14} className="mr-1" />
                       {errors.from_time}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
                     <Clock size={16} className="mr-2" />
                     To
                   </label>
-                  <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
-                    <Clock size={16} className="ml-3 text-gray-500" />
+                  <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+                    <Clock size={16} className="ml-3 text-foreground-tertiary" />
                     <input
                       type="time"
                       name="to_time"
@@ -504,7 +502,7 @@ export default function RequisitionCreatePage({
                   </div>
                   {touchedFields.to_time && errors.to_time && (
                     <p className="mt-1 text-red-500 text-sm flex items-center">
-                      <AlertCircle size={14} className="mr-1" />
+                      <WarningCircle size={14} className="mr-1" />
                       {errors.to_time}
                     </p>
                   )}
@@ -514,7 +512,7 @@ export default function RequisitionCreatePage({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-secondary mb-1">
               Description
             </label>
             <input
@@ -524,18 +522,18 @@ export default function RequisitionCreatePage({
               value={requisitionState.description}
               onChange={handleInputChange}
               placeholder="Max 35 characters"
-              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <Upload size={16} className="mr-2" />
               Attachment
             </label>
-            <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <Upload className="mx-auto mb-4 text-gray-400 h-10 w-10" />
-              <p className="text-sm text-gray-500 mb-4">
+            <div className="bg-background-secondary dark:bg-background-tertiary border border-dashed border-border-secondary rounded-lg p-6 text-center">
+              <Upload className="mx-auto mb-4 text-foreground-tertiary h-10 w-10" />
+              <p className="text-sm text-foreground-tertiary mb-4">
                 Drag and drop files here, or
               </p>
               <label
@@ -577,7 +575,7 @@ export default function RequisitionCreatePage({
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
-                        className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm"
+                        className="flex items-center gap-2 bg-surface-primary border border-border-primary px-3 py-2 rounded-lg text-sm"
                       >
                         <FileText size={14} className="text-blue-500" />
                         <span className="truncate max-w-xs">{file.name}</span>
@@ -585,7 +583,7 @@ export default function RequisitionCreatePage({
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           type="button"
-                          className="text-gray-400 hover:text-red-500"
+                          className="text-foreground-tertiary hover:text-red-500"
                           onClick={() => removeFile(file.name)}
                         >
                           <X size={16} />
@@ -606,7 +604,7 @@ export default function RequisitionCreatePage({
             type="button"
             disabled={isSubmitting}
             onClick={handleSaveDraft}
-            className="flex items-center gap-2 bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary px-6 py-2 rounded-lg hover:bg-surface-hover transition-colors disabled:opacity-50"
           >
             <Save size={18} />
             <span>Save as Draft</span>
@@ -621,7 +619,7 @@ export default function RequisitionCreatePage({
           >
             {isSubmitting ? (
               <>
-                <Loader2 size={18} className="animate-spin" />
+                <Loader size={18} className="animate-spin" />
                 <span>Submitting...</span>
               </>
             ) : (
@@ -886,9 +884,9 @@ export function RequisitionDraftPage({
           onClick={() => setIsOneOff(!isOneOff)}
         >
           {isOneOff ? (
-            <PiToggleRightFill size={36} className="text-blue-500" />
+            <ToggleRight size={36} className="text-blue-500" />
           ) : (
-            <PiToggleLeftFill size={36} className="text-gray-400" />
+            <ToggleLeft size={36} className="text-foreground-tertiary" />
           )}
           <span className="text-sm text-blue-600">One-Off</span>
         </div>
@@ -983,8 +981,8 @@ export function RequisitionDraftPage({
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <label className="block font-bold text-[#003366] mb-1">Date</label>
-            <div className="relative bg-white shadow px-4 py-2 rounded-md flex items-center gap-2">
-              <IoMdCalendar className="text-gray-600" />
+            <div className="relative bg-surface-primary shadow px-4 py-2 rounded-md flex items-center gap-2">
+              <Calendar className="text-foreground-secondary" />
               <input
                 type="date"
                 name="date"
@@ -1010,7 +1008,7 @@ export function RequisitionDraftPage({
                 value={requisitionState.from_time}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur('from_time')}
-                className="w-full bg-white shadow px-4 py-2 rounded-md"
+                className="w-full bg-surface-primary shadow px-4 py-2 rounded-md"
               />
               {touchedFields.from_time && errors.from_time && (
                 <p className="text-red-500 text-sm mt-1">{errors.from_time}</p>
@@ -1027,7 +1025,7 @@ export function RequisitionDraftPage({
                 value={requisitionState.to_time}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur('to_time')}
-                className="w-full bg-white shadow px-4 py-2 rounded-md"
+                className="w-full bg-surface-primary shadow px-4 py-2 rounded-md"
               />
               {touchedFields.to_time && errors.to_time && (
                 <p className="text-red-500 text-sm mt-1">{errors.to_time}</p>
@@ -1055,11 +1053,11 @@ export function RequisitionDraftPage({
           <label className="block font-bold text-[#003366] mb-1">
             Attachment
           </label>
-          <div className="bg-gray-100 rounded-md border border-gray-300 p-6 text-center text-sm text-gray-500">
-            <FiUploadCloud className="mx-auto mb-4 text-2xl" />
+          <div className="bg-background-tertiary dark:bg-surface-secondary rounded-md border border-border-secondary p-6 text-center text-sm text-foreground-tertiary">
+            <CloudUpload className="mx-auto mb-4 text-2xl" />
             <label
               htmlFor="file_upload"
-              className="px-4 py-2 bg-white border border-gray-400 text-sm rounded-md cursor-pointer hover:bg-gray-200 transition"
+              className="px-4 py-2 bg-surface-primary border border-border-secondary text-sm rounded-md cursor-pointer hover:bg-surface-hover transition"
             >
               Browse File
             </label>
@@ -1080,7 +1078,7 @@ export function RequisitionDraftPage({
                 ]);
               }}
             />
-            <div className="flex gap-3 mt-8 text-gray-600">
+            <div className="flex gap-3 mt-8 text-foreground-secondary">
               {attachments.length > 0
                 ? attachments.map((file, index) => (
                   <div

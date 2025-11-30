@@ -7,13 +7,13 @@ import { TabItem } from "@/components/ui/TabView";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  AlertCircle,
+  WarningCircle,
   History,
   BookOpen,
   FilePlus,
   ClipboardCheck,
   AlertTriangle
-} from "lucide-react";
+} from "@/lib/icons";
 import { PERMISSION_MODULES } from "@/lib/constants";
 
 
@@ -49,16 +49,16 @@ export default function ComplaintPage() {
       color: "text-purple-600",
       content: (
         <div className="p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <h2 className="text-xl font-bold text-foreground-primary mb-4 flex items-center">
             <AlertTriangle className="mr-2 h-5 w-5 text-red-500" />
             Complaint Policy
           </h2>
           <div className="prose prose-red max-w-none">
-            <p className="text-gray-600">
+            <p className="text-foreground-secondary">
               Our complaint policy is designed to ensure that all employee concerns are addressed promptly and fairly. Please review the guidelines below before submitting a complaint.
             </p>
-            <h3 className="text-lg font-semibold text-gray-700 mt-4">Submission Guidelines</h3>
-            <ul className="mt-2 space-y-1 text-gray-600">
+            <h3 className="text-lg font-semibold text-foreground-secondary mt-4">Submission Guidelines</h3>
+            <ul className="mt-2 space-y-1 text-foreground-secondary">
               <li className="flex items-start">
                 <span className="text-red-500 mr-2">•</span>
                 All complaints must be factual and include specific details about the incident.
@@ -76,8 +76,8 @@ export default function ComplaintPage() {
                 Follow up through the appropriate channels as directed.
               </li>
             </ul>
-            <h3 className="text-lg font-semibold text-gray-700 mt-4">Resolution Process</h3>
-            <ol className="mt-2 space-y-2 text-gray-600">
+            <h3 className="text-lg font-semibold text-foreground-secondary mt-4">Resolution Process</h3>
+            <ol className="mt-2 space-y-2 text-foreground-secondary">
               <li className="flex items-start">
                 <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 flex-shrink-0">1</span>
                 <div>
@@ -114,7 +114,7 @@ export default function ComplaintPage() {
     <ServicePageTemplate
       title="Complaint Management"
       description="Submit, track, and manage workplace complaints and concerns. Our system ensures all issues are addressed promptly and fairly."
-      icon={<AlertCircle className="h-6 w-6" />}
+      icon={<WarningCircle className="h-6 w-6" />}
       primaryColor="text-red-600"
       tabs={tabs}
       activeTab={activeTab}

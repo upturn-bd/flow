@@ -2,7 +2,7 @@
 
 import { ComplaintsType } from "@/lib/types";
 import { validateComplaintsType } from "@/lib/utils/validation";
-import { Tag } from "@phosphor-icons/react";
+import { Tag } from "@/lib/icons";
 import { FormModal } from "@/components/ui/modals";
 import { FormField } from "@/components/forms";
 

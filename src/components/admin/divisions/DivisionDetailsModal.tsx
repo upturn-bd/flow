@@ -3,8 +3,8 @@
 "use client";
 
 import { Division } from "@/hooks/useDivisions";
-import { PencilSimple, TrashSimple, User, FileText, X } from "@phosphor-icons/react";
-import { Layers } from "lucide-react";
+import { PencilSimple, Trash, User, FileText, X } from "@/lib/icons";
+import { Layers } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
@@ -53,36 +53,36 @@ export default function DivisionDetailsModal({
         animate="visible"
         exit="exit"
         variants={modalVariants}
-        className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl border border-gray-200"
+        className="bg-surface-primary p-6 rounded-lg w-full max-w-md shadow-xl border border-border-primary"
       >
         <motion.div variants={fadeInUp} className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Layers size={24} className="text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-800">Division Details</h2>
+            <Layers size={24} className="text-foreground-secondary" />
+            <h2 className="text-xl font-semibold text-foreground-primary">Division Details</h2>
           </div>
           <Button
             variant="ghost"
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500"
+            className="p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 text-foreground-tertiary hover:text-red-500"
           >
             <X size={20} weight="bold" />
           </Button>
         </motion.div>
 
         <motion.div variants={fadeInUp} className="mt-6 space-y-4">
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
-            <Layers size={20} className="text-gray-600 flex-shrink-0" />
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
+            <Layers size={20} className="text-foreground-secondary flex-shrink-0" />
             <div>
-              <div className="text-sm text-gray-600 font-medium">Division Name</div>
-              <div className="font-medium text-gray-800">{division?.name}</div>
+              <div className="text-sm text-foreground-secondary font-medium">Division Name</div>
+              <div className="font-medium text-foreground-primary">{division?.name}</div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
-            <User size={20} weight="duotone" className="text-gray-600 flex-shrink-0" />
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
+            <User size={20} weight="duotone" className="text-foreground-secondary flex-shrink-0" />
             <div>
-              <div className="text-sm text-gray-600 font-medium">Division Head</div>
-              <div className="font-medium text-gray-800">
+              <div className="text-sm text-foreground-secondary font-medium">Division Head</div>
+              <div className="font-medium text-foreground-primary">
                 {divisionHead ? divisionHead.name : "No head assigned"}
               </div>
             </div>
@@ -93,7 +93,7 @@ export default function DivisionDetailsModal({
           <Button
             variant="outline"
             onClick={editDivision}
-            className="flex items-center gap-2 border border-gray-200 text-gray-700 hover:bg-gray-50"
+            className="flex items-center gap-2 border border-border-primary text-foreground-secondary hover:bg-background-secondary dark:hover:bg-background-tertiary"
           >
             <PencilSimple size={18} weight="bold" />
             Edit
@@ -101,9 +101,9 @@ export default function DivisionDetailsModal({
           <Button
             variant="danger"
             onClick={deleteDivision}
-            className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 hover:border-red-300"
+            className="flex items-center gap-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:border-red-300"
           >
-            <TrashSimple size={18} weight="bold" />
+            <Trash size={18} weight="bold" />
             Delete
           </Button>
         </motion.div>

@@ -1,5 +1,158 @@
 @import "tailwindcss";
 
+/* Tailwind 4: Configure dark mode to use the 'class' strategy */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Tailwind 4 Theme Configuration - Define custom colors using CSS variables */
+@theme inline {
+  /* Primary theme colors - these reference CSS custom properties defined in :root */
+  --color-primary-50: var(--theme-primary-50, #eff6ff);
+  --color-primary-100: var(--theme-primary-100, #dbeafe);
+  --color-primary-200: var(--theme-primary-200, #bfdbfe);
+  --color-primary-300: var(--theme-primary-300, #93c5fd);
+  --color-primary-400: var(--theme-primary-400, #60a5fa);
+  --color-primary-500: var(--theme-primary-500, #3b82f6);
+  --color-primary-600: var(--theme-primary-600, #2563eb);
+  --color-primary-700: var(--theme-primary-700, #1d4ed8);
+  --color-primary-800: var(--theme-primary-800, #1e40af);
+  --color-primary-900: var(--theme-primary-900, #1e3a8a);
+  --color-primary-950: var(--theme-primary-950, #172554);
+
+  /* Semantic colors */
+  --color-success: var(--theme-success, #22c55e);
+  --color-warning: var(--theme-warning, #f59e0b);
+  --color-error: var(--theme-error, #ef4444);
+  --color-info: var(--theme-info, #3b82f6);
+
+  /* Background colors */
+  --color-background-primary: var(--theme-bg-primary, #ffffff);
+  --color-background-secondary: var(--theme-bg-secondary, #f9fafb);
+  --color-background-tertiary: var(--theme-bg-tertiary, #f3f4f6);
+
+  /* Foreground/text colors */
+  --color-foreground-primary: var(--theme-fg-primary, #111827);
+  --color-foreground-secondary: var(--theme-fg-secondary, #4b5563);
+  --color-foreground-tertiary: var(--theme-fg-tertiary, #6b7280);
+
+  /* Border colors */
+  --color-border-primary: var(--theme-border-primary, #e5e7eb);
+  --color-border-secondary: var(--theme-border-secondary, #d1d5db);
+
+  /* Surface colors */
+  --color-surface-primary: var(--theme-surface-primary, #ffffff);
+  --color-surface-secondary: var(--theme-surface-secondary, #f9fafb);
+  --color-surface-hover: var(--theme-surface-hover, #f3f4f6);
+}
+
+/* CSS Custom Properties for dynamic theming */
+@layer base {
+  :root {
+    /* Default to blue color scheme in light mode */
+    --theme-primary-50: #eff6ff;
+    --theme-primary-100: #dbeafe;
+    --theme-primary-200: #bfdbfe;
+    --theme-primary-300: #93c5fd;
+    --theme-primary-400: #60a5fa;
+    --theme-primary-500: #3b82f6;
+    --theme-primary-600: #2563eb;
+    --theme-primary-700: #1d4ed8;
+    --theme-primary-800: #1e40af;
+    --theme-primary-900: #1e3a8a;
+    --theme-primary-950: #172554;
+
+    /* Semantic colors */
+    --theme-success: #22c55e;
+    --theme-warning: #f59e0b;
+    --theme-error: #ef4444;
+    --theme-info: #3b82f6;
+
+    /* Light mode colors */
+    --theme-bg-primary: #ffffff;
+    --theme-bg-secondary: #f9fafb;
+    --theme-bg-tertiary: #f3f4f6;
+
+    --theme-fg-primary: #111827;
+    --theme-fg-secondary: #4b5563;
+    --theme-fg-tertiary: #6b7280;
+
+    --theme-border-primary: #e5e7eb;
+    --theme-border-secondary: #d1d5db;
+
+    --theme-surface-primary: #ffffff;
+    --theme-surface-secondary: #f9fafb;
+    --theme-surface-hover: #f3f4f6;
+  }
+
+  /* Dark mode */
+  .dark {
+    --theme-bg-primary: #0f172a;
+    --theme-bg-secondary: #1e293b;
+    --theme-bg-tertiary: #334155;
+
+    --theme-fg-primary: #f1f5f9;
+    --theme-fg-secondary: #cbd5e1;
+    --theme-fg-tertiary: #94a3b8;
+
+    --theme-border-primary: #334155;
+    --theme-border-secondary: #475569;
+
+    --theme-surface-primary: #1e293b;
+    --theme-surface-secondary: #334155;
+    --theme-surface-hover: #475569;
+  }
+
+  /* Green color scheme */
+  [data-color-scheme="green"] {
+    --theme-primary-50: #f0fdf4;
+    --theme-primary-100: #dcfce7;
+    --theme-primary-200: #bbf7d0;
+    --theme-primary-300: #86efac;
+    --theme-primary-400: #4ade80;
+    --theme-primary-500: #22c55e;
+    --theme-primary-600: #16a34a;
+    --theme-primary-700: #15803d;
+    --theme-primary-800: #166534;
+    --theme-primary-900: #14532d;
+    --theme-primary-950: #052e16;
+  }
+
+  /* Purple color scheme */
+  [data-color-scheme="purple"] {
+    --theme-primary-50: #faf5ff;
+    --theme-primary-100: #f3e8ff;
+    --theme-primary-200: #e9d5ff;
+    --theme-primary-300: #d8b4fe;
+    --theme-primary-400: #c084fc;
+    --theme-primary-500: #a855f7;
+    --theme-primary-600: #9333ea;
+    --theme-primary-700: #7e22ce;
+    --theme-primary-800: #6b21a8;
+    --theme-primary-900: #581c87;
+    --theme-primary-950: #3b0764;
+  }
+
+  /* Orange color scheme */
+  [data-color-scheme="orange"] {
+    --theme-primary-50: #fff7ed;
+    --theme-primary-100: #ffedd5;
+    --theme-primary-200: #fed7aa;
+    --theme-primary-300: #fdba74;
+    --theme-primary-400: #fb923c;
+    --theme-primary-500: #f97316;
+    --theme-primary-600: #ea580c;
+    --theme-primary-700: #c2410c;
+    --theme-primary-800: #9a3412;
+    --theme-primary-900: #7c2d12;
+    --theme-primary-950: #431407;
+  }
+
+  /* Base styles */
+  body {
+    background-color: var(--theme-bg-primary);
+    color: var(--theme-fg-primary);
+  }
+}
+
 /* Notification animations */
 @keyframes fade-in-up {
   from {

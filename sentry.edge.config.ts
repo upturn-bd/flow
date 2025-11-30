@@ -8,6 +8,9 @@ import * as Sentry from "@sentry/nextjs";
 Sentry.init({
   dsn: "https://bd10d9b181809060ba3bd0491d689356@o4510448453615616.ingest.de.sentry.io/4510448455188560",
 
+  // Disable Sentry in development
+  enabled: process.env.NODE_ENV === "production",
+
   // Edge functions run frequently (middleware on every request)
   // Sample at low rate to avoid high costs
   tracesSampleRate: 0.05, // 5% of edge transactions

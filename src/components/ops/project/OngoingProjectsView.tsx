@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { debounce } from "lodash";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Building2, Plus, Search } from "lucide-react";
+import { Building, Plus, Search } from "@/lib/icons";
 
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -189,27 +189,27 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
           <motion.div variants={fadeInUp} className="relative mb-4">
             <Search
               size={16}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
             />
             <input
               type="text"
               value={searchTerm}
               onChange={handleSearchChange}
               placeholder="Search projects..."
-              className="w-full border rounded pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring focus:border-blue-300"
+              className="w-full border border-border-primary rounded pl-9 pr-3 py-2 text-sm bg-surface-primary text-foreground-primary focus:outline-none focus:ring focus:border-primary-300"
             />
           </motion.div>
 
           {/* Loading below search bar */}
           {(ongoingLoading && !searchTerm && !searching && ongoingProjects.length === 0) && (
-            <LoadingSection icon={Building2} text="Loading projects..." color="blue" />
+            <LoadingSection icon={Building} text="Loading projects..." color="blue" />
           )}
 
           {/* Project Cards */}
           <motion.div variants={fadeInUp}>
             <AnimatePresence>
               {searching ? (
-                <LoadingSection icon={Building2} text="Searching projects..." color="blue" />
+                <LoadingSection icon={Building} text="Searching projects..." color="blue" />
               ) : displayProjects.length > 0 ? (
                 <>
                   <div className="space-y-4">
@@ -243,7 +243,7 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
               ) : (
                 showEmpty && (
                   <EmptyState
-                    icon={<Building2 className="h-12 w-12" />}
+                    icon={<Building className="h-12 w-12" />}
                     title="No projects found"
                     description={
                       searchTerm 

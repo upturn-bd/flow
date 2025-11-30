@@ -20,9 +20,6 @@ export default function HomeLayout({
 
 function ApprovalLayout({ children }: { children: React.ReactNode }) {
   const { isApproved } = useAuth();
-  
-  // Set Sentry user context for error tracking
-  useSentryUser();
 
   return (
     <div className="flex h-dvh w-full overflow-x-hidden">

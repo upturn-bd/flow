@@ -27,7 +27,7 @@ interface BasicInfoFieldProps {
 }
 
 const inputClass =
-  "w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+  "w-full rounded-md border border-border-primary bg-background-primary px-3 py-2 text-sm text-foreground-primary placeholder:text-foreground-tertiary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500";
 
 export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
   id,
@@ -54,13 +54,13 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
     ${
       error && touched
         ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-        : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+        : "border-border-secondary focus:border-primary-500 focus:ring-primary-500"
     }
     px-3 py-2 text-sm
     shadow-sm focus:outline-none focus:ring-1
-    disabled:bg-gray-100 disabled:cursor-not-allowed
+    disabled:bg-background-secondary disabled:cursor-not-allowed
     transition-colors
-    placeholder:text-gray-400
+    placeholder:text-foreground-tertiary
     max-w-full
   `;
 
@@ -69,7 +69,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
       return (
         <div className="flex items-center justify-center py-2">
           <LoadingSpinner className="h-5 w-5 text-blue-500" />
-          <span className="ml-2 text-sm text-gray-500">Loading...</span>
+          <span className="ml-2 text-sm text-foreground-tertiary">Loading...</span>
         </div>
       );
     }
@@ -124,7 +124,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
       return (
         <div className="mb-0">
           {label && (
-            <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldId} className="block text-sm font-medium text-foreground-secondary mb-1">
               {label}
             </label>
           )}
@@ -183,7 +183,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
       return (
         <div className="mb-0">
           {label && (
-            <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldId} className="block text-sm font-medium text-foreground-secondary mb-1">
               {label}
             </label>
           )}
@@ -216,7 +216,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
     return (
       <div className="mb-0">
         {label && (
-          <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor={fieldId} className="block text-sm font-medium text-foreground-secondary mb-1">
             {label}
           </label>
         )}

@@ -5,15 +5,15 @@ import { motion } from "framer-motion";
 import {
   Download,
   Users,
-  Building2,
+  Building,
   CheckCircle,
   FileSpreadsheet,
-  AlertCircle,
+  WarningCircle,
   FolderKanban,
   ListTodo,
   Calendar,
   ClipboardCheck,
-} from "lucide-react";
+} from "@/lib/icons";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useProjects } from "@/hooks/useProjects";
@@ -394,7 +394,7 @@ export default function DataExportPage() {
       type: "stakeholders" as ExportType,
       title: "Stakeholder Data",
       description: "Export stakeholder and lead information with contact details and process status",
-      icon: Building2,
+      icon: Building,
       color: "bg-purple-100 text-purple-700 border-purple-200",
       count: stakeholders.length,
       loading: stakeholdersLoading,
@@ -469,8 +469,8 @@ export default function DataExportPage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Data Export Center</h1>
-          <p className="text-sm text-gray-600 mt-1">
+          <h1 className="text-2xl font-bold text-foreground-primary">Data Export Center</h1>
+          <p className="text-sm text-foreground-secondary mt-1">
             Export company data to CSV format for analysis and reporting
           </p>
         </div>
@@ -487,7 +487,7 @@ export default function DataExportPage() {
         variants={fadeInUp}
         className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3"
       >
-        <AlertCircle className="text-amber-600 mt-0.5" size={20} />
+        <WarningCircle className="text-amber-600 mt-0.5" size={20} />
         <div>
           <h3 className="font-semibold text-amber-900">Data Privacy Notice</h3>
           <p className="text-sm text-amber-800 mt-1">
@@ -513,8 +513,8 @@ export default function DataExportPage() {
               key={option.type}
               variants={fadeInUp}
               className={`
-                bg-white rounded-lg border-2 transition-all cursor-pointer
-                ${isSelected ? "border-blue-500 shadow-lg ring-2 ring-blue-100" : "border-gray-200 hover:border-gray-300 hover:shadow-md"}
+                bg-surface-primary rounded-lg border-2 transition-all cursor-pointer
+                ${isSelected ? "border-blue-500 shadow-lg ring-2 ring-blue-100" : "border-border-primary hover:border-border-secondary hover:shadow-md"}
               `}
               onClick={() => setSelectedExport(option.type)}
             >
@@ -530,10 +530,10 @@ export default function DataExportPage() {
                   </div>
                 </div>
 
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-foreground-primary mb-2">
                   {option.title}
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-foreground-secondary mb-4">
                   {option.description}
                 </p>
 
@@ -541,11 +541,11 @@ export default function DataExportPage() {
                   <div className="text-sm">
                     {option.loading || (isSelected && isLoadingData) ? (
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
-                        <span className="text-gray-500">Loading...</span>
+                        <div className="w-4 h-4 border-2 border-border-secondary border-t-blue-600 rounded-full animate-spin"></div>
+                        <span className="text-foreground-tertiary">Loading...</span>
                       </div>
                     ) : (
-                      <span className="font-semibold text-gray-900">
+                      <span className="font-semibold text-foreground-primary">
                         {option.count} records
                       </span>
                     )}
@@ -591,7 +591,7 @@ export default function DataExportPage() {
                 {selectedExport === "employees" && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={employeeConfig.includeEmail}
@@ -603,10 +603,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Email Address</span>
+                        <span className="text-sm font-medium text-foreground-primary">Email Address</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={employeeConfig.includePhone}
@@ -618,10 +618,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Phone Number</span>
+                        <span className="text-sm font-medium text-foreground-primary">Phone Number</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={employeeConfig.includeDepartment}
@@ -633,10 +633,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Department</span>
+                        <span className="text-sm font-medium text-foreground-primary">Department</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={employeeConfig.includeDesignation}
@@ -648,10 +648,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Designation</span>
+                        <span className="text-sm font-medium text-foreground-primary">Designation</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={employeeConfig.includeJoinDate}
@@ -663,7 +663,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Join Date</span>
+                        <span className="text-sm font-medium text-foreground-primary">Join Date</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-red-200 rounded-lg hover:bg-red-50 cursor-pointer bg-red-50/50">
@@ -684,7 +684,7 @@ export default function DataExportPage() {
                       </label>
                     </div>
 
-                    <div className="flex justify-end pt-4 border-t border-gray-200">
+                    <div className="flex justify-end pt-4 border-t border-border-primary">
                       <button
                         onClick={handleExportEmployees}
                         disabled={employeesLoading || isLoadingData}
@@ -700,7 +700,7 @@ export default function DataExportPage() {
                 {selectedExport === "stakeholders" && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={stakeholderConfig.includeAddress}
@@ -712,10 +712,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Address</span>
+                        <span className="text-sm font-medium text-foreground-primary">Address</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={stakeholderConfig.includeContactPersons}
@@ -727,10 +727,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Contact Persons</span>
+                        <span className="text-sm font-medium text-foreground-primary">Contact Persons</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={stakeholderConfig.includeStatus}
@@ -742,10 +742,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Status</span>
+                        <span className="text-sm font-medium text-foreground-primary">Status</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={stakeholderConfig.includeProcess}
@@ -757,10 +757,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Process</span>
+                        <span className="text-sm font-medium text-foreground-primary">Process</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={stakeholderConfig.includeKAM}
@@ -772,10 +772,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Key Account Manager</span>
+                        <span className="text-sm font-medium text-foreground-primary">Key Account Manager</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={stakeholderConfig.includeType}
@@ -787,7 +787,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Stakeholder Type</span>
+                        <span className="text-sm font-medium text-foreground-primary">Stakeholder Type</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-green-200 rounded-lg hover:bg-green-50 cursor-pointer bg-green-50/50">
@@ -806,7 +806,7 @@ export default function DataExportPage() {
                       </label>
                     </div>
 
-                    <div className="flex justify-end pt-4 border-t border-gray-200">
+                    <div className="flex justify-end pt-4 border-t border-border-primary">
                       <button
                         onClick={handleExportStakeholders}
                         disabled={stakeholdersLoading || isLoadingData}
@@ -822,7 +822,7 @@ export default function DataExportPage() {
                 {selectedExport === "projects" && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={projectConfig.includeDescription}
@@ -834,10 +834,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Description</span>
+                        <span className="text-sm font-medium text-foreground-primary">Description</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={projectConfig.includeDates}
@@ -849,10 +849,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Start & End Dates</span>
+                        <span className="text-sm font-medium text-foreground-primary">Start & End Dates</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={projectConfig.includeStatus}
@@ -864,10 +864,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Status</span>
+                        <span className="text-sm font-medium text-foreground-primary">Status</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={projectConfig.includeProgress}
@@ -879,10 +879,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Progress</span>
+                        <span className="text-sm font-medium text-foreground-primary">Progress</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={projectConfig.includeGoal}
@@ -894,10 +894,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Goal</span>
+                        <span className="text-sm font-medium text-foreground-primary">Goal</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={projectConfig.includeAssignees}
@@ -909,11 +909,11 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Assignees</span>
+                        <span className="text-sm font-medium text-foreground-primary">Assignees</span>
                       </label>
                     </div>
 
-                    <div className="flex justify-end pt-4 border-t border-gray-200">
+                    <div className="flex justify-end pt-4 border-t border-border-primary">
                       <button
                         onClick={handleExportProjects}
                         disabled={isLoadingData}
@@ -929,7 +929,7 @@ export default function DataExportPage() {
                 {selectedExport === "tasks" && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={taskConfig.includeDescription}
@@ -941,10 +941,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Description</span>
+                        <span className="text-sm font-medium text-foreground-primary">Description</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={taskConfig.includeDates}
@@ -956,10 +956,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Start & End Dates</span>
+                        <span className="text-sm font-medium text-foreground-primary">Start & End Dates</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={taskConfig.includePriority}
@@ -971,10 +971,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Priority</span>
+                        <span className="text-sm font-medium text-foreground-primary">Priority</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={taskConfig.includeStatus}
@@ -986,10 +986,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Status</span>
+                        <span className="text-sm font-medium text-foreground-primary">Status</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={taskConfig.includeProject}
@@ -1001,10 +1001,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Project ID</span>
+                        <span className="text-sm font-medium text-foreground-primary">Project ID</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={taskConfig.includeAssignees}
@@ -1016,11 +1016,11 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Assignees</span>
+                        <span className="text-sm font-medium text-foreground-primary">Assignees</span>
                       </label>
                     </div>
 
-                    <div className="flex justify-end pt-4 border-t border-gray-200">
+                    <div className="flex justify-end pt-4 border-t border-border-primary">
                       <button
                         onClick={handleExportTasks}
                         disabled={isLoadingData}
@@ -1036,7 +1036,7 @@ export default function DataExportPage() {
                 {selectedExport === "leaves" && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={leaveConfig.includeDates}
@@ -1048,10 +1048,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Start & End Dates</span>
+                        <span className="text-sm font-medium text-foreground-primary">Start & End Dates</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={leaveConfig.includeStatus}
@@ -1063,10 +1063,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Status</span>
+                        <span className="text-sm font-medium text-foreground-primary">Status</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={leaveConfig.includeType}
@@ -1078,10 +1078,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Leave Type</span>
+                        <span className="text-sm font-medium text-foreground-primary">Leave Type</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={leaveConfig.includeRemarks}
@@ -1093,10 +1093,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Remarks</span>
+                        <span className="text-sm font-medium text-foreground-primary">Remarks</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={leaveConfig.includeEmployee}
@@ -1108,11 +1108,11 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Employee ID</span>
+                        <span className="text-sm font-medium text-foreground-primary">Employee ID</span>
                       </label>
                     </div>
 
-                    <div className="flex justify-end pt-4 border-t border-gray-200">
+                    <div className="flex justify-end pt-4 border-t border-border-primary">
                       <button
                         onClick={handleExportLeaves}
                         disabled={leavesLoading || isLoadingData}
@@ -1128,7 +1128,7 @@ export default function DataExportPage() {
                 {selectedExport === "attendance" && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={attendanceConfig.includeCheckInTime}
@@ -1140,10 +1140,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Check In Time</span>
+                        <span className="text-sm font-medium text-foreground-primary">Check In Time</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={attendanceConfig.includeCheckOutTime}
@@ -1155,10 +1155,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Check Out Time</span>
+                        <span className="text-sm font-medium text-foreground-primary">Check Out Time</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={attendanceConfig.includeTag}
@@ -1170,10 +1170,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Tag/Status</span>
+                        <span className="text-sm font-medium text-foreground-primary">Tag/Status</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={attendanceConfig.includeSite}
@@ -1185,10 +1185,10 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Site Name</span>
+                        <span className="text-sm font-medium text-foreground-primary">Site Name</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={attendanceConfig.includeSiteTimings}
@@ -1200,7 +1200,7 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">Site Timings</span>
+                        <span className="text-sm font-medium text-foreground-primary">Site Timings</span>
                       </label>
 
                       <label className="flex items-center gap-3 p-3 border border-green-200 rounded-lg hover:bg-green-50 cursor-pointer bg-green-50/50">
@@ -1233,7 +1233,7 @@ export default function DataExportPage() {
                         <span className="text-sm font-medium text-green-900">Location Status (Wrong Location)</span>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label className="flex items-center gap-3 p-3 border border-border-primary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary cursor-pointer">
                         <input
                           type="checkbox"
                           checked={attendanceConfig.includeCoordinates}
@@ -1245,11 +1245,11 @@ export default function DataExportPage() {
                           }
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-900">GPS Coordinates</span>
+                        <span className="text-sm font-medium text-foreground-primary">GPS Coordinates</span>
                       </label>
                     </div>
 
-                    <div className="flex justify-end pt-4 border-t border-gray-200">
+                    <div className="flex justify-end pt-4 border-t border-border-primary">
                       <button
                         onClick={handleExportAttendance}
                         disabled={attendanceLoading || isLoadingData}

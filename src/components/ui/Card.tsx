@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { LucideIcon } from "lucide-react";
 import { ReactNode } from "react";
 
 interface CardProps {
@@ -50,9 +49,9 @@ const paddingClasses = {
 };
 
 const variantClasses = {
-  default: "bg-white border border-gray-200",
-  outlined: "bg-white border-2 border-gray-300",
-  elevated: "bg-white border border-gray-200 shadow-lg",
+  default: "bg-surface-primary border border-border-primary",
+  outlined: "bg-surface-primary border-2 border-border-secondary",
+  elevated: "bg-surface-primary border border-border-primary shadow-lg",
 };
 
 export function Card({
@@ -74,7 +73,7 @@ export function Card({
         ${paddingClasses[padding]}
         rounded-lg
         transition-all duration-200
-        ${hover ? "hover:shadow-md hover:border-gray-300" : ""}
+        ${hover ? "hover:shadow-md hover:border-border-secondary" : ""}
         ${className}
       `}
       {...rest}
@@ -89,16 +88,16 @@ export function CardHeader({ title, subtitle, icon, action, className = "" }: Ca
     <div className={`flex items-start justify-between mb-4 ${className}`}>
       <div className="flex items-center gap-3 min-w-0 flex-1">
         {icon && (
-          <div className="flex-shrink-0 text-gray-600">
+          <div className="flex-shrink-0 text-foreground-secondary">
             {icon}
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 truncate">
+          <h3 className="text-lg font-semibold text-foreground-primary truncate">
             {title}
           </h3>
           {subtitle && (
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-foreground-secondary mt-1">
               {subtitle}
             </p>
           )}
@@ -123,7 +122,7 @@ export function CardContent({ children, className = "" }: CardContentProps) {
 
 export function CardFooter({ children, className = "" }: CardFooterProps) {
   return (
-    <div className={`mt-4 pt-4 border-t border-gray-100 ${className}`}>
+    <div className={`mt-4 pt-4 border-t border-border-primary ${className}`}>
       {children}
     </div>
   );
@@ -133,11 +132,11 @@ export function StatusBadge({ status, variant, size = "sm" }: StatusBadgeProps) 
   const getVariantClasses = (status: string, variant?: string) => {
     if (variant) {
       const variantMap = {
-        success: "bg-green-100 text-green-800 border-green-200",
-        warning: "bg-yellow-100 text-yellow-800 border-yellow-200",
-        error: "bg-red-100 text-red-800 border-red-200",
-        info: "bg-blue-100 text-blue-800 border-blue-200",
-        pending: "bg-gray-100 text-gray-800 border-gray-200",
+        success: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800",
+        warning: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800",
+        error: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800",
+        info: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800",
+        pending: "bg-surface-secondary text-foreground-secondary border-border-primary",
       };
       return variantMap[variant as keyof typeof variantMap] || variantMap.info;
     }
@@ -145,18 +144,18 @@ export function StatusBadge({ status, variant, size = "sm" }: StatusBadgeProps) 
     // Auto-detect based on status text
     const statusLower = status.toLowerCase();
     if (statusLower.includes("completed") || statusLower.includes("approved") || statusLower.includes("success")) {
-      return "bg-green-100 text-green-800 border-green-200";
+      return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
     }
     if (statusLower.includes("pending") || statusLower.includes("draft")) {
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800";
     }
     if (statusLower.includes("rejected") || statusLower.includes("failed") || statusLower.includes("error") || statusLower.includes("not started")) {
-      return "bg-red-100 text-red-800 border-red-200";
+      return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800";
     }
     if (statusLower.includes("in progress") || statusLower.includes("ongoing")) {
-      return "bg-blue-100 text-blue-800 border-blue-200";
+      return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800";
     }
-    return "bg-gray-100 text-gray-800 border-gray-200";
+    return "bg-surface-secondary text-foreground-secondary border-border-primary";
   };
 
   const sizeClasses = {
@@ -177,11 +176,10 @@ export function StatusBadge({ status, variant, size = "sm" }: StatusBadgeProps) 
 
 export function PriorityBadge({ priority, size = "sm" }: PriorityBadgeProps) {
   const priorityClasses = {
-    urgent: "bg-red-100 text-red-800 border-red-200",
-    high: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    normal: "bg-green-100 text-green-800 border-green-200",
-    low: "bg-green-100 text-green-800 border-green-200",
-
+    urgent: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800",
+    high: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800",
+    normal: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800",
+    low: "bg-surface-secondary text-foreground-tertiary border-border-primary",
   };
 
   const sizeClasses = {
@@ -213,13 +211,13 @@ export function InfoRow({
 }) {
   return (
     <div className={`flex items-center gap-2 text-sm ${className}`}>
-      <div className="text-gray-500 flex-shrink-0">
+      <div className="text-foreground-tertiary flex-shrink-0">
         {icon}
       </div>
-      <span className="font-medium text-gray-700 flex-shrink-0">
+      <span className="font-medium text-foreground-secondary flex-shrink-0">
         {label}:
       </span>
-      <span className="text-gray-900 truncate">
+      <span className="text-foreground-primary truncate">
         {value}
       </span>
     </div>

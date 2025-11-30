@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Check, X, ChevronDown } from "lucide-react";
+import { Check, X, CaretDown } from "@/lib/icons";
 
 export interface DropdownOption {
   label: string;
@@ -64,7 +64,7 @@ export default function MultiSelectDropdown({
   return (
     <div className="space-y-2" ref={dropdownRef}>
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-foreground-primary dark:text-foreground-primary">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
@@ -74,8 +74,8 @@ export default function MultiSelectDropdown({
         {/* Selected items display */}
         <div
           onClick={() => setIsOpen(!isOpen)}
-          className={`min-h-[42px] w-full px-4 py-2 border rounded-lg cursor-pointer focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-            error ? "border-red-500" : "border-gray-300"
+          className={`min-h-[42px] w-full px-4 py-2 border rounded-lg cursor-pointer focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary dark:bg-surface-primary ${
+            error ? "border-red-500" : "border-border-primary dark:border-border-primary"
           }`}
         >
           <div className="flex items-center justify-between gap-2">
@@ -86,7 +86,7 @@ export default function MultiSelectDropdown({
                   return (
                     <span
                       key={index}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-sm rounded"
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-sm rounded"
                     >
                       {label}
                       <button
@@ -95,7 +95,7 @@ export default function MultiSelectDropdown({
                           e.stopPropagation();
                           removeOption(optionValue);
                         }}
-                        className="hover:bg-blue-200 rounded-full p-0.5"
+                        className="hover:bg-primary-200 dark:hover:bg-primary-800 rounded-full p-0.5"
                       >
                         <X size={14} />
                       </button>
@@ -103,11 +103,11 @@ export default function MultiSelectDropdown({
                   );
                 })
               ) : (
-                <span className="text-gray-400 text-sm">{placeholder}</span>
+                <span className="text-foreground-tertiary dark:text-foreground-tertiary text-sm">{placeholder}</span>
               )}
             </div>
-            <ChevronDown
-              className={`text-gray-400 transition-transform flex-shrink-0 ${
+            <CaretDown
+              className={`text-foreground-tertiary dark:text-foreground-tertiary transition-transform flex-shrink-0 ${
                 isOpen ? "rotate-180" : ""
               }`}
               size={20}
@@ -117,7 +117,7 @@ export default function MultiSelectDropdown({
 
         {/* Dropdown menu */}
         {isOpen && (
-          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          <div className="absolute z-10 w-full mt-1 bg-surface-primary dark:bg-surface-primary border border-border-primary dark:border-border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto">
             {options.length > 0 ? (
               options.map((option) => {
                 const isSelected = value.includes(option.value);
@@ -125,19 +125,19 @@ export default function MultiSelectDropdown({
                   <div
                     key={option.value}
                     onClick={() => toggleOption(option.value)}
-                    className={`flex items-center justify-between px-4 py-2 cursor-pointer hover:bg-gray-50 ${
-                      isSelected ? "bg-blue-50" : ""
+                    className={`flex items-center justify-between px-4 py-2 cursor-pointer hover:bg-surface-hover dark:hover:bg-surface-hover ${
+                      isSelected ? "bg-primary-50 dark:bg-primary-900/20" : ""
                     }`}
                   >
-                    <span className={isSelected ? "text-blue-700 font-medium" : "text-gray-700"}>
+                    <span className={isSelected ? "text-primary-700 dark:text-primary-300 font-medium" : "text-foreground-primary dark:text-foreground-primary"}>
                       {option.label}
                     </span>
-                    {isSelected && <Check className="text-blue-700" size={16} />}
+                    {isSelected && <Check className="text-primary-700 dark:text-primary-300" size={16} />}
                   </div>
                 );
               })
             ) : (
-              <div className="px-4 py-2 text-sm text-gray-500">No options available</div>
+              <div className="px-4 py-2 text-sm text-foreground-tertiary dark:text-foreground-tertiary">No options available</div>
             )}
           </div>
         )}
@@ -146,7 +146,7 @@ export default function MultiSelectDropdown({
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
       {selectedLabels.length > 0 && (
-        <p className="text-xs text-gray-500">{selectedLabels.length} selected</p>
+        <p className="text-xs text-foreground-tertiary dark:text-foreground-tertiary">{selectedLabels.length} selected</p>
       )}
     </div>
   );

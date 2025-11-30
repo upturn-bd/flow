@@ -44,7 +44,7 @@ export function PageLayout({
 }: PageLayoutProps) {
   const content = (
     <div className={`
-      min-h-screen bg-gray-50
+      min-h-screen bg-background-secondary dark:bg-background-primary
       ${className}
     `}>
       <div className={`
@@ -55,7 +55,7 @@ export function PageLayout({
         {/* Breadcrumbs */}
         {breadcrumbs && breadcrumbs.length > 0 && (
           <nav className="mb-6">
-            <ol className="flex items-center space-x-2 text-sm text-gray-500">
+            <ol className="flex items-center space-x-2 text-sm text-foreground-tertiary">
               {breadcrumbs.map((crumb, index) => (
                 <li key={index} className="flex items-center">
                   {index > 0 && (
@@ -64,11 +64,11 @@ export function PageLayout({
                     </svg>
                   )}
                   {crumb.href ? (
-                    <a href={crumb.href} className="hover:text-gray-700 transition-colors">
+                    <a href={crumb.href} className="hover:text-foreground-secondary transition-colors">
                       {crumb.label}
                     </a>
                   ) : (
-                    <span className="text-gray-900 font-medium">{crumb.label}</span>
+                    <span className="text-foreground-primary font-medium">{crumb.label}</span>
                   )}
                 </li>
               ))}
@@ -82,12 +82,12 @@ export function PageLayout({
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 {title && (
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  <h1 className="text-3xl font-bold text-foreground-primary mb-2">
                     {title}
                   </h1>
                 )}
                 {subtitle && (
-                  <p className="text-lg text-gray-600">
+                  <p className="text-lg text-foreground-secondary">
                     {subtitle}
                   </p>
                 )}

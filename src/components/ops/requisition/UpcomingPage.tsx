@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import RequisitionCreatePage, { RequisitionDraftPage } from "./RequisitionCreatePage";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
-import { Clock, FileEdit, Trash2 } from "lucide-react";
+import { Clock, FileEdit, Trash } from "@/lib/icons";
 import { motion } from "framer-motion";
 
 export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:string) => void }) {
@@ -48,7 +48,7 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
           className="p-4 sm:p-6"
         >
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl font-semibold text-gray-800">Saved Drafts</h1>
+            <h1 className="text-xl font-semibold text-foreground-primary">Saved Drafts</h1>
             <button
               onClick={() => setIsCreatingRequisition(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors shadow-sm"
@@ -64,9 +64,9 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
           ) : upcoming.length === 0 ? (
-            <div className="mt-10 flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg border border-gray-200">
-              <Clock className="h-12 w-12 text-gray-400 mb-3" />
-              <p className="text-gray-600 text-center">No saved drafts found.</p>
+            <div className="mt-10 flex flex-col items-center justify-center p-8 bg-background-secondary dark:bg-background-tertiary rounded-lg border border-border-primary">
+              <Clock className="h-12 w-12 text-foreground-tertiary mb-3" />
+              <p className="text-foreground-secondary text-center">No saved drafts found.</p>
               <button
                 onClick={() => setIsCreatingRequisition(true)}
                 className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
@@ -87,7 +87,7 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-white shadow-sm hover:shadow-md transition-shadow rounded-lg overflow-hidden border border-gray-100"
+                    className="bg-surface-primary shadow-sm hover:shadow-md transition-shadow rounded-lg overflow-hidden border border-border-primary"
                   >
                     <div className="p-4">
                       <div className="flex justify-between items-start">
@@ -114,17 +114,17 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
                             className="p-1.5 text-red-600 hover:bg-red-50 rounded-full transition-colors"
                             aria-label="Delete draft"
                           >
-                            <Trash2 className="h-5 w-5" />
+                            <Trash className="h-5 w-5" />
                           </button>
                         </div>
                       </div>
 
-                      <div className="mt-3 text-gray-600 text-sm line-clamp-2">
+                      <div className="mt-3 text-foreground-secondary text-sm line-clamp-2">
                         {item.description || "No description provided."}
                       </div>
 
-                      <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
-                        <div className="text-sm text-gray-500">
+                      <div className="mt-4 pt-3 border-t border-border-primary flex justify-between items-center">
+                        <div className="text-sm text-foreground-tertiary">
                           {item.is_one_off ? "One-off request" : "Regular request"}
                         </div>
                         <button

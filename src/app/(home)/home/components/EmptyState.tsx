@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import { IconType } from '@/lib/icons';
 import { motion } from 'framer-motion';
 
 interface EmptyStateProps {
-  icon: LucideIcon;
+  icon: IconType;
   message: string;
   iconSize?: number;
 }
@@ -17,12 +17,12 @@ export default function EmptyState({
 }: EmptyStateProps) {
   return (
     <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col items-center justify-center h-full min-h-[120px] text-gray-500"
+      className="flex flex-col items-center justify-center h-full min-h-[120px] text-foreground-secondary"
     >
-      <Icon size={iconSize} className="text-gray-300 mb-3" />
+      <Icon size={iconSize} weight="duotone" className="text-foreground-tertiary opacity-50 mb-3" />
       <p className="text-sm text-center px-4">{message}</p>
     </motion.div>
   );

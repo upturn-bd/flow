@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Bell, RefreshCw, AlertCircle, Plus } from 'lucide-react';
-
+import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import SectionHeader from './SectionHeader';
 import EmptyState from './EmptyState';
 import LoadingSection from './LoadingSection';
@@ -97,16 +97,16 @@ export default function NoticesSection({
         onClick={() => setActiveTab(tab)}
         className={`relative px-3 py-1 transition-colors ${
           isActive 
-            ? 'text-blue-600' 
-            : 'text-gray-500 hover:text-gray-700'
+            ? 'text-primary-600' 
+            : 'text-foreground-secondary hover:text-foreground-primary'
         }`}
       >
         {label}
         {count > 0 && (
           <span className={`ml-1 text-xs px-1.5 py-0.5 rounded-full ${
             isActive 
-              ? 'bg-blue-100 text-blue-600' 
-              : 'bg-gray-100 text-gray-500'
+              ? 'bg-primary-100 text-primary-600' 
+              : 'bg-background-tertiary text-foreground-secondary'
           }`}>
             {count}
           </span>
@@ -114,14 +114,14 @@ export default function NoticesSection({
         {isActive && (
           <motion.span 
             layoutId="news-tab-indicator"
-            className="absolute left-0 right-0 -bottom-1 h-0.5 bg-blue-600 rounded-full" 
+            className="absolute left-0 right-0 -bottom-1 h-0.5 bg-primary-600 rounded-full" 
           />
         )}
       </button>
     );
   };
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col overflow-hidden">
+    <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
       <div className="p-5 flex-shrink-0">
         <SectionHeader title="News & Reminder" icon={Bell} />
       </div>
@@ -136,16 +136,16 @@ export default function NoticesSection({
               whileHover={{ rotate: 180 }}
               transition={{ duration: 0.3 }}
               onClick={onRefresh}
-              className="rounded-full p-2 bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="rounded-full p-2 bg-surface-secondary hover:bg-surface-hover transition-colors"
             >
-              <RefreshCw size={16} className="text-gray-600" />
+              <RefreshCw size={16} className="text-foreground-secondary" />
             </motion.button>
             {canCreate && onCreateClick && (
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onCreateClick}
-                className="rounded-full p-2 bg-blue-600 hover:bg-blue-700 transition-colors"
+                className="rounded-full p-2 bg-primary-600 hover:bg-primary-700 transition-colors"
                 title="Create new notice"
               >
                 <Plus size={16} className="text-white" />
@@ -172,16 +172,16 @@ export default function NoticesSection({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: 0.05 }}
                     onClick={() => item.id && handleNoticeClick(item.id)}
-                    className={`flex justify-between items-center p-3 rounded-lg hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer ${
+                    className={`flex justify-between items-center p-3 rounded-lg hover:bg-primary-50 transition-colors border-b border-border-primary last:border-b-0 cursor-pointer ${
                       isRead ? 'opacity-70' : ''
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       {!isRead && (
-                        <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                        <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0" />
                       )}
                       <span className={`font-medium ${
-                        isRead ? 'text-gray-600' : 'text-gray-800'
+                        isRead ? 'text-foreground-secondary' : 'text-foreground-primary'
                       }`}>
                         {item.title}
                       </span>

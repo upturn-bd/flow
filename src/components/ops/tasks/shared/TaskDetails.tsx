@@ -3,7 +3,7 @@
 import { useEmployees } from "@/hooks/useEmployees";
 import { Task, useTasks} from "@/hooks/useTasks";
 import { useEffect, useState } from "react";
-import { Calendar, ChevronLeft, User, XCircle, Clock, Target } from "lucide-react";
+import { Calendar, CaretLeft, User, XCircle, Clock, Target } from "@/lib/icons";
 import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
 import { Button } from "@/components/ui/button";
@@ -171,7 +171,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
         action={{
           label: "Go back",
           onClick: onClose,
-          icon: <ChevronLeft size={16} />
+          icon: <CaretLeft size={16} />
         }}
       />
     );
@@ -186,7 +186,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
         action={{
           label: "Go back",
           onClick: onClose,
-          icon: <ChevronLeft size={16} />
+          icon: <CaretLeft size={16} />
         }}
       />
     );
@@ -288,7 +288,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
           />
           <CardContent>
             <div className="prose prose-sm max-w-none">
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-foreground-secondary leading-relaxed">
                 {taskDetails.task_description}
               </p>
             </div>

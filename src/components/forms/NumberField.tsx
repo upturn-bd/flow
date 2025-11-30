@@ -1,5 +1,5 @@
 import React from 'react';
-import { Hash, Plus, Minus } from '@phosphor-icons/react';
+import { Hash, Plus, Minus } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 
 interface NumberFieldProps {
@@ -39,11 +39,11 @@ export const NumberField: React.FC<NumberFieldProps> = ({
   onDecrement,
   disabled=false
 }) => {
-  const IconComponent = icon || <Hash size={18} weight="duotone" className="text-gray-500" />;
+  const IconComponent = icon || <Hash size={18} weight="duotone" className="text-foreground-secondary dark:text-foreground-secondary" />;
 
   return (
     <div className={className}>
-      <label className="block font-semibold text-gray-700 mb-2">
+      <label className="block font-semibold text-foreground-primary dark:text-foreground-primary mb-2">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
@@ -53,7 +53,7 @@ export const NumberField: React.FC<NumberFieldProps> = ({
           <Button
             type="button"
             onClick={onDecrement}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-l-md p-2.5"
+            className="bg-background-tertiary dark:bg-background-tertiary hover:bg-border-primary dark:hover:bg-border-secondary text-foreground-primary dark:text-foreground-primary rounded-l-md p-2.5"
           >
             <Minus size={16} weight="bold" />
           </Button>
@@ -67,12 +67,12 @@ export const NumberField: React.FC<NumberFieldProps> = ({
             step={step}
             disabled={disabled}
             placeholder={placeholder}
-            className="w-16 text-center p-2.5 border-t border-b border-gray-300 outline-none"
+            className="w-16 text-center p-2.5 border-t border-b border-border-primary dark:border-border-primary outline-none bg-surface-primary dark:bg-surface-primary text-foreground-primary dark:text-foreground-primary"
           />
           <Button
             type="button"
             onClick={onIncrement}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-r-md p-2.5"
+            className="bg-background-tertiary dark:bg-background-tertiary hover:bg-border-primary dark:hover:bg-border-secondary text-foreground-primary dark:text-foreground-primary rounded-r-md p-2.5"
           >
             <Plus size={16} weight="bold" />
           </Button>
@@ -92,7 +92,7 @@ export const NumberField: React.FC<NumberFieldProps> = ({
             step={step}
             disabled={disabled}
             placeholder={placeholder}
-            className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+            className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-secondary p-2.5 border border-border-primary dark:border-border-primary focus:ring-2 focus:ring-primary-400 focus:border-primary-400 outline-none transition-all text-foreground-primary dark:text-foreground-primary"
           />
         </div>
       )}

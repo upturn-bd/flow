@@ -18,7 +18,7 @@ import {
   Building,
   Edit,
   X
-} from "lucide-react";
+} from "@/lib/icons";
 import { useAccounts } from "@/hooks/useAccounts";
 import { Account } from "@/lib/types/schemas";
 import { formatDate } from "@/lib/utils";
@@ -75,13 +75,13 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-foreground-secondary">
           Additional Data (Optional)
         </label>
         <button
           type="button"
           onClick={addPair}
-          className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+          className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-primary-600 bg-primary-50 border border-primary-200 rounded-md hover:bg-primary-100 transition-colors"
         >
           <Plus size={14} className="mr-1" />
           Add Field
@@ -89,33 +89,33 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
       </div>
 
       {pairs.length === 0 ? (
-        <div className="text-center py-4 border-2 border-dashed border-gray-200 rounded-lg">
-          <p className="text-sm text-gray-500 italic">No additional data fields</p>
-          <p className="text-xs text-gray-400 mt-1">Click "Add Field" to create key-value pairs</p>
+        <div className="text-center py-4 border-2 border-dashed border-border-primary rounded-lg">
+          <p className="text-sm text-foreground-secondary italic">No additional data fields</p>
+          <p className="text-xs text-foreground-tertiary mt-1">Click "Add Field" to create key-value pairs</p>
         </div>
       ) : (
         <div className="space-y-2 max-h-48 overflow-y-auto">
           {pairs.map((pair, index) => (
-            <div key={index} className="flex gap-2 items-center p-2 bg-gray-50 rounded-lg">
+            <div key={index} className="flex gap-2 items-center p-2 bg-surface-secondary rounded-lg">
               <input
                 type="text"
                 placeholder="Key (e.g., reference)"
                 value={pair.key}
                 onChange={(e) => updatePair(index, 'key', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="flex-1 px-3 py-2 border border-border-primary rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary text-foreground-primary"
               />
-              <span className="text-gray-400 font-mono">:</span>
+              <span className="text-foreground-tertiary font-mono">:</span>
               <input
                 type="text"
                 placeholder="Value (e.g., REF123)"
                 value={pair.value}
                 onChange={(e) => updatePair(index, 'value', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="flex-1 px-3 py-2 border border-border-primary rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary text-foreground-primary"
               />
               <button
                 type="button"
                 onClick={() => removePair(index)}
-                className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+                className="p-2 text-error hover:text-error/80 hover:bg-error/10 rounded-md transition-colors"
                 title="Remove field"
               >
                 <X size={16} />
@@ -126,7 +126,7 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
       )}
 
       {error && (
-        <p className="text-red-600 text-xs mt-1">{error}</p>
+        <p className="text-error text-xs mt-1">{error}</p>
       )}
     </div>
   );
@@ -288,7 +288,7 @@ export default function StakeholderTransactions({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
       </div>
     );
   }
@@ -299,82 +299,82 @@ export default function StakeholderTransactions({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 sm:p-4 border border-blue-200"
+          className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg p-3 sm:p-4 border border-primary-200"
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs sm:text-sm text-blue-600 font-medium">Total Transactions</p>
-              <p className="text-xl sm:text-2xl font-bold text-blue-900 mt-1">
+              <p className="text-xs sm:text-sm text-primary-600 font-medium">Total Transactions</p>
+              <p className="text-xl sm:text-2xl font-bold text-primary-900 mt-1">
                 {summary.totalTransactions}
               </p>
             </div>
-            <div className="p-2 sm:p-3 bg-blue-200 rounded-lg">
-              <Activity className="text-blue-700" size={20} />
+            <div className="p-2 sm:p-3 bg-primary-200 rounded-lg">
+              <Activity className="text-primary-700" size={20} />
             </div>
           </div>
         </motion.div>
 
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-3 sm:p-4 border border-green-200"
+          className="bg-gradient-to-br from-success/20 to-success/30 rounded-lg p-3 sm:p-4 border border-success/40"
         >
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm text-green-600 font-medium">Total Income</p>
-              <p className="text-lg sm:text-2xl font-bold text-green-900 mt-1 truncate">
+              <p className="text-xs sm:text-sm text-success font-medium">Total Income</p>
+              <p className="text-lg sm:text-2xl font-bold text-success mt-1 truncate">
                 {summary.totalIncome.toLocaleString()} BDT
               </p>
             </div>
-            <div className="p-2 sm:p-3 bg-green-200 rounded-lg flex-shrink-0">
-              <TrendingUp className="text-green-700" size={20} />
+            <div className="p-2 sm:p-3 bg-success/30 rounded-lg flex-shrink-0">
+              <TrendingUp className="text-success" size={20} />
             </div>
           </div>
         </motion.div>
 
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-3 sm:p-4 border border-red-200"
+          className="bg-gradient-to-br from-error/20 to-error/30 rounded-lg p-3 sm:p-4 border border-error/40"
         >
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm text-red-600 font-medium">Total Expense</p>
-              <p className="text-lg sm:text-2xl font-bold text-red-900 mt-1 truncate">
+              <p className="text-xs sm:text-sm text-error font-medium">Total Expense</p>
+              <p className="text-lg sm:text-2xl font-bold text-error mt-1 truncate">
                 {summary.totalExpense.toLocaleString()} BDT
               </p>
             </div>
-            <div className="p-2 sm:p-3 bg-red-200 rounded-lg flex-shrink-0">
-              <TrendingDown className="text-red-700" size={20} />
+            <div className="p-2 sm:p-3 bg-error/30 rounded-lg flex-shrink-0">
+              <TrendingDown className="text-error" size={20} />
             </div>
           </div>
         </motion.div>
 
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 sm:p-4 border border-purple-200"
+          className="bg-gradient-to-br from-primary-50/50 to-primary-100/50 rounded-lg p-3 sm:p-4 border border-primary-200/50"
         >
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm text-purple-600 font-medium">Net Amount</p>
+              <p className="text-xs sm:text-sm text-primary-600 font-medium">Net Amount</p>
               <p className={`text-lg sm:text-2xl font-bold mt-1 truncate ${
-                summary.netAmount >= 0 ? 'text-green-700' : 'text-red-700'
+                summary.netAmount >= 0 ? 'text-success' : 'text-error'
               }`}>
                 {summary.netAmount.toLocaleString()} BDT
               </p>
             </div>
-            <div className="p-2 sm:p-3 bg-purple-200 rounded-lg flex-shrink-0">
-              <Wallet className="text-purple-700" size={20} />
+            <div className="p-2 sm:p-3 bg-primary-200/50 rounded-lg flex-shrink-0">
+              <Wallet className="text-primary-700" size={20} />
             </div>
           </div>
         </motion.div>
       </div>
 
       {/* Transactions List */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+      <div className="bg-surface-primary rounded-lg border border-border-primary">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border-primary">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Transaction History</h3>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground-primary">Transaction History</h3>
+              <p className="text-xs sm:text-sm text-foreground-secondary mt-1 break-words">
                 {dateRangeFilter === 'all' 
                   ? `All transactions for ${stakeholderName}`
                   : dateRangeFilter === '7days'
@@ -387,7 +387,7 @@ export default function StakeholderTransactions({
             </div>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex-shrink-0"
+              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm flex-shrink-0"
             >
               <Plus size={16} />
               <span className="hidden sm:inline">New Transaction</span>
@@ -397,16 +397,16 @@ export default function StakeholderTransactions({
         </div>
 
         {/* Search and Filter */}
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50 space-y-3 sm:space-y-4">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border-primary bg-surface-secondary space-y-3 sm:space-y-4">
           {/* Time Range Filter Buttons */}
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-xs sm:text-sm font-medium text-gray-700 flex-shrink-0">Time Period:</span>
+            <span className="text-xs sm:text-sm font-medium text-foreground-secondary flex-shrink-0">Time Period:</span>
             <button
               onClick={() => setDateRangeFilter('7days')}
               className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
                 dateRangeFilter === '7days'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-surface-primary text-foreground-secondary border border-border-primary hover:bg-surface-hover'
               }`}
             >
               <span className="hidden sm:inline">Last 7 Days</span>
@@ -416,8 +416,8 @@ export default function StakeholderTransactions({
               onClick={() => setDateRangeFilter('30days')}
               className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
                 dateRangeFilter === '30days'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-surface-primary text-foreground-secondary border border-border-primary hover:bg-surface-hover'
               }`}
             >
               <span className="hidden sm:inline">Last 30 Days</span>
@@ -427,8 +427,8 @@ export default function StakeholderTransactions({
               onClick={() => setDateRangeFilter('90days')}
               className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
                 dateRangeFilter === '90days'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-surface-primary text-foreground-secondary border border-border-primary hover:bg-surface-hover'
               }`}
             >
               <span className="hidden sm:inline">Last 90 Days</span>
@@ -438,8 +438,8 @@ export default function StakeholderTransactions({
               onClick={() => setDateRangeFilter('all')}
               className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
                 dateRangeFilter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-surface-primary text-foreground-secondary border border-border-primary hover:bg-surface-hover'
               }`}
             >
               <span className="hidden sm:inline">All Time</span>
@@ -449,13 +449,13 @@ export default function StakeholderTransactions({
 
           {/* Amount Type Filter Buttons */}
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-xs sm:text-sm font-medium text-gray-700 flex-shrink-0">Type:</span>
+            <span className="text-xs sm:text-sm font-medium text-foreground-secondary flex-shrink-0">Type:</span>
             <button
               onClick={() => setAmountFilter('all')}
               className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
                 amountFilter === 'all'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-surface-primary text-foreground-secondary border border-border-primary hover:bg-surface-hover'
               }`}
             >
               All
@@ -464,8 +464,8 @@ export default function StakeholderTransactions({
               onClick={() => setAmountFilter('income')}
               className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
                 amountFilter === 'income'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  ? 'bg-success text-white'
+                  : 'bg-surface-primary text-foreground-secondary border border-border-primary hover:bg-surface-hover'
               }`}
             >
               <span className="hidden sm:inline">Income Only</span>
@@ -475,8 +475,8 @@ export default function StakeholderTransactions({
               onClick={() => setAmountFilter('expense')}
               className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
                 amountFilter === 'expense'
-                  ? 'bg-red-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  ? 'bg-error text-white'
+                  : 'bg-surface-primary text-foreground-secondary border border-border-primary hover:bg-surface-hover'
               }`}
             >
               <span className="hidden sm:inline">Expenses Only</span>
@@ -487,22 +487,22 @@ export default function StakeholderTransactions({
           {/* Search and Status Filter */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="relative flex-1">
-              <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary" />
               <input
                 type="text"
                 placeholder="Search transactions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 text-sm border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary text-foreground-primary"
               />
             </div>
             
             <div className="flex items-center gap-2 flex-shrink-0">
-              <Filter size={16} className="text-gray-500" />
+              <Filter size={16} className="text-foreground-tertiary" />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="border border-border-primary rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary text-foreground-primary"
               >
                 <option value="All">All Status</option>
                 <option value="Complete">Complete</option>
@@ -513,12 +513,12 @@ export default function StakeholderTransactions({
           
           {/* Results count and active filters */}
           <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-            <span className="text-gray-600">
+            <span className="text-foreground-secondary">
               Showing {filteredTransactions.length} of {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}
             </span>
             {(searchTerm || statusFilter !== 'All' || amountFilter !== 'all' || dateRangeFilter !== '30days') && (
               <>
-                <span className="text-gray-400 hidden sm:inline">•</span>
+                <span className="text-foreground-tertiary hidden sm:inline">•</span>
                 <button
                   onClick={() => {
                     setSearchTerm('');
@@ -526,7 +526,7 @@ export default function StakeholderTransactions({
                     setAmountFilter('all');
                     setDateRangeFilter('30days');
                   }}
-                  className="text-blue-600 hover:text-blue-800 font-medium"
+                  className="text-primary-600 hover:text-primary-800 font-medium"
                 >
                   Clear filters
                 </button>
@@ -537,14 +537,14 @@ export default function StakeholderTransactions({
 
         {filteredTransactions.length === 0 ? (
           <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-            <DollarSign size={40} className="mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500 text-xs sm:text-sm">
+            <DollarSign size={40} className="mx-auto text-foreground-tertiary mb-3" />
+            <p className="text-foreground-secondary text-xs sm:text-sm">
               {transactions.length === 0 
                 ? 'No transactions found' 
                 : 'No transactions match your search criteria'
               }
             </p>
-            <p className="text-gray-400 text-xs mt-1">
+            <p className="text-foreground-tertiary text-xs mt-1">
               {transactions.length === 0
                 ? 'Transactions will appear here once created'
                 : 'Try adjusting your search or filter'
@@ -554,22 +554,22 @@ export default function StakeholderTransactions({
         ) : (
           <>
             {/* Mobile Card View */}
-            <div className="sm:hidden divide-y divide-gray-200">
+            <div className="sm:hidden divide-y divide-border-primary">
               {paginatedTransactions.map((txn) => (
                 <motion.div
                   key={txn.id}
                   variants={fadeInUp}
-                  className="p-4 hover:bg-gray-50 transition-colors"
+                  className="p-4 hover:bg-surface-hover transition-colors"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 text-sm truncate">{txn.title}</h4>
-                      <p className="text-xs text-gray-500 mt-1">{txn.from_source}</p>
+                      <h4 className="font-medium text-foreground-primary text-sm truncate">{txn.title}</h4>
+                      <p className="text-xs text-foreground-secondary mt-1">{txn.from_source}</p>
                     </div>
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ml-2 ${
                       txn.status === 'Complete' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-success/20 text-success' 
+                        : 'bg-warning/20 text-warning'
                     }`}>
                       {txn.status === 'Complete' ? (
                         <><CheckCircle size={10} className="mr-1" />Done</>
@@ -579,19 +579,19 @@ export default function StakeholderTransactions({
                     </span>
                   </div>
                   <div className="flex items-center justify-between mt-3">
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                    <div className="flex items-center gap-3 text-xs text-foreground-secondary">
                       <div className="flex items-center gap-1">
                         <Calendar size={12} />
                         {formatDate(txn.transaction_date)}
                       </div>
                       {txn.method && (
-                        <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
+                        <span className="px-2 py-0.5 bg-surface-secondary text-foreground-secondary rounded">
                           {txn.method}
                         </span>
                       )}
                     </div>
                     <span className={`text-sm font-semibold ${
-                      txn.amount >= 0 ? 'text-green-600' : 'text-red-600'
+                      txn.amount >= 0 ? 'text-success' : 'text-error'
                     }`}>
                       {formatAmount(txn.amount, txn.currency)}
                     </span>
@@ -602,63 +602,63 @@ export default function StakeholderTransactions({
 
             {/* Desktop Table View */}
             <div className="hidden sm:block overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-border-primary">
+              <thead className="bg-surface-secondary">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground-secondary uppercase tracking-wider">
                     Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground-secondary uppercase tracking-wider">
                     Title
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground-secondary uppercase tracking-wider">
                     Method
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground-secondary uppercase tracking-wider">
                     From
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground-secondary uppercase tracking-wider">
                     Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground-secondary uppercase tracking-wider">
                     Status
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-surface-primary divide-y divide-border-primary">
                 {paginatedTransactions.map((txn) => (
                   <motion.tr 
                     key={txn.id} 
                     variants={fadeInUp}
-                    className="hover:bg-gray-50"
+                    className="hover:bg-surface-hover"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground-secondary">
                       <div className="flex items-center gap-1">
                         <Calendar size={14} />
                         {formatDate(txn.transaction_date)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">{txn.title}</div>
+                      <div className="font-medium text-foreground-primary">{txn.title}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-secondary text-foreground-secondary">
                         {txn.method || 'N/A'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground-primary">
                       {txn.from_source}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <span className={txn.amount >= 0 ? 'text-green-600' : 'text-red-600'}>
+                      <span className={txn.amount >= 0 ? 'text-success' : 'text-error'}>
                         {formatAmount(txn.amount, txn.currency)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         txn.status === 'Complete' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
+                          ? 'bg-success/20 text-success' 
+                          : 'bg-warning/20 text-warning'
                       }`}>
                         {txn.status === 'Complete' ? (
                           <><CheckCircle size={12} className="mr-1" />Complete</>

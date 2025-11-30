@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar } from '@phosphor-icons/react';
+import { Calendar } from '@/lib/icons';
 
 interface DateFieldProps {
   name: string;
@@ -28,13 +28,13 @@ export const DateField: React.FC<DateFieldProps> = ({
 }) => {
   return (
     <div className={className}>
-      <label className="block font-semibold text-gray-700 mb-2">
+      <label className="block font-semibold text-foreground-secondary mb-2">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Calendar size={18} weight="duotone" className="text-gray-500" />
+          <Calendar size={18} weight="duotone" className="text-foreground-tertiary" />
         </div>
         <input
           type="date"
@@ -44,7 +44,7 @@ export const DateField: React.FC<DateFieldProps> = ({
           min={min}
           max={max}
           placeholder={placeholder}
-          className="w-full pl-10 rounded-md bg-gray-50 p-2.5 border border-gray-300 focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all"
+          className="w-full pl-10 rounded-md bg-background-secondary p-2.5 border border-border-secondary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
         />
       </div>
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}

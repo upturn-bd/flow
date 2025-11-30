@@ -11,8 +11,8 @@ import {
   GraduationCap,
   BarChart2,
   FileCheck,
-  Loader2,
-} from "lucide-react";
+  Loader,
+} from "@/lib/icons";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getEmployeeId } from "@/lib/utils/auth";
@@ -64,36 +64,36 @@ function ProfileContent() {
         key: "basic",
         label: "Basic Information",
         icon: <User className="h-5 w-5" />,
-        color: "text-blue-600",
+        color: "text-primary-600",
         content: <BasicInfoTab />,
       },
       {
         key: "personal",
         label: "Personal Information",
         icon: <ClipboardList className="h-5 w-5" />,
-        color: "text-purple-600",
+        color: "text-primary-700",
         content: <PersonalInfoTab />,
       },
       {
         key: "education",
         label: "Education & Experience",
         icon: <GraduationCap className="h-5 w-5" />,
-        color: "text-emerald-600",
+        color: "text-success",
         content: <EducationExperienceTab />,
       },
       {
         key: "key-performance-indicator",
         label: "Key Performance Indicator",
         icon: <BarChart2 className="h-5 w-5" />,
-        color: "text-amber-600",
+        color: "text-warning",
         content: (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-16 text-foreground-tertiary">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <BarChart2 className="h-16 w-16 text-amber-200 mb-4" />
+              <BarChart2 className="h-16 w-16 text-warning/40 mb-4" />
             </motion.div>
             <h3 className="text-xl font-medium mb-2">
               Key Performance Indicator
@@ -109,15 +109,15 @@ function ProfileContent() {
         key: "performance-evaluation",
         label: "Performance Evaluation",
         icon: <FileCheck className="h-5 w-5" />,
-        color: "text-indigo-600",
+        color: "text-info",
         content: (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-16 text-foreground-tertiary">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <FileCheck className="h-16 w-16 text-indigo-200 mb-4" />
+              <FileCheck className="h-16 w-16 text-info/40 mb-4" />
             </motion.div>
             <h3 className="text-xl font-medium mb-2">Performance Evaluation</h3>
             <p className="mt-2 text-center max-w-md">
@@ -134,8 +134,8 @@ function ProfileContent() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-96">
-        <Loader2 className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
-        <p className="text-gray-600">Loading profile information...</p>
+        <Loader className="w-12 h-12 text-primary-600 animate-spin mb-4" />
+        <p className="text-foreground-tertiary">Loading profile information...</p>
       </div>
     );
   }
@@ -164,10 +164,10 @@ function ProfileContent() {
         transition={{ duration: 0.3 }}
         className="mb-8"
       >
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground-primary">
           My Profile
         </h1>
-        <p className="text-sm sm:text-base text-gray-500 mt-1">
+        <p className="text-sm sm:text-base text-foreground-tertiary mt-1">
           View and update your profile information
         </p>
       </motion.div>
@@ -183,8 +183,8 @@ export default function ProfilePage() {
     <Suspense
       fallback={
         <div className="flex flex-col items-center justify-center h-96">
-          <Loader2 className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
-          <p className="text-gray-600">Loading profile data...</p>
+          <Loader className="w-12 h-12 text-primary-600 animate-spin mb-4" />
+          <p className="text-foreground-tertiary">Loading profile data...</p>
         </div>
       }
     >

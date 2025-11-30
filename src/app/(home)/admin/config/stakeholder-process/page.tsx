@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { Plus, Settings, Trash2, Edit } from "lucide-react";
+import { Plus, Settings, Trash, Edit } from "@/lib/icons";
 import { StakeholderProcess } from "@/lib/types/schemas";
 import ProcessForm from "@/components/stakeholder-processes/ProcessForm";
 
@@ -37,8 +37,8 @@ export default function StakeholderProcessesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Stakeholder Processes</h1>
-          <p className="text-sm text-gray-600 mt-1">
+          <h1 className="text-2xl font-bold text-foreground-primary">Stakeholder Processes</h1>
+          <p className="text-sm text-foreground-secondary mt-1">
             Manage workflow processes for stakeholders and leads
           </p>
         </div>
@@ -67,10 +67,10 @@ export default function StakeholderProcessesPage() {
 
       {/* Empty State */}
       {!loading && processes.length === 0 && (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <Settings className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-semibold text-gray-900">No processes</h3>
-          <p className="mt-1 text-sm text-gray-500">
+        <div className="text-center py-12 bg-background-secondary dark:bg-background-tertiary rounded-lg border-2 border-dashed border-border-secondary">
+          <Settings className="mx-auto h-12 w-12 text-foreground-tertiary" />
+          <h3 className="mt-2 text-sm font-semibold text-foreground-primary">No processes</h3>
+          <p className="mt-1 text-sm text-foreground-tertiary">
             Get started by creating a new stakeholder process.
           </p>
           <div className="mt-6">
@@ -91,24 +91,24 @@ export default function StakeholderProcessesPage() {
           {processes.map((process) => (
             <div
               key={process.id}
-              className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              className="bg-surface-primary rounded-lg border border-border-primary p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{process.name}</h3>
+                    <h3 className="text-lg font-semibold text-foreground-primary">{process.name}</h3>
                     {process.is_active ? (
                       <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded">
                         Active
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-800 rounded">
+                      <span className="px-2 py-0.5 text-xs font-medium bg-background-tertiary dark:bg-surface-secondary text-foreground-primary rounded">
                         Inactive
                       </span>
                     )}
                   </div>
                   {process.description && (
-                    <p className="mt-2 text-sm text-gray-600 line-clamp-2">
+                    <p className="mt-2 text-sm text-foreground-secondary line-clamp-2">
                       {process.description}
                     </p>
                   )}
@@ -117,10 +117,10 @@ export default function StakeholderProcessesPage() {
 
               <div className="mt-4 flex items-center justify-between text-sm">
                 <div className="space-y-1">
-                  <div className="text-gray-600">
+                  <div className="text-foreground-secondary">
                     <span className="font-medium">{process.step_count || 0}</span> steps
                   </div>
-                  <div className="text-gray-600">
+                  <div className="text-foreground-secondary">
                     {process.is_sequential ? (
                       <span className="inline-flex items-center gap-1">
                         <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
@@ -134,7 +134,7 @@ export default function StakeholderProcessesPage() {
                     )}
                   </div>
                   {process.is_sequential && process.allow_rollback && (
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-foreground-tertiary">
                       Rollback allowed
                     </div>
                   )}
@@ -144,7 +144,7 @@ export default function StakeholderProcessesPage() {
                     onClick={() => {
                       router.push(`/admin/config/stakeholder-process/${process.id}`);
                     }}
-                    className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    className="p-2 text-foreground-secondary hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                     title="Edit process"
                   >
                     <Edit size={18} />
@@ -152,13 +152,13 @@ export default function StakeholderProcessesPage() {
                   <button
                     onClick={() => handleDelete(process.id!)}
                     disabled={processingId === process.id}
-                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                    className="p-2 text-foreground-secondary hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
                     title="Delete process"
                   >
                     {processingId === process.id ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
                     ) : (
-                      <Trash2 size={18} />
+                      <Trash size={18} />
                     )}
                   </button>
                 </div>

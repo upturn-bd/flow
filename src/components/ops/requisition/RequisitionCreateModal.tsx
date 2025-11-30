@@ -249,7 +249,7 @@ export default function RequisitionCreateModal({
     >
       <div className="space-y-6">
         <div
-          className="flex items-center cursor-pointer gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200"
+          className="flex items-center cursor-pointer gap-2 bg-background-secondary dark:bg-background-tertiary p-3 rounded-lg border border-border-primary"
           onClick={() => setIsOneOff(!isOneOff)}
         >
           <div
@@ -258,21 +258,21 @@ export default function RequisitionCreateModal({
             } transition-colors duration-300`}
           >
             <motion.div
-              className="w-5 h-5 bg-white rounded-full absolute top-0.5"
+              className="w-5 h-5 bg-surface-primary rounded-full absolute top-0.5"
               animate={{
                 left: isOneOff ? "calc(100% - 1.25rem - 0.125rem)" : "0.125rem",
               }}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             />
           </div>
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-foreground-secondary">
             One-Off Request
           </span>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <PackageOpen size={16} className="mr-2" />
               Category
             </label>
@@ -282,7 +282,7 @@ export default function RequisitionCreateModal({
                 value={formState.requisition_category_id ?? ""}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur("requisition_category_id")}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value="">Select category</option>
                 {requisitionTypes.length > 0 &&
@@ -293,7 +293,7 @@ export default function RequisitionCreateModal({
                   ))}
               </select>
               <ChevronDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
                 size={16}
               />
               {touchedFields.requisition_category_id &&
@@ -307,7 +307,7 @@ export default function RequisitionCreateModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-secondary mb-1">
               Item
             </label>
             <div className="relative">
@@ -316,7 +316,7 @@ export default function RequisitionCreateModal({
                 value={formState.item_id ?? ""}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur("item_id")}
-                className="w-full appearance-none rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
               >
                 <option value="">Select item</option>
                 {requisitionInventories.length > 0 &&
@@ -333,7 +333,7 @@ export default function RequisitionCreateModal({
                     ))}
               </select>
               <ChevronDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
                 size={16}
               />
               {touchedFields.item_id && errors.item_id && (
@@ -346,7 +346,7 @@ export default function RequisitionCreateModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-secondary mb-1">
               Quantity
             </label>
             <input
@@ -355,7 +355,7 @@ export default function RequisitionCreateModal({
               value={formState.quantity ?? ""}
               onChange={handleInputChange}
               onBlur={() => handleFieldBlur("quantity")}
-              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
             {touchedFields.quantity && errors.quantity && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
@@ -367,12 +367,12 @@ export default function RequisitionCreateModal({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="col-span-1">
-              <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+              <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
                 <Calendar size={16} className="mr-2" />
                 Date
               </label>
-              <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
-                <Calendar size={16} className="ml-3 text-gray-500" />
+              <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+                <Calendar size={16} className="ml-3 text-foreground-tertiary" />
                 <input
                   type="date"
                   name="date"
@@ -393,12 +393,12 @@ export default function RequisitionCreateModal({
             {!isOneOff && (
               <>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
                     <Clock size={16} className="mr-2" />
                     From
                   </label>
-                  <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
-                    <Clock size={16} className="ml-3 text-gray-500" />
+                  <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+                    <Clock size={16} className="ml-3 text-foreground-tertiary" />
                     <input
                       type="time"
                       name="from_time"
@@ -417,12 +417,12 @@ export default function RequisitionCreateModal({
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
                     <Clock size={16} className="mr-2" />
                     To
                   </label>
-                  <div className="relative bg-gray-50 border border-gray-300 rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
-                    <Clock size={16} className="ml-3 text-gray-500" />
+                  <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+                    <Clock size={16} className="ml-3 text-foreground-tertiary" />
                     <input
                       type="time"
                       name="to_time"
@@ -444,7 +444,7 @@ export default function RequisitionCreateModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-secondary mb-1">
               Description
             </label>
             <input
@@ -454,17 +454,17 @@ export default function RequisitionCreateModal({
               value={formState.description}
               onChange={handleInputChange}
               placeholder="Max 35 characters"
-              className="w-full rounded-md border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
             />
           </div>
 
           {/* Attachments */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
+            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
               <Upload size={16} className="mr-2" />
               Attachments
             </label>
-            <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4 text-center">
+            <div className="bg-background-secondary dark:bg-background-tertiary border border-dashed border-border-secondary rounded-lg p-4 text-center">
               <label
                 htmlFor="create_file_upload"
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg cursor-pointer hover:bg-blue-700 transition-colors"
@@ -504,13 +504,13 @@ export default function RequisitionCreateModal({
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
-                        className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm"
+                        className="flex items-center gap-2 bg-surface-primary border border-border-primary px-3 py-2 rounded-lg text-sm"
                       >
                         <FileText size={14} className="text-blue-500" />
                         <span className="truncate max-w-xs">{file.name}</span>
                         <button
                           type="button"
-                          className="text-gray-400 hover:text-red-500"
+                          className="text-foreground-tertiary hover:text-red-500"
                           onClick={() => removeFile(file.name)}
                         >
                           <X size={16} />
@@ -529,7 +529,7 @@ export default function RequisitionCreateModal({
               whileTap={{ scale: 0.98 }}
               type="button"
               onClick={onClose}
-              className="flex items-center gap-2 bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+              className="flex items-center gap-2 bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary px-6 py-2 rounded-lg hover:bg-surface-hover transition-colors"
             >
               Cancel
             </motion.button>

@@ -32,7 +32,7 @@ const Page: React.FC = () => {
     };
 
     return (
-        <section className='bg-white text-black'>
+        <section className='bg-surface-primary text-foreground-primary'>
             <div className='h-screen grid grid-cols-6 gap-10'>
                 <div className='bg-[#001731] w-full flex items-start justify-start p-8 col-span-2'>
                     <Image
@@ -46,14 +46,14 @@ const Page: React.FC = () => {
                     <div className='bg-[#eff8ff] p-28 rounded-3xl shadow-2xl w-full'>
                         <form onSubmit={handleSubmit(onSubmit)} className='grid grid-cols-1 gap-4'>
                             <input
-                                className='p-3 py-5 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none'
+                                className='p-3 py-5 rounded-lg bg-surface-secondary border border-border-primary focus:outline-none focus:ring-2 focus:ring-primary-500'
                                 type="email"
                                 placeholder="Email"
                                 {...register("email", { required: "Email is required" })}
                             />
                             {errors.email && <p className="text-red-500">{errors.email.message}</p>}
 
-                            <button type="submit" className='px-10 py-4 my-5 rounded-full bg-amber-400 text-black shadow-xl'>
+                            <button type="submit" className='px-10 py-4 my-5 rounded-full bg-primary-600 text-white shadow-xl hover:bg-primary-700 transition-colors'>
                                 Send code to registered mail
                             </button>
                         </form>

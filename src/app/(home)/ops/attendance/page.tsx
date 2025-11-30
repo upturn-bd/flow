@@ -15,7 +15,7 @@ import {
   UserX,
   Clock,
   ClipboardCheck,
-} from "lucide-react";
+} from "@/lib/icons";
 import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 import { PERMISSION_MODULES } from "@/lib/constants";
@@ -74,7 +74,7 @@ function AttendancePageContent() {
       key: "records",
       label: "Records",
       icon: <Calendar className="h-5 w-5" />,
-      color: "text-gray-600",
+      color: "text-foreground-secondary",
       content: <AttendanceRecordsPage />,
       link: "/ops/attendance?tab=records",
     },
@@ -111,7 +111,7 @@ export default function AttendancePage() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="flex flex-col items-center gap-3">
             <Calendar className="h-8 w-8 text-blue-600 animate-pulse" />
-            <p className="text-sm text-gray-600">Loading attendance...</p>
+            <p className="text-sm text-foreground-secondary">Loading attendance...</p>
           </div>
         </div>
       }

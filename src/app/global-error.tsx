@@ -17,11 +17,11 @@ export default function GlobalError({
   return (
     <html>
       <body>
-        <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-background-secondary dark:bg-background-primary px-4">
           <div className="max-w-md text-center">
             <div className="mb-6">
               <svg
-                className="mx-auto h-16 w-16 text-red-500"
+                className="mx-auto h-16 w-16 text-red-500 dark:text-red-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -34,28 +34,28 @@ export default function GlobalError({
                 />
               </svg>
             </div>
-            <h1 className="mb-2 text-3xl font-bold text-gray-900">
+            <h1 className="mb-2 text-3xl font-bold text-foreground-primary">
               Something went wrong
             </h1>
-            <p className="mb-6 text-gray-600">
+            <p className="mb-6 text-foreground-secondary">
               We&apos;ve been notified and are working to fix the issue. Please
               try again or contact support if the problem persists.
             </p>
             {error.digest && (
-              <p className="mb-6 font-mono text-xs text-gray-400">
+              <p className="mb-6 font-mono text-xs text-foreground-tertiary">
                 Error ID: {error.digest}
               </p>
             )}
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
               <button
                 onClick={() => reset()}
-                className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
               >
                 Try again
               </button>
               <button
                 onClick={() => (window.location.href = "/")}
-                className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="rounded-lg border border-border-secondary bg-background-primary px-6 py-3 font-medium text-foreground-secondary transition-colors hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
               >
                 Go home
               </button>

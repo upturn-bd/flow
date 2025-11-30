@@ -6,11 +6,11 @@ import {
   Calendar,
   ArrowRight,
   Pencil,
-  Trash2,
+  Trash,
   Plus,
   Target,
   Users,
-} from "lucide-react";
+} from "@/lib/icons";
 import { type Milestone as MilestoneType } from "./MilestoneForm";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -64,10 +64,10 @@ export default function MilestoneList({
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="border border-gray-200 rounded-lg p-4 space-y-3 hover:shadow-sm transition-shadow"
+                  className="border border-border-primary rounded-lg p-4 space-y-3 hover:shadow-sm transition-shadow"
                 >
                   <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-lg text-gray-900">
+                    <h4 className="font-semibold text-lg text-foreground-primary">
                       {m.milestone_title}
                     </h4>
                     <div className="flex items-center gap-2">
@@ -87,13 +87,13 @@ export default function MilestoneList({
                           size="sm"
                           onClick={() => m.id && onDelete(m.id)}
                         >
-                          <Trash2 size={14} />
+                          <Trash size={14} />
                         </Button>
                       </div>
                     </div>
                   </div>
                   
-                  <p className="text-sm text-gray-600 line-clamp-2">{m.description}</p>
+                  <p className="text-sm text-foreground-secondary line-clamp-2">{m.description}</p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <InfoRow 
@@ -109,8 +109,8 @@ export default function MilestoneList({
                   </div>
                   
                   {m.assignees && m.assignees.length > 0 && (
-                    <div className="pt-2 border-t border-gray-100">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                    <div className="pt-2 border-t border-border-primary">
+                      <div className="flex items-center gap-2 text-sm text-foreground-secondary mb-2">
                         <Users size={14} />
                         <span>Assigned to:</span>
                       </div>
@@ -120,7 +120,7 @@ export default function MilestoneList({
                           return employee ? (
                             <span 
                               key={assigneeId}
-                              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
+                              className="text-xs bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary px-2 py-1 rounded-full"
                             >
                               {employee.name}
                             </span>

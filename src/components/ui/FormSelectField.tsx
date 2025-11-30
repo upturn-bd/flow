@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AlertCircle, ChevronDown } from "lucide-react";
+import { WarningCircle, CaretDown } from "@/lib/icons";
 import { motion } from "framer-motion";
 import { fadeInUp } from "./animations";
 
@@ -37,12 +37,12 @@ export default function FormSelectField({
     <div className="mb-4">
       <label 
         htmlFor={name} 
-        className="block text-sm font-semibold text-gray-700 mb-1"
+        className="block text-sm font-semibold text-foreground-primary mb-1"
       >
         {label}
       </label>
       <div className="relative">
-        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary">
           {icon}
         </div>
         <select
@@ -52,10 +52,10 @@ export default function FormSelectField({
           onChange={onChange}
           aria-invalid={hasError}
           aria-describedby={hasError ? `${name}-error` : undefined}
-          className={`w-full pl-10 pr-10 py-2.5 text-gray-900 rounded-lg border appearance-none shadow-sm ${
+          className={`w-full pl-10 pr-10 py-2.5 text-foreground-primary rounded-lg border appearance-none shadow-sm ${
             hasError 
-              ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50" 
-              : "border-gray-200 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50 dark:bg-red-950/20 dark:border-red-700" 
+              : "border-border-primary focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
           } focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200`}
         >
           <option value={"null"}>{placeholder}</option>
@@ -65,8 +65,8 @@ export default function FormSelectField({
             </option>
           ))}
         </select>
-        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
-          <ChevronDown size={16} />
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none">
+          <CaretDown size={16} weight="bold" />
         </div>
         {hasError && (
           <motion.div
@@ -76,7 +76,7 @@ export default function FormSelectField({
             exit="hidden"
             className="absolute right-8 top-1/2 transform -translate-y-1/2 text-red-500"
           >
-            <AlertCircle size={16} />
+            <WarningCircle size={16} weight="fill" />
           </motion.div>
         )}
       </div>
@@ -87,7 +87,7 @@ export default function FormSelectField({
           initial="hidden"
           animate="visible"
           exit="hidden"
-          className="mt-1 text-sm text-red-600"
+          className="mt-1 text-sm text-red-600 dark:text-red-400"
         >
           {error}
         </motion.p>

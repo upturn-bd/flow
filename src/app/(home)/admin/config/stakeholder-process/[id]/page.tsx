@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { ArrowLeft, Edit, Play, Pause, ToggleRight, ToggleLeft } from "lucide-react";
+import { ArrowLeft, Edit, Play, Pause, ToggleRight, ToggleLeft } from "@/lib/icons";
 import ProcessForm from "@/components/stakeholder-processes/ProcessForm";
 import StepManager from "@/components/stakeholder-processes/StepManager";
 
@@ -65,7 +65,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
     return (
       <div className="p-6">
         <div className="text-center py-12">
-          <h3 className="text-lg font-semibold text-gray-900">Process not found</h3>
+          <h3 className="text-lg font-semibold text-foreground-primary">Process not found</h3>
           <button
             onClick={() => router.back()}
             className="mt-4 text-blue-600 hover:underline"
@@ -84,28 +84,28 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
           <button
             onClick={() => router.back()}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+            className="p-2 hover:bg-surface-hover rounded-lg transition-colors flex-shrink-0"
             aria-label="Go back"
           >
             <ArrowLeft size={20} />
           </button>
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 break-words">{process.name}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary break-words">{process.name}</h1>
               {process.is_active ? (
                 <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded whitespace-nowrap">
                   Active
                 </span>
               ) : (
-                <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded whitespace-nowrap">
+                <span className="px-2 py-1 text-xs font-medium bg-background-tertiary dark:bg-surface-secondary text-foreground-primary rounded whitespace-nowrap">
                   Inactive
                 </span>
               )}
             </div>
             {process.description && (
-              <p className="mt-2 text-sm sm:text-base text-gray-600 break-words">{process.description}</p>
+              <p className="mt-2 text-sm sm:text-base text-foreground-secondary break-words">{process.description}</p>
             )}
-            <div className="mt-3 flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-600">
+            <div className="mt-3 flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm text-foreground-secondary">
               <span>
                 {process.is_sequential ? (
                   <span className="inline-flex items-center gap-1">
@@ -132,7 +132,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           <button
             onClick={handleToggleActive}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 border border-border-secondary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary transition-colors font-medium"
           >
             {process.is_active ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
             {process.is_active ? "Deactivate" : "Activate"}
@@ -148,7 +148,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* Step Manager */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+      <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 shadow-sm">
         <StepManager
           processId={processId}
           steps={steps}

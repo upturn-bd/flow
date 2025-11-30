@@ -2,7 +2,7 @@
  * Widget System Type Definitions
  */
 
-import { LucideIcon } from 'lucide-react';
+import { IconType } from '@/lib/icons';
 import { ReactNode } from 'react';
 
 // Widget types available in the system
@@ -52,7 +52,7 @@ export interface WidgetDefinition {
   type: WidgetType;
   name: string;
   description: string;
-  icon: LucideIcon;
+  icon: IconType;
   defaultSize: WidgetSize;
   minSize?: WidgetSize;
   maxSize?: WidgetSize;

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, X } from "lucide-react";
+import { ArrowLeft, Save, X } from "@/lib/icons";
 import { ReactNode } from "react";
 
 interface FormLayoutProps {
@@ -51,15 +51,15 @@ export function FormLayout({
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="p-2 hover:bg-gray-100"
+              className="p-2 hover:bg-background-secondary dark:hover:bg-background-tertiary"
             >
               <ArrowLeft size={20} />
             </Button>
           )}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+            <h1 className="text-2xl font-bold text-foreground-primary">{title}</h1>
             {subtitle && (
-              <p className="text-gray-600 mt-1">{subtitle}</p>
+              <p className="text-foreground-secondary mt-1">{subtitle}</p>
             )}
           </div>
         </div>
@@ -91,7 +91,7 @@ export function FormLayout({
       </div>
       
       {/* Content */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-surface-primary dark:bg-surface-primary rounded-lg border border-border-primary dark:border-border-primary p-6">
         {children}
       </div>
     </motion.div>
@@ -113,10 +113,10 @@ export function FormSection({
 }: FormSectionProps) {
   return (
     <div className={`space-y-4 ${className}`}>
-      <div className="border-b border-gray-200 pb-3">
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      <div className="border-b border-border-primary pb-3">
+        <h3 className="text-lg font-semibold text-foreground-primary">{title}</h3>
         {description && (
-          <p className="text-sm text-gray-600 mt-1">{description}</p>
+          <p className="text-sm text-foreground-secondary mt-1">{description}</p>
         )}
       </div>
       <div className="space-y-4">

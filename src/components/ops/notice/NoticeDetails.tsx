@@ -2,16 +2,16 @@ import { useDepartments } from "@/hooks/useDepartments";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  ChevronLeft,
-  Loader2,
+  CaretLeft,
+  Loader,
   XCircle,
   Calendar,
   Bell,
-  AlertCircle,
-  Building2,
+  WarningCircle,
+  Building,
   FileText,
   AlertCircleIcon,
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { useNotices, useNoticeTypes } from "@/hooks/useNotice";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow, PriorityBadge } from "@/components/ui/Card";
@@ -111,7 +111,7 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
           action={{
             label: "Go back",
             onClick: onClose,
-            icon: <ChevronLeft size={16} />
+            icon: <CaretLeft size={16} />
           }}
         />
       </BaseModal>
@@ -127,7 +127,7 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
         action={{
           label: "Go back",
           onClick: onClose,
-          icon: <ChevronLeft size={16} />
+          icon: <CaretLeft size={16} />
         }}
       />
     );
@@ -146,7 +146,7 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
       <Card variant="elevated">
         <CardHeader
           title={notice?.title || "Untitled Notice"}
-          icon={<AlertCircle size={20} className="text-amber-500" />}
+          icon={<WarningCircle size={20} className="text-amber-500" />}
           action={
             <PriorityBadge
               priority={
@@ -177,7 +177,7 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
               }
             />
             <InfoRow
-              icon={<Building2 size={16} />}
+              icon={<Building size={16} />}
               label="Department"
               value={
                 <StatusBadge 
@@ -200,9 +200,9 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
           </div>
           
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-gray-900">Description</h3>
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <p className="text-gray-700 leading-relaxed">
+            <h3 className="text-lg font-semibold text-foreground-primary">Description</h3>
+            <div className="bg-background-secondary border border-border-primary rounded-lg p-4">
+              <p className="text-foreground-primary leading-relaxed">
                 {notice?.description || "No description provided."}
               </p>
             </div>

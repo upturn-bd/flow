@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "@phosphor-icons/react";
+import { X } from "@/lib/icons";
 import { fadeIn, fadeInUp } from "../animations";
 import { BaseModalProps } from "./types";
 
@@ -54,7 +54,7 @@ export default function BaseModal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 overflow-y-auto py-4 sm:py-8 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/70 dark:bg-black/80 flex items-center justify-center z-50 overflow-y-auto py-4 sm:py-8 backdrop-blur-sm"
           variants={fadeIn}
           initial="hidden"
           animate="visible"
@@ -69,23 +69,23 @@ export default function BaseModal({
             exit="hidden"
           >
             <div
-              className={`bg-white rounded-xl w-full max-h-[calc(100vh-2rem)] overflow-y-auto shadow-2xl ${className}`}
+              className={`bg-surface-primary rounded-xl w-full max-h-[calc(100vh-2rem)] overflow-y-auto shadow-2xl ${className}`}
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-5 sm:p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between p-5 sm:p-6 border-b border-border-primary">
                 <div className="flex items-center gap-3">
-                  {icon && <div className="text-gray-600">{icon}</div>}
-                  <h2 className="text-xl sm:text-2xl font-bold text-[#192D46]">
+                  {icon && <div className="text-foreground-secondary">{icon}</div>}
+                  <h2 className="text-xl sm:text-2xl font-bold text-foreground-primary">
                     {title}
                   </h2>
                 </div>
                 {showCloseButton && (
                   <button
                     onClick={onClose}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    className="p-2 hover:bg-surface-hover rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500"
                     aria-label="Close modal"
                   >
-                    <X size={20} className="text-gray-500" />
+                    <X size={20} weight="bold" className="text-foreground-secondary" />
                   </button>
                 )}
               </div>

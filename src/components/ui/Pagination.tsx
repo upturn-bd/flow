@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CaretLeft, CaretRight } from "@/lib/icons";
 
 interface PaginationProps {
   currentPage: number;
@@ -25,8 +25,8 @@ export default function Pagination({
   const endItem = Math.min(currentPage * pageSize, totalCount);
 
   return (
-    <div className={`flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 rounded-b-lg ${className}`}>
-      <div className="flex items-center text-sm text-gray-600">
+    <div className={`flex items-center justify-between px-4 py-3 bg-surface-primary border-t border-border-primary rounded-b-lg ${className}`}>
+      <div className="flex items-center text-sm text-foreground-secondary">
         Showing {startItem} to {endItem} of {totalCount} items
       </div>
       
@@ -34,9 +34,9 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+          className="px-3 py-1 text-sm border border-border-primary rounded-lg hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 text-foreground-primary"
         >
-          <ChevronLeft size={16} />
+          <CaretLeft size={16} weight="bold" />
           Previous
         </button>
         
@@ -59,8 +59,8 @@ export default function Pagination({
                 onClick={() => onPageChange(pageNum)}
                 className={`px-3 py-1 text-sm min-w-[32px] border rounded-lg ${
                   currentPage === pageNum
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "border-gray-300 hover:bg-gray-50"
+                    ? "bg-primary-600 text-white border-primary-600"
+                    : "border-border-primary hover:bg-surface-hover text-foreground-primary"
                 }`}
               >
                 {pageNum}
@@ -72,10 +72,10 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+          className="px-3 py-1 text-sm border border-border-primary rounded-lg hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 text-foreground-primary"
         >
           Next
-          <ChevronRight size={16} />
+          <CaretRight size={16} weight="bold" />
         </button>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { FiUploadCloud, FiX, FiFile } from "react-icons/fi";
+import { CloudUpload, X, File } from "@/lib/icons";
 import { extractFilenameFromUrl } from "@/lib/utils";
 
 interface FileUploadFieldProps {
@@ -71,7 +71,7 @@ export default function FileUploadField({
 
   return (
     <div className={containerClassName}>
-      <label className="block font-medium text-gray-700 mb-1 text-sm sm:text-base">
+      <label className="block font-medium text-foreground-secondary mb-1 text-sm sm:text-base">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
@@ -80,7 +80,7 @@ export default function FileUploadField({
       <div
         className={`
           border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer
-          ${dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}
+          ${dragOver ? 'border-primary-500 bg-primary-50' : 'border-border-secondary hover:border-border-primary'}
           ${error ? 'border-red-500' : ''}
           ${className}
         `}
@@ -90,11 +90,11 @@ export default function FileUploadField({
         onClick={() => fileInputRef.current?.click()}
       >
         <div className="text-center">
-          <FiUploadCloud className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-          <p className="text-sm text-gray-600">
+          <CloudUpload className="mx-auto h-8 w-8 text-foreground-tertiary mb-2" />
+          <p className="text-sm text-foreground-secondary">
             Click to upload or drag and drop files here
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-foreground-tertiary mt-1">
             {multiple ? "Multiple files allowed" : "Single file only"}
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function FileUploadField({
           {existingFiles.map((url, index) => (
             <div key={`existing-${index}`} className="flex items-center justify-between bg-blue-50 p-2 rounded-lg">
               <div className="flex items-center space-x-2">
-                <FiFile className="text-blue-500" />
+                <File className="text-blue-500" />
                 <span className="text-sm text-blue-700">
                   {extractFilenameFromUrl(url)}
                 </span>
@@ -128,7 +128,7 @@ export default function FileUploadField({
                   onClick={() => removeExistingFile(url)}
                   className="text-red-500 hover:text-red-700 p-1"
                 >
-                  <FiX size={14} />
+                  <X size={14} />
                 </button>
               )}
             </div>
@@ -136,11 +136,11 @@ export default function FileUploadField({
 
           {/* New Files */}
           {files.map((file, index) => (
-            <div key={`new-${index}`} className="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
+            <div key={`new-${index}`} className="flex items-center justify-between bg-background-secondary p-2 rounded-lg">
               <div className="flex items-center space-x-2">
-                <FiFile className="text-gray-500" />
-                <span className="text-sm text-gray-700">{file.name}</span>
-                <span className="text-xs text-gray-500">
+                <File className="text-foreground-tertiary" />
+                <span className="text-sm text-foreground-secondary">{file.name}</span>
+                <span className="text-xs text-foreground-tertiary">
                   ({Math.round(file.size / 1024)} KB)
                 </span>
               </div>
@@ -149,7 +149,7 @@ export default function FileUploadField({
                 onClick={() => removeFile(file.name)}
                 className="text-red-500 hover:text-red-700 p-1"
               >
-                <FiX size={14} />
+                <X size={14} />
               </button>
             </div>
           ))}

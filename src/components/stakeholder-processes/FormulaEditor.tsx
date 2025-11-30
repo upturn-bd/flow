@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import { StakeholderProcessStep, FieldDefinition } from "@/lib/types/schemas";
-import { X, Plus, Calculator, AlertCircle } from "lucide-react";
+import { X, Plus, Calculator, WarningCircle } from "@/lib/icons";
 
 interface CellReference {
   stepOrder: number;
@@ -589,16 +589,16 @@ export default function FormulaEditor({
   };
 
   return (
-    <div className="border border-gray-300 rounded-lg p-4 space-y-4 bg-white">
+    <div className="border border-border-primary rounded-lg p-4 space-y-4 bg-surface-primary">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Calculator className="text-blue-600" size={20} />
-          <h4 className="font-semibold text-gray-900">Formula Editor</h4>
+          <Calculator className="text-primary-600" size={20} />
+          <h4 className="font-semibold text-foreground-primary">Formula Editor</h4>
         </div>
         {onClose && (
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded"
+            className="p-1 hover:bg-background-secondary rounded"
             type="button"
           >
             <X size={16} />
@@ -608,15 +608,15 @@ export default function FormulaEditor({
 
       {/* Validation Error */}
       {validationError && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
-          <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={16} />
+        <div className="bg-error/10 border border-error/30 rounded-lg p-3 flex items-start gap-2">
+          <WarningCircle className="text-error flex-shrink-0 mt-0.5" size={16} />
           <div className="flex-1">
-            <p className="text-sm font-medium text-red-800">Invalid Formula</p>
-            <p className="text-sm text-red-600 mt-1">{validationError}</p>
+            <p className="text-sm font-medium text-error">Invalid Formula</p>
+            <p className="text-sm text-error mt-1">{validationError}</p>
           </div>
           <button
             onClick={() => setValidationError(null)}
-            className="text-red-400 hover:text-red-600"
+            className="text-error/60 hover:text-error"
             type="button"
           >
             <X size={14} />
@@ -626,12 +626,12 @@ export default function FormulaEditor({
 
       {/* Rich Text Formula Input */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground-secondary mb-2">
           Formula Builder
         </label>
         <div
           ref={containerRef}
-          className="min-h-[80px] p-3 border-2 border-gray-300 rounded-lg bg-white focus-within:border-blue-500 focus-within:ring-blue-200 transition-all cursor-text"
+          className="min-h-[80px] p-3 border-2 border-border-primary rounded-lg bg-surface-primary focus-within:border-primary-500 focus-within:ring-primary-200 transition-all cursor-text"
           onClick={(e) => {
             // Always try to focus an element when clicking in the container
             const target = e.target as HTMLElement;
@@ -663,7 +663,7 @@ export default function FormulaEditor({
                     key={element.id}
                     contentEditable={false}
                     data-element-id={element.id}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 text-blue-800 rounded-md text-sm font-medium border border-blue-200 cursor-pointer select-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-100 text-primary-800 rounded-md text-sm font-medium border border-primary-200 cursor-pointer select-none focus:outline-none focus:ring-2 focus:ring-primary-400"
                     onClick={(e) => {
                       e.stopPropagation();
                       // Determine where to place cursor based on click position
@@ -746,7 +746,7 @@ export default function FormulaEditor({
                       target.focus();
                     }}
                     data-element-id={element.id}
-                    className="inline-block min-w-[8px] outline-none text-sm text-gray-900 font-mono cursor-text"
+                    className="inline-block min-w-[8px] outline-none text-sm text-foreground-primary font-mono cursor-text"
                     style={{ 
                       minHeight: '1.5em', 
                       display: 'inline-block',
@@ -761,8 +761,8 @@ export default function FormulaEditor({
             })}
           </div>
         </div>
-        <p className="text-xs text-gray-500 mt-2">
-          Type your formula directly (numbers, +, -, *, /, parentheses). Press <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">@</kbd> or click "Add Field" to insert field references.
+        <p className="text-xs text-foreground-secondary mt-2">
+          Type your formula directly (numbers, +, -, *, /, parentheses). Press <kbd className="px-1.5 py-0.5 bg-surface-secondary border border-border-primary rounded text-xs">@</kbd> or click "Add Field" to insert field references.
         </p>
       </div>
 
@@ -777,17 +777,17 @@ export default function FormulaEditor({
               setFieldPickerPosition({ top: rect.bottom + 5, left: rect.left });
             }
           }}
-          className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          className="flex items-center gap-2 px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
         >
           <Plus size={16} />
           {showFieldPicker ? "Hide Fields" : "Add Field"}
         </button>
 
         {showFieldPicker && (
-          <div ref={fieldPickerRef} className="mt-3 border border-gray-200 rounded-lg overflow-hidden shadow-lg max-h-64 overflow-y-auto">
+          <div ref={fieldPickerRef} className="mt-3 border border-border-primary rounded-lg overflow-hidden shadow-lg max-h-64 overflow-y-auto bg-surface-primary">
             {filteredFields.length > 0 ? (
               <>
-                <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 sticky top-0">
+                <div className="bg-surface-secondary px-3 py-2 border-b border-border-primary sticky top-0">
                   <input
                     type="text"
                     value={searchQuery}
@@ -813,11 +813,11 @@ export default function FormulaEditor({
                       }
                     }}
                     placeholder="Search fields... (↑↓ to navigate, Enter to select)"
-                    className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-2 py-1 border border-border-primary rounded text-xs focus:ring-2 focus:ring-primary-500 outline-none bg-surface-primary text-foreground-primary"
                     autoFocus
                   />
                 </div>
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-border-primary">
                   {filteredFields.map((field, index) => (
                     <button
                       key={index}
@@ -825,24 +825,24 @@ export default function FormulaEditor({
                       onClick={() => insertField(field)}
                       onMouseEnter={() => setSelectedFieldIndex(index)}
                       className={`w-full px-3 py-2 text-left transition-colors ${
-                        index === selectedFieldIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
+                        index === selectedFieldIndex ? 'bg-primary-100' : 'hover:bg-primary-50'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-gray-900 truncate">
+                          <div className="text-sm font-medium text-foreground-primary truncate">
                             {field.fieldLabel}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-foreground-secondary">
                             {field.stepName}
                             {field.isNested && (
-                              <span className="ml-1 px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-xs">
+                              <span className="ml-1 px-1.5 py-0.5 bg-warning/20 text-warning rounded text-xs">
                                 Nested
                               </span>
                             )}
                           </div>
                         </div>
-                        <Plus size={16} className="text-blue-600 flex-shrink-0" />
+                        <Plus size={16} className="text-primary-600 flex-shrink-0" />
                       </div>
                     </button>
                   ))}
@@ -850,10 +850,10 @@ export default function FormulaEditor({
               </>
             ) : (
               <div className="px-4 py-8 text-center">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-foreground-secondary">
                   {searchQuery ? 'No fields match your search' : 'No number fields available from previous steps'}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-foreground-tertiary mt-1">
                   {searchQuery ? 'Try a different search term' : 'Add number fields to earlier steps to use them in calculations'}
                 </p>
               </div>
@@ -863,12 +863,12 @@ export default function FormulaEditor({
       </div>
 
       {/* Save Button */}
-      <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
+      <div className="flex justify-end gap-2 pt-2 border-t border-border-primary">
         {onClose && (
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium"
+            className="px-4 py-2 text-foreground-secondary hover:bg-surface-secondary rounded-lg transition-colors text-sm font-medium"
           >
             Cancel
           </button>
@@ -877,7 +877,7 @@ export default function FormulaEditor({
           type="button"
           onClick={handleSave}
           disabled={!elementsToFormula(elements).trim()}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Save Formula
         </button>

@@ -25,7 +25,7 @@ const LoadMore: FC<LoadMoreProps> = ({
         whileHover={{ scale: 1.01 }}
         onClick={onLoadMore}
         disabled={isLoading}
-        className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all"
+        className="px-6 py-2 bg-primary-600 text-white rounded-lg shadow hover:bg-primary-700 disabled:bg-foreground-tertiary disabled:cursor-not-allowed transition-all"
       >
         {isLoading ? "Loading..." : "Load More"}
       </motion.button>

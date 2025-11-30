@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MagnifyingGlass as Search, X, CaretDown, User } from '@phosphor-icons/react';
+import { MagnifyingGlass as Search, X, CaretDown, User } from '@/lib/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { matchesEmployeeSearch } from '@/lib/utils/user-search';
 import { Employee } from '@/lib/types/schemas';
@@ -80,7 +80,7 @@ export default function SingleEmployeeSelector({
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-foreground-primary dark:text-foreground-primary">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -88,26 +88,26 @@ export default function SingleEmployeeSelector({
       <div className="relative" ref={dropdownRef}>
         {/* Selected Employee Display / Search Input */}
         <div 
-          className={`w-full border rounded-lg bg-white cursor-pointer ${
+          className={`w-full border rounded-lg bg-surface-primary dark:bg-surface-primary cursor-pointer ${
             error
               ? 'border-red-300 focus-within:ring-red-500 focus-within:border-red-500'
-              : 'border-gray-300 focus-within:ring-purple-500 focus-within:border-purple-500'
-          } ${disabled ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+              : 'border-border-primary dark:border-border-primary focus-within:ring-primary-500 focus-within:border-primary-500'
+          } ${disabled ? 'bg-background-secondary dark:bg-background-secondary cursor-not-allowed' : ''}`}
           onClick={!disabled ? handleInputClick : undefined}
         >
           <div className="flex items-center p-3">
-            <Search className="h-4 w-4 text-gray-400 mr-3 flex-shrink-0" />
+            <Search className="h-4 w-4 text-foreground-tertiary dark:text-foreground-tertiary mr-3 flex-shrink-0" />
             
             {selectedEmployee && !isDropdownOpen ? (
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                    <User className="h-4 w-4 text-purple-600" />
+                  <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                    <User className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{selectedEmployee.name}</p>
+                    <p className="text-sm font-medium text-foreground-primary dark:text-foreground-primary">{selectedEmployee.name}</p>
                     {selectedEmployee.email && (
-                      <p className="text-xs text-gray-500">{selectedEmployee.email}</p>
+                      <p className="text-xs text-foreground-secondary dark:text-foreground-secondary">{selectedEmployee.email}</p>
                     )}
                   </div>
                 </div>
@@ -117,7 +117,7 @@ export default function SingleEmployeeSelector({
                     e.stopPropagation();
                     handleClearSelection();
                   }}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-foreground-tertiary dark:text-foreground-tertiary hover:text-foreground-secondary dark:hover:text-foreground-secondary"
                   disabled={disabled}
                 >
                   <X className="h-4 w-4" />
@@ -131,10 +131,10 @@ export default function SingleEmployeeSelector({
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder={placeholder}
-                  className="flex-1 border-none focus:outline-none focus:ring-0 p-0 text-sm bg-transparent"
+                  className="flex-1 border-none focus:outline-none focus:ring-0 p-0 text-sm bg-transparent text-foreground-primary dark:text-foreground-primary placeholder:text-foreground-tertiary"
                   disabled={disabled}
                 />
-                <CaretDown className={`h-4 w-4 text-gray-400 transition-transform ${
+                <CaretDown className={`h-4 w-4 text-foreground-tertiary dark:text-foreground-tertiary transition-transform ${
                   isDropdownOpen ? 'rotate-180' : ''
                 }`} />
               </div>
@@ -150,7 +150,7 @@ export default function SingleEmployeeSelector({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+              className="absolute z-50 w-full mt-1 bg-surface-primary dark:bg-surface-primary border border-border-primary dark:border-border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto"
             >
               {filteredEmployees.length > 0 ? (
                 <div className="p-1">
@@ -159,25 +159,25 @@ export default function SingleEmployeeSelector({
                       key={employee.id}
                       type="button"
                       onClick={() => handleEmployeeSelect(employee)}
-                      className="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors text-left"
+                      className="w-full flex items-center space-x-3 p-3 hover:bg-surface-hover dark:hover:bg-surface-hover rounded-lg transition-colors text-left"
                     >
-                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <User className="h-4 w-4 text-purple-600" />
+                      <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                        <User className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{employee.name}</p>
+                        <p className="text-sm font-medium text-foreground-primary dark:text-foreground-primary truncate">{employee.name}</p>
                         {employee.email && (
-                          <p className="text-xs text-gray-500 truncate">{employee.email}</p>
+                          <p className="text-xs text-foreground-secondary dark:text-foreground-secondary truncate">{employee.email}</p>
                         )}
                         {employee.designation && (
-                          <p className="text-xs text-gray-400 truncate">{employee.designation}</p>
+                          <p className="text-xs text-foreground-tertiary dark:text-foreground-tertiary truncate">{employee.designation}</p>
                         )}
                       </div>
                     </button>
                   ))}
                 </div>
               ) : (
-                <div className="p-4 text-center text-gray-500 text-sm">
+                <div className="p-4 text-center text-foreground-tertiary text-sm">
                   {searchTerm ? `No employees found matching "${searchTerm}"` : 'No employees available'}
                 </div>
               )}

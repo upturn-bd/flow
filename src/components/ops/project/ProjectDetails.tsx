@@ -13,7 +13,7 @@ import { type MilestoneData } from "@/lib/validation/schemas/advanced";
 import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import {
   Plus,
-  Building2,
+  Building,
   User,
   Clock,
   Users,
@@ -22,10 +22,10 @@ import {
   Target,
   Calendar,
   Pencil,
-  Trash2,
+  Trash,
   Projector,
   ExternalLink,
-} from "lucide-react";
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -380,7 +380,7 @@ export default function ProjectDetails({
   if (error) {
     return (
       <EmptyState
-        icon={<Building2 className="h-12 w-12" />}
+        icon={<Building className="h-12 w-12" />}
         title="Error loading project"
         description={error}
       />
@@ -390,7 +390,7 @@ export default function ProjectDetails({
   if (!projectDetails) {
     return (
       <EmptyState
-        icon={<Building2 className="h-12 w-12" />}
+        icon={<Building className="h-12 w-12" />}
         title="Project not found"
         description="The requested project could not be found"
       />
@@ -412,15 +412,15 @@ export default function ProjectDetails({
             className="flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
-              <Building2 size={24} className="text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">
+              <Building size={24} className="text-blue-600" />
+              <h1 className="text-2xl font-bold text-foreground-primary">
                 Project Details
               </h1>
             </div>
             <Button
               variant="ghost"
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full"
+              className="p-2 hover:bg-background-tertiary dark:bg-surface-secondary rounded-full"
             >
               <X size={20} />
             </Button>
@@ -432,7 +432,7 @@ export default function ProjectDetails({
               <CardHeader
                 title={projectDetails.project_title}
                 subtitle={projectDetails.description}
-                icon={<Building2 size={20} />}
+                icon={<Building size={20} />}
                 action={
                   <StatusBadge
                     status={projectDetails.status || "pending"}
@@ -484,7 +484,7 @@ export default function ProjectDetails({
                 {projectDetails.assignees &&
                   projectDetails.assignees.length > 0 && (
                     <div className="mt-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">
+                      <p className="text-sm font-medium text-foreground-secondary mb-2">
                         Assigned Team:
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -506,7 +506,7 @@ export default function ProjectDetails({
                   )}
 
                 {projectDetails.status !== "Completed" && (projectDetails.created_by === currentUserId || projectDetails.project_lead_id === currentUserId) && (
-                  <div className="pt-4 border-t border-gray-100">
+                  <div className="pt-4 border-t border-border-primary">
                     <Button
                       onClick={() => setDisplaySubmissionModal(true)}
                       className="flex items-center justify-center gap-2"
@@ -595,7 +595,7 @@ export default function ProjectDetails({
         >
           <form onSubmit={submitProject} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                 Remarks
               </label>
               <textarea
@@ -603,7 +603,7 @@ export default function ProjectDetails({
                 value={remark}
                 onChange={(e) => setRemark(e.target.value)}
                 placeholder="Add your final remarks about the project..."
-                className="w-full h-32 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full h-32 rounded-md border border-border-secondary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />
             </div>

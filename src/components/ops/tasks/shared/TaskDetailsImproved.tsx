@@ -4,7 +4,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { Task, useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, ChevronLeft, User, CheckCircle, XCircle, Clock, Target } from "lucide-react";
+import { Calendar, CaretLeft, User, CheckCircle, XCircle, Clock, Target } from "@/lib/icons";
 import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
 import { Button } from "@/components/ui/button";
@@ -155,7 +155,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
         action={{
           label: "Go back",
           onClick: onClose,
-          icon: <ChevronLeft size={16} />
+          icon: <CaretLeft size={16} />
         }}
       />
     );
@@ -170,7 +170,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
         action={{
           label: "Go back",
           onClick: onClose,
-          icon: <ChevronLeft size={16} />
+          icon: <CaretLeft size={16} />
         }}
       />
     );
@@ -187,13 +187,13 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
   const getPriorityColor = (priority: string) => {
     switch (priority?.toLowerCase()) {
       case 'high':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
       case 'low':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-background-tertiary dark:bg-background-tertiary text-foreground-primary dark:text-foreground-primary';
     }
   };
 
@@ -202,8 +202,8 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <Target size={24} className="text-blue-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Task Details</h1>
+          <Target size={24} className="text-primary-600 dark:text-primary-400" />
+          <h1 className="text-2xl font-bold text-foreground-primary dark:text-foreground-primary">Task Details</h1>
         </div>
         <div className="flex items-center gap-3">
           <Button
@@ -219,7 +219,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
             variant="outline"
             size="sm"
           >
-            <ChevronLeft size={16} className="mr-2" />
+            <CaretLeft size={16} className="mr-2" />
             Back
           </Button>
         </div>
@@ -281,9 +281,9 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
           </div>
 
           {taskDetails?.task_description && (
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-medium text-gray-900 mb-2">Description</h4>
-              <p className="text-gray-700 text-sm leading-relaxed">
+            <div className="mt-6 p-4 bg-background-secondary dark:bg-background-secondary rounded-lg">
+              <h4 className="font-medium text-foreground-primary dark:text-foreground-primary mb-2">Description</h4>
+              <p className="text-foreground-secondary dark:text-foreground-secondary text-sm leading-relaxed">
                 {taskDetails.task_description}
               </p>
             </div>

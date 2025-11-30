@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
+import { EyeOff, Eye } from "@/lib/icons";
 import Link from "next/link";
 
 interface FormData {
@@ -33,7 +33,7 @@ const page = () => {
     };
 
     return (
-        <section className='bg-white text-black'>
+        <section className='bg-surface-primary text-foreground-primary'>
             <div className='h-screen grid grid-cols-6 gap-10'>
                 <div className='bg-[#001731] w-full flex items-start justify-start p-8 col-span-2'>
                     <Image src="/Logo.png" width={150} height={150} alt="Company Logo" />
@@ -70,7 +70,7 @@ const page = () => {
                                     className="absolute top-5 right-3"
                                     onClick={togglePasswordVisibility}
                                 >
-                                    {showPassword ? <AiOutlineEyeInvisible className="text-2xl" /> : <AiFillEye className="text-2xl" />}
+                                    {showPassword ? <EyeOff className="text-2xl" /> : <Eye className="text-2xl" />}
                                 </button>
                             </div>
                             {errors.password && <p className="text-red-500">{errors.password.message}</p>}
@@ -90,14 +90,14 @@ const page = () => {
                                     className="absolute top-5 right-3"
                                     onClick={toggleConfirmPasswordVisibility}
                                 >
-                                    {showConfirmPassword ? <AiOutlineEyeInvisible className="text-2xl" /> : <AiFillEye className="text-2xl" />}
+                                    {showConfirmPassword ? <EyeOff className="text-2xl" /> : <Eye className="text-2xl" />}
                                 </button>
                             </div>
                             {errors.confirmPassword && <p className="text-red-500">{errors.confirmPassword.message}</p>}
                             <input
                                 type="submit"
                                 value="Create Account"
-                                className="px-10 py-4 my-5 rounded-full bg-amber-400 text-black shadow-xl cursor-pointer"/>
+                                className="px-10 py-4 my-5 rounded-full bg-amber-400 text-foreground-primary shadow-xl cursor-pointer"/>
                         </form>
                         <div className="flex justify-between mt-5 items-center">
                             <button className="text-[#002568]">

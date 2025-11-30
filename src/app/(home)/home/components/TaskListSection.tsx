@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckSquare, Clock } from 'lucide-react';
-
+import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import { cn } from '@/components/ui/class';
 import { formatDateToDayMonth } from '@/lib/utils';
 import SectionHeader from './SectionHeader';
@@ -35,8 +35,9 @@ export default function TaskListSection({
       {loading ? (
         <LoadingSection text="Loading tasks..." icon={CheckSquare} />
       ) : (
-        <div
-          className="bg-white rounded-xl p-5 shadow-sm border border-gray-100"
+        <motion.div
+          variants={staggerContainer} 
+          className="bg-surface-primary rounded-xl p-5 shadow-sm border border-border-primary"
         >
           <div className="space-y-3">
             {tasks.length > 0 ? (
@@ -47,7 +48,7 @@ export default function TaskListSection({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.2, delay: 0.05 }}
                   onClick={() => task.id && onTaskClick(task.id)}
-                  className="flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-blue-50 rounded-lg transition-colors text-sm font-medium border border-gray-100 cursor-pointer"
+                  className="flex items-center justify-between px-4 py-3 bg-background-secondary hover:bg-primary-50 rounded-lg transition-colors text-sm font-medium border border-border-primary cursor-pointer"
                 >
                   <div className="flex items-center space-x-3">
                     <div className={cn(
@@ -57,8 +58,8 @@ export default function TaskListSection({
                     <span>{task.task_title}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock size={14} className="text-gray-400" />
-                    <span className="whitespace-nowrap text-gray-600">
+                    <Clock size={14} className="text-foreground-tertiary" />
+                    <span className="whitespace-nowrap text-foreground-secondary">
                       {formatDateToDayMonth(task.end_date)}
                     </span>
                   </div>
@@ -68,7 +69,7 @@ export default function TaskListSection({
               <EmptyState icon={CheckSquare} message="No tasks available at this time" />
             )}
           </div>
-        </div>
+        </motion.div>
       )}
     </>
   );

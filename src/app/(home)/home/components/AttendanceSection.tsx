@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, CheckCircle2, Clock, CheckSquare, MapPin, Navigation, AlertTriangle, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, CheckSquare, MapPin, Navigation, AlertTriangle, AlertCircle, CheckCircle } from '@/lib/icons';
 import { cn } from '@/components/ui/class';
 import SectionHeader from './SectionHeader';
 import LoadingSection from './LoadingSection';
@@ -181,7 +181,7 @@ export default function AttendanceSection({
   }, []);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col overflow-hidden">
+    <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
       <div className="p-5 flex-shrink-0">
         <SectionHeader title="Attendance Today" icon={Calendar} />
       </div>
@@ -198,14 +198,14 @@ export default function AttendanceSection({
 
               {checkOutCompleted && checkInCompleted && (
                 <div className="flex items-center text-green-600 font-medium">
-                  <CheckCircle2 className="mr-2 h-5 w-5" />
+                  <CheckCircle className="mr-2 h-5 w-5" />
                   <span>Both check-in and check-out completed for today</span>
                 </div>
               )}
 
               {!checkOutCompleted && checkInCompleted && (
                 <div className="flex items-center text-green-600 font-medium">
-                  <CheckCircle2 className="mr-2 h-5 w-5" />
+                  <CheckCircle className="mr-2 h-5 w-5" />
                   <span>Check-in completed for today</span>
                 </div>
               )}
@@ -213,8 +213,8 @@ export default function AttendanceSection({
               {!checkInCompleted && (
                 <div className="space-y-4">
                   <div className="flex flex-col gap-2">
-                    <label className="flex items-center text-gray-700 font-medium">
-                      <MapPin className="w-4 h-4 mr-2 text-blue-600" />
+                    <label className="flex items-center text-foreground-primary font-medium">
+                      <MapPin className="w-4 h-4 mr-2 text-primary-600" />
                       Site Location
                     </label>
                     <select
@@ -225,7 +225,7 @@ export default function AttendanceSection({
                           site_id: Number(e.target.value),
                         })
                       }
-                      className="border border-gray-300 rounded-lg px-4 py-2.5 bg-[#EAF4FF] focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64"
+                      className="border border-border-primary rounded-lg px-4 py-2.5 bg-surface-primary focus:ring-primary-500 focus:border-primary-500 w-full sm:w-64"
                     >
                       <option value="">
                         {sitesLoading ? "Loading..." : "Select site"}
@@ -242,7 +242,7 @@ export default function AttendanceSection({
                   {attendanceRecord.site_id && (
                     <div className="space-y-3">
                       {locationLoading && (
-                        <div className="flex items-center gap-2 text-blue-600 text-sm">
+                        <div className="flex items-center gap-2 text-primary-600 text-sm">
                           <Navigation className="w-4 h-4 animate-spin" />
                           Getting your location...
                         </div>
@@ -256,15 +256,15 @@ export default function AttendanceSection({
                       )}
 
                       {userLocation && !locationLoading && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <div className="bg-primary-50 border border-primary-200 rounded-lg p-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <MapPin className="w-4 h-4 text-blue-600" />
-                              <span className="text-sm font-medium text-blue-800">
+                              <MapPin className="w-4 h-4 text-primary-600" />
+                              <span className="text-sm font-medium text-primary-800">
                                 Distance to Site:
                               </span>
                             </div>
-                            <span className="text-sm font-bold text-blue-900">
+                            <span className="text-sm font-bold text-primary-900">
                               {formatDistance(getDistanceToSite() || 0)}
                             </span>
                           </div>
@@ -328,7 +328,7 @@ export default function AttendanceSection({
                   onClick={handleCheckIn}
                   disabled={!attendanceRecord.site_id || !attendanceRecord.tag}
                   className={cn(
-                    "bg-blue-600 text-white font-medium rounded-lg px-5 py-2.5 flex items-center gap-2 w-full md:w-auto",
+                    "bg-primary-600 text-white font-medium rounded-lg px-5 py-2.5 flex items-center gap-2 w-full md:w-auto",
                     (!attendanceRecord.site_id || !attendanceRecord.tag) &&
                     "opacity-50 cursor-not-allowed"
                   )}
@@ -355,41 +355,41 @@ export default function AttendanceSection({
 
         {/* TABLE - Simplified for widget view */}
         {attendanceData.length > 0 && (
-        <div className="overflow-x-auto rounded-lg border border-gray-200">
-          <table className="min-w-full divide-y divide-gray-200">
+        <div className="overflow-x-auto rounded-lg border border-border-primary">
+          <table className="min-w-full divide-y divide-border-primary">
             <thead>
-              <tr className="bg-gray-50">
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <tr className="bg-background-secondary">
+                <th className="px-4 py-3 text-left text-xs font-medium text-foreground-secondary uppercase tracking-wider">
                   Site
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-foreground-secondary uppercase tracking-wider">
                   Check-In
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-foreground-secondary uppercase tracking-wider">
                   Check-Out
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-foreground-secondary uppercase tracking-wider">
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-surface-primary divide-y divide-border-primary">
               {attendanceData.slice(0, 3).map((entry, idx) => (
                 <tr
                   key={idx}
-                  className="hover:bg-gray-50 transition-colors duration-150"
+                  className="hover:bg-surface-hover transition-colors duration-150"
                 >
-                  <td className="px-4 py-3 text-sm text-gray-900">
+                  <td className="px-4 py-3 text-sm text-foreground-primary">
                     {sites.length > 0 &&
                       sites.filter((site) => site.id === entry.site_id)[0]
                         ?.name || "Unknown Site"}
                     {sites.length === 0 && (
-                      <span className="inline-flex items-center animate-pulse text-gray-400">
+                      <span className="inline-flex items-center animate-pulse text-foreground-tertiary">
                         Loading...
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                  <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">
                     {entry.check_in_time && (
                       <div className="space-y-1">
                         <div className='mb-2' >{formatTimeFromISO(entry.check_in_time)}</div>
@@ -414,7 +414,7 @@ export default function AttendanceSection({
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                  <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">
                     {entry.check_out_time ? (
                       <div className="space-y-1">
                         <div className='mb-2'>{formatTimeFromISO(entry.check_out_time)}</div>

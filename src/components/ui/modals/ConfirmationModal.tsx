@@ -57,7 +57,7 @@ export default function ConfirmationModal({
     >
       <div className="space-y-4">
         {/* Message */}
-        <div className="text-gray-700 text-sm sm:text-base leading-relaxed">
+        <div className="text-foreground-primary dark:text-foreground-primary text-sm sm:text-base leading-relaxed">
           {message}
         </div>
 

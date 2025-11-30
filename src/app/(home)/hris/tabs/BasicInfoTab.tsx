@@ -11,7 +11,7 @@ import {
 import { validateBasicInfo, validationErrorsToObject } from "@/lib/utils/validation";
 import { BasicInfoField } from "./BasicInfoField";
 import { motion } from "framer-motion";
-import { User, Briefcase, Calendar, CheckCircle, AlertCircle, DollarSign } from "lucide-react";
+import { User, Briefcase, Calendar, CheckCircle, WarningCircle, DollarSign } from "@/lib/icons";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { fadeIn } from "@/components/ui/animations";
 import { useProfile } from "@/hooks/useProfile";
@@ -294,7 +294,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
       className="w-full"
     >
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+        <h2 className="text-2xl font-bold text-foreground-primary flex items-center">
           <Calendar className="mr-2 h-6 w-6 text-blue-600" />
           Basic Information
         </h2>
@@ -309,12 +309,12 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
               aria-checked={isEditMode}
             >
               <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                className={`inline-block h-5 w-5 transform rounded-full bg-surface-primary shadow transition-transform ${
                   isEditMode ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
             </button>
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-foreground-secondary">
               {isEditMode ? 'Edit Mode On' : 'Edit Mode Off'}
             </span>
           </div>
@@ -328,7 +328,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
           className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm"
         >
           <div className="flex items-start">
-            <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
+            <WarningCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
             <p className="text-sm font-medium text-red-700">{submitError}</p>
           </div>
         </motion.div>
@@ -359,12 +359,12 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
             >
               <div className="flex items-center mb-4">
                 <div className="mr-3">{group.icon}</div>
-                <h3 className="font-medium text-lg text-gray-800">{group.title}</h3>
+                <h3 className="font-medium text-lg text-foreground-primary">{group.title}</h3>
               </div>
               
-              <div className="overflow-hidden border border-gray-200 rounded-lg shadow-sm">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <tbody className="bg-white divide-y divide-gray-200">
+              <div className="overflow-hidden border border-border-primary rounded-lg shadow-sm">
+                <table className="min-w-full divide-y divide-border-primary">
+                  <tbody className="bg-background-primary divide-y divide-border-primary">
                     {group.fields
                       .filter((field: any) => {
                         // Show admin-only fields only to Admin/Manager or for viewing
@@ -386,12 +386,12 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                         animate={{ opacity: 1 }}
                         transition={{ delay: fieldIndex * 0.05 + groupIndex * 0.1 }}
                       >
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal sm:whitespace-nowrap text-sm font-medium text-gray-800 bg-gray-50 w-1/3">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal sm:whitespace-nowrap text-sm font-medium text-foreground-primary bg-background-secondary w-1/3">
                           <div className="flex items-center">
                             {field.label}
                           </div>
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal text-sm text-gray-600">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal text-sm text-foreground-secondary">
                           {isEditMode && canEditField ? (
                             <div className="max-w-full overflow-hidden">
                               <BasicInfoField

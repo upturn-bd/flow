@@ -33,15 +33,15 @@ export default function Error({
             />
           </svg>
         </div>
-        <h2 className="mb-2 text-2xl font-bold text-gray-900">
+        <h2 className="mb-2 text-2xl font-bold text-foreground-primary">
           Something went wrong
         </h2>
-        <p className="mb-6 text-gray-600">
+        <p className="mb-6 text-foreground-secondary">
           We encountered an unexpected error. Our team has been notified and is
           working on a fix.
         </p>
         {error.digest && (
-          <p className="mb-6 font-mono text-xs text-gray-400">
+          <p className="mb-6 font-mono text-xs text-foreground-tertiary">
             Error ID: {error.digest}
           </p>
         )}
@@ -54,7 +54,7 @@ export default function Error({
           </button>
           <button
             onClick={() => (window.location.href = "/")}
-            className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="rounded-lg border border-border-secondary bg-background-primary px-6 py-3 font-medium text-foreground-secondary transition-colors hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
           >
             Go home
           </button>

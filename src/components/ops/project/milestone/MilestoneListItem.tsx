@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Pencil, ExternalLink } from "lucide-react";
+import { Pencil, ExternalLink } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { Milestone, Project } from "@/lib/types/schemas";
 
@@ -28,11 +28,11 @@ const MilestoneListItem: React.FC<MilestoneListItemProps> = ({
       key={milestone.id ?? index}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="border border-gray-200 rounded-lg p-4 space-y-3"
+      className="border border-border-primary rounded-lg p-4 space-y-3"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center justify-center gap-3">
-          <h4 className="font-semibold text-gray-900">
+          <h4 className="font-semibold text-foreground-primary">
             {milestone.milestone_title}
           </h4>
           <span className="text-xs font-medium bg-blue-100 px-2 py-1 rounded-full text-blue-600">
@@ -112,9 +112,9 @@ const MilestoneListItem: React.FC<MilestoneListItemProps> = ({
         </div>
       </div>
 
-      <p className="text-sm text-gray-600">{milestone.description}</p>
+      <p className="text-sm text-foreground-secondary">{milestone.description}</p>
 
-      <div className="flex items-center justify-between text-sm text-gray-500">
+      <div className="flex items-center justify-between text-sm text-foreground-tertiary">
         <span>
           {milestone.start_date} - {milestone.end_date}
         </span>

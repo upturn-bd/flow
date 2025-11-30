@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, Plus, Settings, Trash2, Edit, UserPlus, Shield, Search, X, Loader2 } from "lucide-react";
+import { Users, Plus, Settings, Trash, Edit, UserPlus, Shield, Search, X, Loader } from "@/lib/icons";
 import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/lib/auth/auth-context";
 import type { Team, TeamWithMembers, TeamWithPermissions } from "@/lib/types/schemas";
@@ -154,11 +154,11 @@ export default function TeamsPage() {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground-primary flex items-center gap-2">
               <Shield className="h-6 w-6 sm:h-7 sm:w-7 text-indigo-600" />
               Team Management
             </h1>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-foreground-secondary mt-1">
               Manage teams and assign granular permissions
             </p>
           </div>
@@ -197,21 +197,21 @@ export default function TeamsPage() {
       >
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
           <div className="relative flex-1 w-full sm:max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground-tertiary" />
             <input
               type="text"
               placeholder="Search teams..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm sm:text-base"
+              className="w-full pl-10 pr-10 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm sm:text-base"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-surface-hover rounded-full transition-colors"
                 aria-label="Clear search"
               >
-                <X className="h-4 w-4 text-gray-400" />
+                <X className="h-4 w-4 text-foreground-tertiary" />
               </button>
             )}
           </div>
@@ -220,9 +220,9 @@ export default function TeamsPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg text-sm"
+              className="flex items-center gap-2 px-3 py-2 bg-background-tertiary dark:bg-surface-secondary rounded-lg text-sm"
             >
-              <span className="text-gray-600">
+              <span className="text-foreground-secondary">
                 {filteredTeams.length} result{filteredTeams.length !== 1 ? 's' : ''}
               </span>
             </motion.div>
@@ -233,8 +233,8 @@ export default function TeamsPage() {
       {/* Loading State */}
       {loading && teams.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20">
-          <Loader2 className="h-12 w-12 text-indigo-600 animate-spin mb-4" />
-          <p className="text-gray-600">Loading teams...</p>
+          <Loader className="h-12 w-12 text-indigo-600 animate-spin mb-4" />
+          <p className="text-foreground-secondary">Loading teams...</p>
         </div>
       )}
 
@@ -246,23 +246,23 @@ export default function TeamsPage() {
               {filteredTeams.map((team) => (
                 <div
                   key={team.id}
-                  className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg hover:border-indigo-200 transition-all duration-200 group flex flex-col h-full"
+                  className="bg-surface-primary rounded-xl border border-border-primary p-5 hover:shadow-lg hover:border-indigo-200 transition-all duration-200 group flex flex-col h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className={`p-2 rounded-lg transition-colors ${
                         team.is_default 
                           ? 'bg-indigo-100 group-hover:bg-indigo-200' 
-                          : 'bg-gray-100 group-hover:bg-gray-200'
+                          : 'bg-background-tertiary dark:bg-surface-secondary group-hover:bg-surface-hover'
                       }`}>
                         <Users className={`h-5 w-5 ${
                           team.is_default 
                             ? 'text-indigo-600' 
-                            : 'text-gray-600'
+                            : 'text-foreground-secondary'
                         }`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-800 truncate" title={team.name}>{team.name}</h3>
+                        <h3 className="font-semibold text-foreground-primary truncate" title={team.name}>{team.name}</h3>
                         {team.is_default && (
                           <span className="inline-flex items-center text-xs text-indigo-600 font-medium bg-indigo-50 px-2 py-0.5 rounded-full mt-1">Default</span>
                         )}
@@ -273,10 +273,10 @@ export default function TeamsPage() {
                       <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity ml-2">
                         <button
                           onClick={() => handleEditTeam(team)}
-                          className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors"
                           title="Edit team"
                         >
-                          <Edit className="h-4 w-4 text-gray-600" />
+                          <Edit className="h-4 w-4 text-foreground-secondary" />
                         </button>
                         {canDeleteTeams && (
                           <button
@@ -284,7 +284,7 @@ export default function TeamsPage() {
                             className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete team"
                           >
-                            <Trash2 className="h-4 w-4 text-red-600" />
+                            <Trash className="h-4 w-4 text-red-600" />
                           </button>
                         )}
                       </div>
@@ -292,11 +292,11 @@ export default function TeamsPage() {
                   </div>
 
                   {team.description ? (
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2 min-h-[40px]" title={team.description}>
+                    <p className="text-sm text-foreground-secondary mb-4 line-clamp-2 min-h-[40px]" title={team.description}>
                       {team.description}
                     </p>
                   ) : (
-                    <p className="text-sm text-gray-400 italic mb-4 min-h-[40px]">
+                    <p className="text-sm text-foreground-tertiary italic mb-4 min-h-[40px]">
                       No description
                     </p>
                   )}
@@ -322,11 +322,11 @@ export default function TeamsPage() {
             </div>
           ) : searchQuery ? (
             <div className="text-center py-16 px-4">
-              <div className="bg-gray-100 rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                <Search className="h-10 w-10 text-gray-400" />
+              <div className="bg-background-tertiary dark:bg-surface-secondary rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                <Search className="h-10 w-10 text-foreground-tertiary" />
               </div>
-              <p className="text-gray-700 text-lg font-semibold">No teams found</p>
-              <p className="text-gray-500 text-sm mt-2 max-w-md mx-auto">
+              <p className="text-foreground-secondary text-lg font-semibold">No teams found</p>
+              <p className="text-foreground-tertiary text-sm mt-2 max-w-md mx-auto">
                 No teams match "{searchQuery}". Try a different search term.
               </p>
               <Button
@@ -339,12 +339,12 @@ export default function TeamsPage() {
               </Button>
             </div>
           ) : (
-            <div className="text-center py-16 px-4 bg-white rounded-xl border-2 border-dashed border-gray-300">
+            <div className="text-center py-16 px-4 bg-surface-primary rounded-xl border-2 border-dashed border-border-secondary">
               <div className="bg-indigo-50 rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                 <Users className="h-10 w-10 text-indigo-400" />
               </div>
-              <p className="text-gray-700 text-lg font-semibold">No teams yet</p>
-              <p className="text-gray-500 text-sm mt-2 mb-6 max-w-md mx-auto">
+              <p className="text-foreground-secondary text-lg font-semibold">No teams yet</p>
+              <p className="text-foreground-tertiary text-sm mt-2 mb-6 max-w-md mx-auto">
                 Teams help you organize employees and manage permissions efficiently.
               </p>
               {canManageTeams && (
@@ -435,8 +435,8 @@ export default function TeamsPage() {
         title="Delete Team"
       >
         <div className="p-6">
-          <p className="text-gray-600 mb-6">
-            Are you sure you want to delete <strong className="text-gray-900">{selectedTeam?.name}</strong>? 
+          <p className="text-foreground-secondary mb-6">
+            Are you sure you want to delete <strong className="text-foreground-primary">{selectedTeam?.name}</strong>? 
             This action cannot be undone and all team members will lose their team-based permissions.
           </p>
 
@@ -459,7 +459,7 @@ export default function TeamsPage() {
             >
               {isLoadingAction ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader className="h-4 w-4 mr-2 animate-spin" />
                   Deleting...
                 </>
               ) : (

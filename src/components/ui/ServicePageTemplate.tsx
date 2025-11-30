@@ -3,7 +3,7 @@
 import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import TabView, { TabItem } from './TabView';
-import { LucideIcon } from 'lucide-react';
+import { IconType } from '@/lib/icons';
 import { useAuth } from '@/lib/auth/auth-context';
 import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from '@/components/permissions';
 import { PermissionModule } from '@/lib/constants';
@@ -101,7 +101,7 @@ export default function ServicePageTemplate({
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
       >
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-2">
+          <h1 className="text-2xl font-bold text-foreground-primary flex items-center mb-2">
             <motion.div 
               initial={{ scale: 0.9, opacity: 0.5 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -112,7 +112,7 @@ export default function ServicePageTemplate({
             </motion.div>
             {title}
           </h1>
-          <p className="text-gray-600 max-w-3xl">
+          <p className="text-foreground-secondary max-w-3xl">
             {description}
           </p>
         </div>
@@ -124,7 +124,7 @@ export default function ServicePageTemplate({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={actionButtonOnClick}
-                className={`flex items-center justify-center gap-2 ${primaryColor.includes('text') ? primaryColor.replace('text', 'bg') : 'bg-blue-600'} hover:brightness-110 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm`}
+                className={`flex items-center justify-center gap-2 ${primaryColor.includes('text') ? primaryColor.replace('text', 'bg') : 'bg-primary-600 hover:bg-primary-700'} text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm`}
               >
                 {actionButtonIcon}
                 <span>{actionButtonLabel}</span>
@@ -133,7 +133,7 @@ export default function ServicePageTemplate({
               <PermissionTooltip message={`You don't have permission to ${actionButtonLabel.toLowerCase()}`}>
                 <button
                   disabled
-                  className="flex items-center justify-center gap-2 bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-60"
+                  className="flex items-center justify-center gap-2 bg-surface-secondary text-foreground-tertiary px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-60"
                 >
                   {actionButtonIcon}
                   <span>{actionButtonLabel}</span>

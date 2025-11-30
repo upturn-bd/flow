@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AlertCircle } from "lucide-react";
+import { WarningCircle } from "@/lib/icons";
 import { motion } from "framer-motion";
 import { fadeInUp } from "./animations";
 
@@ -34,15 +34,15 @@ export default function FormDateField({
     <div className="mb-4">
       <label 
         htmlFor={name} 
-        className="block text-sm font-semibold text-gray-700 mb-1"
+        className="block text-sm font-semibold text-foreground-primary dark:text-foreground-primary mb-1"
       >
         {label}
       </label>
       {description && (
-        <p className="text-sm text-gray-600 mb-2">{description}</p>
+        <p className="text-sm text-foreground-secondary dark:text-foreground-secondary mb-2">{description}</p>
       )}
       <div className="relative">
-        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary dark:text-foreground-tertiary">
           {icon}
         </div>
         <input
@@ -55,11 +55,11 @@ export default function FormDateField({
           placeholder={placeholder}
           aria-invalid={hasError}
           aria-describedby={hasError ? `${name}-error` : undefined}
-          className={`w-full pl-10 pr-4 py-2.5 text-gray-900 rounded-lg border shadow-sm ${
+          className={`w-full pl-10 pr-4 py-2.5 text-foreground-primary dark:text-foreground-primary rounded-lg border shadow-sm ${
             hasError 
               ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50" 
-              : "border-gray-200 focus:ring-blue-500 focus:border-blue-500 bg-white"
-          } ${readOnly ? "bg-gray-100 cursor-not-allowed" : ""} focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200`}
+              : "border-border-primary dark:border-border-primary focus:ring-primary-500 focus:border-primary-500 bg-surface-primary dark:bg-surface-primary"
+          } ${readOnly ? "bg-background-tertiary dark:bg-background-tertiary cursor-not-allowed" : ""} focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200`}
         />
         {hasError && (
           <motion.div
@@ -69,7 +69,7 @@ export default function FormDateField({
             exit="hidden"
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500"
           >
-            <AlertCircle size={16} />
+            <WarningCircle size={16} />
           </motion.div>
         )}
       </div>

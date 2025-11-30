@@ -119,7 +119,7 @@ export default function DivisionModal({
         />
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4 pt-4 border-t border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4 pt-4 border-t border-border-primary">
           <Button
             type="button"
             variant="secondary"

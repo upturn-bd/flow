@@ -1,11 +1,8 @@
 "use client";
-
-import { useAuth } from "@/lib/auth/auth-context";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { pageVariants } from "@/app/(home)/home/components/animations";
 import { useHomeLayout } from "@/hooks/useHomeLayout";
-import { getWidgetDefinition } from "@/app/(home)/home/widgets/widgetRegistry";
 import AttendanceWidget from "@/app/(home)/home/widgets/AttendanceWidget";
 import NoticesWidget from "@/app/(home)/home/widgets/NoticesWidget";
 import TasksWidget from "@/app/(home)/home/widgets/TasksWidget";
@@ -14,7 +11,7 @@ import StakeholderIssuesWidget from "@/app/(home)/home/widgets/StakeholderIssues
 import ServicesWidget from "@/app/(home)/home/widgets/ServicesWidget";
 import DetailModals from "@/app/(home)/home/components/DetailModals";
 import Portal from "@/components/ui/Portal";
-import { Settings, GripVertical, Eye, EyeOff, ArrowDownRight } from "lucide-react";
+import { Settings, GripVertical, Eye, EyeOff, ArrowDownRight } from "@/lib/icons";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import { WidgetConfig, WidgetSize } from "@/lib/types/widgets";
@@ -25,7 +22,6 @@ const MOBILE_COLS = 1;
 const ROW_HEIGHT = 80;
 
 export default function HomePage() {
-  const { employeeInfo } = useAuth();
   const { layout: homeLayout, loading: layoutLoading, saveLayout, updateAllWidgets } = useHomeLayout();
   const [isEditMode, setIsEditMode] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -268,24 +264,24 @@ export default function HomePage() {
       initial="hidden"
       animate="visible"
       variants={pageVariants}
-      className="min-h-screen bg-gray-50 px-2 py-4 sm:px-4 sm:py-6 lg:px-8 lg:py-8"
+      className="min-h-screen bg-background-primary px-2 py-4 sm:px-4 sm:py-6 lg:px-8 lg:py-8"
     >
       <div className="w-full max-w-full">
         {/* Header with edit button */}
         <div className="flex justify-between items-center mb-4 sm:mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Dashboard</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary">Dashboard</h1>
           <div className="flex gap-2">
             {isEditMode ? (
               <>
                 <button
                   onClick={() => setIsEditMode(false)}
-                  className="px-3 py-2 sm:px-4 text-sm sm:text-base text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-3 py-2 sm:px-4 text-sm sm:text-base text-foreground-primary bg-surface-primary border border-border-primary rounded-lg hover:bg-surface-hover transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveLayout}
-                  className="px-3 py-2 sm:px-4 text-sm sm:text-base text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-3 py-2 sm:px-4 text-sm sm:text-base text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   Save Changes
                 </button>
@@ -293,7 +289,7 @@ export default function HomePage() {
             ) : (
               <button
                 onClick={() => setIsEditMode(true)}
-                className="flex items-center gap-2 px-3 py-2 sm:px-4 text-sm sm:text-base text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 sm:px-4 text-sm sm:text-base text-foreground-primary bg-surface-primary border border-border-primary rounded-lg hover:bg-surface-hover transition-colors"
               >
                 <Settings size={18} />
                 <span className="hidden sm:inline">Customize</span>
@@ -304,7 +300,7 @@ export default function HomePage() {
 
         {layoutLoading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="text-gray-500">Loading dashboard...</div>
+            <div className="text-foreground-secondary">Loading dashboard...</div>
           </div>
         ) : (
           <div ref={containerRef} className="w-full">
@@ -330,14 +326,14 @@ export default function HomePage() {
                   {isEditMode && (
                     <div className={`absolute inset-0 border-2 rounded-lg z-10 transition-all pointer-events-none ${
                       widget.enabled 
-                        ? 'bg-blue-500/10 border-blue-400' 
-                        : 'bg-gray-500/20 border-gray-400'
+                        ? 'bg-primary-500/10 border-primary-400' 
+                        : 'bg-foreground-tertiary/20 border-foreground-tertiary'
                     }`}>
                       {/* Control bar at top */}
                       <div className={`absolute top-0 left-0 right-0 backdrop-blur-sm px-4 py-3 flex items-center justify-between rounded-t-md pointer-events-auto ${
                         widget.enabled 
-                          ? 'bg-blue-500/90' 
-                          : 'bg-gray-500/90'
+                          ? 'bg-primary-500/90' 
+                          : 'bg-foreground-tertiary/90'
                       }`}>
                         <div className="flex items-center gap-3">
                           <GripVertical size={20} className="text-white cursor-grab active:cursor-grabbing" />
@@ -355,7 +351,7 @@ export default function HomePage() {
                               e.stopPropagation();
                               handleToggleWidget(widget.id);
                             }}
-                            className="p-2 hover:bg-white/20 rounded transition-colors text-white"
+                            className="p-2 hover:bg-surface-primary/20 rounded transition-colors text-white"
                             title={widget.enabled ? 'Hide widget' : 'Show widget'}
                           >
                             {widget.enabled ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -364,7 +360,7 @@ export default function HomePage() {
                       </div>
                       {/* Resize handle indicator at bottom-right */}
                       {widget.enabled && (
-                        <div className="absolute bottom-0 right-0 w-8 h-8 pointer-events-none flex items-center justify-center bg-blue-500 rounded-tl">
+                        <div className="absolute bottom-0 right-0 w-8 h-8 pointer-events-none flex items-center justify-center bg-primary-500 rounded-tl">
                           <ArrowDownRight size={20} className="text-white" strokeWidth={3} />
                         </div>
                       )}

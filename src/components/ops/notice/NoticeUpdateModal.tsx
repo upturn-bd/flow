@@ -5,7 +5,7 @@ import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField } from '@/components/forms';
 import { validateNotice, type NoticeData } from '@/lib/validation';
 import { useDepartments } from '@/hooks/useDepartments';
-import { Bell } from '@phosphor-icons/react';
+import { Bell } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { Notice, useNoticeTypes } from '@/hooks/useNotice';
 

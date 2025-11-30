@@ -3,9 +3,8 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
+import { EyeOff, Eye, GoogleLogo } from "@/lib/icons";
 import Link from "next/link";
-import { FcGoogle } from "react-icons/fc";
 
 import { googleSignIn, login } from "../auth-actions";
 
@@ -62,7 +61,7 @@ const SignIn = () => {
   };
 
   return (
-    <section className="bg-white text-black min-h-screen flex flex-col">
+    <section className="bg-surface-primary text-foreground-primary min-h-screen flex flex-col">
       <div className="flex flex-col md:flex-row h-full min-h-screen">
         {/* Logo Section */}
         <div className="bg-[#001731] flex items-center justify-center p-8 md:w-2/6 w-full min-h-[120px] md:min-h-0">
@@ -78,7 +77,7 @@ const SignIn = () => {
               <div>
                 <input
                   data-testid="email-input"
-                  className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full placeholder:text-gray-500"
+                  className="p-3 py-4 rounded-lg bg-surface-secondary border border-border-primary focus:outline-none focus:ring-2 focus:ring-primary-500 w-full placeholder:text-foreground-tertiary"
                   type="email"
                   placeholder="Email"
                   autoComplete="email"
@@ -93,7 +92,7 @@ const SignIn = () => {
               <div className="relative">
                 <input
                   data-testid="password-input"
-                  className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full pr-12 placeholder:text-gray-500"
+                  className="p-3 py-4 rounded-lg bg-surface-secondary border border-border-primary focus:outline-none focus:ring-2 focus:ring-primary-500 w-full pr-12 placeholder:text-foreground-tertiary"
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   autoComplete="current-password"
@@ -104,14 +103,14 @@ const SignIn = () => {
                 />
                 <button
                   type="button"
-                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 hover:text-black"
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-foreground-tertiary hover:text-foreground-primary"
                   onClick={togglePasswordVisibility}
                   tabIndex={-1}
                 >
                   {showPassword ? (
-                    <AiOutlineEyeInvisible className="text-2xl" />
+                    <EyeOff className="text-2xl" />
                   ) : (
-                    <AiFillEye className="text-2xl" />
+                    <Eye className="text-2xl" />
                   )}
                 </button>
                 {errors.password && (
@@ -122,7 +121,7 @@ const SignIn = () => {
               <button
                 data-testid="login-button"
                 type="submit"
-                className="px-8 py-3 mt-2 rounded-full bg-amber-400 text-black font-semibold shadow-xl cursor-pointer disabled:opacity-50 transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="px-8 py-3 mt-2 rounded-full bg-primary-600 text-white font-semibold shadow-xl cursor-pointer disabled:opacity-50 transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 disabled={loading}
               >
                 {loading ? "Logging in..." : "Login"}
@@ -135,16 +134,16 @@ const SignIn = () => {
 
             <button
               onClick={handleGoogleSignIn}
-              className="w-full flex items-center justify-center gap-2 px-8 py-3 mt-4 rounded-full border border-yellow-950 text-black font-semibold shadow-2xl disabled:opacity-50 transition hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+              className="w-full flex items-center justify-center gap-2 px-8 py-3 mt-4 rounded-full border border-border-secondary text-foreground-primary font-semibold shadow-2xl disabled:opacity-50 transition hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary-500"
               disabled={loading}
             >
-              <FcGoogle className="text-2xl" />
+              <GoogleLogo className="text-2xl" />
               {loading ? "Signing in..." : "Sign In with Google"}
             </button>
 
             <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-2 text-sm">
-              <span className="text-[#002568]">Don't have an account?</span>
-              <Link href="/signup" className="text-[#FFAB2C] font-semibold hover:underline">
+              <span className="text-foreground-secondary">Don't have an account?</span>
+              <Link href="/signup" className="text-primary-600 font-semibold hover:underline">
                 Sign Up
               </Link>
             </div>

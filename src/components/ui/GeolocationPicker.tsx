@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { MapPin, Loader2 } from "lucide-react";
+import { MapPin, Loader } from "@/lib/icons";
 
 // Dynamically import the map component to avoid SSR issues
 const MapComponent = dynamic(
@@ -10,8 +10,8 @@ const MapComponent = dynamic(
   { 
     ssr: false,
     loading: () => (
-      <div className="w-full h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
-        <Loader2 className="animate-spin text-gray-400" size={32} />
+      <div className="w-full h-[400px] bg-background-secondary dark:bg-background-secondary rounded-lg flex items-center justify-center">
+        <Loader className="animate-spin text-foreground-tertiary dark:text-foreground-tertiary" size={32} />
       </div>
     )
   }
@@ -94,14 +94,14 @@ export default function GeolocationPicker({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-foreground-primary dark:text-foreground-primary">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
         <button
           type="button"
           onClick={handleGetCurrentLocation}
-          className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700"
+          className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
         >
           <MapPin size={14} />
           Use current location
@@ -111,26 +111,26 @@ export default function GeolocationPicker({
       {/* Manual Input */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs text-gray-600 mb-1">Latitude</label>
+          <label className="block text-xs text-foreground-secondary dark:text-foreground-secondary mb-1">Latitude</label>
           <input
             type="text"
             value={manualInput.latitude}
             onChange={(e) => handleManualInputChange("latitude", e.target.value)}
             placeholder="e.g., 23.8103"
-            className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-              error ? "border-red-500" : "border-gray-300"
+            className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary dark:bg-surface-primary text-foreground-primary dark:text-foreground-primary ${
+              error ? "border-red-500" : "border-border-primary dark:border-border-primary"
             }`}
           />
         </div>
         <div>
-          <label className="block text-xs text-gray-600 mb-1">Longitude</label>
+          <label className="block text-xs text-foreground-secondary dark:text-foreground-secondary mb-1">Longitude</label>
           <input
             type="text"
             value={manualInput.longitude}
             onChange={(e) => handleManualInputChange("longitude", e.target.value)}
             placeholder="e.g., 90.4125"
-            className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-              error ? "border-red-500" : "border-gray-300"
+            className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary dark:bg-surface-primary text-foreground-primary dark:text-foreground-primary ${
+              error ? "border-red-500" : "border-border-primary dark:border-border-primary"
             }`}
           />
         </div>
@@ -144,7 +144,7 @@ export default function GeolocationPicker({
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
       {value && (
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-foreground-tertiary dark:text-foreground-tertiary">
           Click on the map to update the location, or enter coordinates manually above.
         </p>
       )}

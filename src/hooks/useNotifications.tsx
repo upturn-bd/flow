@@ -184,9 +184,8 @@ export function useNotifications() {
 
   // Create notification (for system use)
   const createNotification = useCallback(async (notificationData: Partial<Notification>) => {
+    const companyId = employeeInfo?.company_id;
     try {
-      const companyId = employeeInfo?.company_id;
-
       if (!companyId) {
         return { success: false, error: 'Company ID not found' };
       }

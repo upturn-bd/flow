@@ -9,16 +9,15 @@ import {
   Bell, // Notice
   Clipboard, // Requisition
   DollarSign,
-  AlertCircle,
+  WarningCircle,
   UserPlus, // Onboarding
   File,
   Search,
-  BellDot, // Reports
   Users,
   CreditCard, // Payroll
-  Building2,
+  Building,
   UserMinus, // Stakeholder
-} from "lucide-react";
+} from "@/lib/icons";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -32,14 +31,14 @@ const sections = [
         path: "/ops/tasks",
         icon: ClipboardList,
         description: "Assign, track and manage day-to-day tasks",
-        color: "bg-indigo-100 text-indigo-700 border-indigo-200"
+        color: "bg-indigo-100 text-indigo-700"
       },
       {
         name: "Project",
         path: "/ops/project",
         icon: BarChart,
         description: "Plan and execute complex projects with milestones",
-        color: "bg-blue-100 text-blue-700 border-blue-200"
+        color: "bg-blue-100 text-blue-700"
       },
     ],
   },
@@ -52,56 +51,56 @@ const sections = [
         path: "/ops/attendance?tab=today",
         icon: LogIn,
         description: "Track and manage your daily attendance",
-        color: "bg-green-100 text-green-700 border-green-200"
+        color: "bg-green-100 text-green-700"
       },
       {
         name: "Leave",
         path: "/ops/leave?tab=apply",
         icon: CalendarX,
         description: "Apply and manage time off and leaves",
-        color: "bg-blue-100 text-blue-700 border-blue-200"
+        color: "bg-blue-100 text-blue-700"
       },
       {
         name: "Notice",
         path: "/ops/notice",
         icon: Bell,
         description: "Important company announcements and notices",
-        color: "bg-amber-100 text-amber-700 border-amber-200"
+        color: "bg-amber-100 text-amber-700"
       },
       {
         name: "Requisition",
         path: "/ops/requisition?tab=create",
         icon: Clipboard,
         description: "Request equipment, supplies and services",
-        color: "bg-cyan-100 text-cyan-700 border-cyan-200"
+        color: "bg-cyan-100 text-cyan-700"
       },
       {
         name: "Settlement",
         path: "/ops/settlement?tab=create",
         icon: DollarSign,
         description: "Manage and track expense reimbursements",
-        color: "bg-emerald-100 text-emerald-700 border-emerald-200"
+        color: "bg-emerald-100 text-emerald-700"
       },
       {
         name: "Complaint",
         path: "/ops/complaint",
-        icon: AlertCircle,
+        icon: WarningCircle,
         description: "Submit and track workplace issues and concerns",
-        color: "bg-red-100 text-red-700 border-red-200"
+        color: "bg-red-100 text-red-700"
       },
       {
         name: "Payroll",
         path: "/ops/payroll",
         icon: CreditCard,
         description: "View payroll history and manage salary information",
-        color: "bg-indigo-100 text-indigo-700 border-indigo-200"
+        color: "bg-indigo-100 text-indigo-700"
       },
       {
         name: "Stakeholder Issues",
         path: "/ops/stakeholder-issues",
-        icon: Building2,
+        icon: Building,
         description: "Manage stakeholder relationships and track issues",
-        color: "bg-purple-100 text-purple-700 border-purple-200"
+        color: "bg-purple-100 text-purple-700"
       },
     ],
   },
@@ -114,21 +113,21 @@ const sections = [
         path: "/ops/onboarding",
         icon: UserPlus,
         description: "Employee onboarding workflow and tasks",
-        color: "bg-purple-100 text-purple-700 border-purple-200"
+        color: "bg-purple-100 text-purple-700"
       },
       {
         name: "Offboarding",
         path: "/ops/offboarding",
         icon: UserMinus,
         description: "Employee offboarding workflow and tasks",
-        color: "bg-red-100 text-red-700 border-red-200"
+        color: "bg-red-100 text-red-700"
       },
       {
         name: "HRIS",
         path: "/ops/hris",
         icon: Users,
         description: "Human Resource Information System",
-        color: "bg-blue-100 text-blue-700 border-blue-200"
+        color: "bg-blue-100 text-blue-700"
       }
     ],
   },
@@ -199,10 +198,10 @@ export default function ServicesPage() {
         className="mb-6"
         variants={itemVariants}
       >
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary mb-1">
           Operations & Services
         </h1>
-        <p className="text-sm sm:text-base text-gray-600">
+        <p className="text-sm sm:text-base text-foreground-secondary">
           Access all operational tools and employee services
         </p>
       </motion.div>
@@ -214,19 +213,19 @@ export default function ServicesPage() {
         <div className="flex flex-col gap-3">
           <div className="relative flex-grow">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search size={18} className="text-gray-500" />
+              <Search size={18} className="text-foreground-tertiary" />
             </div>
             <input
               type="text"
               placeholder="Search services..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-gray-300 rounded-lg pl-10 pr-10 py-2.5 text-sm sm:text-base text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-300 transition-all outline-none"
+              className="w-full bg-surface-primary border border-border-secondary rounded-lg pl-10 pr-10 py-2.5 text-sm sm:text-base text-foreground-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-300 transition-all outline-none"
             />
             {searchQuery && (
               <motion.button 
                 onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700"
+                className="absolute inset-y-0 right-2 flex items-center text-foreground-tertiary hover:text-foreground-primary"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -245,8 +244,8 @@ export default function ServicesPage() {
               onClick={() => setSelectedSection(null)}
               className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
                 ${!selectedSection 
-                  ? 'bg-blue-600 text-white shadow-sm' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                  ? 'bg-primary-600 text-white shadow-sm' 
+                  : 'bg-surface-secondary text-foreground-secondary hover:bg-surface-hover'}`
               }
             >
               All
@@ -260,8 +259,8 @@ export default function ServicesPage() {
                 onClick={() => setSelectedSection(section.title)}
                 className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
                   ${selectedSection === section.title 
-                    ? 'bg-blue-600 text-white shadow-sm' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                    ? 'bg-primary-600 text-white shadow-sm' 
+                    : 'bg-surface-secondary text-foreground-secondary hover:bg-surface-hover'}`
                 }
               >
                 {section.title}
@@ -275,11 +274,11 @@ export default function ServicesPage() {
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center p-8 sm:p-12 bg-gray-50 rounded-lg border border-gray-200 mt-8"
+          className="flex flex-col items-center justify-center p-8 sm:p-12 bg-background-secondary rounded-lg border border-border-primary mt-8"
         >
-          <File size={40} className="text-gray-400 mb-3" />
-          <h3 className="text-base sm:text-lg font-medium text-gray-700 mb-2">No services found</h3>
-          <p className="text-sm sm:text-base text-gray-600 text-center max-w-md mb-4">
+          <File size={40} className="text-foreground-tertiary mb-3" />
+          <h3 className="text-base sm:text-lg font-medium text-foreground-primary mb-2">No services found</h3>
+          <p className="text-sm sm:text-base text-foreground-secondary text-center max-w-md mb-4">
             Try searching with different keywords or browse all services
           </p>
           <motion.button
@@ -289,7 +288,7 @@ export default function ServicesPage() {
               setSearchQuery("");
               setSelectedSection(null);
             }}
-            className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg shadow-sm hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg shadow-sm hover:bg-primary-700 transition-colors"
           >
             View all services
           </motion.button>
@@ -310,13 +309,13 @@ export default function ServicesPage() {
                 className="flex items-center mb-3"
                 variants={itemVariants}
               >
-                <h2 className="text-lg sm:text-xl font-bold text-gray-800 mr-2">
+                <h2 className="text-lg sm:text-xl font-bold text-foreground-primary mr-2">
                   {section.title}
                 </h2>
-                <div className="h-[1px] flex-grow bg-gray-200"></div>
+                <div className="h-[1px] flex-grow bg-border-primary"></div>
               </motion.div>
               <motion.p 
-                className="text-sm sm:text-base text-gray-600 mb-4"
+                className="text-sm sm:text-base text-foreground-secondary mb-4"
                 variants={itemVariants}
               >
                 {section.description}
@@ -336,7 +335,7 @@ export default function ServicesPage() {
                     >
                       <Link
                         href={item.path}
-                        className={`group flex flex-col sm:flex-row items-start sm:items-center p-3 sm:p-4 bg-white rounded-lg border ${item.color.includes('border') ? item.color.split(' ').find(c => c.startsWith('border-')) : 'border-gray-200'} shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 block min-h-[100px] sm:h-24`}
+                        className="group flex flex-col sm:flex-row items-start sm:items-center p-3 sm:p-4 bg-surface-primary rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 block min-h-[100px] sm:h-24"
                       >
                         <motion.div 
                           whileHover={{ scale: 1.1 }}
@@ -346,14 +345,14 @@ export default function ServicesPage() {
                         </motion.div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start sm:items-center justify-between">
-                            <h3 className="text-sm sm:text-base font-semibold text-gray-800 group-hover:text-blue-700 transition-colors line-clamp-1">
+                            <h3 className="text-sm sm:text-base font-semibold text-foreground-primary group-hover:text-primary-700 transition-colors line-clamp-1">
                               {item.name}
                             </h3>
                             <motion.svg 
                               initial={{ x: 0 }}
                               whileHover={{ x: 3 }}
                               xmlns="http://www.w3.org/2000/svg" 
-                              className="hidden sm:block h-4 w-4 text-blue-600 ml-2 transition-all flex-shrink-0" 
+                              className="hidden sm:block h-4 w-4 text-primary-600 ml-2 transition-all flex-shrink-0" 
                               fill="none" 
                               viewBox="0 0 24 24" 
                               stroke="currentColor"
@@ -361,7 +360,7 @@ export default function ServicesPage() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </motion.svg>
                           </div>
-                          <p className="text-xs sm:text-sm text-gray-600 mt-0.5 line-clamp-2">
+                          <p className="text-xs sm:text-sm text-foreground-secondary mt-0.5 line-clamp-2">
                             {item.description}
                           </p>
                         </div>

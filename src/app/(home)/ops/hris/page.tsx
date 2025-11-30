@@ -11,9 +11,9 @@ import {
   Building,
   Calendar,
   Filter,
-  LoaderCircle,
+  Loader,
   Download,
-} from "lucide-react";
+} from "@/lib/icons";
 import FormInputField from "@/components/ui/FormInputField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
@@ -130,8 +130,8 @@ useEffect(() => {
             <Users size={24} />
           </motion.div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Employee Finder</h1>
-            <p className="text-gray-600">
+            <h1 className="text-2xl font-bold text-foreground-primary">Employee Finder</h1>
+            <p className="text-foreground-secondary">
               Search and find detailed information about employees
             </p>
           </div>
@@ -152,8 +152,8 @@ useEffect(() => {
       <ModulePermissionsBanner module={PERMISSION_MODULES.HRIS} title="HRIS" compact />
 
       {/* Search and Filters */}
-      <motion.div variants={fadeIn} className="bg-white rounded-xl shadow-sm mb-8">
-        <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+      <motion.div variants={fadeIn} className="bg-surface-primary rounded-xl shadow-sm mb-8">
+        <div className="border-b border-border-primary px-6 py-4 flex justify-between items-center">
           <h2 className="text-lg font-semibold text-indigo-700 flex items-center">
             <Search className="w-5 h-5 mr-2" />
             Search Employees
@@ -189,9 +189,9 @@ useEffect(() => {
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden"
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-border-primary">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-foreground-secondary mb-1">
                       Department
                     </label>
                     <select
@@ -199,7 +199,7 @@ useEffect(() => {
                       onChange={(e) =>
                         setFilters({ ...filters, department: e.target.value })
                       }
-                      className="w-full rounded-lg border border-gray-300 bg-[#EAF4FF] px-3 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full rounded-lg border border-border-secondary bg-[#EAF4FF] px-3 py-2 text-foreground-secondary focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     >
                       <option value="">All Departments</option>
                       {departments.map((dept) => (
@@ -210,7 +210,7 @@ useEffect(() => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-foreground-secondary mb-1">
                       Position
                     </label>
                     <select
@@ -218,7 +218,7 @@ useEffect(() => {
                       onChange={(e) =>
                         setFilters({ ...filters, designation: e.target.value })
                       }
-                      className="w-full rounded-lg border border-gray-300 bg-[#EAF4FF] px-3 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full rounded-lg border border-border-secondary bg-[#EAF4FF] px-3 py-2 text-foreground-secondary focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     >
                       <option value="">All Positions</option>
                       {positions.map((position) => (
@@ -253,7 +253,7 @@ useEffect(() => {
       {/* Results */}
       <motion.div variants={fadeInUp}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-semibold text-foreground-primary">
             Results{" "}
             {filteredEmployees.length > 0 && `(${filteredEmployees.length})`}
           </h2>
@@ -265,23 +265,23 @@ useEffect(() => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm p-6"
+              className="flex flex-col items-center justify-center h-64 bg-surface-primary rounded-xl shadow-sm p-6"
             >
-              <LoaderCircle className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
-              <p className="text-gray-600">Loading employee data...</p>
+              <Loader className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
+              <p className="text-foreground-secondary">Loading employee data...</p>
             </motion.div>
           ) : filteredEmployees.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="bg-white rounded-xl shadow-sm p-8 text-center"
+              className="bg-surface-primary rounded-xl shadow-sm p-8 text-center"
             >
-              <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+              <Users className="w-16 h-16 text-foreground-tertiary mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground-secondary mb-2">
                 No employees found
               </h3>
-              <p className="text-gray-500 max-w-md mx-auto">
+              <p className="text-foreground-tertiary max-w-md mx-auto">
                 No employees match your search criteria. Try adjusting your
                 filters or search query.
               </p>
@@ -290,7 +290,7 @@ useEffect(() => {
             <>
               {/* ✅ Table for large screens */}
               <div className="hidden lg:block overflow-x-auto">
-                <table className="min-w-full bg-white rounded-xl shadow-sm border border-gray-100">
+                <table className="min-w-full bg-surface-primary rounded-xl shadow-sm border border-border-primary">
                   <thead>
                     <tr className="bg-indigo-50 text-indigo-700 text-left text-sm font-medium">
                       <th className="px-6 py-3 truncate">Name</th>
@@ -302,29 +302,29 @@ useEffect(() => {
                       <th className="px-6 py-3 text-center">Profile</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-border-primary">
                     {filteredEmployees.map((employee) => (
                       <tr
                         key={employee.id}
-                        className="hover:bg-gray-50 transition-colors"
+                        className="hover:bg-background-secondary dark:bg-background-tertiary transition-colors"
                       >
-                        <td className="px-6 py-3 font-medium text-gray-800 flex items-center gap-2">
+                        <td className="px-6 py-3 font-medium text-foreground-primary flex items-center gap-2">
                           <User className="w-5 h-5 text-indigo-500" />
                           {employee.name}
                         </td>
-                        <td className="px-6 py-3 text-sm text-gray-600">
+                        <td className="px-6 py-3 text-sm text-foreground-secondary">
                           {employee.email}
                         </td>
-                        <td className="px-6 py-3 text-sm text-gray-600">
+                        <td className="px-6 py-3 text-sm text-foreground-secondary">
                           {employee.phone}
                         </td>
-                        <td className="px-6 py-3 text-sm text-gray-600">
+                        <td className="px-6 py-3 text-sm text-foreground-secondary">
                           {employee.department}
                         </td>
-                        <td className="px-6 py-3 text-sm text-gray-600">
+                        <td className="px-6 py-3 text-sm text-foreground-secondary">
                           {employee.designation}
                         </td>
-                        <td className="px-6 py-3 text-sm text-gray-600">
+                        <td className="px-6 py-3 text-sm text-foreground-secondary">
                           {employee.joinDate
                             ? formatDate(employee.joinDate)
                             : "N/A"}
@@ -354,11 +354,11 @@ useEffect(() => {
                       boxShadow:
                         "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                     }}
-                    className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 transition-all duration-200"
+                    className="bg-surface-primary rounded-xl shadow-sm overflow-hidden border border-border-primary transition-all duration-200"
                   >
                     <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-4">
                       <div className="flex items-center">
-                        <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-indigo-600 mr-4">
+                        <div className="w-14 h-14 bg-surface-primary rounded-full flex items-center justify-center text-indigo-600 mr-4">
                           <User size={28} />
                         </div>
                         <div>
@@ -372,26 +372,26 @@ useEffect(() => {
 
                     <div className="p-5 space-y-3">
                       <div className="flex">
-                        <Mail className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
-                        <span className="text-gray-600 text-sm">
+                        <Mail className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                        <span className="text-foreground-secondary text-sm">
                           {employee.email}
                         </span>
                       </div>
                       <div className="flex">
-                        <Phone className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
-                        <span className="text-gray-600 text-sm">
+                        <Phone className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                        <span className="text-foreground-secondary text-sm">
                           {employee.phone}
                         </span>
                       </div>
                       <div className="flex">
-                        <Building className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
-                        <span className="text-gray-600 text-sm">
+                        <Building className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                        <span className="text-foreground-secondary text-sm">
                           {employee.department}
                         </span>
                       </div>
                       <div className="flex">
-                        <Calendar className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
-                        <span className="text-gray-600 text-sm">
+                        <Calendar className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                        <span className="text-foreground-secondary text-sm">
                           Joined:{" "}
                           {employee.joinDate
                             ? formatDate(employee.joinDate)
@@ -400,7 +400,7 @@ useEffect(() => {
                       </div>
                     </div>
 
-                    <div className="border-t border-gray-100 p-4">
+                    <div className="border-t border-border-primary p-4">
                       <motion.a
                         href={`/hris?uid=${employee.id}`}
                         whileHover={{ scale: 1.03 }}

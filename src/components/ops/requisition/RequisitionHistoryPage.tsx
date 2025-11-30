@@ -3,12 +3,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Loader2,
+  Loader,
   XCircle,
   PackageOpen,
   Calendar,
   Plus,
-} from "lucide-react";
+} from "@/lib/icons";
 import { extractFileNameFromStoragePath } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
@@ -148,13 +148,13 @@ export default function RequisitionHistoryPage() {
                 animate={{ opacity: 1 }}
                 className="flex flex-col items-center justify-center py-12 text-center"
               >
-                <div className="bg-gray-100 rounded-full p-4 mb-4">
-                  <PackageOpen className="h-12 w-12 text-gray-400" />
+                <div className="bg-background-tertiary dark:bg-background-tertiary rounded-full p-4 mb-4">
+                  <PackageOpen className="h-12 w-12 text-foreground-tertiary dark:text-foreground-tertiary" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-foreground-primary dark:text-foreground-primary">
                   No requisition history
                 </h3>
-                <p className="mt-1 text-gray-500">
+                <p className="mt-1 text-foreground-secondary dark:text-foreground-secondary">
                   Completed requisition requests will appear here
                 </p>
               </motion.div>

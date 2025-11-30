@@ -8,7 +8,7 @@ import {
   FileText as FileTextIcon,
   CurrencyDollar as CurrencyDollarIcon,
   Buildings as BuildingsIcon,
-} from "@phosphor-icons/react/dist/ssr";
+} from "@/lib/icons";
 
 const navItems = [
   {
@@ -43,10 +43,10 @@ export default function Page() {
                 <a
                   href={item.href}
                   key={item.label}
-                  className="w-60 h-40 flex flex-col items-center justify-center border border-gray-300 rounded-lg shadow-md p-4 hover:bg-gray-100 transition"
+                  className="w-60 h-40 flex flex-col items-center justify-center border border-border-secondary rounded-lg shadow-md p-4 hover:bg-background-tertiary dark:bg-surface-secondary transition"
                 >
                   <Icon size={72} className="text-blue-500" />
-                  <p className="mt-2 text-xl text-gray-700">{item.label}</p>
+                  <p className="mt-2 text-xl text-foreground-secondary">{item.label}</p>
                 </a>
               );
             })}

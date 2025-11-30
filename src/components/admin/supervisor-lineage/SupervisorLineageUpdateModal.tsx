@@ -3,7 +3,7 @@ import { BaseModal } from '@/components/ui/modals';
 import { FormField, HierarchyField } from '@/components/forms';
 import { validateLineageForm, type LineageFormData } from '@/lib/validation';
 import { usePositions } from '@/hooks/usePositions';
-import { Buildings } from '@phosphor-icons/react';
+import { Buildings } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 
 interface HierarchyLevel {
@@ -138,7 +138,7 @@ export default function SupervisorLineageUpdateModal({
         size="md"
       >
         <div className="flex justify-center items-center py-8">
-          <div className="text-gray-500">Loading positions...</div>
+          <div className="text-foreground-tertiary">Loading positions...</div>
         </div>
       </BaseModal>
     );

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { AiOutlineEyeInvisible, AiFillEye } from "react-icons/ai";
+import { EyeOff, Eye } from "@/lib/icons";
 import Link from "next/link";
 
 import { signup } from "../auth-actions";
@@ -47,7 +47,7 @@ const Signup = () => {
   };
 
   return (
-    <section className="bg-white text-black min-h-screen flex flex-col">
+    <section className="bg-surface-primary text-foreground-primary min-h-screen flex flex-col">
       <div className="flex flex-col md:flex-row h-full min-h-screen">
         {/* Logo Section */}
         <div className="bg-[#001731] flex items-center justify-center p-8 md:w-2/6 w-full min-h-[120px] md:min-h-0">
@@ -62,7 +62,7 @@ const Signup = () => {
             >
               <div>
                 <input
-                  className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full placeholder:text-gray-500"
+                  className="p-3 py-4 rounded-lg bg-surface-secondary border border-border-primary focus:outline-none focus:ring-2 focus:ring-primary-500 w-full placeholder:text-foreground-tertiary"
                   type="email"
                   placeholder="Email"
                   autoComplete="email"
@@ -76,7 +76,7 @@ const Signup = () => {
 
               <div>
                 <input
-                  className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full placeholder:text-gray-500"
+                  className="p-3 py-4 rounded-lg bg-surface-secondary border border-border-primary focus:outline-none focus:ring-2 focus:ring-primary-500 w-full placeholder:text-foreground-tertiary"
                   type="text"
                   placeholder="First Name"
                   autoComplete="given-name"
@@ -92,7 +92,7 @@ const Signup = () => {
 
               <div>
                 <input
-                  className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full placeholder:text-gray-500"
+                  className="p-3 py-4 rounded-lg bg-surface-secondary border border-border-primary focus:outline-none focus:ring-2 focus:ring-primary-500 w-full placeholder:text-foreground-tertiary"
                   type="text"
                   placeholder="Last Name"
                   autoComplete="family-name"
@@ -106,7 +106,7 @@ const Signup = () => {
 
               <div className="relative">
                 <input
-                  className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full pr-12 placeholder:text-gray-500"
+                  className="p-3 py-4 rounded-lg bg-surface-secondary border border-border-primary focus:outline-none focus:ring-2 focus:ring-primary-500 w-full pr-12 placeholder:text-foreground-tertiary"
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   autoComplete="new-password"
@@ -130,14 +130,14 @@ const Signup = () => {
                 />
                 <button
                   type="button"
-                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 hover:text-black"
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-foreground-tertiary hover:text-foreground-primary"
                   onClick={togglePasswordVisibility}
                   tabIndex={-1}
                 >
                   {showPassword ? (
-                    <AiOutlineEyeInvisible className="text-2xl" />
+                    <EyeOff className="text-2xl" />
                   ) : (
-                    <AiFillEye className="text-2xl" />
+                    <Eye className="text-2xl" />
                   )}
                 </button>
                 {errors.password && (
@@ -149,7 +149,7 @@ const Signup = () => {
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm Password"
-                  className="p-3 py-4 rounded-lg bg-[#e3f4fe] border border-[#BFE4FF] focus:outline-none focus:ring-2 focus:ring-amber-400 w-full pr-12 placeholder:text-gray-500"
+                  className="p-3 py-4 rounded-lg bg-surface-secondary border border-border-primary focus:outline-none focus:ring-2 focus:ring-primary-500 w-full pr-12 placeholder:text-foreground-tertiary"
                   autoComplete="new-password"
                   {...register("confirmPassword", {
                     required: "Confirm Password is required",
@@ -161,14 +161,14 @@ const Signup = () => {
                 />
                 <button
                   type="button"
-                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 hover:text-black"
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-foreground-tertiary hover:text-foreground-primary"
                   onClick={toggleConfirmPasswordVisibility}
                   tabIndex={-1}
                 >
                   {showConfirmPassword ? (
-                    <AiOutlineEyeInvisible className="text-2xl" />
+                    <EyeOff className="text-2xl" />
                   ) : (
-                    <AiFillEye className="text-2xl" />
+                    <Eye className="text-2xl" />
                   )}
                 </button>
                 {errors.confirmPassword && (
@@ -179,7 +179,7 @@ const Signup = () => {
               <div className="flex items-center gap-2 mt-2">
                 <input
                   type="checkbox"
-                  className="accent-amber-400 w-4 h-4"
+                  className="accent-primary-600 w-4 h-4"
                   id="terms"
                   onChange={(e) => setIsChecked(e.target.checked)}
                 />
@@ -190,7 +190,7 @@ const Signup = () => {
 
               <button
                 type="submit"
-                className={`px-8 py-3 mt-4 rounded-full bg-amber-400 text-black font-semibold shadow-xl cursor-pointer transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 ${
+                className={`px-8 py-3 mt-4 rounded-full bg-primary-600 text-white font-semibold shadow-xl cursor-pointer transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                   !isChecked ? "opacity-50 cursor-not-allowed" : ""
                 }`}
                 disabled={!isChecked}
@@ -199,8 +199,8 @@ const Signup = () => {
               </button>
             </form>
             <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-2 text-sm">
-              <span className="text-[#002568]">Already have an account?</span>
-              <Link href="/login" className="text-[#FFAB2C] font-semibold hover:underline">
+              <span className="text-foreground-secondary">Already have an account?</span>
+              <Link href="/login" className="text-primary-600 font-semibold hover:underline">
                 Sign In
               </Link>
             </div>

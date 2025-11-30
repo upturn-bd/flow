@@ -80,13 +80,13 @@ export default function PositionsSection({
   const renderPositionCard = (position: any) => (
     <div
       key={position.id}
-      className="bg-white rounded-lg border border-gray-200 p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
+      className="bg-surface-primary rounded-lg border border-border-primary p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
     >
       <div className="flex items-center mb-2 sm:mb-0">
-        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 mr-3">
+        <div className="w-8 h-8 bg-background-tertiary rounded-full flex items-center justify-center text-foreground-secondary mr-3">
           <BriefcaseBusiness size={16} />
         </div>
-        <span className="font-medium text-gray-800">
+        <span className="font-medium text-foreground-primary">
           {position.name}
         </span>
       </div>
@@ -97,7 +97,7 @@ export default function PositionsSection({
             setViewPosition(position.id ?? null);
             setShowAllPositions(false);
           }}
-          className="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
+          className="px-3 py-1.5 rounded-md bg-background-tertiary text-foreground-secondary text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
         >
           <Eye size={14} />
           <span className="hidden sm:inline">Details</span>
@@ -123,13 +123,13 @@ export default function PositionsSection({
   );
 
   return (
-    <section className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm">
-      <div className="border-b border-gray-200 pb-4 mb-4">
-        <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-          <BriefcaseBusiness className="w-5 h-5 mr-2 text-gray-600" />
+    <section className="bg-surface-primary p-4 sm:p-6 rounded-lg border border-border-primary shadow-sm">
+      <div className="border-b border-border-primary pb-4 mb-4">
+        <h3 className="text-lg font-semibold text-foreground-primary flex items-center">
+          <BriefcaseBusiness className="w-5 h-5 mr-2 text-foreground-secondary" />
           Positions
         </h3>
-        <p className="text-sm text-gray-600">Manage job positions and roles</p>
+        <p className="text-sm text-foreground-secondary">Manage job positions and roles</p>
       </div>
 
       {positionsLoading ? (
@@ -142,7 +142,7 @@ export default function PositionsSection({
       ) : (
         <div className="space-y-3">
           {positions.length === 0 ? (
-            <div className="p-4 sm:p-6 bg-gray-50 rounded-lg text-center text-gray-500">
+            <div className="p-4 sm:p-6 bg-background-secondary rounded-lg text-center text-foreground-tertiary">
               No positions added yet. Click the plus button to add one.
             </div>
           ) : (
@@ -151,7 +151,7 @@ export default function PositionsSection({
               {hasMorePositions && (
                 <button
                   onClick={() => setShowAllPositions(true)}
-                  className="w-full py-2 px-4 rounded-md bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-2 px-4 rounded-md bg-background-tertiary text-foreground-secondary text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
                 >
                   <BriefcaseBusiness size={16} />
                   View All Positions ({positions.length})
@@ -214,7 +214,7 @@ export default function PositionsSection({
           >
             <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
               {positions.length === 0 ? (
-                <div className="p-6 bg-gray-50 rounded-lg text-center text-gray-500">
+                <div className="p-6 bg-background-secondary rounded-lg text-center text-foreground-tertiary">
                   No positions available.
                 </div>
               ) : (

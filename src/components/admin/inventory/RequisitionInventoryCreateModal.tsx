@@ -4,7 +4,7 @@ import { FormField, SelectField, TextAreaField, NumberField, SingleEmployeeSelec
 import { validateRequisitionInventory, type RequisitionInventoryData } from '@/lib/validation';
 import { useDepartments } from '@/hooks/useDepartments';
 import { useEmployees } from '@/hooks/useEmployees';
-import { Package, UserPlus, Buildings, Tag } from '@phosphor-icons/react';
+import { Package, UserPlus, Buildings, Tag } from '@/lib/icons';
 
 interface RequisitionInventoryCreateModalProps {
   isOpen: boolean;
@@ -49,7 +49,7 @@ export const RequisitionInventoryCreateModal: React.FC<RequisitionInventoryCreat
   return (
     <FormModal<RequisitionInventoryData>
       title="Configure Inventory Item"
-      icon={<Package size={24} weight="duotone" className="text-gray-600" />}
+      icon={<Package size={24} weight="duotone" className="text-foreground-secondary" />}
       initialValues={defaultData}
       validationFn={validateRequisitionInventory}
       onSubmit={onSubmit}
@@ -92,7 +92,7 @@ export const RequisitionInventoryCreateModal: React.FC<RequisitionInventoryCreat
               error={errors.name}
               required
               placeholder="Enter Item Name"
-              icon={<Package size={18} weight="duotone" className="text-gray-500" />}
+              icon={<Package size={18} weight="duotone" className="text-foreground-tertiary" />}
             />
 
             <TextAreaField

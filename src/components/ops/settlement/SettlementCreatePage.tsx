@@ -7,10 +7,10 @@ import {
   X,
   FileText,
   User,
-  AlertCircle,
+  WarningCircle,
   Paperclip,
   CheckCircle
-} from "lucide-react";
+} from "@/lib/icons";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useSettlementRequests } from "@/hooks/useSettlement";
@@ -263,11 +263,11 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
                 ...prev,
                 in_advance: e.target.checked
               }))}
-              className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500"
+              className="w-4 h-4 text-orange-600 bg-surface-secondary border-border-secondary rounded focus:ring-orange-500"
               style={{ display: 'block', flex: 'none' }}
             />
             <label htmlFor="in_advance" className="flex items-center gap-2 text-sm font-medium text-orange-800 ml-2">
-              <AlertCircle size={16} />
+              <WarningCircle size={16} />
               Request as advance payment
             </label>
           </div>
@@ -279,7 +279,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
           description="Provide detailed information about your request"
         >
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-foreground-secondary mb-2">
               Description *
             </label>
             <textarea
@@ -287,7 +287,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
               value={settlementState.description}
               onChange={handleInputChange}
               rows={4}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.description ? 'border-red-300 ring-1 ring-red-300' : 'border-gray-300'
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.description ? 'border-red-300 ring-1 ring-red-300' : 'border-border-secondary'
                 }`}
               placeholder="Describe the reason for this settlement request..."
             />
@@ -297,7 +297,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-foreground-secondary mb-2">
               Additional Comments
             </label>
             <textarea
@@ -305,7 +305,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
               value={settlementState.comment}
               onChange={handleInputChange}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Any additional comments or notes..."
             />
           </div>
@@ -320,7 +320,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
             <div className="flex items-center gap-4">
               <label
                 htmlFor="file-upload"
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 border border-border-secondary rounded-lg cursor-pointer hover:bg-background-secondary dark:hover:bg-background-tertiary transition-colors"
               >
                 <Paperclip size={16} />
                 Choose Files
@@ -333,20 +333,20 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
                 className="hidden"
                 accept="image/*,.pdf,.doc,.docx"
               />
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-foreground-tertiary">
                 Supported formats: PDF, DOC, DOCX, Images
               </span>
             </div>
 
             {attachments.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Selected Files:</h4>
+                <h4 className="text-sm font-medium text-foreground-secondary">Selected Files:</h4>
                 {attachments.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-3 bg-background-secondary dark:bg-background-tertiary rounded-lg">
                     <div className="flex items-center gap-2">
-                      <FileText size={16} className="text-gray-500" />
-                      <span className="text-sm text-gray-700">{file.name}</span>
-                      <span className="text-xs text-gray-500">
+                      <FileText size={16} className="text-foreground-tertiary" />
+                      <span className="text-sm text-foreground-secondary">{file.name}</span>
+                      <span className="text-xs text-foreground-tertiary">
                         ({(file.size / 1024 / 1024).toFixed(2)} MB)
                       </span>
                     </div>
@@ -368,7 +368,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
         {/* Action Buttons */}
         {/* Allowance info
         {allowance && (
-          <div className="text-sm text-gray-600 ml-4">
+          <div className="text-sm text-foreground-secondary ml-4">
             Maximum allowance:{" "}
             <span className="font-semibold">
               ${allowance.toLocaleString()}
@@ -376,7 +376,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
           </div>
         )} */}
 
-        <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+        <div className="flex justify-between items-center pt-6 border-t border-border-primary">
           {/* Left side */}
           <Button
             variant="outline"

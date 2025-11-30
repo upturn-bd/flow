@@ -3,11 +3,10 @@
 import { Attendance } from "@/hooks/useAttendance";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { FaChevronDown, FaCalendarAlt, FaSearch } from "react-icons/fa";
+import { CaretDown, Calendar, Search, Ban } from "@/lib/icons";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { Ban } from "lucide-react";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function AttendanceAbsentPage() {
@@ -59,32 +58,32 @@ export default function AttendanceAbsentPage() {
   }, [fetchSites]);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="bg-surface-primary rounded-lg shadow-sm">
       <div className="p-4 sm:p-6">
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FaCalendarAlt className="text-gray-400" />
+              <Calendar className="text-foreground-tertiary" />
             </div>
             <input
               type="date"
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
-              className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
+              className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
             />
           </div>
 
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FaCalendarAlt className="text-gray-400" />
+              <Calendar className="text-foreground-tertiary" />
             </div>
             <input
               type="date"
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
-              className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
+              className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
             />
           </div>
 
@@ -92,7 +91,7 @@ export default function AttendanceAbsentPage() {
             <select
               value={siteId}
               onChange={(e) => setSiteId(e.target.value)}
-              className="appearance-none pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full text-sm"
+              className="appearance-none pl-4 pr-10 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-full text-sm"
             >
               <option value="">Select Site</option>
               {sites.map((site) => (
@@ -100,7 +99,7 @@ export default function AttendanceAbsentPage() {
               ))}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <FaChevronDown className="text-gray-400 text-xs" />
+              <CaretDown className="text-foreground-tertiary text-xs" />
             </div>
           </div>
 
@@ -108,7 +107,7 @@ export default function AttendanceAbsentPage() {
             onClick={fetchAttendanceData}
             className="bg-[#192D46] text-white rounded-lg px-4 py-2.5 font-medium hover:bg-[#0f1c2d] transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
           >
-            <FaSearch />
+            <Search />
             <span>Search</span>
           </button>
         </div>
@@ -117,29 +116,29 @@ export default function AttendanceAbsentPage() {
         {loading ? (
           <LoadingSection text="Loading attendance records..." icon={Ban} color="blue" />
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-gray-200">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="overflow-x-auto rounded-lg border border-border-primary">
+            <table className="min-w-full divide-y divide-border-primary">
               <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Site</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-In</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-Out</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <tr className="bg-background-secondary dark:bg-background-tertiary">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Date</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Site</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Check-In</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Check-Out</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-background-primary divide-y divide-border-primary">
                 {attendanceData.length > 0 ? (
                   attendanceData.map((entry, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50 transition-colors duration-150">
-                      <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{formatDateToDayMonth(entry.attendance_date)}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">
+                    <tr key={idx} className="hover:bg-background-secondary dark:bg-background-tertiary transition-colors duration-150">
+                      <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">{formatDateToDayMonth(entry.attendance_date)}</td>
+                      <td className="px-4 py-3 text-sm text-foreground-primary">
                         {sites.find((s) => s.id === entry.site_id)?.name || "Unknown Site"}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">
                         {entry.check_in_time ? formatTimeFromISO(entry.check_in_time) : "N/A"}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">
                         {entry.check_out_time ? formatTimeFromISO(entry.check_out_time) : "N/A"}
                       </td>
                       <td className="px-4 py-3 text-sm">
@@ -151,7 +150,7 @@ export default function AttendanceAbsentPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-sm text-gray-500 text-center">
+                    <td colSpan={5} className="px-4 py-8 text-sm text-foreground-tertiary text-center">
                       No attendance records found.
                     </td>
                   </tr>

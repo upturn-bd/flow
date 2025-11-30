@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { StakeholderProcessStep, FieldType, FieldDefinition, DropdownOption } from "@/lib/types/schemas";
 import { useTeams } from "@/hooks/useTeams";
-import { Plus, Trash2, Calendar, ChevronDown, ChevronUp, ArrowUp, ArrowDown, List, X, Calculator, AlertCircle } from "lucide-react";
+import { Plus, Trash, Calendar, CaretDown, CaretUp, ArrowUp, ArrowDown, List, X, Calculator, WarningCircle } from "@/lib/icons";
 import { FIELD_TYPES, generateFieldKey } from "@/lib/constants";
 import Toggle from "@/components/ui/Toggle";
 import FormulaEditor from "./FormulaEditor";
@@ -85,10 +85,10 @@ export default function StepManager({
     <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold text-gray-900">Process Steps</h3>
+        <h3 className="text-lg font-semibold text-foreground-primary">Process Steps</h3>
         <button
           onClick={handleAddStep}
-          className="flex items-center justify-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          className="flex items-center justify-center gap-2 px-3 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
         >
           <Plus size={16} />
           Add Step
@@ -97,16 +97,16 @@ export default function StepManager({
 
       {/* Steps List */}
       {steps.length === 0 ? (
-        <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <p className="text-sm text-gray-600">No steps defined yet</p>
-          <p className="text-xs text-gray-500 mt-1">Add at least one step to create the process</p>
+        <div className="text-center py-8 bg-background-secondary rounded-lg border-2 border-dashed border-border-primary">
+          <p className="text-sm text-foreground-secondary">No steps defined yet</p>
+          <p className="text-xs text-foreground-tertiary mt-1">Add at least one step to create the process</p>
         </div>
       ) : (
         <div className="space-y-3">
           {steps.map((step, index) => (
             <div
               key={step.id}
-              className="flex flex-col sm:flex-row items-start gap-3 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all"
+              className="flex flex-col sm:flex-row items-start gap-3 p-3 sm:p-4 bg-surface-primary border border-border-primary rounded-lg hover:shadow-md transition-all"
             >
               {/* Reorder Buttons + Step Number - Mobile: Horizontal, Desktop: Vertical */}
               <div className="flex sm:flex-col items-center sm:items-start gap-2 sm:gap-1 w-full sm:w-auto">
@@ -116,8 +116,8 @@ export default function StepManager({
                     disabled={index === 0}
                     className={`p-1.5 sm:p-1 rounded transition-colors ${
                       index === 0
-                        ? "text-gray-300 cursor-not-allowed"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        ? "text-foreground-tertiary/50 cursor-not-allowed"
+                        : "text-foreground-secondary hover:bg-background-secondary hover:text-foreground-primary"
                     }`}
                     title="Move up"
                     aria-label="Move step up"
@@ -129,8 +129,8 @@ export default function StepManager({
                     disabled={index === steps.length - 1}
                     className={`p-1.5 sm:p-1 rounded transition-colors ${
                       index === steps.length - 1
-                        ? "text-gray-300 cursor-not-allowed"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        ? "text-foreground-tertiary/50 cursor-not-allowed"
+                        : "text-foreground-secondary hover:bg-background-secondary hover:text-foreground-primary"
                     }`}
                     title="Move down"
                     aria-label="Move step down"
@@ -140,7 +140,7 @@ export default function StepManager({
                 </div>
                 
                 {/* Step Number */}
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-sm">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-semibold text-sm">
                   {step.step_order}
                 </div>
               </div>
@@ -149,11 +149,11 @@ export default function StepManager({
               <div className="flex-1 min-w-0 w-full sm:w-auto">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 text-base">{step.name}</h4>
+                    <h4 className="font-medium text-foreground-primary text-base">{step.name}</h4>
                     {step.description && (
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">{step.description}</p>
+                      <p className="text-sm text-foreground-secondary mt-1 line-clamp-2">{step.description}</p>
                     )}
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-gray-500">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-foreground-tertiary">
                       <span className="inline-flex items-center gap-1">
                         <span className="font-medium">
                           {step.teams && step.teams.length > 1 ? "Teams:" : "Team:"}
@@ -191,16 +191,16 @@ export default function StepManager({
                   <div className="flex items-center gap-1.5 sm:gap-1 self-end sm:self-start">
                     <button
                       onClick={() => handleEditStep(step)}
-                      className="px-3 py-1.5 text-xs sm:text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 rounded transition-colors font-medium"
+                      className="px-3 py-1.5 text-xs sm:text-sm text-primary-600 bg-primary-50 hover:bg-primary-100 rounded transition-colors font-medium"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteStep(step)}
-                      className="p-1.5 sm:p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                      className="p-1.5 sm:p-1 text-error hover:bg-error/10 rounded transition-colors"
                       aria-label="Delete step"
                     >
-                      <Trash2 size={16} />
+                      <Trash size={16} />
                     </button>
                   </div>
                 </div>
@@ -415,14 +415,14 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900">
+      <div className="bg-surface-primary rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border-primary sticky top-0 bg-surface-primary z-10">
+          <h3 className="text-lg sm:text-xl font-bold text-foreground-primary">
             {step ? "Edit Step" : "Add New Step"}
           </h3>
           <button 
             onClick={onClose} 
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+            className="p-2 hover:bg-background-secondary rounded-lg transition-colors flex-shrink-0"
             aria-label="Close"
           >
             <X size={20} />
@@ -432,17 +432,17 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5 sm:space-y-6">
           {/* Validation Errors Summary */}
           {Object.keys(validationErrors).length > 0 && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4" data-validation-error>
+            <div className="bg-error/10 border border-error/30 rounded-lg p-4" data-validation-error>
               <div className="flex items-start gap-2">
-                <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
+                <WarningCircle className="text-error flex-shrink-0 mt-0.5" size={20} />
                 <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-red-800 mb-2">Please fix the following errors:</h4>
-                  <ul className="text-sm text-red-700 space-y-1 list-disc list-inside">
+                  <h4 className="text-sm font-semibold text-error mb-2">Please fix the following errors:</h4>
+                  <ul className="text-sm text-error space-y-1 list-disc list-inside">
                     {Object.entries(validationErrors).slice(0, 5).map(([key, message]) => (
                       <li key={key}>{message}</li>
                     ))}
                     {Object.keys(validationErrors).length > 5 && (
-                      <li className="text-red-600">...and {Object.keys(validationErrors).length - 5} more errors</li>
+                      <li className="text-error">...and {Object.keys(validationErrors).length - 5} more errors</li>
                     )}
                   </ul>
                 </div>
@@ -452,8 +452,8 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
           
           {/* Step Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Step Name <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-foreground-secondary mb-2">
+              Step Name <span className="text-error">*</span>
             </label>
             <input
               type="text"
@@ -465,26 +465,26 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
                   setValidationErrors(rest);
                 }
               }}
-              className={`w-full px-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors ${
-                validationErrors.name ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition-colors ${
+                validationErrors.name ? 'border-error' : 'border-border-primary'
               }`}
               required
             />
             {validationErrors.name && (
-              <p className="text-red-600 text-xs mt-1">{validationErrors.name}</p>
+              <p className="text-error text-xs mt-1">{validationErrors.name}</p>
             )}
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground-secondary mb-2">
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={2}
-              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors resize-none"
+              className="w-full px-3 py-2.5 sm:py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition-colors resize-none"
             />
           </div>
 
@@ -512,7 +512,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
               required
               error={validationErrors.team_ids}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-foreground-tertiary mt-1">
               Select one or more teams that can work on this step
             </p>
           </div>
@@ -528,25 +528,25 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
             {formData.use_date_range && (
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pl-0 sm:pl-14">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-foreground-secondary mb-1">
                     Start Date
                   </label>
                   <input
                     type="date"
                     value={formData.start_date}
                     onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-foreground-secondary mb-1">
                     End Date
                   </label>
                   <input
                     type="date"
                     value={formData.end_date}
                     onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -554,13 +554,13 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
           </div>
 
           {/* Field Definitions */}
-          <div className="border-t border-gray-200 pt-5 sm:pt-6">
+          <div className="border-t border-border-primary pt-5 sm:pt-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-              <label className="text-sm font-medium text-gray-700">Data Fields</label>
+              <label className="text-sm font-medium text-foreground-secondary">Data Fields</label>
               <button
                 type="button"
                 onClick={addField}
-                className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors font-medium"
+                className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm text-primary-600 bg-primary-50 hover:bg-primary-100 border border-primary-200 rounded-lg transition-colors font-medium"
               >
                 <Plus size={16} />
                 Add Field
@@ -592,7 +592,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
           </div>
 
           {/* Rejection Option */}
-          <div className="border-t border-gray-200 pt-5 sm:pt-6">
+          <div className="border-t border-border-primary pt-5 sm:pt-6">
             <Toggle
               checked={formData.can_reject}
               onChange={(checked) => setFormData({ ...formData, can_reject: checked })}
@@ -602,7 +602,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
           </div>
 
           {/* Status Field Option */}
-          <div className="border-t border-gray-200 pt-5 sm:pt-6">
+          <div className="border-t border-border-primary pt-5 sm:pt-6">
             <Toggle
               checked={formData.status_field?.enabled || false}
               onChange={(checked) => setFormData({ 
@@ -622,15 +622,15 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
               <div className="mt-4 pl-0 sm:pl-14 space-y-4">
                 {/* Status Field Error Warning */}
                 {validationErrors.status_field && (
-                  <div className="p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
-                    <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={14} />
-                    <p className="text-xs text-red-800">{validationErrors.status_field}</p>
+                  <div className="p-2 bg-error/10 border border-error/30 rounded flex items-start gap-2">
+                    <WarningCircle className="text-error flex-shrink-0 mt-0.5" size={14} />
+                    <p className="text-xs text-error">{validationErrors.status_field}</p>
                   </div>
                 )}
                 
                 {/* Status Label */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-foreground-secondary mb-1">
                     Status Field Label
                   </label>
                   <input
@@ -645,14 +645,14 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
                         options: formData.status_field?.options || []
                       }
                     })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition-colors"
                     placeholder="e.g., Status, Progress, Stage"
                   />
                 </div>
 
                 {/* Status Options */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-foreground-secondary mb-2">
                     Status Options
                   </label>
                   
@@ -684,7 +684,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
                         }
                       }}
                       placeholder="Enter status option (e.g., In Progress, Completed)"
-                      className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+                      className="flex-1 px-3 py-2 text-sm border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition-colors"
                     />
                     <button
                       type="button"
@@ -706,7 +706,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
                           setStatusOptionInput("");
                         }
                       }}
-                      className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium whitespace-nowrap"
+                      className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium whitespace-nowrap"
                     >
                       Add
                     </button>
@@ -718,9 +718,9 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
                       (formData.status_field?.options || []).map((option, optIndex) => (
                         <div
                           key={optIndex}
-                          className="flex items-center justify-between p-2.5 sm:p-2 bg-white border border-gray-200 rounded text-sm"
+                          className="flex items-center justify-between p-2.5 sm:p-2 bg-surface-primary border border-border-primary rounded text-sm"
                         >
-                          <span className="text-gray-700">{option.label}</span>
+                          <span className="text-foreground-secondary">{option.label}</span>
                           <button
                             type="button"
                             onClick={() => {
@@ -735,14 +735,14 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
                                 }
                               });
                             }}
-                            className="text-red-600 hover:text-red-700 text-xs font-medium"
+                            className="text-error hover:text-error/80 text-xs font-medium"
                           >
                             Remove
                           </button>
                         </div>
                       ))
                     ) : (
-                      <p className="text-xs text-gray-500 italic">No status options added yet</p>
+                      <p className="text-xs text-foreground-tertiary italic">No status options added yet</p>
                     )}
                   </div>
                 </div>
@@ -751,18 +751,18 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-4 border-t border-gray-200 sticky bottom-0 bg-white -mx-4 sm:-mx-6 px-4 sm:px-6 pb-4 sm:pb-0">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-4 border-t border-border-primary sticky bottom-0 bg-surface-primary -mx-4 sm:-mx-6 px-4 sm:px-6 pb-4 sm:pb-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 sm:py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="px-4 py-2.5 sm:py-2 border border-border-primary text-foreground-secondary rounded-lg hover:bg-background-secondary transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 font-medium"
+              className="px-4 py-2.5 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 font-medium"
             >
               {loading ? "Saving..." : step ? "Update Step" : "Add Step"}
             </button>
@@ -918,15 +918,15 @@ function FieldEditor({
   };
 
   return (
-    <div className={`bg-gray-50 rounded-lg border ${
-      hasLabelError || hasOptionsError || hasFormulaError ? 'border-red-300 bg-red-50/50' : 'border-gray-200'
+    <div className={`bg-background-secondary rounded-lg border ${
+      hasLabelError || hasOptionsError || hasFormulaError ? 'border-error/30 bg-error/10' : 'border-border-primary'
     }`}>
       {/* Validation Error Banner */}
       {(hasLabelError || hasOptionsError || hasFormulaError) && (
-        <div className="px-3 py-2 bg-red-100 border-b border-red-200 flex items-center gap-2">
-          <AlertCircle className="text-red-600 flex-shrink-0" size={16} />
+        <div className="px-3 py-2 bg-error/20 border-b border-error/30 flex items-center gap-2">
+          <WarningCircle className="text-error flex-shrink-0" size={16} />
           <div className="flex-1">
-            <p className="text-xs font-medium text-red-800">
+            <p className="text-xs font-medium text-error">
               {hasLabelError && validationErrors[`${fieldKey}_label`]}
               {hasOptionsError && validationErrors[`${fieldKey}_options`]}
               {hasFormulaError && validationErrors[`${fieldKey}_formula`]}
@@ -960,12 +960,12 @@ function FieldEditor({
                 }
               }}
               placeholder="Field Label"
-              className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-colors ${
-                hasLabelError ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none bg-surface-primary transition-colors ${
+                hasLabelError ? 'border-error' : 'border-border-primary'
               }`}
             />
             {hasLabelError && (
-              <p className="text-red-600 text-xs mt-1">{validationErrors[`${fieldKey}_label`]}</p>
+              <p className="text-error text-xs mt-1">{validationErrors[`${fieldKey}_label`]}</p>
             )}
           </div>
           <select
@@ -974,7 +974,7 @@ function FieldEditor({
               const newType = e.target.value as FieldType;
               onUpdate(index, { type: newType, options: newType === 'dropdown' || newType === 'multi_select' ? [] : undefined });
             }}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-colors"
+            className="px-3 py-2 text-sm border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 outline-none bg-surface-primary transition-colors"
           >
             {Object.values(FIELD_TYPES).map((type) => (
               <option key={type} value={type}>
@@ -997,12 +997,12 @@ function FieldEditor({
               onClick={onEditToggle}
               className={`flex-1 sm:flex-initial px-3 py-2 rounded-lg transition-colors font-medium text-sm flex items-center justify-center gap-1.5 ${
                 isEditing 
-                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                  : 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100'
+                  ? 'bg-primary-600 text-white hover:bg-primary-700' 
+                  : 'bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100'
               }`}
               title={isEditing ? "Collapse options" : "Edit options"}
             >
-              {isEditing ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              {isEditing ? <CaretUp size={16} /> : <CaretDown size={16} />}
               <span>{isEditing ? "Collapse" : "Options"}</span>
             </button>
           )}
@@ -1037,38 +1037,38 @@ function FieldEditor({
           <button
             type="button"
             onClick={() => onRemove(index)}
-            className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+            className="p-2 text-error hover:bg-error/10 rounded transition-colors"
             aria-label="Remove field"
           >
-            <Trash2 size={16} />
+            <Trash size={16} />
           </button>
         </div>
       </div>
 
       {/* Dropdown Options Editor */}
       {isDropdownType && isEditing && (
-        <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3 bg-white">
+        <div className="px-3 pb-3 border-t border-border-primary mt-2 pt-3 bg-surface-primary">
           {/* Options Error Warning */}
           {hasOptionsError && (
-            <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
-              <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={14} />
-              <p className="text-xs text-red-800">{validationErrors[`${fieldKey}_options`]}</p>
+            <div className="mb-3 p-2 bg-error/10 border border-error/30 rounded flex items-start gap-2">
+              <WarningCircle className="text-error flex-shrink-0 mt-0.5" size={14} />
+              <p className="text-xs text-error">{validationErrors[`${fieldKey}_options`]}</p>
             </div>
           )}
           
           {/* Section Header */}
           <div className="mb-3">
-            <h4 className="text-sm font-semibold text-gray-800 mb-1">
+            <h4 className="text-sm font-semibold text-foreground-primary mb-1">
               {field.type === 'multi_select' ? 'Multi-Select Options' : 'Dropdown Options'}
             </h4>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-foreground-secondary">
               Add the options that users can select from for this field
             </p>
           </div>
           
           {/* Add Option Input */}
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <label className="block text-xs font-medium text-blue-900 mb-2">
+          <div className="mb-4 p-3 bg-primary-50 border border-primary-200 rounded-lg">
+            <label className="block text-xs font-medium text-primary-900 mb-2">
               Add New Option
             </label>
             <div className="flex gap-2">
@@ -1083,12 +1083,12 @@ function FieldEditor({
                   }
                 }}
                 placeholder="Type option name and press Enter or click Add"
-                className="flex-1 px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white"
+                className="flex-1 px-3 py-2 text-sm border border-primary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary"
               />
               <button
                 type="button"
                 onClick={addOption}
-                className="flex items-center gap-1 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                className="flex items-center gap-1 px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
               >
                 <Plus size={14} />
                 Add Option
@@ -1098,23 +1098,23 @@ function FieldEditor({
 
           {/* Options List */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-2">
+            <label className="block text-xs font-medium text-foreground-secondary mb-2">
               Available Options ({(field.options || []).length})
             </label>
             <div className="space-y-2">
               {(field.options || []).length > 0 ? (
                 (field.options || []).map((option, optIndex) => (
-                <div key={optIndex} className="bg-white border border-gray-200 rounded">
+                <div key={optIndex} className="bg-surface-primary border border-border-primary rounded">
                   <div className="flex items-center justify-between p-2">
-                    <span className="text-gray-700 text-sm">{option.label}</span>
+                    <span className="text-foreground-secondary text-sm">{option.label}</span>
                     <div className="flex items-center gap-1">
                       <button
                         type="button"
                         onClick={() => setEditingOptionNested(editingOptionNested === optIndex ? null : optIndex)}
                         className={`px-2 py-1 text-xs rounded transition-colors ${
                           editingOptionNested === optIndex
-                            ? 'bg-blue-50 text-blue-600'
-                            : 'text-gray-600 hover:bg-gray-100'
+                            ? 'bg-primary-50 text-primary-600'
+                            : 'text-foreground-tertiary hover:bg-background-secondary'
                         }`}
                         title="Configure nested fields for this option"
                       >
@@ -1123,7 +1123,7 @@ function FieldEditor({
                       <button
                         type="button"
                         onClick={() => removeOption(optIndex)}
-                        className="text-red-600 hover:text-red-700 text-xs px-2"
+                        className="text-error hover:text-error/80 text-xs px-2"
                       >
                         Remove
                       </button>
@@ -1132,15 +1132,15 @@ function FieldEditor({
                   
                   {/* Option Nested Fields Editor */}
                   {editingOptionNested === optIndex && (
-                    <div className="px-3 pb-3 border-t border-gray-100 bg-gray-50">
+                    <div className="px-3 pb-3 border-t border-border-secondary bg-background-secondary">
                       <div className="flex items-center justify-between mb-2 mt-2">
-                        <label className="text-xs font-medium text-gray-700">
+                        <label className="text-xs font-medium text-foreground-secondary">
                           Nested Fields for "{option.label}"
                         </label>
                         <button
                           type="button"
                           onClick={() => addOptionNestedField(optIndex)}
-                          className="flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                          className="flex items-center gap-1 px-2 py-1 text-xs text-primary-600 hover:bg-primary-50 rounded transition-colors"
                         >
                           <Plus size={12} />
                           Add
@@ -1148,7 +1148,7 @@ function FieldEditor({
                       </div>
                       <div className="space-y-2">
                         {(option.nested || []).map((nestedField, nestedIdx) => (
-                          <div key={nestedIdx} className="bg-white p-2 sm:p-2.5 rounded border border-gray-200 space-y-2">
+                          <div key={nestedIdx} className="bg-surface-primary p-2 sm:p-2.5 rounded border border-border-primary space-y-2">
                             <div className="flex flex-col sm:flex-row gap-2">
                               <input
                                 type="text"
@@ -1168,12 +1168,12 @@ function FieldEditor({
                                   updateOptionNestedField(optIndex, nestedIdx, updates);
                                 }}
                                 placeholder="Field Label"
-                                className="flex-1 px-2 py-1.5 sm:py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none"
+                                className="flex-1 px-2 py-1.5 sm:py-1 text-xs border border-border-primary rounded focus:ring-1 focus:ring-primary-500 outline-none"
                               />
                               <select
                                 value={nestedField.type}
                                 onChange={(e) => updateOptionNestedField(optIndex, nestedIdx, { type: e.target.value as FieldType })}
-                                className="w-full sm:w-auto px-2 py-1.5 sm:py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none"
+                                className="w-full sm:w-auto px-2 py-1.5 sm:py-1 text-xs border border-border-primary rounded focus:ring-1 focus:ring-primary-500 outline-none"
                               >
                                 {Object.values(FIELD_TYPES).map((type) => (
                                   <option key={type} value={type}>
@@ -1188,12 +1188,12 @@ function FieldEditor({
                                   checked={nestedField.required}
                                   onChange={(checked) => updateOptionNestedField(optIndex, nestedIdx, { required: checked })}
                                 />
-                                <span className="text-xs text-gray-700 font-medium">Required</span>
+                                <span className="text-xs text-foreground-secondary font-medium">Required</span>
                               </div>
                               <button
                                 type="button"
                                 onClick={() => removeOptionNestedField(optIndex, nestedIdx)}
-                                className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded font-medium"
+                                className="px-2 py-1 text-xs text-error hover:bg-error/10 rounded font-medium"
                               >
                                 Remove
                               </button>
@@ -1201,7 +1201,7 @@ function FieldEditor({
                           </div>
                         ))}
                         {(!option.nested || option.nested.length === 0) && (
-                          <p className="text-xs text-gray-500 italic text-center py-2">
+                          <p className="text-xs text-foreground-tertiary italic text-center py-2">
                             No nested fields defined
                           </p>
                         )}
@@ -1211,9 +1211,9 @@ function FieldEditor({
                 </div>
               ))
             ) : (
-              <div className="text-center py-6 px-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">No options added yet</p>
-                <p className="text-xs text-gray-500">Use the "Add New Option" section above to create your first option</p>
+              <div className="text-center py-6 px-4 bg-background-secondary border-2 border-dashed border-border-primary rounded-lg">
+                <p className="text-sm text-foreground-secondary mb-1">No options added yet</p>
+                <p className="text-xs text-foreground-tertiary">Use the "Add New Option" section above to create your first option</p>
               </div>
             )}
           </div>
@@ -1223,11 +1223,11 @@ function FieldEditor({
 
       {/* Formula Editor (for calculated fields) */}
       {isCalculatedField && showFormulaEditor && (
-        <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3 bg-white">
+        <div className="px-3 pb-3 border-t border-border-primary mt-2 pt-3 bg-surface-primary">
           {hasFormulaError && (
-            <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded flex items-start gap-2">
-              <AlertCircle className="text-yellow-600 flex-shrink-0 mt-0.5" size={14} />
-              <p className="text-xs text-yellow-800">
+            <div className="mb-3 p-2 bg-warning/10 border border-warning/30 rounded flex items-start gap-2">
+              <WarningCircle className="text-warning flex-shrink-0 mt-0.5" size={14} />
+              <p className="text-xs text-warning">
                 Please configure a valid formula for this calculated field
               </p>
             </div>
@@ -1250,13 +1250,13 @@ function FieldEditor({
 
       {/* General Nested Fields Editor (for all field types) */}
       {showNestedFields && (
-        <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3 bg-white">
+        <div className="px-3 pb-3 border-t border-border-primary mt-2 pt-3 bg-surface-primary">
           {/* Section Header */}
           <div className="mb-3">
-            <h4 className="text-sm font-semibold text-gray-800 mb-1">
+            <h4 className="text-sm font-semibold text-foreground-primary mb-1">
               Nested Fields
             </h4>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-foreground-secondary">
               Define additional fields that appear when this field is filled
             </p>
           </div>
@@ -1266,7 +1266,7 @@ function FieldEditor({
             <button
               type="button"
               onClick={() => addNestedField()}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors font-medium w-full justify-center"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-primary-600 bg-primary-50 hover:bg-primary-100 border border-primary-200 rounded-lg transition-colors font-medium w-full justify-center"
             >
               <Plus size={14} />
               Add Nested Field
@@ -1276,7 +1276,7 @@ function FieldEditor({
           {/* Nested Fields List */}
           <div className="space-y-2">
             {(field.nested || []).map((nestedField, nestedIdx) => (
-              <div key={nestedIdx} className="bg-white p-2 sm:p-2.5 rounded border border-gray-200 space-y-2">
+              <div key={nestedIdx} className="bg-surface-primary p-2 sm:p-2.5 rounded border border-border-primary space-y-2">
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
@@ -1296,12 +1296,12 @@ function FieldEditor({
                       updateNestedField(nestedIdx, updates);
                     }}
                     placeholder="Field Label"
-                    className="flex-1 px-2 py-1.5 sm:py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none"
+                    className="flex-1 px-2 py-1.5 sm:py-1 text-xs border border-border-secondary rounded focus:ring-1 focus:ring-blue-500 outline-none"
                   />
                   <select
                     value={nestedField.type}
                     onChange={(e) => updateNestedField(nestedIdx, { type: e.target.value as FieldType })}
-                    className="w-full sm:w-auto px-2 py-1.5 sm:py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none"
+                    className="w-full sm:w-auto px-2 py-1.5 sm:py-1 text-xs border border-border-secondary rounded focus:ring-1 focus:ring-blue-500 outline-none"
                   >
                     {Object.values(FIELD_TYPES).map((type) => (
                       <option key={type} value={type}>
@@ -1316,7 +1316,7 @@ function FieldEditor({
                       checked={nestedField.required}
                       onChange={(checked) => updateNestedField(nestedIdx, { required: checked })}
                     />
-                    <span className="text-xs text-gray-700 font-medium">Required</span>
+                    <span className="text-xs text-foreground-secondary font-medium">Required</span>
                   </div>
                   <button
                     type="button"
@@ -1329,7 +1329,7 @@ function FieldEditor({
               </div>
             ))}
             {(!field.nested || field.nested.length === 0) && (
-              <p className="text-xs text-gray-500 italic text-center py-2">
+              <p className="text-xs text-foreground-tertiary italic text-center py-2">
                 No nested fields defined. Click "Add Nested Field" to create one.
               </p>
             )}

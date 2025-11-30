@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
-import { UserPlus, Loader2, Check, X, AlertTriangle, Users, User, RefreshCw } from "lucide-react";
+import { UserPlus, Loader, Check, X, AlertTriangle, Users, User, RefreshCw } from "@/lib/icons";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -32,7 +32,7 @@ const Textarea = ({
   ...props
 }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
   <textarea
-    className={`w-full p-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${className}`}
+    className={`w-full p-3 text-sm border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${className}`}
     {...props}
   />
 );
@@ -161,7 +161,7 @@ export default function OnboardingApprovalPage() {
         transition={{ duration: 0.3 }}
         className="flex items-center mb-8"
       >
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center">
+        <h1 className="text-2xl font-bold text-foreground-primary flex items-center">
           <UserPlus className="mr-2 h-7 w-7 text-purple-600" />
           Employee Onboarding
         </h1>
@@ -184,8 +184,8 @@ export default function OnboardingApprovalPage() {
           >
             <Users className="h-16 w-16 text-purple-300 mb-4" />
           </motion.div>
-          <h3 className="text-xl font-medium text-gray-700 mb-2">No Pending Requests</h3>
-          <p className="text-gray-600 text-center max-w-md">
+          <h3 className="text-xl font-medium text-foreground-secondary mb-2">No Pending Requests</h3>
+          <p className="text-foreground-secondary text-center max-w-md">
             There are currently no pending onboarding requests that require approval.
           </p>
         </motion.div>
@@ -195,7 +195,7 @@ export default function OnboardingApprovalPage() {
           className="space-y-6"
         >
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-800">New User Requests</h2>
+            <h2 className="text-xl font-semibold text-foreground-primary">New User Requests</h2>
             <div className="flex items-center gap-4">
               <button
                 onClick={handleRefresh}
@@ -205,7 +205,7 @@ export default function OnboardingApprovalPage() {
                 <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
               </button>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-foreground-tertiary">
                 {pendingEmployees.length} request{pendingEmployees.length !== 1 ? 's' : ''} pending
               </div>
             </div>
@@ -220,7 +220,7 @@ export default function OnboardingApprovalPage() {
                 y: -4,
                 boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)" 
               }}
-              className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4"
+              className="bg-surface-primary rounded-xl p-6 shadow-sm border border-border-primary space-y-4"
             >
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
@@ -228,10 +228,10 @@ export default function OnboardingApprovalPage() {
                     <User className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-800">
+                    <h3 className="font-semibold text-foreground-primary">
                       {emp.first_name} {emp.last_name}
                     </h3>
-                    <p className="text-sm text-gray-500">{emp.designation}</p>
+                    <p className="text-sm text-foreground-tertiary">{emp.designation}</p>
                   </div>
                 </div>
                 <div className="text-xs font-medium text-white bg-purple-500 px-2 py-1 rounded-full">
@@ -242,28 +242,28 @@ export default function OnboardingApprovalPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Department</span>
-                    <span className="font-medium text-gray-700">
+                    <span className="text-foreground-tertiary">Department</span>
+                    <span className="font-medium text-foreground-secondary">
                       {departments.find(d => d.id === emp.department_id)?.name || 'Not assigned'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Phone</span>
-                    <span className="font-medium text-gray-700">{emp.phone_number}</span>
+                    <span className="text-foreground-tertiary">Phone</span>
+                    <span className="font-medium text-foreground-secondary">{emp.phone_number}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Email</span>
-                    <span className="font-medium text-gray-700">{emp.email}</span>
+                    <span className="text-foreground-tertiary">Email</span>
+                    <span className="font-medium text-foreground-secondary">{emp.email}</span>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Job Status</span>
-                    <span className="font-medium text-gray-700">{emp.job_status}</span>
+                    <span className="text-foreground-tertiary">Job Status</span>
+                    <span className="font-medium text-foreground-secondary">{emp.job_status}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Joining Date</span>
-                    <span className="font-medium text-gray-700">
+                    <span className="text-foreground-tertiary">Joining Date</span>
+                    <span className="font-medium text-foreground-secondary">
                       {new Date(emp.hire_date).toLocaleDateString('en-US', { 
                         year: 'numeric', 
                         month: 'short', 
@@ -272,8 +272,8 @@ export default function OnboardingApprovalPage() {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Supervisor</span>
-                    <span className="font-medium text-gray-700">
+                    <span className="text-foreground-tertiary">Supervisor</span>
+                    <span className="font-medium text-foreground-secondary">
                       {employees.length > 0 && employees.filter((e) => e.id === emp.supervisor_id)[0]?.name || 'Not assigned'}
                     </span>
                   </div>
@@ -295,14 +295,14 @@ export default function OnboardingApprovalPage() {
                       <div className="flex gap-4">
                         <button
                           disabled
-                          className="bg-gray-300 text-gray-500 rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center gap-2"
+                          className="bg-gray-300 text-foreground-tertiary rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center gap-2"
                         >
                           <X className="h-4 w-4" />
                           Reject
                         </button>
                         <button
                           disabled
-                          className="bg-gray-300 text-gray-500 rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center gap-2"
+                          className="bg-gray-300 text-foreground-tertiary rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center gap-2"
                         >
                           <Check className="h-4 w-4" />
                           Accept

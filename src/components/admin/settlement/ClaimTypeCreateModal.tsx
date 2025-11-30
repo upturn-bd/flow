@@ -4,7 +4,7 @@ import { FormField, SelectField, NumberField, SingleEmployeeSelector } from '@/c
 import { validateClaimType, type ClaimTypeData } from '@/lib/validation';
 import { useEmployees } from '@/hooks/useEmployees';
 import { usePositions } from '@/hooks/usePositions';
-import { Receipt, UserPlus, Money } from '@phosphor-icons/react';
+import { Receipt, UserPlus, Money } from '@/lib/icons';
 
 interface ClaimTypeCreateModalProps {
   isOpen: boolean;
@@ -41,7 +41,7 @@ export const ClaimTypeCreateModal: React.FC<ClaimTypeCreateModalProps> = ({
   return (
     <FormModal<ClaimTypeData>
       title="Configure Settlement Item"
-      icon={<Receipt size={24} weight="duotone" className="text-gray-600" />}
+      icon={<Receipt size={24} weight="duotone" className="text-foreground-secondary" />}
       initialValues={defaultData}
       validationFn={validateClaimType}
       onSubmit={onSubmit}
@@ -61,7 +61,7 @@ export const ClaimTypeCreateModal: React.FC<ClaimTypeCreateModalProps> = ({
             error={errors.settlement_item}
             required
             placeholder="Enter settlement item name"
-            icon={<Receipt size={18} weight="duotone" className="text-gray-500" />}
+            icon={<Receipt size={18} weight="duotone" className="text-foreground-tertiary" />}
           />
 
           <NumberField
@@ -73,7 +73,7 @@ export const ClaimTypeCreateModal: React.FC<ClaimTypeCreateModalProps> = ({
             required
             min={1}
             placeholder="Enter allowance amount"
-            icon={<Money size={18} weight="duotone" className="text-gray-500" />}
+            icon={<Money size={18} weight="duotone" className="text-foreground-tertiary" />}
           />
 
           <SingleEmployeeSelector

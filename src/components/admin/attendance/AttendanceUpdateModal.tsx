@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/modals';
 import { FormField, TimeField, MapField } from '@/components/forms';
 import { validateSite, type SiteData } from '@/lib/validation';
-import { Buildings, Clock } from '@phosphor-icons/react';
+import { Buildings, Clock } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 
 interface Coordinates {
@@ -96,7 +96,7 @@ export const AttendanceUpdateModal: React.FC<AttendanceUpdateModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Update Attendance Site"
-      icon={<Buildings size={24} weight="duotone" className="text-gray-600" />}
+      icon={<Buildings size={24} weight="duotone" className="text-foreground-secondary" />}
       size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -108,7 +108,7 @@ export const AttendanceUpdateModal: React.FC<AttendanceUpdateModalProps> = ({
           error={errors.name}
           required
           placeholder="Enter site name"
-          icon={<Buildings size={18} weight="duotone" className="text-gray-500" />}
+          icon={<Buildings size={18} weight="duotone" className="text-foreground-tertiary" />}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -119,7 +119,7 @@ export const AttendanceUpdateModal: React.FC<AttendanceUpdateModalProps> = ({
             onChange={handleChange}
             error={errors.check_in}
             required
-            icon={<Clock size={18} weight="duotone" className="text-gray-500" />}
+            icon={<Clock size={18} weight="duotone" className="text-foreground-tertiary" />}
           />
 
           <TimeField
@@ -129,7 +129,7 @@ export const AttendanceUpdateModal: React.FC<AttendanceUpdateModalProps> = ({
             onChange={handleChange}
             error={errors.check_out}
             required
-            icon={<Clock size={18} weight="duotone" className="text-gray-500" />}
+            icon={<Clock size={18} weight="duotone" className="text-foreground-tertiary" />}
           />
         </div>
 
@@ -146,7 +146,7 @@ export const AttendanceUpdateModal: React.FC<AttendanceUpdateModalProps> = ({
             type="button"
             variant="outline"
             onClick={onClose}
-            className="border border-gray-300 text-gray-700 hover:bg-gray-50"
+            className="border border-border-secondary text-foreground-secondary hover:bg-background-secondary dark:bg-background-tertiary"
           >
             Cancel
           </Button>
@@ -154,7 +154,7 @@ export const AttendanceUpdateModal: React.FC<AttendanceUpdateModalProps> = ({
             type="submit"
             variant="primary"
             disabled={!isValid || !hasChanges || isLoading}
-            className="bg-gray-800 hover:bg-gray-900 text-white disabled:opacity-50"
+            className="bg-primary-700 dark:bg-primary-600 hover:bg-primary-800 dark:hover:bg-primary-700 text-white disabled:opacity-50"
           >
             {isLoading ? 'Updating...' : 'Update Site'}
           </Button>

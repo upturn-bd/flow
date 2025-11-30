@@ -4,12 +4,13 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useRequisitionRequests, RequisitionState } from "@/hooks/useRequisition";
 import { supabase } from "@/lib/supabase/client";
 import {
-  Loader2,
+  Loader,
   ClipboardList,
   Clock,
   AlertCircle,
   Plus,
-} from "lucide-react";
+  WarningCircle,
+} from "@/lib/icons";
 import TabView from "@/components/ui/TabView";
 import { RequisitionCard } from "@/components/ops/requisition/RequisitionCard";
 import RequisitionCreateModal from "@/components/ops/requisition/RequisitionCreateModal";
@@ -147,15 +148,15 @@ export default function RequisitionPage() {
               content: (
                 <>
                   {loading && (
-                    <div className="flex justify-center items-center py-20 text-gray-500">
-                      <Loader2 className="animate-spin mr-2" />
+                    <div className="flex justify-center items-center py-20 text-foreground-tertiary">
+                      <Loader className="animate-spin mr-2" />
                       Loading requisitions...
                     </div>
                   )}
 
                   {!loading && filtered.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-                      <AlertCircle className="mb-2" size={28} />
+                    <div className="flex flex-col items-center justify-center py-20 text-foreground-tertiary">
+                      <WarningCircle className="mb-2" size={28} />
                       <p>No pending requisition requests found.</p>
                     </div>
                   )}
@@ -186,19 +187,19 @@ export default function RequisitionPage() {
               key: "history",
               label: "History",
               icon: <Clock />,
-              color: "text-gray-500",
+              color: "text-foreground-tertiary",
               content: (
                 <>
                   {loading && (
-                    <div className="flex justify-center items-center py-20 text-gray-500">
-                      <Loader2 className="animate-spin mr-2" />
+                    <div className="flex justify-center items-center py-20 text-foreground-tertiary">
+                      <Loader className="animate-spin mr-2" />
                       Loading history...
                     </div>
                   )}
 
                   {!loading && filtered.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-                      <AlertCircle className="mb-2" size={28} />
+                    <div className="flex flex-col items-center justify-center py-20 text-foreground-tertiary">
+                      <WarningCircle className="mb-2" size={28} />
                       <p>No past requisitions found.</p>
                     </div>
                   )}

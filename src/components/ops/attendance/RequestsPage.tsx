@@ -11,9 +11,9 @@ import {
   Clock,
   ExternalLink,
   CheckCircle,
-  AlertCircle,
+  WarningCircle,
   User2
-} from "lucide-react";
+} from "@/lib/icons";
 import {
   formatTimeFromISO,
   formatDateToDayMonth,
@@ -181,7 +181,7 @@ export default function AttendanceRequestsPage() {
             <FormSelectField
               name="status"
               label="Update Status"
-              icon={<AlertCircle size={18} />}
+              icon={<WarningCircle size={18} />}
               value={updateTag}
               onChange={(e) => setUpdateTag(e.target.value)}
               placeholder="Select new status"
@@ -193,7 +193,7 @@ export default function AttendanceRequestsPage() {
               ]}
             />
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+            <div className="flex justify-end gap-3 pt-4 border-t border-border-primary">
               <Button
                 type="button"
                 variant="outline"

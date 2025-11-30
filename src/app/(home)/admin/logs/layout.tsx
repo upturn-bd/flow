@@ -3,7 +3,7 @@
 import { AdminDataProvider } from "@/contexts/AdminDataContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, ChevronRight, ClipboardList, FileText } from "lucide-react";
+import { Home, CaretRight, ClipboardList, FileText } from "@/lib/icons";
 import { motion } from "framer-motion";
 
 // Helper function to capitalize and format the path segment
@@ -35,7 +35,7 @@ const LogsBreadcrumbs = () => {
     const currentPageLabel = formatSegment(currentSegment) + " Log";
     
     return (
-        <nav className="flex mb-6 text-sm font-medium text-gray-500" aria-label="Breadcrumb">
+        <nav className="flex mb-6 text-sm font-medium text-foreground-secondary" aria-label="Breadcrumb">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
                 
                 {/* 1. Render Base Breadcrumbs (Admin Management, Company Logs) */}
@@ -43,12 +43,12 @@ const LogsBreadcrumbs = () => {
                     <li key={index} className="inline-flex items-center">
                         <div className="flex items-center">
                             {/* Render separator for all items after the first one */}
-                            {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
+                            {index > 0 && <CaretRight className="w-4 h-4 text-foreground-tertiary" />}
                             
                             <Link 
                                 href={item.href} 
                                 // Adjust margin for items after Admin Management
-                                className={`ml-1 ${index > 0 ? 'md:ml-3' : 'md:ml-0'} text-gray-500 hover:text-blue-600 transition-colors inline-flex items-center`}
+                                className={`ml-1 ${index > 0 ? 'md:ml-3' : 'md:ml-0'} text-foreground-secondary hover:text-primary-600 transition-colors inline-flex items-center`}
                             >
                                 {item.label}
                             </Link>
@@ -59,9 +59,9 @@ const LogsBreadcrumbs = () => {
                 {/* 2. Current Active Page */}
                 <li aria-current="page">
                     <div className="flex items-center">
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                        <CaretRight className="w-4 h-4 text-foreground-tertiary" />
                         {/* Using ClipboardList icon for log-related pages */}
-                        <span className="ml-1 text-blue-600 md:ml-3 flex items-center font-semibold">
+                        <span className="ml-1 text-primary-600 md:ml-3 flex items-center font-semibold">
                             <ClipboardList className="w-4 h-4 mr-1.5" />
                             {currentPageLabel}
                         </span>

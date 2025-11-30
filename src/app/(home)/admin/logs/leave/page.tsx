@@ -6,7 +6,7 @@ import { useLeaveTypes } from "@/hooks/useLeaveManagement";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Check, X as CloseIcon, RotateCw } from "lucide-react";
+import { Loader, Check, X as CloseIcon, RotateCw } from "@/lib/icons";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
 import TabView, { TabItem } from "@/components/ui/TabView";
@@ -125,45 +125,45 @@ export default function LeaveLogsPage() {
       if (loading) {
          return (
             <div className="flex justify-center items-center h-32">
-               <Loader2 className="animate-spin text-gray-500" />
+               <Loader className="animate-spin text-foreground-tertiary" />
             </div>
          );
       }
 
       if (leaveRequests.length === 0) {
-         return <p className="text-gray-500 text-sm mt-2">No leave records found.</p>;
+         return <p className="text-foreground-tertiary text-sm mt-2">No leave records found.</p>;
       }
 
       return (
          <div className="overflow-x-auto">
-            <table className="w-full table-auto border border-gray-200 rounded-lg shadow-sm">
-               <thead className="bg-gray-100 text-gray-700 uppercase text-sm">
+            <table className="w-full table-auto border border-border-primary rounded-lg shadow-sm">
+               <thead className="bg-background-secondary dark:bg-background-tertiary text-foreground-secondary uppercase text-sm">
                   <tr>
-                     <th className="px-4 py-3 border-b">Employee</th>
-                     <th className="px-4 py-3 border-b">Leave Type</th>
-                     <th className="px-4 py-3 border-b">Dates</th>
-                     <th className="px-4 py-3 border-b">Total Days</th>
-                     <th className="px-4 py-3 border-b">Status</th>
-                     <th className="px-4 py-3 border-b">Actions</th>
+                     <th className="px-4 py-3 border-b border-border-primary">Employee</th>
+                     <th className="px-4 py-3 border-b border-border-primary">Leave Type</th>
+                     <th className="px-4 py-3 border-b border-border-primary">Dates</th>
+                     <th className="px-4 py-3 border-b border-border-primary">Total Days</th>
+                     <th className="px-4 py-3 border-b border-border-primary">Status</th>
+                     <th className="px-4 py-3 border-b border-border-primary">Actions</th>
                   </tr>
                </thead>
                <tbody>
                   {leaveRequests.map((leave, idx) => (
                      <tr
                         key={leave.id}
-                        className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 transition-all cursor-pointer`}
+                        className={`${idx % 2 === 0 ? "bg-surface-primary" : "bg-background-secondary dark:bg-background-tertiary"} hover:bg-surface-hover dark:hover:bg-surface-hover transition-all cursor-pointer`}
                         onClick={() => setSelectedLeave(leave)}
                      >
-                        <td className="px-4 py-3 border-b font-medium text-gray-800">
+                        <td className="px-4 py-3 border-b border-border-primary font-medium text-foreground-primary">
                            {employeeNames[leave.employee_id] || "Unknown"}
                         </td>
-                        <td className="px-4 py-3 border-b text-gray-600">{getLeaveTypeName(leave.type_id)}</td>
-                        <td className="px-4 py-3 border-b text-gray-600">
+                        <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">{getLeaveTypeName(leave.type_id)}</td>
+                        <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">
                            {leave.start_date} to {leave.end_date}
                         </td>
-                        <td className="px-4 py-3 border-b text-gray-600">{calculateTotalDays(leave.start_date, leave.end_date)}</td>
-                        <td className="px-4 py-3 border-b">
-                           <span className={`px-3 py-1 text-sm font-medium rounded-full ${statusStyles[leave.status] || "bg-gray-100 text-gray-700"}`}>
+                        <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">{calculateTotalDays(leave.start_date, leave.end_date)}</td>
+                        <td className="px-4 py-3 border-b border-border-primary">
+                           <span className={`px-3 py-1 text-sm font-medium rounded-full ${statusStyles[leave.status] || "bg-background-secondary dark:bg-background-tertiary text-foreground-secondary"}`}>
                               {leave.status}
                            </span>
                         </td>
@@ -210,12 +210,12 @@ export default function LeaveLogsPage() {
                {/* Leave Details Modal */}
                {selectedLeave && (
                   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                     <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 relative">
-                        <button className="absolute top-3 right-3 text-gray-500 hover:text-gray-800" onClick={() => setSelectedLeave(null)}>
+                     <div className="bg-surface-primary rounded-xl shadow-xl max-w-lg w-full p-6 relative">
+                        <button className="absolute top-3 right-3 text-foreground-tertiary hover:text-foreground-primary" onClick={() => setSelectedLeave(null)}>
                            <CloseIcon size={20} />
                         </button>
                         <h2 className="text-lg font-semibold mb-4">Leave Details</h2>
-                        <div className="space-y-2 text-gray-700">
+                        <div className="space-y-2 text-foreground-secondary">
                            <p><strong>Employee:</strong> {employeeNames[selectedLeave.employee_id] || "Unknown"}</p>
                            <p><strong>Type:</strong> {getLeaveTypeName(selectedLeave.type_id)}</p>
                            <p><strong>Dates:</strong> {selectedLeave.start_date} to {selectedLeave.end_date} ({calculateTotalDays(selectedLeave.start_date, selectedLeave.end_date)} days)</p>

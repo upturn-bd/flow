@@ -3,8 +3,8 @@
 import { Department } from "@/hooks/useDepartments";
 import { Grade } from "@/hooks/useGrades";
 import { Position } from "@/hooks/usePositions";
-import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
-import { BriefcaseBusiness, Building, GraduationCap, FileText, X } from "lucide-react";
+import { PencilSimple, Trash } from "@/lib/icons";
+import { BriefcaseBusiness, Building, GraduationCap, FileText, X } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
@@ -55,55 +55,55 @@ export default function PositionDetailsModal({
         animate="visible"
         exit="exit"
         variants={modalVariants}
-        className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl border border-gray-200"
+        className="bg-surface-primary p-6 rounded-lg w-full max-w-md shadow-xl border border-border-primary"
       >
         <motion.div variants={fadeInUp} className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <BriefcaseBusiness className="w-6 h-6 text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-800">Position Details</h2>
+            <BriefcaseBusiness className="w-6 h-6 text-foreground-secondary" />
+            <h2 className="text-xl font-semibold text-foreground-primary">Position Details</h2>
           </div>
           <Button
             variant="ghost"
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500"
+            className="p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 text-foreground-tertiary hover:text-red-500"
           >
             <X className="h-5 w-5" />
           </Button>
         </motion.div>
 
         <motion.div variants={fadeInUp} className="mt-6 space-y-4">
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
-            <BriefcaseBusiness className="h-5 w-5 text-gray-600 flex-shrink-0" />
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
+            <BriefcaseBusiness className="h-5 w-5 text-foreground-secondary flex-shrink-0" />
             <div>
-              <div className="text-sm text-gray-600 font-medium">Position Name</div>
-              <div className="font-medium text-gray-800">{position?.name}</div>
+              <div className="text-sm text-foreground-secondary font-medium">Position Name</div>
+              <div className="font-medium text-foreground-primary">{position?.name}</div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
-            <Building className="h-5 w-5 text-gray-600 flex-shrink-0" />
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
+            <Building className="h-5 w-5 text-foreground-secondary flex-shrink-0" />
             <div>
-              <div className="text-sm text-gray-600 font-medium">Department</div>
-              <div className="font-medium text-gray-800">
+              <div className="text-sm text-foreground-secondary font-medium">Department</div>
+              <div className="font-medium text-foreground-primary">
                 {department ? department.name : "No department assigned"}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
-            <GraduationCap className="h-5 w-5 text-gray-600 flex-shrink-0" />
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
+            <GraduationCap className="h-5 w-5 text-foreground-secondary flex-shrink-0" />
             <div>
-              <div className="text-sm text-gray-600 font-medium">Grade</div>
-              <div className="font-medium text-gray-800">{grade ? grade.name : "No grade assigned"}</div>
+              <div className="text-sm text-foreground-secondary font-medium">Grade</div>
+              <div className="font-medium text-foreground-primary">{grade ? grade.name : "No grade assigned"}</div>
             </div>
           </div>
 
           {position?.description && (
-            <div className="flex gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
-              <FileText className="h-5 w-5 text-gray-600 flex-shrink-0 mt-0.5" />
+            <div className="flex gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
+              <FileText className="h-5 w-5 text-foreground-secondary flex-shrink-0 mt-0.5" />
               <div>
-                <div className="text-sm text-gray-600 font-medium">Description</div>
-                <div className="text-gray-800">{position.description}</div>
+                <div className="text-sm text-foreground-secondary font-medium">Description</div>
+                <div className="text-foreground-primary">{position.description}</div>
               </div>
             </div>
           )}
@@ -113,7 +113,7 @@ export default function PositionDetailsModal({
           <Button
             variant="outline"
             onClick={editPosition}
-            className="flex items-center gap-2 border border-gray-200 text-gray-700 hover:bg-gray-50"
+            className="flex items-center gap-2 border border-border-primary text-foreground-secondary hover:bg-background-secondary dark:hover:bg-background-tertiary"
           >
             <PencilSimple size={18} weight="bold" />
             Edit
@@ -121,9 +121,9 @@ export default function PositionDetailsModal({
           <Button
             variant="danger"
             onClick={deletePosition}
-            className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 hover:border-red-300"
+            className="flex items-center gap-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:border-red-300"
           >
-            <TrashSimple size={18} weight="bold" />
+            <Trash size={18} weight="bold" />
             Delete
           </Button>
         </motion.div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, FloppyDisk } from '@phosphor-icons/react';
+import { X, FloppyDisk } from '@/lib/icons';
 import { TeamWithPermissions, TeamPermission, PermissionCategory, Permission } from '@/lib/types';
 import { supabase } from '@/lib/supabase/client';
 import { useTeams } from '@/hooks/useTeams';
@@ -216,25 +216,25 @@ export default function TeamPermissionsModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-7xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-surface-primary rounded-2xl shadow-2xl max-w-7xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border-primary bg-gradient-to-r from-purple-50 to-primary-50 dark:from-purple-900/30 dark:to-primary-900/30">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-foreground-primary">
               Configure Permissions
             </h2>
-            <p className="text-sm text-gray-600 mt-1 flex items-center gap-2">
-              <span className="font-medium text-purple-600">{team.name}</span>
-              <span className="text-gray-400">•</span>
+            <p className="text-sm text-foreground-tertiary mt-1 flex items-center gap-2">
+              <span className="font-medium text-purple-600 dark:text-purple-400">{team.name}</span>
+              <span className="text-foreground-tertiary">•</span>
               <span>Set granular access controls</span>
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+            className="p-2 hover:bg-surface-hover rounded-lg transition-colors"
             aria-label="Close"
           >
-            <X size={24} className="text-gray-600" />
+            <X size={24} className="text-foreground-tertiary" />
           </button>
         </div>
 
@@ -243,7 +243,7 @@ export default function TeamPermissionsModal({
           {loadingPermissions ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
-              <div className="text-gray-600 font-medium">Loading permissions...</div>
+              <div className="text-foreground-secondary font-medium">Loading permissions...</div>
             </div>
           ) : (
             <div className="space-y-8">
@@ -258,40 +258,40 @@ export default function TeamPermissionsModal({
                   return (
                     <div key={categoryKey} className="space-y-4">
                       <div className="flex items-center gap-3 pb-2">
-                        <div className="h-8 w-1 bg-gradient-to-b from-purple-500 to-indigo-500 rounded-full"></div>
-                        <h3 className="text-xl font-bold text-gray-900 capitalize">
+                        <div className="h-8 w-1 bg-gradient-to-b from-purple-500 to-primary-500 rounded-full"></div>
+                        <h3 className="text-xl font-bold text-foreground-primary capitalize">
                           {categoryName} Permissions
                         </h3>
                       </div>
 
                       {/* Permission Matrix */}
-                      <div className="border-2 border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                      <div className="border-2 border-border-primary rounded-xl overflow-hidden shadow-sm">
                         <div className="overflow-x-auto">
-                          <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                          <table className="min-w-full divide-y divide-border-primary">
+                            <thead className="bg-gradient-to-r from-background-secondary to-background-tertiary">
                               <tr>
-                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider w-1/3 sticky left-0 bg-gray-50">
+                                <th className="px-6 py-4 text-left text-xs font-bold text-foreground-secondary uppercase tracking-wider w-1/3 sticky left-0 bg-background-secondary">
                                   Module
                                 </th>
                                 {Object.values(PERMISSION_ACTIONS).map((action) => (
                                   <th
                                     key={action}
-                                    className="px-4 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
+                                    className="px-4 py-4 text-center text-xs font-bold text-foreground-secondary uppercase tracking-wider"
                                   >
                                     <div className="flex flex-col items-center gap-2">
                                       <span>{action}</span>
                                       <div className="flex gap-1.5 text-xs font-normal normal-case">
                                         <button
                                           onClick={() => handleSelectAll(categoryKey, `can_${action.toLowerCase()}` as keyof PermissionState[string])}
-                                          className="px-2 py-1 text-indigo-600 hover:bg-indigo-100 rounded transition-colors font-medium"
+                                          className="px-2 py-1 text-primary-600 hover:bg-primary-100 dark:hover:bg-primary-900/50 rounded transition-colors font-medium"
                                           title="Select all"
                                         >
                                           All
                                         </button>
-                                        <span className="text-gray-300">|</span>
+                                        <span className="text-border-secondary">|</span>
                                         <button
                                           onClick={() => handleClearAll(categoryKey, `can_${action.toLowerCase()}` as keyof PermissionState[string])}
-                                          className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded transition-colors font-medium"
+                                          className="px-2 py-1 text-foreground-tertiary hover:bg-background-tertiary rounded transition-colors font-medium"
                                           title="Clear all"
                                         >
                                           None
@@ -302,15 +302,15 @@ export default function TeamPermissionsModal({
                                 ))}
                               </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-100">
+                            <tbody className="bg-surface-primary divide-y divide-border-primary">
                               {modules.map((module) => (
-                                <tr key={module.name} className="hover:bg-purple-50/50 transition-colors">
-                                  <td className="px-6 py-4 sticky left-0 bg-white">
-                                    <div className="font-semibold text-gray-900">
+                                <tr key={module.name} className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-colors">
+                                  <td className="px-6 py-4 sticky left-0 bg-surface-primary">
+                                    <div className="font-semibold text-foreground-primary">
                                       {module.displayName}
                                     </div>
                                     {module.description && (
-                                      <div className="text-xs text-gray-500 mt-1 leading-relaxed">
+                                      <div className="text-xs text-foreground-tertiary mt-1 leading-relaxed">
                                         {module.description}
                                       </div>
                                     )}
@@ -320,7 +320,7 @@ export default function TeamPermissionsModal({
                                       type="checkbox"
                                       checked={permissions[module.name]?.can_read || false}
                                       onChange={() => handlePermissionToggle(module.name, 'can_read')}
-                                      className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                      className="w-5 h-5 text-primary-600 border-border-secondary rounded focus:ring-primary-500 focus:ring-2 cursor-pointer"
                                     />
                                   </td>
                                   <td className="px-4 py-4 text-center">
@@ -328,7 +328,7 @@ export default function TeamPermissionsModal({
                                       type="checkbox"
                                       checked={permissions[module.name]?.can_write || false}
                                       onChange={() => handlePermissionToggle(module.name, 'can_write')}
-                                      className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                      className="w-5 h-5 text-primary-600 border-border-secondary rounded focus:ring-primary-500 focus:ring-2 cursor-pointer"
                                     />
                                   </td>
                                   <td className="px-4 py-4 text-center">
@@ -336,7 +336,7 @@ export default function TeamPermissionsModal({
                                       type="checkbox"
                                       checked={permissions[module.name]?.can_delete || false}
                                       onChange={() => handlePermissionToggle(module.name, 'can_delete')}
-                                      className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                      className="w-5 h-5 text-primary-600 border-border-secondary rounded focus:ring-primary-500 focus:ring-2 cursor-pointer"
                                     />
                                   </td>
                                   <td className="px-4 py-4 text-center">
@@ -344,7 +344,7 @@ export default function TeamPermissionsModal({
                                       type="checkbox"
                                       checked={permissions[module.name]?.can_approve || false}
                                       onChange={() => handlePermissionToggle(module.name, 'can_approve')}
-                                      className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                      className="w-5 h-5 text-primary-600 border-border-secondary rounded focus:ring-primary-500 focus:ring-2 cursor-pointer"
                                     />
                                   </td>
                                   <td className="px-4 py-4 text-center">
@@ -352,7 +352,7 @@ export default function TeamPermissionsModal({
                                       type="checkbox"
                                       checked={permissions[module.name]?.can_comment || false}
                                       onChange={() => handlePermissionToggle(module.name, 'can_comment')}
-                                      className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                      className="w-5 h-5 text-primary-600 border-border-secondary rounded focus:ring-primary-500 focus:ring-2 cursor-pointer"
                                     />
                                   </td>
                                 </tr>
@@ -370,22 +370,22 @@ export default function TeamPermissionsModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-between items-center gap-3 px-6 py-4 border-t bg-gradient-to-r from-gray-50 to-gray-100">
-          <p className="text-sm text-gray-600">
+        <div className="flex justify-between items-center gap-3 px-6 py-4 border-t border-border-primary bg-gradient-to-r from-background-secondary to-background-tertiary">
+          <p className="text-sm text-foreground-tertiary">
             Changes will apply to all team members
           </p>
           <div className="flex gap-3">
             <button
               onClick={onClose}
               disabled={isSaving}
-              className="px-6 py-2.5 text-gray-700 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 active:scale-[0.98] transition-all disabled:opacity-50 font-medium"
+              className="px-6 py-2.5 text-foreground-secondary bg-surface-primary border-2 border-border-secondary rounded-lg hover:bg-surface-hover active:scale-[0.98] transition-all disabled:opacity-50 font-medium"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving || loading}
-              className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 active:scale-[0.98] transition-all disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed font-medium shadow-md hover:shadow-lg"
+              className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-lg hover:from-primary-700 hover:to-purple-700 active:scale-[0.98] transition-all disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed font-medium shadow-md hover:shadow-lg"
             >
               <FloppyDisk size={20} />
               {isSaving ? 'Saving...' : 'Save Permissions'}

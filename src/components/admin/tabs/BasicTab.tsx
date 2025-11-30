@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Building, Code, Briefcase, Globe, LoaderCircle } from "lucide-react";
+import { Building, Code, Briefcase, Globe, Loader } from "@/lib/icons";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { validateCompanyBasics, validationErrorsToObject } from "@/lib/utils/validation";
@@ -93,8 +93,8 @@ export default function BasicTab() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <LoaderCircle className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading configuration...</p>
+          <Loader className="w-12 h-12 animate-spin text-primary-600 mx-auto mb-4" />
+          <p className="text-foreground-tertiary">Loading configuration...</p>
         </div>
       </div>
     );
@@ -102,10 +102,10 @@ export default function BasicTab() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm mb-8">
-        <div className="border-b border-gray-200 px-3 py-4">
-          <h3 className="text-lg font-semibold text-gray-700 flex items-center">
-            <Building className="w-5 h-5 mr-2 text-gray-600" />
+      <div className="bg-surface-primary rounded-xl shadow-sm mb-8">
+        <div className="border-b border-border-primary px-3 py-4">
+          <h3 className="text-lg font-semibold text-foreground-secondary flex items-center">
+            <Building className="w-5 h-5 mr-2 text-foreground-tertiary" />
             Company Basics
           </h3>
         </div>
@@ -177,7 +177,7 @@ export default function BasicTab() {
         />
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-2">
+      <div className="bg-surface-primary rounded-xl shadow-sm p-2">
         <CompanyBasicsConfigView />
       </div>
     </div>

@@ -3,10 +3,10 @@
 import { Attendance } from "@/hooks/useAttendance";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState, useMemo } from "react";
-import { FaChevronDown, FaCalendarAlt } from "react-icons/fa";
+import { CaretDown, Calendar } from "@/lib/icons";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { Clock } from "lucide-react";
+import { Clock } from "@/lib/icons";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function AttendanceRecordsPage() {
@@ -92,20 +92,20 @@ export default function AttendanceRecordsPage() {
    }, [attendanceData, selectedMonth]);
 
    return (
-      <div className="bg-white rounded-lg shadow-sm">
+      <div className="bg-surface-primary rounded-lg shadow-sm">
          <div className="p-4 sm:p-6">
             {/* Filters */}
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6">
                {/* Choose Month */}
                <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                     <FaCalendarAlt className="text-gray-400" />
+                     <Calendar className="text-foreground-tertiary" />
                   </div>
                   <input
                      type="month"
                      value={selectedMonth}
                      onChange={(e) => setSelectedMonth(e.target.value)}
-                     className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
+                     className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-full sm:w-auto min-w-[160px] text-sm"
                   />
                </div>
 
@@ -114,7 +114,7 @@ export default function AttendanceRecordsPage() {
                   <select
                      value={selectedStatus}
                      onChange={(e) => setSelectedStatus(e.target.value)}
-                     className="appearance-none pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full text-sm"
+                     className="appearance-none pl-4 pr-10 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-full text-sm"
                   >
                      <option value="">All Statuses</option>
                      <option value="Present">Present</option>
@@ -125,14 +125,14 @@ export default function AttendanceRecordsPage() {
                      <option value="On_Leave">On Leave</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                     <FaChevronDown className="text-gray-400 text-xs" />
+                     <CaretDown className="text-foreground-tertiary text-xs" />
                   </div>
                </div>
             </div>
 
             {/* Summary Overview */}
             <div className="mb-6">
-               <h3 className="text-base font-semibold text-gray-700 mb-3">
+               <h3 className="text-base font-semibold text-foreground-secondary mb-3">
                   Attendance Overview –{" "}
                   {new Date(selectedMonth + "-01").toLocaleString("default", {
                      month: "long",
@@ -143,7 +143,7 @@ export default function AttendanceRecordsPage() {
                   {Object.entries(currentMonthCounts).map(([tag, count]) => (
                      <div
                         key={tag}
-                        className={`px-3 py-2 rounded-lg text-center text-sm font-semibold ${tagStyles[tag] || "bg-gray-100 text-gray-800"
+                        className={`px-3 py-2 rounded-lg text-center text-sm font-semibold ${tagStyles[tag] || "bg-background-tertiary dark:bg-surface-secondary text-foreground-primary"
                            }`}
                      >
                         <div>{tag.replace(/_/g, " ")}</div>
@@ -161,40 +161,40 @@ export default function AttendanceRecordsPage() {
                   color="blue"
                />
             ) : (
-               <div className="overflow-x-auto rounded-lg border border-gray-200">
-                  <table className="min-w-full divide-y divide-gray-200">
+               <div className="overflow-x-auto rounded-lg border border-border-primary">
+                  <table className="min-w-full divide-y divide-border-primary">
                      <thead>
-                        <tr className="bg-gray-50">
-                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <tr className="bg-background-secondary dark:bg-background-tertiary">
+                           <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                               Date
                            </th>
-                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                               Check-In
                            </th>
-                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                               Check-Out
                            </th>
-                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                               Status
                            </th>
                         </tr>
                      </thead>
-                     <tbody className="bg-white divide-y divide-gray-200">
+                     <tbody className="bg-background-primary divide-y divide-border-primary">
                         {attendanceData.length > 0 ? (
                            attendanceData.map((entry, idx) => (
                               <tr
                                  key={idx}
-                                 className="hover:bg-gray-50 transition-colors duration-150"
+                                 className="hover:bg-background-secondary dark:bg-background-tertiary transition-colors duration-150"
                               >
-                                 <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                                 <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">
                                     {formatDateToDayMonth(entry.attendance_date)}
                                  </td>
-                                 <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                                 <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">
                                     {entry.check_in_time
                                        ? formatTimeFromISO(entry.check_in_time)
                                        : "N/A"}
                                  </td>
-                                 <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                                 <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">
                                     {entry.check_out_time
                                        ? formatTimeFromISO(entry.check_out_time)
                                        : "N/A"}
@@ -202,7 +202,7 @@ export default function AttendanceRecordsPage() {
                                  <td className="px-4 py-3 text-sm">
                                     <span
                                        className={`px-3 py-1 inline-flex justify-center text-xs leading-5 font-semibold rounded-full w-28 ${tagStyles[entry.tag] ||
-                                          "bg-gray-100 text-gray-800"
+                                          "bg-background-tertiary dark:bg-surface-secondary text-foreground-primary"
                                           }`}
                                     >
                                        {entry.tag.replace(/_/g, " ")}
@@ -214,7 +214,7 @@ export default function AttendanceRecordsPage() {
                            <tr>
                               <td
                                  colSpan={4}
-                                 className="px-4 py-8 text-sm text-gray-500 text-center"
+                                 className="px-4 py-8 text-sm text-foreground-tertiary text-center"
                               >
                                  No attendance records found for this month.
                               </td>

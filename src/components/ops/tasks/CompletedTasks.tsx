@@ -7,7 +7,7 @@ import { useEffect, useState, memo, useCallback } from "react";
 import { Department } from "@/lib/types/schemas";
 import TaskDetails from "./shared/TaskDetails";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, ExternalLink, CheckCircle, Calendar } from "lucide-react";
+import { Trash, ExternalLink, CheckCircle, Calendar } from "@/lib/icons";
 import { toast } from "sonner";
 import {
   Card,
@@ -80,9 +80,9 @@ function TaskCard({
           size="sm"
           onClick={handleDelete}
           isLoading={isDeleting}
-          className="p-2 h-8 w-8 hover:bg-red-50 hover:text-red-600"
+          className="p-2 h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400"
         >
-          <Trash2 size={14} />
+          <Trash size={14} />
         </Button>
       )}
 
@@ -94,7 +94,7 @@ function TaskCard({
             disabled
             className="p-2 h-8 w-8 opacity-50 cursor-not-allowed"
           >
-            <Trash2 size={14} />
+            <Trash size={14} />
           </Button>
         </PermissionTooltip>
       )}
@@ -103,7 +103,7 @@ function TaskCard({
         variant="ghost"
         size="sm"
         onClick={onDetails}
-        className="p-2 h-8 w-8 hover:bg-gray-50 hover:text-gray-700"
+        className="p-2 h-8 w-8 hover:bg-background-secondary dark:hover:bg-background-tertiary hover:text-foreground-primary"
       >
         <ExternalLink size={14} />
       </Button>
@@ -241,7 +241,7 @@ const CompletedTasksList = memo(({
           value={searchTerm}
           onChange={handleSearchChange}
           placeholder="Search completed tasks..."
-          className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+          className="w-full border border-border-primary rounded px-3 py-2 focus:outline-none focus:ring focus:border-primary-300 bg-surface-primary text-foreground-primary"
         />
       </div>
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Building, Code, Briefcase, Globe } from "lucide-react";
+import { Building, Code, Briefcase, Globe } from "@/lib/icons";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { staggerContainer } from "@/components/ui/animations";
@@ -123,19 +123,19 @@ export default function SetupStep1({
         transition={{ duration: 0.4 }}
         className="text-center mb-8"
       >
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Step 1: Company Basics</h2>
-        <p className="text-gray-600">Set up your company information and organizational structure</p>
+        <h2 className="text-2xl font-bold text-foreground-primary mb-2">Step 1: Company Basics</h2>
+        <p className="text-foreground-secondary">Set up your company information and organizational structure</p>
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="bg-white rounded-xl shadow-sm mb-8"
+        className="bg-surface-primary rounded-xl shadow-sm mb-8"
       >
-        <div className="border-b border-gray-200 px-3 py-4">
-          <h3 className="text-lg font-semibold text-gray-700 flex items-center">
-            <Building className="w-5 h-5 mr-2 text-gray-600" />
+        <div className="border-b border-border-primary px-3 py-4">
+          <h3 className="text-lg font-semibold text-foreground-secondary flex items-center">
+            <Building className="w-5 h-5 mr-2 text-foreground-secondary" />
             Company Information
           </h3>
         </div>
@@ -216,7 +216,7 @@ export default function SetupStep1({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="bg-white rounded-xl shadow-sm p-2"
+        className="bg-surface-primary rounded-xl shadow-sm p-2"
       >
         <CompanyBasicsConfigView />
       </motion.div>

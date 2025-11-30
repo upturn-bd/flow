@@ -5,6 +5,7 @@ import "./globals.css";
 import 'leaflet/dist/leaflet.css';
 import { Toaster } from "sonner";
 import PWARegistration from "@/components/PWARegistration";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -48,10 +49,11 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Upturn" />
       </head>
       <body className="antialiased">
-        <PWARegistration />
-        {children}
-
-        <Toaster position="bottom-right" richColors />
+        <ThemeProvider>
+          <PWARegistration />
+          {children}
+          <Toaster position="bottom-right" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );

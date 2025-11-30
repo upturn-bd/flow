@@ -30,7 +30,7 @@ export const BaseForm: React.FC<BaseFormProps> = ({
       {title && (
         <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-6">
           {icon}
-          <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+          <h3 className="text-lg font-semibold text-foreground-primary">{title}</h3>
         </motion.div>
       )}
       

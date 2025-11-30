@@ -85,20 +85,20 @@ export function NoticeModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="bg-surface-primary rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <h2 className="text-lg font-semibold mb-4">
           {initialData ? "Edit Notice" : "Create Notice"}
         </h2>
         
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-primary mb-1">
               Title *
             </label>
             <input
               {...register("title", { required: "Title is required" })}
               type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-border-primary rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
               placeholder="Enter notice title..."
             />
             {errors.title && (
@@ -107,13 +107,13 @@ export function NoticeModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-primary mb-1">
               Description *
             </label>
             <textarea
               {...register("description", { required: "Description is required" })}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-border-primary rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
               placeholder="Enter notice description..."
             />
             {errors.description && (
@@ -122,12 +122,12 @@ export function NoticeModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-primary mb-1">
               Urgency
             </label>
             <select
               {...register("urgency")}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-border-primary bg-surface-primary rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
             >
               <option value="low">Low</option>
               <option value="normal">Normal</option>
@@ -137,12 +137,12 @@ export function NoticeModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground-primary mb-1">
               Department (optional)
             </label>
             <select
               {...register("department_id", { valueAsNumber: true })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-border-primary bg-surface-primary rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
             >
               <option value="">All Departments (Global)</option>
               {departments.map((dept) => (
@@ -151,20 +151,20 @@ export function NoticeModal({
                 </option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-foreground-tertiary">
               Leave empty to send notice to all departments
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground-primary mb-1">
                 Valid From *
               </label>
               <input
                 {...register("valid_from", { required: "Valid from date is required" })}
                 type="date"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-border-primary bg-surface-primary rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
               />
               {errors.valid_from && (
                 <p className="mt-1 text-sm text-red-600">{errors.valid_from.message}</p>
@@ -172,13 +172,13 @@ export function NoticeModal({
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground-primary mb-1">
                 Valid Till *
               </label>
               <input
                 {...register("valid_till", { required: "Valid till date is required" })}
                 type="date"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-border-primary bg-surface-primary rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
               />
               {errors.valid_till && (
                 <p className="mt-1 text-sm text-red-600">{errors.valid_till.message}</p>

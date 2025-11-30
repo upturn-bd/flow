@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, CheckCircle, Info } from "lucide-react";
+import { WarningCircle, CheckCircle, Info } from "@/lib/icons";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ValidationFeedbackProps {
@@ -24,15 +24,15 @@ export default function ValidationFeedback({ isDirty, isValid, errors, className
         transition={{ duration: 0.2 }}
         className={`rounded-lg border p-3 ${className} ${
           isValid 
-            ? 'bg-green-50 border-green-200 text-green-800' 
-            : 'bg-red-50 border-red-200 text-red-800'
+            ? 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300' 
+            : 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300'
         }`}
       >
         <div className="flex items-start">
           {isValid ? (
             <CheckCircle className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0 text-green-600" />
           ) : (
-            <AlertCircle className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0 text-red-600" />
+            <WarningCircle className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0 text-red-600" />
           )}
           <div className="flex-1">
             {isValid ? (

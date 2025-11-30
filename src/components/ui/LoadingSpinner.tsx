@@ -1,11 +1,11 @@
-import { LucideIcon } from "lucide-react";
+import { IconType } from "@/lib/icons";
 import { cn } from "./class";
 
 export type ColorType = "blue" | "emerald" | "purple" | "amber" | "red" | "gray";
 
 type LoadingSpinnerProps = {
   /** Optional icon to display in the center of the spinner */
-  icon?: LucideIcon;
+  icon?: IconType;
   /** Text to display alongside the spinner */
   text?: string;
   /** Color theme for the spinner (blue, emerald, purple, amber, red, gray) */
@@ -33,7 +33,7 @@ export default function LoadingSpinner({
     purple: { spinner: "border-purple-500", icon: "text-purple-500" },
     amber: { spinner: "border-amber-500", icon: "text-amber-500" },
     red: { spinner: "border-red-500", icon: "text-red-500" },
-    gray: { spinner: "border-gray-500", icon: "text-gray-500" },
+    gray: { spinner: "border-foreground-tertiary", icon: "text-foreground-tertiary" },
   };
 
   const colorClasses = colorMap[color as ColorType] || colorMap.blue;
@@ -65,7 +65,7 @@ export default function LoadingSpinner({
         </div>
         {text && (
           <p className={cn(
-            "text-gray-500 font-medium",
+            "text-foreground-secondary dark:text-foreground-secondary font-medium",
             horizontal ? "ml-4" : "mt-4"
           )}>
             {text}

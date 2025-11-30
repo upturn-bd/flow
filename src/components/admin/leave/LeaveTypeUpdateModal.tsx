@@ -2,7 +2,7 @@ import React from 'react';
 import { FormModal } from '@/components/ui/modals';
 import { FormField, NumberField, SelectField } from '@/components/forms';
 import { validateLeaveType, type LeaveTypeData } from '@/lib/validation';
-import { Tag } from '@phosphor-icons/react';
+import { Tag } from '@/lib/icons';
 
 interface LeaveTypeUpdateModalProps {
   isOpen: boolean;
@@ -34,7 +34,7 @@ export const LeaveTypeUpdateModal: React.FC<LeaveTypeUpdateModalProps> = ({
   return (
     <FormModal<LeaveTypeData>
       title="Update Leave Type"
-      icon={<Tag size={24} weight="duotone" className="text-gray-600" />}
+      icon={<Tag size={24} weight="duotone" className="text-foreground-secondary" />}
       initialValues={initialData}
       validationFn={validateLeaveType}
       onSubmit={onSubmit}
@@ -54,7 +54,7 @@ export const LeaveTypeUpdateModal: React.FC<LeaveTypeUpdateModalProps> = ({
             error={errors.name}
             required
             placeholder="Enter leave type name"
-            icon={<Tag size={18} weight="duotone" className="text-gray-500" />}
+            icon={<Tag size={18} weight="duotone" className="text-foreground-tertiary" />}
           />
 
           <NumberField

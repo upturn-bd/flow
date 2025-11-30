@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import { IconType } from '@/lib/icons';
 import LoadingSpinner, {ColorType} from '@/components/ui/LoadingSpinner';
 
 
 interface LoadingSectionProps {
   text: string;
-  icon: LucideIcon;
+  icon: IconType;
   color?: ColorType;
 }
 

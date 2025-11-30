@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Lock } from "@phosphor-icons/react";
+import { Lock } from "@/lib/icons";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface PermissionTooltipProps {
@@ -50,7 +50,7 @@ export function PermissionTooltip({
     >
       <div className="flex items-center gap-2">
         {children}
-        <Lock size={16} className="text-gray-400 flex-shrink-0" />
+        <Lock size={16} className="text-foreground-tertiary flex-shrink-0" />
       </div>
 
       <AnimatePresence>
@@ -62,7 +62,7 @@ export function PermissionTooltip({
             transition={{ duration: 0.15 }}
             className={`absolute ${positionClasses[position]} z-50 pointer-events-none`}
           >
-            <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg whitespace-nowrap max-w-xs">
+            <div className="bg-foreground-primary text-background-primary text-xs rounded-lg px-3 py-2 shadow-lg whitespace-nowrap max-w-xs">
               <div className="flex items-center gap-2">
                 <Lock size={14} />
                 <span>{message}</span>

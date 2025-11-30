@@ -6,10 +6,10 @@ import {
   Users, 
   Search, 
   Shield, 
-  ChevronLeft, 
-  ChevronRight,
+  CaretLeft, 
+  CaretRight,
   AlertTriangle 
-} from "lucide-react";
+} from "@/lib/icons";
 import { useEmployees, ExtendedEmployee } from "@/hooks/useEmployees";
 import { USER_ROLES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
@@ -100,8 +100,8 @@ export default function RoleManagementTab() {
     const endItem = Math.min(currentPage * pageSize, totalCount);
 
     return (
-      <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 rounded-b-lg">
-        <div className="flex items-center text-sm text-gray-600">
+      <div className="flex items-center justify-between px-4 py-3 bg-surface-primary border-t border-border-primary rounded-b-lg">
+        <div className="flex items-center text-sm text-foreground-secondary">
           Showing {startItem} to {endItem} of {totalCount} employees
         </div>
         
@@ -113,7 +113,7 @@ export default function RoleManagementTab() {
             disabled={currentPage === 1}
             className="px-3 py-1"
           >
-            <ChevronLeft size={16} />
+            <CaretLeft size={16} />
             Previous
           </Button>
           
@@ -152,7 +152,7 @@ export default function RoleManagementTab() {
             className="px-3 py-1"
           >
             Next
-            <ChevronRight size={16} />
+            <CaretRight size={16} />
           </Button>
         </div>
       </div>
@@ -163,19 +163,19 @@ export default function RoleManagementTab() {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl shadow-sm border border-gray-200"
+      className="bg-surface-primary rounded-xl shadow-sm border border-border-primary"
     >
       {/* Header */}
-      <div className="border-b border-gray-200 px-6 py-4">
+      <div className="border-b border-border-primary px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Shield className="w-5 h-5 text-indigo-600 mr-2" />
+            <Shield className="w-5 h-5 text-primary-600 mr-2" />
             <div>
-              <h2 className="text-lg font-semibold text-gray-800">Role Management</h2>
-              <p className="text-sm text-gray-600">Assign and manage employee roles</p>
+              <h2 className="text-lg font-semibold text-foreground-primary">Role Management</h2>
+              <p className="text-sm text-foreground-secondary">Assign and manage employee roles</p>
             </div>
           </div>
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
+          <div className="flex items-center space-x-2 text-sm text-foreground-tertiary">
             <Users size={16} />
             <span>{searchResult?.totalCount || 0} employees</span>
           </div>
@@ -183,7 +183,7 @@ export default function RoleManagementTab() {
       </div>
 
       {/* Search */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b border-border-primary">
         <FormInputField
           name="search"
           label="Search employees by name or email"
@@ -197,14 +197,14 @@ export default function RoleManagementTab() {
       <div className="min-h-[400px]">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
           </div>
         ) : error ? (
           <div className="flex items-center justify-center h-64 text-red-600">
             <p>Error loading employees: {error.message}</p>
           </div>
         ) : !searchResult || searchResult.employees.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+          <div className="flex flex-col items-center justify-center h-64 text-foreground-tertiary">
             <Users size={48} className="mb-4" />
             <h3 className="text-lg font-medium mb-2">No employees found</h3>
             <p>Try adjusting your search criteria.</p>
@@ -212,45 +212,45 @@ export default function RoleManagementTab() {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-background-secondary dark:bg-background-tertiary">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                     Employee
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                     Current Role
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-surface-primary divide-y divide-border-primary">
                 {searchResult.employees.map((employee) => (
-                  <tr key={employee.id} className="hover:bg-gray-50">
+                  <tr key={employee.id} className="hover:bg-background-secondary dark:hover:bg-background-tertiary">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
-                          <Users size={16} className="text-indigo-600" />
+                        <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mr-3">
+                          <Users size={16} className="text-primary-600" />
                         </div>
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-foreground-primary">
                           {employee.name}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground-secondary">
                       {employee.email || "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         employee.role === USER_ROLES.ADMIN
-                          ? "bg-red-100 text-red-800"
+                          ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
                           : employee.role === USER_ROLES.MANAGER
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-green-100 text-green-800"
+                          ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
+                          : "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
                       }`}>
                         {employee.role || "Employee"}
                       </span>
@@ -260,7 +260,7 @@ export default function RoleManagementTab() {
                         value={employee.role || USER_ROLES.EMPLOYEE}
                         onChange={(e) => handleRoleChange(employee, e.target.value)}
                         disabled={isSubmitting}
-                        className="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        className="block w-full px-3 py-2 text-sm border border-border-primary bg-surface-primary text-foreground-primary rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                       >
                         {ROLE_OPTIONS.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -289,12 +289,12 @@ export default function RoleManagementTab() {
         <div className="p-6">
           <div className="flex items-center mb-4">
             <AlertTriangle className="w-6 h-6 text-amber-500 mr-3" />
-            <h3 className="text-lg font-semibold text-gray-800">
+            <h3 className="text-lg font-semibold text-foreground-primary">
               Are you sure?
             </h3>
           </div>
           
-          <p className="text-gray-600 mb-6">
+          <p className="text-foreground-secondary mb-6">
             You are about to assign <strong>{selectedEmployee?.name}</strong> the <strong>Admin</strong> role. 
             This will give them full administrative access to the system.
           </p>

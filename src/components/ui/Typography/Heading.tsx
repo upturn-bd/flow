@@ -35,12 +35,12 @@ const weightClasses = {
 };
 
 const colorClasses = {
-  primary: "text-gray-900",
-  secondary: "text-gray-600",
-  success: "text-green-600",
-  warning: "text-yellow-600", 
-  error: "text-red-600",
-  muted: "text-gray-500"
+  primary: "text-foreground-primary",
+  secondary: "text-foreground-secondary",
+  success: "text-green-600 dark:text-green-400",
+  warning: "text-yellow-600 dark:text-yellow-400", 
+  error: "text-red-600 dark:text-red-400",
+  muted: "text-foreground-tertiary"
 };
 
 const alignClasses = {

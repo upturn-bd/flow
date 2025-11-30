@@ -6,7 +6,7 @@ import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
-import { Loader2, Trash2, Edit2, X } from "lucide-react";
+import { Loader, Trash, Edit2, X } from "@/lib/icons";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -145,7 +145,7 @@ export default function AttendanceLogsPage() {
 
   const renderTable = (records: any[]) => {
     if (records.length === 0) {
-      return <p className="text-gray-500 text-sm mt-2">No attendance records found.</p>;
+      return <p className="text-foreground-tertiary text-sm mt-2">No attendance records found.</p>;
     }
 
     // Tag color styles
@@ -161,43 +161,43 @@ export default function AttendanceLogsPage() {
 
     return (
       <div className="overflow-x-auto mt-3">
-        <table className="w-full table-auto border border-gray-200 rounded-lg shadow-sm">
-          <thead className="bg-gray-100 text-gray-700 uppercase text-sm">
+        <table className="w-full table-auto border border-border-primary rounded-lg shadow-sm">
+          <thead className="bg-background-secondary dark:bg-background-tertiary text-foreground-secondary uppercase text-sm">
             <tr>
-              <th className="px-4 py-3 border-b">Employee</th>
-              <th className="px-4 py-3 border-b">Date</th>
-              <th className="px-4 py-3 border-b">Status</th>
-              <th className="px-4 py-3 border-b">Check In</th>
-              <th className="px-4 py-3 border-b">Check Out</th>
-              <th className="px-4 py-3 border-b">Actions</th>
+              <th className="px-4 py-3 border-b border-border-primary">Employee</th>
+              <th className="px-4 py-3 border-b border-border-primary">Date</th>
+              <th className="px-4 py-3 border-b border-border-primary">Status</th>
+              <th className="px-4 py-3 border-b border-border-primary">Check In</th>
+              <th className="px-4 py-3 border-b border-border-primary">Check Out</th>
+              <th className="px-4 py-3 border-b border-border-primary">Actions</th>
             </tr>
           </thead>
           <tbody>
             {records.map((att, idx) => (
-              <tr key={att.id} className={`transition-all hover:bg-gray-50 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
-                <td className="px-4 py-3 border-b font-medium text-gray-800">{employeeNames[att.employee_id] || "Unknown"}</td>
-                <td className="px-4 py-3 border-b text-gray-600">{att.attendance_date || "N/A"}</td>
-                <td className="px-4 py-3 border-b text-gray-600">
+              <tr key={att.id} className={`transition-all hover:bg-surface-hover dark:hover:bg-surface-hover ${idx % 2 === 0 ? "bg-surface-primary" : "bg-background-secondary dark:bg-background-tertiary"}`}>
+                <td className="px-4 py-3 border-b border-border-primary font-medium text-foreground-primary">{employeeNames[att.employee_id] || "Unknown"}</td>
+                <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">{att.attendance_date || "N/A"}</td>
+                <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">
                   {att.tag ? (
                     <span
-                      className={`px-3 py-1 text-sm font-medium rounded-full ${tagStyles[att.tag] || "bg-gray-100 text-gray-700"
+                      className={`px-3 py-1 text-sm font-medium rounded-full ${tagStyles[att.tag] || "bg-background-secondary dark:bg-background-tertiary text-foreground-secondary"
                         }`}
                     >
                       {att.tag.replace(/_/g, " ")}
                     </span>
                   ) : (
-                    <span className="text-gray-400">N/A</span>
+                    <span className="text-foreground-tertiary">N/A</span>
                   )}
                 </td>
 
-                <td className="px-4 py-3 border-b text-gray-600">{att.check_in_time ? new Date(att.check_in_time).toLocaleTimeString() : "N/A"}</td>
-                <td className="px-4 py-3 border-b text-gray-600">{att.check_out_time ? new Date(att.check_out_time).toLocaleTimeString() : "N/A"}</td>
-                <td className="px-4 py-3 border-b flex gap-2">
+                <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">{att.check_in_time ? new Date(att.check_in_time).toLocaleTimeString() : "N/A"}</td>
+                <td className="px-4 py-3 border-b border-border-primary text-foreground-secondary">{att.check_out_time ? new Date(att.check_out_time).toLocaleTimeString() : "N/A"}</td>
+                <td className="px-4 py-3 border-b border-border-primary flex gap-2">
                   {canWrite(MODULE) && (
                     <Button
                       size="sm"
                       variant="secondary"
-                      className="p-2 hover:bg-blue-100 transition-colors"
+                      className="p-2 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
                       onClick={() => handleEdit(att)}
                     >
                       <Edit2 size={16} />
@@ -211,7 +211,7 @@ export default function AttendanceLogsPage() {
                       className="p-2 hover:bg-red-100 transition-colors"
                       onClick={() => handleDelete(att)}
                     >
-                      <Trash2 size={16} />
+                      <Trash size={16} />
                     </Button>
                   )}
                 </td>
@@ -236,7 +236,7 @@ export default function AttendanceLogsPage() {
               placeholder="Search by employee..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full sm:w-1/3 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full sm:w-1/3 px-4 py-2 border border-border-secondary rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
 
@@ -249,7 +249,7 @@ export default function AttendanceLogsPage() {
                 color: "text-blue-500",
                 content: todayLoading ? (
                   <div className="flex justify-center items-center h-32">
-                    <Loader2 className="animate-spin text-gray-500" />
+                    <Loader className="animate-spin text-foreground-tertiary" />
                   </div>
                 ) : (
                   renderTable(filteredToday)
@@ -272,9 +272,9 @@ export default function AttendanceLogsPage() {
       {/* Edit Modal */}
       {selectedAttendance && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
+          <div className="bg-surface-primary rounded-lg shadow-lg max-w-md w-full p-6 relative">
             <button
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+              className="absolute top-4 right-4 text-foreground-secondary hover:text-foreground-primary"
               onClick={() => setSelectedAttendance(null)}
             >
               <X size={20} />

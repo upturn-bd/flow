@@ -3,7 +3,7 @@ import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField, AssigneeField } from '@/components/forms';
 import { validateTask, type TaskData } from '@/lib/validation';
 import { useEmployees } from '@/hooks/useEmployees';
-import { CheckSquare } from '@phosphor-icons/react';
+import { CheckSquare } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import SuccessToast from '@/components/ui/SuccessToast';
 import { useTasks } from '@/hooks/useTasks';
@@ -169,8 +169,8 @@ export default function TaskCreateModal({
         />
 
         {milestoneId && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
+          <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+            <p className="text-sm text-primary-800">
               <strong>Note:</strong> This task will be associated with milestone ID: {milestoneId}
             </p>
           </div>

@@ -7,7 +7,7 @@ import {
   ClipboardCheck,
   AlertTriangle,
   Users
-} from "lucide-react";
+} from "@/lib/icons";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
 import PendingPayrolls from "@/components/ops/payroll/PendingPayrolls";
@@ -21,7 +21,7 @@ const tabs: TabItem[] = [
     key: "pending", 
     label: "Pending",
     icon: <ClipboardCheck className="h-5 w-5" />,
-    color: "text-blue-600",
+    color: "text-primary-600",
     content: <PendingPayrolls />
   },
   { 

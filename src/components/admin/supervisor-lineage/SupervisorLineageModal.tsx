@@ -2,7 +2,7 @@
 import { useLineage } from "@/hooks/useSupervisorLineage";
 import { Lineage } from "@/lib/types/schemas";
 import { useEffect, useState } from "react";
-import { Trash, Plus, Buildings } from "@phosphor-icons/react";
+import { Trash, Plus, Buildings } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
@@ -143,7 +143,7 @@ export default function LineageCreateModal({
         animate="visible"
         exit="exit"
         variants={modalVariants}
-        className="bg-white p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-blue-100"
+        className="bg-surface-primary p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-blue-100"
       >
         <motion.div variants={fadeInUp} className="flex items-center gap-3">
           <Buildings size={24} weight="duotone" className="text-blue-600" />
@@ -167,7 +167,7 @@ export default function LineageCreateModal({
 
         <motion.div
           variants={fadeInUp}
-          className="bg-white py-4 w-full max-w-4xl mx-auto"
+          className="bg-surface-primary py-4 w-full max-w-4xl mx-auto"
         >
           <h3 className="text-md font-semibold text-blue-700 mb-4">
             Set Hierarchy
@@ -432,7 +432,7 @@ export function LineageUpdateModal({
         initial="hidden"
         animate="visible"
         exit="exit"
-        className="bg-white p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-blue-100"
+        className="bg-surface-primary p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl border border-blue-100"
       >
         <motion.div variants={fadeInUp} className="flex items-center gap-3">
           <Buildings size={24} weight="duotone" className="text-blue-600" />
@@ -454,7 +454,7 @@ export function LineageUpdateModal({
 
         <motion.div
           variants={fadeInUp}
-          className="bg-white py-4 w-full max-w-4xl mx-auto"
+          className="bg-surface-primary py-4 w-full max-w-4xl mx-auto"
         >
           <h3 className="text-md font-semibold text-blue-700 mb-4">
             Update Hierarchy
