@@ -231,7 +231,6 @@ export default function OngoingTaskPage({
 function TaskCard({
   adminScoped,
   userId,
-  userRole,
   task,
   onEdit,
   onDelete,

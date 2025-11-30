@@ -20,6 +20,7 @@ import SubmitActions from "@/components/ui/SubmitActions";
 import { showNotification } from "@/lib/utils/notifications";
 import { useAuth } from "@/lib/auth/auth-context";
 import { PERMISSION_MODULES } from "@/lib/constants";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 
 const initialFormState: BasicInfoFormData = {
   first_name: "",
