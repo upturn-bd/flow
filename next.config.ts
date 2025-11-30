@@ -51,4 +51,8 @@ export default withSentryConfig(withPWA(nextConfig), {
   // https://docs.sentry.io/product/crons/
   // https://vercel.com/docs/cron-jobs
   automaticVercelMonitors: true,
+
+  // Workaround for Sentry CLI crash on Vercel (os error 11)
+  // See: https://github.com/getsentry/sentry-cli/issues
+  telemetry: false,
 });
