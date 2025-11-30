@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FolderKanban, Clock, RefreshCw, Plus } from 'lucide-react';
-import { staggerContainer, fadeInUp } from '@/components/ui/animations';
+import { FolderKanban, Clock, ArrowsClockwise, Plus } from '@/lib/icons';
 import SectionHeader from '@/app/(home)/home/components/SectionHeader';
 import LoadingSection from '@/app/(home)/home/components/LoadingSection';
 import EmptyState from '@/app/(home)/home/components/EmptyState';
@@ -80,7 +79,7 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
                   onClick={handleRefresh}
                   className="rounded-full p-2 bg-surface-secondary hover:bg-surface-hover transition-colors"
                 >
-                  <RefreshCw size={16} className="text-foreground-secondary" />
+                  <ArrowsClockwise size={16} className="text-foreground-secondary" />
                 </motion.button>
                 {canCreateProjects && (
                   <motion.button

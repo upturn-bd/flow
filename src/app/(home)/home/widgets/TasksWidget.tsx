@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckSquare, Clock, Plus } from 'lucide-react';
-import { staggerContainer, fadeInUp } from '@/components/ui/animations';
+import { CheckSquare, Clock, Plus, CheckCircle, Circle } from '@/lib/icons';
 import { cn } from '@/components/ui/class';
 import { formatDateToDayMonth } from '@/lib/utils';
 import BaseWidget from './BaseWidget';
@@ -87,7 +86,34 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
         ) : (
           <div className="px-5 pb-5 flex-1 overflow-hidden flex flex-col">
             <div className="flex items-center justify-between mb-4 flex-shrink-0">
-              <h3 className="text-sm font-medium text-foreground-secondary">Your Tasks</h3>
+              {/* Tab buttons */}
+              <div className="flex items-center gap-1 bg-background-secondary dark:bg-background-tertiary rounded-lg p-1">
+                <button
+                  onClick={() => setActiveTab('ongoing')}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                    activeTab === 'ongoing' 
+                      ? "bg-surface-primary text-primary-600 shadow-sm" 
+                      : "text-foreground-secondary hover:text-foreground-primary"
+                  )}
+                >
+                  <Circle size={12} />
+                  Ongoing ({ongoingTasks.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('completed')}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                    activeTab === 'completed' 
+                      ? "bg-surface-primary text-success shadow-sm" 
+                      : "text-foreground-secondary hover:text-foreground-primary"
+                  )}
+                >
+                  <CheckCircle size={12} />
+                  Completed ({completedTasks.length})
+                </button>
+              </div>
+              
               {canCreateTasks && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -110,14 +136,27 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.2, delay: index * 0.05 }}
                   onClick={() => task.id && onTaskClick(task.id)}
-                  className="flex items-center justify-between px-4 py-3 bg-background-secondary dark:bg-background-tertiary hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors text-sm font-medium border border-border-primary cursor-pointer"
+                  className={cn(
+                    "flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-sm font-medium border cursor-pointer",
+                    activeTab === 'completed'
+                      ? "bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 border-green-100 dark:border-green-800"
+                      : "bg-background-secondary dark:bg-background-tertiary hover:bg-primary-50 dark:hover:bg-primary-900/30 border-border-primary"
+                  )}
                 >
                   <div className="flex items-center space-x-3">
-                    <div className={cn(
-                      "w-2 h-2 rounded-full",
-                      new Date(task.end_date) < new Date() ? "bg-red-500" : "bg-green-500"
-                    )}></div>
-                    <span className="text-foreground-primary">{task.task_title}</span>
+                    {activeTab === 'completed' ? (
+                      <CheckCircle size={16} className="text-success" weight="fill" />
+                    ) : (
+                      <div className={cn(
+                        "w-2 h-2 rounded-full",
+                        new Date(task.end_date) < new Date() ? "bg-error" : "bg-primary-500"
+                      )}></div>
+                    )}
+                    <span className={cn(
+                      activeTab === 'completed' ? "text-foreground-secondary line-through" : "text-foreground-primary"
+                    )}>
+                      {task.task_title}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock size={14} className="text-foreground-tertiary" />

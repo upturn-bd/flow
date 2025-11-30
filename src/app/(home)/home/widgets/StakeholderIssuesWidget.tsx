@@ -2,10 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Plus, RefreshCw, FileText } from 'lucide-react';
-import { staggerContainer, fadeInUp } from '@/components/ui/animations';
+import { WarningCircle, Plus, ArrowsClockwise, FileText } from '@/lib/icons';
 import SectionHeader from '@/app/(home)/home/components/SectionHeader';
-import SectionContainer from '@/app/(home)/home/components/SectionContainer';
 import LoadingSection from '@/app/(home)/home/components/LoadingSection';
 import EmptyState from '@/app/(home)/home/components/EmptyState';
 import BaseWidget from './BaseWidget';
@@ -80,8 +78,8 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
           <div className="p-5 flex-shrink-0">
             <SectionHeader
               title="Stakeholder Issues"
-              icon={AlertCircle}
-              iconColor="text-red-600"
+              icon={WarningCircle}
+              iconColor="text-error"
             />
           </div>
 
@@ -89,7 +87,7 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
             <NoPermissionMessage moduleName="stakeholder issues" />
           ) : loading ? (
             <div className="flex-1 flex items-center justify-center overflow-hidden">
-              <LoadingSection text="Loading issues..." icon={AlertCircle} />
+              <LoadingSection text="Loading issues..." icon={WarningCircle} />
             </div>
           ) : (
             <div
@@ -104,7 +102,7 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
                     onClick={handleRefresh}
                     className="rounded-full p-2 bg-surface-secondary hover:bg-surface-hover transition-colors"
                   >
-                    <RefreshCw size={16} className="text-foreground-secondary" />
+                    <ArrowsClockwise size={16} className="text-foreground-secondary" />
                   </motion.button>
                   {canManageStakeholders && (
                     <motion.button

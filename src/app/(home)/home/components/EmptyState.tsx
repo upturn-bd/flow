@@ -3,7 +3,6 @@
 import React from 'react';
 import { IconType } from '@/lib/icons';
 import { motion } from 'framer-motion';
-import { fadeIn } from '@/components/ui/animations';
 
 interface EmptyStateProps {
   icon: IconType;
@@ -18,7 +17,9 @@ export default function EmptyState({
 }: EmptyStateProps) {
   return (
     <motion.div 
-      variants={fadeIn}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
       className="flex flex-col items-center justify-center h-full min-h-[120px] text-foreground-secondary"
     >
       <Icon size={iconSize} weight="duotone" className="text-foreground-tertiary opacity-50 mb-3" />
