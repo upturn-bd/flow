@@ -55,4 +55,7 @@ export default withSentryConfig(withPWA(nextConfig), {
   // Workaround for Sentry CLI crash on Vercel (os error 11)
   // See: https://github.com/getsentry/sentry-cli/issues
   telemetry: false,
+  sourcemaps: {
+    disable: process.env.VERCEL === "1",
+  },
 });
