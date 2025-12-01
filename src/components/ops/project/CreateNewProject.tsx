@@ -57,7 +57,8 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
       fetchDepartments();
       fetchEmployeeInfo();
     }
-  }, [user, employeeInfo?.company_id, fetchDepartments, fetchEmployeeInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, employeeInfo?.company_id]); // Only re-run when user or company_id changes
 
   const handleSubmit = async (
     data: ProjectDetails,

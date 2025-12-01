@@ -153,6 +153,7 @@ export default function MilestoneList({
                           </Button>
                         )}
                         <Button
+                        data-testid="edit-milestone-button"
                           type="button"
                           variant="ghost"
                           size="sm"

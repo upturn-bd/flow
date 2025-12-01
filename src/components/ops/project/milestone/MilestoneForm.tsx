@@ -364,6 +364,7 @@ export default function MilestoneForm({
             </motion.button>
 
             <motion.button
+            data-testid="milestone-submit-button"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="button"
