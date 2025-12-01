@@ -18,11 +18,11 @@ import {
     UserPlus, // Onboarding Log
     GitBranch, // Stakeholder Processes (workflow/branching)
     File,
-    Search,
     Download, // Data Export
 } from "@/lib/icons";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { SearchBar, EmptyState, PageHeader } from "@/components/ui";
 
 // --- New Structure for Admin Management ---
 const sections = [
@@ -213,48 +213,24 @@ export default function AdminManagementPage() {
             animate="visible"
             variants={pageVariants}
         >
-            <motion.div
-                className="mb-8"
-                variants={itemVariants}
-            >
-                <h1 className="text-2xl font-bold text-foreground-primary mb-2">
-                    Admin Management
-                </h1>
-                <p className="text-foreground-secondary">
-                    Configure company settings and review historical logs and records
-                </p>
+            <motion.div variants={itemVariants}>
+                <PageHeader
+                    title="Admin Management"
+                    description="Configure company settings and review historical logs and records"
+                    icon={Settings}
+                    iconColor="text-primary-600"
+                />
             </motion.div>
 
             <motion.div
                 className="mb-6"
                 variants={itemVariants}
             >
-                <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="relative flex-grow">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search size={20} className="text-foreground-tertiary" />
-                        </div>
-                        <input
-                            type="text"
-                            placeholder="Search for configurations, logs or keywords..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-surface-primary border border-border-secondary rounded-lg pl-10 pr-4 py-2.5 text-foreground-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-300 transition-all outline-none"
-                        />
-                        {searchQuery && (
-                            <motion.button
-                                onClick={() => setSearchQuery("")}
-                                className="absolute inset-y-0 right-2 flex items-center text-foreground-tertiary hover:text-foreground-primary"
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </motion.button>
-                        )}
-                    </div>
-                </div>
+                <SearchBar
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    placeholder="Search for configurations, logs or keywords..."
+                />
 
                 {/* Section filters */}
                 <div className="flex flex-wrap gap-2 mt-4">
@@ -293,24 +269,19 @@ export default function AdminManagementPage() {
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col items-center justify-center p-12 bg-background-secondary rounded-lg border border-border-primary mt-8"
                 >
-                    <File size={48} className="text-foreground-tertiary mb-4" />
-                    <h3 className="text-lg font-medium text-foreground-primary mb-2">No items found</h3>
-                    <p className="text-foreground-secondary text-center max-w-md mb-5">
-                        Try searching with different keywords or browse all items
-                    </p>
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => {
-                            setSearchQuery("");
-                            setSelectedSection(null);
+                    <EmptyState
+                        icon={File}
+                        title="No items found"
+                        description="Try searching with different keywords or browse all items"
+                        action={{
+                            label: "View all items",
+                            onClick: () => {
+                                setSearchQuery("");
+                                setSelectedSection(null);
+                            }
                         }}
-                        className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg shadow-sm hover:bg-primary-700 transition-colors"
-                    >
-                        View all items
-                    </motion.button>
+                    />
                 </motion.div>
             ) : (
                 <AnimatePresence>

@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import PositionDetailsModal from "./PositionDetailsModal";
 import PositionModal from "./PositionModal";
-import { BriefcaseBusiness, Plus, Eye } from "lucide-react";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { TrashSimple } from "@phosphor-icons/react";
-import BaseModal from "@/components/ui/modals/BaseModal";
+import { Briefcase } from "@/lib/icons";
+import { Section, EntityListItem, EntityList, BaseModal, Button } from "@/components/ui";
 
 type PositionsSectionProps = {
   showNotification: (message: string, isError?: boolean) => void;
@@ -77,99 +75,52 @@ export default function PositionsSection({
   const displayedPositions = positions.slice(0, 10);
   const hasMorePositions = positions.length > 10;
 
-  const renderPositionCard = (position: any) => (
-    <div
-      key={position.id}
-      className="bg-surface-primary rounded-lg border border-border-primary p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-200"
-    >
-      <div className="flex items-center mb-2 sm:mb-0">
-        <div className="w-8 h-8 bg-background-tertiary rounded-full flex items-center justify-center text-foreground-secondary mr-3">
-          <BriefcaseBusiness size={16} />
-        </div>
-        <span className="font-medium text-foreground-primary">
-          {position.name}
-        </span>
-      </div>
-
-      <div className="flex gap-2 w-full sm:w-auto justify-end">
-        <button
-          onClick={() => {
-            setViewPosition(position.id ?? null);
-            setShowAllPositions(false);
-          }}
-          className="px-3 py-1.5 rounded-md bg-background-tertiary text-foreground-secondary text-sm flex items-center gap-1 hover:bg-gray-200 transition-colors"
-        >
-          <Eye size={14} />
-          <span className="hidden sm:inline">Details</span>
-        </button>
-        <button
-          onClick={() => handleDeletePosition(position.id ?? 0)}
-          disabled={positionDeleteLoading === position.id}
-          className={`px-3 py-1.5 rounded-md bg-red-50 text-red-600 text-sm flex items-center gap-1 hover:bg-red-100 transition-colors ${
-            positionDeleteLoading === position.id
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}
-        >
-          <TrashSimple size={14} />
-          {positionDeleteLoading === position.id ? (
-            <span className="hidden sm:inline">Deleting...</span>
-          ) : (
-            <span className="hidden sm:inline">Delete</span>
-          )}
-        </button>
-      </div>
-    </div>
-  );
-
   return (
-    <section className="bg-surface-primary p-4 sm:p-6 rounded-lg border border-border-primary shadow-sm">
-      <div className="border-b border-border-primary pb-4 mb-4">
-        <h3 className="text-lg font-semibold text-foreground-primary flex items-center">
-          <BriefcaseBusiness className="w-5 h-5 mr-2 text-foreground-secondary" />
-          Positions
-        </h3>
-        <p className="text-sm text-foreground-secondary">Manage job positions and roles</p>
-      </div>
-
-      {positionsLoading ? (
-        <LoadingSpinner
-          icon={BriefcaseBusiness}
-          text="Loading positions..."
-          height="h-40"
-          color="gray"
-        />
-      ) : (
-        <div className="space-y-3">
-          {positions.length === 0 ? (
-            <div className="p-4 sm:p-6 bg-background-secondary rounded-lg text-center text-foreground-tertiary">
-              No positions added yet. Click the plus button to add one.
-            </div>
-          ) : (
-            <>
-              {displayedPositions.map((position) => renderPositionCard(position))}
-              {hasMorePositions && (
-                <button
-                  onClick={() => setShowAllPositions(true)}
-                  className="w-full py-2 px-4 rounded-md bg-background-tertiary text-foreground-secondary text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-                >
-                  <BriefcaseBusiness size={16} />
-                  View All Positions ({positions.length})
-                </button>
-              )}
-            </>
-          )}
-        </div>
-      )}
-
-      <div className="flex justify-center sm:justify-start mt-4">
-        <button
-          onClick={() => setIsCreatingPosition(true)}
-          className="flex items-center justify-center text-white bg-gray-800 rounded-full w-10 h-10 sm:w-8 sm:h-8 shadow-sm hover:bg-gray-700 transition-colors"
+    <Section
+      icon={<Briefcase size={20} />}
+      title="Positions"
+      description="Manage job positions and roles"
+      loading={positionsLoading}
+      loadingText="Loading positions..."
+      loadingIcon={Briefcase}
+      emptyState={{
+        show: positions.length === 0,
+        message: "No positions added yet. Click the plus button to add one.",
+      }}
+      addButton={{
+        onClick: () => setIsCreatingPosition(true),
+        label: "Add Position",
+      }}
+    >
+      <EntityList>
+        {displayedPositions.map((position) => (
+          <EntityListItem
+            key={position.id}
+            icon={<Briefcase size={16} />}
+            name={position.name || "Unnamed Position"}
+            actions={{
+              onView: () => {
+                setViewPosition(position.id ?? null);
+                setShowAllPositions(false);
+              },
+              onDelete: () => handleDeletePosition(position.id ?? 0),
+            }}
+            deleteLoading={positionDeleteLoading === position.id}
+          />
+        ))}
+      </EntityList>
+      
+      {hasMorePositions && (
+        <Button
+          variant="secondary"
+          onClick={() => setShowAllPositions(true)}
+          fullWidth
+          className="mt-3"
         >
-          <Plus size={18} />
-        </button>
-      </div>
+          <Briefcase size={16} />
+          View All Positions ({positions.length})
+        </Button>
+      )}
 
       <AnimatePresence>
         {isCreatingPosition && (
@@ -209,21 +160,37 @@ export default function PositionsSection({
             isOpen={showAllPositions}
             onClose={() => setShowAllPositions(false)}
             title="All Positions"
-            icon={<BriefcaseBusiness className="w-5 h-5" />}
+            icon={<Briefcase size={20} />}
             size="lg"
           >
-            <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-              {positions.length === 0 ? (
-                <div className="p-6 bg-background-secondary rounded-lg text-center text-foreground-tertiary">
-                  No positions available.
-                </div>
-              ) : (
-                positions.map((position) => renderPositionCard(position))
-              )}
+            <div className="max-h-[60vh] overflow-y-auto pr-2">
+              <EntityList>
+                {positions.length === 0 ? (
+                  <div className="p-6 bg-background-secondary rounded-lg text-center text-foreground-tertiary">
+                    No positions available.
+                  </div>
+                ) : (
+                  positions.map((position) => (
+                    <EntityListItem
+                      key={position.id}
+                      icon={<Briefcase size={16} />}
+                      name={position.name || "Unnamed Position"}
+                      actions={{
+                        onView: () => {
+                          setViewPosition(position.id ?? null);
+                          setShowAllPositions(false);
+                        },
+                        onDelete: () => handleDeletePosition(position.id ?? 0),
+                      }}
+                      deleteLoading={positionDeleteLoading === position.id}
+                    />
+                  ))
+                )}
+              </EntityList>
             </div>
           </BaseModal>
         )}
       </AnimatePresence>
-    </section>
+    </Section>
   );
 }

@@ -6,6 +6,7 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { ArrowLeft, Edit, Play, Pause, ToggleRight, ToggleLeft } from "@/lib/icons";
 import ProcessForm from "@/components/stakeholder-processes/ProcessForm";
 import StepManager from "@/components/stakeholder-processes/StepManager";
+import { InlineSpinner } from "@/components/ui";
 
 export default function ProcessDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -56,7 +57,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <InlineSpinner size="lg" color="blue" />
       </div>
     );
   }

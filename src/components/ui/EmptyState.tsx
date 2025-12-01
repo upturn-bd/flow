@@ -1,12 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { IconType } from "@/lib/icons";
-import { ReactNode } from "react";
+import { ReactNode, ComponentType, isValidElement } from "react";
 import { Button } from "./button";
 
+// Match Phosphor's IconWeight type for better compatibility
+type IconWeight = "regular" | "thin" | "light" | "bold" | "fill" | "duotone";
+
 interface EmptyStateProps {
-  icon: ReactNode;
+  /** Icon - can be a Phosphor icon component, any component, or a ReactNode */
+  icon: ComponentType<{ size?: number; weight?: IconWeight; className?: string }> | ReactNode;
   title: string;
   description: string;
   action?: {
@@ -24,6 +27,21 @@ export function EmptyState({
   action, 
   className = "" 
 }: EmptyStateProps) {
+  // Handle both component types and ReactNode
+  const renderIcon = () => {
+    // Check if it's already a rendered React element
+    if (isValidElement(icon)) {
+      return icon;
+    }
+    // Check if it's a component (function or ForwardRef)
+    // ForwardRef components have $$typeof Symbol but are still callable
+    if (typeof icon === 'function' || (typeof icon === 'object' && icon !== null && '$$typeof' in icon)) {
+      const IconComponent = icon as ComponentType<{ size?: number; weight?: IconWeight }>;
+      return <IconComponent size={32} weight="duotone" />;
+    }
+    return icon;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -37,7 +55,7 @@ export function EmptyState({
         className="w-16 h-16 bg-background-secondary dark:bg-background-tertiary rounded-full flex items-center justify-center mb-4"
       >
         <div className="text-foreground-tertiary text-2xl">
-          {icon}
+          {renderIcon()}
         </div>
       </motion.div>
       
