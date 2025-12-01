@@ -11,7 +11,10 @@
     "test:ui": "bun playwright test --ui",
     "test:headed": "bun playwright test --headed",
     "test:debug": "bun playwright test --debug",
-    "test:report": "bun playwright show-report"
+    "test:report": "bun playwright show-report",
+    "test:auth": "bun playwright test auth.setup.ts",
+    "test:smoke": "bun playwright test auth-smoke.spec.ts",
+    "test:reauth": "rm -rf tests/.auth/user.json && bun playwright test"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

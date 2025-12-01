@@ -1,6 +1,63 @@
-# Task Management E2E Test Suite
+# E2E Test Suite with Global Authentication
 
-Comprehensive end-to-end testing for the Task Management system in `/ops/tasks`.
+Comprehensive end-to-end testing with persistent authentication for all test suites.
+
+## 🔐 Authentication Setup
+
+This project uses **global authentication** - you only login ONCE and all tests reuse the authenticated state.
+
+### How It Works
+
+1. **Setup Phase**: `auth.setup.ts` runs ONCE before all tests
+2. **Login**: Logs in with test credentials and saves auth state to `.auth/user.json`
+3. **Test Execution**: All tests automatically use the saved authentication
+4. **No Re-login**: Tests run without logging in repeatedly
+
+### Benefits
+- ⚡ **Faster test execution** - No repeated logins
+- 🔄 **Consistent state** - All tests use same authentication
+- 🛡️ **More reliable** - Reduces auth-related flakiness
+- 🎯 **Better isolation** - Focus on testing features, not login
+
+## Running Tests
+
+### Basic Commands
+
+```bash
+# Run all tests (authentication happens automatically on first run)
+npm test
+
+# Run tests in UI mode (great for debugging)
+npm run test:ui
+
+# Run tests in headed mode (see the browser)
+npm run test:headed
+
+# Run specific test file
+npm test project-management.spec.ts
+
+# Debug mode (step through tests)
+npm run test:debug
+
+# View test report
+npm run test:report
+```
+
+### Re-authenticating
+
+If you need to login again (e.g., credentials changed, session expired):
+
+```bash
+# Delete the auth file and run tests again
+rm -rf .auth/user.json
+npm test
+```
+
+Or on Windows PowerShell:
+```powershell
+Remove-Item -Path .auth\user.json -Force
+npm test
+```
 
 ## Overview
 
@@ -64,7 +121,34 @@ npm run test:report
 
 ## Test Structure
 
-### 1. Navigation and UI Tests
+```
+tests/
+├── auth.setup.ts              # ⭐ Global authentication (runs once)
+├── project-management.spec.ts # Project tests
+├── task-management.spec.ts    # Task tests
+└── README.md                  # This file
+.auth/
+└── user.json                  # 🔒 Saved authentication state (auto-generated)
+```
+
+### Authentication File Structure
+
+The `auth.setup.ts` file:
+- Runs before all test suites
+- Logs in with test credentials
+- Saves cookies and local storage to `.auth/user.json`
+- All test projects depend on this setup
+
+Test projects in `playwright.config.ts`:
+```typescript
+{
+  name: 'chromium',
+  use: {
+    storageState: '.auth/user.json', // ← Uses saved auth
+  },
+  dependencies: ['setup'], // ← Waits for auth setup
+}
+```
 - Page loads correctly
 - All tabs are visible
 - Create Task button is present
@@ -330,6 +414,70 @@ test.describe.configure({ mode: 'parallel' });
 ```
 
 ## Troubleshooting
+
+### ❌ Tests Ask for Login Every Time
+
+**Problem**: Tests keep asking you to login on each run
+
+**Solutions**:
+1. Check that `.auth/user.json` exists after running tests
+   ```bash
+   ls -la .auth/
+   ```
+
+2. Verify `playwright.config.ts` has correct configuration:
+   ```typescript
+   storageState: '.auth/user.json'
+   dependencies: ['setup']
+   ```
+
+3. Ensure setup project is configured:
+   ```typescript
+   { name: 'setup', testMatch: /.*\.setup\.ts/ }
+   ```
+
+4. Delete auth file and re-run to generate fresh auth:
+   ```bash
+   rm -rf .auth/user.json && npm test
+   ```
+
+### ❌ Authentication Fails
+
+**Problem**: Setup fails to authenticate
+
+**Solutions**:
+1. Check the screenshot at `.auth/failed-login.png` for visual debugging
+2. Verify test credentials in `auth.setup.ts` are correct
+3. Ensure the login page structure hasn't changed
+4. Check if Supabase/backend is running properly
+5. Try logging in manually with the test credentials
+
+### ❌ Tests Fail After Authentication
+
+**Problem**: Auth works but tests fail
+
+**Solutions**:
+1. Session may have expired (Supabase tokens expire)
+   ```bash
+   rm .auth/user.json && npm test
+   ```
+
+2. Check if test user has proper permissions
+3. Verify database has required test data
+4. Run tests more frequently to keep session active
+
+### ❌ Auth File Not Being Used
+
+**Problem**: `.auth/user.json` exists but tests still login
+
+**Solutions**:
+1. Check test is using correct project (chromium, firefox, webkit)
+2. Verify `storageState` path is correct in config
+3. Ensure dependencies are set up correctly
+4. Clear Playwright cache:
+   ```bash
+   npx playwright clean
+   ```
 
 ### Tests Failing Locally
 

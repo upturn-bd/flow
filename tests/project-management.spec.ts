@@ -23,9 +23,10 @@ const TEST_PROJECT = {
 // Helper functions
 // ---------------------------------------------------------------------------
 async function navigateToProjects(page: Page) {
-    await page.goto('/ops/project');
-    await page.waitForLoadState('networkidle');
-    await expect(page.locator('h1:has-text("Project Management")')).toBeVisible();
+    await page.goto('/ops/project', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('h1:has-text("Project Management")', { timeout: 15000 });
+    // Give page time to fully render
+    await page.waitForTimeout(1000);
 }
 
 async function openCreateProjectTab(page: Page) {
@@ -89,28 +90,45 @@ async function submitProjectForm(page: Page) {
 // Navigation & UI tests
 // ---------------------------------------------------------------------------
 test.describe('Project Management - Navigation and UI', () => {
-    test('should navigate to project management page', async ({ page }) => {
+    // Configure serial execution and reuse same page to avoid browser "refresh"
+    test.describe.configure({ mode: 'serial' });
+
+    let page: Page;
+
+    test.beforeAll(async ({ browser }) => {
+        // Create a persistent page for this entire test suite
+        const context = await browser.newContext({ storageState: 'tests/.auth/user.json' });
+        page = await context.newPage();
+        // Navigate once for all tests in this suite
         await navigateToProjects(page);
+    });
+
+    test.afterAll(async () => {
+        await page.close();
+    });
+
+    test('should navigate to project management page', async () => {
+        // Page already navigated in beforeAll - just verify elements
         await expect(page.locator('h1:has-text("Project Management")')).toBeVisible();
         await expect(page.locator('text=Efficiently manage your projects')).toBeVisible();
     });
 
-    test('should display all tabs (Ongoing, Completed, Create New, Archived)', async ({ page }) => {
-        await navigateToProjects(page);
+    test('should display all tabs (Ongoing, Completed, Create New, Archived)', async () => {
+        // Reuse same page - no need to navigate again
         await expect(page.locator('button:has-text("Ongoing")')).toBeVisible();
         await expect(page.locator('button:has-text("Completed")')).toBeVisible();
         await expect(page.locator('button:has-text("Create New")')).toBeVisible();
         await expect(page.locator('button:has-text("Archived")')).toBeVisible();
     });
 
-    test('should have Ongoing tab active by default', async ({ page }) => {
-        await navigateToProjects(page);
+    test('should have Ongoing tab active by default', async () => {
+        // Check URL without navigating
         const url = page.url();
         expect(url.includes('tab=ongoing') || !url.includes('tab=')).toBeTruthy();
     });
 
-    test('should display correct icons for each tab', async ({ page }) => {
-        await navigateToProjects(page);
+    test('should display correct icons for each tab', async () => {
+        // Just check icons on current page
         await expect(page.locator('button:has-text("Ongoing")').locator('svg')).toBeVisible();
         await expect(page.locator('button:has-text("Completed")').locator('svg')).toBeVisible();
         await expect(page.locator('button:has-text("Create New")').locator('svg')).toBeVisible();
@@ -122,31 +140,44 @@ test.describe('Project Management - Navigation and UI', () => {
 // Tab navigation tests
 // ---------------------------------------------------------------------------
 test.describe('Project Management - Tab Navigation', () => {
-    test.beforeEach(async ({ page }) => {
+    // Configure serial execution and reuse same page to avoid browser "refresh"
+    test.describe.configure({ mode: 'serial' });
+
+    let page: Page;
+
+    test.beforeAll(async ({ browser }) => {
+        // Create a persistent page for this entire test suite
+        const context = await browser.newContext({ storageState: 'tests/.auth/user.json' });
+        page = await context.newPage();
+        // Navigate once for all tests in this suite
         await navigateToProjects(page);
     });
 
-    test('should switch to Completed tab and update URL', async ({ page }) => {
+    test.afterAll(async () => {
+        await page.close();
+    });
+
+    test('should switch to Completed tab and update URL', async () => {
         await page.click('button:has-text("Completed")');
         await page.waitForURL('**/ops/project?tab=completed');
         expect(page.url()).toContain('tab=completed');
     });
 
-    test('should switch to Create New tab and update URL', async ({ page }) => {
+    test('should switch to Create New tab and update URL', async () => {
         await page.click('button:has-text("Create New")');
         await page.waitForURL('**/ops/project?tab=create');
         expect(page.url()).toContain('tab=create');
         await expect(page.locator('h2:has-text("Create New Project")')).toBeVisible();
     });
 
-    test('should switch to Archived tab and show coming soon message', async ({ page }) => {
+    test('should switch to Archived tab and show coming soon message', async () => {
         await page.click('button:has-text("Archived")');
         await page.waitForURL('**/ops/project?tab=archived');
         await expect(page.locator('text=Archived Projects').first()).toBeVisible();
         await expect(page.locator('text=Feature coming soon')).toBeVisible();
     });
 
-    test('should maintain tab state on page reload', async ({ page }) => {
+    test('should maintain tab state on page reload', async () => {
         await page.click('button:has-text("Completed")');
         await page.waitForURL('**/ops/project?tab=completed');
         await page.reload();
@@ -154,17 +185,26 @@ test.describe('Project Management - Tab Navigation', () => {
         expect(page.url()).toContain('tab=completed');
     });
 
-    test('should navigate between all tabs correctly', async ({ page }) => {
-        expect(page.url().includes('tab=ongoing') || !page.url().includes('tab=')).toBeTruthy();
+    test('should navigate between all tabs correctly', async () => {
+        // Start from current state (might be on Completed from previous test)
+        // First go to Ongoing to have consistent starting point
+        await page.click('button:has-text("Ongoing")');
+        await page.waitForURL('**/ops/project?tab=ongoing');
+        
+        expect(page.url().includes('tab=ongoing')).toBeTruthy();
+        
         await page.click('button:has-text("Completed")');
         await page.waitForURL('**/ops/project?tab=completed');
         expect(page.url()).toContain('tab=completed');
+        
         await page.click('button:has-text("Create New")');
         await page.waitForURL('**/ops/project?tab=create');
         expect(page.url()).toContain('tab=create');
+        
         await page.click('button:has-text("Archived")');
         await page.waitForURL('**/ops/project?tab=archived');
         expect(page.url()).toContain('tab=archived');
+        
         await page.click('button:has-text("Ongoing")');
         await page.waitForURL('**/ops/project?tab=ongoing');
         expect(page.url()).toContain('tab=ongoing');
@@ -175,23 +215,36 @@ test.describe('Project Management - Tab Navigation', () => {
 // Project creation tests
 // ---------------------------------------------------------------------------
 test.describe('Project Management - Project Creation', () => {
-    test.beforeEach(async ({ page }) => {
+    // Configure serial execution and reuse same page to avoid browser "refresh"
+    test.describe.configure({ mode: 'serial' });
+
+    let page: Page;
+
+    test.beforeAll(async ({ browser }) => {
+        // Create a persistent page for this entire test suite
+        const context = await browser.newContext({ storageState: 'tests/.auth/user.json' });
+        page = await context.newPage();
+        // Navigate once for all tests in this suite
         await navigateToProjects(page);
     });
 
-    test('should navigate to create project tab', async ({ page }) => {
+    test.afterAll(async () => {
+        await page.close();
+    });
+
+    test('should navigate to create project tab', async () => {
         await openCreateProjectTab(page);
         await expect(page.locator('h2:has-text("Create New Project")')).toBeVisible();
     });
 
-    test('should display validation error for empty project title', async ({ page }) => {
+    test('should display validation error for empty project title', async () => {
         await openCreateProjectTab(page);
         await submitProjectForm(page);
         await expect(page.locator('text=Please enter a valid project title').or(page.locator('text=project_title'))).toBeVisible();
     });
 
     test.describe('should create a new project successfully', () => {
-        test('without milestones', async ({ page }) => {
+        test('without milestones', async () => {
             await openCreateProjectTab(page);
             await fillProjectForm(page, TEST_PROJECT);
             await submitProjectForm(page);
@@ -209,7 +262,7 @@ test.describe('Project Management - Project Creation', () => {
             await expect(page.locator(`text=${TEST_PROJECT.title}`)).toBeVisible({ timeout: 5000 });
         });
 
-        test('with one milestone', async ({ page }) => {
+        test('with one milestone', async () => {
             const projectWithOneMilestone = {
                 ...TEST_PROJECT,
                 title: 'E2E Test Project with One Milestone - ' + Date.now(),
@@ -259,7 +312,7 @@ test.describe('Project Management - Project Creation', () => {
             await expect(page.locator(`text=${projectWithOneMilestone.title}`)).toBeVisible({ timeout: 5000 });
         });
 
-        test('with multiple milestones', async ({ page }) => {
+        test('with multiple milestones', async () => {
             const projectWithMultipleMilestones = {
                 ...TEST_PROJECT,
                 title: 'E2E Test Project with Multiple Milestones - ' + Date.now(),
@@ -335,7 +388,7 @@ test.describe('Project Management - Project Creation', () => {
         });
     });
 
-    // test('should validate date range (end date after start date)', async ({ page }) => {
+    // test('should validate date range (end date after start date)', async () => {
     //     await openCreateProjectTab(page);
     //     const invalidProject = { ...TEST_PROJECT, startDate: '2024-12-31', endDate: '2024-01-01' };
     //     await fillProjectForm(page, invalidProject);
@@ -343,7 +396,7 @@ test.describe('Project Management - Project Creation', () => {
     //     await expect(page.locator('text=End date must be after start date').or(page.locator('text=end_date'))).toBeVisible();
     // });
 
-    test('should handle project creation failure gracefully', async ({ page }) => {
+    test('should handle project creation failure gracefully', async () => {
         await page.route('**/rest/v1/project_records*', route => {
             route.fulfill({
                 status: 500,
@@ -356,7 +409,7 @@ test.describe('Project Management - Project Creation', () => {
         await expect(page.locator('text=Failed to create project')).toBeVisible({ timeout: 10000 });
     });
 
-    test('should preserve form data when validation fails', async ({ page }) => {
+    test('should preserve form data when validation fails', async () => {
         await openCreateProjectTab(page);
         const titleInput = page.locator('input[name="project_title"]').or(page.locator('input[placeholder*="title" i]')).first();
         const descInput = page.locator('textarea[name="description"]').or(page.locator('textarea[placeholder*="description" i]')).first();
@@ -372,11 +425,16 @@ test.describe('Project Management - Project Creation', () => {
 // Project Viewing tests
 // ---------------------------------------------------------------------------
 test.describe('Project Management - Project Viewing', () => {
-    test.beforeEach(async ({ page }) => {
+    test.describe.configure({ mode: 'serial' });
+    let page: Page;
+    test.beforeAll(async ({ browser }) => {
+        const context = await browser.newContext({ storageState: 'tests/.auth/user.json' });
+        page = await context.newPage();
         await navigateToProjects(page);
     });
+    test.afterAll(async () => { await page.close(); });
 
-    test('should view project details', async ({ page }) => {
+    test('should view project details', async () => {
         // Wait for projects to load and click the first view button
         const viewButton = page.locator('[data-testid="view-project-button"]').first();
         await viewButton.waitFor({ state: 'visible', timeout: 10000 });
@@ -388,14 +446,20 @@ test.describe('Project Management - Project Viewing', () => {
 
         // Check details
         await expect(page.locator('h1').or(page.locator('h2')).filter({ hasText: "Project Details" })).toBeVisible();
+        
+        // Go back to project list for next tests
+        await page.goBack();
+        await page.waitForSelector('h1:has-text("Project Management")', { timeout: 5000 });
     });
 
-    test('should display search functionality', async ({ page }) => {
+    test('should display search functionality', async () => {
+        // Already on project list page from previous test or beforeAll
         const searchInput = page.locator('input[placeholder*="Search projects" i]');
         await expect(searchInput).toBeVisible();
     });
 
-    test('should search for projects', async ({ page }) => {
+    test('should search for projects', async () => {
+        // Already on project list page
         const searchInput = page.locator('input[placeholder*="Search projects" i]');
         await searchInput.fill('test');
         await page.waitForTimeout(500); // Wait for debounce
@@ -407,11 +471,16 @@ test.describe('Project Management - Project Viewing', () => {
 // Project Updating tests
 // ---------------------------------------------------------------------------
 test.describe('Project Management - Project Updating', () => {
-    test.beforeEach(async ({ page }) => {
+    test.describe.configure({ mode: 'serial' });
+    let page: Page;
+    test.beforeAll(async ({ browser }) => {
+        const context = await browser.newContext({ storageState: 'tests/.auth/user.json' });
+        page = await context.newPage();
         await navigateToProjects(page);
     });
+    test.afterAll(async () => { await page.close(); });
 
-    test('should update project details successfully', async ({ page }) => {
+    test('should update project details successfully', async () => {
         const newTitle = `Updated Project ${Date.now()}`;
 
         // Wait for projects to load and click the first edit button
@@ -440,11 +509,16 @@ test.describe('Project Management - Project Updating', () => {
 // Project Deletion tests
 // ---------------------------------------------------------------------------
 test.describe('Project Management - Project Deletion', () => {
-    test.beforeEach(async ({ page }) => {
+    test.describe.configure({ mode: 'serial' });
+    let page: Page;
+    test.beforeAll(async ({ browser }) => {
+        const context = await browser.newContext({ storageState: 'tests/.auth/user.json' });
+        page = await context.newPage();
         await navigateToProjects(page);
     });
+    test.afterAll(async () => { await page.close(); });
 
-    test('should delete a project successfully', async ({ page }) => {
+    test('should delete a project successfully', async () => {
         // Wait for projects to load and get the first project's title
         const firstProjectCard = page.locator('[data-testid="project-card"]').first();
         await firstProjectCard.waitFor({ state: 'visible', timeout: 10000 });
@@ -471,11 +545,16 @@ test.describe('Project Management - Project Deletion', () => {
 // Project Completion tests
 // ---------------------------------------------------------------------------
 test.describe('Project Management - Project Completion', () => {
-    test.beforeEach(async ({ page }) => {
+    test.describe.configure({ mode: 'serial' });
+    let page: Page;
+    test.beforeAll(async ({ browser }) => {
+        const context = await browser.newContext({ storageState: 'tests/.auth/user.json' });
+        page = await context.newPage();
         await navigateToProjects(page);
     });
+    test.afterAll(async () => { await page.close(); });
 
-    test('should mark a project as complete', async ({ page }) => {
+    test('should mark a project as complete', async () => {
         // Wait for projects to load and get the first project's title
         const firstProjectCard = page.locator('[data-testid="project-card"]').first();
         await firstProjectCard.waitFor({ state: 'visible', timeout: 10000 });
@@ -519,7 +598,7 @@ test.describe('Project Management - Project Completion', () => {
         }
     });
 
-    test('should reopen a completed project', async ({ page }) => {
+    test('should reopen a completed project', async () => {
         // Navigate to Completed tab
         await page.click('button:has-text("Completed")');
         await page.waitForURL(/\/ops\/project\?tab=completed/, { timeout: 5000 });
@@ -571,11 +650,16 @@ test.describe('Project Management - Project Completion', () => {
 // Pagination tests
 // ---------------------------------------------------------------------------
 test.describe('Project Management - Pagination', () => {
-    test.beforeEach(async ({ page }) => {
+    test.describe.configure({ mode: 'serial' });
+    let page: Page;
+    test.beforeAll(async ({ browser }) => {
+        const context = await browser.newContext({ storageState: 'tests/.auth/user.json' });
+        page = await context.newPage();
         await navigateToProjects(page);
     });
+    test.afterAll(async () => { await page.close(); });
 
-    test('should display and use load more button for ongoing projects', async ({ page }) => {
+    test('should display and use load more button for ongoing projects', async () => {
         // Count initial projects
         const initialProjectCount = await page.locator('[data-testid="project-card"]').count();
 
@@ -602,7 +686,7 @@ test.describe('Project Management - Pagination', () => {
         }
     });
 
-    test('should display and use load more button for completed projects', async ({ page }) => {
+    test('should display and use load more button for completed projects', async () => {
         // Navigate to Completed tab
         await page.click('button:has-text("Completed")');
         await page.waitForURL(/\/ops\/project\?tab=completed/, { timeout: 5000 });
