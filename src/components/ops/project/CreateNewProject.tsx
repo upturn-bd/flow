@@ -8,7 +8,7 @@ import { Department, useDepartments } from "@/hooks/useDepartments";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { useProjects } from "@/hooks/useProjects";
 import { useMilestones } from "@/hooks/useMilestones";
-import { WarningCircle, Building, X } from "@/lib/icons";
+import { WarningCircle, Building, X, Loader } from "@/lib/icons";
 import ProjectForm, { type ProjectDetails } from "./ProjectForm";
 import MilestoneList from "./milestone/MilestoneList";
 import MilestoneForm, { type Milestone } from "./milestone/MilestoneForm";
@@ -43,16 +43,21 @@ const initialProjectDetails: ProjectDetails = {
 export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (key: string) => void }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user } = useAuth()
-  const { departments, fetchDepartments } = useDepartments();
-  const { employees, fetchEmployeeInfo } = useEmployeeInfo();
+  const { user, employeeInfo } = useAuth()
+  const { departments, fetchDepartments, loading: departmentsLoading } = useDepartments();
+  const { employees, fetchEmployeeInfo, loading: employeesLoading } = useEmployeeInfo();
   const { createProject } = useProjects();
   const { createMilestone } = useMilestones();
 
+  const isDataLoading = departmentsLoading || employeesLoading;
+
   useEffect(() => {
-    fetchDepartments();
-    fetchEmployeeInfo();
-  }, [user]);
+    // Only fetch when user is authenticated AND employeeInfo with company_id is available
+    if (user && employeeInfo?.company_id) {
+      fetchDepartments();
+      fetchEmployeeInfo();
+    }
+  }, [user, employeeInfo?.company_id, fetchDepartments, fetchEmployeeInfo]);
 
   const handleSubmit = async (
     data: ProjectDetails,
@@ -133,6 +138,17 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
           </h2>
         </div>
       </motion.div>
+
+      {/* Loading indicator for data fetching */}
+      {isDataLoading && (
+        <motion.div 
+          variants={fadeInUp}
+          className="flex items-center gap-2 px-4 py-3 mb-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg text-primary-700 dark:text-primary-300"
+        >
+          <Loader size={16} className="animate-spin" />
+          <span className="text-sm">Loading departments and employees...</span>
+        </motion.div>
+      )}
 
       <motion.div variants={fadeInUp}>
         <ProjectForm
