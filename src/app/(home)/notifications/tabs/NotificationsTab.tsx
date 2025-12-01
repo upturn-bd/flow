@@ -16,6 +16,7 @@ import {
 import { useNotifications, Notification } from "@/hooks/useNotifications";
 import { formatRelativeTime } from "@/lib/utils";
 import Link from "next/link";
+import { InlineSpinner } from "@/components/ui";
 
 const iconMap = {
   'alert-circle': WarningCircle,
@@ -98,7 +99,7 @@ export default function NotificationsTab() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <InlineSpinner size="lg" color="blue" />
       </div>
     );
   }

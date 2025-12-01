@@ -61,7 +61,7 @@ export default function SuperadminNav() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/sa" className="flex items-center gap-2.5">
-              <div className="bg-gradient-to-br from-blue-600 to-purple-600 text-white px-3 py-1.5 rounded-lg font-bold text-lg shadow-sm">
+              <div className="bg-gradient-to-br from-primary-600 to-primary-800 text-white px-3 py-1.5 rounded-lg font-bold text-lg shadow-sm">
                 SA
               </div>
               <span className="text-xl font-semibold text-foreground-primary hidden sm:block">

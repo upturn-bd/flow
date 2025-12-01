@@ -186,3 +186,30 @@ BEGIN
   RAISE NOTICE '2. Update middleware to check superadmin status';
   RAISE NOTICE '3. Create /sa routes for superadmin interface';
 END $$;
+
+
+-- ==============================================================================
+-- Updated Table Definition
+
+create table public.superadmins (
+  id serial not null,
+  user_id uuid not null,
+  granted_by uuid null,
+  granted_at timestamp with time zone null default now(),
+  notes text null,
+  is_active boolean null default true,
+  created_at timestamp with time zone null default now(),
+  updated_at timestamp with time zone null default now(),
+  constraint superadmins_pkey primary key (id),
+  constraint superadmins_user_id_key unique (user_id),
+  constraint superadmins_granted_by_fkey foreign KEY (granted_by) references auth.users (id),
+  constraint superadmins_user_id_fkey1 foreign KEY (user_id) references employees (id) on update CASCADE on delete CASCADE
+) TABLESPACE pg_default;
+
+create index IF not exists idx_superadmins_user_id on public.superadmins using btree (user_id) TABLESPACE pg_default;
+
+create index IF not exists idx_superadmins_is_active on public.superadmins using btree (is_active) TABLESPACE pg_default;
+
+create trigger trigger_update_superadmins_updated_at BEFORE
+update on superadmins for EACH row
+execute FUNCTION update_superadmins_updated_at ();

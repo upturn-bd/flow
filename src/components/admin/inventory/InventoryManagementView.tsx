@@ -9,11 +9,11 @@ import {
 } from ".";
 import { RequisitionInventory, useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
-import { Trash, Package, Tag, Plus, Eye } from "@/lib/icons";
+import { Trash, Package, Tag, Plus } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
-
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { EntityCard, EntityCardGrid, EmptyState } from "@/components/ui";
 
 export default function InventoryManagementView() {
   const {
@@ -57,7 +57,7 @@ export default function InventoryManagementView() {
     fetchRequisitionTypes();
   }, [fetchRequisitionTypes]);
 
-  //Inventory states and functions
+  // Inventory states and functions
   const {
     requisitionInventories,
     fetchRequisitionInventories,
@@ -149,47 +149,43 @@ export default function InventoryManagementView() {
               color="gray"
             />
           ) : (
-            <div>
-              <AnimatePresence>
-                {requisitionTypes.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {requisitionTypes.map((type, idx) => (
-                      <div
-                        key={type.id || idx}
-                        className="flex items-center bg-background-tertiary rounded-lg px-3 py-2 border border-border-primary shadow-sm"
+            <AnimatePresence>
+              {requisitionTypes.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {requisitionTypes.map((type, idx) => (
+                    <div
+                      key={type.id || idx}
+                      className="flex items-center bg-background-tertiary rounded-lg px-3 py-2 border border-border-primary shadow-sm"
+                    >
+                      <span className="text-foreground-primary font-medium">{type.name}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => type.id !== undefined && handleDeleteRequisitionType(type.id)}
+                        isLoading={deleteLoading === type.id}
+                        disabled={deleteLoading === type.id}
+                        className="ml-2 p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
                       >
-                        <span className="text-foreground-primary font-medium">{type.name}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => type.id !== undefined && handleDeleteRequisitionType(type.id)}
-                          isLoading={deleteLoading === type.id}
-                          disabled={deleteLoading === type.id}
-                          className="ml-2 p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
-                        >
-                          <Trash size={16} weight="bold" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="bg-background-secondary rounded-lg p-6 text-center border border-border-primary">
-                    <div className="flex justify-center mb-3">
-                      <Tag size={40} weight="duotone" className="text-foreground-tertiary" />
+                        <Trash size={16} weight="bold" />
+                      </Button>
                     </div>
-                    <p className="text-foreground-tertiary mb-1">No categories found</p>
-                    <p className="text-foreground-tertiary text-sm mb-4">Create categories to organize your inventory items</p>
-                  </div>
-                )}
-              </AnimatePresence>
-            </div>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon={Tag}
+                  title="No categories found"
+                  description="Create categories to organize your inventory items"
+                />
+              )}
+            </AnimatePresence>
           )}
 
           <div className="flex justify-end mt-4">
             <Button
               variant="primary" 
               onClick={() => setIsCreatingRequisitionType(true)}
-              className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"
+              className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
             >
               <Plus size={16} weight="bold" />
               Add Category
@@ -223,71 +219,42 @@ export default function InventoryManagementView() {
               color="gray"
             />
           ) : (
-            <div>
-              <AnimatePresence>
-                {requisitionInventories.length > 0 ? (
-                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                    {requisitionInventories.map((item: RequisitionInventory, idx) => (
-                      <div
-                        key={item.id || idx}
-                        className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Package size={20} weight="duotone" className="text-foreground-secondary" />
-                            <h4 className="font-medium text-foreground-primary">{item.name}</h4>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => item.id !== undefined && handleDeleteRequisitionInventory(item.id)}
-                            isLoading={inventoryDeleteLoading === item.id}
-                            disabled={inventoryDeleteLoading === item.id}
-                            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
-                          >
-                            <Trash size={16} weight="bold" />
-                          </Button>
-                        </div>
-                        
-                        {item.description && (
-                          <p className="text-foreground-secondary text-sm mb-3 line-clamp-2">{item.description}</p>
-                        )}
-                        
-                        <div className="flex items-center justify-between mt-2">
-                          <span className="text-sm bg-background-tertiary px-2 py-1 rounded text-foreground-secondary">
-                            Qty: {item.quantity}
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditRequisitionInventory(item.id!)}
-                            className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
-                          >
-                            <Eye size={16} weight="bold" />
-                            View Details
-                          </Button>
-                        </div>
+            <AnimatePresence>
+              {requisitionInventories.length > 0 ? (
+                <EntityCardGrid columns={3}>
+                  {requisitionInventories.map((item: RequisitionInventory, idx) => (
+                    <EntityCard
+                      key={item.id || idx}
+                      title={item.name}
+                      icon={Package}
+                      description={item.description}
+                      onDelete={item.id !== undefined ? () => handleDeleteRequisitionInventory(item.id!) : undefined}
+                      deleteLoading={inventoryDeleteLoading === item.id}
+                      onView={() => setEditRequisitionInventory(item.id!)}
+                    >
+                      <div className="flex items-center mt-2">
+                        <span className="text-sm bg-background-tertiary dark:bg-surface-secondary px-2 py-1 rounded text-foreground-secondary">
+                          Qty: {item.quantity}
+                        </span>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="bg-background-secondary rounded-lg p-6 text-center border border-border-primary">
-                    <div className="flex justify-center mb-3">
-                      <Package size={40} weight="duotone" className="text-foreground-tertiary" />
-                    </div>
-                    <p className="text-foreground-tertiary mb-1">No inventory items found</p>
-                    <p className="text-foreground-tertiary text-sm mb-4">Add items to your inventory to keep track of your supplies</p>
-                  </div>
-                )}
-              </AnimatePresence>
-            </div>
+                    </EntityCard>
+                  ))}
+                </EntityCardGrid>
+              ) : (
+                <EmptyState
+                  icon={Package}
+                  title="No inventory items found"
+                  description="Add items to your inventory to keep track of your supplies"
+                />
+              )}
+            </AnimatePresence>
           )}
 
           <div className="flex justify-end mt-4">
             <Button
               variant="primary" 
               onClick={() => setIsCreatingRequisitionInventory(true)}
-              className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"
+              className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
             >
               <Plus size={16} weight="bold" />
               Add Inventory Item

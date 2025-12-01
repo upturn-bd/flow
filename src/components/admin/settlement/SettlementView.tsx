@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
-import { Trash, Receipt, Money, Plus, Eye, MoneyIcon, EyeIcon, ReceiptIcon } from "@/lib/icons";
+import { Receipt, Plus, MoneyIcon } from "@/lib/icons";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { ClaimType } from "@/lib/types/schemas";
 import {
@@ -11,8 +11,8 @@ import {
 } from ".";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
-
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { EntityCard, EntityCardGrid, EntityCardBadge, EmptyState } from "@/components/ui";
 
 type SettlementType = ClaimType;
 
@@ -108,64 +108,34 @@ export default function ClaimSettlementView() {
             color="gray"
           />
         ) : (
-          <div>
-            <AnimatePresence>
-              {claimTypes.length > 0 ? (
-                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                  {claimTypes.map((settlementType: SettlementType, idx) => (
-                    <div
-                      key={settlementType.id || idx}
-                      className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Receipt size={20} weight="duotone" className="text-foreground-secondary" />
-                          <h4 className="font-medium text-foreground-primary">{settlementType.settlement_item}</h4>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => settlementType.id !== undefined && handleDeleteClaimType(settlementType.id)}
-                          isLoading={deleteLoading === settlementType.id}
-                          disabled={deleteLoading === settlementType.id}
-                          className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
-                        >
-                          <Trash size={16} weight="bold" />
-                        </Button>
-                      </div>
-                      
-                      <div className="mt-2">
-                        <span className="flex items-center gap-1.5 text-sm bg-background-tertiary dark:bg-surface-secondary px-2 py-1 rounded text-foreground-secondary w-fit">
-                          <MoneyIcon size={16} weight="duotone" className="text-foreground-tertiary" />
-                          Allowance: {formatCurrency(settlementType.allowance)}
-                        </span>
-                      </div>
-                      
-                      <div className="flex justify-end mt-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => settlementType.id !== undefined && setEditClaimType(settlementType.id)}
-                          className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
-                        >
-                          <EyeIcon size={16} weight="bold" />
-                          View Details
-                        </Button>
-                      </div>
+          <AnimatePresence>
+            {claimTypes.length > 0 ? (
+              <EntityCardGrid columns={3}>
+                {claimTypes.map((settlementType: SettlementType, idx) => (
+                  <EntityCard
+                    key={settlementType.id || idx}
+                    title={settlementType.settlement_item}
+                    icon={Receipt}
+                    onDelete={settlementType.id !== undefined ? () => handleDeleteClaimType(settlementType.id!) : undefined}
+                    deleteLoading={deleteLoading === settlementType.id}
+                    onView={settlementType.id !== undefined ? () => setEditClaimType(settlementType.id!) : undefined}
+                  >
+                    <div className="mt-2">
+                      <EntityCardBadge icon={MoneyIcon}>
+                        Allowance: {formatCurrency(settlementType.allowance)}
+                      </EntityCardBadge>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary">
-                  <div className="flex justify-center mb-3">
-                    <ReceiptIcon size={40} weight="duotone" className="text-foreground-tertiary" />
-                  </div>
-                  <p className="text-foreground-tertiary mb-1">No settlement types found</p>
-                  <p className="text-foreground-tertiary text-sm mb-4">Add settlement types to configure the settlement system</p>
-                </div>
-              )}
-            </AnimatePresence>
-          </div>
+                  </EntityCard>
+                ))}
+              </EntityCardGrid>
+            ) : (
+              <EmptyState
+                icon={Receipt}
+                title="No settlement types found"
+                description="Add settlement types to configure the settlement system"
+              />
+            )}
+          </AnimatePresence>
         )}
 
         <div className="flex justify-end mt-4">

@@ -9,13 +9,13 @@ import {
   LeaveTypeUpdateModal,
 } from ".";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
-import { Trash, Tag, CalendarCheck, CalendarBlank, Plus, Clock, Eye } from "@/lib/icons";
+import { Tag, CalendarCheck, CalendarBlank, Plus, Clock } from "@/lib/icons";
 import { useHolidayConfigs, useWeeklyHolidayConfigs } from "@/hooks/useLeaveManagement";
 import { HolidayConfig, LeaveType } from "@/hooks/useLeaveManagement";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
-
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { EntityCard, EntityCardGrid, EntityCardBadge, EntityCardMetaItem, EmptyState } from "@/components/ui";
 
 export default function LeaveManagementView() {
   const {
@@ -259,7 +259,6 @@ export default function LeaveManagementView() {
             })}
           </div>
 
-
           {weeklyHolidays.length > 0 && (
             <p className="mt-2 text-sm text-foreground-tertiary">
               Selected: {weeklyHolidays.map(d => weekdays[d]).join(", ")}
@@ -282,69 +281,33 @@ export default function LeaveManagementView() {
               color="gray"
             />
           ) : (
-            <div>
-              <AnimatePresence>
-                {holidayConfigs.length > 0 ? (
-                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                    {holidayConfigs.map((holiday: HolidayConfig, idx) => (
-                      <div
-                        key={holiday.id || idx}
-                        className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-2 mb-2">
-                            <CalendarCheck size={20} weight="duotone" className="text-foreground-secondary" />
-                            <h4 className="font-medium text-foreground-primary">{holiday.name}</h4>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => holiday.id !== undefined && handleDeleteHolidayConfig(holiday.id)}
-                            isLoading={deleteHolidayLoading === holiday.id}
-                            disabled={deleteHolidayLoading === holiday.id}
-                            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
-                          >
-                            <Trash size={16} weight="bold" />
-                          </Button>
-                        </div>
-
-                        <div className="mt-2">
-                          <span className="flex items-center gap-1.5 text-sm text-foreground-secondary">
-                            <CalendarBlank size={16} weight="duotone" className="text-foreground-tertiary" />
-                            {holiday.start_day == holiday.end_day ? formatDate(holiday.start_day) : `${formatDate(holiday.start_day)} - ${formatDate(holiday.end_day)}`}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-end mt-3">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditHolidayConfig(holiday.id!)}
-                            className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
-                          >
-                            <Eye size={16} weight="bold" />
-                            View Details
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div
-                    
-                    className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary"
-                  >
-                    <div
-                      className="flex justify-center mb-3"
-                    >
-                      <CalendarCheck size={40} weight="duotone" className="text-foreground-tertiary" />
-                    </div>
-                    <p className="text-foreground-tertiary mb-1">No holidays found</p>
-                    <p className="text-foreground-tertiary text-sm mb-4">Add holidays to the calendar</p>
-                  </div>
-                )}
-              </AnimatePresence>
-            </div>
+            <AnimatePresence>
+              {holidayConfigs.length > 0 ? (
+                <EntityCardGrid columns={3}>
+                  {holidayConfigs.map((holiday: HolidayConfig, idx) => (
+                    <EntityCard
+                      key={holiday.id || idx}
+                      title={holiday.name}
+                      icon={CalendarCheck}
+                      onDelete={holiday.id !== undefined ? () => handleDeleteHolidayConfig(holiday.id!) : undefined}
+                      deleteLoading={deleteHolidayLoading === holiday.id}
+                      onView={() => setEditHolidayConfig(holiday.id!)}
+                      metadata={
+                        <EntityCardMetaItem icon={CalendarBlank}>
+                          {holiday.start_day == holiday.end_day ? formatDate(holiday.start_day) : `${formatDate(holiday.start_day)} - ${formatDate(holiday.end_day)}`}
+                        </EntityCardMetaItem>
+                      }
+                    />
+                  ))}
+                </EntityCardGrid>
+              ) : (
+                <EmptyState
+                  icon={CalendarCheck}
+                  title="No holidays found"
+                  description="Add holidays to the calendar"
+                />
+              )}
+            </AnimatePresence>
           )}
 
           <div className="flex justify-end mt-4">
@@ -374,69 +337,34 @@ export default function LeaveManagementView() {
               color="gray"
             />
           ) : (
-            <div>
-              <AnimatePresence>
-                {leaveTypes.length > 0 ? (
-                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                    {leaveTypes.map((type: LeaveType, idx) => (
-                      <div
-                        key={type.id || idx}
-                        className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Tag size={20} weight="duotone" className="text-foreground-secondary" />
-                            <h4 className="font-medium text-foreground-primary">{type.name}</h4>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => type.id !== undefined && handleDeleteLeaveType(type.id)}
-                            isLoading={deleteTypeLoading === type.id}
-                            disabled={deleteTypeLoading === type.id}
-                            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
-                          >
-                            <Trash size={16} weight="bold" />
-                          </Button>
-                        </div>
-
-                        <div className="mt-2">
-                          <span className="flex items-center gap-1.5 text-sm bg-background-tertiary dark:bg-surface-secondary px-2 py-1 rounded text-foreground-secondary w-fit">
-                            <Clock size={16} weight="duotone" className="text-foreground-tertiary" />
-                            Annual quota: {type.annual_quota} days
-                          </span>
-                        </div>
-
-                        <div className="flex justify-end mt-3">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditLeaveType(type.id!)}
-                            className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
-                          >
-                            <Eye size={16} weight="bold" />
-                            View Details
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div
-                    
-                    className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary"
-                  >
-                    <div
-                      className="flex justify-center mb-3"
+            <AnimatePresence>
+              {leaveTypes.length > 0 ? (
+                <EntityCardGrid columns={3}>
+                  {leaveTypes.map((type: LeaveType, idx) => (
+                    <EntityCard
+                      key={type.id || idx}
+                      title={type.name}
+                      icon={Tag}
+                      onDelete={type.id !== undefined ? () => handleDeleteLeaveType(type.id!) : undefined}
+                      deleteLoading={deleteTypeLoading === type.id}
+                      onView={() => setEditLeaveType(type.id!)}
                     >
-                      <Tag size={40} weight="duotone" className="text-foreground-tertiary" />
-                    </div>
-                    <p className="text-foreground-tertiary mb-1">No leave types found</p>
-                    <p className="text-foreground-tertiary text-sm mb-4">Add leave types to configure the leave system</p>
-                  </div>
-                )}
-              </AnimatePresence>
-            </div>
+                      <div className="mt-2">
+                        <EntityCardBadge icon={Clock}>
+                          Annual quota: {type.annual_quota} days
+                        </EntityCardBadge>
+                      </div>
+                    </EntityCard>
+                  ))}
+                </EntityCardGrid>
+              ) : (
+                <EmptyState
+                  icon={Tag}
+                  title="No leave types found"
+                  description="Add leave types to configure the leave system"
+                />
+              )}
+            </AnimatePresence>
           )}
 
           <div className="flex justify-end mt-4">

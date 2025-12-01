@@ -2,7 +2,7 @@
 import { TaskUpdateModal } from "./shared/TaskModal";
 import { TaskFilters, useTasks } from "@/hooks/useTasks";
 import { Task } from "@/lib/types/schemas";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import TaskDetails from "./shared/TaskDetails";
 import { AnimatePresence } from "framer-motion";
 import {
@@ -121,35 +121,29 @@ export default function OngoingTaskPage({
 
   const displayTasks = searchTerm ? searchResults : ongoingTasks;
   const [showEmpty, setShowEmpty] = useState(false);
-  const hasLoadedRef = useRef(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   // Track when we've completed the initial load
   useEffect(() => {
-    // Mark as loaded when we have tasks OR when loading completes and we've waited a bit
-    if (ongoingTasks.length > 0 && !hasLoadedRef.current) {
-      hasLoadedRef.current = true;
-    } else if (!loading && !hasLoadedRef.current) {
-      // Wait 2 seconds to ensure the fetch has actually completed
-      const timer = setTimeout(() => {
-        hasLoadedRef.current = true;
-      }, 2000);
-      return () => clearTimeout(timer);
+    // Mark as loaded when loading finishes (whether we have tasks or not)
+    if (!loading && !hasLoaded) {
+      setHasLoaded(true);
     }
-  }, [loading, ongoingTasks.length]);
+  }, [loading, hasLoaded]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (displayTasks.length === 0 && !loading && !searching) {
-      // Delay showing empty state by 1 second
+    if (displayTasks.length === 0 && !loading && !searching && hasLoaded) {
+      // Delay showing empty state by 500ms
       timer = setTimeout(() => {
         setShowEmpty(true);
-      }, 2000);
+      }, 500);
     } else {
       setShowEmpty(false);
     }
 
     return () => clearTimeout(timer);
-  }, [displayTasks.length, loading, searching]);
+  }, [displayTasks.length, loading, searching, hasLoaded]);
 
   return (
     <div>
@@ -165,7 +159,7 @@ export default function OngoingTaskPage({
       </div>
 
       {/* Loading / searching spinner */}
-      {!editTask && (loading || searching || !hasLoadedRef.current) ? (
+      {!editTask && (loading || searching) ? (
         <LoadingSpinner text={searching ? "Searching Tasks..." : "Loading Tasks..."} />
       ) : (
         <div className="grid grid-cols-1 gap-4">
@@ -184,7 +178,7 @@ export default function OngoingTaskPage({
             </div>
           ))}
 
-          {displayTasks.length === 0 && !loading && !searching && hasLoadedRef.current && (
+          {displayTasks.length === 0 && !loading && !searching && hasLoaded && (
             <EmptyState
               icon={<ClipboardList className="w-12 h-12" />}
               title="No tasks found"

@@ -134,10 +134,10 @@ const SignIn = () => {
 
             <button
               onClick={handleGoogleSignIn}
-              className="w-full flex items-center justify-center gap-2 px-8 py-3 mt-4 rounded-full border border-border-secondary text-foreground-primary font-semibold shadow-2xl disabled:opacity-50 transition hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full flex items-center justify-center gap-2 px-8 py-3 mt-4 rounded-full bg-white border border-gray-300 text-gray-700 font-semibold shadow-md disabled:opacity-50 transition hover:bg-gray-50 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-300"
               disabled={loading}
             >
-              <GoogleLogo className="text-2xl" />
+              <GoogleLogo className="text-2xl" weight="bold" />
               {loading ? "Signing in..." : "Sign In with Google"}
             </button>
 

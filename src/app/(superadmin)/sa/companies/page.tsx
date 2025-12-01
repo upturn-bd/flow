@@ -7,7 +7,6 @@ import {
   Plus, 
   Pencil, 
   Trash, 
-  MagnifyingGlass,
   Buildings,
   Users,
   UsersThree,
@@ -27,6 +26,8 @@ import {
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { PageHeader, SearchBar, StatCard, StatCardGrid, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
+import SuperadminFormModal from "@/components/ui/modals/SuperadminFormModal";
 
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -233,118 +234,80 @@ export default function CompaniesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground-primary flex items-center gap-2">
-            <Buildings size={28} weight="duotone" className="text-blue-600" />
-            Companies
-          </h1>
-          <p className="text-foreground-secondary mt-1">Manage all companies in the system</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center bg-background-tertiary rounded-lg p-1">
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-md transition-colors ${viewMode === "grid" ? "bg-surface-primary shadow text-blue-600" : "text-foreground-tertiary hover:text-foreground-secondary"}`}
-            >
-              <SquaresFour size={20} />
-            </button>
-            <button
-              onClick={() => setViewMode("table")}
-              className={`p-2 rounded-md transition-colors ${viewMode === "table" ? "bg-surface-primary shadow text-blue-600" : "text-foreground-tertiary hover:text-foreground-secondary"}`}
-            >
-              <List size={20} />
-            </button>
-          </div>
+      <PageHeader
+        title="Companies"
+        description="Manage all companies in the system"
+        icon={Buildings}
+        iconColor="text-blue-600"
+        action={{
+          label: "Add Company",
+          onClick: () => {
+            resetForm();
+            setShowModal(true);
+          },
+          icon: Plus
+        }}
+      >
+        <div className="flex items-center bg-background-tertiary rounded-lg p-1">
           <button
-            onClick={() => {
-              resetForm();
-              setShowModal(true);
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-sm transition-all"
+            onClick={() => setViewMode("grid")}
+            className={`p-2 rounded-md transition-colors ${viewMode === "grid" ? "bg-surface-primary shadow text-primary-600 dark:text-primary-400" : "text-foreground-tertiary hover:text-foreground-secondary"}`}
           >
-            <Plus size={20} weight="bold" />
-            <span>Add Company</span>
+            <SquaresFour size={20} />
+          </button>
+          <button
+            onClick={() => setViewMode("table")}
+            className={`p-2 rounded-md transition-colors ${viewMode === "table" ? "bg-surface-primary shadow text-primary-600 dark:text-primary-400" : "text-foreground-tertiary hover:text-foreground-secondary"}`}
+          >
+            <List size={20} />
           </button>
         </div>
-      </div>
+      </PageHeader>
 
       {/* Stats Summary */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Buildings size={20} className="text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground-primary">{companies.length}</p>
-              <p className="text-xs text-foreground-tertiary">Total Companies</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Users size={20} className="text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground-primary">
-                {Object.values(companyStats).reduce((a, b) => a + b.employees, 0)}
-              </p>
-              <p className="text-xs text-foreground-tertiary">Total Employees</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <UsersThree size={20} className="text-purple-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground-primary">
-                {Object.values(companyStats).reduce((a, b) => a + b.teams, 0)}
-              </p>
-              <p className="text-xs text-foreground-tertiary">Total Teams</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <Lightning size={20} className="text-orange-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground-primary">
-                {companies.filter(c => c.live_payroll_enabled).length}
-              </p>
-              <p className="text-xs text-foreground-tertiary">Payroll Active</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <StatCardGrid columns={4}>
+        <StatCard
+          title="Total Companies"
+          value={companies.length}
+          icon={Buildings}
+          iconColor="text-blue-600"
+          iconBgColor="bg-blue-100"
+        />
+        <StatCard
+          title="Total Employees"
+          value={Object.values(companyStats).reduce((a, b) => a + b.employees, 0)}
+          icon={Users}
+          iconColor="text-green-600"
+          iconBgColor="bg-green-100"
+        />
+        <StatCard
+          title="Total Teams"
+          value={Object.values(companyStats).reduce((a, b) => a + b.teams, 0)}
+          icon={UsersThree}
+          iconColor="text-purple-600"
+          iconBgColor="bg-purple-100"
+        />
+        <StatCard
+          title="Payroll Active"
+          value={companies.filter(c => c.live_payroll_enabled).length}
+          icon={Lightning}
+          iconColor="text-orange-600"
+          iconBgColor="bg-orange-100"
+        />
+      </StatCardGrid>
 
       {/* Search */}
-      <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-4">
-        <div className="relative">
-          <MagnifyingGlass
-            size={20}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
-          />
-          <input
-            type="text"
-            placeholder="Search companies by name or code..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-          />
-        </div>
-      </div>
+      <SearchBar
+        value={searchTerm}
+        onChange={setSearchTerm}
+        placeholder="Search companies by name or code..."
+      />
 
       {/* Companies Grid/Table */}
       {loading ? (
         <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12">
           <div className="flex flex-col items-center justify-center text-foreground-tertiary">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
+            <InlineSpinner size="xl" color="blue" className="mb-4" />
             <p>Loading companies...</p>
           </div>
         </div>
@@ -369,33 +332,18 @@ export default function CompaniesPage() {
                     <div className="flex items-center gap-1 ml-2">
                       <button
                         onClick={() => handleEdit(company)}
-                        className="p-2 text-foreground-tertiary hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-foreground-tertiary hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 rounded-lg transition-colors"
                       >
                         <Pencil size={18} />
                       </button>
-                      {deleteConfirm === company.id ? (
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => handleDelete(company.id)}
-                            className="p-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
-                          >
-                            <Check size={18} />
-                          </button>
-                          <button
-                            onClick={() => setDeleteConfirm(null)}
-                            className="p-2 text-foreground-tertiary hover:bg-background-tertiary rounded-lg transition-colors"
-                          >
-                            <X size={18} />
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setDeleteConfirm(company.id)}
-                          className="p-2 text-foreground-tertiary hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                          <Trash size={18} />
-                        </button>
-                      )}
+                      <InlineDeleteConfirm
+                        isConfirming={deleteConfirm === company.id}
+                        onConfirm={() => handleDelete(company.id)}
+                        onCancel={() => setDeleteConfirm(null)}
+                        onDelete={() => setDeleteConfirm(company.id)}
+                        size={18}
+                        colorScheme="blue"
+                      />
                     </div>
                   </div>
 
@@ -448,38 +396,38 @@ export default function CompaniesPage() {
                         <div className="pt-3 space-y-2">
                           <label className="flex items-center justify-between p-2 bg-background-secondary rounded-lg cursor-pointer hover:bg-background-tertiary transition-colors">
                             <span className="text-sm flex items-center gap-2">
-                              <Lightning size={16} className="text-green-600" />
+                              <Lightning size={16} className="text-success" />
                               Absent Tracking
                             </span>
                             <input
                               type="checkbox"
                               checked={company.live_absent_enabled}
                               onChange={() => toggleFeature(company, 'live_absent_enabled')}
-                              className="rounded border-border-secondary text-blue-600 focus:ring-blue-500"
+                              className="rounded border-border-secondary text-primary-600 focus:ring-primary-500"
                             />
                           </label>
                           <label className="flex items-center justify-between p-2 bg-background-secondary rounded-lg cursor-pointer hover:bg-background-tertiary transition-colors">
                             <span className="text-sm flex items-center gap-2">
-                              <CurrencyDollar size={16} className="text-blue-600" />
+                              <CurrencyDollar size={16} className="text-primary-600 dark:text-primary-400" />
                               Live Payroll
                             </span>
                             <input
                               type="checkbox"
                               checked={company.live_payroll_enabled}
                               onChange={() => toggleFeature(company, 'live_payroll_enabled')}
-                              className="rounded border-border-secondary text-blue-600 focus:ring-blue-500"
+                              className="rounded border-border-secondary text-primary-600 focus:ring-primary-500"
                             />
                           </label>
                           <label className="flex items-center justify-between p-2 bg-background-secondary rounded-lg cursor-pointer hover:bg-background-tertiary transition-colors">
                             <span className="text-sm flex items-center gap-2">
-                              <TreeStructure size={16} className="text-purple-600" />
+                              <TreeStructure size={16} className="text-purple-600 dark:text-purple-400" />
                               Has Divisions
                             </span>
                             <input
                               type="checkbox"
                               checked={company.has_division}
                               onChange={() => toggleFeature(company, 'has_division')}
-                              className="rounded border-border-secondary text-blue-600 focus:ring-blue-500"
+                              className="rounded border-border-secondary text-primary-600 focus:ring-primary-500"
                             />
                           </label>
                         </div>
@@ -491,13 +439,13 @@ export default function CompaniesPage() {
                 {/* Active Features Bar */}
                 <div className="px-5 py-2 bg-background-secondary border-t flex flex-wrap gap-1.5">
                   {company.live_absent_enabled && (
-                    <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">Absent</span>
+                    <span className="px-2 py-0.5 text-xs bg-success/20 text-success rounded-full">Absent</span>
                   )}
                   {company.live_payroll_enabled && (
-                    <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Payroll</span>
+                    <span className="px-2 py-0.5 text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full">Payroll</span>
                   )}
                   {company.has_division && (
-                    <span className="px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">Divisions</span>
+                    <span className="px-2 py-0.5 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">Divisions</span>
                   )}
                   {!company.live_absent_enabled && !company.live_payroll_enabled && !company.has_division && (
                     <span className="text-xs text-foreground-tertiary">No features enabled</span>
@@ -549,13 +497,13 @@ export default function CompaniesPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-wrap gap-1">
                         {company.live_absent_enabled && (
-                          <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">Absent</span>
+                          <span className="px-2 py-0.5 text-xs bg-success/20 text-success rounded-full">Absent</span>
                         )}
                         {company.live_payroll_enabled && (
-                          <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Payroll</span>
+                          <span className="px-2 py-0.5 text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full">Payroll</span>
                         )}
                         {company.has_division && (
-                          <span className="px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">Divisions</span>
+                          <span className="px-2 py-0.5 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">Divisions</span>
                         )}
                       </div>
                     </td>
@@ -563,33 +511,18 @@ export default function CompaniesPage() {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => handleEdit(company)}
-                          className="p-2 text-foreground-tertiary hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-2 text-foreground-tertiary hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 rounded-lg transition-colors"
                         >
                           <Pencil size={18} />
                         </button>
-                        {deleteConfirm === company.id ? (
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => handleDelete(company.id)}
-                              className="p-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
-                            >
-                              <Check size={18} />
-                            </button>
-                            <button
-                              onClick={() => setDeleteConfirm(null)}
-                              className="p-2 text-foreground-tertiary hover:bg-background-tertiary rounded-lg transition-colors"
-                            >
-                              <X size={18} />
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setDeleteConfirm(company.id)}
-                            className="p-2 text-foreground-tertiary hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          >
-                            <Trash size={18} />
-                          </button>
-                        )}
+                        <InlineDeleteConfirm
+                          isConfirming={deleteConfirm === company.id}
+                          onConfirm={() => handleDelete(company.id)}
+                          onCancel={() => setDeleteConfirm(null)}
+                          onDelete={() => setDeleteConfirm(company.id)}
+                          size={18}
+                          colorScheme="blue"
+                        />
                       </div>
                     </td>
                   </tr>
@@ -599,274 +532,219 @@ export default function CompaniesPage() {
           </div>
 
           {filteredCompanies.length === 0 && (
-            <div className="p-12 text-center">
-              <Buildings size={48} className="mx-auto text-foreground-tertiary mb-4" />
-              <p className="text-foreground-tertiary">No companies found</p>
-            </div>
+            <EmptyState
+              icon={Buildings}
+              title="No companies found"
+              description={searchTerm ? "Try adjusting your search criteria" : "Get started by creating your first company"}
+            />
           )}
         </div>
       )}
 
       {filteredCompanies.length === 0 && !loading && viewMode === "grid" && (
-        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12 text-center">
-          <Buildings size={48} className="mx-auto text-foreground-tertiary mb-4" />
-          <p className="text-foreground-tertiary">No companies found</p>
-        </div>
+        <EmptyState
+          icon={Buildings}
+          title="No companies found"
+          description={searchTerm ? "Try adjusting your search criteria" : "Get started by creating your first company"}
+          action={!searchTerm ? {
+            label: "Add Company",
+            onClick: () => {
+              resetForm();
+              setShowModal(true);
+            }
+          } : undefined}
+        />
       )}
 
       {/* Modal */}
-      <AnimatePresence>
-        {showModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={() => {
-              setShowModal(false);
-              resetForm();
-            }}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-surface-primary rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
+      <SuperadminFormModal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          resetForm();
+        }}
+        onSubmit={handleSubmit}
+        title={editingCompany ? "Edit Company" : "Add Company"}
+        subtitle={editingCompany ? "Update company details" : "Create a new company"}
+        icon={Buildings}
+        colorScheme="blue"
+        size="lg"
+        saving={saving}
+        submitDisabled={!!codeError || !formData.name || !formData.code || !formData.industry_id || !formData.country_id}
+        submitText={editingCompany ? "Update Company" : "Create Company"}
+        isEditing={!!editingCompany}
+      >
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
+              Company Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-surface-primary text-foreground-primary"
+              placeholder="Enter company name"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
+              Company Code <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.code}
+              onChange={(e) => {
+                const newCode = e.target.value;
+                setFormData({ ...formData, code: newCode });
+                if (newCode) {
+                  setCodeError(validateCode(newCode));
+                } else {
+                  setCodeError("");
+                }
+              }}
+              placeholder="e.g., MyCompany@2024"
+              className={`w-full px-3 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary-500 transition-all bg-surface-primary text-foreground-primary ${
+                codeError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-border-primary'
+              }`}
+            />
+            {codeError ? (
+              <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                <Warning size={12} />
+                {codeError}
+              </p>
+            ) : (
+              <p className="mt-1.5 text-xs text-foreground-tertiary">
+                9+ chars with uppercase, lowercase, and special character
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
+              Industry <span className="text-red-500">*</span>
+            </label>
+            <select
+              required
+              value={formData.industry_id}
+              onChange={(e) => setFormData({ ...formData, industry_id: e.target.value })}
+              className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-surface-primary text-foreground-primary"
             >
-              <div className="p-6 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 rounded-xl">
-                      <Buildings size={24} className="text-blue-600" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-semibold text-foreground-primary">
-                        {editingCompany ? "Edit Company" : "Add Company"}
-                      </h2>
-                      <p className="text-sm text-foreground-tertiary">
-                        {editingCompany ? "Update company details" : "Create a new company"}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setShowModal(false);
-                      resetForm();
-                    }}
-                    className="p-2 hover:bg-surface-primary/50 rounded-lg transition-colors"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
+              <option value="">Select Industry</option>
+              {industries.map((industry) => (
+                <option key={industry.id} value={industry.id}>
+                  {industry.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
+              Country <span className="text-red-500">*</span>
+            </label>
+            <select
+              required
+              value={formData.country_id}
+              onChange={(e) => setFormData({ ...formData, country_id: e.target.value })}
+              className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-surface-primary text-foreground-primary"
+            >
+              <option value="">Select Country</option>
+              {countries.map((country) => (
+                <option key={country.id} value={country.id}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
+              Payroll Generation Day
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="31"
+              value={formData.payroll_generation_day}
+              onChange={(e) => setFormData({ ...formData, payroll_generation_day: parseInt(e.target.value) })}
+              className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-surface-primary text-foreground-primary"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
+              Fiscal Year Start
+            </label>
+            <input
+              type="date"
+              value={formData.fiscal_year_start}
+              onChange={(e) => setFormData({ ...formData, fiscal_year_start: e.target.value })}
+              className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-surface-primary text-foreground-primary"
+            />
+          </div>
+        </div>
+
+        <div className="bg-background-secondary rounded-xl p-4 space-y-3">
+          <h3 className="text-sm font-medium text-foreground-secondary mb-2">Feature Settings</h3>
+          <label className="flex items-center justify-between p-3 bg-surface-primary rounded-lg cursor-pointer hover:bg-background-secondary transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="p-1.5 bg-green-100 dark:bg-green-900/50 rounded-lg">
+                <Lightning size={18} className="text-green-600 dark:text-green-400" />
               </div>
-
-              <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[calc(90vh-180px)] space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-                      Company Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="Enter company name"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-                      Company Code <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.code}
-                      onChange={(e) => {
-                        const newCode = e.target.value;
-                        setFormData({ ...formData, code: newCode });
-                        if (newCode) {
-                          setCodeError(validateCode(newCode));
-                        } else {
-                          setCodeError("");
-                        }
-                      }}
-                      placeholder="e.g., MyCompany@2024"
-                      className={`w-full px-3 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all ${
-                        codeError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-border-primary'
-                      }`}
-                    />
-                    {codeError ? (
-                      <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
-                        <Warning size={12} />
-                        {codeError}
-                      </p>
-                    ) : (
-                      <p className="mt-1.5 text-xs text-foreground-tertiary">
-                        9+ chars with uppercase, lowercase, and special character
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-                      Industry <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      required
-                      value={formData.industry_id}
-                      onChange={(e) => setFormData({ ...formData, industry_id: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    >
-                      <option value="">Select Industry</option>
-                      {industries.map((industry) => (
-                        <option key={industry.id} value={industry.id}>
-                          {industry.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-                      Country <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      required
-                      value={formData.country_id}
-                      onChange={(e) => setFormData({ ...formData, country_id: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    >
-                      <option value="">Select Country</option>
-                      {countries.map((country) => (
-                        <option key={country.id} value={country.id}>
-                          {country.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-                      Payroll Generation Day
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="31"
-                      value={formData.payroll_generation_day}
-                      onChange={(e) => setFormData({ ...formData, payroll_generation_day: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-                      Fiscal Year Start
-                    </label>
-                    <input
-                      type="date"
-                      value={formData.fiscal_year_start}
-                      onChange={(e) => setFormData({ ...formData, fiscal_year_start: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div className="bg-background-secondary rounded-xl p-4 space-y-3">
-                  <h3 className="text-sm font-medium text-foreground-secondary mb-2">Feature Settings</h3>
-                  <label className="flex items-center justify-between p-3 bg-surface-primary rounded-lg cursor-pointer hover:bg-background-secondary transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="p-1.5 bg-green-100 rounded-lg">
-                        <Lightning size={18} className="text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground-primary">Live Absent Tracking</p>
-                        <p className="text-xs text-foreground-tertiary">Track employee absences in real-time</p>
-                      </div>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={formData.live_absent_enabled}
-                      onChange={(e) => setFormData({ ...formData, live_absent_enabled: e.target.checked })}
-                      className="rounded border-border-secondary text-blue-600 focus:ring-blue-500"
-                    />
-                  </label>
-
-                  <label className="flex items-center justify-between p-3 bg-surface-primary rounded-lg cursor-pointer hover:bg-background-secondary transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="p-1.5 bg-blue-100 rounded-lg">
-                        <CurrencyDollar size={18} className="text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground-primary">Live Payroll</p>
-                        <p className="text-xs text-foreground-tertiary">Enable live payroll processing</p>
-                      </div>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={formData.live_payroll_enabled}
-                      onChange={(e) => setFormData({ ...formData, live_payroll_enabled: e.target.checked })}
-                      className="rounded border-border-secondary text-blue-600 focus:ring-blue-500"
-                    />
-                  </label>
-
-                  <label className="flex items-center justify-between p-3 bg-surface-primary rounded-lg cursor-pointer hover:bg-background-secondary transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="p-1.5 bg-purple-100 rounded-lg">
-                        <TreeStructure size={18} className="text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground-primary">Has Divisions</p>
-                        <p className="text-xs text-foreground-tertiary">Enable divisional structure</p>
-                      </div>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={formData.has_division}
-                      onChange={(e) => setFormData({ ...formData, has_division: e.target.checked })}
-                      className="rounded border-border-secondary text-blue-600 focus:ring-blue-500"
-                    />
-                  </label>
-                </div>
-              </form>
-
-              <div className="p-6 border-t bg-background-secondary flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowModal(false);
-                    resetForm();
-                  }}
-                  className="px-4 py-2.5 border border-border-secondary rounded-xl hover:bg-background-tertiary transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  disabled={saving}
-                  className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
-                >
-                  {saving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Check size={18} />
-                      {editingCompany ? "Update Company" : "Create Company"}
-                    </>
-                  )}
-                </button>
+              <div>
+                <p className="text-sm font-medium text-foreground-primary">Live Absent Tracking</p>
+                <p className="text-xs text-foreground-tertiary">Track employee absences in real-time</p>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+            <input
+              type="checkbox"
+              checked={formData.live_absent_enabled}
+              onChange={(e) => setFormData({ ...formData, live_absent_enabled: e.target.checked })}
+              className="rounded border-border-secondary text-primary-600 focus:ring-primary-500"
+            />
+          </label>
+
+          <label className="flex items-center justify-between p-3 bg-surface-primary rounded-lg cursor-pointer hover:bg-background-secondary transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="p-1.5 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+                <CurrencyDollar size={18} className="text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground-primary">Live Payroll</p>
+                <p className="text-xs text-foreground-tertiary">Enable live payroll processing</p>
+              </div>
+            </div>
+            <input
+              type="checkbox"
+              checked={formData.live_payroll_enabled}
+              onChange={(e) => setFormData({ ...formData, live_payroll_enabled: e.target.checked })}
+              className="rounded border-border-secondary text-primary-600 focus:ring-primary-500"
+            />
+          </label>
+
+          <label className="flex items-center justify-between p-3 bg-surface-primary rounded-lg cursor-pointer hover:bg-background-secondary transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="p-1.5 bg-purple-100 dark:bg-purple-900/50 rounded-lg">
+                <TreeStructure size={18} className="text-purple-600 dark:text-purple-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground-primary">Has Divisions</p>
+                <p className="text-xs text-foreground-tertiary">Enable divisional structure</p>
+              </div>
+            </div>
+            <input
+              type="checkbox"
+              checked={formData.has_division}
+              onChange={(e) => setFormData({ ...formData, has_division: e.target.checked })}
+              className="rounded border-border-secondary text-primary-600 focus:ring-primary-500"
+            />
+          </label>
+        </div>
+      </SuperadminFormModal>
     </div>
   );
 }

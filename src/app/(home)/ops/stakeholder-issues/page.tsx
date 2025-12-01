@@ -13,15 +13,15 @@ import {
   Clock,
   Download,
   Eye,
-  Filter,
   Plus,
-  Search,
   Trash,
+  Building,
 } from "@/lib/icons";
 import { StakeholderIssue } from "@/lib/types/schemas";
 import { useAuth } from "@/lib/auth/auth-context";
 import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
+import { PageHeader, SearchBar, StatCard, StatCardGrid, EmptyState, InlineSpinner } from "@/components/ui";
 
 export default function StakeholderIssuesPage() {
   const router = useRouter();
@@ -175,81 +175,58 @@ export default function StakeholderIssuesPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground-primary">My Stakeholder Issues</h1>
-          <p className="text-sm text-foreground-secondary mt-1">
-            Manage issues for stakeholders you are assigned to handle
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="My Stakeholder Issues"
+        description="Manage issues for stakeholders you are assigned to handle"
+        icon={Building}
+        iconColor="text-purple-600"
+      />
 
       {/* Permission Banner */}
       <ModulePermissionsBanner module={PERMISSION_MODULES.STAKEHOLDERS} title="Stakeholder Issues" compact />
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-surface-primary rounded-lg border border-border-primary p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-foreground-secondary">Pending</p>
-              <p className="text-2xl font-bold text-foreground-primary mt-1">{pendingIssues.length}</p>
-            </div>
-            <div className="p-3 bg-yellow-100 rounded-lg">
-              <Clock className="text-yellow-600" size={24} />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-surface-primary rounded-lg border border-border-primary p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-foreground-secondary">In Progress</p>
-              <p className="text-2xl font-bold text-foreground-primary mt-1">{inProgressIssues.length}</p>
-            </div>
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <WarningCircle className="text-blue-600" size={24} />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-surface-primary rounded-lg border border-border-primary p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-foreground-secondary">Resolved</p>
-              <p className="text-2xl font-bold text-foreground-primary mt-1">{resolvedIssues.length}</p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-lg">
-              <CheckCircle className="text-green-600" size={24} />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-surface-primary rounded-lg border border-border-primary p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-foreground-secondary">High Priority</p>
-              <p className="text-2xl font-bold text-foreground-primary mt-1">{highPriorityIssues.length}</p>
-            </div>
-            <div className="p-3 bg-red-100 rounded-lg">
-              <WarningCircle className="text-red-600" size={24} />
-            </div>
-          </div>
-        </div>
-      </div>
+      <StatCardGrid columns={4}>
+        <StatCard
+          title="Pending"
+          value={pendingIssues.length}
+          icon={Clock}
+          iconColor="text-yellow-600"
+          iconBgColor="bg-yellow-100"
+        />
+        <StatCard
+          title="In Progress"
+          value={inProgressIssues.length}
+          icon={WarningCircle}
+          iconColor="text-blue-600"
+          iconBgColor="bg-blue-100"
+        />
+        <StatCard
+          title="Resolved"
+          value={resolvedIssues.length}
+          icon={CheckCircle}
+          iconColor="text-green-600"
+          iconBgColor="bg-green-100"
+        />
+        <StatCard
+          title="High Priority"
+          value={highPriorityIssues.length}
+          icon={WarningCircle}
+          iconColor="text-red-600"
+          iconBgColor="bg-red-100"
+        />
+      </StatCardGrid>
 
       {/* Filters */}
       <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Search */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-tertiary" size={20} />
-            <input
-              type="text"
-              placeholder="Search issues..."
+          <div className="flex-1">
+            <SearchBar
               value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              onChange={handleSearch}
+              placeholder="Search issues..."
+              withContainer={false}
             />
           </div>
 
@@ -290,7 +267,7 @@ export default function StakeholderIssuesPage() {
       {/* Loading State */}
       {loading && issues.length === 0 && (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <InlineSpinner size="lg" color="blue" />
         </div>
       )}
 

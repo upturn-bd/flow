@@ -6,6 +6,7 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { Plus, Settings, Trash, Edit } from "@/lib/icons";
 import { StakeholderProcess } from "@/lib/types/schemas";
 import ProcessForm from "@/components/stakeholder-processes/ProcessForm";
+import { InlineSpinner } from "@/components/ui";
 
 export default function StakeholderProcessesPage() {
   const router = useRouter();
@@ -61,7 +62,7 @@ export default function StakeholderProcessesPage() {
       {/* Loading State */}
       {loading && processes.length === 0 && (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <InlineSpinner size="lg" color="blue" />
         </div>
       )}
 
