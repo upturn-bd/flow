@@ -318,6 +318,38 @@ export const createSystemNotification = async (
       throw error;
     }
 
+    // Send email for high priority notifications
+    const priority = options.priority || 'normal';
+    if (priority === 'high' || priority === 'urgent') {
+      // Import dynamically to avoid circular dependencies
+      const { sendNotificationEmail } = await import('@/lib/email/notification-email');
+      
+      // Fetch recipient email from employees table
+      const { data: employee, error: employeeError } = await supabase
+        .from('employees')
+        .select('email, name')
+        .eq('id', recipientId)
+        .single();
+
+      if (employeeError) {
+        console.error('Failed to fetch employee for notification email:', employeeError);
+      } else if (employee?.email) {
+        // Send email asynchronously without blocking the notification creation
+        sendNotificationEmail({
+          recipientEmail: employee.email,
+          recipientName: employee.name,
+          title,
+          message,
+          priority: priority as 'high' | 'urgent',
+          actionUrl: options.actionUrl,
+          context: options.context,
+        }).catch((emailError) => {
+          // Log email error but don't fail the notification
+          console.error('Failed to send notification email:', emailError);
+        });
+      }
+    }
+
     return { success: true, data };
   } catch (error) {
     captureSupabaseError(
