@@ -106,7 +106,7 @@ export default function TaskLayout({
 
       />
     ),
-    [ongoingTasks, updateTask, deleteTask]
+    [ongoingTasks, ongoingTasksLoading, loadMoreLoading, hasMoreOngoingTasks, updateTask, deleteTask]
   );
 
   const completedTasksList = useMemo(

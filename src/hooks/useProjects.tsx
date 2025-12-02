@@ -55,7 +55,7 @@ export function useProjects() {
           .eq("company_id", employeeInfo.company_id)
           .eq("status", "Ongoing")
           .or(`project_lead_id.eq.${employeeInfo.id},assignees.cs.{${employeeInfo.id}},created_by.eq.${employeeInfo.id}`)
-          .order("id", { ascending: true })
+          .order("created_at", { ascending: false })
           .limit(limit);
 
         // Cursor-based pagination

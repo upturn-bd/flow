@@ -13,6 +13,8 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
+  /* Timeout for each test */
+  timeout: 60 * 1000, // 60 seconds per test
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -20,7 +22,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 4, // Limit to 4 workers to reduce resource contention
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -30,6 +32,21 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    
+    /* Navigation timeout */
+    navigationTimeout: 30 * 1000, // 30 seconds for navigation
+    
+    /* Action timeout */
+    actionTimeout: 15 * 1000, // 15 seconds for actions
+    
+    /* Viewport size */
+    viewport: { width: 1280, height: 720 },
+    
+    /* Enable JavaScript */
+    javaScriptEnabled: true,
+    
+    /* HTTP credentials for auth */
+    // storageState will be used instead (set per project below)
   },
 
   /* Configure projects for major browsers */
@@ -42,7 +59,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         // Use saved authentication state
-        storageState: '.auth/user.json',
+        storageState: 'tests/.auth/user.json',
       },
       dependencies: ['setup'],
     },
@@ -52,7 +69,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Firefox'],
         // Use saved authentication state
-        storageState: '.auth/user.json',
+        storageState: 'tests/.auth/user.json',
       },
       dependencies: ['setup'],
     },
@@ -62,7 +79,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Safari'],
         // Use saved authentication state
-        storageState: '.auth/user.json',
+        storageState: 'tests/.auth/user.json',
       },
       dependencies: ['setup'],
     },
@@ -89,9 +106,10 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  webServer: {
+    command: 'bun run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000, // 2 minutes for server to start
+  },
 });

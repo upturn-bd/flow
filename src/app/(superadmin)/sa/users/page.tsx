@@ -7,7 +7,6 @@ import { filterEmployeesBySearch } from "@/lib/utils/user-search";
 import { 
   Plus, 
   Trash, 
-  MagnifyingGlass, 
   ShieldCheck, 
   X,
   Check,
@@ -17,13 +16,16 @@ import {
   Lightning as Power,
   AlertTriangle as Warning,
   Star as Crown,
-  CaretDown
+  CaretDown,
+  MagnifyingGlass
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { PageHeader, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner, SearchBar } from "@/components/ui";
+import { SelectField, TextAreaField } from "@/components/forms";
 
 interface Employee {
-  id: number;
+  id: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -32,7 +34,7 @@ interface Employee {
 
 interface Superadmin {
   id?: number;
-  employee_id: number;
+  user_id: string;
   is_active: boolean;
   granted_at?: string;
   notes?: string;
@@ -59,7 +61,7 @@ export default function SuperadminUsersPage() {
       const [superadminsResult, companiesResult] = await Promise.all([
         supabase
           .from("superadmins")
-          .select("*, employee:employees(id, first_name, last_name, email, designation)")
+          .select("*, employee:employees!superadmins_user_id_fkey1(id, first_name, last_name, email, designation)")
           .order("granted_at", { ascending: false }),
         supabase.from("companies").select("*").order("name"),
       ]);
@@ -96,9 +98,9 @@ export default function SuperadminUsersPage() {
         if (error) throw error;
         
         // Filter out employees who are already superadmins
-        const superadminEmployeeIds = superadmins.map(sa => sa.employee_id);
+        const superadminUserIds = superadmins.map(sa => sa.user_id);
         const availableEmployees = (data || []).filter(
-          emp => !superadminEmployeeIds.includes(emp.id)
+          emp => !superadminUserIds.includes(emp.id)
         );
         
         setEmployees(availableEmployees);
@@ -118,7 +120,7 @@ export default function SuperadminUsersPage() {
     try {
       const { error } = await supabase.from("superadmins").insert([
         {
-          employee_id: selectedEmployee.id,
+          user_id: selectedEmployee.id,
           is_active: true,
           notes: notes || null,
         },
@@ -203,35 +205,30 @@ export default function SuperadminUsersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground-primary flex items-center gap-2">
-            <ShieldCheck size={28} weight="duotone" className="text-amber-600" />
-            Superadmin Users
-          </h1>
-          <p className="text-foreground-secondary mt-1">Manage users with superadmin privileges</p>
-        </div>
-        <button
-          onClick={() => {
+      <PageHeader
+        title="Superadmin Users"
+        description="Manage users with superadmin privileges"
+        icon={ShieldCheck}
+        iconColor="text-amber-600"
+        action={{
+          label: "Add Superadmin",
+          onClick: () => {
             resetForm();
             setShowModal(true);
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg hover:from-amber-700 hover:to-amber-800 shadow-sm transition-all"
-        >
-          <Plus size={20} weight="bold" />
-          <span>Add Superadmin</span>
-        </button>
-      </div>
+          },
+          icon: Plus
+        }}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         <button
           onClick={() => setFilterActive("all")}
-          className={`bg-surface-primary rounded-xl p-4 shadow-sm border transition-all ${filterActive === "all" ? "border-amber-300 ring-2 ring-amber-100" : "border-border-primary hover:border-border-primary"}`}
+          className={`bg-surface-primary rounded-xl p-4 shadow-sm border transition-all ${filterActive === "all" ? "border-warning/50 ring-2 ring-warning/20" : "border-border-primary hover:border-border-primary"}`}
         >
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-100 rounded-lg">
-              <ShieldCheck size={20} className="text-amber-600" />
+            <div className="p-2 bg-warning/20 rounded-lg">
+              <ShieldCheck size={20} className="text-warning" />
             </div>
             <div className="text-left">
               <p className="text-2xl font-bold text-foreground-primary">{stats.total}</p>
@@ -241,11 +238,11 @@ export default function SuperadminUsersPage() {
         </button>
         <button
           onClick={() => setFilterActive("active")}
-          className={`bg-surface-primary rounded-xl p-4 shadow-sm border transition-all ${filterActive === "active" ? "border-green-300 ring-2 ring-green-100" : "border-border-primary hover:border-border-primary"}`}
+          className={`bg-surface-primary rounded-xl p-4 shadow-sm border transition-all ${filterActive === "active" ? "border-success/50 ring-2 ring-success/20" : "border-border-primary hover:border-border-primary"}`}
         >
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Power size={20} className="text-green-600" />
+            <div className="p-2 bg-success/20 rounded-lg">
+              <Power size={20} className="text-success" />
             </div>
             <div className="text-left">
               <p className="text-2xl font-bold text-foreground-primary">{stats.active}</p>
@@ -255,10 +252,10 @@ export default function SuperadminUsersPage() {
         </button>
         <button
           onClick={() => setFilterActive("inactive")}
-          className={`bg-surface-primary rounded-xl p-4 shadow-sm border transition-all ${filterActive === "inactive" ? "border-border-secondary ring-2 ring-gray-200" : "border-border-primary hover:border-border-primary"}`}
+          className={`bg-surface-primary rounded-xl p-4 shadow-sm border transition-all ${filterActive === "inactive" ? "border-border-secondary ring-2 ring-border-primary" : "border-border-primary hover:border-border-primary"}`}
         >
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-background-tertiary rounded-lg">
+            <div className="p-2 bg-background-tertiary dark:bg-surface-secondary rounded-lg">
               <Power size={20} className="text-foreground-tertiary" />
             </div>
             <div className="text-left">
@@ -273,7 +270,7 @@ export default function SuperadminUsersPage() {
       {loading ? (
         <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12">
           <div className="flex flex-col items-center justify-center text-foreground-tertiary">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-600 mb-4"></div>
+            <InlineSpinner size="xl" color="amber" className="mb-4" />
             <p>Loading superadmins...</p>
           </div>
         </div>
@@ -288,13 +285,13 @@ export default function SuperadminUsersPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 className={`bg-surface-primary rounded-xl shadow-sm border overflow-hidden transition-all ${
-                  superadmin.is_active ? "border-border-primary hover:border-amber-200" : "border-border-primary opacity-75"
+                  superadmin.is_active ? "border-border-primary hover:border-warning/30" : "border-border-primary opacity-75"
                 }`}
               >
                 <div className="p-5 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className={`p-3 rounded-xl ${superadmin.is_active ? "bg-amber-100" : "bg-background-tertiary"}`}>
-                      <Crown size={24} className={superadmin.is_active ? "text-amber-600" : "text-foreground-tertiary"} />
+                    <div className={`p-3 rounded-xl ${superadmin.is_active ? "bg-warning/20" : "bg-background-tertiary dark:bg-surface-secondary"}`}>
+                      <Crown size={24} className={superadmin.is_active ? "text-warning" : "text-foreground-tertiary"} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -305,8 +302,8 @@ export default function SuperadminUsersPage() {
                         </h3>
                         <span className={`px-2 py-0.5 text-xs rounded-full ${
                           superadmin.is_active 
-                            ? "bg-green-100 text-green-700" 
-                            : "bg-background-tertiary text-foreground-secondary"
+                            ? "bg-success/20 text-success" 
+                            : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary"
                         }`}>
                           {superadmin.is_active ? "Active" : "Inactive"}
                         </span>
@@ -343,36 +340,22 @@ export default function SuperadminUsersPage() {
                       onClick={() => handleToggleActive(superadmin.id!, superadmin.is_active)}
                       className={`px-3 py-1.5 text-sm rounded-lg transition-colors flex items-center gap-1.5 ${
                         superadmin.is_active
-                          ? "bg-background-tertiary text-foreground-secondary hover:bg-gray-200"
-                          : "bg-green-100 text-green-700 hover:bg-green-200"
+                          ? "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
+                          : "bg-success/20 text-success hover:bg-success/30"
                       }`}
                     >
                       <Power size={16} />
                       {superadmin.is_active ? "Deactivate" : "Activate"}
                     </button>
-                    {deleteConfirm === superadmin.id ? (
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => handleRemoveSuperadmin(superadmin.id!)}
-                          className="p-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
-                        >
-                          <Check size={18} />
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirm(null)}
-                          className="p-2 text-foreground-tertiary hover:bg-background-tertiary rounded-lg transition-colors"
-                        >
-                          <X size={18} />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setDeleteConfirm(superadmin.id!)}
-                        className="p-2 text-foreground-tertiary hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <Trash size={18} />
-                      </button>
-                    )}
+                    <InlineDeleteConfirm
+                      isConfirming={deleteConfirm === superadmin.id}
+                      onConfirm={() => handleRemoveSuperadmin(superadmin.id!)}
+                      onCancel={() => setDeleteConfirm(null)}
+                      onDelete={() => setDeleteConfirm(superadmin.id!)}
+                      size={18}
+                      colorScheme="amber"
+                      title="Remove superadmin"
+                    />
                   </div>
                 </div>
               </motion.div>
@@ -382,14 +365,20 @@ export default function SuperadminUsersPage() {
       )}
 
       {filteredSuperadmins.length === 0 && !loading && (
-        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12 text-center">
-          <ShieldCheck size={48} className="mx-auto text-foreground-tertiary mb-4" />
-          <p className="text-foreground-tertiary">
-            {filterActive !== "all" 
-              ? `No ${filterActive} superadmins found`
-              : "No superadmins found"}
-          </p>
-        </div>
+        <EmptyState
+          icon={ShieldCheck}
+          title={filterActive !== "all" 
+            ? `No ${filterActive} superadmins found`
+            : "No superadmins found"}
+          description="Grant superadmin privileges to employees who need system-wide access"
+          action={{
+            label: "Add Superadmin",
+            onClick: () => {
+              resetForm();
+              setShowModal(true);
+            }
+          }}
+        />
       )}
 
       {/* Add Superadmin Modal */}
@@ -412,11 +401,11 @@ export default function SuperadminUsersPage() {
               onClick={(e) => e.stopPropagation()}
               className="bg-surface-primary rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
             >
-              <div className="p-6 border-b bg-gradient-to-r from-amber-50 to-orange-50">
+              <div className="p-6 border-b bg-gradient-to-r from-warning/10 to-warning/5 dark:from-warning/20 dark:to-warning/10">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-100 rounded-xl">
-                      <ShieldCheck size={24} className="text-amber-600" />
+                    <div className="p-2 bg-warning/20 rounded-xl">
+                      <ShieldCheck size={24} className="text-warning" />
                     </div>
                     <div>
                       <h2 className="text-xl font-semibold text-foreground-primary">Add Superadmin</h2>
@@ -439,42 +428,38 @@ export default function SuperadminUsersPage() {
                 {/* Step 1: Select Company */}
                 <div>
                   <label className="flex items-center gap-2 text-sm font-medium text-foreground-secondary mb-2">
-                    <span className="flex items-center justify-center w-6 h-6 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">1</span>
+                    <span className="flex items-center justify-center w-6 h-6 bg-warning/20 text-warning rounded-full text-xs font-bold">1</span>
                     Select Company
                   </label>
-                  <div className="relative">
-                    <select
-                      value={selectedCompany || ""}
-                      onChange={(e) => {
-                        setSelectedCompany(e.target.value ? parseInt(e.target.value) : null);
-                        setSelectedEmployee(null);
-                        setSearchTerm("");
-                      }}
-                      className="w-full px-4 py-3 border border-border-primary rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all appearance-none bg-surface-primary"
-                    >
-                      <option value="">Select a company</option>
-                      {companies.map((company) => (
-                        <option key={company.id} value={company.id}>
-                          {company.name}
-                        </option>
-                      ))}
-                    </select>
-                    <CaretDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground-tertiary pointer-events-none" />
-                  </div>
+                  <SelectField
+                    value={selectedCompany?.toString() || ""}
+                    onChange={(e) => {
+                      setSelectedCompany(e.target.value ? parseInt(e.target.value) : null);
+                      setSelectedEmployee(null);
+                      setSearchTerm("");
+                    }}
+                    options={[
+                      { value: "", label: "Select a company" },
+                      ...companies.map((company) => ({
+                        value: company.id.toString(),
+                        label: company.name
+                      }))
+                    ]}
+                  />
                 </div>
 
                 {/* Step 2: Search and Select Employee */}
                 <div className={selectedCompany ? "" : "opacity-50 pointer-events-none"}>
                   <label className="flex items-center gap-2 text-sm font-medium text-foreground-secondary mb-2">
-                    <span className="flex items-center justify-center w-6 h-6 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">2</span>
+                    <span className="flex items-center justify-center w-6 h-6 bg-warning/20 text-warning rounded-full text-xs font-bold">2</span>
                     Search and Select Employee
                   </label>
                   
                   {selectedEmployee ? (
-                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between">
+                    <div className="p-4 bg-warning/10 border border-warning/30 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-amber-100 rounded-lg">
-                          <User size={20} className="text-amber-600" />
+                        <div className="p-2 bg-warning/20 rounded-lg">
+                          <User size={20} className="text-warning" />
                         </div>
                         <div>
                           <p className="font-medium text-foreground-primary">
@@ -488,26 +473,19 @@ export default function SuperadminUsersPage() {
                       </div>
                       <button
                         onClick={() => setSelectedEmployee(null)}
-                        className="p-2 hover:bg-amber-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-warning/20 rounded-lg transition-colors"
                       >
                         <X size={20} className="text-foreground-tertiary" />
                       </button>
                     </div>
                   ) : (
                     <>
-                      <div className="relative mb-3">
-                        <MagnifyingGlass
-                          size={20}
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Search by name, email, or designation..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full pl-12 pr-4 py-3 border border-border-primary rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                        />
-                      </div>
+                      <SearchBar
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                        placeholder="Search by name, email, or designation..."
+                        containerClassName="mb-3"
+                      />
 
                       {searchTerm && (
                         <div className="max-h-60 overflow-y-auto border border-border-primary rounded-xl divide-y divide-border-primary">
@@ -559,22 +537,21 @@ export default function SuperadminUsersPage() {
                 {/* Step 3: Notes */}
                 <div className={selectedEmployee ? "" : "opacity-50 pointer-events-none"}>
                   <label className="flex items-center gap-2 text-sm font-medium text-foreground-secondary mb-2">
-                    <span className="flex items-center justify-center w-6 h-6 bg-gray-200 text-foreground-secondary rounded-full text-xs font-bold">3</span>
+                    <span className="flex items-center justify-center w-6 h-6 bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary rounded-full text-xs font-bold">3</span>
                     Notes (Optional)
                   </label>
-                  <textarea
+                  <TextAreaField
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-3 border border-border-primary rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all resize-none"
                     placeholder="Add any notes about this superadmin grant..."
                   />
                 </div>
 
                 {/* Warning */}
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
-                  <Warning size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-amber-800">
+                <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 flex items-start gap-3">
+                  <Warning size={20} className="text-warning flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-warning">
                     <p className="font-medium">Important</p>
                     <p className="mt-1">Superadmin privileges grant full access to all companies and system settings. Only grant to trusted employees.</p>
                   </div>
@@ -595,11 +572,11 @@ export default function SuperadminUsersPage() {
                 <button
                   onClick={handleAddSuperadmin}
                   disabled={saving || !selectedEmployee}
-                  className="px-6 py-2.5 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-xl hover:from-amber-700 hover:to-amber-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                  className="px-6 py-2.5 bg-gradient-to-r from-warning to-warning/80 text-white rounded-xl hover:from-warning/90 hover:to-warning/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
                 >
                   {saving ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <InlineSpinner size="sm" color="white" />
                       Adding...
                     </>
                   ) : (

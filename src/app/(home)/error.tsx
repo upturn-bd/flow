@@ -20,7 +20,7 @@ export default function Error({
       <div className="max-w-md text-center">
         <div className="mb-6">
           <svg
-            className="mx-auto h-16 w-16 text-red-500"
+            className="mx-auto h-16 w-16 text-error"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -48,7 +48,7 @@ export default function Error({
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <button
             onClick={() => reset()}
-            className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
           >
             Try again
           </button>

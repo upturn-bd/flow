@@ -11,11 +11,11 @@ import {
   User,
   FileText,
   MessageCircle,
-  Loader,
   Check,
   X,
   Pencil,
 } from "@/lib/icons";
+import InlineSpinner from "@/components/ui/InlineSpinner";
 import { motion } from "framer-motion";
 
 import { RequisitionType, RequisitionInventory } from "@/lib/types";
@@ -247,7 +247,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                   className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                 >
                   {processingId === req.id ? (
-                    <Loader size={16} className="animate-spin" />
+                    <InlineSpinner size="xs" color="white" />
                   ) : (
                     <X size={16} />
                   )}
@@ -265,7 +265,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                   className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                 >
                   {processingId === req.id ? (
-                    <Loader size={16} className="animate-spin" />
+                    <InlineSpinner size="xs" color="white" />
                   ) : (
                     <Check size={16} />
                   )}

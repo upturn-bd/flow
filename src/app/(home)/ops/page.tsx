@@ -12,14 +12,15 @@ import {
   WarningCircle,
   UserPlus, // Onboarding
   File,
-  Search,
   Users,
   CreditCard, // Payroll
   Building,
   UserMinus, // Stakeholder
+  Briefcase, // Operations icon
 } from "@/lib/icons";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { SearchBar, EmptyState, PageHeader } from "@/components/ui";
 
 const sections = [
   {
@@ -194,104 +195,75 @@ export default function ServicesPage() {
       animate="visible"
       variants={pageVariants}
     >
-      <motion.div 
-        className="mb-6"
-        variants={itemVariants}
-      >
-        <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary mb-1">
-          Operations & Services
-        </h1>
-        <p className="text-sm sm:text-base text-foreground-secondary">
-          Access all operational tools and employee services
-        </p>
+      <motion.div variants={itemVariants}>
+        <PageHeader
+          title="Operations & Services"
+          description="Access all operational tools and employee services"
+          icon={Briefcase}
+          iconColor="text-primary-600"
+        />
       </motion.div>
 
       <motion.div 
         className="mb-6"
         variants={itemVariants}
       >
-        <div className="flex flex-col gap-3">
-          <div className="relative flex-grow">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search size={18} className="text-foreground-tertiary" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search services..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-surface-primary border border-border-secondary rounded-lg pl-10 pr-10 py-2.5 text-sm sm:text-base text-foreground-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-300 transition-all outline-none"
-            />
-            {searchQuery && (
-              <motion.button 
-                onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-2 flex items-center text-foreground-tertiary hover:text-foreground-primary"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </motion.button>
-            )}
-          </div>
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search services..."
+        />
 
-          {/* Section filters */}
-          <div className="flex flex-wrap gap-2">
+        {/* Section filters */}
+        <div className="flex flex-wrap gap-2 mt-4">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setSelectedSection(null)}
+            className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
+              ${!selectedSection 
+                ? 'bg-primary-600 text-white shadow-sm' 
+                : 'bg-surface-secondary text-foreground-secondary hover:bg-surface-hover'}`
+            }
+          >
+            All
+          </motion.button>
+          
+          {sections.map((section) => (
             <motion.button
+              key={section.title}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setSelectedSection(null)}
+              onClick={() => setSelectedSection(section.title)}
               className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
-                ${!selectedSection 
+                ${selectedSection === section.title 
                   ? 'bg-primary-600 text-white shadow-sm' 
                   : 'bg-surface-secondary text-foreground-secondary hover:bg-surface-hover'}`
               }
             >
-              All
+              {section.title}
             </motion.button>
-            
-            {sections.map((section) => (
-              <motion.button
-                key={section.title}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedSection(section.title)}
-                className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
-                  ${selectedSection === section.title 
-                    ? 'bg-primary-600 text-white shadow-sm' 
-                    : 'bg-surface-secondary text-foreground-secondary hover:bg-surface-hover'}`
-                }
-              >
-                {section.title}
-              </motion.button>
-            ))}
-          </div>
+          ))}
         </div>
       </motion.div>
 
       {filteredSections.length === 0 ? (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center p-8 sm:p-12 bg-background-secondary rounded-lg border border-border-primary mt-8"
         >
-          <File size={40} className="text-foreground-tertiary mb-3" />
-          <h3 className="text-base sm:text-lg font-medium text-foreground-primary mb-2">No services found</h3>
-          <p className="text-sm sm:text-base text-foreground-secondary text-center max-w-md mb-4">
-            Try searching with different keywords or browse all services
-          </p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              setSearchQuery("");
-              setSelectedSection(null);
+          <EmptyState
+            icon={File}
+            title="No services found"
+            description="Try searching with different keywords or browse all services"
+            action={{
+              label: "View all services",
+              onClick: () => {
+                setSearchQuery("");
+                setSelectedSection(null);
+              }
             }}
-            className="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg shadow-sm hover:bg-primary-700 transition-colors"
-          >
-            View all services
-          </motion.button>
+          />
         </motion.div>
       ) : (
         <AnimatePresence>

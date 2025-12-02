@@ -7,14 +7,16 @@ import {
   Plus, 
   Pencil, 
   Trash, 
-  MagnifyingGlass,
   GlobeHemisphereWest,
   Buildings,
-  X,
   Check,
+  X,
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { PageHeader, SearchBar, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
+import SuperadminFormModal from "@/components/ui/modals/SuperadminFormModal";
+import { FormField } from "@/components/forms";
 
 export default function CountriesPage() {
   const [countries, setCountries] = useState<Country[]>([]);
@@ -144,90 +146,60 @@ export default function CountriesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground-primary flex items-center gap-2">
-            <GlobeHemisphereWest size={28} weight="duotone" className="text-emerald-600" />
-            Countries
-          </h1>
-          <p className="text-foreground-secondary mt-1">Manage countries available for companies</p>
-        </div>
-        <button
-          onClick={() => {
-            setEditingCountry(null);
-            setFormData({ name: "" });
-            setShowModal(true);
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 shadow-sm transition-all"
-        >
-          <Plus size={20} weight="bold" />
-          <span>Add Country</span>
-        </button>
-      </div>
+      <PageHeader
+        icon={GlobeHemisphereWest}
+        title="Countries"
+        description="Manage countries available for companies"
+        actions={[
+          {
+            label: "Add Country",
+            icon: <Plus size={20} weight="bold" />,
+            onClick: () => {
+              setEditingCountry(null);
+              setFormData({ name: "" });
+              setShowModal(true);
+            },
+            variant: "gradient",
+            color: "emerald",
+          },
+        ]}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-100 rounded-lg">
-              <GlobeHemisphereWest size={20} className="text-emerald-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground-primary">{countries.length}</p>
-              <p className="text-xs text-foreground-tertiary">Total Countries</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Buildings size={20} className="text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground-primary">
-                {countries.filter(c => countryStats[c.id] > 0).length}
-              </p>
-              <p className="text-xs text-foreground-tertiary">With Companies</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-100 rounded-lg">
-              <GlobeHemisphereWest size={20} className="text-amber-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground-primary">
-                {countries.filter(c => (countryStats[c.id] || 0) === 0).length}
-              </p>
-              <p className="text-xs text-foreground-tertiary">Unused</p>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          icon={GlobeHemisphereWest}
+          value={countries.length}
+          label="Total Countries"
+          color="green"
+        />
+        <StatCard
+          icon={Buildings}
+          value={countries.filter(c => countryStats[c.id] > 0).length}
+          label="With Companies"
+          color="blue"
+        />
+        <StatCard
+          icon={GlobeHemisphereWest}
+          value={countries.filter(c => (countryStats[c.id] || 0) === 0).length}
+          label="Unused"
+          color="amber"
+        />
       </div>
 
       {/* Search */}
-      <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-4">
-        <div className="relative">
-          <MagnifyingGlass
-            size={20}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
-          />
-          <input
-            type="text"
-            placeholder="Search countries..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-border-primary rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-          />
-        </div>
-      </div>
+      <SearchBar
+        value={searchTerm}
+        onChange={setSearchTerm}
+        placeholder="Search countries..."
+        withContainer
+      />
 
       {/* Countries Grid */}
       {loading ? (
         <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12">
           <div className="flex flex-col items-center justify-center text-foreground-tertiary">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600 mb-4"></div>
+            <InlineSpinner size="xl" color="emerald" className="mb-4" />
             <p>Loading countries...</p>
           </div>
         </div>
@@ -245,8 +217,8 @@ export default function CountriesPage() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="p-2 bg-emerald-50 rounded-lg group-hover:bg-emerald-100 transition-colors">
-                      <GlobeHemisphereWest size={18} className="text-emerald-600" />
+                    <div className="p-2 bg-success/10 rounded-lg group-hover:bg-success/20 transition-colors">
+                      <GlobeHemisphereWest size={18} className="text-success" />
                     </div>
                     <div className="flex-1 min-w-0">
                       {inlineEditing === country.id ? (
@@ -259,12 +231,12 @@ export default function CountriesPage() {
                             if (e.key === "Enter") handleInlineEdit(country);
                             if (e.key === "Escape") setInlineEditing(null);
                           }}
-                          className="w-full px-2 py-1 text-sm border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                          className="w-full px-2 py-1 text-sm border border-success/50 rounded-lg focus:ring-2 focus:ring-success focus:border-transparent"
                           autoFocus
                         />
                       ) : (
                         <p 
-                          className="font-medium text-foreground-primary truncate cursor-pointer hover:text-emerald-600 transition-colors"
+                          className="font-medium text-foreground-primary truncate cursor-pointer hover:text-success transition-colors"
                           onDoubleClick={() => {
                             setInlineEditing(country.id);
                             setInlineValue(country.name);
@@ -285,35 +257,20 @@ export default function CountriesPage() {
                         setInlineEditing(country.id);
                         setInlineValue(country.name);
                       }}
-                      className="p-1.5 text-foreground-tertiary hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                      className="p-1.5 text-foreground-tertiary hover:text-success hover:bg-success/10 rounded-lg transition-colors"
                     >
                       <Pencil size={16} />
                     </button>
-                    {deleteConfirm === country.id ? (
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => handleDelete(country.id)}
-                          className="p-1.5 text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
-                        >
-                          <Check size={16} />
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirm(null)}
-                          className="p-1.5 text-foreground-tertiary hover:bg-surface-hover rounded-lg transition-colors"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setDeleteConfirm(country.id)}
-                        className="p-1.5 text-foreground-tertiary hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        disabled={(countryStats[country.id] || 0) > 0}
-                        title={(countryStats[country.id] || 0) > 0 ? "Cannot delete: has companies" : "Delete country"}
-                      >
-                        <Trash size={16} />
-                      </button>
-                    )}
+                    <InlineDeleteConfirm
+                      isConfirming={deleteConfirm === country.id}
+                      onConfirm={() => handleDelete(country.id)}
+                      onCancel={() => setDeleteConfirm(null)}
+                      onDelete={() => setDeleteConfirm(country.id)}
+                      disabled={(countryStats[country.id] || 0) > 0}
+                      disabledTitle="Cannot delete: has companies"
+                      title="Delete country"
+                      colorScheme="emerald"
+                    />
                   </div>
                 </div>
               </motion.div>
@@ -323,112 +280,40 @@ export default function CountriesPage() {
       )}
 
       {filteredCountries.length === 0 && !loading && (
-        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12 text-center">
-          <GlobeHemisphereWest size={48} className="mx-auto text-foreground-tertiary mb-4" />
-          <p className="text-foreground-tertiary">No countries found</p>
-        </div>
+        <EmptyState
+          icon={GlobeHemisphereWest}
+          title="No countries found"
+          description={searchTerm ? "Try adjusting your search" : "Add countries to get started"}
+        />
       )}
 
       {/* Modal */}
-      <AnimatePresence>
-        {showModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={() => {
-              setShowModal(false);
-              setEditingCountry(null);
-              setFormData({ name: "" });
-            }}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-surface-primary rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
-            >
-              <div className="p-6 border-b bg-gradient-to-r from-emerald-50 to-green-50">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-emerald-100 rounded-xl">
-                      <GlobeHemisphereWest size={24} className="text-emerald-600" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-semibold text-foreground-primary">
-                        {editingCountry ? "Edit Country" : "Add Country"}
-                      </h2>
-                      <p className="text-sm text-foreground-tertiary">
-                        {editingCountry ? "Update country name" : "Add a new country"}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setShowModal(false);
-                      setEditingCountry(null);
-                      setFormData({ name: "" });
-                    }}
-                    className="p-2 hover:bg-surface-primary/50 rounded-lg transition-colors"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-              </div>
-
-              <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-                    Country Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ name: e.target.value })}
-                    className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                    placeholder="e.g., Bangladesh"
-                    autoFocus
-                  />
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4 border-t">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowModal(false);
-                      setEditingCountry(null);
-                      setFormData({ name: "" });
-                    }}
-                    className="px-4 py-2.5 border border-border-secondary rounded-xl hover:bg-surface-hover transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={saving || !formData.name.trim()}
-                    className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
-                  >
-                    {saving ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Check size={18} />
-                        {editingCountry ? "Update" : "Create"}
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <SuperadminFormModal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setEditingCountry(null);
+          setFormData({ name: "" });
+        }}
+        onSubmit={handleSubmit}
+        title={editingCountry ? "Edit Country" : "Add Country"}
+        subtitle={editingCountry ? "Update country name" : "Add a new country"}
+        icon={GlobeHemisphereWest}
+        colorScheme="emerald"
+        saving={saving}
+        submitDisabled={!formData.name.trim()}
+        isEditing={!!editingCountry}
+      >
+        <FormField
+          name="name"
+          label="Country Name"
+          required
+          value={formData.name}
+          onChange={(e) => setFormData({ name: e.target.value })}
+          placeholder="e.g., Bangladesh"
+          autoFocus
+        />
+      </SuperadminFormModal>
     </div>
   );
 }

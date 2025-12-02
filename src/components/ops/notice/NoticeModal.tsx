@@ -102,7 +102,7 @@ export function NoticeModal({
               placeholder="Enter notice title..."
             />
             {errors.title && (
-              <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+              <p className="mt-1 text-sm text-error">{errors.title.message}</p>
             )}
           </div>
 
@@ -117,7 +117,7 @@ export function NoticeModal({
               placeholder="Enter notice description..."
             />
             {errors.description && (
-              <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+              <p className="mt-1 text-sm text-error">{errors.description.message}</p>
             )}
           </div>
 
@@ -167,7 +167,7 @@ export function NoticeModal({
                 className="w-full px-3 py-2 border border-border-primary bg-surface-primary rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
               />
               {errors.valid_from && (
-                <p className="mt-1 text-sm text-red-600">{errors.valid_from.message}</p>
+                <p className="mt-1 text-sm text-error">{errors.valid_from.message}</p>
               )}
             </div>
             
@@ -181,7 +181,7 @@ export function NoticeModal({
                 className="w-full px-3 py-2 border border-border-primary bg-surface-primary rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
               />
               {errors.valid_till && (
-                <p className="mt-1 text-sm text-red-600">{errors.valid_till.message}</p>
+                <p className="mt-1 text-sm text-error">{errors.valid_till.message}</p>
               )}
             </div>
           </div>

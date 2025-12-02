@@ -21,6 +21,7 @@ import { Z_INDEX } from "@/lib/theme";
 import Portal from "@/components/ui/Portal";
 import Link from "next/link";
 import { cn } from "@/components/ui/class";
+import { InlineSpinner } from "../ui";
 
 interface NotificationDropdownProps {
   isOpen: boolean;
@@ -236,7 +237,7 @@ export default function NotificationDropdown({
           <div className="max-h-80 overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                <InlineSpinner size="md" color="primary" />
               </div>
             ) : notifications.length === 0 ? (
               <div className="text-center py-8 text-foreground-secondary dark:text-foreground-secondary">

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { StakeholderProcess } from "@/lib/types/schemas";
 import { X } from "@/lib/icons";
 import Toggle from "@/components/ui/Toggle";
+import InlineSpinner from "@/components/ui/InlineSpinner";
 
 interface ProcessFormProps {
   process?: StakeholderProcess | null;
@@ -214,7 +215,7 @@ export default function ProcessForm({ process, onSubmit, onClose }: ProcessFormP
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <InlineSpinner size="xs" color="white" />
                   {process ? "Updating..." : "Creating..."}
                 </span>
               ) : (

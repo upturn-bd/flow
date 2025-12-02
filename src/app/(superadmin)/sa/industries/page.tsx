@@ -7,14 +7,16 @@ import {
   Plus, 
   Pencil, 
   Trash, 
-  MagnifyingGlass,
   Factory,
   Buildings,
-  X,
   Check,
+  X,
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { PageHeader, SearchBar, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
+import SuperadminFormModal from "@/components/ui/modals/SuperadminFormModal";
+import { FormField } from "@/components/forms";
 
 export default function IndustriesPage() {
   const [industries, setIndustries] = useState<Industry[]>([]);
@@ -143,14 +145,14 @@ export default function IndustriesPage() {
 
   // Color palette for industry cards
   const colors = [
-    { bg: "bg-violet-50", icon: "text-violet-600", hover: "group-hover:bg-violet-100" },
-    { bg: "bg-blue-50", icon: "text-blue-600", hover: "group-hover:bg-blue-100" },
-    { bg: "bg-cyan-50", icon: "text-cyan-600", hover: "group-hover:bg-cyan-100" },
-    { bg: "bg-teal-50", icon: "text-teal-600", hover: "group-hover:bg-teal-100" },
-    { bg: "bg-emerald-50", icon: "text-emerald-600", hover: "group-hover:bg-emerald-100" },
-    { bg: "bg-amber-50", icon: "text-amber-600", hover: "group-hover:bg-amber-100" },
-    { bg: "bg-orange-50", icon: "text-orange-600", hover: "group-hover:bg-orange-100" },
-    { bg: "bg-rose-50", icon: "text-rose-600", hover: "group-hover:bg-rose-100" },
+    { bg: "bg-purple-50 dark:bg-purple-950/30", icon: "text-purple-600 dark:text-purple-400", hover: "group-hover:bg-purple-100 dark:group-hover:bg-purple-900/40" },
+    { bg: "bg-primary-50 dark:bg-primary-950/30", icon: "text-primary-600 dark:text-primary-400", hover: "group-hover:bg-primary-100 dark:group-hover:bg-primary-900/40" },
+    { bg: "bg-cyan-50 dark:bg-cyan-950/30", icon: "text-cyan-600 dark:text-cyan-400", hover: "group-hover:bg-cyan-100 dark:group-hover:bg-cyan-900/40" },
+    { bg: "bg-teal-50 dark:bg-teal-950/30", icon: "text-teal-600 dark:text-teal-400", hover: "group-hover:bg-teal-100 dark:group-hover:bg-teal-900/40" },
+    { bg: "bg-emerald-50 dark:bg-emerald-950/30", icon: "text-emerald-600 dark:text-emerald-400", hover: "group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/40" },
+    { bg: "bg-amber-50 dark:bg-amber-950/30", icon: "text-amber-600 dark:text-amber-400", hover: "group-hover:bg-amber-100 dark:group-hover:bg-amber-900/40" },
+    { bg: "bg-orange-50 dark:bg-orange-950/30", icon: "text-orange-600 dark:text-orange-400", hover: "group-hover:bg-orange-100 dark:group-hover:bg-orange-900/40" },
+    { bg: "bg-rose-50 dark:bg-rose-950/30", icon: "text-rose-600 dark:text-rose-400", hover: "group-hover:bg-rose-100 dark:group-hover:bg-rose-900/40" },
   ];
 
   const getColor = (index: number) => colors[index % colors.length];
@@ -158,90 +160,60 @@ export default function IndustriesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground-primary flex items-center gap-2">
-            <Factory size={28} weight="duotone" className="text-violet-600" />
-            Industries
-          </h1>
-          <p className="text-foreground-secondary mt-1">Manage industry categories for companies</p>
-        </div>
-        <button
-          onClick={() => {
-            setEditingIndustry(null);
-            setFormData({ name: "" });
-            setShowModal(true);
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 shadow-sm transition-all"
-        >
-          <Plus size={20} weight="bold" />
-          <span>Add Industry</span>
-        </button>
-      </div>
+      <PageHeader
+        icon={Factory}
+        title="Industries"
+        description="Manage industry categories for companies"
+        actions={[
+          {
+            label: "Add Industry",
+            icon: <Plus size={20} weight="bold" />,
+            onClick: () => {
+              setEditingIndustry(null);
+              setFormData({ name: "" });
+              setShowModal(true);
+            },
+            variant: "gradient",
+            color: "violet",
+          },
+        ]}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-violet-100 rounded-lg">
-              <Factory size={20} className="text-violet-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground-primary">{industries.length}</p>
-              <p className="text-xs text-foreground-tertiary">Total Industries</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Buildings size={20} className="text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground-primary">
-                {industries.filter(i => industryStats[i.id] > 0).length}
-              </p>
-              <p className="text-xs text-foreground-tertiary">With Companies</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-surface-primary rounded-xl p-4 shadow-sm border border-border-primary">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-100 rounded-lg">
-              <Factory size={20} className="text-amber-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground-primary">
-                {industries.filter(i => (industryStats[i.id] || 0) === 0).length}
-              </p>
-              <p className="text-xs text-foreground-tertiary">Unused</p>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          icon={Factory}
+          value={industries.length}
+          label="Total Industries"
+          color="purple"
+        />
+        <StatCard
+          icon={Buildings}
+          value={industries.filter(i => industryStats[i.id] > 0).length}
+          label="With Companies"
+          color="blue"
+        />
+        <StatCard
+          icon={Factory}
+          value={industries.filter(i => (industryStats[i.id] || 0) === 0).length}
+          label="Unused"
+          color="amber"
+        />
       </div>
 
       {/* Search */}
-      <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-4">
-        <div className="relative">
-          <MagnifyingGlass
-            size={20}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
-          />
-          <input
-            type="text"
-            placeholder="Search industries..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-border-primary rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
-          />
-        </div>
-      </div>
+      <SearchBar
+        value={searchTerm}
+        onChange={setSearchTerm}
+        placeholder="Search industries..."
+        withContainer
+      />
 
       {/* Industries Grid */}
       {loading ? (
         <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12">
           <div className="flex flex-col items-center justify-center text-foreground-tertiary">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-violet-600 mb-4"></div>
+            <InlineSpinner size="xl" color="violet" className="mb-4" />
             <p>Loading industries...</p>
           </div>
         </div>
@@ -275,12 +247,12 @@ export default function IndustriesPage() {
                               if (e.key === "Enter") handleInlineEdit(industry);
                               if (e.key === "Escape") setInlineEditing(null);
                             }}
-                            className="w-full px-2 py-1 text-sm border border-violet-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                            className="w-full px-2 py-1 text-sm border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-surface-primary text-foreground-primary"
                             autoFocus
                           />
                         ) : (
                           <p 
-                            className="font-medium text-foreground-primary truncate cursor-pointer hover:text-violet-600 transition-colors"
+                            className="font-medium text-foreground-primary truncate cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
                             onDoubleClick={() => {
                               setInlineEditing(industry.id);
                               setInlineValue(industry.name);
@@ -301,35 +273,20 @@ export default function IndustriesPage() {
                           setInlineEditing(industry.id);
                           setInlineValue(industry.name);
                         }}
-                        className="p-1.5 text-foreground-tertiary hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors"
+                        className="p-1.5 text-foreground-tertiary hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/30 rounded-lg transition-colors"
                       >
                         <Pencil size={16} />
                       </button>
-                      {deleteConfirm === industry.id ? (
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => handleDelete(industry.id)}
-                            className="p-1.5 text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
-                          >
-                            <Check size={16} />
-                          </button>
-                          <button
-                            onClick={() => setDeleteConfirm(null)}
-                            className="p-1.5 text-foreground-tertiary hover:bg-surface-hover rounded-lg transition-colors"
-                          >
-                            <X size={16} />
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setDeleteConfirm(industry.id)}
-                          className="p-1.5 text-foreground-tertiary hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          disabled={(industryStats[industry.id] || 0) > 0}
-                          title={(industryStats[industry.id] || 0) > 0 ? "Cannot delete: has companies" : "Delete industry"}
-                        >
-                          <Trash size={16} />
-                        </button>
-                      )}
+                      <InlineDeleteConfirm
+                        isConfirming={deleteConfirm === industry.id}
+                        onConfirm={() => handleDelete(industry.id)}
+                        onCancel={() => setDeleteConfirm(null)}
+                        onDelete={() => setDeleteConfirm(industry.id)}
+                        disabled={(industryStats[industry.id] || 0) > 0}
+                        disabledTitle="Cannot delete: has companies"
+                        title="Delete industry"
+                        colorScheme="violet"
+                      />
                     </div>
                   </div>
                 </motion.div>
@@ -340,112 +297,47 @@ export default function IndustriesPage() {
       )}
 
       {filteredIndustries.length === 0 && !loading && (
-        <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-12 text-center">
-          <Factory size={48} className="mx-auto text-foreground-tertiary mb-4" />
-          <p className="text-foreground-tertiary">No industries found</p>
-        </div>
+        <EmptyState
+          icon={Factory}
+          title="No industries found"
+          description={searchTerm ? "Try adjusting your search criteria" : "Get started by creating your first industry"}
+          action={!searchTerm ? {
+            label: "Add Industry",
+            onClick: () => {
+              setEditingIndustry(null);
+              setFormData({ name: "" });
+              setShowModal(true);
+            }
+          } : undefined}
+        />
       )}
 
       {/* Modal */}
-      <AnimatePresence>
-        {showModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={() => {
-              setShowModal(false);
-              setEditingIndustry(null);
-              setFormData({ name: "" });
-            }}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-surface-primary rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
-            >
-              <div className="p-6 border-b bg-gradient-to-r from-violet-50 to-purple-50">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-violet-100 rounded-xl">
-                      <Factory size={24} className="text-violet-600" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-semibold text-foreground-primary">
-                        {editingIndustry ? "Edit Industry" : "Add Industry"}
-                      </h2>
-                      <p className="text-sm text-foreground-tertiary">
-                        {editingIndustry ? "Update industry name" : "Add a new industry"}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setShowModal(false);
-                      setEditingIndustry(null);
-                      setFormData({ name: "" });
-                    }}
-                    className="p-2 hover:bg-surface-primary/50 rounded-lg transition-colors"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-              </div>
-
-              <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-                    Industry Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ name: e.target.value })}
-                    className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
-                    placeholder="e.g., Technology"
-                    autoFocus
-                  />
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4 border-t">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowModal(false);
-                      setEditingIndustry(null);
-                      setFormData({ name: "" });
-                    }}
-                    className="px-4 py-2.5 border border-border-secondary rounded-xl hover:bg-surface-hover transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={saving || !formData.name.trim()}
-                    className="px-6 py-2.5 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-xl hover:from-violet-700 hover:to-violet-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
-                  >
-                    {saving ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Check size={18} />
-                        {editingIndustry ? "Update" : "Create"}
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <SuperadminFormModal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setEditingIndustry(null);
+          setFormData({ name: "" });
+        }}
+        onSubmit={handleSubmit}
+        title={editingIndustry ? "Edit Industry" : "Add Industry"}
+        subtitle={editingIndustry ? "Update industry name" : "Add a new industry"}
+        icon={Factory}
+        colorScheme="violet"
+        saving={saving}
+        submitDisabled={!formData.name.trim()}
+        isEditing={!!editingIndustry}
+      >
+        <FormField
+          label="Industry Name"
+          required
+          value={formData.name}
+          onChange={(e) => setFormData({ name: e.target.value })}
+          placeholder="e.g., Technology"
+          autoFocus
+        />
+      </SuperadminFormModal>
     </div>
   );
 }

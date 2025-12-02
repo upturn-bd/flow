@@ -15,6 +15,7 @@ import {
   Clock,
 } from "@/lib/icons";
 import { StakeholderIssue } from "@/lib/types/schemas";
+import { InlineSpinner } from "@/components/ui";
 
 interface StakeholderIssuesTabProps {
   stakeholderId: number;
@@ -123,7 +124,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
   if (loading && issues.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        <InlineSpinner size="lg" color="primary" />
       </div>
     );
   }

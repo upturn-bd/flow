@@ -15,6 +15,7 @@ import {
   CheckCircle,
 } from "@/lib/icons";
 import { motion } from "framer-motion";
+import { StatCard, StatCardGrid, EmptyState } from "@/components/ui";
 
 interface Stats {
   companies: number;
@@ -114,63 +115,6 @@ export default function SuperadminDashboard() {
     }
   };
 
-  const statCards = [
-    {
-      label: "Companies",
-      value: stats.companies,
-      icon: Buildings,
-      color: "from-blue-500 to-blue-600",
-      bgColor: "bg-blue-50",
-      textColor: "text-blue-600",
-      href: "/sa/companies",
-    },
-    {
-      label: "Employees",
-      value: stats.employees,
-      icon: Users,
-      color: "from-emerald-500 to-emerald-600",
-      bgColor: "bg-emerald-50",
-      textColor: "text-emerald-600",
-      href: "/sa/companies",
-    },
-    {
-      label: "Teams",
-      value: stats.teams,
-      icon: Users,
-      color: "from-violet-500 to-violet-600",
-      bgColor: "bg-violet-50",
-      textColor: "text-violet-600",
-      href: "/sa/teams",
-    },
-    {
-      label: "Countries",
-      value: stats.countries,
-      icon: GlobeHemisphereWest,
-      color: "from-amber-500 to-amber-600",
-      bgColor: "bg-amber-50",
-      textColor: "text-amber-600",
-      href: "/sa/countries",
-    },
-    {
-      label: "Industries",
-      value: stats.industries,
-      icon: Factory,
-      color: "from-rose-500 to-rose-600",
-      bgColor: "bg-rose-50",
-      textColor: "text-rose-600",
-      href: "/sa/industries",
-    },
-    {
-      label: "Superadmins",
-      value: stats.superadmins,
-      icon: ChartBar,
-      color: "from-foreground-tertiary to-foreground-secondary",
-      bgColor: "bg-background-tertiary dark:bg-surface-secondary",
-      textColor: "text-foreground-secondary",
-      href: "/sa/users",
-    },
-  ];
-
   const quickActions = [
     {
       label: "Manage Companies",
@@ -210,10 +154,10 @@ export default function SuperadminDashboard() {
   ];
 
   const colorClasses: Record<string, { bg: string; hover: string; text: string; border: string }> = {
-    blue: { bg: "bg-blue-50", hover: "hover:bg-blue-100", text: "text-blue-600", border: "border-blue-200" },
-    violet: { bg: "bg-violet-50", hover: "hover:bg-violet-100", text: "text-violet-600", border: "border-violet-200" },
-    amber: { bg: "bg-amber-50", hover: "hover:bg-amber-100", text: "text-amber-600", border: "border-amber-200" },
-    rose: { bg: "bg-rose-50", hover: "hover:bg-rose-100", text: "text-rose-600", border: "border-rose-200" },
+    blue: { bg: "bg-primary-50 dark:bg-primary-950/30", hover: "hover:bg-primary-100 dark:hover:bg-primary-900/40", text: "text-primary-600 dark:text-primary-400", border: "border-primary-200 dark:border-primary-800" },
+    violet: { bg: "bg-purple-50 dark:bg-purple-950/30", hover: "hover:bg-purple-100 dark:hover:bg-purple-900/40", text: "text-purple-600 dark:text-purple-400", border: "border-purple-200 dark:border-purple-800" },
+    amber: { bg: "bg-amber-50 dark:bg-amber-950/30", hover: "hover:bg-amber-100 dark:hover:bg-amber-900/40", text: "text-amber-600 dark:text-amber-400", border: "border-amber-200 dark:border-amber-800" },
+    rose: { bg: "bg-rose-50 dark:bg-rose-950/30", hover: "hover:bg-rose-100 dark:hover:bg-rose-900/40", text: "text-rose-600 dark:text-rose-400", border: "border-rose-200 dark:border-rose-800" },
     slate: { bg: "bg-background-tertiary dark:bg-surface-secondary", hover: "hover:bg-surface-hover", text: "text-foreground-secondary", border: "border-border-primary" },
   };
 
@@ -230,10 +174,10 @@ export default function SuperadminDashboard() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg"
+            className="flex items-center gap-2 px-4 py-2 bg-warning/10 border border-warning/30 rounded-lg"
           >
-            <Warning size={20} className="text-amber-600" />
-            <span className="text-sm font-medium text-amber-700">
+            <Warning size={20} className="text-warning" />
+            <span className="text-sm font-medium text-warning">
               {stats.pendingApprovals} pending approval{stats.pendingApprovals !== 1 ? "s" : ""}
             </span>
           </motion.div>
@@ -253,29 +197,54 @@ export default function SuperadminDashboard() {
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {statCards.map((card, index) => {
-            const Icon = card.icon;
-            return (
-              <motion.div
-                key={card.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <Link href={card.href}>
-                  <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-5 hover:shadow-md hover:border-border-secondary transition-all group">
-                    <div className={`${card.bgColor} p-2.5 rounded-lg w-fit mb-3 group-hover:scale-110 transition-transform`}>
-                      <Icon size={22} weight="duotone" className={card.textColor} />
-                    </div>
-                    <p className="text-sm text-foreground-tertiary mb-1">{card.label}</p>
-                    <p className="text-2xl font-bold text-foreground-primary">
-                      {card.value.toLocaleString()}
-                    </p>
-                  </div>
-                </Link>
-              </motion.div>
-            );
-          })}
+          <Link href="/sa/companies">
+            <StatCard
+              icon={Buildings}
+              value={stats.companies}
+              label="Companies"
+              color="blue"
+            />
+          </Link>
+          <Link href="/sa/companies">
+            <StatCard
+              icon={Users}
+              value={stats.employees}
+              label="Employees"
+              color="green"
+            />
+          </Link>
+          <Link href="/sa/teams">
+            <StatCard
+              icon={Users}
+              value={stats.teams}
+              label="Teams"
+              color="purple"
+            />
+          </Link>
+          <Link href="/sa/countries">
+            <StatCard
+              icon={GlobeHemisphereWest}
+              value={stats.countries}
+              label="Countries"
+              color="amber"
+            />
+          </Link>
+          <Link href="/sa/industries">
+            <StatCard
+              icon={Factory}
+              value={stats.industries}
+              label="Industries"
+              color="red"
+            />
+          </Link>
+          <Link href="/sa/users">
+            <StatCard
+              icon={ChartBar}
+              value={stats.superadmins}
+              label="Superadmins"
+              color="gray"
+            />
+          </Link>
         </div>
       )}
 
@@ -317,7 +286,7 @@ export default function SuperadminDashboard() {
               <h2 className="text-lg font-semibold text-foreground-primary">Recent Companies</h2>
               <p className="text-sm text-foreground-tertiary mt-0.5">Latest additions</p>
             </div>
-            <Link href="/sa/companies" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+            <Link href="/sa/companies" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
               View all
             </Link>
           </div>
@@ -339,7 +308,7 @@ export default function SuperadminDashboard() {
               {recentCompanies.map((company) => (
                 <Link key={company.id} href="/sa/companies">
                   <div className="p-4 hover:bg-surface-hover transition-colors flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                    <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
                       {company.name.substring(0, 2).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -361,9 +330,12 @@ export default function SuperadminDashboard() {
               ))}
             </div>
           ) : (
-            <div className="p-8 text-center">
-              <Buildings size={40} className="mx-auto text-foreground-tertiary mb-2" />
-              <p className="text-foreground-tertiary text-sm">No companies yet</p>
+            <div className="p-8">
+              <EmptyState
+                icon={Buildings}
+                title="No companies yet"
+                description="Companies will appear here once created"
+              />
             </div>
           )}
         </div>
@@ -375,25 +347,25 @@ export default function SuperadminDashboard() {
           <h2 className="text-lg font-semibold text-foreground-primary">System Status</h2>
         </div>
         <div className="p-5 grid sm:grid-cols-3 gap-4">
-          <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-            <CheckCircle size={24} weight="fill" className="text-emerald-600" />
+          <div className="flex items-center gap-3 p-3 bg-success/10 rounded-lg border border-success/30">
+            <CheckCircle size={24} weight="fill" className="text-success" />
             <div>
-              <p className="font-medium text-emerald-700">Database</p>
-              <p className="text-sm text-emerald-600">Connected</p>
+              <p className="font-medium text-success">Database</p>
+              <p className="text-sm text-success/80">Connected</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-            <CheckCircle size={24} weight="fill" className="text-emerald-600" />
+          <div className="flex items-center gap-3 p-3 bg-success/10 rounded-lg border border-success/30">
+            <CheckCircle size={24} weight="fill" className="text-success" />
             <div>
-              <p className="font-medium text-emerald-700">Authentication</p>
-              <p className="text-sm text-emerald-600">Active</p>
+              <p className="font-medium text-success">Authentication</p>
+              <p className="text-sm text-success/80">Active</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-            <CheckCircle size={24} weight="fill" className="text-emerald-600" />
+          <div className="flex items-center gap-3 p-3 bg-success/10 rounded-lg border border-success/30">
+            <CheckCircle size={24} weight="fill" className="text-success" />
             <div>
-              <p className="font-medium text-emerald-700">Storage</p>
-              <p className="text-sm text-emerald-600">Operational</p>
+              <p className="font-medium text-success">Storage</p>
+              <p className="text-sm text-success/80">Operational</p>
             </div>
           </div>
         </div>

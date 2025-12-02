@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Pencil, Trash, Plus, Clock, CalendarDays, Info } from "@/lib/icons";
 import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { NoticeCreateModal, NoticeUpdateModal } from "@/components/ops/notice";
 import { getEmployeeId } from "@/lib/utils/auth";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -161,22 +163,13 @@ export default function NoticePage() {
               transition={{ duration: 0.3 }}
               className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
             >
-              <div>
-                <h1 className="text-2xl font-bold text-foreground-primary flex items-center mb-2">
-                  <motion.div
-                    initial={{ scale: 0.9, opacity: 0.5 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="mr-2 h-6 w-6 text-amber-500"
-                  >
-                    <Bell className="h-6 w-6" />
-                  </motion.div>
-                  Notices & Announcements
-                </h1>
-                <p className="text-foreground-secondary max-w-3xl">
-                  View and manage company-wide notices and important announcements.
-                </p>
-              </div>
+              <PageHeader
+                icon={Bell}
+                iconColor="text-amber-500"
+                title="Notices & Announcements"
+                description="View and manage company-wide notices and important announcements."
+                className="mb-0"
+              />
               {canWrite(PERMISSION_MODULES.NOTICE) ? (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -258,7 +251,7 @@ export default function NoticePage() {
                                 whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.1)" }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => setEditNotice(notice)}
-                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                                className="p-2 text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded-full transition-colors"
                                 aria-label="Edit notice"
                               >
                                 <Pencil className="h-4 w-4" />

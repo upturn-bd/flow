@@ -8,13 +8,13 @@ import {
   CaretDown,
   WarningCircle,
   Check,
-  Loader,
   X,
   FileText,
   MessageCircle,
   User,
   Flag
 } from "@/lib/icons";
+import InlineSpinner from "@/components/ui/InlineSpinner";
 import { supabase } from "@/lib/supabase/client";
 import { ComplaintRecord } from "@/lib/types/schemas";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { uploadManyFiles } from "@/lib/utils/files";
 import { useNotifications } from "@/hooks/useNotifications";
+import { SelectField, TextAreaField } from "@/components/forms";
 
 const initialComplaintRecord = {
   complaint_type_id: undefined,
@@ -219,94 +220,41 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
       >
         <div className="space-y-4">
           {/* Category */}
-          <div>
-            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
-              <Flag size={16} className="mr-2" />
-              Category
-            </label>
-            <div className="relative">
-              <select
-                name="complaint_type_id"
-                value={complaintState.complaint_type_id}
-                onChange={handleInputChange}
-                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
-              >
-                <option value={""}>Select category</option>
-                {complaintTypes.length > 0 &&
-                  complaintTypes.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  ))}
-              </select>
-              <CaretDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
-                size={16}
-              />
-            </div>
-            {touched.complaint_type_id && errors.complaint_type_id && (
-              <p className="mt-1 text-red-500 text-sm flex items-center">
-                <WarningCircle size={14} className="mr-1" />
-                {errors.complaint_type_id}
-              </p>
-            )}
-          </div>
+          <SelectField
+            name="complaint_type_id"
+            label="Category"
+            value={complaintState.complaint_type_id}
+            onChange={handleInputChange}
+            options={[
+              { value: "", label: "Select category" },
+              ...complaintTypes.map((type) => ({ value: type.id, label: type.name }))
+            ]}
+            error={touched.complaint_type_id ? errors.complaint_type_id : undefined}
+          />
 
           {/* Complaint Against */}
-          <div>
-            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
-              <User size={16} className="mr-2" />
-              Complaint Against
-            </label>
-            <div className="relative">
-              <select
-                name="against_whom"
-                value={complaintState.against_whom}
-                onChange={handleInputChange}
-                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
-              >
-                <option value="">Select a person</option>
-                {employees.length > 0 &&
-                  employees.map((emp) => (
-                    <option key={emp.id} value={emp.id}>
-                      {emp.name}
-                    </option>
-                  ))}
-              </select>
-              <CaretDown
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
-                size={16}
-              />
-            </div>
-            {touched.against_whom && errors.against_whom && (
-              <p className="mt-1 text-red-500 text-sm flex items-center">
-                <WarningCircle size={14} className="mr-1" />
-                {errors.against_whom}
-              </p>
-            )}
-          </div>
+          <SelectField
+            name="against_whom"
+            label="Complaint Against"
+            value={complaintState.against_whom}
+            onChange={handleInputChange}
+            options={[
+              { value: "", label: "Select a person" },
+              ...employees.map((emp) => ({ value: emp.id, label: emp.name }))
+            ]}
+            error={touched.against_whom ? errors.against_whom : undefined}
+          />
 
           {/* Description */}
-          <div>
-            <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
-              <MessageCircle size={16} className="mr-2" />
-              Description
-            </label>
-            <textarea
-              name="description"
-              value={complaintState.description}
-              onChange={handleInputChange}
-              rows={4}
-              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
-              placeholder="Describe your complaint..."
-            />
-            {touched.description && errors.description && (
-              <p className="mt-1 text-red-500 text-sm flex items-center">
-                <WarningCircle size={14} className="mr-1" />
-                {errors.description}
-              </p>
-            )}
-          </div>
+          <TextAreaField
+            name="description"
+            label="Description"
+            value={complaintState.description}
+            onChange={handleInputChange}
+            rows={4}
+            placeholder="Describe your complaint..."
+            error={touched.description ? errors.description : undefined}
+          />
 
           {/* Attachments */}
           <div>
@@ -321,7 +269,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
               </p>
               <label
                 htmlFor="file_upload"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg cursor-pointer hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-primary-600 text-white text-sm rounded-lg cursor-pointer hover:bg-primary-700 transition-colors"
               >
                 <Upload size={16} className="mr-2" />
                 Browse Files
@@ -387,11 +335,11 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={!isValid || isSubmitting}
-            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>
-                <Loader size={18} className="animate-spin" />
+                <InlineSpinner size="sm" color="white" />
                 <span>Submitting...</span>
               </>
             ) : (

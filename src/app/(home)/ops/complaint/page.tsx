@@ -32,7 +32,7 @@ export default function ComplaintPage() {
       key: "history",
       label: "History",
       icon: <History className="h-5 w-5" />,
-      color: "text-blue-600",
+      color: "text-primary-600",
       content: <ComplaintHistoryPage />
     },
         {

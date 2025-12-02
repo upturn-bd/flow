@@ -66,7 +66,7 @@ export default function MultiSelectDropdown({
       {label && (
         <label className="block text-sm font-medium text-foreground-primary dark:text-foreground-primary">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-error ml-1">*</span>}
         </label>
       )}
 
@@ -75,7 +75,7 @@ export default function MultiSelectDropdown({
         <div
           onClick={() => setIsOpen(!isOpen)}
           className={`min-h-[42px] w-full px-4 py-2 border rounded-lg cursor-pointer focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary dark:bg-surface-primary ${
-            error ? "border-red-500" : "border-border-primary dark:border-border-primary"
+            error ? "border-error" : "border-border-primary dark:border-border-primary"
           }`}
         >
           <div className="flex items-center justify-between gap-2">
@@ -143,7 +143,7 @@ export default function MultiSelectDropdown({
         )}
       </div>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-error text-sm">{error}</p>}
 
       {selectedLabels.length > 0 && (
         <p className="text-xs text-foreground-tertiary dark:text-foreground-tertiary">{selectedLabels.length} selected</p>

@@ -6,14 +6,14 @@ import {
   Upload,
   Calendar,
   Clock,
-  ChevronDown,
+  CaretDown,
   PackageOpen,
-  AlertCircle,
+  WarningCircle,
   Check,
-  Loader2,
   X,
   FileText,
-} from "lucide-react";
+} from "@/lib/icons";
+import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import BaseModal from "@/components/ui/modals/BaseModal";
 import { useRequisitionInventories, useRequisitionTypes } from "@/hooks/useConfigTypes";
@@ -285,14 +285,14 @@ export default function RequisitionEditModal({
                     </option>
                   ))}
               </select>
-              <ChevronDown
+              <CaretDown
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
                 size={16}
               />
               {touchedFields.requisition_category_id &&
                 errors.requisition_category_id && (
                   <p className="mt-1 text-red-500 text-sm flex items-center">
-                    <AlertCircle size={14} className="mr-1" />
+                    <WarningCircle size={14} className="mr-1" />
                     {errors.requisition_category_id}
                   </p>
                 )}
@@ -325,13 +325,13 @@ export default function RequisitionEditModal({
                       </option>
                     ))}
               </select>
-              <ChevronDown
+              <CaretDown
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 text-foreground-tertiary pointer-events-none"
                 size={16}
               />
               {touchedFields.item_id && errors.item_id && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
-                  <AlertCircle size={14} className="mr-1" />
+                  <WarningCircle size={14} className="mr-1" />
                   {errors.item_id}
                 </p>
               )}
@@ -352,7 +352,7 @@ export default function RequisitionEditModal({
             />
             {touchedFields.quantity && errors.quantity && (
               <p className="mt-1 text-red-500 text-sm flex items-center">
-                <AlertCircle size={14} className="mr-1" />
+                <WarningCircle size={14} className="mr-1" />
                 {errors.quantity}
               </p>
             )}
@@ -377,7 +377,7 @@ export default function RequisitionEditModal({
               </div>
               {touchedFields.date && errors.date && (
                 <p className="mt-1 text-red-500 text-sm flex items-center">
-                  <AlertCircle size={14} className="mr-1" />
+                  <WarningCircle size={14} className="mr-1" />
                   {errors.date}
                 </p>
               )}
@@ -403,7 +403,7 @@ export default function RequisitionEditModal({
                   </div>
                   {touchedFields.from_time && errors.from_time && (
                     <p className="mt-1 text-red-500 text-sm flex items-center">
-                      <AlertCircle size={14} className="mr-1" />
+                      <WarningCircle size={14} className="mr-1" />
                       {errors.from_time}
                     </p>
                   )}
@@ -427,7 +427,7 @@ export default function RequisitionEditModal({
                   </div>
                   {touchedFields.to_time && errors.to_time && (
                     <p className="mt-1 text-red-500 text-sm flex items-center">
-                      <AlertCircle size={14} className="mr-1" />
+                      <WarningCircle size={14} className="mr-1" />
                       {errors.to_time}
                     </p>
                   )}
@@ -561,11 +561,11 @@ export default function RequisitionEditModal({
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={!isValid || isSubmitting}
-              className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 size={18} className="animate-spin" />
+                  <InlineSpinner size="sm" color="white" />
                   <span>Updating...</span>
                 </>
               ) : (

@@ -20,6 +20,7 @@ import {
   X
 } from "@/lib/icons";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import InlineSpinner from "@/components/ui/InlineSpinner";
 import { formatDate } from "@/lib/utils";
 import { PayrollAdjustment } from "@/lib/types/schemas";
 
@@ -196,7 +197,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
           <p className="text-foreground-tertiary mb-4">{error.message}</p>
           <button
             onClick={() => fetchPayrollHistory()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           >
             Try Again
           </button>
@@ -395,7 +396,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                             <h4 className="text-sm font-medium text-foreground-primary">Adjustments</h4>
                             <button
                               onClick={handleAddAdjustment}
-                              className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 border border-blue-200 rounded hover:bg-blue-50"
+                              className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 border border-blue-200 rounded hover:bg-primary-50 dark:hover:bg-primary-950"
                             >
                               <Plus className="h-3 w-3 mr-1" />
                               Add
@@ -409,18 +410,18 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                                   placeholder="Adjustment type (e.g., Bonus, Deduction)"
                                   value={adjustment.type}
                                   onChange={(e) => handleAdjustmentChange(idx, 'type', e.target.value)}
-                                  className="flex-1 px-3 py-2 border border-border-secondary rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                                  className="flex-1 px-3 py-2 border border-border-secondary rounded-md text-sm bg-surface-primary focus:ring-primary-500 focus:border-primary-500 outline-none"
                                 />
                                 <input
                                   type="number"
                                   placeholder="Amount"
                                   value={adjustment.amount}
                                   onChange={(e) => handleAdjustmentChange(idx, 'amount', e.target.value)}
-                                  className="w-24 px-3 py-2 border border-border-secondary rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                                  className="w-24 px-3 py-2 border border-border-secondary rounded-md text-sm bg-surface-primary focus:ring-primary-500 focus:border-primary-500 outline-none"
                                 />
                                 <button
                                   onClick={() => handleRemoveAdjustment(idx)}
-                                  className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
+                                  className="p-1.5 text-error hover:text-error/80 hover:bg-error/10 rounded"
                                 >
                                   <X className="h-3 w-3" />
                                 </button>
@@ -434,18 +435,18 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                             <button
                               onClick={handleCancelEdit}
                               disabled={processingUpdate}
-                              className="px-3 py-2 text-sm font-medium text-foreground-secondary bg-surface-primary border border-border-secondary rounded-md hover:bg-background-secondary dark:bg-background-tertiary focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                              className="px-3 py-2 text-sm font-medium text-foreground-secondary bg-surface-primary border border-border-secondary rounded-md hover:bg-background-secondary dark:bg-background-tertiary focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50"
                             >
                               Cancel
                             </button>
                             <button
                               onClick={handleSaveAdjustments}
                               disabled={processingUpdate}
-                              className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                              className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50"
                             >
                               {processingUpdate ? (
                                 <>
-                                  <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin mr-1"></div>
+                                  <InlineSpinner size="xs" color="white" className="mr-1" />
                                   Publishing...
                                 </>
                               ) : (
@@ -503,7 +504,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                                   >
                                     {processingUpdate ? (
                                       <>
-                                        <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                                        <InlineSpinner size="xs" color="white" className="mr-2" />
                                         Publishing...
                                       </>
                                     ) : (
@@ -523,7 +524,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                                 >
                                   {processingUpdate ? (
                                     <>
-                                      <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                                      <InlineSpinner size="xs" color="white" className="mr-2" />
                                       Processing...
                                     </>
                                   ) : (

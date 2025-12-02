@@ -38,7 +38,7 @@ const initialFormState: BasicInfoFormData = {
 const fieldGroups = [
   {
     title: "Personal Info",
-    icon: <User className="h-5 w-5 text-blue-600" />,
+    icon: <User className="h-5 w-5 text-primary-600" />,
     fields: [
       { name: "first_name", label: "First Name", type: "text" },
       { name: "last_name", label: "Last Name", type: "text" },
@@ -48,7 +48,7 @@ const fieldGroups = [
   },
   {
     title: "Job Info",
-    icon: <Briefcase className="h-5 w-5 text-blue-600" />,
+    icon: <Briefcase className="h-5 w-5 text-primary-600" />,
     fields: [
       { name: "department_id", label: "Department", type: "number" },
       { name: "designation", label: "Designation", type: "text" },
@@ -288,7 +288,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
     >
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-foreground-primary flex items-center">
-          <Calendar className="mr-2 h-6 w-6 text-blue-600" />
+          <Calendar className="mr-2 h-6 w-6 text-primary-600" />
           Basic Information
         </h2>
         {isCurrentUser && (
@@ -296,7 +296,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
             <button
               onClick={handleEditToggle}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
-                isEditMode ? 'bg-blue-600' : 'bg-gray-200'
+                isEditMode ? 'bg-primary-600' : 'bg-gray-200'
               }`}
               role="switch"
               aria-checked={isEditMode}
@@ -374,7 +374,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                         return (
                       <motion.tr 
                         key={field.name} 
-                        className={isEditMode ? "hover:bg-blue-50 transition-colors" : ""}
+                        className={isEditMode ? "hover:bg-primary-50 dark:hover:bg-primary-950 transition-colors" : ""}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: fieldIndex * 0.05 + groupIndex * 0.1 }}

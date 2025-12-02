@@ -7,6 +7,7 @@ import { useStakeholderIssues, StakeholderIssueFormData } from '@/hooks/useStake
 import { useStakeholders } from '@/hooks/useStakeholders';
 import { useAuth } from '@/lib/auth/auth-context';
 import { cn } from '@/components/ui/class';
+import { LoadingSpinner } from '@/components/ui';
 
 // Alias for backward compatibility
 const Building2 = Building;
@@ -140,10 +141,7 @@ export default function StakeholderIssueModal({
             {loadingIssue ? (
               // Loading state
               <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-                  <p className="text-foreground-secondary">Loading issue details...</p>
-                </div>
+                <LoadingSpinner message="Loading issue details..." />
               </div>
             ) : isViewMode && issue ? (
               // View mode

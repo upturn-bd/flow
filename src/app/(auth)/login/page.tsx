@@ -61,15 +61,15 @@ const SignIn = () => {
   };
 
   return (
-    <section className="bg-surface-primary text-foreground-primary min-h-screen flex flex-col">
+    <section className="bg-background-secondary text-foreground-primary min-h-screen flex flex-col">
       <div className="flex flex-col md:flex-row h-full min-h-screen">
         {/* Logo Section */}
-        <div className="bg-[#001731] flex items-center justify-center p-8 md:w-2/6 w-full min-h-[120px] md:min-h-0">
+        <div className="bg-primary-950 dark:bg-primary-900 flex items-center justify-center p-8 md:w-2/6 w-full min-h-[120px] md:min-h-0">
           <Image src="/Logo.png" width={150} height={150} alt="Logo" className="mx-auto" />
         </div>
         {/* Form Section */}
         <div className="flex flex-1 items-center justify-center px-4 py-8 md:px-16 lg:px-32">
-          <div className="bg-[#eff8ff] w-full max-w-md md:max-w-lg p-8 md:p-12 rounded-3xl shadow-2xl">
+          <div className="bg-surface-primary dark:bg-surface-secondary w-full max-w-md md:max-w-lg p-8 md:p-12 rounded-3xl shadow-2xl border border-border-primary">
             <form
               onSubmit={handleSubmit(handleSignIn)}
               className="flex flex-col gap-4"
@@ -85,7 +85,7 @@ const SignIn = () => {
                   disabled={loading}
                 />
                 {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                  <p className="text-error text-sm mt-1">{errors.email.message}</p>
                 )}
               </div>
 
@@ -114,7 +114,7 @@ const SignIn = () => {
                   )}
                 </button>
                 {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                  <p className="text-error text-sm mt-1">{errors.password.message}</p>
                 )}
               </div>
 
@@ -129,20 +129,20 @@ const SignIn = () => {
             </form>
 
             {generalError && (
-              <p className="text-red-500 text-center mt-4">{generalError}</p>
+              <p className="text-error text-center mt-4">{generalError}</p>
             )}
 
             <button
               onClick={handleGoogleSignIn}
-              className="w-full flex items-center justify-center gap-2 px-8 py-3 mt-4 rounded-full border border-border-secondary text-foreground-primary font-semibold shadow-2xl disabled:opacity-50 transition hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full flex items-center justify-center gap-2 px-8 py-3 mt-4 rounded-full bg-surface-primary dark:bg-surface-secondary border border-border-primary text-foreground-primary font-semibold shadow-md disabled:opacity-50 transition hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary-500"
               disabled={loading}
             >
-              <GoogleLogo className="text-2xl" />
+              <GoogleLogo className="text-2xl" weight="bold" />
               {loading ? "Signing in..." : "Sign In with Google"}
             </button>
 
             <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-2 text-sm">
-              <span className="text-foreground-secondary">Don't have an account?</span>
+              <span className="text-foreground-tertiary">Don't have an account?</span>
               <Link href="/signup" className="text-primary-600 font-semibold hover:underline">
                 Sign Up
               </Link>

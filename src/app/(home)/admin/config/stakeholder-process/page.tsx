@@ -6,6 +6,7 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { Plus, Settings, Trash, Edit } from "@/lib/icons";
 import { StakeholderProcess } from "@/lib/types/schemas";
 import ProcessForm from "@/components/stakeholder-processes/ProcessForm";
+import { InlineSpinner } from "@/components/ui";
 
 export default function StakeholderProcessesPage() {
   const router = useRouter();
@@ -44,7 +45,7 @@ export default function StakeholderProcessesPage() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           <Plus size={20} />
           Create Process
@@ -61,7 +62,7 @@ export default function StakeholderProcessesPage() {
       {/* Loading State */}
       {loading && processes.length === 0 && (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <InlineSpinner size="lg" color="blue" />
         </div>
       )}
 
@@ -76,7 +77,7 @@ export default function StakeholderProcessesPage() {
           <div className="mt-6">
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
             >
               <Plus size={20} />
               Create Process
@@ -144,7 +145,7 @@ export default function StakeholderProcessesPage() {
                     onClick={() => {
                       router.push(`/admin/config/stakeholder-process/${process.id}`);
                     }}
-                    className="p-2 text-foreground-secondary hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    className="p-2 text-foreground-secondary hover:text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
                     title="Edit process"
                   >
                     <Edit size={18} />
@@ -156,7 +157,7 @@ export default function StakeholderProcessesPage() {
                     title="Delete process"
                   >
                     {processingId === process.id ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                      <InlineSpinner size="sm" color="error" />
                     ) : (
                       <Trash size={18} />
                     )}

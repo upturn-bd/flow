@@ -630,6 +630,7 @@ export default function ProjectDetails({
           id={milestoneDetailsId}
           onClose={() => setMilestoneDetailsId(null)}
           project_created_by={projectDetails.created_by || ""}
+          employees={employees}
         />
       )}
 
@@ -670,6 +671,7 @@ export default function ProjectDetails({
           )}
           onClose={() => setSelectedMilestone(null)}
           onSubmit={handleUpdateMilestone}
+          employees={employees}
         />
       )}
     </div>

@@ -5,13 +5,14 @@ import { useNotices, useNoticeTypes } from "@/hooks/useNotice";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import {
-  Loader,
   Search,
   WarningCircle,
   FileText,
   Pencil,
   Trash,
 } from "@/lib/icons";
+import InlineSpinner from "@/components/ui/InlineSpinner";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { motion } from "framer-motion";
 import NoticeUpdateModal from "@/components/ops/notice/NoticeUpdateModal";
 import { toast } from "sonner";
@@ -132,7 +133,7 @@ export default function NoticePage() {
     <div className="p-6 space-y-6">
       {/* Page header */}
       <div className="flex items-center gap-2">
-        <FileText className="text-blue-600" size={26} />
+        <FileText className="text-primary-600" size={26} />
         <h1 className="text-2xl font-semibold">Notice Logs</h1>
       </div>
 
@@ -152,17 +153,18 @@ export default function NoticePage() {
       {/* Loading */}
       {loading && (
         <div className="flex justify-center items-center py-20 text-foreground-tertiary">
-          <Loader className="animate-spin mr-2" />
+          <InlineSpinner size="md" color="primary" className="mr-2" />
           Loading notices...
         </div>
       )}
 
       {/* Empty */}
       {!loading && filtered.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-foreground-tertiary">
-          <WarningCircle className="mb-2" size={28} />
-          <p>No notices found.</p>
-        </div>
+        <EmptyState
+          icon={WarningCircle}
+          title="No notices found"
+          description="There are no notices matching your search criteria."
+        />
       )}
 
       {/* List */}
@@ -224,7 +226,7 @@ export default function NoticePage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-border-secondary hover:bg-blue-50 hover:text-blue-600"
+                      className="border-border-secondary hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-600"
                       title="Edit Notice"
                       onClick={() => setEditingNotice(notice)}
                     >

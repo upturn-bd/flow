@@ -6,11 +6,11 @@ import AttendanceCreateModal, {
   AttendanceUpdateModal,
 } from "./AttendanceModal";
 import { Site, useSites } from "@/hooks/useAttendanceManagement";
-import { Trash, Buildings, Plus, MapPin, Clock, Eye } from "@/lib/icons";
+import { Buildings, Plus, MapPin, Clock } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
-
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { EntityCard, EntityCardGrid, EntityCardMetaItem, EmptyState } from "@/components/ui";
 
 export default function AttendanceManagementView() {
   const { sites, fetchSites, createSite, deleteSite, updateSite, loading } =
@@ -89,72 +89,38 @@ export default function AttendanceManagementView() {
             color="gray"
           />
         ) : (
-          <div>
-            <AnimatePresence>
-              {sites.length > 0 ? (
-                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                  {sites.map((site: Site, idx) => (
-                    <div
-                      key={site.id || idx}
-                      className="bg-surface-primary p-4 rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Buildings size={20} weight="duotone" className="text-foreground-secondary" />
-                          <h4 className="font-medium text-foreground-primary">{site.name}</h4>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => site.id !== undefined && handleDeleteSite(site.id)}
-                          isLoading={deleteLoading === site.id}
-                          disabled={deleteLoading === site.id}
-                          className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
-                        >
-                          <Trash size={16} weight="bold" />
-                        </Button>
-                      </div>
-                      
-                      <div className="mt-2 space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-sm text-foreground-secondary">
-                          <MapPin size={16} weight="duotone" className="text-foreground-tertiary" />
-                          <span className="truncate">
-                            {parseFloat(site.latitude.toString()).toFixed(5)}, {parseFloat(site.longitude.toString()).toFixed(5)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-sm text-foreground-secondary">
-                          <Clock size={16} weight="duotone" className="text-foreground-tertiary" />
-                          <span>
-                            {site.check_in} - {site.check_out}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-end mt-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditSite(site.id!)}
-                          className="text-sm flex items-center gap-1 text-foreground-secondary hover:text-foreground-primary"
-                        >
-                          <Eye size={16} weight="bold" />
-                          View Details
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="bg-background-secondary dark:bg-background-tertiary rounded-lg p-6 text-center border border-border-primary">
-                  <div className="flex justify-center mb-3">
-                    <Buildings size={40} weight="duotone" className="text-foreground-tertiary" />
-                  </div>
-                  <p className="text-foreground-tertiary mb-1">No attendance sites found</p>
-                  <p className="text-foreground-tertiary text-sm mb-4">Add sites to manage attendance locations</p>
-                </div>
-              )}
-            </AnimatePresence>
-          </div>
+          <AnimatePresence>
+            {sites.length > 0 ? (
+              <EntityCardGrid columns={3}>
+                {sites.map((site: Site, idx) => (
+                  <EntityCard
+                    key={site.id || idx}
+                    title={site.name}
+                    icon={Buildings}
+                    onDelete={site.id !== undefined ? () => handleDeleteSite(site.id!) : undefined}
+                    deleteLoading={deleteLoading === site.id}
+                    onView={() => setEditSite(site.id!)}
+                    metadata={
+                      <>
+                        <EntityCardMetaItem icon={MapPin}>
+                          {parseFloat(site.latitude.toString()).toFixed(5)}, {parseFloat(site.longitude.toString()).toFixed(5)}
+                        </EntityCardMetaItem>
+                        <EntityCardMetaItem icon={Clock}>
+                          {site.check_in} - {site.check_out}
+                        </EntityCardMetaItem>
+                      </>
+                    }
+                  />
+                ))}
+              </EntityCardGrid>
+            ) : (
+              <EmptyState
+                icon={Buildings}
+                title="No attendance sites found"
+                description="Add sites to manage attendance locations"
+              />
+            )}
+          </AnimatePresence>
         )}
 
         <div className="flex justify-end mt-4">

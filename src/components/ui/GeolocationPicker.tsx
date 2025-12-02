@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { MapPin, Loader } from "@/lib/icons";
+import { MapPin } from "@/lib/icons";
+import { LoadingSpinner } from "@/components/ui";
 
 // Dynamically import the map component to avoid SSR issues
 const MapComponent = dynamic(
@@ -11,7 +12,7 @@ const MapComponent = dynamic(
     ssr: false,
     loading: () => (
       <div className="w-full h-[400px] bg-background-secondary dark:bg-background-secondary rounded-lg flex items-center justify-center">
-        <Loader className="animate-spin text-foreground-tertiary dark:text-foreground-tertiary" size={32} />
+        <LoadingSpinner />
       </div>
     )
   }
@@ -96,7 +97,7 @@ export default function GeolocationPicker({
       <div className="flex items-center justify-between">
         <label className="block text-sm font-medium text-foreground-primary dark:text-foreground-primary">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-error ml-1">*</span>}
         </label>
         <button
           type="button"
@@ -118,7 +119,7 @@ export default function GeolocationPicker({
             onChange={(e) => handleManualInputChange("latitude", e.target.value)}
             placeholder="e.g., 23.8103"
             className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary dark:bg-surface-primary text-foreground-primary dark:text-foreground-primary ${
-              error ? "border-red-500" : "border-border-primary dark:border-border-primary"
+              error ? "border-error" : "border-border-primary dark:border-border-primary"
             }`}
           />
         </div>
@@ -130,7 +131,7 @@ export default function GeolocationPicker({
             onChange={(e) => handleManualInputChange("longitude", e.target.value)}
             placeholder="e.g., 90.4125"
             className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary dark:bg-surface-primary text-foreground-primary dark:text-foreground-primary ${
-              error ? "border-red-500" : "border-border-primary dark:border-border-primary"
+              error ? "border-error" : "border-border-primary dark:border-border-primary"
             }`}
           />
         </div>
@@ -141,7 +142,7 @@ export default function GeolocationPicker({
         <MapComponent value={value} onChange={handleMapChange} />
       </div>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-error text-sm">{error}</p>}
 
       {value && (
         <p className="text-xs text-foreground-tertiary dark:text-foreground-tertiary">
