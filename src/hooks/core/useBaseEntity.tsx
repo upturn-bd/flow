@@ -56,21 +56,36 @@ export function useBaseEntity<T extends BaseEntity>(
         let errorMessage: string;
         if (error instanceof Error) {
           errorMessage = error.message;
+          // Also capture standard Error instances to Sentry
+          captureSupabaseError(
+            { message: error.message },
+            `${config.tableName}_operation`,
+            { entityName: config.entityName }
+          );
         } else if (typeof error === 'object' && error !== null) {
           // Handle Supabase errors which may have different structures
           const errorObj = error as { message?: string; error_description?: string; code?: string; details?: string; hint?: string };
           errorMessage = errorObj.message 
             || errorObj.error_description 
+            || errorObj.details
+            || errorObj.hint
             || JSON.stringify(error);
           
           // Capture Supabase error to Sentry with context
+          // Use the resolved errorMessage to ensure we never pass undefined
           captureSupabaseError(
-            { code: errorObj.code, message: errorObj.message, details: errorObj.details, hint: errorObj.hint },
+            { code: errorObj.code, message: errorMessage, details: errorObj.details, hint: errorObj.hint },
             `${config.tableName}_operation`,
             { entityName: config.entityName }
           );
         } else {
           errorMessage = String(error) || "An unknown error occurred";
+          // Capture non-object errors to Sentry
+          captureSupabaseError(
+            { message: errorMessage },
+            `${config.tableName}_operation`,
+            { entityName: config.entityName }
+          );
         }
 
         if (options.showErrorMessage) {
