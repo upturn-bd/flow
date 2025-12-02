@@ -121,7 +121,7 @@ export default function NewStakeholderPage() {
   // Show error if no processes exist (only for lead creation)
   if (!loading && !createAsPermanent && activeProcesses.length === 0) {
     return (
-      <div className="p-4 sm:p-6">
+      <div className="p-4 sm:p-6 lg:p-8">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-2 text-foreground-secondary hover:text-foreground-primary mb-4 sm:mb-6 text-sm sm:text-base"
@@ -155,7 +155,7 @@ export default function NewStakeholderPage() {
   }
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <button
         onClick={() => router.back()}

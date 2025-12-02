@@ -174,7 +174,7 @@ export default function StakeholderIssuesPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Header */}
       <PageHeader
         title="My Stakeholder Issues"

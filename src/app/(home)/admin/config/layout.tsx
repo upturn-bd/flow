@@ -88,7 +88,7 @@ export default function CompanyConfigurationsLayout({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="p-3 bg-background-primary dark:bg-background-primary sm:p-6 pb-12"
+        className="p-4 sm:p-6 lg:p-8 pb-12"
       >
         {/* 2. ADD BREADCRUMBS ONCE */}
         <ConfigurationBreadcrumbs />

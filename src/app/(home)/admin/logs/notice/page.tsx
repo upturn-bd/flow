@@ -130,7 +130,7 @@ export default function NoticePage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="w-full space-y-6">
       {/* Page header */}
       <div className="flex items-center gap-2">
         <FileText className="text-primary-600" size={26} />
