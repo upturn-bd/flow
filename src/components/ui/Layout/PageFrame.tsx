@@ -51,8 +51,9 @@ export function PageFrame({
   };
 
   // Standard responsive padding class
+  // When mobileNavPadding is true, we use separate x/y padding to ensure pb-12 doesn't conflict
   const paddingClass = mobileNavPadding
-    ? "p-4 sm:p-6 lg:p-8 pb-12"
+    ? "px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-12"
     : "p-4 sm:p-6 lg:p-8";
 
   if (animate) {
