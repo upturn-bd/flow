@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check, Eye, Trash2, AlertCircle, Calendar, Briefcase, User, Clock, Bell } from "lucide-react";
+import { X, Check, Eye, Trash, AlertCircle, Calendar, Briefcase, User, Clock, Bell } from "@/lib/icons";
 import { Notification } from "@/hooks/useNotifications";
 import { formatRelativeTime } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -175,7 +175,7 @@ export default function NewNotificationModal({
                 onClick={handleDelete}
                 className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm border border-red-200"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash className="h-4 w-4" />
                 Delete
               </button>
             </div>

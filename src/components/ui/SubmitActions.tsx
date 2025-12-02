@@ -25,8 +25,6 @@ export default function SubmitActions({
   className = "",
   disabled = false,
 }: SubmitActionsProps) {
-  console.log(isSubmitting, isDirty, isValid);
-
   const canSubmit = isDirty && isValid && !isSubmitting && !disabled;
 
   return (
