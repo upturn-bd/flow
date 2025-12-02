@@ -356,9 +356,9 @@ export default function AccountsTab() {
   if (loading && accounts.length === 0) {
     return (
       <LoadingSpinner
-        size="lg"
-        message="Loading accounts..."
-        className="h-64 bg-surface-primary rounded-xl shadow-sm"
+        text="Loading accounts..."
+        height="h-64"
+        className="bg-surface-primary rounded-xl shadow-sm"
       />
     );
   }

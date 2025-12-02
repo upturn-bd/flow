@@ -93,9 +93,8 @@ export default function BasicTab() {
   if (loading) {
     return (
       <LoadingSpinner
-        size="lg"
-        message="Loading configuration..."
-        fullHeight
+        text="Loading configuration..."
+        height="h-screen"
       />
     );
   }

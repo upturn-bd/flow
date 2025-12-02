@@ -227,7 +227,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
             onChange={handleInputChange}
             options={[
               { value: "", label: "Select category" },
-              ...complaintTypes.map((type) => ({ value: type.id, label: type.name }))
+              ...complaintTypes.filter((type) => type.id !== undefined).map((type) => ({ value: type.id!, label: type.name }))
             ]}
             error={touched.complaint_type_id ? errors.complaint_type_id : undefined}
           />

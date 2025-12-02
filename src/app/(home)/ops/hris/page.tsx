@@ -123,9 +123,9 @@ useEffect(() => {
       <motion.div variants={fadeInUp} className="flex items-center justify-between mb-8">
         <PageHeader
           title="Employee Finder"
-          subtitle="Search and find detailed information about employees"
+          description="Search and find detailed information about employees"
           icon={Users}
-          iconClassName="bg-indigo-100 text-indigo-700"
+          iconColor="text-indigo-700"
           className="mb-0"
         />
         <motion.button
@@ -250,9 +250,9 @@ useEffect(() => {
         <AnimatePresence>
           {loading ? (
             <LoadingSpinner
-              size="lg"
-              message="Loading employee data..."
-              className="h-64 bg-surface-primary rounded-xl shadow-sm"
+              text="Loading employee data..."
+              height="h-64"
+              className="bg-surface-primary rounded-xl shadow-sm"
             />
           ) : filteredEmployees.length === 0 ? (
             <EmptyState

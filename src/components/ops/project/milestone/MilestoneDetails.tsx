@@ -24,11 +24,14 @@ import { getCompanyId, getEmployeeId } from "@/lib/utils/auth";
 import { toast } from "sonner";
 import { StatusBadge } from "@/components/ui/Card";
 
+// Allow partial employee objects with at minimum id and name
+type EmployeeBasic = Pick<Employee, 'id' | 'name'> & Partial<Employee>;
+
 interface MilestoneDetailsProps {
   id: number;
   onClose: () => void;
   project_created_by: string;
-  employees: Employee[];
+  employees: EmployeeBasic[];
 }
 
 function formatDate(dateStr: string): string {

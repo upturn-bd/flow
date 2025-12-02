@@ -173,7 +173,6 @@ export default function NewStakeholderPage() {
         {/* Stakeholder Type Toggle */}
         <div className="bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 rounded-lg p-4 mb-6">
           <ToggleField
-            name="createAsPermanent"
             label="Create as Permanent Stakeholder"
             description={createAsPermanent 
               ? "Will be created directly as a permanent stakeholder, skipping the lead process workflow"
@@ -220,8 +219,8 @@ export default function NewStakeholderPage() {
               onChange={(e) => setFormData({ ...formData, stakeholder_type_id: e.target.value })}
               options={[
                 { value: "", label: "None (No type selected)" },
-                ...activeStakeholderTypes.map((type) => ({
-                  value: type.id.toString(),
+                ...activeStakeholderTypes.filter((type) => type.id !== undefined).map((type) => ({
+                  value: type.id!.toString(),
                   label: type.name
                 }))
               ]}
@@ -241,8 +240,8 @@ export default function NewStakeholderPage() {
                   error={errors.process_id}
                   options={[
                     { value: "", label: "Select a process" },
-                    ...activeProcesses.map((process) => ({
-                      value: process.id.toString(),
+                    ...activeProcesses.filter((process) => process.id !== undefined).map((process) => ({
+                      value: process.id!.toString(),
                       label: `${process.name} (${process.is_sequential ? "Sequential" : "Independent"})`
                     }))
                   ]}
@@ -260,8 +259,8 @@ export default function NewStakeholderPage() {
               onChange={(e) => setFormData({ ...formData, parent_stakeholder_id: e.target.value })}
               options={[
                 { value: "", label: "None (No parent stakeholder)" },
-                ...stakeholders.filter(s => s.status !== 'Rejected').map((stakeholder) => ({
-                  value: stakeholder.id.toString(),
+                ...stakeholders.filter(s => s.status !== 'Rejected' && s.id !== undefined).map((stakeholder) => ({
+                  value: stakeholder.id!.toString(),
                   label: `${stakeholder.name} (${stakeholder.status})`
                 }))
               ]}

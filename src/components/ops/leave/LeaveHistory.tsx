@@ -17,9 +17,9 @@ export default function LeaveHistoryPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
 
-  async function fetchComplaintRequests() {
+  async function fetchLeaveHistory() {
     setLoading(true);
 
     const user = await getEmployeeInfo();
@@ -37,6 +37,11 @@ export default function LeaveHistoryPage() {
       }
 
       setLeaveRequests(data);
+      
+      // Fetch only the current user's employee info for display
+      if (user.id) {
+        fetchEmployeesByIds([user.id]);
+      }
     } catch (error) {
       setError("Failed to fetch leave requests");
     } finally {
@@ -45,16 +50,9 @@ export default function LeaveHistoryPage() {
   }
 
   useEffect(() => {
-    fetchComplaintRequests();
-  }, []);
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
-
-  useEffect(() => {
+    fetchLeaveHistory();
     fetchLeaveTypes();
-  }, [fetchLeaveTypes]);
+  }, []);
 
   if (loading) {
     return (

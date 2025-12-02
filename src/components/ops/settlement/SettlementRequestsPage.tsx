@@ -22,6 +22,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { ArrowArcLeft } from "@/lib/icons";
+import { extractEmployeeIds } from "@/lib/utils/project-utils";
 
 // Define the structure of a settlement request
 interface SettlementRequest {
@@ -40,7 +41,7 @@ interface SettlementRequest {
 export default function SettlementRequestsPage() {
   const [comment, setComment] = useState<string>("");
   const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const { claimTypes, fetchClaimTypes } = useClaimTypes();
   const { 
     settlementRequests, 
@@ -52,12 +53,18 @@ export default function SettlementRequestsPage() {
   } = useSettlementRequests();
 
   useEffect(() => {
-    fetchSettlementRequests();
-  }, [fetchSettlementRequests]);
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
+    const initData = async () => {
+      const requests = await fetchSettlementRequests();
+      // Only fetch employees that are referenced in the requests
+      if (requests && requests.length > 0) {
+        const employeeIds = extractEmployeeIds(requests, ["claimant_id"]);
+        if (employeeIds.length > 0) {
+          fetchEmployeesByIds(employeeIds);
+        }
+      }
+    };
+    initData();
+  }, [fetchSettlementRequests, fetchEmployeesByIds]);
 
   useEffect(() => {
     fetchClaimTypes();

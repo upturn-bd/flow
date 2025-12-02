@@ -29,12 +29,13 @@ import { toast } from "sonner";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useNotifications } from "@/hooks/useNotifications";
+import { extractEmployeeIdsFromRequests } from "@/lib/utils/project-utils";
 
 export default function AttendanceRequestsPage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(false);
   const { sites, fetchSites } = useSites();
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const [selectedRecord, setSelectedRecord] = useState<Attendance | null>(null);
   const [updateTag, setUpdateTag] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -111,10 +112,47 @@ export default function AttendanceRequestsPage() {
   }
 
   useEffect(() => {
-    fetchAttendanceData();
-    fetchSites();
-    fetchEmployees();
+    const initData = async () => {
+      const data = await fetchAttendanceDataInternal();
+      fetchSites();
+      // Only fetch employees that are referenced in the attendance data
+      if (data && data.length > 0) {
+        const employeeIds = extractEmployeeIdsFromRequests(data);
+        if (employeeIds.length > 0) {
+          fetchEmployeesByIds(employeeIds);
+        }
+      }
+    };
+    initData();
   }, []);
+
+  // Internal fetch that returns data for employee ID extraction
+  async function fetchAttendanceDataInternal() {
+    setLoading(true);
+
+    const user = await getEmployeeInfo();
+    try {
+      const { data, error } = await supabase
+        .from("attendance_records")
+        .select("*")
+        .eq("company_id", user.company_id)
+        .eq("supervisor_id", user.id)
+        .eq("tag", "Pending")
+        .order("attendance_date", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching attendance data:", error);
+        return [];
+      }
+      setAttendanceData(data || []);
+      return data || [];
+    } catch (error) {
+      console.error("Error fetching attendance data:", error);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }
 
   if (loading) {
     return <LoadingSection

@@ -429,7 +429,7 @@ export default function TeamDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <LoadingSpinner message="Loading team details..." />
+        <LoadingSpinner text="Loading team details..." />
       </div>
     );
   }
@@ -466,6 +466,7 @@ export default function TeamDetailPage() {
           {isEditingTeam ? (
             <div className="space-y-3 flex-1">
               <FormField
+                label="Team Name"
                 value={editedTeam.name}
                 onChange={(e) => setEditedTeam(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Team name"
@@ -473,6 +474,7 @@ export default function TeamDetailPage() {
                 className="text-2xl font-bold"
               />
               <TextAreaField
+                label="Description"
                 value={editedTeam.description}
                 onChange={(e) => setEditedTeam(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Team description (optional)"

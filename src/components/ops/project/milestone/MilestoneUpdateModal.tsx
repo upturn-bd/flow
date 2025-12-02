@@ -6,6 +6,9 @@ import { Employee } from '@/lib/types/schemas';
 import { Target } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 
+// Allow partial employee objects with at minimum id and name
+type EmployeeBasic = Pick<Employee, 'id' | 'name'> & Partial<Employee>;
+
 interface MilestoneUpdateModalProps {
   currentTotalWeightage: number;
   initialData: MilestoneData;
@@ -14,7 +17,7 @@ interface MilestoneUpdateModalProps {
   isLoading?: boolean;
   projectStartDate?: string;
   projectEndDate?: string;
-  employees: Employee[];
+  employees: EmployeeBasic[];
 }
 
 const statusOptions = [
@@ -214,7 +217,7 @@ export default function MilestoneUpdateModal({
           label="Assignees"
           value={formData.assignees || []}
           onChange={(assignees) => handleInputChange('assignees', assignees)}
-          employees={employees}
+          employees={employees as Employee[]}
           error={errors.assignees}
           disabled={isLoading}
           placeholder="Search and select assignees..."

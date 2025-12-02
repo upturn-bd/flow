@@ -541,6 +541,7 @@ export default function SuperadminUsersPage() {
                     Notes (Optional)
                   </label>
                   <TextAreaField
+                    label=""
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows={3}

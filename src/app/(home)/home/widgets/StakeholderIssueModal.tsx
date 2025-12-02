@@ -141,7 +141,7 @@ export default function StakeholderIssueModal({
             {loadingIssue ? (
               // Loading state
               <div className="flex items-center justify-center py-12">
-                <LoadingSpinner message="Loading issue details..." />
+                <LoadingSpinner text="Loading issue details..." />
               </div>
             ) : isViewMode && issue ? (
               // View mode

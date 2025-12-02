@@ -157,7 +157,7 @@ export default function StakeholderProcessesPage() {
                     title="Delete process"
                   >
                     {processingId === process.id ? (
-                      <InlineSpinner size="sm" color="error" />
+                      <InlineSpinner size="sm" color="red" />
                     ) : (
                       <Trash size={18} />
                     )}

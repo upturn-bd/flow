@@ -135,9 +135,8 @@ function ProfileContent() {
   if (loading) {
     return (
       <LoadingSpinner
-        size="lg"
-        message="Loading profile information..."
-        fullHeight
+        text="Loading profile information..."
+        height="h-screen"
       />
     );
   }
@@ -162,7 +161,7 @@ function ProfileContent() {
     >
       <PageHeader
         title="My Profile"
-        subtitle="View and update your profile information"
+        description="View and update your profile information"
       />
 
       <TabView tabs={TABS} activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -176,9 +175,8 @@ export default function ProfilePage() {
     <Suspense
       fallback={
         <LoadingSpinner
-          size="lg"
-          message="Loading profile data..."
-          fullHeight
+          text="Loading profile data..."
+          height="h-screen"
         />
       }
     >

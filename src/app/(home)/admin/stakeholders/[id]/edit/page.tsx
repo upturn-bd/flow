@@ -152,7 +152,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
   if (loadingStakeholder) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner message="Loading stakeholder..." />
+        <LoadingSpinner text="Loading stakeholder..." />
       </div>
     );
   }

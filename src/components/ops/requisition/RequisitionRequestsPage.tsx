@@ -17,10 +17,11 @@ import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { RequisitionCard } from "./RequisitionCard";
 import RequisitionEditModal from "./RequisitionEditModal";
+import { extractEmployeeIdsFromRequests } from "@/lib/utils/project-utils";
 
 export default function RequisitionRequestsPage() {
   const [comment, setComment] = useState<string>("");
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } = useRequisitionInventories();
 
@@ -68,12 +69,18 @@ export default function RequisitionRequestsPage() {
   };
 
   useEffect(() => {
-    fetchRequisitionRequests("Pending");
-  }, [fetchRequisitionRequests]);
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
+    const initData = async () => {
+      const requests = await fetchRequisitionRequests("Pending");
+      // Only fetch employees that are referenced in the requests
+      if (requests && requests.length > 0) {
+        const employeeIds = extractEmployeeIdsFromRequests(requests);
+        if (employeeIds.length > 0) {
+          fetchEmployeesByIds(employeeIds);
+        }
+      }
+    };
+    initData();
+  }, [fetchRequisitionRequests, fetchEmployeesByIds]);
 
   useEffect(() => {
     fetchRequisitionTypes();

@@ -63,7 +63,6 @@ export default function StakeholderTypeFormModal({
           />
 
           <ToggleField
-            name="is_active"
             label="Active"
             checked={values.is_active}
             onChange={(checked) =>

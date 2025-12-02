@@ -19,9 +19,10 @@ import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { RequisitionCard } from "./RequisitionCard";
 import RequisitionEditModal from "./RequisitionEditModal";
 import RequisitionCreateModal from "./RequisitionCreateModal";
+import { extractEmployeeIdsFromRequests } from "@/lib/utils/project-utils";
 
 export default function RequisitionHistoryPage() {
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } = useRequisitionInventories();
   const {
@@ -70,9 +71,15 @@ export default function RequisitionHistoryPage() {
     fetchRequisitionHistory();
   }, [fetchRequisitionHistory]);
 
+  // Fetch employees when requisition data is loaded
   useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
+    if (requisitionRequests && requisitionRequests.length > 0) {
+      const employeeIds = extractEmployeeIdsFromRequests(requisitionRequests);
+      if (employeeIds.length > 0) {
+        fetchEmployeesByIds(employeeIds);
+      }
+    }
+  }, [requisitionRequests, fetchEmployeesByIds]);
 
   useEffect(() => {
     fetchRequisitionTypes();

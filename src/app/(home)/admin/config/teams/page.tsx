@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, Plus, Settings, Trash, Edit, UserPlus, Shield } from "@/lib/icons";
+import { Users, Plus, Settings, Trash, Edit, UserPlus, Shield, Search, X } from "@/lib/icons";
 import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/lib/auth/auth-context";
 import type { Team, TeamWithMembers, TeamWithPermissions } from "@/lib/types/schemas";

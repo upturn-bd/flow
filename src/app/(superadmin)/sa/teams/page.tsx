@@ -395,7 +395,7 @@ export default function TeamsManagementPage() {
 
           {/* Teams List */}
           {loading ? (
-            <LoadingSpinner message="Loading teams..." />
+            <LoadingSpinner text="Loading teams..." />
           ) : filteredTeams.length === 0 ? (
             <EmptyState
               icon={Users}
@@ -430,12 +430,14 @@ export default function TeamsManagementPage() {
                           </div>
                           <div className="flex-1 space-y-3">
                             <FormField
+                              label="Team Name"
                               value={editingTeam.name}
                               onChange={(e) => setEditingTeam(prev => prev ? { ...prev, name: e.target.value } : null)}
                               placeholder="Team name"
                               autoFocus
                             />
                             <TextAreaField
+                              label="Description"
                               value={editingTeam.description}
                               onChange={(e) => setEditingTeam(prev => prev ? { ...prev, description: e.target.value } : null)}
                               placeholder="Team description (optional)"
@@ -505,7 +507,7 @@ export default function TeamsManagementPage() {
                             title={team.is_default ? "Remove default status" : "Set as default"}
                           >
                             {togglingDefaultId === team.id ? (
-                              <InlineSpinner size="sm" color="warning" />
+                              <InlineSpinner size="sm" color="amber" />
                             ) : team.is_default ? (
                               <Star size={18} weight="fill" />
                             ) : (
@@ -537,7 +539,7 @@ export default function TeamsManagementPage() {
                               title="Delete team"
                             >
                               {deletingTeamId === team.id ? (
-                                <InlineSpinner size="sm" color="error" />
+                                <InlineSpinner size="sm" color="red" />
                               ) : (
                                 <Trash size={18} />
                               )}

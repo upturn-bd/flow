@@ -598,8 +598,7 @@ export default function CompaniesPage() {
               }
             }}
             placeholder="e.g., MyCompany@2024"
-            error={codeError}
-            hint={!codeError ? "9+ chars with uppercase, lowercase, and special character" : undefined}
+            error={codeError || (!codeError && formData.code ? undefined : "9+ chars with uppercase, lowercase, and special character")}
           />
 
           <SelectField
@@ -631,6 +630,7 @@ export default function CompaniesPage() {
           />
 
           <NumberField
+            name="payroll_generation_day"
             label="Payroll Generation Day"
             min={1}
             max={31}
@@ -639,6 +639,7 @@ export default function CompaniesPage() {
           />
 
           <DateField
+            name="fiscal_year_start"
             label="Fiscal Year Start"
             value={formData.fiscal_year_start}
             onChange={(e) => setFormData({ ...formData, fiscal_year_start: e.target.value })}

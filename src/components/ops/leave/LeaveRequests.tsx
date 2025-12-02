@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, User, FileText, MessageCircle, Check, X, CalendarDays } from "@/lib/icons";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
-import { set } from "react-hook-form";
+import { extractEmployeeIdsFromRequests } from "@/lib/utils/project-utils";
 
 // Add this interface
 interface LeaveRequest {
@@ -26,7 +26,7 @@ export default function LeaveRequestsPage() {
   const [comment, setComment] = useState<string>("");
   const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
 
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const { leaveTypes, fetchLeaveTypes } = useLeaveTypes();
   const {
     leaveRequests,
@@ -38,9 +38,18 @@ export default function LeaveRequestsPage() {
 
   useEffect(() => {
     fetchLeaveRequests();
-    fetchEmployees();
     fetchLeaveTypes();
   }, []);
+
+  // Fetch employees when leave requests are loaded
+  useEffect(() => {
+    if (leaveRequests && leaveRequests.length > 0) {
+      const employeeIds = extractEmployeeIdsFromRequests(leaveRequests);
+      if (employeeIds.length > 0) {
+        fetchEmployeesByIds(employeeIds);
+      }
+    }
+  }, [leaveRequests, fetchEmployeesByIds]);
 
   const handleUpdateRequest = async (action: string, id: number, leaveTypeId: number, employeeId: string, start_date: string, end_date: string) => {
     setCurrentlyProcessingId(id);

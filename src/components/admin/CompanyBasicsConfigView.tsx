@@ -35,8 +35,7 @@ export default function CompanyBasicsConfigView() {
   if (loading) {
     return (
       <LoadingSpinner
-        size="lg"
-        message="Loading organizational structure..."
+        text="Loading organizational structure..."
       />
     );
   }

@@ -9,7 +9,8 @@ import {
   Phone, 
   Building,
   Calendar,
-  Filter
+  Filter,
+  Search
 } from "@/lib/icons";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
