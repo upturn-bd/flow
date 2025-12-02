@@ -1,6 +1,7 @@
 "use client";
 
-import { Info, X, Loader } from "@/lib/icons";
+import { Info, X } from "@/lib/icons";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useState } from "react";
 
 // Import the section components directly
@@ -33,12 +34,10 @@ export default function CompanyBasicsConfigView() {
   // Show loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[200px]">
-        <div className="text-center">
-          <Loader className="w-8 h-8 animate-spin text-primary-600 mx-auto mb-2" />
-          <p className="text-sm text-foreground-tertiary">Loading organizational structure...</p>
-        </div>
-      </div>
+      <LoadingSpinner
+        size="lg"
+        message="Loading organizational structure..."
+      />
     );
   }
 

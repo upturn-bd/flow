@@ -140,7 +140,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
           </button>
           <button
             onClick={() => setShowEditModal(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
           >
             <Edit size={20} />
             Edit Process

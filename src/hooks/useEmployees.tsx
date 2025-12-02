@@ -108,6 +108,63 @@ export function useEmployees() {
     }
   }, [employeeInfo?.company_id]);
 
+  /**
+   * Fetch employees by specific IDs - use this to avoid N+1 queries
+   * when you only need to display names for specific employees
+   */
+  const fetchEmployeesByIds = useCallback(async (ids: string[]) => {
+    if (!ids || ids.length === 0) {
+      return [];
+    }
+
+    // Filter out null/undefined and deduplicate
+    const uniqueIds = [...new Set(ids.filter(Boolean))];
+    if (uniqueIds.length === 0) {
+      return [];
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error } = await supabase
+        .from("employees")
+        .select("id, first_name, last_name, email, designation, department_id(name)")
+        .in("id", uniqueIds);
+
+      if (error) throw error;
+
+      const fetchedEmployees: Employee[] = data?.map((employee) => ({
+        id: employee.id,
+        name: `${employee.first_name} ${employee.last_name}`,
+        email: employee.email,
+        designation: employee.designation || undefined,
+        department: (employee.department_id as unknown as { name: string })?.name || undefined
+      })) || [];
+
+      // Merge with existing employees to avoid losing data
+      setEmployees((prev) => {
+        const existingIds = new Set(prev.map((e) => e.id));
+        const newEmployees = fetchedEmployees.filter((e) => !existingIds.has(e.id));
+        return [...prev, ...newEmployees];
+      });
+
+      return fetchedEmployees;
+    } catch (err) {
+      const errorObj = err instanceof Error ? err : new Error(String(err));
+      setError(errorObj);
+      captureSupabaseError(
+        { message: errorObj.message },
+        "fetchEmployeesByIds",
+        { ids: uniqueIds }
+      );
+      console.error("Error fetching employees by IDs:", errorObj);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return useMemo(() => ({
     employees,
     extendedEmployees,
@@ -115,5 +172,6 @@ export function useEmployees() {
     error,
     fetchEmployees,
     fetchExtendedEmployees,
-  }), [employees, extendedEmployees, loading, error, fetchEmployees, fetchExtendedEmployees]);
+    fetchEmployeesByIds,
+  }), [employees, extendedEmployees, loading, error, fetchEmployees, fetchExtendedEmployees, fetchEmployeesByIds]);
 }

@@ -12,7 +12,9 @@ import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
 import { useLeaveBalances } from "@/hooks/useLeaveBalances";
 import { LoadingSpinner } from "@/components/ui";
+import InlineSpinner from "@/components/ui/InlineSpinner";
 import { useRouter } from "next/navigation";
+import { SelectField, DateField, TextAreaField } from "@/components/forms";
 
 const initialLeaveRecord = {
   type_id: undefined,
@@ -152,7 +154,7 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 min-h-[100px]">
           {balancesLoading ? (
             <div className="col-span-full flex justify-center items-center h-full">
-              <div className="animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+              <InlineSpinner size="md" color="blue" />
             </div>
           ) : (
             leaveBalances.map(balance => (
@@ -178,68 +180,39 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Leave Type */}
-          <div className="space-y-2">
-            <label className="block font-medium text-foreground-secondary">Leave Type *</label>
-            <div className="relative">
-              <select
-                name="type_id"
-                value={leaveRecord.type_id ?? ""}
-                onChange={handleChange}
-                className={`w-full bg-background-secondary dark:bg-background-tertiary border ${touched.type_id && errors.type_id ? "border-red-300" : "border-border-secondary"} rounded-lg p-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
-              >
-                <option value="">Select leave type</option>
-                {isLoading ? (
-                  <option disabled>Loading leave types...</option>
-                ) : (
-                  leaveTypes.map((type) => <option key={type.id} value={type.id}>{type.name}</option>)
-                )}
-              </select>
-            </div>
-            {touched.type_id && errors.type_id && (
-              <p className="text-red-500 text-sm mt-1">{errors.type_id}</p>
-            )}
-          </div>
+          <SelectField
+            name="type_id"
+            label="Leave Type"
+            required
+            value={leaveRecord.type_id ?? ""}
+            onChange={handleChange}
+            options={[
+              { value: "", label: isLoading ? "Loading leave types..." : "Select leave type" },
+              ...leaveTypes.filter((type) => type.id !== undefined).map((type) => ({ value: type.id!, label: type.name }))
+            ]}
+            error={touched.type_id ? errors.type_id : undefined}
+          />
 
           {/* Dates */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="block font-medium text-foreground-secondary">From *</label>
-              <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-lg overflow-hidden">
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary">
-                  <Calendar className="h-5 w-5" />
-                </div>
-                <input
-                  name="start_date"
-                  type="date"
-                  value={leaveRecord.start_date}
-                  onChange={handleChange}
-                  className="w-full py-3 pl-10 pr-3 outline-none bg-transparent"
-                />
-              </div>
-              {touched.start_date && errors.start_date && (
-                <p className="text-red-500 text-sm">{errors.start_date}</p>
-              )}
-            </div>
+            <DateField
+              name="start_date"
+              label="From"
+              required
+              value={leaveRecord.start_date}
+              onChange={handleChange}
+              error={touched.start_date ? errors.start_date : undefined}
+            />
 
-            <div className="space-y-2">
-              <label className="block font-medium text-foreground-secondary">To *</label>
-              <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-lg overflow-hidden">
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary">
-                  <Calendar className="h-5 w-5" />
-                </div>
-                <input
-                  name="end_date"
-                  type="date"
-                  value={leaveRecord.end_date}
-                  onChange={handleChange}
-                  min={leaveRecord.start_date}
-                  className="w-full py-3 pl-10 pr-3 outline-none bg-transparent"
-                />
-              </div>
-              {touched.end_date && errors.end_date && (
-                <p className="text-red-500 text-sm">{errors.end_date}</p>
-              )}
-            </div>
+            <DateField
+              name="end_date"
+              label="To"
+              required
+              value={leaveRecord.end_date}
+              onChange={handleChange}
+              min={leaveRecord.start_date}
+              error={touched.end_date ? errors.end_date : undefined}
+            />
           </div>
 
           {/* Days count */}
@@ -253,20 +226,15 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
           )}
 
           {/* Description */}
-          <div className="space-y-2">
-            <label className="block font-medium text-foreground-secondary">Reason for Leave</label>
-            <textarea
-              name="description"
-              rows={4}
-              value={leaveRecord.description}
-              onChange={handleChange}
-              placeholder="Please provide details about your leave request..."
-              className={`w-full bg-background-secondary dark:bg-background-tertiary border ${touched.description && errors.description ? "border-red-300" : "border-border-secondary"} rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
-            />
-            {touched.description && errors.description && (
-              <p className="text-red-500 text-sm">{errors.description}</p>
-            )}
-          </div>
+          <TextAreaField
+            name="description"
+            label="Reason for Leave"
+            rows={4}
+            value={leaveRecord.description}
+            onChange={handleChange}
+            placeholder="Please provide details about your leave request..."
+            error={touched.description ? errors.description : undefined}
+          />
 
           {/* Submit */}
           <div className="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-border-primary">
@@ -276,11 +244,11 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
             <button
               type="submit"
               disabled={isSubmitting || !isValid || leaveRecord.type_id === undefined}
-              className={`flex items-center justify-center w-full sm:w-auto bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm disabled:opacity-60 disabled:cursor-not-allowed ${isSubmitting ? "opacity-80" : ""}`}
+              className={`flex items-center justify-center w-full sm:w-auto bg-primary-600 text-white px-6 py-2.5 rounded-lg hover:bg-primary-700 transition shadow-sm disabled:opacity-60 disabled:cursor-not-allowed ${isSubmitting ? "opacity-80" : ""}`}
             >
               {isSubmitting ? (
                 <>
-                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                  <InlineSpinner size="sm" color="white" className="mr-2" />
                   Submitting...
                 </>
               ) : (

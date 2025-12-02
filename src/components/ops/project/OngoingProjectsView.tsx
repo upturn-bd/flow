@@ -12,6 +12,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { Project, useProjects } from "@/hooks/useProjects";
 import { getEmployeeId } from "@/lib/utils/auth";
 import { useAuth } from "@/lib/auth/auth-context";
+import { extractEmployeeIdsFromProjects } from "@/lib/utils/project-utils";
 
 import ProjectDetails from "./ProjectDetails";
 import { UpdateProjectPage } from "./CreateNewProject";
@@ -32,7 +33,7 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
     searchOngoingProjects,
   } = useProjects();
 
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const { departments, fetchDepartments } = useDepartments();
   const { employeeInfo } = useAuth();
   const router = useRouter();
@@ -59,13 +60,21 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
     const initData = async () => {
       const id = await getEmployeeId();
       setUserId(id);
-      await fetchOngoingProjects(10, true);
-      fetchEmployees();
+      const projects = await fetchOngoingProjects(10, true);
+      
+      // Only fetch employees that are referenced in the projects
+      if (projects && projects.length > 0) {
+        const employeeIds = extractEmployeeIdsFromProjects(projects);
+        if (employeeIds.length > 0) {
+          fetchEmployeesByIds(employeeIds);
+        }
+      }
+      
       fetchDepartments();
       setInitialLoadComplete(true);
     };
     initData();
-  }, [employeeInfo, fetchOngoingProjects, fetchEmployees, fetchDepartments]);
+  }, [employeeInfo, fetchOngoingProjects, fetchEmployeesByIds, fetchDepartments]);
 
   /** Debounced Search */
   const debouncedSearch = useCallback(
@@ -172,7 +181,15 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
 
   /** Pagination: Load More */
   const handleLoadMore = async () => {
-    await fetchOngoingProjects(10, false);
+    const newProjects = await fetchOngoingProjects(10, false);
+    
+    // Fetch any new employees that might be in the newly loaded projects
+    if (newProjects && newProjects.length > 0) {
+      const employeeIds = extractEmployeeIdsFromProjects(newProjects);
+      if (employeeIds.length > 0) {
+        fetchEmployeesByIds(employeeIds);
+      }
+    }
   };
 
   return (

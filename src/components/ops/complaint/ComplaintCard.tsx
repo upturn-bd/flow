@@ -178,7 +178,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Add your feedback here..."
                   rows={3}
-                  className="w-full border border-border-secondary rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full border border-border-secondary bg-surface-primary rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
                 />
               </div>
             )}

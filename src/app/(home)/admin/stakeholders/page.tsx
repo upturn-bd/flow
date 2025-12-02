@@ -167,7 +167,7 @@ export default function StakeholdersPage() {
               onClick={() => handleFilterChange("all")}
               className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 filterStatus === "all"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-primary-600 text-white"
                   : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover active:bg-surface-hover"
               }`}
             >
@@ -177,7 +177,7 @@ export default function StakeholdersPage() {
               onClick={() => handleFilterChange("Lead")}
               className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 filterStatus === "Lead"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-primary-600 text-white"
                   : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover active:bg-surface-hover"
               }`}
             >
@@ -187,7 +187,7 @@ export default function StakeholdersPage() {
               onClick={() => handleFilterChange("Permanent")}
               className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 filterStatus === "Permanent"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-primary-600 text-white"
                   : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover active:bg-surface-hover"
               }`}
             >
@@ -197,7 +197,7 @@ export default function StakeholdersPage() {
               onClick={() => handleFilterChange("Rejected")}
               className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 filterStatus === "Rejected"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-primary-600 text-white"
                   : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover active:bg-surface-hover"
               }`}
             >
@@ -233,7 +233,7 @@ export default function StakeholdersPage() {
           {!searchTerm && (
             <button
               onClick={() => router.push("/admin/stakeholders/new")}
-              className="mt-3 sm:mt-4 inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-sm"
+              className="mt-3 sm:mt-4 inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-blue-800 text-sm"
             >
               <Plus size={18} />
               Add New Lead
@@ -356,7 +356,7 @@ export default function StakeholdersPage() {
                           e.stopPropagation();
                           router.push(`/admin/stakeholders/${stakeholder.id}`);
                         }}
-                        className="inline-flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                        className="inline-flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
                       >
                         <Eye size={16} />
                         View

@@ -6,6 +6,7 @@ import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
 import { UserPlus, Loader, Check, X, AlertTriangle, Users, User, RefreshCw } from "@/lib/icons";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useOnboarding, PendingEmployee } from "@/hooks/useOnboarding";
 import { useDepartments } from "@/hooks/useDepartments";
@@ -171,24 +172,13 @@ export default function OnboardingApprovalPage() {
       <ModulePermissionsBanner module={PERMISSION_MODULES.ONBOARDING} title="Onboarding" compact />
 
       {pendingEmployees.length === 0 ? (
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
-          className="mt-10 flex flex-col items-center justify-center p-10 bg-purple-50/50 rounded-xl border border-purple-100"
-        >
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-          >
-            <Users className="h-16 w-16 text-purple-300 mb-4" />
-          </motion.div>
-          <h3 className="text-xl font-medium text-foreground-secondary mb-2">No Pending Requests</h3>
-          <p className="text-foreground-secondary text-center max-w-md">
-            There are currently no pending onboarding requests that require approval.
-          </p>
-        </motion.div>
+        <div className="mt-10 bg-purple-50/50 rounded-xl border border-purple-100">
+          <EmptyState
+            icon={Users}
+            title="No Pending Requests"
+            description="There are currently no pending onboarding requests that require approval."
+          />
+        </div>
       ) : (
         <motion.div 
           variants={contentVariants}

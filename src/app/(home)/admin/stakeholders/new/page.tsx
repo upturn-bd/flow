@@ -7,6 +7,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { useStakeholderTypes } from "@/hooks/useStakeholderTypes";
 import { ArrowLeft, WarningCircle, Plus, Trash } from "@/lib/icons";
 import { ContactPerson } from "@/lib/types/schemas";
+import { FormField, TextAreaField, SelectField, ToggleField } from "@/components/forms";
 
 export default function NewStakeholderPage() {
   const router = useRouter();
@@ -143,7 +144,7 @@ export default function NewStakeholderPage() {
             </p>
             <button
               onClick={() => router.push("/admin/config/stakeholder-process")}
-              className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium"
             >
               Go to Process Management
             </button>
@@ -170,29 +171,22 @@ export default function NewStakeholderPage() {
         </h1>
 
         {/* Stakeholder Type Toggle */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={createAsPermanent}
-              onChange={(e) => {
-                setCreateAsPermanent(e.target.checked);
-                // Clear process_id when switching to permanent
-                if (e.target.checked) {
-                  setFormData({ ...formData, process_id: "" });
-                }
-              }}
-              className="w-5 h-5 text-blue-600 border-border-secondary rounded focus:ring-blue-500"
-            />
-            <div>
-              <span className="font-medium text-foreground-primary">Create as Permanent Stakeholder</span>
-              <p className="text-sm text-foreground-secondary mt-1">
-                {createAsPermanent 
-                  ? "Will be created directly as a permanent stakeholder, skipping the lead process workflow"
-                  : "Will be created as a lead and must go through the configured process to become permanent"}
-              </p>
-            </div>
-          </label>
+        <div className="bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 rounded-lg p-4 mb-6">
+          <ToggleField
+            name="createAsPermanent"
+            label="Create as Permanent Stakeholder"
+            description={createAsPermanent 
+              ? "Will be created directly as a permanent stakeholder, skipping the lead process workflow"
+              : "Will be created as a lead and must go through the configured process to become permanent"}
+            checked={createAsPermanent}
+            onChange={(checked) => {
+              setCreateAsPermanent(checked);
+              // Clear process_id when switching to permanent
+              if (checked) {
+                setFormData({ ...formData, process_id: "" });
+              }
+            }}
+          />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
@@ -200,127 +194,98 @@ export default function NewStakeholderPage() {
           <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 space-y-3 sm:space-y-4">
             <h2 className="text-base sm:text-lg font-semibold text-foreground-primary">Basic Information</h2>
 
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-foreground-secondary mb-1 sm:mb-2">
-                Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className={`w-full px-3 sm:px-4 py-2 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                  errors.name ? "border-red-500" : "border-border-secondary"
-                }`}
-                placeholder="Enter stakeholder/company name"
-              />
-              {errors.name && (
-                <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.name}</p>
-              )}
-            </div>
+            <FormField
+              name="name"
+              label="Name"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              error={errors.name}
+              placeholder="Enter stakeholder/company name"
+            />
 
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-foreground-secondary mb-1 sm:mb-2">
-                Address
-              </label>
-              <textarea
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                rows={3}
-                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="Enter full address (optional)"
-              />
-            </div>
+            <TextAreaField
+              name="address"
+              label="Address"
+              value={formData.address}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              rows={3}
+              placeholder="Enter full address (optional)"
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-foreground-secondary mb-2">
-                Stakeholder Type
-              </label>
-              <select
-                value={formData.stakeholder_type_id}
-                onChange={(e) => setFormData({ ...formData, stakeholder_type_id: e.target.value })}
-                className="w-full px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              >
-                <option value="">None (No type selected)</option>
-                {activeStakeholderTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-              </select>
-              <p className="text-foreground-tertiary text-sm mt-1">
-                Optional categorization (e.g., Client, Vendor, Partner)
-              </p>
-            </div>
+            <SelectField
+              name="stakeholder_type_id"
+              label="Stakeholder Type"
+              value={formData.stakeholder_type_id}
+              onChange={(e) => setFormData({ ...formData, stakeholder_type_id: e.target.value })}
+              options={[
+                { value: "", label: "None (No type selected)" },
+                ...activeStakeholderTypes.map((type) => ({
+                  value: type.id.toString(),
+                  label: type.name
+                }))
+              ]}
+            />
+            <p className="text-foreground-tertiary text-sm -mt-3 mb-2">
+              Optional categorization (e.g., Client, Vendor, Partner)
+            </p>
 
             {!createAsPermanent && (
-              <div>
-                <label className="block text-sm font-medium text-foreground-secondary mb-2">
-                  Process <span className="text-red-500">*</span>
-                </label>
-                <select
+              <>
+                <SelectField
+                  name="process_id"
+                  label="Process"
+                  required
                   value={formData.process_id}
                   onChange={(e) => setFormData({ ...formData, process_id: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                    errors.process_id ? "border-red-500" : "border-border-secondary"
-                  }`}
-                >
-                  <option value="">Select a process</option>
-                  {activeProcesses.map((process) => (
-                    <option key={process.id} value={process.id}>
-                      {process.name} ({process.is_sequential ? "Sequential" : "Independent"})
-                    </option>
-                  ))}
-                </select>
-                {errors.process_id && (
-                  <p className="text-red-500 text-sm mt-1">{errors.process_id}</p>
-                )}
-                <p className="text-foreground-tertiary text-sm mt-1">
+                  error={errors.process_id}
+                  options={[
+                    { value: "", label: "Select a process" },
+                    ...activeProcesses.map((process) => ({
+                      value: process.id.toString(),
+                      label: `${process.name} (${process.is_sequential ? "Sequential" : "Independent"})`
+                    }))
+                  ]}
+                />
+                <p className="text-foreground-tertiary text-sm -mt-3 mb-2">
                   Select the workflow process this lead will follow
                 </p>
-              </div>
+              </>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-foreground-secondary mb-2">
-                Parent Stakeholder
-              </label>
-              <select
-                value={formData.parent_stakeholder_id}
-                onChange={(e) => setFormData({ ...formData, parent_stakeholder_id: e.target.value })}
-                className="w-full px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              >
-                <option value="">None (No parent stakeholder)</option>
-                {stakeholders.filter(s => s.status !== 'Rejected').map((stakeholder) => (
-                  <option key={stakeholder.id} value={stakeholder.id}>
-                    {stakeholder.name} ({stakeholder.status})
-                  </option>
-                ))}
-              </select>
-              <p className="text-foreground-tertiary text-sm mt-1">
-                Optional parent stakeholder for hierarchical relationships (e.g., subsidiary companies)
-              </p>
-            </div>
+            <SelectField
+              name="parent_stakeholder_id"
+              label="Parent Stakeholder"
+              value={formData.parent_stakeholder_id}
+              onChange={(e) => setFormData({ ...formData, parent_stakeholder_id: e.target.value })}
+              options={[
+                { value: "", label: "None (No parent stakeholder)" },
+                ...stakeholders.filter(s => s.status !== 'Rejected').map((stakeholder) => ({
+                  value: stakeholder.id.toString(),
+                  label: `${stakeholder.name} (${stakeholder.status})`
+                }))
+              ]}
+            />
+            <p className="text-foreground-tertiary text-sm -mt-3 mb-2">
+              Optional parent stakeholder for hierarchical relationships (e.g., subsidiary companies)
+            </p>
 
-            <div>
-              <label className="block text-sm font-medium text-foreground-secondary mb-2">
-                Key Accounts Manager (KAM)
-              </label>
-              <select
-                value={formData.kam_id}
-                onChange={(e) => setFormData({ ...formData, kam_id: e.target.value })}
-                className="w-full px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              >
-                <option value="">None (No KAM assigned)</option>
-                {employees.map((employee) => (
-                  <option key={employee.id} value={employee.id}>
-                    {employee.name}
-                  </option>
-                ))}
-              </select>
-              <p className="text-foreground-tertiary text-sm mt-1">
-                Assign a Key Accounts Manager who will receive notifications for any changes (optional)
-              </p>
-            </div>
+            <SelectField
+              name="kam_id"
+              label="Key Accounts Manager (KAM)"
+              value={formData.kam_id}
+              onChange={(e) => setFormData({ ...formData, kam_id: e.target.value })}
+              options={[
+                { value: "", label: "None (No KAM assigned)" },
+                ...employees.map((employee) => ({
+                  value: employee.id,
+                  label: employee.name
+                }))
+              ]}
+            />
+            <p className="text-foreground-tertiary text-sm -mt-3 mb-2">
+              Assign a Key Accounts Manager who will receive notifications for any changes (optional)
+            </p>
           </div>
 
           {/* Contact Persons */}
@@ -330,7 +295,7 @@ export default function NewStakeholderPage() {
               <button
                 type="button"
                 onClick={handleAddContactPerson}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
               >
                 <Plus size={16} />
                 Add Contact
@@ -355,70 +320,49 @@ export default function NewStakeholderPage() {
                       <button
                         type="button"
                         onClick={() => handleRemoveContactPerson(index)}
-                        className="text-red-600 hover:text-red-700 p-1"
+                        className="text-error hover:text-error/80 p-1"
                       >
                         <Trash size={16} />
                       </button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <div>
-                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                          Name
-                        </label>
-                        <input
-                          type="text"
-                          value={contact.name}
-                          onChange={(e) =>
-                            handleContactPersonChange(index, "name", e.target.value)
-                          }
-                          className="w-full px-3 py-2 text-sm border border-border-secondary rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                          placeholder="Full name"
-                        />
-                      </div>
+                      <FormField
+                        name={`contact_${index}_name`}
+                        label="Name"
+                        value={contact.name}
+                        onChange={(e) =>
+                          handleContactPersonChange(index, "name", e.target.value)
+                        }
+                        placeholder="Full name"
+                      />
 
-                      <div>
-                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                          Email
-                        </label>
-                        <input
-                          type="email"
-                          value={contact.email || ""}
-                          onChange={(e) =>
-                            handleContactPersonChange(index, "email", e.target.value)
-                          }
-                          className={`w-full px-3 py-2 text-sm border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                            errors[`contact_${index}_email`]
-                              ? "border-red-500"
-                              : "border-border-secondary"
-                          }`}
-                          placeholder="email@example.com"
-                        />
-                        {errors[`contact_${index}_email`] && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors[`contact_${index}_email`]}
-                          </p>
-                        )}
-                      </div>
+                      <FormField
+                        name={`contact_${index}_email`}
+                        label="Email"
+                        type="email"
+                        value={contact.email || ""}
+                        onChange={(e) =>
+                          handleContactPersonChange(index, "email", e.target.value)
+                        }
+                        error={errors[`contact_${index}_email`]}
+                        placeholder="email@example.com"
+                      />
 
-                      <div>
-                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                          Phone
-                        </label>
-                        <input
-                          type="tel"
-                          value={contact.phone || ""}
-                          onChange={(e) =>
-                            handleContactPersonChange(index, "phone", e.target.value)
-                          }
-                          className="w-full px-3 py-2 text-sm border border-border-secondary rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                          placeholder="+1234567890"
-                        />
-                      </div>
+                      <FormField
+                        name={`contact_${index}_phone`}
+                        label="Phone"
+                        type="tel"
+                        value={contact.phone || ""}
+                        onChange={(e) =>
+                          handleContactPersonChange(index, "phone", e.target.value)
+                        }
+                        placeholder="+1234567890"
+                      />
                     </div>
 
                     {errors[`contact_${index}`] && (
-                      <p className="text-red-500 text-xs">{errors[`contact_${index}`]}</p>
+                      <p className="text-error text-xs">{errors[`contact_${index}`]}</p>
                     )}
                   </div>
                 ))}
@@ -428,7 +372,7 @@ export default function NewStakeholderPage() {
 
           {/* Error Message */}
           {errors.submit && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg">
               {errors.submit}
             </div>
           )}
@@ -446,7 +390,7 @@ export default function NewStakeholderPage() {
             <button
               type="submit"
               disabled={submitting || loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting 
                 ? "Creating..." 

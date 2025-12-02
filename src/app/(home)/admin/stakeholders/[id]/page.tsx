@@ -30,6 +30,8 @@ import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
 import StakeholderIssuesTab from "@/components/stakeholder-issues/StakeholderIssuesTab";
 import StakeholderTransactions from "@/components/stakeholders/StakeholderTransactions";
 import AdditionalDataModal from "@/components/stakeholders/AdditionalDataModal";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { toast } from "sonner";
 
 // Helper to convert programming values to human-readable labels
@@ -194,27 +196,28 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
   if (loading && !stakeholder) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <LoadingSpinner
+        icon={User}
+        text="Loading stakeholder..."
+        color="blue"
+        height="min-h-screen"
+      />
     );
   }
 
   if (!stakeholder) {
     return (
       <div className="p-6">
-        <div className="max-w-2xl mx-auto text-center py-12">
-          <WarningCircle className="mx-auto text-foreground-tertiary" size={48} />
-          <h2 className="text-xl font-bold text-foreground-primary mt-4">Stakeholder Not Found</h2>
-          <p className="text-foreground-secondary mt-2">
-            The stakeholder you're looking for doesn't exist or has been deleted.
-          </p>
-          <button
-            onClick={() => router.push("/admin/stakeholders")}
-            className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Back to Stakeholders
-          </button>
+        <div className="max-w-2xl mx-auto">
+          <EmptyState
+            icon={WarningCircle}
+            title="Stakeholder Not Found"
+            description="The stakeholder you're looking for doesn't exist or has been deleted."
+            action={{
+              label: "Back to Stakeholders",
+              onClick: () => router.push("/admin/stakeholders")
+            }}
+          />
         </div>
       </div>
     );
@@ -299,7 +302,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               </p>
               <button
                 onClick={() => setShowAdditionalDataModal(true)}
-                className="mt-2 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="mt-2 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
                 Add Data Now
               </button>
@@ -491,7 +494,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 <h2 className="text-base sm:text-lg font-semibold text-foreground-primary">Additional Data</h2>
                 <button
                   onClick={() => setShowAdditionalDataModal(true)}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950 transition-colors"
                 >
                   <Edit size={16} />
                   <span className="hidden sm:inline">Edit</span>
@@ -532,7 +535,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 <button
                   onClick={() => setActiveTab("process")}
                   className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${activeTab === "process"
-                      ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                      ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
                       : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
@@ -541,7 +544,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 <button
                   onClick={() => setActiveTab("issues")}
                   className={`px-6 py-3 text-sm font-medium transition-colors ${activeTab === "issues"
-                      ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                      ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
                       : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
@@ -550,7 +553,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 <button
                   onClick={() => setActiveTab("transactions")}
                   className={`px-6 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "transactions"
-                      ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                      ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
                       : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
@@ -614,7 +617,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                               isCompleted
                                 ? "border-green-300 bg-green-50"
                                 : isCurrent
-                                  ? "border-blue-300 bg-blue-50"
+                                  ? "border-primary-300 bg-primary-50 dark:bg-primary-950 dark:border-primary-700"
                                   : canEdit && !isSequential
                                     ? "border-blue-200 bg-blue-25"
                                     : "border-border-primary bg-surface-secondary"
@@ -685,7 +688,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       onClick={() =>
                                         setActiveStepId(activeStepId === step.id ? null : (step.id || null))
                                       }
-                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white text-xs sm:text-sm rounded-lg hover:bg-blue-700 whitespace-nowrap"
+                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white text-xs sm:text-sm rounded-lg hover:bg-primary-700 whitespace-nowrap"
                                     >
                                       {activeStepId === step.id ? "Cancel" : "Work on Step"}
                                     </button>

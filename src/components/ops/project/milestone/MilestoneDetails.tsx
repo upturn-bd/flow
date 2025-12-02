@@ -12,7 +12,7 @@ import {
   ArrowUpRight,
   CaretLeft,
 } from "@/lib/icons";
-import { useEmployees } from "@/hooks/useEmployees";
+import { Employee } from "@/lib/types/schemas";
 import { Milestone } from "@/hooks/useMilestones";
 import { Task, useTasks } from "@/hooks/useTasks";
 import { createClient } from '@/lib/supabase/client';
@@ -28,6 +28,7 @@ interface MilestoneDetailsProps {
   id: number;
   onClose: () => void;
   project_created_by: string;
+  employees: Employee[];
 }
 
 function formatDate(dateStr: string): string {
@@ -55,13 +56,13 @@ function formatDate(dateStr: string): string {
 export default function MilestoneDetails({
   id,
   onClose,
-  project_created_by
+  project_created_by,
+  employees,
 }: MilestoneDetailsProps) {
   const [milestoneId, setMilestoneId] = useState<number>(id);
   const [milestoneDetails, setMilestoneDetails] = useState<Milestone | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { employees, fetchEmployees } = useEmployees();
 
   // Tasks states and functions
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -185,10 +186,6 @@ export default function MilestoneDetails({
       setMilestoneId(id);
     }
   }, [id]);
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
 
   if (loading) {
     return (

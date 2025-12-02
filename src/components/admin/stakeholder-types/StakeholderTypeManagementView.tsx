@@ -118,7 +118,7 @@ export default function StakeholderTypeManagementView() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(type)}
-                        className="p-1 rounded-full text-foreground-tertiary hover:bg-blue-50 hover:text-blue-500"
+                        className="p-1 rounded-full text-foreground-tertiary hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-blue-500"
                       >
                         <PencilSimple size={16} weight="bold" />
                       </Button>

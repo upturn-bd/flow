@@ -121,7 +121,7 @@ export default function NotificationsTab() {
         {unreadNotifications.length > 0 && (
           <button
             onClick={handleMarkAllAsRead}
-            className="text-blue-600 hover:bg-blue-50 px-3 py-1 rounded text-sm font-medium"
+            className="text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 px-3 py-1 rounded text-sm font-medium"
           >
             Mark all as read
           </button>
@@ -208,7 +208,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
           {notification.action_url && (
             <Link
               href={notification.action_url}
-              className="text-blue-600 hover:bg-blue-50 p-1.5 rounded"
+              className="text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded"
               title="View details"
             >
               <ExternalLink className="h-4 w-4" />

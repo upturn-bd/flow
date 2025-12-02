@@ -90,7 +90,7 @@ export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             id={`${fieldId}-error`}
-            className="mt-1 text-xs text-red-600"
+            className="mt-1 text-xs text-error"
             aria-live="polite"
           >
             {error}
@@ -125,7 +125,7 @@ export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             id={`${fieldId}-error`}
-            className="mt-1 text-xs text-red-600"
+            className="mt-1 text-xs text-error"
             aria-live="polite"
           >
             {error}
@@ -160,7 +160,7 @@ export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           id={`${fieldId}-error`}
-          className="mt-1 text-xs text-red-600"
+          className="mt-1 text-xs text-error"
           aria-live="polite"
         >
           {error}

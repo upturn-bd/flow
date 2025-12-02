@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, SearchBar, StatCard, StatCardGrid, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
 import SuperadminFormModal from "@/components/ui/modals/SuperadminFormModal";
+import { FormField, SelectField, NumberField, DateField, CheckboxField } from "@/components/forms";
 
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -238,7 +239,7 @@ export default function CompaniesPage() {
         title="Companies"
         description="Manage all companies in the system"
         icon={Buildings}
-        iconColor="text-blue-600"
+        iconColor="text-primary-600"
         action={{
           label: "Add Company",
           onClick: () => {
@@ -270,7 +271,7 @@ export default function CompaniesPage() {
           title="Total Companies"
           value={companies.length}
           icon={Buildings}
-          iconColor="text-blue-600"
+          iconColor="text-primary-600"
           iconBgColor="bg-blue-100"
         />
         <StatCard
@@ -575,117 +576,73 @@ export default function CompaniesPage() {
         isEditing={!!editingCompany}
       >
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-              Company Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-surface-primary text-foreground-primary"
-              placeholder="Enter company name"
-            />
-          </div>
+          <FormField
+            label="Company Name"
+            required
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            placeholder="Enter company name"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-              Company Code <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.code}
-              onChange={(e) => {
-                const newCode = e.target.value;
-                setFormData({ ...formData, code: newCode });
-                if (newCode) {
-                  setCodeError(validateCode(newCode));
-                } else {
-                  setCodeError("");
-                }
-              }}
-              placeholder="e.g., MyCompany@2024"
-              className={`w-full px-3 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary-500 transition-all bg-surface-primary text-foreground-primary ${
-                codeError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-border-primary'
-              }`}
-            />
-            {codeError ? (
-              <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
-                <Warning size={12} />
-                {codeError}
-              </p>
-            ) : (
-              <p className="mt-1.5 text-xs text-foreground-tertiary">
-                9+ chars with uppercase, lowercase, and special character
-              </p>
-            )}
-          </div>
+          <FormField
+            label="Company Code"
+            required
+            value={formData.code}
+            onChange={(e) => {
+              const newCode = e.target.value;
+              setFormData({ ...formData, code: newCode });
+              if (newCode) {
+                setCodeError(validateCode(newCode));
+              } else {
+                setCodeError("");
+              }
+            }}
+            placeholder="e.g., MyCompany@2024"
+            error={codeError}
+            hint={!codeError ? "9+ chars with uppercase, lowercase, and special character" : undefined}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-              Industry <span className="text-red-500">*</span>
-            </label>
-            <select
-              required
-              value={formData.industry_id}
-              onChange={(e) => setFormData({ ...formData, industry_id: e.target.value })}
-              className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-surface-primary text-foreground-primary"
-            >
-              <option value="">Select Industry</option>
-              {industries.map((industry) => (
-                <option key={industry.id} value={industry.id}>
-                  {industry.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectField
+            label="Industry"
+            required
+            value={formData.industry_id}
+            onChange={(e) => setFormData({ ...formData, industry_id: e.target.value })}
+            options={[
+              { value: "", label: "Select Industry" },
+              ...industries.map((industry) => ({
+                value: industry.id.toString(),
+                label: industry.name
+              }))
+            ]}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-              Country <span className="text-red-500">*</span>
-            </label>
-            <select
-              required
-              value={formData.country_id}
-              onChange={(e) => setFormData({ ...formData, country_id: e.target.value })}
-              className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-surface-primary text-foreground-primary"
-            >
-              <option value="">Select Country</option>
-              {countries.map((country) => (
-                <option key={country.id} value={country.id}>
-                  {country.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectField
+            label="Country"
+            required
+            value={formData.country_id}
+            onChange={(e) => setFormData({ ...formData, country_id: e.target.value })}
+            options={[
+              { value: "", label: "Select Country" },
+              ...countries.map((country) => ({
+                value: country.id.toString(),
+                label: country.name
+              }))
+            ]}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-              Payroll Generation Day
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="31"
-              value={formData.payroll_generation_day}
-              onChange={(e) => setFormData({ ...formData, payroll_generation_day: parseInt(e.target.value) })}
-              className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-surface-primary text-foreground-primary"
-            />
-          </div>
+          <NumberField
+            label="Payroll Generation Day"
+            min={1}
+            max={31}
+            value={formData.payroll_generation_day}
+            onChange={(e) => setFormData({ ...formData, payroll_generation_day: parseInt(e.target.value) })}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-              Fiscal Year Start
-            </label>
-            <input
-              type="date"
-              value={formData.fiscal_year_start}
-              onChange={(e) => setFormData({ ...formData, fiscal_year_start: e.target.value })}
-              className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-surface-primary text-foreground-primary"
-            />
-          </div>
+          <DateField
+            label="Fiscal Year Start"
+            value={formData.fiscal_year_start}
+            onChange={(e) => setFormData({ ...formData, fiscal_year_start: e.target.value })}
+          />
         </div>
 
         <div className="bg-background-secondary rounded-xl p-4 space-y-3">
@@ -711,7 +668,7 @@ export default function CompaniesPage() {
           <label className="flex items-center justify-between p-3 bg-surface-primary rounded-lg cursor-pointer hover:bg-background-secondary transition-colors">
             <div className="flex items-center gap-3">
               <div className="p-1.5 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
-                <CurrencyDollar size={18} className="text-blue-600 dark:text-blue-400" />
+                <CurrencyDollar size={18} className="text-primary-600 dark:text-blue-400" />
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground-primary">Live Payroll</p>

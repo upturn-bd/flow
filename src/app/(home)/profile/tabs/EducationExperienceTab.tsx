@@ -376,7 +376,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsCreatingExperience(true)}
-              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm shadow-sm"
+              className="px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2 text-sm shadow-sm"
               disabled={isExperienceActionLoading}
             >
               <Plus className="h-4 w-4" /> Add Experience
@@ -442,7 +442,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                     <div className="flex items-center space-x-2 mt-2 md:mt-0">
                       <button
                         onClick={() => setEditExperience(exp.id ?? null)}
-                        className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                        className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded-full transition-colors"
                       >
                         <Pencil className="h-4 w-4" />
                       </button>

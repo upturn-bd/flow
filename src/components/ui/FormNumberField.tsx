@@ -66,7 +66,7 @@ export default function FormNumberField({
           aria-describedby={hasError ? `${name}-error` : undefined}
           className={`w-full pl-10 pr-4 py-2.5 text-foreground-primary dark:text-foreground-primary rounded-lg border shadow-sm ${
             hasError 
-              ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50" 
+              ? "border-error ring-1 ring-error focus:ring-error focus:border-error bg-error/5" 
               : "border-border-primary dark:border-border-primary focus:ring-primary-500 focus:border-primary-500 bg-surface-primary dark:bg-surface-primary"
           } ${readOnly ? "bg-background-tertiary dark:bg-background-tertiary cursor-not-allowed" : ""} focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200`}
         />
@@ -76,7 +76,7 @@ export default function FormNumberField({
             initial="hidden"
             animate="visible"
             exit="hidden"
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-error"
           >
             <WarningCircle size={16} />
           </motion.div>
@@ -89,7 +89,7 @@ export default function FormNumberField({
           initial="hidden"
           animate="visible"
           exit="hidden"
-          className="mt-1 text-sm text-red-600"
+          className="mt-1 text-sm text-error"
         >
           {error}
         </motion.p>

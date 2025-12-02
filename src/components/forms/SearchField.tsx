@@ -44,12 +44,13 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             className={`
-              w-full pl-10 pr-10 py-2 
-              border border-border-secondary rounded-lg 
-              focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
-              disabled:bg-background-secondary disabled:cursor-not-allowed
-              transition-colors duration-200
-              ${isFocused ? 'ring-2 ring-primary-500 border-primary-500' : ''}
+              w-full pl-10 pr-10 py-2.5 
+              bg-surface-primary text-foreground-primary
+              placeholder:text-foreground-tertiary
+              border border-border-primary rounded-lg 
+              focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none
+              disabled:bg-surface-secondary disabled:cursor-not-allowed
+              transition-all duration-200
             `}
             {...props}
           />
@@ -59,7 +60,7 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(
               variant="ghost"
               size="sm"
               onClick={handleClear}
-              className="absolute right-2 top-1/2 h-6 w-6 p-0 -translate-y-1/2 hover:bg-surface-hover dark:hover:bg-surface-hover"
+              className="absolute right-2 top-1/2 h-6 w-6 p-0 -translate-y-1/2 hover:bg-surface-hover"
               disabled={disabled}
             >
               <X className="h-3 w-3" />

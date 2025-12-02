@@ -6,6 +6,7 @@ export { default as FileUploadField } from './FileUploadField';
 export { default as DateField } from './DateField';
 export { default as NumberField } from './NumberField';
 export { default as TimeField } from './TimeField';
+export { default as CheckboxField } from './CheckboxField';
 
 // Advanced form components
 export { SearchField } from './SearchField';

@@ -13,11 +13,11 @@ import {
   BarChart2,
   FileCheck,
   ArrowLeft,
-  Loader,
 } from "@/lib/icons";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import Link from "next/link";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 // Client component that uses useSearchParams
 function ProfileContent() {
@@ -78,7 +78,7 @@ function ProfileContent() {
         key: "basic",
         label: "Basic Information",
         icon: <User className="h-5 w-5" />,
-        color: "text-blue-600",
+        color: "text-primary-600",
         content: <BasicInfoTab uid={uid} />,
       },
       {
@@ -147,10 +147,12 @@ function ProfileContent() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-96">
-        <Loader className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
-        <p className="text-foreground-secondary">Loading profile information...</p>
-      </div>
+      <LoadingSpinner
+        icon={User}
+        text="Loading profile information..."
+        color="purple"
+        height="h-96"
+      />
     );
   }
 
@@ -224,10 +226,12 @@ export default function ProfilePage() {
   return (
     <Suspense
       fallback={
-        <div className="flex flex-col items-center justify-center h-96">
-          <Loader className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
-          <p className="text-foreground-secondary">Loading profile data...</p>
-        </div>
+        <LoadingSpinner
+          icon={User}
+          text="Loading profile data..."
+          color="purple"
+          height="h-96"
+        />
       }
     >
       <ProfileContent />

@@ -51,7 +51,7 @@ const Page: React.FC = () => {
                                 placeholder="Email"
                                 {...register("email", { required: "Email is required" })}
                             />
-                            {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+                            {errors.email && <p className="text-error">{errors.email.message}</p>}
 
                             <button type="submit" className='px-10 py-4 my-5 rounded-full bg-primary-600 text-white shadow-xl hover:bg-primary-700 transition-colors'>
                                 Send code to registered mail

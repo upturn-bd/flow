@@ -37,7 +37,7 @@ export default function FormToggleField({
       </label>
       <div className={`flex items-center gap-3 p-3 rounded-lg border ${
         hasError 
-          ? "border-red-300 bg-red-50" 
+          ? "border-error bg-error/5" 
           : "border-border-primary dark:border-border-primary bg-background-secondary dark:bg-background-secondary"
       }`}>
         <div className="text-foreground-tertiary dark:text-foreground-tertiary">
@@ -84,7 +84,7 @@ export default function FormToggleField({
           initial="hidden"
           animate="visible"
           exit="hidden"
-          className="mt-1 text-sm text-red-600"
+          className="mt-1 text-sm text-error"
         >
           {error}
         </motion.p>

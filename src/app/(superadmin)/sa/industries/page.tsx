@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, SearchBar, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
 import SuperadminFormModal from "@/components/ui/modals/SuperadminFormModal";
+import { FormField } from "@/components/forms";
 
 export default function IndustriesPage() {
   const [industries, setIndustries] = useState<Industry[]>([]);
@@ -246,7 +247,7 @@ export default function IndustriesPage() {
                               if (e.key === "Enter") handleInlineEdit(industry);
                               if (e.key === "Escape") setInlineEditing(null);
                             }}
-                            className="w-full px-2 py-1 text-sm border border-purple-300 dark:border-purple-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-2 py-1 text-sm border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-surface-primary text-foreground-primary"
                             autoFocus
                           />
                         ) : (
@@ -328,20 +329,14 @@ export default function IndustriesPage() {
         submitDisabled={!formData.name.trim()}
         isEditing={!!editingIndustry}
       >
-        <div>
-          <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-            Industry Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            required
-            value={formData.name}
-            onChange={(e) => setFormData({ name: e.target.value })}
-            className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-surface-primary text-foreground-primary"
-            placeholder="e.g., Technology"
-            autoFocus
-          />
-        </div>
+        <FormField
+          label="Industry Name"
+          required
+          value={formData.name}
+          onChange={(e) => setFormData({ name: e.target.value })}
+          placeholder="e.g., Technology"
+          autoFocus
+        />
       </SuperadminFormModal>
     </div>
   );

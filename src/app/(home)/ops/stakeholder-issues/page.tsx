@@ -22,6 +22,7 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
 import { PageHeader, SearchBar, StatCard, StatCardGrid, EmptyState, InlineSpinner } from "@/components/ui";
+import { SelectField } from "@/components/forms";
 
 export default function StakeholderIssuesPage() {
   const router = useRouter();
@@ -198,7 +199,7 @@ export default function StakeholderIssuesPage() {
           title="In Progress"
           value={inProgressIssues.length}
           icon={WarningCircle}
-          iconColor="text-blue-600"
+          iconColor="text-primary-600"
           iconBgColor="bg-blue-100"
         />
         <StatCard
@@ -231,35 +232,39 @@ export default function StakeholderIssuesPage() {
           </div>
 
           {/* Status Filter */}
-          <select
+          <SelectField
+            name="filterStatus"
             value={filterStatus}
             onChange={(e) => handleStatusFilterChange(e.target.value as any)}
-            className="px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-          >
-            <option value="all">All Statuses</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Resolved">Resolved</option>
-          </select>
+            options={[
+              { value: "all", label: "All Statuses" },
+              { value: "Pending", label: "Pending" },
+              { value: "In Progress", label: "In Progress" },
+              { value: "Resolved", label: "Resolved" },
+            ]}
+            containerClassName="w-48"
+          />
 
           {/* Priority Filter */}
-          <select
+          <SelectField
+            name="filterPriority"
             value={filterPriority}
             onChange={(e) => handlePriorityFilterChange(e.target.value as any)}
-            className="px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-          >
-            <option value="all">All Priorities</option>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-            <option value="Urgent">Urgent</option>
-          </select>
+            options={[
+              { value: "all", label: "All Priorities" },
+              { value: "Low", label: "Low" },
+              { value: "Medium", label: "Medium" },
+              { value: "High", label: "High" },
+              { value: "Urgent", label: "Urgent" },
+            ]}
+            containerClassName="w-48"
+          />
         </div>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
@@ -356,7 +361,7 @@ export default function StakeholderIssuesPage() {
                         setSelectedIssue(issue);
                         openCreateModal();
                       }}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
                       title="Edit issue"
                     >
                       <Eye size={18} />

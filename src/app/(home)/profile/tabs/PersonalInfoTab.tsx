@@ -258,7 +258,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
     },
     {
       title: "Address Information",
-      icon: <MapPin className="h-5 w-5 text-blue-600" />,
+      icon: <MapPin className="h-5 w-5 text-primary-600" />,
       fields: [
         {
           name: "permanent_address",
@@ -278,15 +278,15 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
     >
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-foreground-primary flex items-center">
-          <Heart className="mr-2 h-6 w-6 text-blue-600" />
+          <Heart className="mr-2 h-6 w-6 text-primary-600" />
           Personal Information
         </h2>
         {isCurrentUser && (
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsEditMode((prev) => !prev)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
-                isEditMode ? "bg-blue-600" : "bg-gray-200"
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 ${
+                isEditMode ? "bg-primary-600" : "bg-gray-200 dark:bg-gray-700"
               }`}
               role="switch"
               aria-checked={isEditMode}
@@ -327,7 +327,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
                     <motion.tr
                       key={field.name}
                       className={
-                        isEditMode ? "hover:bg-blue-50 transition-colors" : ""
+                        isEditMode ? "hover:bg-primary-50 dark:hover:bg-primary-950 transition-colors" : ""
                       }
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}

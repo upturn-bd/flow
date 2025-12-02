@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Search,
   Users,
   User,
   Mail,
@@ -11,10 +10,12 @@ import {
   Building,
   Calendar,
   Filter,
-  Loader,
   Download,
 } from "@/lib/icons";
-import FormInputField from "@/components/ui/FormInputField";
+import SearchBar from "@/components/ui/SearchBar";
+import PageHeader from "@/components/ui/PageHeader";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
 import { matchesEmployeeSearch } from "@/lib/utils/user-search";
@@ -120,22 +121,13 @@ useEffect(() => {
     >
       {/* Header */}
       <motion.div variants={fadeInUp} className="flex items-center justify-between mb-8">
-        <div className="flex items-center">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0.5 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="p-2 rounded-lg bg-indigo-100 text-indigo-700 mr-3"
-          >
-            <Users size={24} />
-          </motion.div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground-primary">Employee Finder</h1>
-            <p className="text-foreground-secondary">
-              Search and find detailed information about employees
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          title="Employee Finder"
+          subtitle="Search and find detailed information about employees"
+          icon={Users}
+          iconClassName="bg-indigo-100 text-indigo-700"
+          className="mb-0"
+        />
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -154,8 +146,7 @@ useEffect(() => {
       {/* Search and Filters */}
       <motion.div variants={fadeIn} className="bg-surface-primary rounded-xl shadow-sm mb-8">
         <div className="border-b border-border-primary px-6 py-4 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-indigo-700 flex items-center">
-            <Search className="w-5 h-5 mr-2" />
+          <h2 className="text-lg font-semibold text-indigo-700">
             Search Employees
           </h2>
           <motion.button
@@ -171,13 +162,10 @@ useEffect(() => {
 
         <div className="p-6">
           <div className="mb-4">
-            <FormInputField
-              name="search"
-              label="Search employees by name, email, position, or department"
-              icon={<Search size={18} />}
+            <SearchBar
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              type="text"
+              onChange={setSearchQuery}
+              placeholder="Search employees by name, email, position, or department"
             />
           </div>
 
@@ -261,31 +249,17 @@ useEffect(() => {
 
         <AnimatePresence>
           {loading ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center h-64 bg-surface-primary rounded-xl shadow-sm p-6"
-            >
-              <Loader className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
-              <p className="text-foreground-secondary">Loading employee data...</p>
-            </motion.div>
+            <LoadingSpinner
+              size="lg"
+              message="Loading employee data..."
+              className="h-64 bg-surface-primary rounded-xl shadow-sm"
+            />
           ) : filteredEmployees.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="bg-surface-primary rounded-xl shadow-sm p-8 text-center"
-            >
-              <Users className="w-16 h-16 text-foreground-tertiary mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground-secondary mb-2">
-                No employees found
-              </h3>
-              <p className="text-foreground-tertiary max-w-md mx-auto">
-                No employees match your search criteria. Try adjusting your
-                filters or search query.
-              </p>
-            </motion.div>
+            <EmptyState
+              icon={Users}
+              title="No employees found"
+              description="No employees match your search criteria. Try adjusting your filters or search query."
+            />
           ) : (
             <>
               {/* ✅ Table for large screens */}

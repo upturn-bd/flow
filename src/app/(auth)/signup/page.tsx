@@ -70,7 +70,7 @@ const Signup = () => {
                   disabled={false}
                 />
                 {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                  <p className="text-error text-sm mt-1">{errors.email.message}</p>
                 )}
               </div>
 
@@ -86,7 +86,7 @@ const Signup = () => {
                   disabled={false}
                 />
                 {errors.firstName && (
-                  <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
+                  <p className="text-error text-sm mt-1">{errors.firstName.message}</p>
                 )}
               </div>
 
@@ -100,7 +100,7 @@ const Signup = () => {
                   disabled={false}
                 />
                 {errors.lastName && (
-                  <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
+                  <p className="text-error text-sm mt-1">{errors.lastName.message}</p>
                 )}
               </div>
 
@@ -141,7 +141,7 @@ const Signup = () => {
                   )}
                 </button>
                 {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                  <p className="text-error text-sm mt-1">{errors.password.message}</p>
                 )}
               </div>
 
@@ -172,7 +172,7 @@ const Signup = () => {
                   )}
                 </button>
                 {errors.confirmPassword && (
-                  <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
+                  <p className="text-error text-sm mt-1">{errors.confirmPassword.message}</p>
                 )}
               </div>
 

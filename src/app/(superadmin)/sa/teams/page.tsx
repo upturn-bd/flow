@@ -19,9 +19,10 @@ import {
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { PageHeader, SearchBar, EmptyState } from "@/components/ui";
+import { PageHeader, SearchBar, EmptyState, InlineSpinner, LoadingSpinner } from "@/components/ui";
 import SuperadminFormModal from "@/components/ui/modals/SuperadminFormModal";
 import ConfirmationModal from "@/components/ui/modals/ConfirmationModal";
+import { FormField, TextAreaField, SelectField, CheckboxField } from "@/components/forms";
 
 interface TeamWithDetails extends Team {
   member_count?: number;
@@ -352,25 +353,21 @@ export default function TeamsManagementPage() {
           </div>
         </div>
         
-        <div className="relative">
-          <select
-            value={selectedCompany || ""}
-            onChange={(e) => {
-              setSelectedCompany(e.target.value ? parseInt(e.target.value) : null);
-              setSearchTerm("");
-              setEditingTeam(null);
-            }}
-            className="w-full appearance-none px-4 py-3 pr-10 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary text-foreground-primary font-medium transition-all"
-          >
-            <option value="">Select a company...</option>
-            {companies.map((company) => (
-              <option key={company.id} value={company.id}>
-                {company.name}
-              </option>
-            ))}
-          </select>
-          <CaretDown size={20} className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-tertiary pointer-events-none" />
-        </div>
+        <SelectField
+          value={selectedCompany?.toString() || ""}
+          onChange={(e) => {
+            setSelectedCompany(e.target.value ? parseInt(e.target.value) : null);
+            setSearchTerm("");
+            setEditingTeam(null);
+          }}
+          options={[
+            { value: "", label: "Select a company..." },
+            ...companies.map((company) => ({
+              value: company.id.toString(),
+              label: company.name
+            }))
+          ]}
+        />
       </div>
 
       {/* Teams Section */}
@@ -379,27 +376,12 @@ export default function TeamsManagementPage() {
           {/* Search Header */}
           <div className="p-4 border-b border-border-primary bg-background-secondary dark:bg-background-tertiary">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="relative flex-1">
-                <MagnifyingGlass
-                  size={20}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-tertiary"
-                />
-                <input
-                  type="text"
-                  placeholder="Search teams by name or description..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                />
-                {searchTerm && (
-                  <button
-                    onClick={() => setSearchTerm("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-surface-hover rounded-full transition-colors"
-                  >
-                    <X size={16} className="text-foreground-tertiary" />
-                  </button>
-                )}
-              </div>
+              <SearchBar
+                value={searchTerm}
+                onChange={setSearchTerm}
+                placeholder="Search teams by name or description..."
+                containerClassName="flex-1"
+              />
               
               <div className="flex items-center gap-2 text-sm text-foreground-secondary">
                 <Users size={18} />
@@ -413,10 +395,7 @@ export default function TeamsManagementPage() {
 
           {/* Teams List */}
           {loading ? (
-            <div className="p-12 text-center">
-              <Spinner size={32} className="animate-spin text-primary-600 dark:text-primary-400 mx-auto mb-3" />
-              <p className="text-foreground-tertiary">Loading teams...</p>
-            </div>
+            <LoadingSpinner message="Loading teams..." />
           ) : filteredTeams.length === 0 ? (
             <EmptyState
               icon={Users}
@@ -450,18 +429,15 @@ export default function TeamsManagementPage() {
                             <Users size={20} className="text-primary-600 dark:text-primary-400" />
                           </div>
                           <div className="flex-1 space-y-3">
-                            <input
-                              type="text"
+                            <FormField
                               value={editingTeam.name}
                               onChange={(e) => setEditingTeam(prev => prev ? { ...prev, name: e.target.value } : null)}
-                              className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-medium"
                               placeholder="Team name"
                               autoFocus
                             />
-                            <textarea
+                            <TextAreaField
                               value={editingTeam.description}
                               onChange={(e) => setEditingTeam(prev => prev ? { ...prev, description: e.target.value } : null)}
-                              className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm resize-none"
                               placeholder="Team description (optional)"
                               rows={2}
                             />
@@ -480,7 +456,7 @@ export default function TeamsManagementPage() {
                             className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
                           >
                             {savingTeamId === team.id ? (
-                              <Spinner size={16} className="animate-spin" />
+                              <InlineSpinner size="sm" color="white" />
                             ) : (
                               <Check size={16} weight="bold" />
                             )}
@@ -529,7 +505,7 @@ export default function TeamsManagementPage() {
                             title={team.is_default ? "Remove default status" : "Set as default"}
                           >
                             {togglingDefaultId === team.id ? (
-                              <Spinner size={18} className="animate-spin" />
+                              <InlineSpinner size="sm" color="warning" />
                             ) : team.is_default ? (
                               <Star size={18} weight="fill" />
                             ) : (
@@ -561,7 +537,7 @@ export default function TeamsManagementPage() {
                               title="Delete team"
                             >
                               {deletingTeamId === team.id ? (
-                                <Spinner size={18} className="animate-spin" />
+                                <InlineSpinner size="sm" color="error" />
                               ) : (
                                 <Trash size={18} />
                               )}
@@ -607,44 +583,29 @@ export default function TeamsManagementPage() {
         submitText="Create Team"
       >
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-              Team Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={newTeam.name}
-              onChange={(e) => setNewTeam(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all bg-surface-primary text-foreground-primary"
-              placeholder="e.g., Engineering, Marketing, HR"
-            />
-          </div>
+          <FormField
+            label="Team Name"
+            value={newTeam.name}
+            onChange={(e) => setNewTeam(prev => ({ ...prev, name: e.target.value }))}
+            placeholder="e.g., Engineering, Marketing, HR"
+            required
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-              Description
-            </label>
-            <textarea
-              value={newTeam.description}
-              onChange={(e) => setNewTeam(prev => ({ ...prev, description: e.target.value }))}
-              className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all resize-none bg-surface-primary text-foreground-primary"
-              placeholder="Brief description of this team's purpose"
-              rows={3}
-            />
-          </div>
+          <TextAreaField
+            label="Description"
+            value={newTeam.description}
+            onChange={(e) => setNewTeam(prev => ({ ...prev, description: e.target.value }))}
+            placeholder="Brief description of this team's purpose"
+            rows={3}
+          />
 
-          <label className="flex items-center gap-3 p-3 border border-border-primary rounded-xl hover:bg-surface-hover cursor-pointer transition-colors">
-            <input
-              type="checkbox"
-              checked={newTeam.isDefault}
-              onChange={(e) => setNewTeam(prev => ({ ...prev, isDefault: e.target.checked }))}
-              className="w-4 h-4 text-primary-600 border-border-primary rounded focus:ring-primary-500"
-            />
-            <div>
-              <span className="text-sm font-medium text-foreground-primary">Set as default team</span>
-              <p className="text-xs text-foreground-tertiary mt-0.5">New employees will be automatically added to this team</p>
-            </div>
-          </label>
+          <CheckboxField
+            label="Set as default team"
+            description="New employees will be automatically added to this team"
+            checked={newTeam.isDefault}
+            onChange={(e) => setNewTeam(prev => ({ ...prev, isDefault: e.target.checked }))}
+            variant="card"
+          />
         </div>
       </SuperadminFormModal>
 

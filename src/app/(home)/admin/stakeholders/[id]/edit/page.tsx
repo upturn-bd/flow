@@ -6,6 +6,7 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { useEmployees } from "@/hooks/useEmployees";
 import { ArrowLeft, WarningCircle, Plus, Trash } from "@/lib/icons";
 import { ContactPerson, Stakeholder } from "@/lib/types/schemas";
+import { LoadingSpinner } from "@/components/ui";
 
 export default function EditStakeholderPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -151,7 +152,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
   if (loadingStakeholder) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <LoadingSpinner message="Loading stakeholder..." />
       </div>
     );
   }
@@ -167,7 +168,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
           </p>
           <button
             onClick={() => router.push("/admin/stakeholders")}
-            className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="mt-6 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
           >
             Back to Stakeholders
           </button>
@@ -201,7 +202,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
             </p>
             <button
               onClick={() => router.push("/admin/config/stakeholder-process")}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium"
             >
               Go to Process Management
             </button>
@@ -353,7 +354,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
               <button
                 type="button"
                 onClick={handleAddContactPerson}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
               >
                 <Plus size={16} />
                 Add Contact
@@ -469,7 +470,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
             <button
               type="submit"
               disabled={submitting || loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? "Saving..." : "Save Changes"}
             </button>

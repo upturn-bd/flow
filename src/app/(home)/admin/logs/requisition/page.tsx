@@ -4,13 +4,14 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useRequisitionRequests, RequisitionState } from "@/hooks/useRequisition";
 import { supabase } from "@/lib/supabase/client";
 import {
-  Loader,
   ClipboardList,
   Clock,
   AlertCircle,
   Plus,
   WarningCircle,
 } from "@/lib/icons";
+import InlineSpinner from "@/components/ui/InlineSpinner";
+import { EmptyState } from "@/components/ui/EmptyState";
 import TabView from "@/components/ui/TabView";
 import { RequisitionCard } from "@/components/ops/requisition/RequisitionCard";
 import RequisitionCreateModal from "@/components/ops/requisition/RequisitionCreateModal";
@@ -125,12 +126,12 @@ export default function RequisitionPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ClipboardList className="text-blue-600" size={26} />
+          <ClipboardList className="text-primary-600" size={26} />
           <h1 className="text-2xl font-semibold">Requisition Logs</h1>
         </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
         >
           <Plus size={18} />
           <span>Add Requisition</span>
@@ -149,16 +150,17 @@ export default function RequisitionPage() {
                 <>
                   {loading && (
                     <div className="flex justify-center items-center py-20 text-foreground-tertiary">
-                      <Loader className="animate-spin mr-2" />
+                      <InlineSpinner size="md" color="primary" className="mr-2" />
                       Loading requisitions...
                     </div>
                   )}
 
                   {!loading && filtered.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-20 text-foreground-tertiary">
-                      <WarningCircle className="mb-2" size={28} />
-                      <p>No pending requisition requests found.</p>
-                    </div>
+                    <EmptyState
+                      icon={WarningCircle}
+                      title="No pending requisition requests"
+                      description="There are no pending requisition requests at this time."
+                    />
                   )}
 
                   <div className="space-y-4">
@@ -192,16 +194,17 @@ export default function RequisitionPage() {
                 <>
                   {loading && (
                     <div className="flex justify-center items-center py-20 text-foreground-tertiary">
-                      <Loader className="animate-spin mr-2" />
+                      <InlineSpinner size="md" color="primary" className="mr-2" />
                       Loading history...
                     </div>
                   )}
 
                   {!loading && filtered.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-20 text-foreground-tertiary">
-                      <WarningCircle className="mb-2" size={28} />
-                      <p>No past requisitions found.</p>
-                    </div>
+                    <EmptyState
+                      icon={WarningCircle}
+                      title="No past requisitions"
+                      description="There are no past requisitions in the history."
+                    />
                   )}
 
                   <div className="space-y-4">

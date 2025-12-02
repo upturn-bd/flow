@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField, NumberField, AssigneeField } from '@/components/forms';
 import { validateMilestone, type MilestoneData } from '@/lib/validation';
-import { useEmployees } from '@/hooks/useEmployees';
+import { Employee } from '@/lib/types/schemas';
 import { Target } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 
@@ -12,6 +12,7 @@ interface MilestoneCreateModalProps {
   onSubmit: (data: MilestoneData) => void;
   onClose: () => void;
   isLoading?: boolean;
+  employees: Employee[];
 }
 
 const statusOptions = [
@@ -27,7 +28,8 @@ export default function MilestoneCreateModal({
   projectId,
   onSubmit,
   onClose,
-  isLoading = false
+  isLoading = false,
+  employees,
 }: MilestoneCreateModalProps) {
   const [formData, setFormData] = useState<MilestoneData>({
     milestone_title: '',
@@ -41,12 +43,6 @@ export default function MilestoneCreateModal({
   });
   console.log(formData)
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
-  const { employees, loading: employeesLoading, fetchEmployees } = useEmployees();
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
 
   const handleInputChange = (field: keyof MilestoneData, value: any) => {
     setFormData(prev => ({
@@ -176,7 +172,7 @@ export default function MilestoneCreateModal({
           onChange={(assignees) => handleInputChange('assignees', assignees)}
           employees={employees}
           error={errors.assignees}
-          disabled={isLoading || employeesLoading}
+          disabled={isLoading}
           placeholder="Search and select assignees..."
         />
 

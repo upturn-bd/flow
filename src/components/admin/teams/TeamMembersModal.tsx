@@ -6,6 +6,8 @@ import { TeamWithMembers } from '@/lib/types';
 import { useEmployees, ExtendedEmployee } from '@/hooks/useEmployees';
 import { useTeams } from '@/hooks/useTeams';
 import { matchesEmployeeSearch } from '@/lib/utils/user-search';
+import InlineSpinner from '@/components/ui/InlineSpinner';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface TeamMembersModalProps {
   isOpen: boolean;
@@ -143,25 +145,15 @@ export default function TeamMembersModal({
                 <div className="max-h-[350px] overflow-y-auto">
                   {employeesLoading ? (
                     <div className="p-8 text-center text-foreground-tertiary">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+                      <InlineSpinner size="md" color="primary" className="mx-auto mb-2" />
                       <p className="text-sm">Loading employees...</p>
                     </div>
                   ) : filteredEmployees.length === 0 ? (
-                    <div className="p-8 text-center">
-                      <div className="bg-background-secondary rounded-full p-4 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
-                        <MagnifyingGlass size={24} className="text-foreground-tertiary" />
-                      </div>
-                      <p className="text-foreground-secondary font-medium">
-                        {searchTerm
-                          ? 'No employees found'
-                          : 'All employees are members'}
-                      </p>
-                      <p className="text-sm text-foreground-tertiary mt-1">
-                        {searchTerm
-                          ? 'Try a different search term'
-                          : 'Everyone is already on this team'}
-                      </p>
-                    </div>
+                    <EmptyState
+                      icon={MagnifyingGlass}
+                      title={searchTerm ? 'No employees found' : 'All employees are members'}
+                      description={searchTerm ? 'Try a different search term' : 'Everyone is already on this team'}
+                    />
                   ) : (
                     <div className="divide-y divide-border-primary">
                       {filteredEmployees.map((employee) => (

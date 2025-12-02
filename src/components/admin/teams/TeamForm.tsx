@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import BaseModal from "@/components/ui/modals/BaseModal";
-import FormInputField from "@/components/ui/FormInputField";
 import { Button } from "@/components/ui/button";
+import { FormField, TextAreaField } from "@/components/forms";
 import type { Team } from "@/lib/types/schemas";
 
 interface TeamFormProps {
@@ -56,36 +55,23 @@ export default function TeamForm({ team, onClose, onSubmit }: TeamFormProps) {
     >
       <form onSubmit={handleSubmit} className="p-6">
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground-secondary mb-1">
-              Team Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-surface-primary text-foreground-primary"
-            />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-            )}
-          </div>
+          <FormField
+            label="Team Name"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            error={errors.name}
+            placeholder="Enter team name"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-foreground-secondary mb-1">
-              Description
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of the team's purpose and responsibilities"
-              rows={3}
-              className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-surface-primary text-foreground-primary"
-            />
-            {errors.description && (
-              <p className="mt-1 text-sm text-red-600">{errors.description}</p>
-            )}
-          </div>
+          <TextAreaField
+            label="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Brief description of the team's purpose and responsibilities"
+            rows={3}
+            error={errors.description}
+          />
         </div>
 
         <div className="mt-6 flex justify-end gap-3">

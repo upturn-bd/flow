@@ -248,7 +248,7 @@ export default function LeaveManagementView() {
                 <div
                   key={day}
                   className={`cursor-pointer select-none rounded-lg py-2 text-center font-medium border ${isSelected
-                    ? "bg-blue-600 text-white border-blue-600"
+                    ? "bg-primary-600 text-white border-primary-600"
                     : "bg-background-secondary dark:bg-background-tertiary text-foreground-secondary border-border-primary hover:bg-background-tertiary dark:bg-surface-secondary"
                     }`}
                   onClick={() => toggleWeekday(idx)}

@@ -645,6 +645,7 @@ export default function ProjectForm({
           currentTotalWeightage={getTotalMilestoneWeightage() - (selectedMilestone.weightage || 0)}
           projectStartDate={projectDetails.start_date}
           projectEndDate={projectDetails.end_date}
+          employees={selectedAssigneeObjects}
         />
       )}
 

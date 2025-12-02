@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, SearchBar, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
 import SuperadminFormModal from "@/components/ui/modals/SuperadminFormModal";
+import { FormField } from "@/components/forms";
 
 export default function CountriesPage() {
   const [countries, setCountries] = useState<Country[]>([]);
@@ -303,20 +304,15 @@ export default function CountriesPage() {
         submitDisabled={!formData.name.trim()}
         isEditing={!!editingCountry}
       >
-        <div>
-          <label className="block text-sm font-medium text-foreground-secondary mb-1.5">
-            Country Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            required
-            value={formData.name}
-            onChange={(e) => setFormData({ name: e.target.value })}
-            className="w-full px-3 py-2.5 border border-border-primary rounded-xl focus:ring-2 focus:ring-success focus:border-transparent transition-all bg-surface-primary text-foreground-primary"
-            placeholder="e.g., Bangladesh"
-            autoFocus
-          />
-        </div>
+        <FormField
+          name="name"
+          label="Country Name"
+          required
+          value={formData.name}
+          onChange={(e) => setFormData({ name: e.target.value })}
+          placeholder="e.g., Bangladesh"
+          autoFocus
+        />
       </SuperadminFormModal>
     </div>
   );

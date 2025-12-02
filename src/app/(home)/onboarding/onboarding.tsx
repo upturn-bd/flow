@@ -13,7 +13,6 @@ import {
   Users, 
   CircleCheck, 
   WarningCircle, 
-  Loader, 
   CheckCircle, 
   Clock, 
   XCircle, 
@@ -25,6 +24,7 @@ import { logout } from "@/app/(auth)/auth-actions";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import { fadeInUp, staggerContainer } from "@/components/ui/animations";
+import { InlineSpinner } from "@/components/ui";
 import { useCompanyValidation } from "@/hooks/useCompanyValidation";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useDepartments } from "@/hooks/useDepartments";
@@ -266,7 +266,7 @@ export default function EmployeeOnboarding() {
           transition={{ duration: 0.3 }}
           className="max-w-lg w-full bg-surface-primary rounded-xl shadow-lg overflow-hidden"
         >
-          <div className="bg-blue-600 py-4 px-6">
+          <div className="bg-primary-600 py-4 px-6">
             <h2 className="text-xl font-semibold text-white flex items-center">
               <Clock className="mr-2 h-5 w-5" />
               Application Pending
@@ -276,7 +276,7 @@ export default function EmployeeOnboarding() {
           <div className="p-6">
             <div className="flex items-center justify-center mb-6">
               <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center">
-                <Clock className="h-12 w-12 text-blue-600" />
+                <Clock className="h-12 w-12 text-primary-600" />
               </div>
             </div>
             
@@ -339,7 +339,7 @@ export default function EmployeeOnboarding() {
             <div className="relative">
               <div className="flex items-center">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  activeSection === "company" ? "bg-blue-600" : isCompanyCodeValid ? "bg-green-600" : "bg-gray-300"
+                  activeSection === "company" ? "bg-primary-600" : isCompanyCodeValid ? "bg-green-600" : "bg-gray-300"
                 } text-white font-medium`}>
                   {isCompanyCodeValid ? <CheckCircle size={18} /> : 1}
                 </div>
@@ -353,7 +353,7 @@ export default function EmployeeOnboarding() {
             <div className="relative">
               <div className="flex items-center">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  activeSection === "personal" ? "bg-blue-600" : "bg-gray-300"
+                  activeSection === "personal" ? "bg-primary-600" : "bg-gray-300"
                 } text-white font-medium`}>
                   2
                 </div>
@@ -432,7 +432,7 @@ export default function EmployeeOnboarding() {
                   className="p-6"
                 >
                   <div className="flex items-center mb-6">
-                    <Building className="h-6 w-6 text-blue-600 mr-2" />
+                    <Building className="h-6 w-6 text-primary-600 mr-2" />
                     <h2 className="text-xl font-semibold text-foreground-primary">Company Information</h2>
                   </div>
                   
@@ -479,11 +479,11 @@ export default function EmployeeOnboarding() {
                           type="button"
                           disabled={!formData.company_name || !companyCode || verifyLoading}
                           onClick={handleValidateCompanyCode}
-                          className="flex items-center justify-center w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex items-center justify-center w-full sm:w-auto px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {verifyLoading ? (
                             <>
-                              <Loader className="mr-2 h-5 w-5 animate-spin" />
+                              <InlineSpinner size="md" color="white" className="mr-2" />
                               Verifying...
                             </>
                           ) : (
@@ -510,7 +510,7 @@ export default function EmployeeOnboarding() {
                   className="p-6"
                 >
                   <div className="flex items-center mb-6">
-                    <User className="h-6 w-6 text-blue-600 mr-2" />
+                    <User className="h-6 w-6 text-primary-600 mr-2" />
                     <h2 className="text-xl font-semibold text-foreground-primary">Personal Information</h2>
                   </div>
                   
@@ -626,11 +626,11 @@ export default function EmployeeOnboarding() {
                       <button
                         type="submit"
                         disabled={loading || (status === "rejected" && !dirty)}
-                        className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {loading ? (
                           <>
-                            <Loader className="mr-2 h-5 w-5 animate-spin" />
+                            <InlineSpinner size="md" color="white" className="mr-2" />
                             Processing...
                           </>
                         ) : status === "rejected" ? (

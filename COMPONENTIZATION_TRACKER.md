@@ -6,9 +6,9 @@ This document tracks the progress of componentizing duplicated UI patterns acros
 ## Summary
 
 **Components Created:** 12 new reusable components (including SuperadminFormModal, InlineDeleteConfirm, InlineSpinner)
-**Files Refactored:** 30+ files across admin, superadmin, and home pages
-**Status:** Primary refactoring, modal refactoring, and inline patterns mostly complete ✅
-**Remaining:** Complex modals (2 files) - users page and team detail member search
+**Files Refactored:** 60+ files across admin, superadmin, and home pages
+**Status:** Primary refactoring complete! All spinner patterns componentized ✅
+**Remaining:** Page headers, empty states, confirmation modals, badge standardization
 
 ---
 
@@ -150,10 +150,158 @@ useEffect(() => {
 - [x] `src/app/(home)/admin/stakeholders/page.tsx` - Using PageHeader, SearchBar, StatCard
 - [x] `src/app/(home)/ops/stakeholder-issues/page.tsx` - Using PageHeader, SearchBar, StatCard
 
+### Recently Refactored (Dec 2024)
+- [x] `src/app/(home)/finder/page.tsx` - Using PageHeader, SearchBar, EmptyState, LoadingSpinner
+- [x] `src/app/(home)/hris/page.tsx` - Using LoadingSpinner
+- [x] `src/app/(home)/notifications/page.tsx` - Using PageHeader
+- [x] `src/app/(home)/ops/onboarding/page.tsx` - Using EmptyState
+- [x] `src/app/(home)/ops/offboarding/page.tsx` - Using SearchBar, EmptyState
+- [x] `src/app/(home)/ops/notice/page.tsx` - Using PageHeader, EmptyState
+- [x] `src/app/(home)/admin/config/teams/page.tsx` - Using SearchBar, LoadingSpinner
+- [x] `src/app/(home)/admin/stakeholders/[id]/page.tsx` - Using LoadingSpinner, EmptyState
+- [x] `src/components/ops/settlement/UpcomingPage.tsx` - Using LoadingSpinner, EmptyState
+- [x] `src/components/ops/requisition/UpcomingPage.tsx` - Using LoadingSpinner, EmptyState
+- [x] `src/components/notifications/NotificationDropdown.tsx` - Using InlineSpinner
+- [x] `src/app/(home)/profile/page.tsx` - Using PageHeader, LoadingSpinner
+- [x] `src/app/(home)/ops/hris/page.tsx` - Using PageHeader, SearchBar, LoadingSpinner, EmptyState
+- [x] `src/app/(home)/admin/data-export/page.tsx` - Using InlineSpinner
+- [x] `src/app/(home)/admin/logs/tasks/page.tsx` - Using InlineSpinner
+- [x] `src/app/(home)/admin/logs/project/page.tsx` - Using InlineSpinner
+- [x] `src/app/(home)/admin/logs/notice/page.tsx` - Using InlineSpinner, EmptyState
+- [x] `src/app/(home)/admin/logs/requisition/page.tsx` - Using InlineSpinner, EmptyState
+- [x] `src/app/(home)/admin/logs/leave/page.tsx` - Using InlineSpinner
+- [x] `src/app/(home)/admin/logs/attendance/page.tsx` - Using InlineSpinner
+- [x] `src/components/ops/requisition/RequisitionCard.tsx` - Using InlineSpinner
+- [x] `src/components/ops/requisition/RequisitionCreateModal.tsx` - Using InlineSpinner (+ fixed lucide→phosphor)
+- [x] `src/components/ops/requisition/RequisitionEditModal.tsx` - Using InlineSpinner (+ fixed lucide→phosphor)
+- [x] `src/components/ops/requisition/RequisitionCreatePage.tsx` - Using InlineSpinner
+- [x] `src/components/ops/leave/LeaveCreatePage.tsx` - Using InlineSpinner
+- [x] `src/components/ops/payroll/PayrollHistory.tsx` - Using InlineSpinner
+- [x] `src/components/ops/payroll/PayrollGenerationModal.tsx` - Using InlineSpinner
+- [x] `src/components/admin/CompanyBasicsConfigView.tsx` - Using LoadingSpinner
+- [x] `src/components/admin/tabs/BasicTab.tsx` - Using LoadingSpinner
+- [x] `src/components/admin/tabs/AccountsTab.tsx` - Using LoadingSpinner
+- [x] `src/components/ops/complaint/ComplaintCreatePage.tsx` - Using InlineSpinner
+
 ## 🟡 Remaining Work
 
-### Modal Refactoring (Priority 4 - 2 files with complex modals)
-- [ ] `src/app/(superadmin)/sa/users/page.tsx` - Complex multi-step superadmin grant modal (company select, employee search)
+### High Priority - Page Headers (Use PageHeader component)
+Files with manual page headers that should use PageHeader:
+- [x] `src/app/(home)/profile/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/ops/hris/page.tsx` - ✅ DONE
+- [ ] `src/app/(home)/ops/onboarding/page.tsx` - Manual header with UserPlus icon
+- [ ] `src/app/(home)/ops/offboarding/page.tsx` - Manual header with UserMinus icon
+- [ ] `src/app/(home)/account/page.tsx` - Manual header "My Account"
+- [ ] `src/app/(home)/admin/config/teams/page.tsx` - Manual header with Users icon
+- [ ] `src/app/(home)/admin/config/stakeholder-process/page.tsx` - Manual header
+- [ ] `src/app/(home)/admin/config/stakeholder-process/[id]/page.tsx` - Manual header
+- [ ] `src/app/(home)/admin/data-export/page.tsx` - Manual header "Data Export Center"
+- [ ] `src/app/(home)/admin/logs/complaint/page.tsx` - Manual header "Complaint Logs"
+- [ ] `src/app/(home)/admin/logs/notice/page.tsx` - Manual header "Notice Logs"
+- [ ] `src/app/(home)/admin/logs/requisition/page.tsx` - Manual header "Requisition Logs"
+- [ ] `src/app/(home)/ops/tasks/TaskLayout.tsx` - Manual header with ClipboardList icon
+- [ ] `src/app/(home)/ops/project/ProjectLayout.tsx` - Manual header with FolderKanban icon
+- [ ] `src/components/ops/leave/LeaveHistory.tsx` - Manual header "Leave History"
+
+### High Priority - Search Inputs (Use SearchBar component)
+Files using FormInputField or manual input for search:
+- [x] `src/app/(home)/ops/hris/page.tsx` - ✅ DONE - Using SearchBar
+
+### High Priority - Loading Spinners (Use LoadingSpinner/InlineSpinner)
+**✅ ALL SPINNER PATTERNS COMPLETE!**
+
+Remaining `animate-spin` in codebase are intentional:
+- UI Components (LoadingSpinner, InlineSpinner, button) - source of truth
+- RefreshCw icon on onboarding/offboarding - intentional refresh icon rotation
+- Navigation icon on AttendanceSection - intentional GPS loading rotation
+
+Files refactored:
+- [x] `src/app/(home)/profile/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/ops/hris/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/admin/logs/tasks/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/admin/logs/project/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/admin/logs/notice/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/admin/logs/requisition/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/admin/logs/leave/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/admin/logs/attendance/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/admin/data-export/page.tsx` - ✅ DONE
+- [x] `src/components/admin/CompanyBasicsConfigView.tsx` - ✅ DONE
+- [x] `src/components/admin/tabs/BasicTab.tsx` - ✅ DONE
+- [x] `src/components/admin/tabs/AccountsTab.tsx` - ✅ DONE
+- [x] `src/components/ops/requisition/RequisitionEditModal.tsx` - ✅ DONE
+- [x] `src/components/ops/requisition/RequisitionCard.tsx` - ✅ DONE
+- [x] `src/components/ops/requisition/RequisitionCreateModal.tsx` - ✅ DONE
+- [x] `src/components/ops/requisition/RequisitionCreatePage.tsx` - ✅ DONE
+- [x] `src/components/ops/payroll/PayrollGenerationModal.tsx` - ✅ DONE
+- [x] `src/components/ops/payroll/PayrollHistory.tsx` - ✅ DONE
+- [x] `src/components/ops/leave/LeaveCreatePage.tsx` - ✅ DONE
+- [x] `src/components/ops/complaint/ComplaintCreatePage.tsx` - ✅ DONE
+- [x] `src/components/admin/teams/TeamPermissionsModal.tsx` - ✅ DONE
+- [x] `src/components/admin/teams/TeamMembersModal.tsx` - ✅ DONE (spinner + empty state)
+- [x] `src/components/admin/salary/SalaryManagement.tsx` - ✅ DONE
+- [x] `src/components/stakeholder-issues/StakeholderIssueForm.tsx` - ✅ DONE
+- [x] `src/components/stakeholder-processes/ProcessForm.tsx` - ✅ DONE
+- [x] `src/app/(home)/admin/config/stakeholder-process/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/admin/stakeholders/[id]/edit/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/home/widgets/StakeholderIssueModal.tsx` - ✅ DONE
+- [x] `src/app/(home)/admin/config/teams/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/onboarding/onboarding.tsx` - ✅ DONE (2 instances)
+- [x] `src/app/(superadmin)/sa/teams/page.tsx` - ✅ DONE (4 instances)
+- [x] `src/app/(superadmin)/sa/teams/[companyId]/[teamId]/page.tsx` - ✅ DONE (4 instances)
+- [x] `src/app/(superadmin)/sa/users/page.tsx` - ✅ DONE
+- [x] `src/components/ui/GeolocationPicker.tsx` - ✅ DONE
+- [x] `src/components/ui/ReportProblemModal.tsx` - ✅ DONE
+- [x] `src/components/admin/attendance/ClientMap.tsx` - ✅ DONE
+- [x] `src/app/contact/page.tsx` - ✅ DONE
+
+### High Priority - Empty States (Use EmptyState component)
+Files with manual empty state displays:
+- [x] `src/app/(home)/ops/hris/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/admin/logs/notice/page.tsx` - ✅ DONE
+- [x] `src/app/(home)/admin/logs/requisition/page.tsx` - ✅ DONE
+- [x] `src/components/admin/teams/TeamMembersModal.tsx` - ✅ DONE
+- [ ] `src/app/(home)/ops/notice/page.tsx` - Manual empty state
+- [ ] `src/app/(home)/admin/stakeholders/page.tsx` - Manual empty state
+- [ ] `src/app/(home)/admin/config/teams/page.tsx` - Manual empty states (2 instances)
+- [ ] `src/app/(home)/ops/stakeholder-issues/page.tsx` - Manual empty state
+- [ ] `src/app/(home)/profile/tabs/EducationExperienceTab.tsx` - Manual empty states
+- [ ] `src/app/(home)/hris/tabs/EducationExperienceTab.tsx` - Manual empty states
+- [ ] `src/components/admin/salary/SalaryManagement.tsx` - Manual empty states (2 instances)
+- [ ] `src/components/admin/stakeholder-types/StakeholderTypeManagementView.tsx` - Manual empty state
+- [ ] `src/components/admin/notice/NoticeManagementView.tsx` - Manual empty state
+- [ ] `src/components/admin/complaints/ComplaintsManagementView.tsx` - Manual empty state
+- [ ] `src/components/admin/supervisor-lineage/SupervisorLineageView.tsx` - Manual empty state
+- [ ] `src/components/ops/attendance/PresentPage.tsx` - Plain text empty state
+- [ ] `src/components/ops/attendance/AbsentPage.tsx` - Plain text empty state
+- [ ] `src/components/ops/attendance/LatePage.tsx` - Plain text empty state
+- [ ] `src/components/ops/attendance/RecordsPage.tsx` - Plain text empty state
+- [ ] `src/components/stakeholder-processes/StepManager.tsx` - Manual empty states
+- [ ] `src/components/stakeholder-issues/StakeholderIssuesTab.tsx` - Manual empty state
+- [ ] `src/components/notifications/NotificationDropdown.tsx` - Manual empty state
+
+### Medium Priority - window.confirm Replacements (Use ConfirmationModal)
+- [ ] `src/app/(home)/ops/notice/page.tsx` - Delete notice confirmation
+- [ ] `src/app/(home)/admin/stakeholders/[id]/page.tsx` - Stakeholder action confirmations
+- [ ] `src/app/(home)/profile/tabs/EducationExperienceTab.tsx` - Delete education/experience records
+- [ ] `src/app/(home)/hris/tabs/EducationExperienceTab.tsx` - Delete education/experience records
+- [ ] `src/app/(home)/admin/config/stakeholder-process/page.tsx` - Delete process confirmation
+- [ ] `src/app/(home)/account/page.tsx` - Logout confirmation
+- [ ] `src/components/admin/tabs/AccountsTab.tsx` - Delete account confirmation
+- [ ] `src/components/stakeholder-processes/StepManager.tsx` - Delete step confirmation
+
+### Medium Priority - Badge Standardization (Use Badge/StatusBadge)
+Files with manual badge implementations:
+- [ ] `src/app/(home)/admin/logs/tasks/page.tsx` - Status badges
+- [ ] `src/app/(home)/admin/logs/project/page.tsx` - Status badges
+- [ ] `src/app/(home)/admin/stakeholders/page.tsx` - Status badges
+- [ ] `src/app/(home)/admin/stakeholders/[id]/page.tsx` - Status badges
+- [ ] `src/app/(home)/account/page.tsx` - Role/status badges
+- [ ] `src/app/(home)/ops/onboarding/page.tsx` - "New Request" badge
+- [ ] `src/components/admin/tabs/AccountsTab.tsx` - Manual badges
+- [ ] `src/components/ops/requisition/RequisitionCard.tsx` - Status badge
+
+### Low Priority - Modal Refactoring (Complex)
+- [ ] `src/app/(superadmin)/sa/users/page.tsx` - Complex multi-step superadmin grant modal
 - [ ] `src/app/(superadmin)/sa/teams/[companyId]/[teamId]/page.tsx` - Add member modal with employee search
 
 ### Completed Modal Refactoring
