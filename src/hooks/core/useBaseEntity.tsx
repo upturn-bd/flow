@@ -12,7 +12,7 @@ import {
 } from "./types";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
-import { captureSupabaseError } from "@/lib/sentry";
+import { captureSupabaseError, captureError } from "@/lib/sentry";
 
 interface BaseEntityHookConfig<T> {
   tableName: string;
@@ -56,12 +56,11 @@ export function useBaseEntity<T extends BaseEntity>(
         let errorMessage: string;
         if (error instanceof Error) {
           errorMessage = error.message;
-          // Also capture standard Error instances to Sentry
-          captureSupabaseError(
-            { message: error.message },
-            `${config.tableName}_operation`,
-            { entityName: config.entityName }
-          );
+          // Capture standard Error instances using the generic captureError function
+          captureError(error, { 
+            operation: `${config.tableName}_operation`,
+            entityName: config.entityName 
+          });
         } else if (typeof error === 'object' && error !== null) {
           // Handle Supabase errors which may have different structures
           const errorObj = error as { message?: string; error_description?: string; code?: string; details?: string; hint?: string };
@@ -80,11 +79,13 @@ export function useBaseEntity<T extends BaseEntity>(
           );
         } else {
           errorMessage = String(error) || "An unknown error occurred";
-          // Capture non-object errors to Sentry
-          captureSupabaseError(
-            { message: errorMessage },
-            `${config.tableName}_operation`,
-            { entityName: config.entityName }
+          // Capture non-object errors using the generic captureError function
+          captureError(
+            new Error(errorMessage), 
+            { 
+              operation: `${config.tableName}_operation`,
+              entityName: config.entityName 
+            }
           );
         }
 
