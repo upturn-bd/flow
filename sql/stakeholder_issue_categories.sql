@@ -3,6 +3,7 @@
 -- ==============================================================================
 -- Adds categories and subcategories with colors for stakeholder issues
 -- Also extends issue assignment to support team assignment
+-- Adds linking to stakeholder step data for dynamic data referencing
 -- Author: Flow HRIS Team
 -- ==============================================================================
 
@@ -65,7 +66,7 @@ CREATE TABLE IF NOT EXISTS stakeholder_issue_subcategories (
 );
 
 -- ==============================================================================
--- PART 3: ADD CATEGORY AND TEAM ASSIGNMENT FIELDS TO STAKEHOLDER ISSUES
+-- PART 3: ADD EXTENDED FIELDS TO STAKEHOLDER ISSUES
 -- ==============================================================================
 
 -- Add category_id to stakeholder_issues if it doesn't exist
@@ -92,6 +93,18 @@ BEGIN
   END IF;
 END $$;
 
+-- Add assigned_to for employee assignment
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'stakeholder_issues' 
+    AND column_name = 'assigned_to'
+  ) THEN
+    ALTER TABLE stakeholder_issues ADD COLUMN assigned_to UUID REFERENCES employees(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+
 -- Add assigned_team_id for team assignment (either employee or team, not both)
 DO $$ 
 BEGIN
@@ -101,6 +114,19 @@ BEGIN
     AND column_name = 'assigned_team_id'
   ) THEN
     ALTER TABLE stakeholder_issues ADD COLUMN assigned_team_id INTEGER REFERENCES teams(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+
+-- Add linked_step_data_ids for linking issues to stakeholder step data (JSONB array of IDs)
+-- This allows dynamic linking/editing of step data from issues
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'stakeholder_issues' 
+    AND column_name = 'linked_step_data_ids'
+  ) THEN
+    ALTER TABLE stakeholder_issues ADD COLUMN linked_step_data_ids JSONB DEFAULT '[]';
   END IF;
 END $$;
 
@@ -129,8 +155,14 @@ CREATE INDEX IF NOT EXISTS idx_stakeholder_issues_category_id
 CREATE INDEX IF NOT EXISTS idx_stakeholder_issues_subcategory_id 
   ON stakeholder_issues(subcategory_id);
 
+CREATE INDEX IF NOT EXISTS idx_stakeholder_issues_assigned_to 
+  ON stakeholder_issues(assigned_to);
+
 CREATE INDEX IF NOT EXISTS idx_stakeholder_issues_assigned_team_id 
   ON stakeholder_issues(assigned_team_id);
+
+CREATE INDEX IF NOT EXISTS idx_stakeholder_issues_linked_step_data 
+  ON stakeholder_issues USING GIN (linked_step_data_ids);
 
 -- ==============================================================================
 -- PART 5: CREATE UPDATE TRIGGERS
@@ -147,156 +179,133 @@ CREATE OR REPLACE TRIGGER update_stakeholder_issue_subcategories_updated_at
   EXECUTE FUNCTION update_updated_at_column();
 
 -- ==============================================================================
--- PART 6: ENABLE ROW LEVEL SECURITY (RLS)
+-- PART 6: ENABLE ROW LEVEL SECURITY (RLS) - CONSOLIDATED POLICIES
 -- ==============================================================================
+-- Using minimal policies by combining logic with OR conditions for superadmin access
 
 -- Enable RLS on categories table
 ALTER TABLE stakeholder_issue_categories ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users with stakeholders read permission can view categories in their company
+-- Combined SELECT policy for categories (regular users with permission OR superadmin)
+DROP POLICY IF EXISTS stakeholder_issue_categories_select_policy ON stakeholder_issue_categories;
+DROP POLICY IF EXISTS "Superadmins can view all issue categories" ON stakeholder_issue_categories;
 CREATE POLICY stakeholder_issue_categories_select_policy ON stakeholder_issue_categories
   FOR SELECT
   USING (
-    has_permission(auth.uid(), 'stakeholders', 'can_read')
-    AND company_id IN (
-      SELECT company_id FROM employees WHERE id = auth.uid()
+    is_superadmin()
+    OR (
+      has_permission(auth.uid(), 'stakeholders', 'can_read')
+      AND company_id IN (SELECT company_id FROM employees WHERE id = auth.uid())
     )
   );
 
--- Policy: Users with stakeholders write permission can insert categories in their company
+-- Combined INSERT policy for categories (regular users with permission OR superadmin)
+DROP POLICY IF EXISTS stakeholder_issue_categories_insert_policy ON stakeholder_issue_categories;
+DROP POLICY IF EXISTS "Superadmins can create issue categories" ON stakeholder_issue_categories;
 CREATE POLICY stakeholder_issue_categories_insert_policy ON stakeholder_issue_categories
   FOR INSERT
   WITH CHECK (
-    has_permission(auth.uid(), 'stakeholders', 'can_write')
-    AND company_id IN (
-      SELECT company_id FROM employees WHERE id = auth.uid()
+    is_superadmin()
+    OR (
+      has_permission(auth.uid(), 'stakeholders', 'can_write')
+      AND company_id IN (SELECT company_id FROM employees WHERE id = auth.uid())
     )
   );
 
--- Policy: Users with stakeholders write permission can update categories in their company
+-- Combined UPDATE policy for categories (regular users with permission OR superadmin)
+DROP POLICY IF EXISTS stakeholder_issue_categories_update_policy ON stakeholder_issue_categories;
+DROP POLICY IF EXISTS "Superadmins can update issue categories" ON stakeholder_issue_categories;
 CREATE POLICY stakeholder_issue_categories_update_policy ON stakeholder_issue_categories
   FOR UPDATE
   USING (
-    has_permission(auth.uid(), 'stakeholders', 'can_write')
-    AND company_id IN (
-      SELECT company_id FROM employees WHERE id = auth.uid()
+    is_superadmin()
+    OR (
+      has_permission(auth.uid(), 'stakeholders', 'can_write')
+      AND company_id IN (SELECT company_id FROM employees WHERE id = auth.uid())
     )
   )
   WITH CHECK (
-    has_permission(auth.uid(), 'stakeholders', 'can_write')
-    AND company_id IN (
-      SELECT company_id FROM employees WHERE id = auth.uid()
+    is_superadmin()
+    OR (
+      has_permission(auth.uid(), 'stakeholders', 'can_write')
+      AND company_id IN (SELECT company_id FROM employees WHERE id = auth.uid())
     )
   );
 
--- Policy: Users with stakeholders delete permission can delete categories in their company
+-- Combined DELETE policy for categories (regular users with permission OR superadmin)
+DROP POLICY IF EXISTS stakeholder_issue_categories_delete_policy ON stakeholder_issue_categories;
+DROP POLICY IF EXISTS "Superadmins can delete issue categories" ON stakeholder_issue_categories;
 CREATE POLICY stakeholder_issue_categories_delete_policy ON stakeholder_issue_categories
   FOR DELETE
   USING (
-    has_permission(auth.uid(), 'stakeholders', 'can_delete')
-    AND company_id IN (
-      SELECT company_id FROM employees WHERE id = auth.uid()
+    is_superadmin()
+    OR (
+      has_permission(auth.uid(), 'stakeholders', 'can_delete')
+      AND company_id IN (SELECT company_id FROM employees WHERE id = auth.uid())
     )
   );
-
--- Superadmin policies for categories
-DROP POLICY IF EXISTS "Superadmins can view all issue categories" ON stakeholder_issue_categories;
-CREATE POLICY "Superadmins can view all issue categories"
-  ON stakeholder_issue_categories
-  FOR SELECT
-  USING (is_superadmin());
-
-DROP POLICY IF EXISTS "Superadmins can create issue categories" ON stakeholder_issue_categories;
-CREATE POLICY "Superadmins can create issue categories"
-  ON stakeholder_issue_categories
-  FOR INSERT
-  WITH CHECK (is_superadmin());
-
-DROP POLICY IF EXISTS "Superadmins can update issue categories" ON stakeholder_issue_categories;
-CREATE POLICY "Superadmins can update issue categories"
-  ON stakeholder_issue_categories
-  FOR UPDATE
-  USING (is_superadmin());
-
-DROP POLICY IF EXISTS "Superadmins can delete issue categories" ON stakeholder_issue_categories;
-CREATE POLICY "Superadmins can delete issue categories"
-  ON stakeholder_issue_categories
-  FOR DELETE
-  USING (is_superadmin());
 
 -- Enable RLS on subcategories table
 ALTER TABLE stakeholder_issue_subcategories ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users with stakeholders read permission can view subcategories in their company
+-- Combined SELECT policy for subcategories (regular users with permission OR superadmin)
+DROP POLICY IF EXISTS stakeholder_issue_subcategories_select_policy ON stakeholder_issue_subcategories;
+DROP POLICY IF EXISTS "Superadmins can view all issue subcategories" ON stakeholder_issue_subcategories;
 CREATE POLICY stakeholder_issue_subcategories_select_policy ON stakeholder_issue_subcategories
   FOR SELECT
   USING (
-    has_permission(auth.uid(), 'stakeholders', 'can_read')
-    AND company_id IN (
-      SELECT company_id FROM employees WHERE id = auth.uid()
+    is_superadmin()
+    OR (
+      has_permission(auth.uid(), 'stakeholders', 'can_read')
+      AND company_id IN (SELECT company_id FROM employees WHERE id = auth.uid())
     )
   );
 
--- Policy: Users with stakeholders write permission can insert subcategories in their company
+-- Combined INSERT policy for subcategories (regular users with permission OR superadmin)
+DROP POLICY IF EXISTS stakeholder_issue_subcategories_insert_policy ON stakeholder_issue_subcategories;
+DROP POLICY IF EXISTS "Superadmins can create issue subcategories" ON stakeholder_issue_subcategories;
 CREATE POLICY stakeholder_issue_subcategories_insert_policy ON stakeholder_issue_subcategories
   FOR INSERT
   WITH CHECK (
-    has_permission(auth.uid(), 'stakeholders', 'can_write')
-    AND company_id IN (
-      SELECT company_id FROM employees WHERE id = auth.uid()
+    is_superadmin()
+    OR (
+      has_permission(auth.uid(), 'stakeholders', 'can_write')
+      AND company_id IN (SELECT company_id FROM employees WHERE id = auth.uid())
     )
   );
 
--- Policy: Users with stakeholders write permission can update subcategories in their company
+-- Combined UPDATE policy for subcategories (regular users with permission OR superadmin)
+DROP POLICY IF EXISTS stakeholder_issue_subcategories_update_policy ON stakeholder_issue_subcategories;
+DROP POLICY IF EXISTS "Superadmins can update issue subcategories" ON stakeholder_issue_subcategories;
 CREATE POLICY stakeholder_issue_subcategories_update_policy ON stakeholder_issue_subcategories
   FOR UPDATE
   USING (
-    has_permission(auth.uid(), 'stakeholders', 'can_write')
-    AND company_id IN (
-      SELECT company_id FROM employees WHERE id = auth.uid()
+    is_superadmin()
+    OR (
+      has_permission(auth.uid(), 'stakeholders', 'can_write')
+      AND company_id IN (SELECT company_id FROM employees WHERE id = auth.uid())
     )
   )
   WITH CHECK (
-    has_permission(auth.uid(), 'stakeholders', 'can_write')
-    AND company_id IN (
-      SELECT company_id FROM employees WHERE id = auth.uid()
+    is_superadmin()
+    OR (
+      has_permission(auth.uid(), 'stakeholders', 'can_write')
+      AND company_id IN (SELECT company_id FROM employees WHERE id = auth.uid())
     )
   );
 
--- Policy: Users with stakeholders delete permission can delete subcategories in their company
+-- Combined DELETE policy for subcategories (regular users with permission OR superadmin)
+DROP POLICY IF EXISTS stakeholder_issue_subcategories_delete_policy ON stakeholder_issue_subcategories;
+DROP POLICY IF EXISTS "Superadmins can delete issue subcategories" ON stakeholder_issue_subcategories;
 CREATE POLICY stakeholder_issue_subcategories_delete_policy ON stakeholder_issue_subcategories
   FOR DELETE
   USING (
-    has_permission(auth.uid(), 'stakeholders', 'can_delete')
-    AND company_id IN (
-      SELECT company_id FROM employees WHERE id = auth.uid()
+    is_superadmin()
+    OR (
+      has_permission(auth.uid(), 'stakeholders', 'can_delete')
+      AND company_id IN (SELECT company_id FROM employees WHERE id = auth.uid())
     )
   );
-
--- Superadmin policies for subcategories
-DROP POLICY IF EXISTS "Superadmins can view all issue subcategories" ON stakeholder_issue_subcategories;
-CREATE POLICY "Superadmins can view all issue subcategories"
-  ON stakeholder_issue_subcategories
-  FOR SELECT
-  USING (is_superadmin());
-
-DROP POLICY IF EXISTS "Superadmins can create issue subcategories" ON stakeholder_issue_subcategories;
-CREATE POLICY "Superadmins can create issue subcategories"
-  ON stakeholder_issue_subcategories
-  FOR INSERT
-  WITH CHECK (is_superadmin());
-
-DROP POLICY IF EXISTS "Superadmins can update issue subcategories" ON stakeholder_issue_subcategories;
-CREATE POLICY "Superadmins can update issue subcategories"
-  ON stakeholder_issue_subcategories
-  FOR UPDATE
-  USING (is_superadmin());
-
-DROP POLICY IF EXISTS "Superadmins can delete issue subcategories" ON stakeholder_issue_subcategories;
-CREATE POLICY "Superadmins can delete issue subcategories"
-  ON stakeholder_issue_subcategories
-  FOR DELETE
-  USING (is_superadmin());
 
 -- ==============================================================================
 -- PART 7: ADD COMMENTS
@@ -314,4 +323,6 @@ COMMENT ON COLUMN stakeholder_issue_subcategories.is_active IS 'Whether the subc
 
 COMMENT ON COLUMN stakeholder_issues.category_id IS 'Optional reference to issue category for organization';
 COMMENT ON COLUMN stakeholder_issues.subcategory_id IS 'Optional reference to issue subcategory (must belong to selected category)';
-COMMENT ON COLUMN stakeholder_issues.assigned_team_id IS 'Optional team assignment - issue can be assigned to either an employee OR a team, not both';
+COMMENT ON COLUMN stakeholder_issues.assigned_to IS 'Employee ID assigned to handle this issue (either employee OR team)';
+COMMENT ON COLUMN stakeholder_issues.assigned_team_id IS 'Team ID assignment - issue can be assigned to either an employee OR a team, not both';
+COMMENT ON COLUMN stakeholder_issues.linked_step_data_ids IS 'JSONB array of stakeholder_step_data IDs linked to this issue for dynamic data referencing';

@@ -511,6 +511,7 @@ export default function StakeholderIssuesPage() {
               assigned_team_id: selectedIssue.assigned_team_id,
               category_id: selectedIssue.category_id,
               subcategory_id: selectedIssue.subcategory_id,
+              linked_step_data_ids: selectedIssue.linked_step_data_ids || [],
               attachments: selectedIssue.attachments,
             }}
             onSubmit={handleUpdateIssue}

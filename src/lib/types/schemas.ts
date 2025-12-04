@@ -715,6 +715,7 @@ export interface StakeholderIssue {
   assigned_team_id?: number; // Team ID assigned to handle this issue (either employee OR team)
   category_id?: number; // Optional category for organization
   subcategory_id?: number; // Optional subcategory (must belong to selected category)
+  linked_step_data_ids?: number[]; // Array of stakeholder_step_data IDs linked to this issue
   company_id: number;
   created_at?: string;
   updated_at?: string;
@@ -735,6 +736,7 @@ export interface StakeholderIssue {
   };
   category?: StakeholderIssueCategory;
   subcategory?: StakeholderIssueSubcategory;
+  linked_step_data?: StakeholderStepData[]; // Joined step data for linked records
   creator?: {
     id: string;
     name: string;

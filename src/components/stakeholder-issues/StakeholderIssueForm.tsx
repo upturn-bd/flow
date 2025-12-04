@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import BaseForm from "@/components/forms/BaseForm";
 import {
   validateStakeholderIssue,
@@ -12,12 +12,20 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { useTeams } from "@/hooks/useTeams";
 import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { useStakeholderIssueCategories } from "@/hooks/useStakeholderIssueCategories";
-import { X, Upload, Trash, Download, FileText, User, UsersThree, Tag } from "@/lib/icons";
+import { X, Upload, Trash, Download, FileText, User, UsersThree, Tag, Link, CheckCircle } from "@/lib/icons";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { FormField, SelectField, TextAreaField } from "@/components/forms";
 import { captureError } from "@/lib/sentry";
 
 type AssignmentType = 'employee' | 'team';
+
+interface StakeholderStepDataOption {
+  id: number;
+  stepName: string;
+  stepOrder: number;
+  isCompleted: boolean;
+  data: Record<string, any>;
+}
 
 interface StakeholderIssueFormProps {
   stakeholderId: number;
@@ -31,6 +39,7 @@ interface StakeholderIssueFormProps {
     assigned_team_id?: number;
     category_id?: number;
     subcategory_id?: number;
+    linked_step_data_ids?: number[];
     attachments?: StakeholderIssueAttachment[];
   };
   onSubmit: (data: StakeholderIssueFormData) => Promise<void>;
@@ -48,7 +57,7 @@ export default function StakeholderIssueForm({
 }: StakeholderIssueFormProps) {
   const { employees, fetchEmployees, loading: loadingEmployees } = useEmployees();
   const { teams, fetchTeams, loading: loadingTeams } = useTeams();
-  const { deleteAttachment, downloadAttachment } = useStakeholderIssues();
+  const { deleteAttachment, downloadAttachment, fetchStakeholderStepData } = useStakeholderIssues();
   const { categories, fetchCategories, loading: loadingCategories } = useStakeholderIssueCategories();
   
   const [files, setFiles] = useState<File[]>([]);
@@ -58,6 +67,10 @@ export default function StakeholderIssueForm({
   const [fileError, setFileError] = useState<string | null>(null);
   const [deletingAttachment, setDeletingAttachment] = useState<string | null>(null);
   const [downloadingAttachment, setDownloadingAttachment] = useState<string | null>(null);
+  
+  // Linked step data state
+  const [availableStepData, setAvailableStepData] = useState<StakeholderStepDataOption[]>([]);
+  const [loadingStepData, setLoadingStepData] = useState(false);
   
   // Determine initial assignment type
   const getInitialAssignmentType = (): AssignmentType => {
@@ -77,6 +90,7 @@ export default function StakeholderIssueForm({
     assigned_team_id: initialData?.assigned_team_id,
     category_id: initialData?.category_id,
     subcategory_id: initialData?.subcategory_id,
+    linked_step_data_ids: initialData?.linked_step_data_ids || [],
     attachments: [],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -86,11 +100,37 @@ export default function StakeholderIssueForm({
   const selectedCategory = categories.find(c => c.id === formData.category_id);
   const availableSubcategories = selectedCategory?.subcategories?.filter(s => s.is_active) || [];
 
+  // Load initial data
   useEffect(() => {
     fetchEmployees();
     fetchTeams();
     fetchCategories();
   }, [fetchEmployees, fetchTeams, fetchCategories]);
+
+  // Load stakeholder step data for linking
+  useEffect(() => {
+    const loadStepData = async () => {
+      setLoadingStepData(true);
+      try {
+        const data = await fetchStakeholderStepData(stakeholderId);
+        const stepDataOptions: StakeholderStepDataOption[] = data.map((sd: any) => ({
+          id: sd.id,
+          stepName: sd.step?.name || `Step ${sd.step_id}`,
+          stepOrder: sd.step?.step_order || 0,
+          isCompleted: sd.is_completed,
+          data: sd.data || {},
+        }));
+        setAvailableStepData(stepDataOptions.sort((a, b) => a.stepOrder - b.stepOrder));
+      } catch (err) {
+        captureError(err, { operation: "loadStepData" });
+        console.error("Error loading step data:", err);
+      } finally {
+        setLoadingStepData(false);
+      }
+    };
+
+    loadStepData();
+  }, [stakeholderId, fetchStakeholderStepData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -128,6 +168,23 @@ export default function StakeholderIssueForm({
     } else {
       setFormData(prev => ({ ...prev, assigned_to: "" }));
     }
+  };
+
+  const handleLinkedStepDataToggle = (stepDataId: number) => {
+    setFormData(prev => {
+      const currentLinkedIds = prev.linked_step_data_ids || [];
+      if (currentLinkedIds.includes(stepDataId)) {
+        return {
+          ...prev,
+          linked_step_data_ids: currentLinkedIds.filter(id => id !== stepDataId),
+        };
+      } else {
+        return {
+          ...prev,
+          linked_step_data_ids: [...currentLinkedIds, stepDataId],
+        };
+      }
+    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -376,6 +433,78 @@ export default function StakeholderIssueForm({
             { value: 'Resolved', label: 'Resolved' },
           ]}
         />
+
+        {/* Linked Step Data */}
+        <div>
+          <label className="block text-sm font-medium text-foreground-primary mb-2">
+            <div className="flex items-center gap-2">
+              <Link size={16} />
+              <span>Link Step Data</span>
+            </div>
+          </label>
+          <p className="text-xs text-foreground-tertiary mb-3">
+            Select step data to link to this issue. Linked data can be viewed and edited from the issue.
+          </p>
+          
+          {loadingStepData ? (
+            <div className="flex items-center justify-center py-4">
+              <InlineSpinner size="sm" color="primary" />
+            </div>
+          ) : availableStepData.length === 0 ? (
+            <p className="text-sm text-foreground-tertiary italic py-2">
+              No step data available for this stakeholder.
+            </p>
+          ) : (
+            <div className="space-y-2 max-h-60 overflow-y-auto border border-border-primary rounded-lg p-3">
+              {availableStepData.map((stepData) => {
+                const isLinked = formData.linked_step_data_ids?.includes(stepData.id);
+                return (
+                  <div
+                    key={stepData.id}
+                    onClick={() => handleLinkedStepDataToggle(stepData.id)}
+                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                      isLinked
+                        ? 'bg-primary-50 dark:bg-primary-900/30 border border-primary-300 dark:border-primary-700'
+                        : 'bg-surface-secondary hover:bg-surface-hover border border-border-secondary'
+                    }`}
+                  >
+                    <div className={`shrink-0 w-5 h-5 rounded border flex items-center justify-center ${
+                      isLinked
+                        ? 'bg-primary-600 border-primary-600 text-white'
+                        : 'border-border-primary'
+                    }`}>
+                      {isLinked && <CheckCircle size={14} weight="bold" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-foreground-primary">
+                          Step {stepData.stepOrder}: {stepData.stepName}
+                        </span>
+                        {stepData.isCompleted && (
+                          <span className="px-1.5 py-0.5 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded">
+                            Completed
+                          </span>
+                        )}
+                      </div>
+                      {Object.keys(stepData.data).length > 0 && (
+                        <p className="text-xs text-foreground-tertiary mt-1 truncate">
+                          {Object.keys(stepData.data).slice(0, 3).join(', ')}
+                          {Object.keys(stepData.data).length > 3 && ` +${Object.keys(stepData.data).length - 3} more`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          
+          {formData.linked_step_data_ids && formData.linked_step_data_ids.length > 0 && (
+            <p className="text-xs text-primary-600 mt-2">
+              {formData.linked_step_data_ids.length} step{formData.linked_step_data_ids.length > 1 ? 's' : ''} linked
+            </p>
+          )}
+        </div>
 
         {/* Description */}
         <TextAreaField

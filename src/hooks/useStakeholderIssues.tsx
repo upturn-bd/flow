@@ -21,6 +21,7 @@ export interface StakeholderIssueFormData {
   assigned_team_id?: number; // Team ID assigned to handle this issue (either employee OR team)
   category_id?: number; // Optional category
   subcategory_id?: number; // Optional subcategory
+  linked_step_data_ids?: number[]; // Array of stakeholder_step_data IDs linked to this issue
   attachments?: File[];
 }
 
@@ -526,6 +527,7 @@ export function useStakeholderIssues() {
               assigned_team_id: issueData.assigned_team_id || null,
               category_id: issueData.category_id || null,
               subcategory_id: issueData.subcategory_id || null,
+              linked_step_data_ids: issueData.linked_step_data_ids || [],
               attachments,
               company_id,
               created_by: employeeInfo?.id,
@@ -669,6 +671,11 @@ export function useStakeholderIssues() {
           updateData.assigned_team_id = null;
         } else if (issueData.assigned_team_id) {
           updateData.assigned_to = null;
+        }
+
+        // Handle linked step data IDs
+        if (issueData.linked_step_data_ids !== undefined) {
+          updateData.linked_step_data_ids = issueData.linked_step_data_ids;
         }
 
         // If status is being changed to Resolved, add resolved metadata
@@ -953,6 +960,80 @@ export function useStakeholderIssues() {
   );
 
   // ==========================================================================
+  // LINKED STEP DATA OPERATIONS
+  // ==========================================================================
+
+  /**
+   * Fetch available step data for a stakeholder (for linking to issues)
+   */
+  const fetchStakeholderStepData = useCallback(
+    async (stakeholderId: number) => {
+      try {
+        const { data, error } = await supabase
+          .from("stakeholder_step_data")
+          .select(`
+            id,
+            stakeholder_id,
+            step_id,
+            data,
+            is_completed,
+            completed_at,
+            step:stakeholder_process_steps(id, name, step_order, field_definitions)
+          `)
+          .eq("stakeholder_id", stakeholderId)
+          .order("id", { ascending: true });
+
+        if (error) {
+          captureSupabaseError(error, "fetchStakeholderStepData", { stakeholderId });
+          throw error;
+        }
+
+        return data || [];
+      } catch (err) {
+        logError("Error fetching stakeholder step data", err);
+        throw err;
+      }
+    },
+    []
+  );
+
+  /**
+   * Update linked step data from an issue
+   * This allows editing stakeholder step data directly from the issue
+   */
+  const updateLinkedStepData = useCallback(
+    async (stepDataId: number, newData: Record<string, any>) => {
+      if (!employeeInfo) {
+        console.warn('Cannot update step data: Employee info not available');
+        return null;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("stakeholder_step_data")
+          .update({
+            data: newData,
+            updated_by: employeeInfo.id,
+          })
+          .eq("id", stepDataId)
+          .select()
+          .single();
+
+        if (error) {
+          captureSupabaseError(error, "updateLinkedStepData", { stepDataId });
+          throw error;
+        }
+
+        return data;
+      } catch (err) {
+        logError("Error updating linked step data", err);
+        throw err;
+      }
+    },
+    [employeeInfo]
+  );
+
+  // ==========================================================================
   // COMPUTED VALUES
   // ==========================================================================
 
@@ -1004,5 +1085,9 @@ export function useStakeholderIssues() {
     deleteAttachment,
     getAttachmentUrl,
     downloadAttachment,
+    
+    // Linked Step Data Operations
+    fetchStakeholderStepData,
+    updateLinkedStepData,
   };
 }
