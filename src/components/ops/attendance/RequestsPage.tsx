@@ -54,7 +54,7 @@ interface AttendanceRequest {
 
 export default function AttendanceRequestsPage() {
   const [requestsData, setRequestsData] = useState<AttendanceRequest[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { sites, fetchSites } = useSites();
   const { employees, fetchEmployees } = useEmployees();
   const [selectedRequest, setSelectedRequest] = useState<AttendanceRequest | null>(null);

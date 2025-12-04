@@ -13,7 +13,7 @@ import ClickableStatusCell from "./ClickableStatusCell";
 
 export default function AttendanceLatePage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { sites, fetchSites } = useSites();
 
   // Filters state

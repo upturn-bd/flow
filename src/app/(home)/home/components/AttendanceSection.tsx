@@ -63,7 +63,7 @@ export default function AttendanceSection({
   const [locationLoading, setLocationLoading] = useState(false);
   const [checkInCompleted, setCheckInCompleted] = useState(false)
   const [checkOutCompleted, setCheckOutCompleted] = useState(false)
-  const [attendanceLoading, setAttendanceLoading] = useState(false);
+  const [attendanceLoading, setAttendanceLoading] = useState(true);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 

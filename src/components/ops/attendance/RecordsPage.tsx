@@ -11,7 +11,7 @@ import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function AttendanceRecordsPage() {
    const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
-   const [loading, setLoading] = useState(false);
+   const [loading, setLoading] = useState(true);
 
    // Filters
    const currentDate = new Date();

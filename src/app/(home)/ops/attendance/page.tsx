@@ -39,7 +39,7 @@ function AttendancePageContent() {
     site_id: undefined as number | undefined,
   });
 
-  const {sites, fetchSites} = useSites();
+  const {sites, fetchSites, loading: sitesLoading} = useSites();
   const {user} = useAuth();
   const { today, todayLoading, getTodaysAttendance } = useAttendanceStatus();
 
@@ -156,14 +156,21 @@ function AttendancePageContent() {
       label: "Today",
       icon: <Clock className="h-5 w-5" />,
       color: "text-blue-600",
-      content: (
+      content: todayLoading || sitesLoading ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-3">
+            <Clock className="h-8 w-8 text-blue-600 animate-pulse" />
+            <p className="text-sm text-foreground-secondary">Loading attendance...</p>
+          </div>
+        </div>
+      ) : (
         <AttendanceSection
           loading={todayLoading}
           attendanceLoading={attendanceLoading}
           attendanceStatus={attendanceCheckStatus}
           attendanceRecord={attendanceRecord}
           sites={sites}
-          sitesLoading={false}
+          sitesLoading={sitesLoading}
           onRecordChange={handleRecordChange}
           onCheckIn={onCheckIn}
           onCheckOut={onCheckOut}
