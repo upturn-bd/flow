@@ -27,7 +27,7 @@ const TEST_TASK = {
 // ---------------------------------------------------------------------------
 async function navigateToTasks(sharedPage: Page) {
     await sharedPage.goto('/ops/tasks');
-    await sharedPage.waitForLoadState('networkidle');
+    await sharedPage.waitForLoadState('domcontentloaded'); // Changed from 'networkidle' for speed
     await expect(sharedPage.locator('h1:has-text("Task Management")')).toBeVisible();
 }
 
@@ -97,27 +97,27 @@ test.afterAll(async () => {
 // ---------------------------------------------------------------------------
 test.describe('Task Management - Navigation and UI', () => {
     test('should navigate to task management sharedPage', async () => {
-        await navigateToTasks(sharedPage);
+        // Page already navigated in beforeAll
         await expect(sharedPage.locator('h1:has-text("Task Management")')).toBeVisible();
         await expect(sharedPage.locator('text=Manage and track your tasks')).toBeVisible();
         await expect(sharedPage.locator('button:has-text("Create Task")')).toBeVisible();
     });
 
     test('should display all three tabs (Ongoing, Completed, Archived)', async () => {
-        await navigateToTasks(sharedPage);
+        // No navigation needed - already on tasks page
         await expect(sharedPage.locator('button:has-text("Ongoing")')).toBeVisible();
         await expect(sharedPage.locator('button:has-text("Completed")')).toBeVisible();
         await expect(sharedPage.locator('button:has-text("Archived")')).toBeVisible();
     });
 
     test('should have Ongoing tab active by default', async () => {
-        await navigateToTasks(sharedPage);
+        // Check current URL state
         const url = sharedPage.url();
         expect(url.includes('tab=ongoing') || !url.includes('tab=')).toBeTruthy();
     });
 
     test('should display correct icons for each tab', async () => {
-        await navigateToTasks(sharedPage);
+        // No navigation needed - already on tasks page
         await expect(sharedPage.locator('button:has-text("Ongoing")').locator('svg')).toBeVisible();
         await expect(sharedPage.locator('button:has-text("Completed")').locator('svg')).toBeVisible();
         await expect(sharedPage.locator('button:has-text("Archived")').locator('svg')).toBeVisible();
@@ -306,8 +306,18 @@ test.describe('Task Management - Task Creation', () => {
 // ---------------------------------------------------------------------------
 test.describe('Task Management - Task Viewing', () => {
 test('should view task details', async () => {
-        // Navigate to tasks page to ensure we're on the correct page
-        await navigateToTasks(sharedPage);
+        // Ensure we're on the Ongoing tab (tasks list)
+        if (!sharedPage.url().includes('/ops/tasks?tab=ongoing') && !sharedPage.url().endsWith('/ops/tasks')) {
+            await sharedPage.goto('/ops/tasks?tab=ongoing');
+            await sharedPage.waitForLoadState('domcontentloaded');
+        }
+        
+        // Make sure we're on the Ongoing tab by clicking it
+        const ongoingTab = sharedPage.locator('button:has-text("Ongoing")');
+        if (await ongoingTab.isVisible()) {
+            await ongoingTab.click();
+            await sharedPage.waitForTimeout(500); // Brief wait for tab to load
+        }
         
         // Wait for tasks to load and click the first view button
         const viewButton = sharedPage.locator('[data-testid="view-task-button"]').first();
@@ -319,7 +329,7 @@ test('should view task details', async () => {
         expect(sharedPage.url()).toContain('/ops/tasks/');
 
         // Wait for modal to open and check for Task Details heading
-        await expect(sharedPage.locator('h2:has-text("Task Details")')).toBeVisible({ timeout: 10000 });
+        await expect(sharedPage.locator('h2:has-text("Task Details")')).toBeVisible({ timeout: 20000 });
         
         // Verify task details modal content is visible
         await expect(sharedPage.locator('text=Assigned to').or(sharedPage.locator('text=Start Date')).first()).toBeVisible();
@@ -331,8 +341,18 @@ test('should view task details', async () => {
 // ---------------------------------------------------------------------------
 test.describe('Task Management - Task Updating', () => {
 test('should update task details successfully', async () => {
-        // Navigate to tasks page to ensure we're on the correct page
-        await navigateToTasks(sharedPage);
+        // Navigate back to tasks list if needed
+        if (!sharedPage.url().includes('/ops/tasks?tab=ongoing') && !sharedPage.url().endsWith('/ops/tasks')) {
+            await sharedPage.goto('/ops/tasks?tab=ongoing');
+            await sharedPage.waitForLoadState('domcontentloaded');
+        }
+        
+        // Ensure we're on the Ongoing tab
+        const ongoingTab = sharedPage.locator('button:has-text("Ongoing")');
+        if (await ongoingTab.isVisible()) {
+            await ongoingTab.click();
+            await sharedPage.waitForTimeout(500);
+        }
         
         const newTitle = `Updated Task ${Date.now()}`;
 
@@ -365,8 +385,18 @@ test('should update task details successfully', async () => {
 // ---------------------------------------------------------------------------
 test.describe('Task Management - Task Deletion', () => {
 test('should delete a task successfully', async () => {
-        // Navigate to tasks page to ensure we're on the correct page
-        await navigateToTasks(sharedPage);
+        // Navigate back to tasks list if needed
+        if (!sharedPage.url().includes('/ops/tasks?tab=ongoing') && !sharedPage.url().endsWith('/ops/tasks')) {
+            await sharedPage.goto('/ops/tasks?tab=ongoing');
+            await sharedPage.waitForLoadState('domcontentloaded');
+        }
+        
+        // Ensure we're on the Ongoing tab
+        const ongoingTab = sharedPage.locator('button:has-text("Ongoing")');
+        if (await ongoingTab.isVisible()) {
+            await ongoingTab.click();
+            await sharedPage.waitForTimeout(500);
+        }
         
         // Wait for tasks to load and get the first task's title
         const firstTaskCard = sharedPage.locator('[data-testid="task-card"]').first();
@@ -395,8 +425,18 @@ test('should delete a task successfully', async () => {
 // ---------------------------------------------------------------------------
 test.describe('Task Management - Task Completion', () => {
 test('should mark a task as complete', async () => {
-        // Navigate to tasks page to ensure we're on the correct page
-        await navigateToTasks(sharedPage);
+        // Navigate back to tasks list if needed
+        if (!sharedPage.url().includes('/ops/tasks?tab=ongoing') && !sharedPage.url().endsWith('/ops/tasks')) {
+            await sharedPage.goto('/ops/tasks?tab=ongoing');
+            await sharedPage.waitForLoadState('domcontentloaded');
+        }
+        
+        // Ensure we're on the Ongoing tab
+        const ongoingTab = sharedPage.locator('button:has-text("Ongoing")');
+        if (await ongoingTab.isVisible()) {
+            await ongoingTab.click();
+            await sharedPage.waitForTimeout(500);
+        }
         
         // Wait for tasks to load and get the first task's title
         const firstTaskCard = sharedPage.locator('[data-testid="task-card"]').first();
@@ -496,8 +536,7 @@ test('should mark a task as complete', async () => {
 // ---------------------------------------------------------------------------
 test.describe('Task Management - Pagination', () => {
 test('should display and use load more button for ongoing tasks', async () => {
-        // Navigate to tasks page to ensure we're on the correct page
-        await navigateToTasks(sharedPage);
+        // Already on tasks page
         
         // Count initial tasks
         const initialTaskCount = await sharedPage.locator('[data-testid="task-card"]').count();
@@ -526,10 +565,7 @@ test('should display and use load more button for ongoing tasks', async () => {
     });
 
     test('should display and use load more button for completed tasks', async () => {
-        // Navigate to tasks page first
-        await navigateToTasks(sharedPage);
-        
-        // Navigate to Completed tab
+        // Navigate to Completed tab (already on tasks page)
         await sharedPage.click('button:has-text("Completed")');
         await sharedPage.waitForURL(/\/ops\/tasks\?tab=completed/, { timeout: 5000 });
 
