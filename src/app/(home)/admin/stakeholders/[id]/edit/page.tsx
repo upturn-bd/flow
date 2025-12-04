@@ -159,7 +159,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
 
   if (!stakeholder) {
     return (
-      <div className="p-6">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="max-w-2xl mx-auto text-center py-12">
           <WarningCircle className="mx-auto text-foreground-tertiary" size={48} />
           <h2 className="text-xl font-bold text-foreground-primary mt-4">Stakeholder Not Found</h2>
@@ -180,7 +180,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
   // Show error if no processes exist
   if (!loading && activeProcesses.length === 0) {
     return (
-      <div className="p-6">
+      <div className="p-4 sm:p-6 lg:p-8">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-2 text-foreground-secondary hover:text-foreground-primary mb-6"
@@ -213,7 +213,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <button
         onClick={() => router.back()}

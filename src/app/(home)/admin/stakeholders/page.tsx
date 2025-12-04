@@ -99,7 +99,7 @@ export default function StakeholdersPage() {
   };
 
   return (
-    <div className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 lg:space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
       {/* Header */}
       <PageHeader
         title="Stakeholders & Leads"
