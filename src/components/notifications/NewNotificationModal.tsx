@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check, Eye, Trash2, AlertCircle, Calendar, Briefcase, User, Clock, Bell } from "lucide-react";
+import { X, Check, Eye, Trash, AlertCircle, Calendar, Briefcase, User, Clock, Bell } from "@/lib/icons";
 import { Notification } from "@/hooks/useNotifications";
 import { formatRelativeTime } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -119,7 +119,7 @@ export default function NewNotificationModal({
                         {notification.title}
                       </h3>
                       {!notification.is_read && (
-                        <span className="inline-block w-2 h-2 bg-primary-500 rounded-full flex-shrink-0"></span>
+                        <span className="inline-block w-2 h-2 bg-primary-500 rounded-full shrink-0"></span>
                       )}
                     </div>
                     <p className="text-xs text-foreground-secondary dark:text-foreground-secondary">
@@ -129,7 +129,7 @@ export default function NewNotificationModal({
                 </div>
                 <button
                   onClick={onClose}
-                  className="text-foreground-tertiary dark:text-foreground-tertiary hover:text-foreground-secondary dark:hover:text-foreground-secondary hover:bg-surface-hover dark:hover:bg-surface-hover p-1.5 rounded-lg transition-colors flex-shrink-0"
+                  className="text-foreground-tertiary dark:text-foreground-tertiary hover:text-foreground-secondary dark:hover:text-foreground-secondary hover:bg-surface-hover dark:hover:bg-surface-hover p-1.5 rounded-lg transition-colors shrink-0"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -175,7 +175,7 @@ export default function NewNotificationModal({
                 onClick={handleDelete}
                 className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm border border-red-200"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash className="h-4 w-4" />
                 Delete
               </button>
             </div>

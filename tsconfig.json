@@ -36,7 +36,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/lib/types/asdtsasdas.bak",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [

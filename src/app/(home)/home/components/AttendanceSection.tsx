@@ -182,7 +182,7 @@ export default function AttendanceSection({
 
   return (
     <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
-      <div className="p-5 flex-shrink-0">
+      <div className="p-5 shrink-0">
         <SectionHeader title="Attendance Today" icon={Calendar} />
       </div>
       <div className="px-5 pb-5 flex-1 overflow-y-auto min-h-0">
@@ -319,7 +319,7 @@ export default function AttendanceSection({
             </div>
 
             {/* RIGHT COLUMN */}
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               {!checkInCompleted && !checkOutCompleted && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}

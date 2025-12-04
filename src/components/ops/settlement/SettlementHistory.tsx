@@ -108,7 +108,7 @@ export default function SettlementHistoryPage() {
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex items-start gap-2">
-                        <DollarSign size={18} className="text-green-600 mt-1 flex-shrink-0" />
+                        <DollarSign size={18} className="text-green-600 mt-1 shrink-0" />
                         <div>
                           <h3 className="font-medium text-foreground-primary">
                             {claimTypes.find(type => type.id === settlement.settlement_type_id)?.settlement_item || "Unknown"}

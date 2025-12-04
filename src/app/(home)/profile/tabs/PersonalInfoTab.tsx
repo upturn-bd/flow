@@ -366,7 +366,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
                             />
                           </div>
                         ) : (
-                          <div className="py-1 break-words">
+                          <div className="py-1 wrap-break-words">
                             {field.name === "date_of_birth" &&
                             formValues[field.name]
                               ? new Date(

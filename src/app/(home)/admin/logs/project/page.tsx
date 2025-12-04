@@ -122,7 +122,7 @@ export default function CompanyProjectsPage() {
                >
                   <CardContent className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 gap-3">
                      <div className="flex flex-col gap-2 w-full sm:w-2/3">
-                        <h3 className="font-semibold text-lg break-words">{project.project_title}</h3>
+                        <h3 className="font-semibold text-lg wrap-break-words">{project.project_title}</h3>
 
                         {/* Desktop badges */}
                         <div className="hidden sm:flex flex-wrap gap-2 text-sm text-foreground-secondary mt-1">

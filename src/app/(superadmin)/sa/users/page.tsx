@@ -551,7 +551,7 @@ export default function SuperadminUsersPage() {
 
                 {/* Warning */}
                 <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 flex items-start gap-3">
-                  <Warning size={20} className="text-warning flex-shrink-0 mt-0.5" />
+                  <Warning size={20} className="text-warning shrink-0 mt-0.5" />
                   <div className="text-sm text-warning">
                     <p className="font-medium">Important</p>
                     <p className="mt-1">Superadmin privileges grant full access to all companies and system settings. Only grant to trusted employees.</p>

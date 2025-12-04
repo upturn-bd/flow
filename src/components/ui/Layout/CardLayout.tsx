@@ -99,7 +99,7 @@ export function CardLayout({
               )}
             </div>
             {headerAction && (
-              <div className="ml-4 flex-shrink-0">
+              <div className="ml-4 shrink-0">
                 {headerAction}
               </div>
             )}

@@ -144,7 +144,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
             setSelectedIssue(null);
             openCreateModal();
           }}
-          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm flex-shrink-0"
+          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm shrink-0"
         >
           <Plus size={18} />
           <span className="hidden sm:inline">Add Issue</span>
@@ -191,7 +191,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <h3 className="text-sm sm:text-base font-semibold text-foreground-primary break-words">{issue.title}</h3>
+                    <h3 className="text-sm sm:text-base font-semibold text-foreground-primary wrap-break-words">{issue.title}</h3>
                     <span className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(issue.status)}`}>
                       {getStatusIcon(issue.status)}
                       <span className="hidden sm:inline">{issue.status}</span>
@@ -203,7 +203,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
 
                   {/* Description */}
                   {issue.description && (
-                    <p className="text-xs sm:text-sm text-foreground-tertiary mt-2 break-words">{issue.description}</p>
+                    <p className="text-xs sm:text-sm text-foreground-tertiary mt-2 wrap-break-words">{issue.description}</p>
                   )}
 
                   {/* Attachments */}
@@ -235,7 +235,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 sm:flex-col sm:items-end flex-shrink-0">
+                <div className="flex items-center gap-2 sm:flex-col sm:items-end shrink-0">
                   <button
                     onClick={() => {
                       setSelectedIssue(issue);

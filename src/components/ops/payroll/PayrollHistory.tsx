@@ -221,7 +221,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
             >
               <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <CreditCard className="h-8 w-8 text-indigo-600" />
                   </div>
                   <div className="ml-4">
@@ -232,7 +232,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
               </div>
               <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <CheckCircle className="h-8 w-8 text-green-600" />
                   </div>
                   <div className="ml-4">
@@ -243,7 +243,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
               </div>
               <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <Clock className="h-8 w-8 text-blue-600" />
                   </div>
                   <div className="ml-4">
@@ -254,7 +254,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
               </div>
                   <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <AlertTriangle className="h-8 w-8 text-amber-600" />
                       </div>
                       <div className="ml-4">
@@ -275,7 +275,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
             >
               <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     {statusFilter === 'Paid' && <CheckCircle className="h-8 w-8 text-green-600" />}
                     {statusFilter === 'Pending' && <Clock className="h-8 w-8 text-blue-600" />}
                     {statusFilter === 'Published' && <AlertTriangle className="h-8 w-8 text-amber-600" />}
@@ -329,7 +329,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                     <div className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start space-x-4">
-                          <div className="flex-shrink-0">
+                          <div className="shrink-0">
                             <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
                               <CreditCard className="h-6 w-6 text-indigo-600" />
                             </div>

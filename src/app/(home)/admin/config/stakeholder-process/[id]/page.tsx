@@ -85,14 +85,14 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
           <button
             onClick={() => router.back()}
-            className="p-2 hover:bg-surface-hover rounded-lg transition-colors flex-shrink-0"
+            className="p-2 hover:bg-surface-hover rounded-lg transition-colors shrink-0"
             aria-label="Go back"
           >
             <ArrowLeft size={20} />
           </button>
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary break-words">{process.name}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary wrap-break-words">{process.name}</h1>
               {process.is_active ? (
                 <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded whitespace-nowrap">
                   Active
@@ -104,7 +104,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
               )}
             </div>
             {process.description && (
-              <p className="mt-2 text-sm sm:text-base text-foreground-secondary break-words">{process.description}</p>
+              <p className="mt-2 text-sm sm:text-base text-foreground-secondary wrap-break-words">{process.description}</p>
             )}
             <div className="mt-3 flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm text-foreground-secondary">
               <span>

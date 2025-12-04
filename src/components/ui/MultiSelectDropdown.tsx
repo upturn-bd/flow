@@ -107,7 +107,7 @@ export default function MultiSelectDropdown({
               )}
             </div>
             <CaretDown
-              className={`text-foreground-tertiary dark:text-foreground-tertiary transition-transform flex-shrink-0 ${
+              className={`text-foreground-tertiary dark:text-foreground-tertiary transition-transform shrink-0 ${
                 isOpen ? "rotate-180" : ""
               }`}
               size={20}

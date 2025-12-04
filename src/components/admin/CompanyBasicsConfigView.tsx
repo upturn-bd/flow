@@ -48,11 +48,11 @@ export default function CompanyBasicsConfigView() {
           className={`fixed top-4 right-4 z-50 p-3 sm:p-4 rounded-lg shadow-lg flex items-center gap-2 max-w-[90vw] sm:max-w-md ${notification.isError ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
             }`}
         >
-          {notification.isError ? <X className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> : <Info className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />}
+          {notification.isError ? <X className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" /> : <Info className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />}
           <span className="text-sm sm:text-base line-clamp-2">{notification.message}</span>
           <button
             onClick={() => setNotification(prev => ({ ...prev, visible: false }))}
-            className="ml-auto flex-shrink-0"
+            className="ml-auto shrink-0"
           >
             <X className="h-4 w-4" />
           </button>

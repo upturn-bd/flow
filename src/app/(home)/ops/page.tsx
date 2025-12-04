@@ -11,7 +11,7 @@ import {
   DollarSign,
   WarningCircle,
   UserPlus, // Onboarding
-  File,
+  FileIcon,
   Users,
   CreditCard, // Payroll
   Building,
@@ -253,7 +253,7 @@ export default function ServicesPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <EmptyState
-            icon={File}
+            icon={FileIcon}
             title="No services found"
             description="Try searching with different keywords or browse all services"
             action={{
@@ -284,7 +284,7 @@ export default function ServicesPage() {
                 <h2 className="text-lg sm:text-xl font-bold text-foreground-primary mr-2">
                   {section.title}
                 </h2>
-                <div className="h-[1px] flex-grow bg-border-primary"></div>
+                <div className="h-px grow bg-border-primary"></div>
               </motion.div>
               <motion.p 
                 className="text-sm sm:text-base text-foreground-secondary mb-4"
@@ -307,11 +307,11 @@ export default function ServicesPage() {
                     >
                       <Link
                         href={item.path}
-                        className="group flex flex-col sm:flex-row items-start sm:items-center p-3 sm:p-4 bg-surface-primary rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 block min-h-[100px] sm:h-24"
+                        className="group flex-col sm:flex-row items-start sm:items-center p-3 sm:p-4 bg-surface-primary rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 block min-h-[100px] sm:h-24"
                       >
                         <motion.div 
                           whileHover={{ scale: 1.1 }}
-                          className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-md ${item.color.split(' ').filter(c => !c.startsWith('border-')).join(' ')} flex items-center justify-center mb-2 sm:mb-0 sm:mr-3 transition-transform`}
+                          className={`shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-md ${item.color.split(' ').filter(c => !c.startsWith('border-')).join(' ')} flex items-center justify-center mb-2 sm:mb-0 sm:mr-3 transition-transform`}
                         >
                           <Icon size={24} className="text-current sm:w-7 sm:h-7" />
                         </motion.div>
@@ -324,7 +324,7 @@ export default function ServicesPage() {
                               initial={{ x: 0 }}
                               whileHover={{ x: 3 }}
                               xmlns="http://www.w3.org/2000/svg" 
-                              className="hidden sm:block h-4 w-4 text-primary-600 ml-2 transition-all flex-shrink-0" 
+                              className="hidden sm:block h-4 w-4 text-primary-600 ml-2 transition-all shrink-0" 
                               fill="none" 
                               viewBox="0 0 24 24" 
                               stroke="currentColor"

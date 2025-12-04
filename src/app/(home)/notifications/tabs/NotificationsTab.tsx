@@ -172,7 +172,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
     <div className={`border-l-4 rounded-lg p-4 ${priorityStyle} ${!notification.is_read ? 'shadow-sm' : ''}`}>
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className={`flex-shrink-0 ${iconColor} mt-0.5`}>
+          <div className={`shrink-0 ${iconColor} mt-0.5`}>
             <IconComponent className="h-5 w-5" />
           </div>
 
@@ -182,7 +182,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
                 {notification.title}
               </h4>
               {!notification.is_read && (
-                <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
+                <span className="w-2 h-2 bg-blue-500 rounded-full shrink-0"></span>
               )}
             </div>
 

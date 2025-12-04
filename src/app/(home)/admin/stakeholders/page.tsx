@@ -395,7 +395,7 @@ export default function StakeholdersPage() {
                     )}
                   </div>
                   <span
-                    className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium flex-shrink-0 leading-tight ${getStepStatusColor(
+                    className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium shrink-0 leading-tight ${getStepStatusColor(
                       stakeholder.status
                     )}`}
                   >

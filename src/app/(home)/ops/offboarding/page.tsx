@@ -324,7 +324,7 @@ export default function OffboardingPage() {
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                    <div className="shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
                       <User className="h-5 w-5" />
                     </div>
                     <div>
@@ -410,7 +410,7 @@ export default function OffboardingPage() {
               {selectedEmployee ? (
                 <div className="bg-surface-primary rounded-xl p-6 shadow-sm border border-border-primary space-y-4">
                   <div className="flex items-center gap-3 pb-4 border-b border-border-primary">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                    <div className="shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600">
                       <User className="h-6 w-6" />
                     </div>
                     <div>

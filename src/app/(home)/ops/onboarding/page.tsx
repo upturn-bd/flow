@@ -214,7 +214,7 @@ export default function OnboardingApprovalPage() {
             >
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                  <div className="shrink-0 w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
                     <User className="h-5 w-5" />
                   </div>
                   <div>

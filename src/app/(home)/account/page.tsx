@@ -129,9 +129,9 @@ export default function AccountPage() {
         }`}>
           <div className="flex items-start">
             {notification.type === 'success' ? (
-              <CheckCircle className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0" />
+              <CheckCircle className="h-5 w-5 mt-0.5 mr-3 shrink-0" />
             ) : (
-              <WarningCircle className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0" />
+              <WarningCircle className="h-5 w-5 mt-0.5 mr-3 shrink-0" />
             )}
             <p className="text-sm font-medium">{notification.message}</p>
           </div>
@@ -176,7 +176,7 @@ export default function AccountPage() {
               </h3>
               <div className="space-y-4">
                 <div className="flex">
-                  <Mail className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                  <Mail className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                   <div>
                     <p className="text-foreground-secondary">{userData.email}</p>
                     <p className="text-xs text-foreground-tertiary">Email</p>
@@ -184,7 +184,7 @@ export default function AccountPage() {
                 </div>
                 
                 <div className="flex">
-                  <Phone className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                  <Phone className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                   <div>
                     <p className="text-foreground-secondary">{userData.phone_number || "Not provided"}</p>
                     <p className="text-xs text-foreground-tertiary">Phone</p>
@@ -200,7 +200,7 @@ export default function AccountPage() {
               </h3>
               <div className="space-y-4">
                 <div className="flex">
-                  <Building className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                  <Building className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                   <div>
                     <p className="text-foreground-secondary">{userData.department_name || "Not assigned"}</p>
                     <p className="text-xs text-foreground-tertiary">Department</p>
@@ -208,7 +208,7 @@ export default function AccountPage() {
                 </div>
                 
                 <div className="flex">
-                  <Calendar className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                  <Calendar className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                   <div>
                     <p className="text-foreground-secondary">
                       {userData.hire_date 
@@ -220,7 +220,7 @@ export default function AccountPage() {
                 </div>
                 
                 <div className="flex">
-                  <Clock className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                  <Clock className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                   <div>
                     <p className="text-foreground-secondary">{userData.job_status || "Not specified"}</p>
                     <p className="text-xs text-foreground-tertiary">Status</p>

@@ -300,7 +300,7 @@ export default function StakeholderTransactions({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg p-3 sm:p-4 border border-primary-200"
+          className="bg-linear-to-br from-primary-50 to-primary-100 rounded-lg p-3 sm:p-4 border border-primary-200"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -317,7 +317,7 @@ export default function StakeholderTransactions({
 
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-success/20 to-success/30 rounded-lg p-3 sm:p-4 border border-success/40"
+          className="bg-linear-to-br from-success/20 to-success/30 rounded-lg p-3 sm:p-4 border border-success/40"
         >
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
@@ -326,7 +326,7 @@ export default function StakeholderTransactions({
                 {summary.totalIncome.toLocaleString()} BDT
               </p>
             </div>
-            <div className="p-2 sm:p-3 bg-success/30 rounded-lg flex-shrink-0">
+            <div className="p-2 sm:p-3 bg-success/30 rounded-lg shrink-0">
               <TrendingUp className="text-success" size={20} />
             </div>
           </div>
@@ -334,7 +334,7 @@ export default function StakeholderTransactions({
 
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-error/20 to-error/30 rounded-lg p-3 sm:p-4 border border-error/40"
+          className="bg-linear-to-br from-error/20 to-error/30 rounded-lg p-3 sm:p-4 border border-error/40"
         >
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
@@ -343,7 +343,7 @@ export default function StakeholderTransactions({
                 {summary.totalExpense.toLocaleString()} BDT
               </p>
             </div>
-            <div className="p-2 sm:p-3 bg-error/30 rounded-lg flex-shrink-0">
+            <div className="p-2 sm:p-3 bg-error/30 rounded-lg shrink-0">
               <TrendingDown className="text-error" size={20} />
             </div>
           </div>
@@ -351,7 +351,7 @@ export default function StakeholderTransactions({
 
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-primary-50/50 to-primary-100/50 rounded-lg p-3 sm:p-4 border border-primary-200/50"
+          className="bg-linear-to-br from-primary-50/50 to-primary-100/50 rounded-lg p-3 sm:p-4 border border-primary-200/50"
         >
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
@@ -362,7 +362,7 @@ export default function StakeholderTransactions({
                 {summary.netAmount.toLocaleString()} BDT
               </p>
             </div>
-            <div className="p-2 sm:p-3 bg-primary-200/50 rounded-lg flex-shrink-0">
+            <div className="p-2 sm:p-3 bg-primary-200/50 rounded-lg shrink-0">
               <Wallet className="text-primary-700" size={20} />
             </div>
           </div>
@@ -375,7 +375,7 @@ export default function StakeholderTransactions({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex-1 min-w-0">
               <h3 className="text-base sm:text-lg font-semibold text-foreground-primary">Transaction History</h3>
-              <p className="text-xs sm:text-sm text-foreground-secondary mt-1 break-words">
+              <p className="text-xs sm:text-sm text-foreground-secondary mt-1 wrap-break-words">
                 {dateRangeFilter === 'all' 
                   ? `All transactions for ${stakeholderName}`
                   : dateRangeFilter === '7days'
@@ -388,7 +388,7 @@ export default function StakeholderTransactions({
             </div>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm flex-shrink-0"
+              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm shrink-0"
             >
               <Plus size={16} />
               <span className="hidden sm:inline">New Transaction</span>
@@ -401,7 +401,7 @@ export default function StakeholderTransactions({
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border-primary bg-surface-secondary space-y-3 sm:space-y-4">
           {/* Time Range Filter Buttons */}
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-xs sm:text-sm font-medium text-foreground-secondary flex-shrink-0">Time Period:</span>
+            <span className="text-xs sm:text-sm font-medium text-foreground-secondary shrink-0">Time Period:</span>
             <button
               onClick={() => setDateRangeFilter('7days')}
               className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
@@ -450,7 +450,7 @@ export default function StakeholderTransactions({
 
           {/* Amount Type Filter Buttons */}
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-xs sm:text-sm font-medium text-foreground-secondary flex-shrink-0">Type:</span>
+            <span className="text-xs sm:text-sm font-medium text-foreground-secondary shrink-0">Type:</span>
             <button
               onClick={() => setAmountFilter('all')}
               className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors ${
@@ -498,7 +498,7 @@ export default function StakeholderTransactions({
               />
             </div>
             
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               <Filter size={16} className="text-foreground-tertiary" />
               <select
                 value={statusFilter}
@@ -567,7 +567,7 @@ export default function StakeholderTransactions({
                       <h4 className="font-medium text-foreground-primary text-sm truncate">{txn.title}</h4>
                       <p className="text-xs text-foreground-secondary mt-1">{txn.from_source}</p>
                     </div>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ml-2 ${
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium shrink-0 ml-2 ${
                       txn.status === 'Complete' 
                         ? 'bg-success/20 text-success' 
                         : 'bg-warning/20 text-warning'

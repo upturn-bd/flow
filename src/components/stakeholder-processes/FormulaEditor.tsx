@@ -609,7 +609,7 @@ export default function FormulaEditor({
       {/* Validation Error */}
       {validationError && (
         <div className="bg-error/10 border border-error/30 rounded-lg p-3 flex items-start gap-2">
-          <WarningCircle className="text-error flex-shrink-0 mt-0.5" size={16} />
+          <WarningCircle className="text-error shrink-0 mt-0.5" size={16} />
           <div className="flex-1">
             <p className="text-sm font-medium text-error">Invalid Formula</p>
             <p className="text-sm text-error mt-1">{validationError}</p>
@@ -842,7 +842,7 @@ export default function FormulaEditor({
                             )}
                           </div>
                         </div>
-                        <Plus size={16} className="text-primary-600 flex-shrink-0" />
+                        <Plus size={16} className="text-primary-600 shrink-0" />
                       </div>
                     </button>
                   ))}

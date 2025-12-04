@@ -50,7 +50,7 @@ export default function DepartmentDetailsModal({
   const divisionName = divisions?.find((division) => division.id === department.division_id)?.name;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 backdrop-blur-sm">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -74,7 +74,7 @@ export default function DepartmentDetailsModal({
 
         <motion.div variants={fadeInUp} className="mt-6 space-y-4">
           <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
-            <Building size={20} weight="duotone" className="text-foreground-secondary flex-shrink-0" />
+            <Building size={20} weight="duotone" className="text-foreground-secondary shrink-0" />
             <div>
               <div className="text-sm text-foreground-secondary font-medium">Department Name</div>
               <div className="font-medium text-foreground-primary">{department?.name}</div>
@@ -82,7 +82,7 @@ export default function DepartmentDetailsModal({
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
-            <User size={20} weight="duotone" className="text-foreground-secondary flex-shrink-0" />
+            <User size={20} weight="duotone" className="text-foreground-secondary shrink-0" />
             <div>
               <div className="text-sm text-foreground-secondary font-medium">Department Head</div>
               <div className="font-medium text-foreground-primary">
@@ -92,7 +92,7 @@ export default function DepartmentDetailsModal({
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
-            <StackSimple size={20} weight="duotone" className="text-foreground-secondary flex-shrink-0" />
+            <StackSimple size={20} weight="duotone" className="text-foreground-secondary shrink-0" />
             <div>
               <div className="text-sm text-foreground-secondary font-medium">Division</div>
               <div className="font-medium text-foreground-primary">{divisionName || "None"}</div>
@@ -100,7 +100,7 @@ export default function DepartmentDetailsModal({
           </div>
 
           <div className="flex gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
-            <FileText size={20} weight="duotone" className="text-foreground-secondary flex-shrink-0 mt-0.5" />
+            <FileText size={20} weight="duotone" className="text-foreground-secondary shrink-0 mt-0.5" />
             <div>
               <div className="text-sm text-foreground-secondary font-medium">Description</div>
               <div className="text-foreground-primary">{department?.description || "No description provided"}</div>
