@@ -41,7 +41,7 @@ import {
   LockKeyOpen as LockOpen,
   
   // Data & Files
-  File,
+  File as FileIcon,
   FileText,
   Folder,
   FolderOpen,
@@ -311,7 +311,7 @@ export {
   LockOpen,
   
   // Data & Files
-  File,
+  FileIcon,
   FileText,
   Folder,
   FolderOpen,
@@ -579,7 +579,7 @@ export default {
   SignIn,
   Lock,
   LockOpen,
-  File,
+  FileIcon,
   FileText,
   Folder,
   FolderOpen,

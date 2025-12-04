@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { X, Plus, Trash, Save } from "@/lib/icons";
+import { useState, useEffect, useMemo } from "react";
+import { X, Plus, Trash, Save, CaretDown, CaretRight, CheckSquare, MapPin } from "@/lib/icons";
 import { StakeholderStepData, StakeholderProcessStep } from "@/lib/types/schemas";
 
 interface AdditionalDataModalProps {
@@ -18,8 +18,149 @@ interface DataField {
   key: string;
   value: any;
   label: string;
+  fieldKey: string; // Original field key
   sourceStep?: string; // Which step this data came from
+  stepOrder?: number; // For ordering steps
 }
+
+interface StepGroup {
+  stepName: string;
+  stepOrder: number;
+  fields: DataField[];
+}
+
+// Helper to convert snake_case or camelCase to human-readable labels
+const toHumanReadable = (value: string): string => {
+  return value
+    .replace(/_/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2") // Handle camelCase
+    .replace(/\b\w/g, (l) => l.toUpperCase())
+    .trim();
+};
+
+// Helper to detect if a value looks like coordinates
+const isCoordinates = (value: any): { lat: number; lng: number } | null => {
+  // Handle object with lat/lng or latitude/longitude
+  if (typeof value === "object" && value !== null) {
+    const lat = value.lat ?? value.latitude ?? value.Lat ?? value.Latitude;
+    const lng = value.lng ?? value.lon ?? value.longitude ?? value.Lng ?? value.Lon ?? value.Longitude;
+    if (typeof lat === "number" && typeof lng === "number") {
+      return { lat, lng };
+    }
+  }
+  
+  // Handle string like "23.8103, 90.4125" or "23.8103,90.4125"
+  if (typeof value === "string") {
+    const match = value.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
+    if (match) {
+      const lat = parseFloat(match[1]);
+      const lng = parseFloat(match[2]);
+      if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+        return { lat, lng };
+      }
+    }
+  }
+  
+  return null;
+};
+
+// Helper to check if field key suggests it's a location field
+const isLocationField = (key: string): boolean => {
+  const locationKeywords = ['location', 'coordinates', 'lat', 'lng', 'latitude', 'longitude', 'geo', 'position', 'coords'];
+  const lowerKey = key.toLowerCase();
+  return locationKeywords.some(keyword => lowerKey.includes(keyword));
+};
+
+// Helper to format values for display
+const formatDisplayValue = (value: any): string => {
+  if (value === null || value === undefined) return "—";
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (typeof value === "number") return value.toLocaleString();
+  if (value instanceof Date) return value.toLocaleDateString();
+  
+  // Handle arrays
+  if (Array.isArray(value)) {
+    if (value.length === 0) return "—";
+    return value.map(item => formatDisplayValue(item)).join(", ");
+  }
+  
+  // Handle objects (not file objects)
+  if (typeof value === "object" && value !== null) {
+    // Skip file objects
+    if ('path' in value) return "[File]";
+    
+    // Check for coordinates
+    const coords = isCoordinates(value);
+    if (coords) {
+      return `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
+    }
+    
+    // Try to extract meaningful info from object
+    if ('name' in value) return String(value.name);
+    if ('label' in value) return String(value.label);
+    if ('title' in value) return String(value.title);
+    // Return a summary of keys
+    const keys = Object.keys(value);
+    if (keys.length === 0) return "—";
+    return keys.map(k => `${toHumanReadable(k)}: ${formatDisplayValue(value[k])}`).join(", ");
+  }
+  
+  // Handle string values
+  if (typeof value === "string") {
+    // Check if it's coordinates string
+    const coords = isCoordinates(value);
+    if (coords) {
+      return `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
+    }
+    
+    // Check if it looks like a date string
+    if (!isNaN(Date.parse(value)) && value.includes("-") && value.length >= 10) {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleDateString();
+      }
+    }
+    
+    // Check if it's a snake_case status-like value (e.g., in_progress, not_started)
+    if (/^[a-z]+(_[a-z]+)+$/.test(value)) {
+      return toHumanReadable(value);
+    }
+    
+    // Check if it's a camelCase value
+    if (/^[a-z]+([A-Z][a-z]+)+$/.test(value)) {
+      return toHumanReadable(value);
+    }
+  }
+  
+  return String(value);
+};
+
+// Component to render value with optional maps link
+const ValueDisplay = ({ value, fieldKey }: { value: any; fieldKey?: string }) => {
+  const coords = isCoordinates(value);
+  const showMapsLink = coords || (fieldKey && isLocationField(fieldKey) && isCoordinates(value));
+  
+  if (coords) {
+    const mapsUrl = `https://www.google.com/maps?q=${coords.lat},${coords.lng}`;
+    return (
+      <span className="inline-flex items-center gap-2 flex-wrap">
+        <span>{formatDisplayValue(value)}</span>
+        <a
+          href={mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors"
+        >
+          <MapPin size={12} />
+          Open in Maps
+        </a>
+      </span>
+    );
+  }
+  
+  return <span>{formatDisplayValue(value)}</span>;
+};
 
 export default function AdditionalDataModal({
   isOpen,
@@ -33,6 +174,7 @@ export default function AdditionalDataModal({
   const [selectedFields, setSelectedFields] = useState<DataField[]>([]);
   const [customFields, setCustomFields] = useState<DataField[]>([]);
   const [saving, setSaving] = useState(false);
+  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
 
   // Initialize with existing data if editing
   useEffect(() => {
@@ -40,39 +182,103 @@ export default function AdditionalDataModal({
       const fields = Object.entries(existingData).map(([key, value]) => ({
         key,
         value,
-        label: key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+        label: toHumanReadable(key),
+        fieldKey: key,
       }));
       setCustomFields(fields);
     }
   }, [existingData]);
 
-  // Build available fields from step data
-  const availableFields: DataField[] = [];
-  
-  stepData.forEach((sd) => {
-    if (!sd.is_completed || !sd.data) return;
+  // Build available fields grouped by step
+  const stepGroups = useMemo(() => {
+    const groups: Map<string, StepGroup> = new Map();
     
-    const step = processSteps.find((s) => s.id === sd.step_id);
-    const stepName = step?.name || `Step ${step?.step_order || "?"}`;
-    
-    Object.entries(sd.data).forEach(([key, value]) => {
-      // Skip file fields
-      if (typeof value === 'object' && value !== null && 'path' in value) {
-        return;
+    stepData.forEach((sd) => {
+      if (!sd.is_completed || !sd.data) return;
+      
+      const step = processSteps.find((s) => s.id === sd.step_id);
+      const stepName = step?.name || `Step ${step?.step_order || "?"}`;
+      const stepOrder = step?.step_order || 0;
+      
+      if (!groups.has(stepName)) {
+        groups.set(stepName, {
+          stepName,
+          stepOrder,
+          fields: [],
+        });
       }
       
-      // Get the field label from field definitions if available
-      const fieldDef = step?.field_definitions?.fields?.find((f) => f.key === key);
-      const fieldLabel = fieldDef?.label || key.replace(/_/g, " ");
+      const group = groups.get(stepName)!;
       
-      availableFields.push({
-        key: `${stepName}_${key}`,
-        value,
-        label: `${stepName}: ${fieldLabel}`,
-        sourceStep: stepName,
+      Object.entries(sd.data).forEach(([key, value]) => {
+        // Skip file fields
+        if (typeof value === 'object' && value !== null && 'path' in value) {
+          return;
+        }
+        
+        // Get the field label from field definitions if available
+        const fieldDef = step?.field_definitions?.fields?.find((f) => f.key === key);
+        const fieldLabel = fieldDef?.label || toHumanReadable(key);
+        
+        group.fields.push({
+          key: `${stepName}_${key}`,
+          value,
+          label: fieldLabel,
+          fieldKey: key,
+          sourceStep: stepName,
+          stepOrder,
+        });
       });
     });
-  });
+    
+    // Sort groups by step order and return as array
+    return Array.from(groups.values()).sort((a, b) => a.stepOrder - b.stepOrder);
+  }, [stepData, processSteps]);
+
+  // Expand all steps by default when modal opens
+  useEffect(() => {
+    if (isOpen && stepGroups.length > 0) {
+      setExpandedSteps(new Set(stepGroups.map(g => g.stepName)));
+    }
+  }, [isOpen, stepGroups]);
+
+  const toggleStepExpansion = (stepName: string) => {
+    setExpandedSteps(prev => {
+      const next = new Set(prev);
+      if (next.has(stepName)) {
+        next.delete(stepName);
+      } else {
+        next.add(stepName);
+      }
+      return next;
+    });
+  };
+
+  const selectAllFromStep = (stepGroup: StepGroup) => {
+    const newFields = stepGroup.fields.filter(
+      field => !selectedFields.some(f => f.key === field.key)
+    );
+    setSelectedFields([...selectedFields, ...newFields]);
+  };
+
+  const deselectAllFromStep = (stepGroup: StepGroup) => {
+    setSelectedFields(
+      selectedFields.filter(f => f.sourceStep !== stepGroup.stepName)
+    );
+  };
+
+  const isStepFullySelected = (stepGroup: StepGroup) => {
+    return stepGroup.fields.every(field => 
+      selectedFields.some(f => f.key === field.key)
+    );
+  };
+
+  const isStepPartiallySelected = (stepGroup: StepGroup) => {
+    const selectedCount = stepGroup.fields.filter(field => 
+      selectedFields.some(f => f.key === field.key)
+    ).length;
+    return selectedCount > 0 && selectedCount < stepGroup.fields.length;
+  };
 
   const handleAddField = (field: DataField) => {
     // Don't add if already selected
@@ -91,6 +297,7 @@ export default function AdditionalDataModal({
       key: `custom_field_${Date.now()}`,
       value: "",
       label: "New Field",
+      fieldKey: `custom_${Date.now()}`,
     };
     setCustomFields([...customFields, newField]);
   };
@@ -108,18 +315,37 @@ export default function AdditionalDataModal({
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Combine selected fields and custom fields into a single object
+      // Build structured data object with step groupings
       const data: Record<string, any> = {};
       
-      selectedFields.forEach((field) => {
-        data[field.label] = field.value;
+      // Group selected fields by step for better organization
+      const stepGroupedFields = selectedFields.reduce((acc, field) => {
+        const stepKey = field.sourceStep || "General";
+        if (!acc[stepKey]) {
+          acc[stepKey] = {};
+        }
+        // Use human-readable label as key
+        acc[stepKey][field.label] = field.value;
+        return acc;
+      }, {} as Record<string, Record<string, any>>);
+      
+      // Add step-grouped data
+      Object.entries(stepGroupedFields).forEach(([stepName, fields]) => {
+        data[stepName] = fields;
       });
       
-      customFields.forEach((field) => {
-        if (field.label.trim() && field.value !== undefined && field.value !== "") {
-          data[field.label] = field.value;
+      // Add custom fields under "Custom Data" section
+      if (customFields.length > 0) {
+        const customData: Record<string, any> = {};
+        customFields.forEach((field) => {
+          if (field.label.trim() && field.value !== undefined && field.value !== "") {
+            customData[field.label] = field.value;
+          }
+        });
+        if (Object.keys(customData).length > 0) {
+          data["Custom Data"] = customData;
         }
-      });
+      }
       
       await onSave(data);
       onClose();
@@ -133,7 +359,7 @@ export default function AdditionalDataModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
       <div className="bg-surface-primary rounded-lg max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border-primary">
@@ -148,76 +374,167 @@ export default function AdditionalDataModal({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-          {/* Available Fields from Steps */}
-          {availableFields.length > 0 && (
+          {/* Available Fields from Steps - Grouped by Step */}
+          {stepGroups.length > 0 && (
             <div>
               <h3 className="text-base sm:text-lg font-semibold text-foreground-primary mb-3">
                 Select from Completed Steps
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                {availableFields.map((field) => {
-                  const isSelected = selectedFields.some((f) => f.key === field.key);
+              <div className="space-y-3">
+                {stepGroups.map((stepGroup) => {
+                  const isExpanded = expandedSteps.has(stepGroup.stepName);
+                  const isFullySelected = isStepFullySelected(stepGroup);
+                  const isPartiallySelected = isStepPartiallySelected(stepGroup);
+                  const selectedCount = stepGroup.fields.filter(field => 
+                    selectedFields.some(f => f.key === field.key)
+                  ).length;
+
                   return (
-                    <button
-                      key={field.key}
-                      onClick={() => !isSelected && handleAddField(field)}
-                      disabled={isSelected}
-                      className={`text-left p-3 rounded-lg border transition-colors ${
-                        isSelected
-                          ? "border-green-300 bg-green-50 dark:bg-green-900/30 text-foreground-tertiary cursor-not-allowed"
-                          : "border-border-primary hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/30"
-                      }`}
+                    <div
+                      key={stepGroup.stepName}
+                      className="border border-border-primary rounded-lg overflow-hidden"
                     >
-                      <p className="text-xs sm:text-sm font-medium text-foreground-secondary truncate">
-                        {field.label}
-                      </p>
-                      <p className="text-xs sm:text-sm text-foreground-tertiary mt-1 truncate">
-                        {typeof field.value === "boolean"
-                          ? field.value
-                            ? "Yes"
-                            : "No"
-                          : String(field.value)}
-                      </p>
-                      {isSelected && (
-                        <p className="text-xs text-green-600 dark:text-green-400 mt-1">✓ Selected</p>
+                      {/* Step Header */}
+                      <div
+                        className={`flex items-center justify-between p-3 cursor-pointer transition-colors ${
+                          isFullySelected
+                            ? "bg-green-50 dark:bg-green-900/20"
+                            : isPartiallySelected
+                              ? "bg-primary-50 dark:bg-primary-900/20"
+                              : "bg-background-secondary hover:bg-surface-hover"
+                        }`}
+                        onClick={() => toggleStepExpansion(stepGroup.stepName)}
+                      >
+                        <div className="flex items-center gap-2">
+                          {isExpanded ? (
+                            <CaretDown size={18} className="text-foreground-secondary" />
+                          ) : (
+                            <CaretRight size={18} className="text-foreground-secondary" />
+                          )}
+                          <span className="font-medium text-foreground-primary">
+                            {stepGroup.stepName}
+                          </span>
+                          <span className="text-xs text-foreground-tertiary">
+                            ({selectedCount}/{stepGroup.fields.length} selected)
+                          </span>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (isFullySelected) {
+                              deselectAllFromStep(stepGroup);
+                            } else {
+                              selectAllFromStep(stepGroup);
+                            }
+                          }}
+                          className={`flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors ${
+                            isFullySelected
+                              ? "text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30"
+                              : "text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/30"
+                          }`}
+                        >
+                          <CheckSquare size={14} />
+                          {isFullySelected ? "Deselect All" : "Select All"}
+                        </button>
+                      </div>
+
+                      {/* Step Fields */}
+                      {isExpanded && (
+                        <div className="border-t border-border-primary p-3 bg-surface-primary">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {stepGroup.fields.map((field) => {
+                              const isSelected = selectedFields.some((f) => f.key === field.key);
+                              return (
+                                <button
+                                  key={field.key}
+                                  onClick={() => {
+                                    if (isSelected) {
+                                      handleRemoveField(field.key);
+                                    } else {
+                                      handleAddField(field);
+                                    }
+                                  }}
+                                  className={`text-left p-3 rounded-lg border transition-all ${
+                                    isSelected
+                                      ? "border-green-400 bg-green-50 dark:bg-green-900/30 ring-1 ring-green-400"
+                                      : "border-border-secondary hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/30"
+                                  }`}
+                                >
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs sm:text-sm font-medium text-foreground-primary">
+                                        {field.label}
+                                      </p>
+                                      <p className="text-xs sm:text-sm text-foreground-tertiary mt-1 truncate">
+                                        {formatDisplayValue(field.value)}
+                                      </p>
+                                    </div>
+                                    {isSelected && (
+                                      <span className="shrink-0 w-5 h-5 flex items-center justify-center bg-green-500 text-white rounded-full text-xs">
+                                        ✓
+                                      </span>
+                                    )}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
                       )}
-                    </button>
+                    </div>
                   );
                 })}
               </div>
             </div>
           )}
 
-          {/* Selected Fields */}
+          {/* Selected Fields Summary - Grouped by Step */}
           {selectedFields.length > 0 && (
             <div>
               <h3 className="text-base sm:text-lg font-semibold text-foreground-primary mb-3">
                 Selected Fields ({selectedFields.length})
               </h3>
-              <div className="space-y-2">
-                {selectedFields.map((field) => (
-                  <div
-                    key={field.key}
-                    className="flex items-center justify-between p-3 bg-primary-50 dark:bg-primary-900/30 rounded-lg border border-primary-200 dark:border-primary-800"
-                  >
-                    <div className="flex-1 min-w-0 mr-2">
-                      <p className="text-xs sm:text-sm font-medium text-foreground-primary truncate">
-                        {field.label}
-                      </p>
-                      <p className="text-xs sm:text-sm text-foreground-tertiary truncate">
-                        {typeof field.value === "boolean"
-                          ? field.value
-                            ? "Yes"
-                            : "No"
-                          : String(field.value)}
-                      </p>
+              <div className="space-y-3">
+                {/* Group selected fields by step */}
+                {Array.from(
+                  selectedFields.reduce((acc, field) => {
+                    const stepName = field.sourceStep || "General";
+                    if (!acc.has(stepName)) {
+                      acc.set(stepName, []);
+                    }
+                    acc.get(stepName)!.push(field);
+                    return acc;
+                  }, new Map<string, DataField[]>())
+                ).map(([stepName, fields]) => (
+                  <div key={stepName} className="bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-200 dark:border-primary-800 overflow-hidden">
+                    <div className="px-3 py-2 bg-primary-100 dark:bg-primary-900/40 border-b border-primary-200 dark:border-primary-800">
+                      <span className="text-xs font-semibold text-primary-700 dark:text-primary-300 uppercase tracking-wide">
+                        {stepName}
+                      </span>
                     </div>
-                    <button
-                      onClick={() => handleRemoveField(field.key)}
-                      className="flex-shrink-0 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                    >
-                      <Trash size={18} />
-                    </button>
+                    <div className="p-3 space-y-2">
+                      {fields.map((field) => (
+                        <div
+                          key={field.key}
+                          className="flex items-center justify-between p-2 bg-surface-primary rounded-lg"
+                        >
+                          <div className="flex-1 min-w-0 mr-2">
+                            <p className="text-xs sm:text-sm font-medium text-foreground-primary">
+                              {field.label}
+                            </p>
+                            <p className="text-xs text-foreground-tertiary truncate">
+                              {formatDisplayValue(field.value)}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => handleRemoveField(field.key)}
+                            className="shrink-0 p-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
+                          >
+                            <Trash size={16} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -279,7 +596,7 @@ export default function AdditionalDataModal({
                         />
                         <button
                           onClick={() => handleRemoveCustomField(index)}
-                          className="flex-shrink-0 px-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                          className="shrink-0 px-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                         >
                           <Trash size={18} />
                         </button>

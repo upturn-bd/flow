@@ -23,9 +23,8 @@
       "request": "launch",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}",
-      "reAttach": true,
-      "reloadOnAttach": true,
-      "profile": "default-release",
+      "profileDir": "${env:HOME}/.mozilla/firefox/90m5rglb.default-release",
+      "keepProfileChanges": true,
       "pathMappings": [
         {
           "url": "about://React/Server/webpack-internal:///(rsc)",

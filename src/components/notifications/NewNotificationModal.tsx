@@ -119,7 +119,7 @@ export default function NewNotificationModal({
                         {notification.title}
                       </h3>
                       {!notification.is_read && (
-                        <span className="inline-block w-2 h-2 bg-primary-500 rounded-full flex-shrink-0"></span>
+                        <span className="inline-block w-2 h-2 bg-primary-500 rounded-full shrink-0"></span>
                       )}
                     </div>
                     <p className="text-xs text-foreground-secondary dark:text-foreground-secondary">
@@ -129,7 +129,7 @@ export default function NewNotificationModal({
                 </div>
                 <button
                   onClick={onClose}
-                  className="text-foreground-tertiary dark:text-foreground-tertiary hover:text-foreground-secondary dark:hover:text-foreground-secondary hover:bg-surface-hover dark:hover:bg-surface-hover p-1.5 rounded-lg transition-colors flex-shrink-0"
+                  className="text-foreground-tertiary dark:text-foreground-tertiary hover:text-foreground-secondary dark:hover:text-foreground-secondary hover:bg-surface-hover dark:hover:bg-surface-hover p-1.5 rounded-lg transition-colors shrink-0"
                 >
                   <X className="h-5 w-5" />
                 </button>

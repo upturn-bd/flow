@@ -50,7 +50,7 @@ export function PermissionTooltip({
     >
       <div className="flex items-center gap-2">
         {children}
-        <Lock size={16} className="text-foreground-tertiary flex-shrink-0" />
+        <Lock size={16} className="text-foreground-tertiary shrink-0" />
       </div>
 
       <AnimatePresence>

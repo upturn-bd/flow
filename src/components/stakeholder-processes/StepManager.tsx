@@ -140,7 +140,7 @@ export default function StepManager({
                 </div>
                 
                 {/* Step Number */}
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-semibold text-sm">
+                <div className="shrink-0 w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-semibold text-sm">
                   {step.step_order}
                 </div>
               </div>
@@ -414,7 +414,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-surface-primary rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border-primary sticky top-0 bg-surface-primary z-10">
           <h3 className="text-lg sm:text-xl font-bold text-foreground-primary">
@@ -422,7 +422,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
           </h3>
           <button 
             onClick={onClose} 
-            className="p-2 hover:bg-background-secondary rounded-lg transition-colors flex-shrink-0"
+            className="p-2 hover:bg-background-secondary rounded-lg transition-colors shrink-0"
             aria-label="Close"
           >
             <X size={20} />
@@ -434,7 +434,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
           {Object.keys(validationErrors).length > 0 && (
             <div className="bg-error/10 border border-error/30 rounded-lg p-4" data-validation-error>
               <div className="flex items-start gap-2">
-                <WarningCircle className="text-error flex-shrink-0 mt-0.5" size={20} />
+                <WarningCircle className="text-error shrink-0 mt-0.5" size={20} />
                 <div className="flex-1">
                   <h4 className="text-sm font-semibold text-error mb-2">Please fix the following errors:</h4>
                   <ul className="text-sm text-error space-y-1 list-disc list-inside">
@@ -623,7 +623,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
                 {/* Status Field Error Warning */}
                 {validationErrors.status_field && (
                   <div className="p-2 bg-error/10 border border-error/30 rounded flex items-start gap-2">
-                    <WarningCircle className="text-error flex-shrink-0 mt-0.5" size={14} />
+                    <WarningCircle className="text-error shrink-0 mt-0.5" size={14} />
                     <p className="text-xs text-error">{validationErrors.status_field}</p>
                   </div>
                 )}
@@ -924,7 +924,7 @@ function FieldEditor({
       {/* Validation Error Banner */}
       {(hasLabelError || hasOptionsError || hasFormulaError) && (
         <div className="px-3 py-2 bg-error/20 border-b border-error/30 flex items-center gap-2">
-          <WarningCircle className="text-error flex-shrink-0" size={16} />
+          <WarningCircle className="text-error shrink-0" size={16} />
           <div className="flex-1">
             <p className="text-xs font-medium text-error">
               {hasLabelError && validationErrors[`${fieldKey}_label`]}
@@ -1051,7 +1051,7 @@ function FieldEditor({
           {/* Options Error Warning */}
           {hasOptionsError && (
             <div className="mb-3 p-2 bg-error/10 border border-error/30 rounded flex items-start gap-2">
-              <WarningCircle className="text-error flex-shrink-0 mt-0.5" size={14} />
+              <WarningCircle className="text-error shrink-0 mt-0.5" size={14} />
               <p className="text-xs text-error">{validationErrors[`${fieldKey}_options`]}</p>
             </div>
           )}
@@ -1226,7 +1226,7 @@ function FieldEditor({
         <div className="px-3 pb-3 border-t border-border-primary mt-2 pt-3 bg-surface-primary">
           {hasFormulaError && (
             <div className="mb-3 p-2 bg-warning/10 border border-warning/30 rounded flex items-start gap-2">
-              <WarningCircle className="text-warning flex-shrink-0 mt-0.5" size={14} />
+              <WarningCircle className="text-warning shrink-0 mt-0.5" size={14} />
               <p className="text-xs text-warning">
                 Please configure a valid formula for this calculated field
               </p>

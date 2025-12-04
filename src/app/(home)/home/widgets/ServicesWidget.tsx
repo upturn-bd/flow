@@ -117,7 +117,7 @@ export default function ServicesWidget({ config, isEditMode, onToggle, onSizeCha
   return (
     <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
       <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
-        <div className="p-5 flex-shrink-0">
+        <div className="p-5 shrink-0">
           <SectionHeader title="Services" icon={Briefcase} iconColor="text-foreground-secondary" />
         </div>
         
@@ -155,7 +155,7 @@ export default function ServicesWidget({ config, isEditMode, onToggle, onSizeCha
                 <ArrowRight 
                   size={16} 
                   className={cn(
-                    'flex-shrink-0 ml-2 transition-transform group-hover:translate-x-1',
+                    'shrink-0 ml-2 transition-transform group-hover:translate-x-1',
                     'text-primary-600 dark:text-primary-400'
                   )} 
                 />

@@ -249,7 +249,7 @@ export default function StakeholderIssueForm({
                     className="flex items-center justify-between p-3 bg-primary-50 dark:bg-primary-900/30 rounded border border-primary-200 dark:border-primary-800"
                   >
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileText size={16} className="text-primary-600 flex-shrink-0" />
+                      <FileText size={16} className="text-primary-600 shrink-0" />
                       <span className="text-sm text-foreground-secondary truncate">
                         {attachment.originalName}
                       </span>
@@ -331,7 +331,7 @@ export default function StakeholderIssueForm({
                     className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-900/30 rounded border border-green-200 dark:border-green-800"
                   >
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileText size={16} className="text-green-600 dark:text-green-400 flex-shrink-0" />
+                      <FileText size={16} className="text-green-600 dark:text-green-400 shrink-0" />
                       <span className="text-sm text-foreground-secondary truncate">
                         {file.name}
                       </span>

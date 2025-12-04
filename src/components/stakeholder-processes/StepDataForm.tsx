@@ -5,7 +5,7 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { StakeholderProcessStep, StakeholderStepData, FieldDefinition, NestedFieldValue } from "@/lib/types/schemas";
-import { Upload, X, CheckCircle, File, Loader, XCircle, Calculator, WarningCircle } from "@/lib/icons";
+import { Upload, X, CheckCircle, FileIcon, Loader, XCircle, Calculator, WarningCircle } from "@/lib/icons";
 import GeolocationPicker, { GeolocationValue } from "@/components/ui/GeolocationPicker";
 import DropdownField from "@/components/ui/DropdownField";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
@@ -802,10 +802,10 @@ export default function StepDataForm({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {hasCalculationError && (
-                    <WarningCircle className="text-error flex-shrink-0" size={16} />
+                    <WarningCircle className="text-error shrink-0" size={16} />
                   )}
                   {hasMissingRefs && !hasCalculationError && (
-                    <WarningCircle className="text-warning flex-shrink-0" size={16} />
+                    <WarningCircle className="text-warning shrink-0" size={16} />
                   )}
                   <span className={`text-lg font-semibold ${hasCalculationError
                     ? 'text-error'
@@ -842,7 +842,7 @@ export default function StepDataForm({
             {/* Error Messages */}
             {calculationResult.error && (
               <div className="mt-2 p-2 bg-error/10 border border-error/30 rounded flex items-start gap-2">
-                <WarningCircle className="text-error flex-shrink-0 mt-0.5" size={14} />
+                <WarningCircle className="text-error shrink-0 mt-0.5" size={14} />
                 <p className="text-xs text-error">
                   <span className="font-medium">Calculation Error:</span> {calculationResult.error}
                 </p>
@@ -852,7 +852,7 @@ export default function StepDataForm({
             {/* Missing References Warning */}
             {calculationResult.missingRefs && calculationResult.missingRefs.length > 0 && (
               <div className="mt-2 p-2 bg-warning/10 border border-warning/30 rounded flex items-start gap-2">
-                <WarningCircle className="text-warning flex-shrink-0 mt-0.5" size={14} />
+                <WarningCircle className="text-warning shrink-0 mt-0.5" size={14} />
                 <div className="flex-1">
                   <p className="text-xs text-warning font-medium mb-1">
                     Missing or incomplete field data:
@@ -948,7 +948,7 @@ export default function StepDataForm({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between bg-background-secondary p-3 rounded-lg">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <File className="text-primary-600 flex-shrink-0" size={20} />
+                      <FileIcon className="text-primary-600 shrink-0" size={20} />
                       <span className="text-sm text-foreground-secondary truncate">
                         {getFileName()}
                       </span>
@@ -1270,7 +1270,7 @@ export default function StepDataForm({
 
       {/* Rejection Dialog */}
       {showRejectionDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-surface-primary rounded-lg max-w-md w-full p-4 sm:p-6">
             <h3 className="text-base sm:text-lg font-bold text-foreground-primary mb-3 sm:mb-4">Reject Stakeholder</h3>
             <p className="text-xs sm:text-sm text-foreground-secondary mb-3 sm:mb-4">

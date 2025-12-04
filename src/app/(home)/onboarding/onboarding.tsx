@@ -258,7 +258,7 @@ export default function EmployeeOnboarding() {
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="w-full min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-6"
+        className="w-full min-h-screen bg-linear-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-6"
       >
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
@@ -289,7 +289,7 @@ export default function EmployeeOnboarding() {
             
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6">
               <p className="text-sm text-blue-700 flex items-start">
-                <WarningCircle size={16} className="mr-2 mt-0.5 flex-shrink-0" />
+                <WarningCircle size={16} className="mr-2 mt-0.5 shrink-0" />
                 If you have any questions about your application status, please contact your supervisor or the HR department.
               </p>
             </div>
@@ -313,7 +313,7 @@ export default function EmployeeOnboarding() {
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="w-full min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-10 px-4 sm:px-6"
+      className="w-full min-h-screen bg-linear-to-br from-blue-50 to-indigo-50 py-10 px-4 sm:px-6"
     >
       <div className="max-w-5xl mx-auto">
         {/* Header */}
@@ -654,7 +654,7 @@ export default function EmployeeOnboarding() {
                         className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm"
                       >
                         <div className="flex items-start">
-                          <WarningCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                          <WarningCircle className="h-5 w-5 mr-2 shrink-0" />
                           <span>{errors.submit}</span>
                         </div>
                       </motion.div>

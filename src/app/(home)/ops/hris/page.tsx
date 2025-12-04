@@ -346,25 +346,25 @@ useEffect(() => {
 
                     <div className="p-5 space-y-3">
                       <div className="flex">
-                        <Mail className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                        <Mail className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                         <span className="text-foreground-secondary text-sm">
                           {employee.email}
                         </span>
                       </div>
                       <div className="flex">
-                        <Phone className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                        <Phone className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                         <span className="text-foreground-secondary text-sm">
                           {employee.phone}
                         </span>
                       </div>
                       <div className="flex">
-                        <Building className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                        <Building className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                         <span className="text-foreground-secondary text-sm">
                           {employee.department}
                         </span>
                       </div>
                       <div className="flex">
-                        <Calendar className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                        <Calendar className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                         <span className="text-foreground-secondary text-sm">
                           Joined:{" "}
                           {employee.joinDate

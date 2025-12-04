@@ -321,7 +321,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
           className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm"
         >
           <div className="flex items-start">
-            <WarningCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
+            <WarningCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3 shrink-0" />
             <p className="text-sm font-medium text-red-700">{submitError}</p>
           </div>
         </motion.div>
@@ -335,7 +335,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
           className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg shadow-sm"
         >
           <div className="flex items-start">
-            <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
+            <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
             <p className="text-sm font-medium text-green-700">Basic information updated successfully!</p>
           </div>
         </motion.div>
@@ -424,7 +424,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                               )}
                             </div>
                           ) : (
-                            <div className="py-1 break-words">
+                            <div className="py-1 wrap-break-words">
                               {field.name === "department_id" 
                                 ? departmentName(Number(formValues[field.name as keyof BasicInfoFormData])) 
                                 : field.name === "hire_date" && formValues[field.name as keyof BasicInfoFormData]

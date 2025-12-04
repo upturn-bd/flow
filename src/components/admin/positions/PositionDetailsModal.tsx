@@ -49,7 +49,7 @@ export default function PositionDetailsModal({
   const grade = grades?.find((g) => g.id === position.grade);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -73,7 +73,7 @@ export default function PositionDetailsModal({
 
         <motion.div variants={fadeInUp} className="mt-6 space-y-4">
           <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
-            <BriefcaseBusiness className="h-5 w-5 text-foreground-secondary flex-shrink-0" />
+            <BriefcaseBusiness className="h-5 w-5 text-foreground-secondary shrink-0" />
             <div>
               <div className="text-sm text-foreground-secondary font-medium">Position Name</div>
               <div className="font-medium text-foreground-primary">{position?.name}</div>
@@ -81,7 +81,7 @@ export default function PositionDetailsModal({
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
-            <Building className="h-5 w-5 text-foreground-secondary flex-shrink-0" />
+            <Building className="h-5 w-5 text-foreground-secondary shrink-0" />
             <div>
               <div className="text-sm text-foreground-secondary font-medium">Department</div>
               <div className="font-medium text-foreground-primary">
@@ -91,7 +91,7 @@ export default function PositionDetailsModal({
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
-            <GraduationCap className="h-5 w-5 text-foreground-secondary flex-shrink-0" />
+            <GraduationCap className="h-5 w-5 text-foreground-secondary shrink-0" />
             <div>
               <div className="text-sm text-foreground-secondary font-medium">Grade</div>
               <div className="font-medium text-foreground-primary">{grade ? grade.name : "No grade assigned"}</div>
@@ -100,7 +100,7 @@ export default function PositionDetailsModal({
 
           {position?.description && (
             <div className="flex gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
-              <FileText className="h-5 w-5 text-foreground-secondary flex-shrink-0 mt-0.5" />
+              <FileText className="h-5 w-5 text-foreground-secondary shrink-0 mt-0.5" />
               <div>
                 <div className="text-sm text-foreground-secondary font-medium">Description</div>
                 <div className="text-foreground-primary">{position.description}</div>

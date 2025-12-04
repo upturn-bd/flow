@@ -30,9 +30,9 @@ export default function ValidationFeedback({ isDirty, isValid, errors, className
       >
         <div className="flex items-start">
           {isValid ? (
-            <CheckCircle className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0 text-green-600" />
+            <CheckCircle className="h-5 w-5 mt-0.5 mr-3 shrink-0 text-green-600" />
           ) : (
-            <WarningCircle className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0 text-red-600" />
+            <WarningCircle className="h-5 w-5 mt-0.5 mr-3 shrink-0 text-red-600" />
           )}
           <div className="flex-1">
             {isValid ? (
@@ -46,7 +46,7 @@ export default function ValidationFeedback({ isDirty, isValid, errors, className
                   {Object.entries(errors).map(([field, error]) => 
                     error ? (
                       <li key={field} className="flex items-start">
-                        <span className="w-2 h-2 bg-current rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                        <span className="w-2 h-2 bg-current rounded-full mt-2 mr-2 shrink-0"></span>
                         <span className="capitalize">{field.replace(/_/g, ' ')}: {error}</span>
                       </li>
                     ) : null

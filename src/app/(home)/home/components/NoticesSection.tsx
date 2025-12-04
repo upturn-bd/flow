@@ -122,11 +122,11 @@ export default function NoticesSection({
   };
   return (
     <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
-      <div className="p-5 flex-shrink-0">
+      <div className="p-5 shrink-0">
         <SectionHeader title="News & Reminder" icon={Bell} />
       </div>
       <div className="px-5 pb-5 flex-1 overflow-hidden flex flex-col">
-        <div className="flex flex-wrap items-center gap-4 text-sm font-medium mb-4 flex-shrink-0">
+        <div className="flex flex-wrap items-center gap-4 text-sm font-medium mb-4 shrink-0">
           <TabButton tab="all" label="All" />
           <TabButton tab="unread" label="Unread" />
           <TabButton tab="urgent" label="Urgent" />
@@ -178,7 +178,7 @@ export default function NoticesSection({
                   >
                     <div className="flex items-center gap-3">
                       {!isRead && (
-                        <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0" />
+                        <div className="w-2 h-2 bg-primary-500 rounded-full shrink-0" />
                       )}
                       <span className={`font-medium ${
                         isRead ? 'text-foreground-secondary' : 'text-foreground-primary'
