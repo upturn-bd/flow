@@ -76,7 +76,7 @@ export default function ComplaintLogsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="w-full space-y-6">
       {/* Header */}
       <div className="flex items-center gap-2">
         <ClipboardList className="text-primary-600" size={26} />

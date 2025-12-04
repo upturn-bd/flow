@@ -208,7 +208,7 @@ export default function AdminManagementPage() {
 
     return (
         <motion.div
-            className="p-4 sm:p-10 lg:p-14"
+            className="p-4 sm:p-6 lg:p-8"
             initial="hidden"
             animate="visible"
             variants={pageVariants}

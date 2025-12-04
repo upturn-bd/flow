@@ -324,7 +324,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
   if (!stakeholder) {
     return (
-      <div className="p-6">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="max-w-2xl mx-auto">
           <EmptyState
             icon={WarningCircle}
@@ -344,7 +344,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
   const sortedSteps = [...processSteps].sort((a, b) => a.step_order - b.step_order);
 
   return (
-    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
         <button
