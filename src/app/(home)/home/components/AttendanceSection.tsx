@@ -356,7 +356,7 @@ export default function AttendanceSection({
 
             {/* RIGHT COLUMN */}
             <div className="shrink-0">
-              {!checkInCompleted && !checkOutCompleted && (
+              {checkInCompleted && !checkOutCompleted && (
                 <motion.button
                   whileHover={{ scale: isCheckingOut ? 1 : 1.05 }}
                   whileTap={{ scale: isCheckingOut ? 1 : 0.95 }}
@@ -371,8 +371,8 @@ export default function AttendanceSection({
                   <CheckSquare size={18} className={isCheckingOut ? "animate-spin" : ""} />
                   {isCheckingOut ? "Checking out..." : "Check-out"}
                 </motion.button>
-              </div>
-            )}
+              )}</div>
+            
 
         {/* TABLE - Simplified for widget view */}
         {attendanceData.length > 0 ? (
