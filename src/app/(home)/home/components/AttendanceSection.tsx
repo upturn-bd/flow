@@ -64,6 +64,8 @@ export default function AttendanceSection({
   const [checkInCompleted, setCheckInCompleted] = useState(false)
   const [checkOutCompleted, setCheckOutCompleted] = useState(false)
   const [attendanceLoading, setAttendanceLoading] = useState(false);
+  const [isCheckingIn, setIsCheckingIn] = useState(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   // Get user's current location
   const getCurrentLocation = () => {
@@ -166,14 +168,31 @@ export default function AttendanceSection({
 
 
   const handleCheckIn = async () => {
+    if (isCheckingIn) return; // Prevent duplicate clicks
     
-    await onCheckIn();
-    fetchAttendanceDataToday()
+    setIsCheckingIn(true);
+    try {
+      await onCheckIn();
+      await fetchAttendanceDataToday();
+    } catch (error) {
+      console.error("Error during check-in:", error);
+    } finally {
+      setIsCheckingIn(false);
+    }
   }
 
   const handleCheckOut = async () => {
-    await onCheckOut()
-    fetchAttendanceDataToday()
+    if (isCheckingOut) return; // Prevent duplicate clicks
+    
+    setIsCheckingOut(true);
+    try {
+      await onCheckOut();
+      await fetchAttendanceDataToday();
+    } catch (error) {
+      console.error("Error during check-out:", error);
+    } finally {
+      setIsCheckingOut(false);
+    }
   }
 
   useEffect(() => {
@@ -182,7 +201,7 @@ export default function AttendanceSection({
 
   return (
     <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
-      <div className="p-5 flex-shrink-0">
+      <div className="p-5 shrink-0">
         <SectionHeader title="Attendance Today" icon={Calendar} />
       </div>
       <div className="px-5 pb-5 flex-1 overflow-y-auto min-h-0">
@@ -192,28 +211,28 @@ export default function AttendanceSection({
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-            {/* LEFT COLUMN */}
-            <div className="space-y-4 flex-1 min-w-0">{/* min-w-0 allows flex children to shrink */}
+            {/* Status Messages */}
+            {checkOutCompleted && checkInCompleted && (
+              <div className="flex items-center text-green-600 font-medium">
+                <CheckCircle className="mr-2 h-5 w-5" />
+                <span>Both check-in and check-out completed for today</span>
+              </div>
+            )}
 
-              {checkOutCompleted && checkInCompleted && (
-                <div className="flex items-center text-green-600 font-medium">
-                  <CheckCircle className="mr-2 h-5 w-5" />
-                  <span>Both check-in and check-out completed for today</span>
-                </div>
-              )}
+            {!checkOutCompleted && checkInCompleted && (
+              <div className="flex items-center text-green-600 font-medium">
+                <CheckCircle className="mr-2 h-5 w-5" />
+                <span>Check-in completed for today</span>
+              </div>
+            )}
 
-              {!checkOutCompleted && checkInCompleted && (
-                <div className="flex items-center text-green-600 font-medium">
-                  <CheckCircle className="mr-2 h-5 w-5" />
-                  <span>Check-in completed for today</span>
-                </div>
-              )}
-
-              {!checkInCompleted && (
-                <div className="space-y-4">
-                  <div className="flex flex-col gap-2">
-                    <label className="flex items-center text-foreground-primary font-medium">
+            {/* Check-in Form */}
+            {!checkInCompleted && (
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
+                  {/* Site Selection */}
+                  <div className="flex flex-col gap-2 flex-1 w-full sm:w-auto">
+                    <label className="flex items-center text-foreground-primary font-medium text-sm">
                       <MapPin className="w-4 h-4 mr-2 text-primary-600" />
                       Site Location
                     </label>
@@ -225,7 +244,7 @@ export default function AttendanceSection({
                           site_id: Number(e.target.value),
                         })
                       }
-                      className="border border-border-primary rounded-lg px-4 py-2.5 bg-surface-primary focus:ring-primary-500 focus:border-primary-500 w-full sm:w-64"
+                      className="border border-border-primary rounded-lg px-4 py-2.5 bg-surface-primary focus:ring-primary-500 focus:border-primary-500 w-full"
                     >
                       <option value="">
                         {sitesLoading ? "Loading..." : "Select site"}
@@ -238,123 +257,125 @@ export default function AttendanceSection({
                     </select>
                   </div>
 
-                  {/* Location Status */}
-                  {attendanceRecord.site_id && (
-                    <div className="space-y-3">
-                      {locationLoading && (
-                        <div className="flex items-center gap-2 text-primary-600 text-sm">
-                          <Navigation className="w-4 h-4 animate-spin" />
-                          Getting your location...
-                        </div>
-                      )}
+                  {/* Check-in Button */}
+                  <motion.button
+                    whileHover={{ scale: isCheckingIn ? 1 : 1.05 }}
+                    whileTap={{ scale: isCheckingIn ? 1 : 0.95 }}
+                    type="button"
+                    onClick={handleCheckIn}
+                    disabled={!attendanceRecord.site_id || !attendanceRecord.tag || isCheckingIn}
+                    className={cn(
+                      "bg-primary-600 text-white font-medium rounded-lg px-6 py-2.5 flex items-center justify-center gap-2 w-full sm:w-auto whitespace-nowrap",
+                      (!attendanceRecord.site_id || !attendanceRecord.tag || isCheckingIn) &&
+                      "opacity-50 cursor-not-allowed"
+                    )}
+                  >
+                    <Clock size={18} className={isCheckingIn ? "animate-spin" : ""} />
+                    {isCheckingIn ? "Checking in..." : "Check-in"}
+                  </motion.button>
+                </div>
 
-                      {locationError && (
-                        <div className="flex items-center gap-2 text-red-600 text-sm">
-                          <AlertCircle className="w-4 h-4" />
-                          {locationError}
-                        </div>
-                      )}
+                {/* Location Status */}
+                {attendanceRecord.site_id && (
+                  <div className="space-y-3">
+                    {locationLoading && (
+                      <div className="flex items-center gap-2 text-primary-600 text-sm">
+                        <Navigation className="w-4 h-4 animate-spin" />
+                        Getting your location...
+                      </div>
+                    )}
 
-                      {userLocation && !locationLoading && (
-                        <div className="bg-primary-50 border border-primary-200 rounded-lg p-3">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <MapPin className="w-4 h-4 text-primary-600" />
-                              <span className="text-sm font-medium text-primary-800">
-                                Distance to Site:
-                              </span>
-                            </div>
-                            <span className="text-sm font-bold text-primary-900">
-                              {formatDistance(getDistanceToSite() || 0)}
+                    {locationError && (
+                      <div className="flex items-center gap-2 text-red-600 text-sm">
+                        <AlertCircle className="w-4 h-4" />
+                        {locationError}
+                      </div>
+                    )}
+
+                    {userLocation && !locationLoading && (
+                      <div className="bg-primary-50 border border-primary-200 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-primary-600" />
+                            <span className="text-sm font-medium text-primary-800">
+                              Distance to Site:
                             </span>
                           </div>
-
-                          {getDistanceToSite() && getDistanceToSite()! > 100 && (
-                            <div className="flex items-center gap-2 mt-2 text-amber-700 text-xs">
-                              <AlertTriangle className="w-3 h-3" />
-                              You are more than 100m away from the site
-                            </div>
-                          )}
+                          <span className="text-sm font-bold text-primary-900">
+                            {formatDistance(getDistanceToSite() || 0)}
+                          </span>
                         </div>
-                      )}
 
-                      {/* Time Status */}
-                      {(() => {
-                        const selectedSite = sites.find(site => site.id === attendanceRecord.site_id);
-                        const currentTime = getCurrentTime24HourFormat();
-                        const isLate = selectedSite && !isOnTime({
-                          checkInTime: selectedSite.check_in,
-                          currentTime: currentTime
-                        });
+                        {getDistanceToSite() && getDistanceToSite()! > 100 && (
+                          <div className="flex items-center gap-2 mt-2 text-amber-700 text-xs">
+                            <AlertTriangle className="w-3 h-3" />
+                            You are more than 100m away from the site
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-                        if (selectedSite) {
-                          return (
-                            <div className={`border rounded-lg p-3 ${isLate ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <Clock className={`w-4 h-4 ${isLate ? 'text-red-600' : 'text-green-600'}`} />
-                                  <span className={`text-sm font-medium ${isLate ? 'text-red-800' : 'text-green-800'}`}>
-                                    Current Time: {currentTime}
-                                  </span>
-                                </div>
-                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${isLate
-                                    ? 'bg-red-100 text-red-800'
-                                    : 'bg-green-100 text-green-800'
-                                  }`}>
-                                  {isLate ? 'Late' : 'On Time'}
+                    {/* Time Status */}
+                    {(() => {
+                      const selectedSite = sites.find(site => site.id === attendanceRecord.site_id);
+                      const currentTime = getCurrentTime24HourFormat();
+                      const isLate = selectedSite && !isOnTime({
+                        checkInTime: selectedSite.check_in,
+                        currentTime: currentTime
+                      });
+
+                      if (selectedSite) {
+                        return (
+                          <div className={`border rounded-lg p-3 ${isLate ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Clock className={`w-4 h-4 ${isLate ? 'text-red-600' : 'text-green-600'}`} />
+                                <span className={`text-sm font-medium ${isLate ? 'text-red-800' : 'text-green-800'}`}>
+                                  Current Time: {currentTime}
                                 </span>
                               </div>
-                              <div className={`text-xs mt-1 ${isLate ? 'text-red-700' : 'text-green-700'}`}>
-                                Expected check-in: {selectedSite.check_in}
-                              </div>
+                              <span className={`text-xs px-2 py-1 rounded-full font-medium ${isLate
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-green-100 text-green-800'
+                                }`}>
+                                {isLate ? 'Late' : 'On Time'}
+                              </span>
                             </div>
-                          );
-                        }
-                        return null;
-                      })()}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+                            <div className={`text-xs mt-1 ${isLate ? 'text-red-700' : 'text-green-700'}`}>
+                              Expected check-in: {selectedSite.check_in}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
+                )}
+              </div>
+            )}
 
-            {/* RIGHT COLUMN */}
-            <div className="flex-shrink-0">
-              {!checkInCompleted && !checkOutCompleted && (
+            {/* Check-out Button */}
+            {checkInCompleted && !checkOutCompleted && (
+              <div className="flex justify-start">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  onClick={handleCheckIn}
-                  disabled={!attendanceRecord.site_id || !attendanceRecord.tag}
-                  className={cn(
-                    "bg-primary-600 text-white font-medium rounded-lg px-5 py-2.5 flex items-center gap-2 w-full md:w-auto",
-                    (!attendanceRecord.site_id || !attendanceRecord.tag) &&
-                    "opacity-50 cursor-not-allowed"
-                  )}
-                >
-                  <Clock size={18} />
-                  Check-in
-                </motion.button>
-              )}
-
-              {checkInCompleted && !checkOutCompleted && (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: isCheckingOut ? 1 : 1.05 }}
+                  whileTap={{ scale: isCheckingOut ? 1 : 0.95 }}
                   onClick={handleCheckOut}
                   type="button"
-                  className="bg-yellow-500 text-white font-medium rounded-lg px-5 py-2.5 flex items-center gap-2 w-full md:w-auto"
+                  disabled={isCheckingOut}
+                  className={cn(
+                    "bg-yellow-500 text-white font-medium rounded-lg px-6 py-2.5 flex items-center gap-2 w-full sm:w-auto",
+                    isCheckingOut && "opacity-50 cursor-not-allowed"
+                  )}
                 >
-                  <CheckSquare size={18} />
-                  Check-out
+                  <CheckSquare size={18} className={isCheckingOut ? "animate-spin" : ""} />
+                  {isCheckingOut ? "Checking out..." : "Check-out"}
                 </motion.button>
-              )}
-            </div>
-          </div>
+              </div>
+            )}
 
         {/* TABLE - Simplified for widget view */}
-        {attendanceData.length > 0 && (
+        {attendanceData.length > 0 ? (
         <div className="overflow-x-auto rounded-lg border border-border-primary">
           <table className="min-w-full divide-y divide-border-primary">
             <thead>
@@ -458,6 +479,18 @@ export default function AttendanceSection({
             </tbody>
           </table>
         </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 px-4">
+            <div className="bg-background-secondary rounded-full p-4 mb-4">
+              <Calendar className="w-12 h-12 text-foreground-tertiary" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground-primary mb-2">
+              No Attendance Record Today
+            </h3>
+            <p className="text-sm text-foreground-secondary text-center max-w-sm">
+              You haven&apos;t checked in yet. Select a site location above and check in to start your attendance for today.
+            </p>
+          </div>
         )}
         </div>
         )}

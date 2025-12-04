@@ -2,12 +2,11 @@ import { supabase } from "@/lib/supabase/client";
 import { getLocalNow } from "@/lib/utils";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { calculateDistance } from "@/lib/utils/location-utils";
-import { getCurrentTime24HourFormat, getTodaysDate, isOnTime } from "@/lib/utils/time-utils";
+import { getCurrentTime24HourFormat, getTodaysDate, isOnTime, checkEarlyCheckOut } from "@/lib/utils/time-utils";
 
 export async function getCurrentCoordinates(): Promise<string | null> {
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
       resolve(null);
       return;
     }
@@ -19,23 +18,7 @@ export async function getCurrentCoordinates(): Promise<string | null> {
         resolve(point);
       },
       (error) => {
-        let errorMessage = "Permission denied - location access is required";
-
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = "You need to allow location access to continue";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = "Your location could not be determined";
-            break;
-          case error.TIMEOUT:
-            errorMessage = "The request to get your location timed out";
-            break;
-          default:
-            errorMessage = "An unknown error occurred while getting location";
-        }
-
-        alert(errorMessage);
+        console.error('Geolocation error:', error);
         resolve(null);
       },
       {
@@ -67,10 +50,13 @@ export async function handleCheckIn(
   attendanceRecord: AttendanceRecord,
   sites: Site[],
   checkAttendanceStatus: () => void
-) {
+): Promise<{ success: boolean; message?: string; status?: string; recordId?: number }> {
   const user = await getEmployeeInfo();
   const coordinates = await getCurrentCoordinates();
-  if (!coordinates) return; // Exit if permission denied
+  
+  if (!coordinates) {
+    return { success: false, message: "Location access is required for check-in" };
+  }
 
   // Get current timestamp in 24-hour format
   const now = getCurrentTime24HourFormat();
@@ -93,7 +79,7 @@ export async function handleCheckIn(
     attendanceRecord.tag = attendanceStatus;
     const date = getTodaysDate()
     
-    const { error } = await supabase.from("attendance_records").insert({
+    const { data, error } = await supabase.from("attendance_records").insert({
       ...attendanceRecord,
       attendance_date: date, // Just the date part (YYYY-MM-DD)
       check_in_time: new Date().toISOString(), // Full ISO timestamp
@@ -101,32 +87,71 @@ export async function handleCheckIn(
       company_id: user.company_id,
       supervisor_id: user.supervisor_id,
       check_in_coordinates: coordinates,
-    });
+    }).select('id').single();
 
     if (error) {
       console.error("Check-in error:", error);
-      alert("Failed to record check-in");
+      return { success: false, message: "Failed to record check-in. Please try again." };
     } else {
-      alert("Check-in recorded successfully!");
       checkAttendanceStatus();
+      return { 
+        success: true, 
+        message: "Your attendance has been recorded successfully!", 
+        status: attendanceStatus,
+        recordId: data?.id
+      };
     }
   } catch (err) {
     console.error("Unexpected error:", err);
-    alert("An unexpected error occurred");
+    return { success: false, message: "An unexpected error occurred. Please try again." };
   }
 }
 
 export async function handleCheckOut(
   attendanceId: number,
-) {
+): Promise<{ success: boolean; message?: string; isEarly?: boolean }> {
   const user = await getEmployeeInfo();
   const coordinates = await getCurrentCoordinates();
-  if (!coordinates) return; // Exit if permission denied
+  
+  if (!coordinates) {
+    return { success: false, message: "Location access is required for check-out" };
+  }
 
-  // Get current timestamp in ISO format
+  // Get current timestamp in ISO format and 24-hour time format
   const now = new Date().toISOString();
+  const currentTime = getCurrentTime24HourFormat();
 
   try {
+    // First, get the attendance record to check the site's check-out time
+    const { data: attendanceRecord, error: fetchError } = await supabase
+      .from("attendance_records")
+      .select("site_id")
+      .eq("id", attendanceId)
+      .eq("employee_id", user.id)
+      .eq("company_id", user.company_id)
+      .single();
+
+    if (fetchError || !attendanceRecord) {
+      console.error("Error fetching attendance record:", fetchError);
+      return { success: false, message: "Failed to fetch attendance record." };
+    }
+
+    // Get the site's check-out time
+    const { data: site, error: siteError } = await supabase
+      .from("sites")
+      .select("check_out")
+      .eq("id", attendanceRecord.site_id)
+      .single();
+
+    if (siteError || !site) {
+      console.error("Error fetching site:", siteError);
+      return { success: false, message: "Failed to fetch site information." };
+    }
+
+    // Check if checkout is early
+    const checkoutStatus = checkEarlyCheckOut(currentTime, site.check_out);
+    const isEarly = checkoutStatus === 'early';
+
     const { data, error } = await supabase
       .from("attendance_records")
       .update({
@@ -135,16 +160,20 @@ export async function handleCheckOut(
       })
       .eq("employee_id", user.id)
       .eq("company_id", user.company_id)
-      .eq("id", attendanceId)
+      .eq("id", attendanceId);
 
     if (error) {
       console.error("Check-out error:", error);
-      alert("Failed to record check-out");
+      return { success: false, message: "Failed to record check-out. Please try again." };
     } else {
-      alert("Check-out recorded successfully!");
+      const message = isEarly 
+        ? "You checked out early. Your check-out has been recorded."
+        : "Your check-out has been recorded successfully!";
+      
+      return { success: true, message, isEarly };
     }
   } catch (err) {
     console.error("Unexpected error:", err);
-    alert("An unexpected error occurred");
+    return { success: false, message: "An unexpected error occurred. Please try again." };
   }
 }

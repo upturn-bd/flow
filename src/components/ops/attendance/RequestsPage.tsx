@@ -1,6 +1,5 @@
 "use client";
 
-import { Attendance } from "@/hooks/useAttendance";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import {
@@ -12,7 +11,8 @@ import {
   ExternalLink,
   CheckCircle,
   WarningCircle,
-  User2
+  User2,
+  Note
 } from "@/lib/icons";
 import {
   formatTimeFromISO,
@@ -30,38 +30,77 @@ import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useNotifications } from "@/hooks/useNotifications";
 
+interface AttendanceRequest {
+  id: number;
+  attendance_record_id: number;
+  employee_id: string;
+  supervisor_id: string | null;
+  company_id: number;
+  request_type: 'late' | 'wrong_location';
+  status: 'pending' | 'approved' | 'rejected';
+  reason: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  attendance_record: {
+    check_in_time: string | null;
+    check_out_time: string | null;
+    site_id: number;
+    attendance_date: string;
+    check_in_coordinates: { x: number; y: number } | null;
+    check_out_coordinates: { x: number; y: number } | null;
+  };
+}
+
 export default function AttendanceRequestsPage() {
-  const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
+  const [requestsData, setRequestsData] = useState<AttendanceRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const { sites, fetchSites } = useSites();
   const { employees, fetchEmployees } = useEmployees();
-  const [selectedRecord, setSelectedRecord] = useState<Attendance | null>(null);
-  const [updateTag, setUpdateTag] = useState<string>("");
+  const [selectedRequest, setSelectedRequest] = useState<AttendanceRequest | null>(null);
+  const [updateStatus, setUpdateStatus] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { createNotification } = useNotifications();
 
-  async function fetchAttendanceData() {
+  async function fetchRequestsData() {
     setLoading(true);
 
     const user = await getEmployeeInfo();
-    console.log(user.supervisor_id)
     try {
       const { data, error } = await supabase
-        .from("attendance_records")
-        .select(
-          "id, check_in_time, check_out_time, site_id, attendance_date, employee_id, check_out_coordinates, check_in_coordinates, tag"
-        )
+        .from("attendance_requests")
+        .select(`
+          id,
+          attendance_record_id,
+          employee_id,
+          supervisor_id,
+          company_id,
+          request_type,
+          status,
+          reason,
+          created_at,
+          reviewed_at,
+          reviewed_by,
+          attendance_record:attendance_records!attendance_record_id (
+            check_in_time,
+            check_out_time,
+            site_id,
+            attendance_date,
+            check_in_coordinates,
+            check_out_coordinates
+          )
+        `)
         .eq("company_id", user.company_id)
-        .eq("tag", "Pending")
-        .eq("supervisor_id", user.supervisor_id)
-        .order("attendance_date", { ascending: false });
+        .eq("status", "pending")
+        .eq("supervisor_id", user.id)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      setAttendanceData(data ?? []);
+      setRequestsData((data as any) ?? []);
     } catch (error) {
-      console.log("Error fetching attendance data:", error);
+      console.log("Error fetching attendance requests:", error);
       toast.error("Failed to load attendance requests");
     } finally {
       setLoading(false);
@@ -71,24 +110,39 @@ export default function AttendanceRequestsPage() {
   async function handleRequest(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!updateTag || !selectedRecord) return;
+    if (!updateStatus || !selectedRequest) return;
 
     setIsSubmitting(true);
     const user = await getEmployeeInfo();
 
     try {
-      const { error } = await supabase
-        .from("attendance_records")
-        .update({ tag: updateTag })
-        .eq("company_id", user.company_id)
-        .eq("id", selectedRecord?.id);
+      // Update the request status
+      const { error: requestError } = await supabase
+        .from("attendance_requests")
+        .update({ 
+          status: updateStatus,
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: user.id
+        })
+        .eq("id", selectedRequest.id);
 
-      if (error) throw error;
+      if (requestError) throw requestError;
 
-      const recipients = [selectedRecord.employee_id].filter(Boolean) as string[];
+      // Update the attendance record tag based on approval
+      if (updateStatus === 'approved') {
+        const { error: recordError } = await supabase
+          .from("attendance_records")
+          .update({ tag: 'Present' })
+          .eq("id", selectedRequest.attendance_record_id);
+
+        if (recordError) throw recordError;
+      }
+      // If rejected, leave the tag as is (Late or Wrong_Location)
+
+      const recipients = [selectedRequest.employee_id].filter(Boolean) as string[];
       createNotification({
         title: "Attendance Request Updated",
-        message: `Your attendance request for ${formatDateToDayMonth(selectedRecord.attendance_date)} has been updated to status: ${updateTag}.`,
+        message: `Your ${selectedRequest.request_type === 'late' ? 'late arrival' : 'wrong location'} request has been ${updateStatus}.`,
         priority: 'normal',
         type_id: 5,
         recipient_id: recipients,
@@ -97,13 +151,12 @@ export default function AttendanceRequestsPage() {
         department_id: user.department_id
       });
 
-
       toast.success("Attendance request updated successfully");
-      fetchAttendanceData();
-      setSelectedRecord(null);
-      setUpdateTag("");
+      fetchRequestsData();
+      setSelectedRequest(null);
+      setUpdateStatus("");
     } catch (error) {
-      console.error("Error updating attendance data:", error);
+      console.error("Error updating attendance request:", error);
       toast.error("Failed to update attendance request");
     } finally {
       setIsSubmitting(false);
@@ -111,7 +164,7 @@ export default function AttendanceRequestsPage() {
   }
 
   useEffect(() => {
-    fetchAttendanceData();
+    fetchRequestsData();
     fetchSites();
     fetchEmployees();
   }, []);
@@ -126,15 +179,15 @@ export default function AttendanceRequestsPage() {
 
   return (
     <div className="space-y-6">
-      {attendanceData.length > 0 ? (
+      {requestsData.length > 0 ? (
         <div className="space-y-4">
-          {attendanceData.map((entry) => (
+          {requestsData.map((request) => (
             <AttendanceRequestCard
-              key={entry.id}
-              entry={entry}
+              key={request.id}
+              request={request}
               sites={sites}
               employees={employees}
-              onReview={() => setSelectedRecord(entry)}
+              onReview={() => setSelectedRequest(request)}
             />
           ))}
         </div>
@@ -148,48 +201,66 @@ export default function AttendanceRequestsPage() {
 
       {/* Review Modal */}
       <BaseModal
-        isOpen={!!selectedRecord}
-        onClose={() => setSelectedRecord(null)}
+        isOpen={!!selectedRequest}
+        onClose={() => setSelectedRequest(null)}
         title="Review Attendance Request"
         icon={<Clock size={20} />}
+        data-testid="review-attendance-modal"
       >
-        {selectedRecord && (
+        {selectedRequest && (
           <form onSubmit={handleRequest} className="space-y-6">
             <div className="space-y-4">
               <InfoRow
                 icon={<User size={16} />}
                 label="Employee"
-                value={employees.find(emp => emp.id === selectedRecord.employee_id)?.name || "Unknown"}
+                value={employees.find(emp => emp.id === selectedRequest.employee_id)?.name || "Unknown"}
               />
               <InfoRow
                 icon={<Calendar size={16} />}
                 label="Date"
-                value={formatDateToDayMonth(selectedRecord.attendance_date)}
+                value={formatDateToDayMonth(selectedRequest.attendance_record.attendance_date)}
               />
               <InfoRow
                 icon={<Clock size={16} />}
-                label="Time"
-                value={`${selectedRecord.check_in_time ? formatTimeFromISO(selectedRecord.check_in_time) : 'N/A'} - ${selectedRecord.check_out_time ? formatTimeFromISO(selectedRecord.check_out_time) : 'N/A'}`}
+                label="Check-in Time"
+                value={selectedRequest.attendance_record.check_in_time ? formatTimeFromISO(selectedRequest.attendance_record.check_in_time) : 'N/A'}
               />
               <InfoRow
                 icon={<Building size={16} />}
                 label="Site"
-                value={sites.find(site => site.id === selectedRecord.site_id)?.name || "Unknown"}
+                value={sites.find(site => site.id === selectedRequest.attendance_record.site_id)?.name || "Unknown"}
               />
+              <InfoRow
+                icon={<WarningCircle size={16} />}
+                label="Request Type"
+                value={selectedRequest.request_type === 'late' ? 'Late Arrival' : 'Wrong Location'}
+              />
+              {selectedRequest.reason && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium text-foreground-secondary">
+                    <Note size={16} />
+                    Reason
+                  </div>
+                  <div className="p-3 bg-surface-secondary rounded-lg border border-border-primary">
+                    <p className="text-sm text-foreground-primary whitespace-pre-wrap">
+                      {selectedRequest.reason}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <FormSelectField
               name="status"
-              label="Update Status"
-              icon={<WarningCircle size={18} />}
-              value={updateTag}
-              onChange={(e) => setUpdateTag(e.target.value)}
-              placeholder="Select new status"
+              label="Decision"
+              icon={<CheckCircle size={18} />}
+              value={updateStatus}
+              onChange={(e) => setUpdateStatus(e.target.value)}
+              placeholder="Select decision"
+              data-testid="attendance-status-select"
               options={[
-                { value: "Present", label: "Present" },
-                { value: "Absent", label: "Absent" },
-                { value: "Late", label: "Late" },
-                { value: "Wrong_Location", label: "Wrong Location" },
+                { value: "approved", label: "Approve" },
+                { value: "rejected", label: "Reject" },
               ]}
             />
 
@@ -197,7 +268,7 @@ export default function AttendanceRequestsPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setSelectedRecord(null)}
+                onClick={() => setSelectedRequest(null)}
                 disabled={isSubmitting}
               >
                 Cancel
@@ -205,10 +276,10 @@ export default function AttendanceRequestsPage() {
               <Button
                 type="submit"
                 variant="primary"
-                disabled={!updateTag || isSubmitting}
+                disabled={!updateStatus || isSubmitting}
                 isLoading={isSubmitting}
               >
-                Save Changes
+                Submit Decision
               </Button>
             </div>
           </form>
@@ -219,26 +290,35 @@ export default function AttendanceRequestsPage() {
 }
 
 function AttendanceRequestCard({
-  entry,
+  request,
   sites,
   employees,
   onReview
 }: {
-  entry: Attendance;
+  request: AttendanceRequest;
   sites: any[];
   employees: any[];
   onReview: () => void;
 }) {
-  const employee = employees.find(emp => emp.id === entry.employee_id);
-  const site = sites.find(site => site.id === entry.site_id);
+  const employee = employees.find(emp => emp.id === request.employee_id);
+  const site = sites.find(site => site.id === request.attendance_record.site_id);
 
   const getLocationLink = (coordinates: { x: number; y: number } | null) => {
     if (!coordinates) return null;
     return `https://www.openstreetmap.org/?mlat=${coordinates.x}&mlon=${coordinates.y}`;
   };
 
+  const getRequestTypeLabel = (type: 'late' | 'wrong_location') => {
+    return type === 'late' ? 'Late Arrival' : 'Wrong Location';
+  };
+
+  const getRequestTypeVariant = (type: 'late' | 'wrong_location') => {
+    return type === 'late' ? 'warning' : 'error';
+  };
+
   const actions = (
     <Button
+      data-testid="review-attendance-button"
       variant="primary"
       size="sm"
       onClick={onReview}
@@ -253,7 +333,7 @@ function AttendanceRequestCard({
     <Card>
       <CardHeader
         title={`${employee?.name || "Unknown Employee"}`}
-        subtitle={formatDateToDayMonth(entry.attendance_date)}
+        subtitle={formatDateToDayMonth(request.attendance_record.attendance_date)}
         icon={<Clock size={20} className="text-blue-500" />}
         action={actions}
       />
@@ -267,18 +347,36 @@ function AttendanceRequestCard({
           />
           <InfoRow
             icon={<Clock size={16} />}
-            label="Check-in / Check-out"
-            value={`${entry.check_in_time ? formatTimeFromISO(entry.check_in_time) : 'N/A'} - ${entry.check_out_time ? formatTimeFromISO(entry.check_out_time) : 'N/A'}`}
+            label="Check-in Time"
+            value={request.attendance_record.check_in_time ? formatTimeFromISO(request.attendance_record.check_in_time) : 'N/A'}
           />
         </div>
 
-        <div className="space-y-2">
-          <StatusBadge status="Pending Review" variant="warning" size="sm" />
+        <div className="space-y-3">
+          <StatusBadge 
+            status={getRequestTypeLabel(request.request_type)} 
+            variant={getRequestTypeVariant(request.request_type)} 
+            size="sm" 
+          />
 
-          <div className="flex items-center gap-4 text-sm">
-            {entry.check_in_coordinates && (
+          {request.reason && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground-secondary">
+                <Note size={14} />
+                Employee's Reason
+              </div>
+              <div className="p-3 bg-surface-secondary rounded-lg border border-border-primary">
+                <p className="text-sm text-foreground-primary whitespace-pre-wrap line-clamp-3">
+                  {request.reason}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center gap-4 text-sm flex-wrap">
+            {request.attendance_record.check_in_coordinates && (
               <a
-                href={getLocationLink(entry.check_in_coordinates) || undefined}
+                href={getLocationLink(request.attendance_record.check_in_coordinates) || undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
@@ -288,9 +386,9 @@ function AttendanceRequestCard({
                 <ExternalLink size={12} />
               </a>
             )}
-            {entry.check_out_coordinates && (
+            {request.attendance_record.check_out_coordinates && (
               <a
-                href={getLocationLink(entry.check_out_coordinates) || undefined}
+                href={getLocationLink(request.attendance_record.check_out_coordinates) || undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
