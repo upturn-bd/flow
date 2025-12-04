@@ -153,90 +153,150 @@ CREATE OR REPLACE TRIGGER update_stakeholder_issue_subcategories_updated_at
 -- Enable RLS on categories table
 ALTER TABLE stakeholder_issue_categories ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can view categories in their company
+-- Policy: Users with stakeholders read permission can view categories in their company
 CREATE POLICY stakeholder_issue_categories_select_policy ON stakeholder_issue_categories
   FOR SELECT
   USING (
-    company_id IN (
+    has_permission(auth.uid(), 'stakeholders', 'can_read')
+    AND company_id IN (
       SELECT company_id FROM employees WHERE id = auth.uid()
     )
   );
 
--- Policy: Users can insert categories in their company
+-- Policy: Users with stakeholders write permission can insert categories in their company
 CREATE POLICY stakeholder_issue_categories_insert_policy ON stakeholder_issue_categories
   FOR INSERT
   WITH CHECK (
-    company_id IN (
+    has_permission(auth.uid(), 'stakeholders', 'can_write')
+    AND company_id IN (
       SELECT company_id FROM employees WHERE id = auth.uid()
     )
   );
 
--- Policy: Users can update categories in their company
+-- Policy: Users with stakeholders write permission can update categories in their company
 CREATE POLICY stakeholder_issue_categories_update_policy ON stakeholder_issue_categories
   FOR UPDATE
   USING (
-    company_id IN (
+    has_permission(auth.uid(), 'stakeholders', 'can_write')
+    AND company_id IN (
       SELECT company_id FROM employees WHERE id = auth.uid()
     )
   )
   WITH CHECK (
-    company_id IN (
+    has_permission(auth.uid(), 'stakeholders', 'can_write')
+    AND company_id IN (
       SELECT company_id FROM employees WHERE id = auth.uid()
     )
   );
 
--- Policy: Users can delete categories in their company
+-- Policy: Users with stakeholders delete permission can delete categories in their company
 CREATE POLICY stakeholder_issue_categories_delete_policy ON stakeholder_issue_categories
   FOR DELETE
   USING (
-    company_id IN (
+    has_permission(auth.uid(), 'stakeholders', 'can_delete')
+    AND company_id IN (
       SELECT company_id FROM employees WHERE id = auth.uid()
     )
   );
+
+-- Superadmin policies for categories
+DROP POLICY IF EXISTS "Superadmins can view all issue categories" ON stakeholder_issue_categories;
+CREATE POLICY "Superadmins can view all issue categories"
+  ON stakeholder_issue_categories
+  FOR SELECT
+  USING (is_superadmin());
+
+DROP POLICY IF EXISTS "Superadmins can create issue categories" ON stakeholder_issue_categories;
+CREATE POLICY "Superadmins can create issue categories"
+  ON stakeholder_issue_categories
+  FOR INSERT
+  WITH CHECK (is_superadmin());
+
+DROP POLICY IF EXISTS "Superadmins can update issue categories" ON stakeholder_issue_categories;
+CREATE POLICY "Superadmins can update issue categories"
+  ON stakeholder_issue_categories
+  FOR UPDATE
+  USING (is_superadmin());
+
+DROP POLICY IF EXISTS "Superadmins can delete issue categories" ON stakeholder_issue_categories;
+CREATE POLICY "Superadmins can delete issue categories"
+  ON stakeholder_issue_categories
+  FOR DELETE
+  USING (is_superadmin());
 
 -- Enable RLS on subcategories table
 ALTER TABLE stakeholder_issue_subcategories ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can view subcategories in their company
+-- Policy: Users with stakeholders read permission can view subcategories in their company
 CREATE POLICY stakeholder_issue_subcategories_select_policy ON stakeholder_issue_subcategories
   FOR SELECT
   USING (
-    company_id IN (
+    has_permission(auth.uid(), 'stakeholders', 'can_read')
+    AND company_id IN (
       SELECT company_id FROM employees WHERE id = auth.uid()
     )
   );
 
--- Policy: Users can insert subcategories in their company
+-- Policy: Users with stakeholders write permission can insert subcategories in their company
 CREATE POLICY stakeholder_issue_subcategories_insert_policy ON stakeholder_issue_subcategories
   FOR INSERT
   WITH CHECK (
-    company_id IN (
+    has_permission(auth.uid(), 'stakeholders', 'can_write')
+    AND company_id IN (
       SELECT company_id FROM employees WHERE id = auth.uid()
     )
   );
 
--- Policy: Users can update subcategories in their company
+-- Policy: Users with stakeholders write permission can update subcategories in their company
 CREATE POLICY stakeholder_issue_subcategories_update_policy ON stakeholder_issue_subcategories
   FOR UPDATE
   USING (
-    company_id IN (
+    has_permission(auth.uid(), 'stakeholders', 'can_write')
+    AND company_id IN (
       SELECT company_id FROM employees WHERE id = auth.uid()
     )
   )
   WITH CHECK (
-    company_id IN (
+    has_permission(auth.uid(), 'stakeholders', 'can_write')
+    AND company_id IN (
       SELECT company_id FROM employees WHERE id = auth.uid()
     )
   );
 
--- Policy: Users can delete subcategories in their company
+-- Policy: Users with stakeholders delete permission can delete subcategories in their company
 CREATE POLICY stakeholder_issue_subcategories_delete_policy ON stakeholder_issue_subcategories
   FOR DELETE
   USING (
-    company_id IN (
+    has_permission(auth.uid(), 'stakeholders', 'can_delete')
+    AND company_id IN (
       SELECT company_id FROM employees WHERE id = auth.uid()
     )
   );
+
+-- Superadmin policies for subcategories
+DROP POLICY IF EXISTS "Superadmins can view all issue subcategories" ON stakeholder_issue_subcategories;
+CREATE POLICY "Superadmins can view all issue subcategories"
+  ON stakeholder_issue_subcategories
+  FOR SELECT
+  USING (is_superadmin());
+
+DROP POLICY IF EXISTS "Superadmins can create issue subcategories" ON stakeholder_issue_subcategories;
+CREATE POLICY "Superadmins can create issue subcategories"
+  ON stakeholder_issue_subcategories
+  FOR INSERT
+  WITH CHECK (is_superadmin());
+
+DROP POLICY IF EXISTS "Superadmins can update issue subcategories" ON stakeholder_issue_subcategories;
+CREATE POLICY "Superadmins can update issue subcategories"
+  ON stakeholder_issue_subcategories
+  FOR UPDATE
+  USING (is_superadmin());
+
+DROP POLICY IF EXISTS "Superadmins can delete issue subcategories" ON stakeholder_issue_subcategories;
+CREATE POLICY "Superadmins can delete issue subcategories"
+  ON stakeholder_issue_subcategories
+  FOR DELETE
+  USING (is_superadmin());
 
 -- ==============================================================================
 -- PART 7: ADD COMMENTS
