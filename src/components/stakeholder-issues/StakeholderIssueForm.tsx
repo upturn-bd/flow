@@ -7,12 +7,17 @@ import {
   validationErrorsToObject,
 } from "@/lib/validation/schemas/stakeholder-issues";
 import { StakeholderIssueFormData } from "@/hooks/useStakeholderIssues";
-import { StakeholderIssueAttachment } from "@/lib/types/schemas";
+import { StakeholderIssueAttachment, StakeholderIssueCategory, StakeholderIssueSubcategory } from "@/lib/types/schemas";
 import { useEmployees } from "@/hooks/useEmployees";
+import { useTeams } from "@/hooks/useTeams";
 import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
-import { X, Upload, Trash, Download, FileText } from "@/lib/icons";
+import { useStakeholderIssueCategories } from "@/hooks/useStakeholderIssueCategories";
+import { X, Upload, Trash, Download, FileText, User, UsersThree, Tag } from "@/lib/icons";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { FormField, SelectField, TextAreaField } from "@/components/forms";
+import { captureError } from "@/lib/sentry";
+
+type AssignmentType = 'employee' | 'team';
 
 interface StakeholderIssueFormProps {
   stakeholderId: number;
@@ -23,6 +28,9 @@ interface StakeholderIssueFormProps {
     status?: 'Pending' | 'In Progress' | 'Resolved';
     priority?: 'Low' | 'Medium' | 'High' | 'Urgent';
     assigned_to?: string;
+    assigned_team_id?: number;
+    category_id?: number;
+    subcategory_id?: number;
     attachments?: StakeholderIssueAttachment[];
   };
   onSubmit: (data: StakeholderIssueFormData) => Promise<void>;
@@ -39,7 +47,10 @@ export default function StakeholderIssueForm({
   submitLabel = "Create Issue",
 }: StakeholderIssueFormProps) {
   const { employees, fetchEmployees, loading: loadingEmployees } = useEmployees();
+  const { teams, fetchTeams, loading: loadingTeams } = useTeams();
   const { deleteAttachment, downloadAttachment } = useStakeholderIssues();
+  const { categories, fetchCategories, loading: loadingCategories } = useStakeholderIssueCategories();
+  
   const [files, setFiles] = useState<File[]>([]);
   const [existingAttachments, setExistingAttachments] = useState<StakeholderIssueAttachment[]>(
     initialData?.attachments || []
@@ -47,6 +58,15 @@ export default function StakeholderIssueForm({
   const [fileError, setFileError] = useState<string | null>(null);
   const [deletingAttachment, setDeletingAttachment] = useState<string | null>(null);
   const [downloadingAttachment, setDownloadingAttachment] = useState<string | null>(null);
+  
+  // Determine initial assignment type
+  const getInitialAssignmentType = (): AssignmentType => {
+    if (initialData?.assigned_team_id) return 'team';
+    return 'employee';
+  };
+  
+  const [assignmentType, setAssignmentType] = useState<AssignmentType>(getInitialAssignmentType());
+  
   const [formData, setFormData] = useState<StakeholderIssueFormData>({
     stakeholder_id: stakeholderId,
     title: initialData?.title || "",
@@ -54,14 +74,23 @@ export default function StakeholderIssueForm({
     status: initialData?.status || "Pending",
     priority: initialData?.priority || "Medium",
     assigned_to: initialData?.assigned_to || "",
+    assigned_team_id: initialData?.assigned_team_id,
+    category_id: initialData?.category_id,
+    subcategory_id: initialData?.subcategory_id,
     attachments: [],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Get subcategories for selected category
+  const selectedCategory = categories.find(c => c.id === formData.category_id);
+  const availableSubcategories = selectedCategory?.subcategories?.filter(s => s.is_active) || [];
+
   useEffect(() => {
     fetchEmployees();
-  }, [fetchEmployees]);
+    fetchTeams();
+    fetchCategories();
+  }, [fetchEmployees, fetchTeams, fetchCategories]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -73,6 +102,31 @@ export default function StakeholderIssueForm({
         delete newErrors[name];
         return newErrors;
       });
+    }
+  };
+
+  const handleCategoryChange = (categoryId: number | "") => {
+    setFormData(prev => ({
+      ...prev,
+      category_id: categoryId === "" ? undefined : categoryId,
+      subcategory_id: undefined, // Reset subcategory when category changes
+    }));
+  };
+
+  const handleSubcategoryChange = (subcategoryId: number | "") => {
+    setFormData(prev => ({
+      ...prev,
+      subcategory_id: subcategoryId === "" ? undefined : subcategoryId,
+    }));
+  };
+
+  const handleAssignmentTypeChange = (type: AssignmentType) => {
+    setAssignmentType(type);
+    // Clear the other assignment field
+    if (type === 'employee') {
+      setFormData(prev => ({ ...prev, assigned_team_id: undefined }));
+    } else {
+      setFormData(prev => ({ ...prev, assigned_to: "" }));
     }
   };
 
@@ -118,6 +172,7 @@ export default function StakeholderIssueForm({
         setExistingAttachments(existingAttachments.filter(att => att.path !== attachmentPath));
       }
     } catch (error) {
+      captureError(error, { operation: "deleteAttachment", issueId });
       console.error("Error deleting attachment:", error);
     } finally {
       setDeletingAttachment(null);
@@ -129,6 +184,7 @@ export default function StakeholderIssueForm({
     try {
       await downloadAttachment(filePath, originalName);
     } catch (error) {
+      captureError(error, { operation: "downloadAttachment" });
       console.error("Error downloading attachment:", error);
       setFileError("Failed to download attachment. The file may not exist or you may not have permission.");
       setTimeout(() => setFileError(null), 5000);
@@ -155,6 +211,7 @@ export default function StakeholderIssueForm({
     try {
       await onSubmit(dataToValidate);
     } catch (error) {
+      captureError(error, { operation: "submitIssueForm" });
       console.error("Form submission error:", error);
     } finally {
       setIsSubmitting(false);
@@ -175,6 +232,48 @@ export default function StakeholderIssueForm({
           placeholder="Enter issue title"
         />
 
+        {/* Category and Subcategory */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SelectField
+            label="Category"
+            name="category_id"
+            value={formData.category_id?.toString() || ""}
+            onChange={(e) => handleCategoryChange(e.target.value ? parseInt(e.target.value) : "")}
+            disabled={loadingCategories}
+            placeholder="-- Select category --"
+            options={categories.filter(c => c.is_active).map((category) => ({
+              value: category.id?.toString() || "",
+              label: category.name,
+            }))}
+            className={loadingCategories ? "opacity-50 cursor-not-allowed" : ""}
+          />
+
+          <SelectField
+            label="Subcategory"
+            name="subcategory_id"
+            value={formData.subcategory_id?.toString() || ""}
+            onChange={(e) => handleSubcategoryChange(e.target.value ? parseInt(e.target.value) : "")}
+            disabled={!formData.category_id || availableSubcategories.length === 0}
+            placeholder={!formData.category_id ? "-- Select category first --" : "-- Select subcategory --"}
+            options={availableSubcategories.map((subcategory) => ({
+              value: subcategory.id?.toString() || "",
+              label: subcategory.name,
+            }))}
+            className={!formData.category_id ? "opacity-50 cursor-not-allowed" : ""}
+          />
+        </div>
+
+        {/* Category Color Preview */}
+        {selectedCategory && (
+          <div className="flex items-center gap-2 text-sm text-foreground-tertiary">
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: selectedCategory.color }}
+            />
+            <span>Category: {selectedCategory.name}</span>
+          </div>
+        )}
+
         {/* Priority */}
         <SelectField
           label="Priority"
@@ -191,21 +290,77 @@ export default function StakeholderIssueForm({
           ]}
         />
 
-        {/* Assigned To */}
-        <SelectField
-          label="Assign To Employee"
-          name="assigned_to"
-          value={formData.assigned_to}
-          onChange={(e) => handleChange({ target: { name: 'assigned_to', value: e.target.value } } as React.ChangeEvent<HTMLInputElement>)}
-          disabled={loadingEmployees}
-          error={errors.assigned_to}
-          placeholder="-- Select an employee --"
-          options={employees.map((employee) => ({
-            value: employee.id,
-            label: employee.name,
-          }))}
-          className={loadingEmployees ? "opacity-50 cursor-not-allowed" : ""}
-        />
+        {/* Assignment Type Toggle */}
+        <div>
+          <label className="block text-sm font-medium text-foreground-primary mb-2">
+            Assign To
+          </label>
+          <div className="flex items-center gap-2 mb-3">
+            <button
+              type="button"
+              onClick={() => handleAssignmentTypeChange('employee')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                assignmentType === 'employee'
+                  ? 'bg-primary-600 text-white border-primary-600'
+                  : 'bg-surface-primary text-foreground-secondary border-border-primary hover:border-primary-500'
+              }`}
+            >
+              <User size={18} />
+              <span>Employee</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleAssignmentTypeChange('team')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                assignmentType === 'team'
+                  ? 'bg-primary-600 text-white border-primary-600'
+                  : 'bg-surface-primary text-foreground-secondary border-border-primary hover:border-primary-500'
+              }`}
+            >
+              <UsersThree size={18} />
+              <span>Team</span>
+            </button>
+          </div>
+
+          {/* Employee Selection */}
+          {assignmentType === 'employee' && (
+            <SelectField
+              label=""
+              name="assigned_to"
+              value={formData.assigned_to || ""}
+              onChange={(e) => handleChange({ target: { name: 'assigned_to', value: e.target.value } } as React.ChangeEvent<HTMLInputElement>)}
+              disabled={loadingEmployees}
+              error={errors.assigned_to}
+              placeholder="-- Select an employee --"
+              options={employees.map((employee) => ({
+                value: employee.id,
+                label: employee.name,
+              }))}
+              className={loadingEmployees ? "opacity-50 cursor-not-allowed" : ""}
+            />
+          )}
+
+          {/* Team Selection */}
+          {assignmentType === 'team' && (
+            <SelectField
+              label=""
+              name="assigned_team_id"
+              value={formData.assigned_team_id?.toString() || ""}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                assigned_team_id: e.target.value ? parseInt(e.target.value) : undefined
+              }))}
+              disabled={loadingTeams}
+              error={errors.assigned_team_id}
+              placeholder="-- Select a team --"
+              options={teams.map((team) => ({
+                value: team.id?.toString() || "",
+                label: team.name,
+              }))}
+              className={loadingTeams ? "opacity-50 cursor-not-allowed" : ""}
+            />
+          )}
+        </div>
 
         {/* Status */}
         <SelectField

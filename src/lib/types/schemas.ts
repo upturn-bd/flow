@@ -671,6 +671,38 @@ export interface StakeholderStepData {
 }
 
 // Stakeholder Issue - issue tracking/ticketing for stakeholders
+// Stakeholder Issue Category - for organizing issues
+export interface StakeholderIssueCategory {
+  id?: number;
+  name: string;
+  description?: string;
+  color: string; // Hex color for visual distinction
+  company_id: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+  // Joined data
+  subcategories?: StakeholderIssueSubcategory[];
+}
+
+// Stakeholder Issue Subcategory - for further organization
+export interface StakeholderIssueSubcategory {
+  id?: number;
+  category_id: number;
+  name: string;
+  description?: string;
+  company_id: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+  // Joined data
+  category?: StakeholderIssueCategory;
+}
+
 export interface StakeholderIssue {
   id?: number;
   stakeholder_id: number;
@@ -680,6 +712,9 @@ export interface StakeholderIssue {
   priority: 'Low' | 'Medium' | 'High' | 'Urgent';
   attachments: StakeholderIssueAttachment[];
   assigned_to?: string; // Employee ID assigned to handle this specific issue
+  assigned_team_id?: number; // Team ID assigned to handle this issue (either employee OR team)
+  category_id?: number; // Optional category for organization
+  subcategory_id?: number; // Optional subcategory (must belong to selected category)
   company_id: number;
   created_at?: string;
   updated_at?: string;
@@ -694,6 +729,12 @@ export interface StakeholderIssue {
     name: string;
     email?: string;
   };
+  assigned_team?: {
+    id: number;
+    name: string;
+  };
+  category?: StakeholderIssueCategory;
+  subcategory?: StakeholderIssueSubcategory;
   creator?: {
     id: string;
     name: string;

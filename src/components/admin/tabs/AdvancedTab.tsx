@@ -9,6 +9,7 @@ import SettlementView from "../settlement/SettlementView";
 import NoticeManagementView from "../notice/NoticeManagementView";
 import ComplaintsManagementView from "../complaints/ComplaintsManagementView";
 import StakeholderTypeManagementView from "../stakeholder-types/StakeholderTypeManagementView";
+import IssueCategoryManagementView from "../stakeholder-issue-categories/IssueCategoryManagementView";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function AdvancedTab() {
@@ -35,6 +36,8 @@ export default function AdvancedTab() {
             <ComplaintsManagementView />
 
             <StakeholderTypeManagementView />
+
+            <IssueCategoryManagementView />
         </div>
       </Suspense>
     </div>
