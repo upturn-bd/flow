@@ -370,7 +370,7 @@ export interface Grade {
 
 export interface CompanyBasics {
   company_name: string;
-  company_id: string;
+  company_id?: string;
   industry_id: string;
   country_id: string;
   // Operations Settings
