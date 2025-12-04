@@ -96,7 +96,7 @@ export default function SingleEmployeeSelector({
           onClick={!disabled ? handleInputClick : undefined}
         >
           <div className="flex items-center p-3">
-            <Search className="h-4 w-4 text-foreground-tertiary dark:text-foreground-tertiary mr-3 flex-shrink-0" />
+            <Search className="h-4 w-4 text-foreground-tertiary dark:text-foreground-tertiary mr-3 shrink-0" />
             
             {selectedEmployee && !isDropdownOpen ? (
               <div className="flex items-center justify-between w-full">
@@ -161,7 +161,7 @@ export default function SingleEmployeeSelector({
                       onClick={() => handleEmployeeSelect(employee)}
                       className="w-full flex items-center space-x-3 p-3 hover:bg-surface-hover dark:hover:bg-surface-hover rounded-lg transition-colors text-left"
                     >
-                      <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center shrink-0">
                         <User className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                       </div>
                       <div className="flex-1 min-w-0">

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, Plus, Settings, Trash, Edit, UserPlus, Shield, Search, X, Loader } from "@/lib/icons";
+import { Users, Plus, Settings, Trash, Edit, UserPlus, Shield, Search, X } from "@/lib/icons";
 import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/lib/auth/auth-context";
 import type { Team, TeamWithMembers, TeamWithPermissions } from "@/lib/types/schemas";
@@ -14,6 +14,10 @@ import TeamMembersModal from "@/components/admin/teams/TeamMembersModal";
 import TeamPermissionsModal from "@/components/admin/teams/TeamPermissionsModal";
 import { ModulePermissionsBanner } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
+import { SearchBar } from "@/components/ui/SearchBar";
+import { EmptyState } from "@/components/ui/EmptyState";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { InlineSpinner } from "@/components/ui";
 
 export default function TeamsPage() {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -196,25 +200,12 @@ export default function TeamsPage() {
         className="mb-6"
       >
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <div className="relative flex-1 w-full sm:max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground-tertiary" />
-            <input
-              type="text"
-              placeholder="Search teams..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm sm:text-base"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-surface-hover rounded-full transition-colors"
-                aria-label="Clear search"
-              >
-                <X className="h-4 w-4 text-foreground-tertiary" />
-              </button>
-            )}
-          </div>
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search teams..."
+            containerClassName="flex-1 w-full sm:max-w-md"
+          />
           
           {searchQuery && (
             <motion.div
@@ -232,10 +223,12 @@ export default function TeamsPage() {
 
       {/* Loading State */}
       {loading && teams.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20">
-          <Loader className="h-12 w-12 text-indigo-600 animate-spin mb-4" />
-          <p className="text-foreground-secondary">Loading teams...</p>
-        </div>
+        <LoadingSpinner
+          icon={Users}
+          text="Loading teams..."
+          color="purple"
+          height="py-20"
+        />
       )}
 
       {/* Teams Grid */}
@@ -459,8 +452,8 @@ export default function TeamsPage() {
             >
               {isLoadingAction ? (
                 <>
-                  <Loader className="h-4 w-4 mr-2 animate-spin" />
-                  Deleting...
+                  <InlineSpinner size="sm" color="white" />
+                  <span className="ml-2">Deleting...</span>
                 </>
               ) : (
                 'Delete Team'

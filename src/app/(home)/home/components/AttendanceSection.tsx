@@ -354,9 +354,9 @@ export default function AttendanceSection({
               </div>
             )}
 
-            {/* Check-out Button */}
-            {checkInCompleted && !checkOutCompleted && (
-              <div className="flex justify-start">
+            {/* RIGHT COLUMN */}
+            <div className="shrink-0">
+              {!checkInCompleted && !checkOutCompleted && (
                 <motion.button
                   whileHover={{ scale: isCheckingOut ? 1 : 1.05 }}
                   whileTap={{ scale: isCheckingOut ? 1 : 0.95 }}

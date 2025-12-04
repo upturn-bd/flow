@@ -18,6 +18,7 @@ import {
   FormInput
 } from "@/lib/icons";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
+import { extractEmployeeIds } from "@/lib/utils/project-utils";
 
 // Define the structure of a settlement request
 interface SettlementRequest {
@@ -34,7 +35,7 @@ interface SettlementRequest {
 }
 
 export default function SettlementHistoryPage() {
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const { claimTypes, fetchClaimTypes } = useClaimTypes();
   const { 
     settlementRequests, 
@@ -44,12 +45,18 @@ export default function SettlementHistoryPage() {
   } = useSettlementRequests();
 
   useEffect(() => {
-    fetchSettlementHistory();
-  }, [fetchSettlementHistory]);
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
+    const initData = async () => {
+      const history = await fetchSettlementHistory();
+      // Only fetch employees that are referenced in the history
+      if (history && history.length > 0) {
+        const employeeIds = extractEmployeeIds(history, ["claimant_id"]);
+        if (employeeIds.length > 0) {
+          fetchEmployeesByIds(employeeIds);
+        }
+      }
+    };
+    initData();
+  }, [fetchSettlementHistory, fetchEmployeesByIds]);
 
   useEffect(() => {
     fetchClaimTypes();
@@ -101,7 +108,7 @@ export default function SettlementHistoryPage() {
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex items-start gap-2">
-                        <DollarSign size={18} className="text-green-600 mt-1 flex-shrink-0" />
+                        <DollarSign size={18} className="text-green-600 mt-1 shrink-0" />
                         <div>
                           <h3 className="font-medium text-foreground-primary">
                             {claimTypes.find(type => type.id === settlement.settlement_type_id)?.settlement_item || "Unknown"}

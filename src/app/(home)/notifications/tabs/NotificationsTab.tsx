@@ -121,7 +121,7 @@ export default function NotificationsTab() {
         {unreadNotifications.length > 0 && (
           <button
             onClick={handleMarkAllAsRead}
-            className="text-blue-600 hover:bg-blue-50 px-3 py-1 rounded text-sm font-medium"
+            className="text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 px-3 py-1 rounded text-sm font-medium"
           >
             Mark all as read
           </button>
@@ -172,7 +172,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
     <div className={`border-l-4 rounded-lg p-4 ${priorityStyle} ${!notification.is_read ? 'shadow-sm' : ''}`}>
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className={`flex-shrink-0 ${iconColor} mt-0.5`}>
+          <div className={`shrink-0 ${iconColor} mt-0.5`}>
             <IconComponent className="h-5 w-5" />
           </div>
 
@@ -182,7 +182,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
                 {notification.title}
               </h4>
               {!notification.is_read && (
-                <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
+                <span className="w-2 h-2 bg-blue-500 rounded-full shrink-0"></span>
               )}
             </div>
 
@@ -208,7 +208,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
           {notification.action_url && (
             <Link
               href={notification.action_url}
-              className="text-blue-600 hover:bg-blue-50 p-1.5 rounded"
+              className="text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded"
               title="View details"
             >
               <ExternalLink className="h-4 w-4" />

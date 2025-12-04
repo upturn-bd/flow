@@ -20,7 +20,8 @@ import {
 } from "@/lib/icons";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import FormInputField from "@/components/ui/FormInputField";
+import { SearchBar } from "@/components/ui/SearchBar";
+import { EmptyState } from "@/components/ui/EmptyState";
 import {
   useOffboarding,
   OffboardingEmployee,
@@ -278,41 +279,25 @@ export default function OffboardingPage() {
 
         {/* Search Bar */}
         <div className="p-6">
-          <FormInputField
-            name="search"
-            label="Search employees by name, email, designation, or department"
-            icon={<Search size={18} />}
+          <SearchBar
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            type="text"
+            onChange={setSearchQuery}
+            placeholder="Search employees by name, email, designation, or department"
           />
         </div>
       </motion.div>
 
       {/* Employee List */}
       {displayedEmployees.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
-          className="mt-10 flex flex-col items-center justify-center p-10 bg-red-50/50 rounded-xl border border-red-100"
-        >
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-          >
-            <Users className="h-16 w-16 text-red-300 mb-4" />
-          </motion.div>
-          <h3 className="text-xl font-medium text-foreground-secondary mb-2">
-            No {activeTab === "active" ? "Active" : "Offboarded"} Employees Found
-          </h3>
-          <p className="text-foreground-secondary text-center max-w-md">
-            {searchQuery
+        <div className="mt-10 bg-red-50/50 rounded-xl border border-red-100">
+          <EmptyState
+            icon={Users}
+            title={`No ${activeTab === "active" ? "Active" : "Offboarded"} Employees Found`}
+            description={searchQuery
               ? "Try adjusting your search criteria"
               : `There are no ${activeTab === "active" ? "active" : "offboarded"} employees to display.`}
-          </p>
-        </motion.div>
+          />
+        </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Employee Cards */}
@@ -339,7 +324,7 @@ export default function OffboardingPage() {
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                    <div className="shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
                       <User className="h-5 w-5" />
                     </div>
                     <div>
@@ -425,7 +410,7 @@ export default function OffboardingPage() {
               {selectedEmployee ? (
                 <div className="bg-surface-primary rounded-xl p-6 shadow-sm border border-border-primary space-y-4">
                   <div className="flex items-center gap-3 pb-4 border-b border-border-primary">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                    <div className="shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600">
                       <User className="h-6 w-6" />
                     </div>
                     <div>

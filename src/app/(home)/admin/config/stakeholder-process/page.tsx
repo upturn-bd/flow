@@ -34,9 +34,9 @@ export default function StakeholderProcessesPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="w-full space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground-primary">Stakeholder Processes</h1>
           <p className="text-sm text-foreground-secondary mt-1">
@@ -45,7 +45,7 @@ export default function StakeholderProcessesPage() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           <Plus size={20} />
           Create Process
@@ -77,7 +77,7 @@ export default function StakeholderProcessesPage() {
           <div className="mt-6">
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
             >
               <Plus size={20} />
               Create Process
@@ -145,7 +145,7 @@ export default function StakeholderProcessesPage() {
                     onClick={() => {
                       router.push(`/admin/config/stakeholder-process/${process.id}`);
                     }}
-                    className="p-2 text-foreground-secondary hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    className="p-2 text-foreground-secondary hover:text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
                     title="Edit process"
                   >
                     <Edit size={18} />
@@ -157,7 +157,7 @@ export default function StakeholderProcessesPage() {
                     title="Delete process"
                   >
                     {processingId === process.id ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                      <InlineSpinner size="sm" color="red" />
                     ) : (
                       <Trash size={18} />
                     )}

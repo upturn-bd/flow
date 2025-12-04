@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Building, Briefcase, Globe, Loader } from "@/lib/icons";
+import { Building, Code, Briefcase, Globe, Loader } from "@/lib/icons";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { validateCompanyBasics, validationErrorsToObject } from "@/lib/utils/validation";
 import { CompanyBasics } from "@/lib/types/schemas";
 import CompanyBasicsConfigView from "@/components/admin/CompanyBasicsConfigView";
@@ -89,12 +90,10 @@ export default function BasicTab() {
   // Show loading state while data is being fetched
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader className="w-12 h-12 animate-spin text-primary-600 mx-auto mb-4" />
-          <p className="text-foreground-tertiary">Loading configuration...</p>
-        </div>
-      </div>
+      <LoadingSpinner
+        text="Loading configuration..."
+        height="h-screen"
+      />
     );
   }
 

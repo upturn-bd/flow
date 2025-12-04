@@ -3,23 +3,22 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Search, 
   Users, 
   User, 
   Mail, 
   Phone, 
-  Briefcase, 
   Building,
-  GraduationCap,
-  MapPin,
   Calendar,
   Filter,
-  Loader 
+  Search
 } from "@/lib/icons";
-import FormInputField from "@/components/ui/FormInputField";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
 import { matchesEmployeeSearch } from "@/lib/utils/user-search";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SearchBar } from "@/components/ui/SearchBar";
+import { EmptyState } from "@/components/ui/EmptyState";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 // Filter options
 type FilterOptions = {
@@ -92,23 +91,12 @@ export default function FinderPage() {
       className="w-full p-4 sm:p-6 lg:p-8 pb-12"
     >
       {/* Header */}
-      <motion.div
-        variants={fadeInUp}
-        className="flex items-center mb-8"
-      >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0.5 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="p-2 rounded-lg bg-indigo-100 text-indigo-700 mr-3"
-        >
-          <Users size={24} />
-        </motion.div>
-        <div>
-          <h1 className="text-2xl font-bold text-foreground-primary">Employee Finder</h1>
-          <p className="text-foreground-secondary">Search and find detailed information about employees</p>
-        </div>
-      </motion.div>
+      <PageHeader
+        icon={Users}
+        iconColor="text-indigo-600"
+        title="Employee Finder"
+        description="Search and find detailed information about employees"
+      />
 
       {/* Search and Filters */}
       <motion.div variants={fadeIn} className="bg-surface-primary rounded-xl shadow-sm mb-8">
@@ -130,13 +118,10 @@ export default function FinderPage() {
         
         <div className="p-6">
           <div className="mb-4">
-            <FormInputField
-              name="search"
-              label="Search employees by name, email, position, or department"
-              icon={<Search size={18} />}
+            <SearchBar
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              type="text"
+              onChange={setSearchQuery}
+              placeholder="Search employees by name, email, position, or department"
             />
           </div>
           
@@ -205,28 +190,18 @@ export default function FinderPage() {
 
         <AnimatePresence>
           {loading ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center h-64 bg-surface-primary rounded-xl shadow-sm p-6"
-            >
-              <Loader className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
-              <p className="text-foreground-secondary">Loading employee data...</p>
-            </motion.div>
+            <LoadingSpinner
+              icon={Users}
+              text="Loading employee data..."
+              color="purple"
+              height="h-64"
+            />
           ) : filteredEmployees.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="bg-surface-primary rounded-xl shadow-sm p-8 text-center"
-            >
-              <Users className="w-16 h-16 text-foreground-tertiary mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground-secondary mb-2">No employees found</h3>
-              <p className="text-foreground-tertiary max-w-md mx-auto">
-                No employees match your search criteria. Try adjusting your filters or search query.
-              </p>
-            </motion.div>
+            <EmptyState
+              icon={Users}
+              title="No employees found"
+              description="No employees match your search criteria. Try adjusting your filters or search query."
+            />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredEmployees.map((employee) => (
@@ -250,19 +225,19 @@ export default function FinderPage() {
                   
                   <div className="p-5 space-y-3">
                     <div className="flex">
-                      <Mail className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                      <Mail className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                       <span className="text-foreground-secondary text-sm">{employee.email}</span>
                     </div>
                     <div className="flex">
-                      <Phone className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                      <Phone className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                       <span className="text-foreground-secondary text-sm">{employee.phone}</span>
                     </div>
                     <div className="flex">
-                      <Building className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                      <Building className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                       <span className="text-foreground-secondary text-sm">{employee.department}</span>
                     </div>
                     <div className="flex">
-                      <Calendar className="w-5 h-5 text-foreground-tertiary mr-3 flex-shrink-0" />
+                      <Calendar className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                       <span className="text-foreground-secondary text-sm">Joined: {employee.joinDate ? formatDate(employee.joinDate) : "N/A"}</span>
                     </div>
                   </div>

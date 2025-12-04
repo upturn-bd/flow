@@ -308,7 +308,7 @@ export default function SuperadminDashboard() {
               {recentCompanies.map((company) => (
                 <Link key={company.id} href="/sa/companies">
                   <div className="p-4 hover:bg-surface-hover transition-colors flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                    <div className="w-10 h-10 bg-linear-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
                       {company.name.substring(0, 2).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">

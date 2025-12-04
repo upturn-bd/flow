@@ -28,7 +28,7 @@ function LeavePageContent() {
       key: "apply",
       label: "Apply Leave",
       icon: <PlusCircle className="h-5 w-5" />,
-      color: "text-blue-600",
+      color: "text-primary-600",
       content: <LeaveCreatePage setActiveTab={setActiveTab} />,
       link: "/ops/leave?tab=apply",
     },
@@ -68,7 +68,7 @@ function LeavePageContent() {
           </p>
           <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 sm:p-4 max-w-md mx-2">
             <div className="flex gap-2 sm:gap-3">
-              <WarningCircle className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <WarningCircle className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-sm font-semibold text-blue-800 mb-1">Policy Information</h4>
                 <p className="text-xs sm:text-sm text-blue-700">
@@ -92,7 +92,7 @@ function LeavePageContent() {
       title="Leave Management"
       description="Apply for leave, track requests, and view leave history. All your leave management in one place."
       icon={<Calendar className="h-7 w-7" />}
-      primaryColor="text-blue-600"
+      primaryColor="text-primary-600"
       tabs={tabs}
       activeTab={activeTab}
       setActiveTab={setActiveTab}
@@ -111,7 +111,7 @@ export default function LeavePage() {
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
-          <Calendar className="h-8 w-8 text-blue-600 animate-pulse" />
+          <Calendar className="h-8 w-8 text-primary-600 animate-pulse" />
           <p className="text-sm text-foreground-secondary">Loading leave management...</p>
         </div>
       </div>

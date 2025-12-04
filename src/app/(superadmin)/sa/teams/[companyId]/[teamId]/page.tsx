@@ -27,6 +27,8 @@ import { filterEmployeesBySearch } from "@/lib/utils/user-search";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import ConfirmationModal from "@/components/ui/modals/ConfirmationModal";
+import { LoadingSpinner, InlineSpinner, SearchBar } from "@/components/ui";
+import { FormField, TextAreaField } from "@/components/forms";
 
 interface EmployeeSearchResult {
   id: string;
@@ -427,10 +429,7 @@ export default function TeamDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <Spinner size={40} className="animate-spin text-primary-600 dark:text-primary-400 mx-auto mb-3" />
-          <p className="text-foreground-tertiary">Loading team details...</p>
-        </div>
+        <LoadingSpinner text="Loading team details..." />
       </div>
     );
   }
@@ -466,18 +465,18 @@ export default function TeamDetailPage() {
           
           {isEditingTeam ? (
             <div className="space-y-3 flex-1">
-              <input
-                type="text"
+              <FormField
+                label="Team Name"
                 value={editedTeam.name}
                 onChange={(e) => setEditedTeam(prev => ({ ...prev, name: e.target.value }))}
-                className="text-2xl font-bold text-foreground-primary w-full px-3 py-1 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Team name"
                 autoFocus
+                className="text-2xl font-bold"
               />
-              <textarea
+              <TextAreaField
+                label="Description"
                 value={editedTeam.description}
                 onChange={(e) => setEditedTeam(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 text-foreground-secondary resize-none"
                 placeholder="Team description (optional)"
                 rows={2}
               />
@@ -496,7 +495,7 @@ export default function TeamDetailPage() {
                   disabled={savingTeam}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
                 >
-                  {savingTeam ? <Spinner size={16} className="animate-spin" /> : <Check size={16} weight="bold" />}
+                  {savingTeam ? <InlineSpinner size="sm" color="white" /> : <Check size={16} weight="bold" />}
                   Save
                 </button>
               </div>
@@ -558,7 +557,7 @@ export default function TeamDetailPage() {
             {members.map((member) => (
               <div key={member.id || member.employee_id} className="p-4 flex items-center justify-between hover:bg-background-secondary/50 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                  <div className="w-10 h-10 bg-linear-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-medium text-sm">
                     {member.employee?.first_name?.[0]}{member.employee?.last_name?.[0]}
                   </div>
                   <div>
@@ -626,7 +625,7 @@ export default function TeamDetailPage() {
             >
               {savingPermissions ? (
                 <>
-                  <Spinner size={16} className="animate-spin" />
+                  <InlineSpinner size="sm" color="white" />
                   Saving...
                 </>
               ) : (
@@ -861,7 +860,7 @@ export default function TeamDetailPage() {
                 >
                   {addingMember ? (
                     <>
-                      <Spinner size={16} className="animate-spin" />
+                      <InlineSpinner size="sm" color="white" />
                       Adding...
                     </>
                   ) : (

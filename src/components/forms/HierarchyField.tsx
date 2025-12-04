@@ -150,7 +150,7 @@ export default function HierarchyField({
                 size="sm"
                 onClick={addNewLevel}
                 disabled={disabled}
-                className="mt-2 flex items-center gap-1 border-blue-200 text-blue-700 hover:bg-blue-50"
+                className="mt-2 flex items-center gap-1 border-blue-200 text-blue-700 hover:bg-primary-50 dark:hover:bg-primary-950"
               >
                 <Plus size={16} weight="bold" />
                 Add Level

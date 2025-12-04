@@ -6,6 +6,7 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { useEmployees } from "@/hooks/useEmployees";
 import { ArrowLeft, WarningCircle, Plus, Trash } from "@/lib/icons";
 import { ContactPerson, Stakeholder } from "@/lib/types/schemas";
+import { LoadingSpinner } from "@/components/ui";
 
 export default function EditStakeholderPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -151,14 +152,14 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
   if (loadingStakeholder) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <LoadingSpinner text="Loading stakeholder..." />
       </div>
     );
   }
 
   if (!stakeholder) {
     return (
-      <div className="p-6">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="max-w-2xl mx-auto text-center py-12">
           <WarningCircle className="mx-auto text-foreground-tertiary" size={48} />
           <h2 className="text-xl font-bold text-foreground-primary mt-4">Stakeholder Not Found</h2>
@@ -167,7 +168,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
           </p>
           <button
             onClick={() => router.push("/admin/stakeholders")}
-            className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="mt-6 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
           >
             Back to Stakeholders
           </button>
@@ -179,7 +180,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
   // Show error if no processes exist
   if (!loading && activeProcesses.length === 0) {
     return (
-      <div className="p-6">
+      <div className="p-4 sm:p-6 lg:p-8">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-2 text-foreground-secondary hover:text-foreground-primary mb-6"
@@ -201,7 +202,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
             </p>
             <button
               onClick={() => router.push("/admin/config/stakeholder-process")}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium"
             >
               Go to Process Management
             </button>
@@ -212,7 +213,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <button
         onClick={() => router.back()}
@@ -353,7 +354,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
               <button
                 type="button"
                 onClick={handleAddContactPerson}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
               >
                 <Plus size={16} />
                 Add Contact
@@ -469,7 +470,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
             <button
               type="submit"
               disabled={submitting || loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? "Saving..." : "Save Changes"}
             </button>

@@ -11,6 +11,8 @@ import { StakeholderIssueAttachment } from "@/lib/types/schemas";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { X, Upload, Trash, Download, FileText } from "@/lib/icons";
+import InlineSpinner from "@/components/ui/InlineSpinner";
+import { FormField, SelectField, TextAreaField } from "@/components/forms";
 
 interface StakeholderIssueFormProps {
   stakeholderId: number;
@@ -163,122 +165,77 @@ export default function StakeholderIssueForm({
     <form onSubmit={handleFormSubmit} className="space-y-6">
       <div className="space-y-4">
         {/* Title */}
-        <div>
-          <label className="block text-sm font-medium text-foreground-secondary mb-1">
-            Title <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary text-foreground-primary ${
-              errors.title ? "border-red-500" : "border-border-secondary"
-            }`}
-            placeholder="Enter issue title"
-          />
-          {errors.title && (
-            <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-          )}
-        </div>
+        <FormField
+          label="Title"
+          required
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          error={errors.title}
+          placeholder="Enter issue title"
+        />
 
         {/* Priority */}
-        <div>
-          <label className="block text-sm font-medium text-foreground-secondary mb-1">
-            Priority <span className="text-red-500">*</span>
-          </label>
-          <select
-            name="priority"
-            value={formData.priority}
-            onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary text-foreground-primary ${
-              errors.priority ? "border-red-500" : "border-border-secondary"
-            }`}
-          >
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-            <option value="Urgent">Urgent</option>
-          </select>
-          {errors.priority && (
-            <p className="mt-1 text-sm text-red-600">{errors.priority}</p>
-          )}
-        </div>
+        <SelectField
+          label="Priority"
+          required
+          name="priority"
+          value={formData.priority}
+          onChange={(e) => handleChange({ target: { name: 'priority', value: e.target.value } } as React.ChangeEvent<HTMLInputElement>)}
+          error={errors.priority}
+          options={[
+            { value: 'Low', label: 'Low' },
+            { value: 'Medium', label: 'Medium' },
+            { value: 'High', label: 'High' },
+            { value: 'Urgent', label: 'Urgent' },
+          ]}
+        />
 
         {/* Assigned To */}
-        <div>
-          <label className="block text-sm font-medium text-foreground-secondary mb-1">
-            Assign To Employee
-          </label>
-          <select
-            name="assigned_to"
-            value={formData.assigned_to}
-            onChange={handleChange}
-            disabled={loadingEmployees}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary text-foreground-primary ${
-              errors.assigned_to ? "border-red-500" : "border-border-secondary"
-            } ${loadingEmployees ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            <option value="">-- Select an employee --</option>
-            {employees.map((employee) => (
-              <option key={employee.id} value={employee.id}>
-                {employee.name}
-              </option>
-            ))}
-          </select>
-          {errors.assigned_to && (
-            <p className="mt-1 text-sm text-red-600">{errors.assigned_to}</p>
-          )}
-          <p className="mt-1 text-xs text-foreground-tertiary">
-            Optional: Assign this issue to a specific employee
-          </p>
-        </div>
+        <SelectField
+          label="Assign To Employee"
+          name="assigned_to"
+          value={formData.assigned_to}
+          onChange={(e) => handleChange({ target: { name: 'assigned_to', value: e.target.value } } as React.ChangeEvent<HTMLInputElement>)}
+          disabled={loadingEmployees}
+          error={errors.assigned_to}
+          placeholder="-- Select an employee --"
+          options={employees.map((employee) => ({
+            value: employee.id,
+            label: employee.name,
+          }))}
+          className={loadingEmployees ? "opacity-50 cursor-not-allowed" : ""}
+        />
 
         {/* Status */}
-        <div>
-          <label className="block text-sm font-medium text-foreground-secondary mb-1">
-            Status <span className="text-red-500">*</span>
-          </label>
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-surface-primary text-foreground-primary ${
-              errors.status ? "border-red-500" : "border-border-secondary"
-            }`}
-          >
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Resolved">Resolved</option>
-          </select>
-          {errors.status && (
-            <p className="mt-1 text-sm text-red-600">{errors.status}</p>
-          )}
-        </div>
+        <SelectField
+          label="Status"
+          required
+          name="status"
+          value={formData.status}
+          onChange={(e) => handleChange({ target: { name: 'status', value: e.target.value } } as React.ChangeEvent<HTMLInputElement>)}
+          error={errors.status}
+          options={[
+            { value: 'Pending', label: 'Pending' },
+            { value: 'In Progress', label: 'In Progress' },
+            { value: 'Resolved', label: 'Resolved' },
+          ]}
+        />
 
         {/* Description */}
-        <div>
-          <label className="block text-sm font-medium text-foreground-secondary mb-1">
-            Description
-          </label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={4}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none bg-surface-primary text-foreground-primary ${
-              errors.description ? "border-red-500" : "border-border-secondary"
-            }`}
-            placeholder="Describe the issue in detail..."
-          />
-          {errors.description && (
-            <p className="mt-1 text-sm text-red-600">{errors.description}</p>
-          )}
-        </div>
+        <TextAreaField
+          label="Description"
+          name="description"
+          value={formData.description}
+          onChange={(e) => handleChange({ target: { name: 'description', value: e.target.value } } as React.ChangeEvent<HTMLInputElement>)}
+          rows={4}
+          error={errors.description}
+          placeholder="Describe the issue in detail..."
+        />
 
         {/* File Attachments */}
         <div>
-          <label className="block text-sm font-medium text-foreground-secondary mb-1">
+          <label className="block text-sm font-medium text-foreground-primary mb-1">
             Attachments
           </label>
           <div className="space-y-3">
@@ -292,7 +249,7 @@ export default function StakeholderIssueForm({
                     className="flex items-center justify-between p-3 bg-primary-50 dark:bg-primary-900/30 rounded border border-primary-200 dark:border-primary-800"
                   >
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileText size={16} className="text-primary-600 flex-shrink-0" />
+                      <FileText size={16} className="text-primary-600 shrink-0" />
                       <span className="text-sm text-foreground-secondary truncate">
                         {attachment.originalName}
                       </span>
@@ -311,7 +268,7 @@ export default function StakeholderIssueForm({
                         title="Download"
                       >
                         {downloadingAttachment === attachment.path ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600"></div>
+                          <InlineSpinner size="xs" color="primary" />
                         ) : (
                           <Download size={16} />
                         )}
@@ -325,7 +282,7 @@ export default function StakeholderIssueForm({
                           title="Delete"
                         >
                           {deletingAttachment === attachment.path ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                            <InlineSpinner size="xs" color="red" />
                           ) : (
                             <Trash size={16} />
                           )}
@@ -374,7 +331,7 @@ export default function StakeholderIssueForm({
                     className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-900/30 rounded border border-green-200 dark:border-green-800"
                   >
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileText size={16} className="text-green-600 dark:text-green-400 flex-shrink-0" />
+                      <FileText size={16} className="text-green-600 dark:text-green-400 shrink-0" />
                       <span className="text-sm text-foreground-secondary truncate">
                         {file.name}
                       </span>

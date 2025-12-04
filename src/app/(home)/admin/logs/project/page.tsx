@@ -6,7 +6,8 @@ import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
-import { Loader, Trash, Edit } from "@/lib/icons";
+import { Trash, Edit } from "@/lib/icons";
+import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
 import { UpdateProjectPage } from "@/components/ops/project/CreateNewProject";
@@ -121,7 +122,7 @@ export default function CompanyProjectsPage() {
                >
                   <CardContent className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 gap-3">
                      <div className="flex flex-col gap-2 w-full sm:w-2/3">
-                        <h3 className="font-semibold text-lg break-words">{project.project_title}</h3>
+                        <h3 className="font-semibold text-lg wrap-break-words">{project.project_title}</h3>
 
                         {/* Desktop badges */}
                         <div className="hidden sm:flex flex-wrap gap-2 text-sm text-foreground-secondary mt-1">
@@ -216,7 +217,7 @@ export default function CompanyProjectsPage() {
                            <>
                               {ongoingLoading ? (
                                  <div className="flex justify-center items-center h-32">
-                                    <Loader className="animate-spin text-foreground-tertiary" />
+                                    <InlineSpinner size="md" color="primary" />
                                  </div>
                               ) : (
                                  renderProjectList(filteredOngoing)
@@ -233,7 +234,7 @@ export default function CompanyProjectsPage() {
                            <>
                               {ongoingLoading ? (
                                  <div className="flex justify-center items-center h-32">
-                                    <Loader className="animate-spin text-foreground-tertiary" />
+                                    <InlineSpinner size="md" color="primary" />
                                  </div>
                               ) : (
                                  renderProjectList(filteredCompleted)

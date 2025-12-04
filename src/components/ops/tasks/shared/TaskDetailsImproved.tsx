@@ -2,7 +2,7 @@
 
 import { useEmployees } from "@/hooks/useEmployees";
 import { Task, useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Calendar, CaretLeft, User, CheckCircle, XCircle, Clock, Target } from "@/lib/icons";
 import { toast } from "sonner";
@@ -37,10 +37,11 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
   const [taskDetails, setTaskDetails] = useState<Task | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const [projectName, setProjectName] = useState<string | null>(null);
   const { completeTask, reopenTask } = useTasks();
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
+  const employeesFetched = useRef(false);
 
   async function fetchTaskDetails(id: number) {
     setLoading(true);
@@ -132,9 +133,13 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
     }
   }, [id]);
 
+  // Fetch only the employees needed for this task's assignees
   useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
+    if (taskDetails?.assignees && taskDetails.assignees.length > 0 && !employeesFetched.current) {
+      fetchEmployeesByIds(taskDetails.assignees);
+      employeesFetched.current = true;
+    }
+  }, [taskDetails, fetchEmployeesByIds]);
 
   if (loading) {
     return (

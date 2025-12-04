@@ -21,7 +21,8 @@ import {
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { PageHeader, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
+import { PageHeader, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner, SearchBar } from "@/components/ui";
+import { SelectField, TextAreaField } from "@/components/forms";
 
 interface Employee {
   id: string;
@@ -430,25 +431,21 @@ export default function SuperadminUsersPage() {
                     <span className="flex items-center justify-center w-6 h-6 bg-warning/20 text-warning rounded-full text-xs font-bold">1</span>
                     Select Company
                   </label>
-                  <div className="relative">
-                    <select
-                      value={selectedCompany || ""}
-                      onChange={(e) => {
-                        setSelectedCompany(e.target.value ? parseInt(e.target.value) : null);
-                        setSelectedEmployee(null);
-                        setSearchTerm("");
-                      }}
-                      className="w-full px-4 py-3 border border-border-primary rounded-xl focus:ring-2 focus:ring-warning focus:border-transparent transition-all appearance-none bg-surface-primary"
-                    >
-                      <option value="">Select a company</option>
-                      {companies.map((company) => (
-                        <option key={company.id} value={company.id}>
-                          {company.name}
-                        </option>
-                      ))}
-                    </select>
-                    <CaretDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground-tertiary pointer-events-none" />
-                  </div>
+                  <SelectField
+                    value={selectedCompany?.toString() || ""}
+                    onChange={(e) => {
+                      setSelectedCompany(e.target.value ? parseInt(e.target.value) : null);
+                      setSelectedEmployee(null);
+                      setSearchTerm("");
+                    }}
+                    options={[
+                      { value: "", label: "Select a company" },
+                      ...companies.map((company) => ({
+                        value: company.id.toString(),
+                        label: company.name
+                      }))
+                    ]}
+                  />
                 </div>
 
                 {/* Step 2: Search and Select Employee */}
@@ -483,19 +480,12 @@ export default function SuperadminUsersPage() {
                     </div>
                   ) : (
                     <>
-                      <div className="relative mb-3">
-                        <MagnifyingGlass
-                          size={20}
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Search by name, email, or designation..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full pl-12 pr-4 py-3 border border-border-primary rounded-xl focus:ring-2 focus:ring-warning focus:border-transparent transition-all"
-                        />
-                      </div>
+                      <SearchBar
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                        placeholder="Search by name, email, or designation..."
+                        containerClassName="mb-3"
+                      />
 
                       {searchTerm && (
                         <div className="max-h-60 overflow-y-auto border border-border-primary rounded-xl divide-y divide-border-primary">
@@ -550,18 +540,18 @@ export default function SuperadminUsersPage() {
                     <span className="flex items-center justify-center w-6 h-6 bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary rounded-full text-xs font-bold">3</span>
                     Notes (Optional)
                   </label>
-                  <textarea
+                  <TextAreaField
+                    label=""
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-3 border border-border-primary rounded-xl focus:ring-2 focus:ring-warning focus:border-transparent transition-all resize-none"
                     placeholder="Add any notes about this superadmin grant..."
                   />
                 </div>
 
                 {/* Warning */}
                 <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 flex items-start gap-3">
-                  <Warning size={20} className="text-warning flex-shrink-0 mt-0.5" />
+                  <Warning size={20} className="text-warning shrink-0 mt-0.5" />
                   <div className="text-sm text-warning">
                     <p className="font-medium">Important</p>
                     <p className="mt-1">Superadmin privileges grant full access to all companies and system settings. Only grant to trusted employees.</p>
@@ -587,7 +577,7 @@ export default function SuperadminUsersPage() {
                 >
                   {saving ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <InlineSpinner size="sm" color="white" />
                       Adding...
                     </>
                   ) : (

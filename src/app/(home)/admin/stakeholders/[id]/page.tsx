@@ -30,13 +30,132 @@ import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
 import StakeholderIssuesTab from "@/components/stakeholder-issues/StakeholderIssuesTab";
 import StakeholderTransactions from "@/components/stakeholders/StakeholderTransactions";
 import AdditionalDataModal from "@/components/stakeholders/AdditionalDataModal";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { toast } from "sonner";
 
 // Helper to convert programming values to human-readable labels
 const toHumanReadable = (value: string): string => {
   return value
     .replace(/_/g, " ")
-    .replace(/\b\w/g, (l) => l.toUpperCase());
+    .replace(/([a-z])([A-Z])/g, "$1 $2") // Handle camelCase
+    .replace(/\b\w/g, (l) => l.toUpperCase())
+    .trim();
+};
+
+// Helper to detect if a value looks like coordinates
+const isCoordinates = (value: any): { lat: number; lng: number } | null => {
+  // Handle object with lat/lng or latitude/longitude
+  if (typeof value === "object" && value !== null) {
+    const lat = value.lat ?? value.latitude ?? value.Lat ?? value.Latitude;
+    const lng = value.lng ?? value.lon ?? value.longitude ?? value.Lng ?? value.Lon ?? value.Longitude;
+    if (typeof lat === "number" && typeof lng === "number") {
+      return { lat, lng };
+    }
+  }
+  
+  // Handle string like "23.8103, 90.4125" or "23.8103,90.4125"
+  if (typeof value === "string") {
+    const match = value.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
+    if (match) {
+      const lat = parseFloat(match[1]);
+      const lng = parseFloat(match[2]);
+      if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+        return { lat, lng };
+      }
+    }
+  }
+  
+  return null;
+};
+
+// Helper to format values for display
+const formatDisplayValue = (value: any): string => {
+  if (value === null || value === undefined) return "—";
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (typeof value === "number") return value.toLocaleString();
+  if (value instanceof Date) return value.toLocaleDateString();
+  
+  // Handle arrays
+  if (Array.isArray(value)) {
+    if (value.length === 0) return "—";
+    return value.map(item => formatDisplayValue(item)).join(", ");
+  }
+  
+  // Handle objects (not file objects)
+  if (typeof value === "object" && value !== null) {
+    // Skip file objects
+    if ('path' in value) return "[File]";
+    
+    // Check for coordinates
+    const coords = isCoordinates(value);
+    if (coords) {
+      return `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
+    }
+    
+    // Try to extract meaningful info from object
+    if ('name' in value) return String(value.name);
+    if ('label' in value) return String(value.label);
+    if ('title' in value) return String(value.title);
+    // Return a summary of keys
+    const keys = Object.keys(value);
+    if (keys.length === 0) return "—";
+    return keys.map(k => `${toHumanReadable(k)}: ${formatDisplayValue(value[k])}`).join(", ");
+  }
+  
+  // Handle string values
+  if (typeof value === "string") {
+    // Check if it's coordinates string
+    const coords = isCoordinates(value);
+    if (coords) {
+      return `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
+    }
+    
+    // Check if it looks like a date string
+    if (!isNaN(Date.parse(value)) && value.includes("-") && value.length >= 10) {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleDateString();
+      }
+    }
+    
+    // Check if it's a snake_case status-like value (e.g., in_progress, not_started)
+    if (/^[a-z]+(_[a-z]+)+$/.test(value)) {
+      return toHumanReadable(value);
+    }
+    
+    // Check if it's a camelCase value
+    if (/^[a-z]+([A-Z][a-z]+)+$/.test(value)) {
+      return toHumanReadable(value);
+    }
+  }
+  
+  return String(value);
+};
+
+// Component to render value with optional maps link
+const ValueWithMapsLink = ({ value, fieldKey }: { value: any; fieldKey?: string }) => {
+  const coords = isCoordinates(value);
+  
+  if (coords) {
+    const mapsUrl = `https://www.google.com/maps?q=${coords.lat},${coords.lng}`;
+    return (
+      <span className="inline-flex items-center gap-2 flex-wrap">
+        <span>{formatDisplayValue(value)}</span>
+        <a
+          href={mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors"
+        >
+          <MapPin size={12} />
+          Open in Maps
+        </a>
+      </span>
+    );
+  }
+  
+  return <span>{formatDisplayValue(value)}</span>;
 };
 
 export default function StakeholderDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -194,27 +313,28 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
   if (loading && !stakeholder) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <LoadingSpinner
+        icon={User}
+        text="Loading stakeholder..."
+        color="blue"
+        height="min-h-screen"
+      />
     );
   }
 
   if (!stakeholder) {
     return (
-      <div className="p-6">
-        <div className="max-w-2xl mx-auto text-center py-12">
-          <WarningCircle className="mx-auto text-foreground-tertiary" size={48} />
-          <h2 className="text-xl font-bold text-foreground-primary mt-4">Stakeholder Not Found</h2>
-          <p className="text-foreground-secondary mt-2">
-            The stakeholder you're looking for doesn't exist or has been deleted.
-          </p>
-          <button
-            onClick={() => router.push("/admin/stakeholders")}
-            className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Back to Stakeholders
-          </button>
+      <div className="p-4 sm:p-6 lg:p-8">
+        <div className="max-w-2xl mx-auto">
+          <EmptyState
+            icon={WarningCircle}
+            title="Stakeholder Not Found"
+            description="The stakeholder you're looking for doesn't exist or has been deleted."
+            action={{
+              label: "Back to Stakeholders",
+              onClick: () => router.push("/admin/stakeholders")
+            }}
+          />
         </div>
       </div>
     );
@@ -224,7 +344,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
   const sortedSteps = [...processSteps].sort((a, b) => a.step_order - b.step_order);
 
   return (
-    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
         <button
@@ -238,30 +358,30 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-0">
           <div className="flex-1 min-w-0">
             <div className="flex items-start gap-2 sm:gap-3 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary break-words">{stakeholder.name}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary wrap-wrap-break-words">{stakeholder.name}</h1>
               {stakeholder.status === "Rejected" ? (
-                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-red-100 text-red-800 flex-shrink-0">
+                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-red-100 text-red-800 shrink-0">
                   <WarningCircle size={14} />
                   Rejected
                 </span>
               ) : stakeholder.is_completed || stakeholder.status === "Permanent" ? (
-                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800 flex-shrink-0">
+                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800 shrink-0">
                   <CheckCircle size={14} />
                   Stakeholder
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800 flex-shrink-0">
+                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800 shrink-0">
                   <Clock size={14} />
                   Lead
                 </span>
               )}
             </div>
-            <p className="text-xs sm:text-sm text-foreground-secondary mt-1 break-words">
+            <p className="text-xs sm:text-sm text-foreground-secondary mt-1 wrap-break-words">
               Process: {stakeholder.process?.name || "N/A"}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => router.push(`/admin/stakeholders/${stakeholder.id}/edit`)}
               className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-foreground-secondary border border-border-secondary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
@@ -291,7 +411,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
       {stakeholder.status === "Permanent" && (!stakeholder.additional_data || Object.keys(stakeholder.additional_data).length === 0) && (
         <div className="bg-blue-50 border-l-4 border-blue-500 px-4 py-3 rounded-lg">
           <div className="flex items-start gap-3">
-            <Database className="text-blue-500 mt-0.5 flex-shrink-0" size={20} />
+            <Database className="text-blue-500 mt-0.5 shrink-0" size={20} />
             <div className="flex-1 min-w-0">
               <p className="font-medium text-blue-800">Add Additional Data</p>
               <p className="text-sm text-blue-700 mt-1">
@@ -299,7 +419,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               </p>
               <button
                 onClick={() => setShowAdditionalDataModal(true)}
-                className="mt-2 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="mt-2 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
                 Add Data Now
               </button>
@@ -491,7 +611,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 <h2 className="text-base sm:text-lg font-semibold text-foreground-primary">Additional Data</h2>
                 <button
                   onClick={() => setShowAdditionalDataModal(true)}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950 transition-colors"
                 >
                   <Edit size={16} />
                   <span className="hidden sm:inline">Edit</span>
@@ -499,20 +619,55 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               </div>
 
               {stakeholder.additional_data && Object.keys(stakeholder.additional_data).length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  {Object.entries(stakeholder.additional_data).map(([key, value]) => (
-                    <div key={key} className="border-t border-border-primary pt-3 first:border-t-0 first:pt-0 sm:border-t-0 sm:pt-0">
-                      <div className="flex items-start gap-3">
-                        <Database className="text-foreground-tertiary mt-0.5 flex-shrink-0" size={18} />
+                <div className="space-y-4">
+                  {Object.entries(stakeholder.additional_data).map(([sectionKey, sectionValue]) => {
+                    // Check if this is a nested object (step-grouped data)
+                    if (typeof sectionValue === "object" && sectionValue !== null && !Array.isArray(sectionValue)) {
+                      return (
+                        <div key={sectionKey} className="border border-border-secondary rounded-lg overflow-hidden">
+                          {/* Section Header */}
+                          <div className="px-3 py-2 bg-background-secondary border-b border-border-secondary">
+                            <span className="text-xs font-semibold text-foreground-secondary uppercase tracking-wide">
+                              {toHumanReadable(sectionKey)}
+                            </span>
+                          </div>
+                          {/* Section Fields */}
+                          <div className="p-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {Object.entries(sectionValue as Record<string, any>).map(([fieldKey, fieldValue]) => (
+                                <div key={fieldKey} className="flex items-start gap-2">
+                                  <Database className="text-foreground-tertiary mt-0.5 shrink-0" size={16} />
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-xs font-medium text-foreground-secondary">
+                                      {toHumanReadable(fieldKey)}
+                                    </p>
+                                    <p className="text-xs sm:text-sm text-foreground-primary mt-0.5 wrap-break-word">
+                                      <ValueWithMapsLink value={fieldValue} fieldKey={fieldKey} />
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    // Handle flat data (legacy format or simple values)
+                    return (
+                      <div key={sectionKey} className="flex items-start gap-3">
+                        <Database className="text-foreground-tertiary mt-0.5 shrink-0" size={18} />
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs sm:text-sm font-medium text-foreground-secondary break-words">{key}</p>
-                          <p className="text-xs sm:text-sm text-foreground-secondary mt-0.5 break-words">
-                            {typeof value === "boolean" ? (value ? "Yes" : "No") : String(value)}
+                          <p className="text-xs sm:text-sm font-medium text-foreground-secondary wrap-break-word">
+                            {toHumanReadable(sectionKey)}
+                          </p>
+                          <p className="text-xs sm:text-sm text-foreground-primary mt-0.5 wrap-break-word">
+                            <ValueWithMapsLink value={sectionValue} fieldKey={sectionKey} />
                           </p>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="text-xs sm:text-sm text-foreground-tertiary">
@@ -532,7 +687,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 <button
                   onClick={() => setActiveTab("process")}
                   className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${activeTab === "process"
-                      ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                      ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
                       : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
@@ -541,7 +696,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 <button
                   onClick={() => setActiveTab("issues")}
                   className={`px-6 py-3 text-sm font-medium transition-colors ${activeTab === "issues"
-                      ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                      ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
                       : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
@@ -550,7 +705,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 <button
                   onClick={() => setActiveTab("transactions")}
                   className={`px-6 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "transactions"
-                      ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                      ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
                       : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
@@ -614,7 +769,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                               isCompleted
                                 ? "border-green-300 bg-green-50"
                                 : isCurrent
-                                  ? "border-blue-300 bg-blue-50"
+                                  ? "border-primary-300 bg-primary-50 dark:bg-primary-950 dark:border-primary-700"
                                   : canEdit && !isSequential
                                     ? "border-blue-200 bg-blue-25"
                                     : "border-border-primary bg-surface-secondary"
@@ -624,7 +779,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                                 <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
                                   <div
-                                    className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-medium flex-shrink-0 ${isCompleted
+                                    className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-medium shrink-0 ${isCompleted
                                         ? "bg-green-500 text-white"
                                         : isCurrent
                                           ? "bg-blue-500 text-white"
@@ -638,9 +793,9 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                     )}
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <h3 className="text-sm sm:text-base font-semibold text-foreground-primary break-words">{step.name}</h3>
+                                    <h3 className="text-sm sm:text-base font-semibold text-foreground-primary wrap-break-words">{step.name}</h3>
                                     {step.description && (
-                                      <p className="text-xs sm:text-sm text-foreground-secondary mt-1 break-words">{step.description}</p>
+                                      <p className="text-xs sm:text-sm text-foreground-secondary mt-1 wrap-break-words">{step.description}</p>
                                     )}
                                     <div className="flex items-center flex-wrap gap-2 sm:gap-4 mt-2 text-xs text-foreground-tertiary">
                                       <span>
@@ -661,7 +816,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                     </div>
                                     {/* Show permission/access warnings */}
                                     {!isCompleted && !hasTeamAccess && (
-                                      <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded break-words">
+                                      <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded wrap-break-words">
                                         You must be a member of {
                                           step.teams && step.teams.length > 0 
                                             ? `one of these teams: ${step.teams.map(t => t.name).join(', ')}`
@@ -672,20 +827,20 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       </div>
                                     )}
                                     {!isCompleted && hasTeamAccess && isSequential && !isCurrent && (
-                                      <div className="mt-2 text-xs text-foreground-secondary bg-background-secondary dark:bg-background-tertiary px-2 py-1 rounded break-words">
+                                      <div className="mt-2 text-xs text-foreground-secondary bg-background-secondary dark:bg-background-tertiary px-2 py-1 rounded wrap-break-words">
                                         This step will become available after completing the previous steps (sequential process)
                                       </div>
                                     )}
                                   </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 flex-shrink-0 sm:flex-col sm:items-end">
+                                <div className="flex items-center gap-2 shrink-0 sm:flex-col sm:items-end">
                                   {canEdit && (
                                     <button
                                       onClick={() =>
                                         setActiveStepId(activeStepId === step.id ? null : (step.id || null))
                                       }
-                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white text-xs sm:text-sm rounded-lg hover:bg-blue-700 whitespace-nowrap"
+                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white text-xs sm:text-sm rounded-lg hover:bg-primary-700 whitespace-nowrap"
                                     >
                                       {activeStepId === step.id ? "Cancel" : "Work on Step"}
                                     </button>
@@ -946,7 +1101,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-surface-primary rounded-lg p-4 sm:p-6 max-w-md w-full mx-4">
             <h3 className="text-base sm:text-lg font-bold text-foreground-primary mb-2">Delete Stakeholder</h3>
             <p className="text-sm text-foreground-secondary mb-4 sm:mb-6">

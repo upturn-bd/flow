@@ -39,13 +39,13 @@ export const NumberField: React.FC<NumberFieldProps> = ({
   onDecrement,
   disabled=false
 }) => {
-  const IconComponent = icon || <Hash size={18} weight="duotone" className="text-foreground-secondary dark:text-foreground-secondary" />;
+  const IconComponent = icon || <Hash size={18} weight="duotone" className="text-foreground-tertiary" />;
 
   return (
     <div className={className}>
-      <label className="block font-semibold text-foreground-primary dark:text-foreground-primary mb-2">
+      <label className="block font-medium text-foreground-primary mb-1">
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
+        {required && <span className="text-error ml-1">*</span>}
       </label>
       
       {showIncrementButtons ? (
@@ -53,7 +53,7 @@ export const NumberField: React.FC<NumberFieldProps> = ({
           <Button
             type="button"
             onClick={onDecrement}
-            className="bg-background-tertiary dark:bg-background-tertiary hover:bg-border-primary dark:hover:bg-border-secondary text-foreground-primary dark:text-foreground-primary rounded-l-md p-2.5"
+            className="bg-surface-secondary hover:bg-surface-hover text-foreground-primary rounded-l-lg p-2.5 border border-border-primary border-r-0"
           >
             <Minus size={16} weight="bold" />
           </Button>
@@ -67,12 +67,12 @@ export const NumberField: React.FC<NumberFieldProps> = ({
             step={step}
             disabled={disabled}
             placeholder={placeholder}
-            className="w-16 text-center p-2.5 border-t border-b border-border-primary dark:border-border-primary outline-none bg-surface-primary dark:bg-surface-primary text-foreground-primary dark:text-foreground-primary"
+            className="w-16 text-center p-2.5 border-t border-b border-border-primary outline-none bg-surface-primary text-foreground-primary focus:ring-2 focus:ring-primary-500"
           />
           <Button
             type="button"
             onClick={onIncrement}
-            className="bg-background-tertiary dark:bg-background-tertiary hover:bg-border-primary dark:hover:bg-border-secondary text-foreground-primary dark:text-foreground-primary rounded-r-md p-2.5"
+            className="bg-surface-secondary hover:bg-surface-hover text-foreground-primary rounded-r-lg p-2.5 border border-border-primary border-l-0"
           >
             <Plus size={16} weight="bold" />
           </Button>
@@ -92,12 +92,12 @@ export const NumberField: React.FC<NumberFieldProps> = ({
             step={step}
             disabled={disabled}
             placeholder={placeholder}
-            className="w-full pl-10 rounded-md bg-background-secondary dark:bg-background-secondary p-2.5 border border-border-primary dark:border-border-primary focus:ring-2 focus:ring-primary-400 focus:border-primary-400 outline-none transition-all text-foreground-primary dark:text-foreground-primary"
+            className={`w-full pl-10 rounded-lg bg-surface-primary p-2.5 border border-border-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-foreground-primary ${error ? 'border-error focus:ring-error' : ''}`}
           />
         </div>
       )}
       
-      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+      {error && <p className="text-error text-sm mt-1">{error}</p>}
     </div>
   );
 };

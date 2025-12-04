@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { getCompanyId } from "@/lib/utils/auth";
 import BaseModal from "@/components/ui/modals/BaseModal";
+import { extractEmployeeIdsFromTasks } from "@/lib/utils/project-utils";
 
 interface TaskDetailsProps {
   id: string;
@@ -47,7 +48,7 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
   const [taskDetails, setTaskDetails] = useState<Task | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const [projectName, setProjectName] = useState<string | null>(null);
   const { completeTask, reopenTask } = useTasks();
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
@@ -148,9 +149,15 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
     }
   }, [id]);
 
+  // Fetch employees when task details are loaded
   useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
+    if (taskDetails) {
+      const employeeIds = extractEmployeeIdsFromTasks([taskDetails]);
+      if (employeeIds.length > 0) {
+        fetchEmployeesByIds(employeeIds);
+      }
+    }
+  }, [taskDetails, fetchEmployeesByIds]);
 
   if (loading) {
     return (

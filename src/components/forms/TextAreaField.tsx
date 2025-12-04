@@ -14,23 +14,24 @@ const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
   ({ label, error, required, className = "", containerClassName = "", ...props }, ref) => {
     return (
       <div className={containerClassName}>
-        <label className="block font-medium text-foreground-secondary mb-1 text-sm sm:text-base">
+        <label className="block font-medium text-foreground-primary mb-1 text-sm sm:text-base">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-error ml-1">*</span>}
         </label>
         <textarea
           ref={ref}
           className={`
-            w-full rounded-lg border-border-secondary border p-2.5 
-            focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
+            w-full rounded-lg border border-border-primary bg-surface-primary text-foreground-primary p-2.5 
+            placeholder:text-foreground-tertiary
+            focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none
             transition-all shadow-sm text-sm sm:text-base resize-vertical
-            ${error ? 'border-red-500 focus:ring-red-500' : ''}
+            ${error ? 'border-error focus:ring-error' : ''}
             ${className}
           `}
           {...props}
         />
         {error && (
-          <p className="text-red-500 text-xs sm:text-sm mt-1">{error}</p>
+          <p className="text-error text-xs sm:text-sm mt-1">{error}</p>
         )}
       </div>
     );

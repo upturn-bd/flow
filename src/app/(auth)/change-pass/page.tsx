@@ -48,7 +48,7 @@ const page = () => {
                                 placeholder="Enter Code"
                                 {...register("code", { required: "Last Name is required" })}
                             />
-                            {errors.code && <p className="text-red-500">{errors.code.message}</p>}
+                            {errors.code && <p className="text-error">{errors.code.message}</p>}
 
                             <div className="relative">
                                 <input
@@ -73,7 +73,7 @@ const page = () => {
                                     {showPassword ? <EyeOff className="text-2xl" /> : <Eye className="text-2xl" />}
                                 </button>
                             </div>
-                            {errors.password && <p className="text-red-500">{errors.password.message}</p>}
+                            {errors.password && <p className="text-error">{errors.password.message}</p>}
 
                             <div className="relative">
                                 <input
@@ -93,7 +93,7 @@ const page = () => {
                                     {showConfirmPassword ? <EyeOff className="text-2xl" /> : <Eye className="text-2xl" />}
                                 </button>
                             </div>
-                            {errors.confirmPassword && <p className="text-red-500">{errors.confirmPassword.message}</p>}
+                            {errors.confirmPassword && <p className="text-error">{errors.confirmPassword.message}</p>}
                             <input
                                 type="submit"
                                 value="Create Account"

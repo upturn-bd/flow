@@ -14,6 +14,8 @@ import {
   Calendar,
   ClipboardCheck,
 } from "@/lib/icons";
+import InlineSpinner from "@/components/ui/InlineSpinner";
+import PageHeader from "@/components/ui/PageHeader";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useProjects } from "@/hooks/useProjects";
@@ -474,9 +476,9 @@ export default function DataExportPage() {
             Export company data to CSV format for analysis and reporting
           </p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
-          <FileSpreadsheet className="text-blue-600" size={20} />
-          <span className="text-sm font-medium text-blue-900">CSV Format</span>
+        <div className="flex items-center gap-2 px-4 py-2 bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 rounded-lg">
+          <FileSpreadsheet className="text-primary-600" size={20} />
+          <span className="text-sm font-medium text-primary-900 dark:text-primary-100">CSV Format</span>
         </div>
       </motion.div>
 
@@ -514,7 +516,7 @@ export default function DataExportPage() {
               variants={fadeInUp}
               className={`
                 bg-surface-primary rounded-lg border-2 transition-all cursor-pointer
-                ${isSelected ? "border-blue-500 shadow-lg ring-2 ring-blue-100" : "border-border-primary hover:border-border-secondary hover:shadow-md"}
+                ${isSelected ? "border-primary-500 shadow-lg ring-2 ring-primary-100 dark:ring-primary-900" : "border-border-primary hover:border-border-secondary hover:shadow-md"}
               `}
               onClick={() => setSelectedExport(option.type)}
             >
@@ -525,7 +527,7 @@ export default function DataExportPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {isSelected && (
-                      <CheckCircle className="text-blue-600" size={24} />
+                      <CheckCircle className="text-primary-600" size={24} />
                     )}
                   </div>
                 </div>
@@ -541,7 +543,7 @@ export default function DataExportPage() {
                   <div className="text-sm">
                     {option.loading || (isSelected && isLoadingData) ? (
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-border-secondary border-t-blue-600 rounded-full animate-spin"></div>
+                        <InlineSpinner size="sm" color="blue" />
                         <span className="text-foreground-tertiary">Loading...</span>
                       </div>
                     ) : (
@@ -551,7 +553,7 @@ export default function DataExportPage() {
                     )}
                   </div>
                   {isSelected && (
-                    <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                    <span className="text-xs font-medium text-primary-600 bg-primary-50 dark:bg-primary-950 dark:text-primary-400 px-2 py-1 rounded">
                       Selected
                     </span>
                   )}
@@ -601,7 +603,7 @@ export default function DataExportPage() {
                               includeEmail: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Email Address</span>
                       </label>
@@ -616,7 +618,7 @@ export default function DataExportPage() {
                               includePhone: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Phone Number</span>
                       </label>
@@ -631,7 +633,7 @@ export default function DataExportPage() {
                               includeDepartment: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Department</span>
                       </label>
@@ -646,7 +648,7 @@ export default function DataExportPage() {
                               includeDesignation: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Designation</span>
                       </label>
@@ -661,7 +663,7 @@ export default function DataExportPage() {
                               includeJoinDate: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Join Date</span>
                       </label>
@@ -688,7 +690,7 @@ export default function DataExportPage() {
                       <button
                         onClick={handleExportEmployees}
                         disabled={employeesLoading || isLoadingData}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Download size={20} />
                         Export Employee Data
@@ -710,7 +712,7 @@ export default function DataExportPage() {
                               includeAddress: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Address</span>
                       </label>
@@ -725,7 +727,7 @@ export default function DataExportPage() {
                               includeContactPersons: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Contact Persons</span>
                       </label>
@@ -740,7 +742,7 @@ export default function DataExportPage() {
                               includeStatus: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Status</span>
                       </label>
@@ -755,7 +757,7 @@ export default function DataExportPage() {
                               includeProcess: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Process</span>
                       </label>
@@ -770,7 +772,7 @@ export default function DataExportPage() {
                               includeKAM: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Key Account Manager</span>
                       </label>
@@ -785,7 +787,7 @@ export default function DataExportPage() {
                               includeType: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Stakeholder Type</span>
                       </label>
@@ -832,7 +834,7 @@ export default function DataExportPage() {
                               includeDescription: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Description</span>
                       </label>
@@ -847,7 +849,7 @@ export default function DataExportPage() {
                               includeDates: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Start & End Dates</span>
                       </label>
@@ -862,7 +864,7 @@ export default function DataExportPage() {
                               includeStatus: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Status</span>
                       </label>
@@ -877,7 +879,7 @@ export default function DataExportPage() {
                               includeProgress: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Progress</span>
                       </label>
@@ -892,7 +894,7 @@ export default function DataExportPage() {
                               includeGoal: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Goal</span>
                       </label>
@@ -907,7 +909,7 @@ export default function DataExportPage() {
                               includeAssignees: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Assignees</span>
                       </label>
@@ -939,7 +941,7 @@ export default function DataExportPage() {
                               includeDescription: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Description</span>
                       </label>
@@ -954,7 +956,7 @@ export default function DataExportPage() {
                               includeDates: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Start & End Dates</span>
                       </label>
@@ -969,7 +971,7 @@ export default function DataExportPage() {
                               includePriority: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Priority</span>
                       </label>
@@ -984,7 +986,7 @@ export default function DataExportPage() {
                               includeStatus: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Status</span>
                       </label>
@@ -999,7 +1001,7 @@ export default function DataExportPage() {
                               includeProject: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Project ID</span>
                       </label>
@@ -1014,7 +1016,7 @@ export default function DataExportPage() {
                               includeAssignees: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Assignees</span>
                       </label>
@@ -1046,7 +1048,7 @@ export default function DataExportPage() {
                               includeDates: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Start & End Dates</span>
                       </label>
@@ -1061,7 +1063,7 @@ export default function DataExportPage() {
                               includeStatus: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Status</span>
                       </label>
@@ -1076,7 +1078,7 @@ export default function DataExportPage() {
                               includeType: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Leave Type</span>
                       </label>
@@ -1091,7 +1093,7 @@ export default function DataExportPage() {
                               includeRemarks: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Remarks</span>
                       </label>
@@ -1106,7 +1108,7 @@ export default function DataExportPage() {
                               includeEmployee: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Employee ID</span>
                       </label>
@@ -1138,7 +1140,7 @@ export default function DataExportPage() {
                               includeCheckInTime: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Check In Time</span>
                       </label>
@@ -1153,7 +1155,7 @@ export default function DataExportPage() {
                               includeCheckOutTime: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Check Out Time</span>
                       </label>
@@ -1168,7 +1170,7 @@ export default function DataExportPage() {
                               includeTag: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Tag/Status</span>
                       </label>
@@ -1183,7 +1185,7 @@ export default function DataExportPage() {
                               includeSite: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Site Name</span>
                       </label>
@@ -1198,7 +1200,7 @@ export default function DataExportPage() {
                               includeSiteTimings: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">Site Timings</span>
                       </label>
@@ -1243,7 +1245,7 @@ export default function DataExportPage() {
                               includeCoordinates: e.target.checked,
                             })
                           }
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-foreground-primary">GPS Coordinates</span>
                       </label>

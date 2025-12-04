@@ -11,6 +11,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { Project, useProjects } from "@/hooks/useProjects";
 import { getEmployeeId } from "@/lib/utils/auth";
 import { useAuth } from "@/lib/auth/auth-context";
+import { extractEmployeeIdsFromProjects } from "@/lib/utils/project-utils";
 
 import ProjectDetails from "./ProjectDetails";
 import ProjectCard from "./ProjectCard";
@@ -30,7 +31,7 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
     searchCompletedProjects,
   } = useProjects();
 
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const { departments, fetchDepartments } = useDepartments();
   const { employeeInfo } = useAuth();
 
@@ -56,13 +57,21 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
     const initData = async () => {
       const id = await getEmployeeId();
       setUserId(id);
-      await fetchCompletedProjects(10, true);
-      fetchEmployees();
+      const projects = await fetchCompletedProjects(10, true);
+      
+      // Only fetch employees that are referenced in the projects
+      if (projects && projects.length > 0) {
+        const employeeIds = extractEmployeeIdsFromProjects(projects);
+        if (employeeIds.length > 0) {
+          fetchEmployeesByIds(employeeIds);
+        }
+      }
+      
       fetchDepartments();
       setInitialLoadComplete(true);
     };
     initData();
-  }, [employeeInfo, fetchCompletedProjects, fetchEmployees, fetchDepartments]);
+  }, [employeeInfo, fetchCompletedProjects, fetchEmployeesByIds, fetchDepartments]);
 
   /** Debounced Search */
   const debouncedSearch = useCallback(
@@ -142,7 +151,15 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
 
   /** Pagination: Load More */
   const handleLoadMore = async () => {
-    await fetchCompletedProjects(10, false);
+    const newProjects = await fetchCompletedProjects(10, false);
+    
+    // Fetch any new employees that might be in the newly loaded projects
+    if (newProjects && newProjects.length > 0) {
+      const employeeIds = extractEmployeeIdsFromProjects(newProjects);
+      if (employeeIds.length > 0) {
+        fetchEmployeesByIds(employeeIds);
+      }
+    }
   };
 
   return (
@@ -203,7 +220,7 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
                           statusIcon={
                             <CheckCircle
                               size={18}
-                              className="text-green-500 mt-1 flex-shrink-0"
+                              className="text-green-500 mt-1 shrink-0"
                             />
                           }
                           progressColor="bg-green-100 text-green-800"

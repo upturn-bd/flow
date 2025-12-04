@@ -19,9 +19,10 @@ import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { RequisitionCard } from "./RequisitionCard";
 import RequisitionEditModal from "./RequisitionEditModal";
 import RequisitionCreateModal from "./RequisitionCreateModal";
+import { extractEmployeeIdsFromRequests } from "@/lib/utils/project-utils";
 
 export default function RequisitionHistoryPage() {
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const { requisitionTypes, fetchRequisitionTypes } = useRequisitionTypes();
   const { requisitionInventories, fetchRequisitionInventories } = useRequisitionInventories();
   const {
@@ -70,9 +71,15 @@ export default function RequisitionHistoryPage() {
     fetchRequisitionHistory();
   }, [fetchRequisitionHistory]);
 
+  // Fetch employees when requisition data is loaded
   useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
+    if (requisitionRequests && requisitionRequests.length > 0) {
+      const employeeIds = extractEmployeeIdsFromRequests(requisitionRequests);
+      if (employeeIds.length > 0) {
+        fetchEmployeesByIds(employeeIds);
+      }
+    }
+  }, [requisitionRequests, fetchEmployeesByIds]);
 
   useEffect(() => {
     fetchRequisitionTypes();
@@ -117,7 +124,7 @@ export default function RequisitionHistoryPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setIsCreateModalOpen(true)}
-                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
               >
                 <Plus size={18} />
                 <span>Add Requisition</span>

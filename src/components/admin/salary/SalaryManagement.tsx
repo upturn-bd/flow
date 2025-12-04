@@ -6,6 +6,8 @@ import { DollarSign, Edit, Save, X, AlertTriangle, CheckCircle, Users, History }
 import { useSalaryManagement } from '@/hooks/useSalaryManagement';
 import { useEmployees } from '@/hooks/useEmployees';
 import { formatDate } from '@/lib/utils';
+import InlineSpinner from '@/components/ui/InlineSpinner';
+import { NumberField, TextAreaField } from '@/components/forms';
 
 interface SalaryManagementModalProps {
   isOpen: boolean;
@@ -108,46 +110,37 @@ export default function SalaryManagementModal({
             {!showHistory ? (
               <>
                 {/* New Salary Input */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground-secondary mb-2">
-                    New Salary (BDT)
-                  </label>
-                  <input
-                    type="number"
-                    value={newSalary}
-                    onChange={(e) => setNewSalary(e.target.value)}
-                    className="w-full rounded-md border border-border-secondary px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter new salary amount"
-                    min="0"
-                    step="100"
-                  />
+                <NumberField
+                  name="newSalary"
+                  label="New Salary (BDT)"
+                  value={newSalary}
+                  onChange={(e) => setNewSalary(e.target.value)}
+                  placeholder="Enter new salary amount"
+                  min={0}
+                  step={100}
+                  icon={<DollarSign size={18} className="text-foreground-tertiary" />}
+                />
                   
-                  {/* Salary Change Indicator */}
-                  {salaryDifference !== 0 && !isNaN(salaryDifference) && (
-                    <div className={`mt-2 p-2 rounded-md flex items-center text-sm ${
-                      isIncrease 
-                        ? 'bg-green-50 text-green-700 border border-green-200' 
-                        : 'bg-red-50 text-red-700 border border-red-200'
-                    }`}>
-                      <AlertTriangle className="h-4 w-4 mr-1" />
-                      {isIncrease ? 'Increase' : 'Decrease'} of ৳{Math.abs(salaryDifference).toLocaleString()}
-                    </div>
-                  )}
-                </div>
+                {/* Salary Change Indicator */}
+                {salaryDifference !== 0 && !isNaN(salaryDifference) && (
+                  <div className={`mt-2 p-2 rounded-lg flex items-center text-sm ${
+                    isIncrease 
+                      ? 'bg-success/10 text-success border border-success/20' 
+                      : 'bg-error/10 text-error border border-error/20'
+                  }`}>
+                    <AlertTriangle className="h-4 w-4 mr-1" />
+                    {isIncrease ? 'Increase' : 'Decrease'} of ৳{Math.abs(salaryDifference).toLocaleString()}
+                  </div>
+                )}
 
                 {/* Reason Input */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground-secondary mb-2">
-                    Reason for Change
-                  </label>
-                  <textarea
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    rows={3}
-                    className="w-full rounded-md border border-border-secondary px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter reason for salary change (optional)"
-                  />
-                </div>
+                <TextAreaField
+                  label="Reason for Change"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  rows={3}
+                  placeholder="Enter reason for salary change (optional)"
+                />
 
                 {/* Error Display */}
                 {error && (
@@ -178,11 +171,11 @@ export default function SalaryManagementModal({
                   <button
                     onClick={handleSaveSalary}
                     disabled={loading || newSalary === currentSalary.toString()}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 flex items-center justify-center"
+                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 flex items-center justify-center"
                   >
                     {loading ? (
                       <>
-                        <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin mr-1"></div>
+                        <InlineSpinner size="xs" color="white" className="mr-1" />
                         Saving...
                       </>
                     ) : (

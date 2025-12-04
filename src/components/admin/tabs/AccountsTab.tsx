@@ -13,13 +13,13 @@ import {
   DollarSign,
   Calendar,
   Building,
-  Loader,
   CheckCircle,
   Clock,
   X,
   Minus,
   Users
 } from "@/lib/icons";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { staggerContainer, fadeInUp } from "@/components/ui/animations";
 import { useAccounts, AccountFilters } from "@/hooks/useAccounts";
 import { useStakeholders } from "@/hooks/useStakeholders";
@@ -79,7 +79,7 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
         <button
           type="button"
           onClick={addPair}
-          className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+          className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-primary-600 bg-primary-50 border border-primary-200 rounded-md hover:bg-primary-100 transition-colors dark:bg-primary-950 dark:border-primary-800 dark:hover:bg-primary-900"
         >
           <Plus size={14} className="mr-1" />
           Add Field
@@ -100,7 +100,7 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
                 placeholder="Key (e.g., reference)"
                 value={pair.key}
                 onChange={(e) => updatePair(index, 'key', e.target.value)}
-                className="flex-1 px-3 py-2 border border-border-secondary rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-surface-primary"
+                className="flex-1 px-3 py-2 border border-border-secondary rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary text-foreground-primary"
               />
               <span className="text-foreground-tertiary font-mono">:</span>
               <input
@@ -108,12 +108,12 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
                 placeholder="Value (e.g., REF123)"
                 value={pair.value}
                 onChange={(e) => updatePair(index, 'value', e.target.value)}
-                className="flex-1 px-3 py-2 border border-border-secondary rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-surface-primary"
+                className="flex-1 px-3 py-2 border border-border-secondary rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary text-foreground-primary"
               />
               <button
                 type="button"
                 onClick={() => removePair(index)}
-                className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+                className="p-2 text-error hover:text-error/80 hover:bg-error/10 rounded-md transition-colors"
                 title="Remove field"
               >
                 <X size={16} />
@@ -355,14 +355,11 @@ export default function AccountsTab() {
 
   if (loading && accounts.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex flex-col items-center justify-center h-64 bg-surface-primary rounded-xl shadow-sm p-6"
-      >
-        <Loader className="w-12 h-12 text-foreground-tertiary animate-spin mb-4" />
-        <p className="text-foreground-secondary">Loading accounts...</p>
-      </motion.div>
+      <LoadingSpinner
+        text="Loading accounts..."
+        height="h-64"
+        className="bg-surface-primary rounded-xl shadow-sm"
+      />
     );
   }
 
@@ -624,7 +621,7 @@ export default function AccountsTab() {
                         <td className="px-4 py-3">
                           {account.stakeholder ? (
                             <div className="flex items-center gap-1">
-                              <Users size={12} className="text-blue-500 flex-shrink-0" />
+                              <Users size={12} className="text-blue-500 shrink-0" />
                               <span className="text-xs text-gray-900 truncate max-w-[100px]" title={account.stakeholder.name}>
                                 {account.stakeholder.name}
                               </span>

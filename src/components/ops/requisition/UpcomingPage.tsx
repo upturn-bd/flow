@@ -2,8 +2,10 @@
 import { useEffect, useState } from "react";
 import RequisitionCreatePage, { RequisitionDraftPage } from "./RequisitionCreatePage";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
-import { Clock, FileEdit, Trash } from "@/lib/icons";
+import { Clock, FileEdit, Trash, ScrollText } from "@/lib/icons";
 import { motion } from "framer-motion";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:string) => void }) {
   const [upcoming, setUpcoming] = useState([]);
@@ -51,7 +53,7 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
             <h1 className="text-xl font-semibold text-foreground-primary">Saved Drafts</h1>
             <button
               onClick={() => setIsCreatingRequisition(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors shadow-sm"
+              className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors shadow-sm"
             >
               <span className="hidden sm:inline">Create New</span>
               <span className="sm:hidden">New</span>
@@ -60,20 +62,22 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center items-center h-60">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
+            <LoadingSpinner
+              icon={ScrollText}
+              text="Loading drafts..."
+              color="blue"
+              height="h-60"
+            />
           ) : upcoming.length === 0 ? (
-            <div className="mt-10 flex flex-col items-center justify-center p-8 bg-background-secondary dark:bg-background-tertiary rounded-lg border border-border-primary">
-              <Clock className="h-12 w-12 text-foreground-tertiary mb-3" />
-              <p className="text-foreground-secondary text-center">No saved drafts found.</p>
-              <button
-                onClick={() => setIsCreatingRequisition(true)}
-                className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
-              >
-                Create your first requisition
-              </button>
-            </div>
+            <EmptyState
+              icon={Clock}
+              title="No saved drafts found"
+              description="Create your first requisition to get started."
+              action={{
+                label: "Create your first requisition",
+                onClick: () => setIsCreatingRequisition(true)
+              }}
+            />
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {upcoming.map((item: any, index: number) => {
@@ -104,7 +108,7 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
                         <div className="flex space-x-2">
                           <button
                             onClick={() => setDisplayDraftId(item.draft_id)}
-                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                            className="p-1.5 text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded-full transition-colors"
                             aria-label="Edit draft"
                           >
                             <FileEdit className="h-5 w-5" />

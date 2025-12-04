@@ -5,7 +5,8 @@ import { useTasks } from "@/hooks/useTasks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
-import { Loader, Trash, RotateCcw, CheckCircle, Edit } from "@/lib/icons";
+import { Trash, RotateCcw, CheckCircle, Edit } from "@/lib/icons";
+import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import TaskUpdateModal from "@/components/ops/tasks/shared/TaskUpdateModal";
 import { getEmployeeName } from "@/lib/utils/auth";
@@ -124,7 +125,7 @@ export default function CompanyTaskLogsPage() {
                      {/* Task info */}
                      {/* Task info */}
                      <div className="flex flex-col gap-2 w-full sm:w-2/3">
-                        <h3 className="font-semibold text-lg break-words">{task.task_title}</h3>
+                        <h3 className="font-semibold text-lg wrap-break-words">{task.task_title}</h3>
 
 
                         {/* Badges: Created At, Start Date, End Date */}
@@ -239,7 +240,7 @@ export default function CompanyTaskLogsPage() {
                            <>
                               {loading ? (
                                  <div className="flex justify-center items-center h-32">
-                                    <Loader className="animate-spin text-foreground-tertiary" />
+                                    <InlineSpinner size="md" color="primary" />
                                  </div>
                               ) : error ? (
                                  <p className="text-red-500">
@@ -260,7 +261,7 @@ export default function CompanyTaskLogsPage() {
                            <>
                               {loading ? (
                                  <div className="flex justify-center items-center h-32">
-                                    <Loader className="animate-spin text-foreground-tertiary" />
+                                    <InlineSpinner size="md" color="primary" />
                                  </div>
                               ) : error ? (
                                  <p className="text-red-500">

@@ -1,7 +1,6 @@
 "use client";
 
 import { useDepartments } from "@/hooks/useDepartments";
-import { useEmployees } from "@/hooks/useEmployees";
 import { Task, TaskStatus, useTasks } from "@/hooks/useTasks";
 import { useEffect, useState, memo, useCallback } from "react";
 import { Department } from "@/lib/types/schemas";
@@ -155,7 +154,6 @@ const CompletedTasksList = memo(({
 }: CompletedTasksListProps) => {
   const [taskDetailsId, setTaskDetailsId] = useState<string | null>(null);
 
-  const { fetchEmployees, loading: employeeLoading } = useEmployees();
   const { departments, fetchDepartments, loading: departmentsLoading } = useDepartments();
   const { searchCompletedTasks } = useTasks();
 
@@ -173,7 +171,6 @@ const CompletedTasksList = memo(({
 
   useEffect(() => {
     userIdInit();
-    fetchEmployees();
     fetchDepartments();
   }, []);
 
@@ -220,7 +217,7 @@ const CompletedTasksList = memo(({
     return () => clearTimeout(timer);
   }, [displayTasks.length, loading, searching]);
 
-  if (loading || employeeLoading || departmentsLoading) {
+  if (loading || departmentsLoading) {
     return (
       <AnimatePresence mode="wait">
         <LoadingSpinner text="Loading completed tasks..." />

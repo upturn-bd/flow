@@ -6,7 +6,8 @@ import { useLeaveTypes } from "@/hooks/useLeaveManagement";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
-import { Loader, Check, X as CloseIcon, RotateCw } from "@/lib/icons";
+import { Check, X as CloseIcon, RotateCw } from "@/lib/icons";
+import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
 import TabView, { TabItem } from "@/components/ui/TabView";
@@ -125,7 +126,7 @@ export default function LeaveLogsPage() {
       if (loading) {
          return (
             <div className="flex justify-center items-center h-32">
-               <Loader className="animate-spin text-foreground-tertiary" />
+               <InlineSpinner size="md" color="primary" />
             </div>
          );
       }

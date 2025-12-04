@@ -73,7 +73,7 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
     <>
     <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
       <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
-        <div className="p-5 flex-shrink-0">
+        <div className="p-5 shrink-0">
           <SectionHeader title="Task List" icon={CheckSquare} />
         </div>
         
@@ -85,7 +85,7 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
           </div>
         ) : (
           <div className="px-5 pb-5 flex-1 overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between mb-4 flex-shrink-0">
+            <div className="flex items-center justify-between mb-4 shrink-0">
               {/* Tab buttons */}
               <div className="flex items-center gap-1 bg-background-secondary dark:bg-background-tertiary rounded-lg p-1">
                 <button

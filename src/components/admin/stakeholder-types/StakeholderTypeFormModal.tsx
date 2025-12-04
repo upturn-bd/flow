@@ -4,7 +4,7 @@ import { StakeholderTypeFormData } from "@/hooks/useStakeholderTypes";
 import { validateStakeholderType } from "@/lib/validation/schemas/stakeholders";
 import { Tag } from "@/lib/icons";
 import { FormModal } from "@/components/ui/modals";
-import { FormField } from "@/components/forms";
+import { FormField, TextAreaField, ToggleField } from "@/components/forms";
 
 interface StakeholderTypeFormModalProps {
   type: any;
@@ -52,42 +52,25 @@ export default function StakeholderTypeFormModal({
             required
           />
 
-          <div>
-            <label className="block font-medium text-foreground-secondary mb-1 text-sm sm:text-base">
-              Description
-            </label>
-            <textarea
-              name="description"
-              value={values.description || ""}
-              onChange={handleChange}
-              rows={3}
-              className={`w-full rounded-lg border p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm text-sm sm:text-base ${
-                errors.description ? "border-red-500 focus:ring-red-500" : "border-border-secondary"
-              }`}
-              placeholder="Optional description of this stakeholder type"
-            />
-            {errors.description && (
-              <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.description}</p>
-            )}
-          </div>
+          <TextAreaField
+            name="description"
+            label="Description"
+            value={values.description || ""}
+            onChange={handleChange}
+            error={errors.description}
+            rows={3}
+            placeholder="Optional description of this stakeholder type"
+          />
 
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="is_active"
-              name="is_active"
-              checked={values.is_active}
-              onChange={(e) =>
-                handleChange({
-                  target: { name: "is_active", value: e.target.checked },
-                } as any)
-              }
-              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="is_active" className="text-sm font-medium text-foreground-secondary">
-              Active
-            </label>
-          </div>
+          <ToggleField
+            label="Active"
+            checked={values.is_active}
+            onChange={(checked) =>
+              handleChange({
+                target: { name: "is_active", value: checked },
+              } as any)
+            }
+          />
         </div>
       )}
     </FormModal>

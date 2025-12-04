@@ -17,7 +17,7 @@ import {
     Building, // Stakeholder Log
     UserPlus, // Onboarding Log
     GitBranch, // Stakeholder Processes (workflow/branching)
-    File,
+    FileIcon,
     Download, // Data Export
 } from "@/lib/icons";
 import { useState } from "react";
@@ -208,7 +208,7 @@ export default function AdminManagementPage() {
 
     return (
         <motion.div
-            className="p-4 sm:p-10 lg:p-14"
+            className="p-4 sm:p-6 lg:p-8"
             initial="hidden"
             animate="visible"
             variants={pageVariants}
@@ -271,7 +271,7 @@ export default function AdminManagementPage() {
                     animate={{ opacity: 1, y: 0 }}
                 >
                     <EmptyState
-                        icon={File}
+                        icon={FileIcon}
                         title="No items found"
                         description="Try searching with different keywords or browse all items"
                         action={{
@@ -302,7 +302,7 @@ export default function AdminManagementPage() {
                                 <h2 className="text-xl font-bold text-foreground-primary mr-2">
                                     {section.title}
                                 </h2>
-                                <div className="h-[1px] flex-grow bg-border-primary"></div>
+                                <div className="h-px grow bg-border-primary"></div>
                             </motion.div>
                             <motion.p
                                 className="text-foreground-secondary mb-6"
@@ -325,11 +325,11 @@ export default function AdminManagementPage() {
                                         >
                                             <Link
                                                 href={item.path}
-                                                className="group flex items-center p-4 bg-surface-primary rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 block h-28"
+                                                className="group items-center p-4 bg-surface-primary rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 block h-28"
                                             >
                                                 <motion.div
                                                     whileHover={{ scale: 1.1 }}
-                                                    className={`flex-shrink-0 w-12 h-12 rounded-md ${item.color.split(' ').filter(c => !c.startsWith('border-')).join(' ')} flex items-center justify-center mr-4 transition-transform`}
+                                                    className={`shrink-0 w-12 h-12 rounded-md ${item.color.split(' ').filter(c => !c.startsWith('border-')).join(' ')} flex items-center justify-center mr-4 transition-transform`}
                                                 >
                                                     <Icon size={28} className="text-current" />
                                                 </motion.div>
@@ -342,7 +342,7 @@ export default function AdminManagementPage() {
                                                             initial={{ x: 0 }}
                                                             whileHover={{ x: 3 }}
                                                             xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-4 w-4 text-primary-600 ml-2 transition-all flex-shrink-0"
+                                                            className="h-4 w-4 text-primary-600 ml-2 transition-all shrink-0"
                                                             fill="none"
                                                             viewBox="0 0 24 24"
                                                             stroke="currentColor"

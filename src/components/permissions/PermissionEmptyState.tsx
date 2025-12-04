@@ -64,7 +64,7 @@ export function PermissionEmptyState({
 
         <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <ShieldWarning size={20} className="text-primary-500 flex-shrink-0 mt-0.5" />
+            <ShieldWarning size={20} className="text-primary-500 shrink-0 mt-0.5" />
             <div className="text-left">
               <h4 className="text-sm font-semibold text-primary-800 dark:text-primary-200 mb-1">
                 Need Access?

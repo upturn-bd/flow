@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, AlertTriangle, CheckCircle, XCircle, Loader, Users, DollarSign } from '@/lib/icons';
+import { Calendar, AlertTriangle, CheckCircle, XCircle, Users, DollarSign } from '@/lib/icons';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 import { usePayroll } from '@/hooks/usePayroll';
 import { formatDate } from '@/lib/utils';
+import { DateField } from '@/components/forms';
 
 interface PayrollGenerationModalProps {
   isOpen: boolean;
@@ -79,7 +81,7 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -95,20 +97,12 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
           {/* Date Selection */}
           {!results && !showConfirmation && !isGenerating && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-foreground-secondary mb-2">
-                  Generation Date
-                </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={handleDateChange}
-                    className="w-full rounded-md border border-border-secondary px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  />
-                  <Calendar className="absolute right-3 top-2.5 h-4 w-4 text-foreground-tertiary pointer-events-none" />
-                </div>
-              </div>
+              <DateField
+                name="generationDate"
+                label="Generation Date"
+                value={selectedDate}
+                onChange={handleDateChange}
+              />
 
               <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
                 <div className="flex">
@@ -189,7 +183,7 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
               className="text-center space-y-4"
             >
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary-100 dark:bg-primary-900/30">
-                <Loader className="h-6 w-6 text-primary-600 dark:text-primary-400 animate-spin" />
+                <InlineSpinner size="md" color="primary" />
               </div>
               <div>
                 <h3 className="text-lg font-medium text-foreground-primary mb-2">
@@ -274,7 +268,7 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
 
               <button
                 onClick={handleClose}
-                className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 Close
               </button>

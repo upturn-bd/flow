@@ -225,7 +225,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
     if (['pdf'].includes(extension)) {
       return <FilePdf className="text-red-600 h-5 w-5" />;
     }
-    return <FileText className="text-blue-600 h-5 w-5" />;
+    return <FileText className="text-primary-600 h-5 w-5" />;
   };
 
   const contentVariants = {
@@ -313,7 +313,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                   key={edu.id}
                   className="p-6 hover:bg-background-secondary flex flex-col md:flex-row md:items-start gap-4"
                 >
-                  <div className="flex-grow">
+                  <div className="grow">
                     <h3 className="font-semibold text-foreground-primary mb-1">{edu.institute}</h3>
                     <p className="text-foreground-primary">{edu.type}</p>
                     <div className="flex items-center text-foreground-tertiary text-sm mt-1">
@@ -368,7 +368,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
       <motion.div variants={itemVariants}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-foreground-primary flex items-center">
-            <Briefcase className="mr-2 h-6 w-6 text-blue-600" />
+            <Briefcase className="mr-2 h-6 w-6 text-primary-600" />
             Work Experience
           </h2>
           {isCurrentUser && (
@@ -376,7 +376,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsCreatingExperience(true)}
-              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm shadow-sm"
+              className="px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2 text-sm shadow-sm"
               disabled={isExperienceActionLoading}
             >
               <Plus className="h-4 w-4" /> Add Experience
@@ -403,7 +403,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
               </p>
               {isCurrentUser && (
                 <button 
-                  className="mt-4 inline-flex items-center gap-1 text-blue-600 font-medium hover:text-blue-700"
+                  className="mt-4 inline-flex items-center gap-1 text-primary-600 font-medium hover:text-blue-700"
                   onClick={() => setIsCreatingExperience(true)}
                 >
                   <Plus className="h-4 w-4" /> Add Experience
@@ -419,7 +419,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                   key={exp.id}
                   className="p-6 hover:bg-background-secondary flex flex-col md:flex-row md:items-start gap-4"
                 >
-                  <div className="flex-grow">
+                  <div className="grow">
                     <h3 className="font-semibold text-foreground-primary mb-1">{exp.company_name}</h3>
                     <p className="text-foreground-primary">{exp.designation}</p>
                     <div className="flex flex-wrap items-center gap-x-4 text-foreground-tertiary text-sm mt-1">
@@ -442,7 +442,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                     <div className="flex items-center space-x-2 mt-2 md:mt-0">
                       <button
                         onClick={() => setEditExperience(exp.id ?? null)}
-                        className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                        className="p-1.5 text-slate-600 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded-full transition-colors"
                       >
                         <Pencil className="h-4 w-4" />
                       </button>

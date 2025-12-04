@@ -89,7 +89,7 @@ export const ColorField = forwardRef<HTMLInputElement, ColorFieldProps>(
             `}
           >
             <div 
-              className="w-6 h-6 rounded border border-border-secondary flex-shrink-0"
+              className="w-6 h-6 rounded border border-border-secondary shrink-0"
               style={{ backgroundColor: value }}
             />
             <span className="flex-1 text-left text-sm text-foreground-primary dark:text-foreground-primary">

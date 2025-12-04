@@ -6,6 +6,8 @@ import { TeamWithMembers } from '@/lib/types';
 import { useEmployees, ExtendedEmployee } from '@/hooks/useEmployees';
 import { useTeams } from '@/hooks/useTeams';
 import { matchesEmployeeSearch } from '@/lib/utils/user-search';
+import InlineSpinner from '@/components/ui/InlineSpinner';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface TeamMembersModalProps {
   isOpen: boolean;
@@ -143,25 +145,15 @@ export default function TeamMembersModal({
                 <div className="max-h-[350px] overflow-y-auto">
                   {employeesLoading ? (
                     <div className="p-8 text-center text-foreground-tertiary">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+                      <InlineSpinner size="md" color="primary" className="mx-auto mb-2" />
                       <p className="text-sm">Loading employees...</p>
                     </div>
                   ) : filteredEmployees.length === 0 ? (
-                    <div className="p-8 text-center">
-                      <div className="bg-background-secondary rounded-full p-4 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
-                        <MagnifyingGlass size={24} className="text-foreground-tertiary" />
-                      </div>
-                      <p className="text-foreground-secondary font-medium">
-                        {searchTerm
-                          ? 'No employees found'
-                          : 'All employees are members'}
-                      </p>
-                      <p className="text-sm text-foreground-tertiary mt-1">
-                        {searchTerm
-                          ? 'Try a different search term'
-                          : 'Everyone is already on this team'}
-                      </p>
-                    </div>
+                    <EmptyState
+                      icon={MagnifyingGlass}
+                      title={searchTerm ? 'No employees found' : 'All employees are members'}
+                      description={searchTerm ? 'Try a different search term' : 'Everyone is already on this team'}
+                    />
                   ) : (
                     <div className="divide-y divide-border-primary">
                       {filteredEmployees.map((employee) => (
@@ -248,7 +240,7 @@ export default function TeamMembersModal({
                         >
                           <div className="flex-1 min-w-0 pr-4">
                             <div className="flex items-center gap-2">
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-white font-semibold shadow-md">
+                              <div className="w-10 h-10 rounded-full bg-linear-to-br from-primary-500 to-purple-500 flex items-center justify-center text-white font-semibold shadow-md">
                                 {(member.employee_name || 'U').charAt(0).toUpperCase()}
                               </div>
                               <div className="flex-1 min-w-0">
@@ -275,7 +267,7 @@ export default function TeamMembersModal({
                           <button
                             onClick={() => handleRemoveMember(member.employee_id)}
                             disabled={teamLoading}
-                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 flex-shrink-0"
+                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 shrink-0"
                             title="Remove from team"
                           >
                             <Trash size={20} />

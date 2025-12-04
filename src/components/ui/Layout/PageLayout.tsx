@@ -93,7 +93,7 @@ export function PageLayout({
                 )}
               </div>
               {action && (
-                <div className="ml-6 flex-shrink-0">
+                <div className="ml-6 shrink-0">
                   {action}
                 </div>
               )}

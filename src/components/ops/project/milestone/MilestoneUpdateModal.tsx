@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/modals';
 import { FormField, SelectField, TextAreaField, DateField, NumberField, AssigneeField } from '@/components/forms';
 import { validateMilestone, type MilestoneData } from '@/lib/validation';
-import { useEmployees } from '@/hooks/useEmployees';
+import { Employee } from '@/lib/types/schemas';
 import { Target } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
+
+// Allow partial employee objects with at minimum id and name
+type EmployeeBasic = Pick<Employee, 'id' | 'name'> & Partial<Employee>;
 
 interface MilestoneUpdateModalProps {
   currentTotalWeightage: number;
@@ -14,6 +17,7 @@ interface MilestoneUpdateModalProps {
   isLoading?: boolean;
   projectStartDate?: string;
   projectEndDate?: string;
+  employees: EmployeeBasic[];
 }
 
 const statusOptions = [
@@ -30,15 +34,10 @@ export default function MilestoneUpdateModal({
   isLoading = false,
   projectStartDate,
   projectEndDate,
+  employees,
 }: MilestoneUpdateModalProps) {
   const [formData, setFormData] = useState<MilestoneData>(initialData);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const { employees, loading: employeesLoading, fetchEmployees } = useEmployees();
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
 
   function formatDateForInput(date: string | Date | undefined): string {
     if (!date) return "";
@@ -218,9 +217,9 @@ export default function MilestoneUpdateModal({
           label="Assignees"
           value={formData.assignees || []}
           onChange={(assignees) => handleInputChange('assignees', assignees)}
-          employees={employees}
+          employees={employees as Employee[]}
           error={errors.assignees}
-          disabled={isLoading || employeesLoading}
+          disabled={isLoading}
           placeholder="Search and select assignees..."
         />
 

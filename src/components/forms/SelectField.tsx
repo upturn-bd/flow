@@ -3,7 +3,7 @@
 import { forwardRef, SelectHTMLAttributes } from "react";
 
 interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  label: string;
+  label?: string;
   error?: string;
   required?: boolean;
   options: Array<{ value: string | number; label: string }>;
@@ -25,17 +25,19 @@ const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
   }, ref) => {
     return (
       <div className={containerClassName}>
-        <label className="block font-medium text-foreground-secondary mb-1 text-sm sm:text-base">
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
+        {label && (
+          <label className="block font-medium text-foreground-primary mb-1 text-sm sm:text-base">
+            {label}
+            {required && <span className="text-error ml-1">*</span>}
+          </label>
+        )}
         <select
           ref={ref}
           className={`
-            w-full rounded-lg border-border-secondary border p-2.5 
-            focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
+            w-full rounded-lg border border-border-primary bg-surface-primary text-foreground-primary p-2.5 
+            focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none
             transition-all shadow-sm text-sm sm:text-base
-            ${error ? 'border-red-500 focus:ring-red-500' : ''}
+            ${error ? 'border-error focus:ring-error' : ''}
             ${className}
           `}
           {...props}
@@ -52,7 +54,7 @@ const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
           ))}
         </select>
         {error && (
-          <p className="text-red-500 text-xs sm:text-sm mt-1">{error}</p>
+          <p className="text-error text-xs sm:text-sm mt-1">{error}</p>
         )}
       </div>
     );

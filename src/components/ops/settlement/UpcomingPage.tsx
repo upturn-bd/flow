@@ -5,6 +5,8 @@ import SettlementCreatePage from "./SettlementCreatePage";
 import SettlementDraftPage from "./SettlementDraftPage";
 import { Receipt, FileEdit, Trash, Clock } from "@/lib/icons";
 import { motion } from "framer-motion";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export default function UpcomingPage({setActiveTab} : {setActiveTab: (tab:string) => void}) {
   const [upcoming, setUpcoming] = useState([]);
@@ -61,20 +63,22 @@ export default function UpcomingPage({setActiveTab} : {setActiveTab: (tab:string
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center items-center h-60">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
-            </div>
+            <LoadingSpinner
+              icon={Receipt}
+              text="Loading drafts..."
+              color="blue"
+              height="h-60"
+            />
           ) : upcoming.length === 0 ? (
-            <div className="mt-10 flex flex-col items-center justify-center p-8 bg-background-secondary dark:bg-background-tertiary rounded-lg border border-border-primary">
-              <Clock className="h-12 w-12 text-foreground-tertiary mb-3" />
-              <p className="text-foreground-secondary text-center">No settlement drafts found.</p>
-              <button
-                onClick={() => setIsCreatingSettlement(true)}
-                className="mt-4 text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
-              >
-                Create your first settlement claim
-              </button>
-            </div>
+            <EmptyState
+              icon={Clock}
+              title="No settlement drafts found"
+              description="Create your first settlement claim to get started."
+              action={{
+                label: "Create your first settlement claim",
+                onClick: () => setIsCreatingSettlement(true)
+              }}
+            />
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {upcoming.map((item: any, index: number) => {

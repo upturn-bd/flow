@@ -137,7 +137,7 @@ export default function LineageCreateModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -236,7 +236,7 @@ export default function LineageCreateModal({
                   variant="primary"
                   size="sm"
                   onClick={addNewLevel}
-                  className="mt-2 flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  className="mt-2 flex items-center gap-1 bg-primary-600 hover:bg-primary-700 text-white"
                 >
                   <Plus size={16} weight="bold" />
                   Add Level
@@ -249,7 +249,7 @@ export default function LineageCreateModal({
             <Button
               variant="outline"
               onClick={onClose}
-              className="border border-blue-200 text-blue-700 hover:bg-blue-50"
+              className="border border-blue-200 text-blue-700 hover:bg-primary-50 dark:hover:bg-primary-950"
             >
               Cancel
             </Button>
@@ -267,7 +267,7 @@ export default function LineageCreateModal({
                     Number.isNaN(level.position_id)
                 )
               }
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-primary-600 hover:bg-primary-700 text-white"
             >
               Save
             </Button>
@@ -427,7 +427,7 @@ export function LineageUpdateModal({
   }, [initialData]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -523,7 +523,7 @@ export function LineageUpdateModal({
                   variant="primary"
                   size="sm"
                   onClick={addNewLevelUpdate}
-                  className="mt-2 flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  className="mt-2 flex items-center gap-1 bg-primary-600 hover:bg-primary-700 text-white"
                 >
                   <Plus size={16} weight="bold" />
                   Add Level
@@ -536,7 +536,7 @@ export function LineageUpdateModal({
             <Button
               variant="outline"
               onClick={onClose}
-              className="border border-blue-200 text-blue-700 hover:bg-blue-50"
+              className="border border-blue-200 text-blue-700 hover:bg-primary-50 dark:hover:bg-primary-950"
             >
               Cancel
             </Button>
@@ -560,7 +560,7 @@ export function LineageUpdateModal({
                   compareLineages(initialData, hierarchy)
                 )
               }
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-primary-600 hover:bg-primary-700 text-white"
             >
               Save
             </Button>

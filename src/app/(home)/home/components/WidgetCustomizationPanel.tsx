@@ -214,7 +214,7 @@ export default function WidgetCustomizationPanel({
           </div>
           <button
             onClick={onCancel}
-            className="p-2 hover:bg-surface-hover rounded-lg transition-colors flex-shrink-0"
+            className="p-2 hover:bg-surface-hover rounded-lg transition-colors shrink-0"
             aria-label="Close"
           >
             <X size={24} className="text-foreground-tertiary" />
@@ -250,13 +250,13 @@ export default function WidgetCustomizationPanel({
                   <div className="sm:hidden">
                     {/* Top row: Icon, Name, Toggle */}
                     <div className="flex items-center gap-3 mb-3">
-                      <div className={`p-2 rounded-lg flex-shrink-0 ${widget.enabled ? 'bg-primary-50 dark:bg-primary-950/20' : 'bg-background-tertiary'}`}>
+                      <div className={`p-2 rounded-lg shrink-0 ${widget.enabled ? 'bg-primary-50 dark:bg-primary-950/20' : 'bg-background-tertiary'}`}>
                         <Icon size={20} className={widget.enabled ? 'text-primary-600 dark:text-primary-400' : 'text-foreground-tertiary'} />
                       </div>
                       <h3 className="font-medium text-sm text-foreground-primary flex-1">{definition.name}</h3>
                       <button
                         onClick={() => toggleWidget(widget.id)}
-                        className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
+                        className={`p-2 rounded-lg transition-colors shrink-0 ${
                           widget.enabled
                             ? 'bg-success/10 hover:bg-success/20 text-success dark:bg-success/20 dark:hover:bg-success/30'
                             : 'bg-background-tertiary hover:bg-surface-hover text-foreground-tertiary'
@@ -303,7 +303,7 @@ export default function WidgetCustomizationPanel({
                   {/* Desktop Layout: Single row */}
                   <div className="hidden sm:flex items-center gap-4">
                     {/* Drag Handle & Reorder Buttons */}
-                    <div className="flex flex-col gap-1 flex-shrink-0">
+                    <div className="flex flex-col gap-1 shrink-0">
                       <button
                         onClick={() => moveWidgetUp(index)}
                         disabled={index === 0}
@@ -323,7 +323,7 @@ export default function WidgetCustomizationPanel({
 
                     {/* Widget Info */}
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className={`p-2 rounded-lg flex-shrink-0 ${widget.enabled ? 'bg-primary-50 dark:bg-primary-950/20' : 'bg-background-tertiary'}`}>
+                      <div className={`p-2 rounded-lg shrink-0 ${widget.enabled ? 'bg-primary-50 dark:bg-primary-950/20' : 'bg-background-tertiary'}`}>
                         <Icon size={18} className={widget.enabled ? 'text-primary-600 dark:text-primary-400' : 'text-foreground-tertiary'} />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -337,7 +337,7 @@ export default function WidgetCustomizationPanel({
                       value={widget.size}
                       onChange={(e) => updateWidgetSize(widget.id, e.target.value as WidgetSize)}
                       disabled={!widget.enabled}
-                      className="px-3 py-2 border border-border-secondary rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 bg-surface-primary"
+                      className="px-3 py-2 border border-border-secondary rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed shrink-0 bg-surface-primary"
                     >
                       {sizeOptions.map(option => (
                         <option key={option.value} value={option.value}>
@@ -349,7 +349,7 @@ export default function WidgetCustomizationPanel({
                     {/* Toggle Button */}
                     <button
                       onClick={() => toggleWidget(widget.id)}
-                      className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
+                      className={`p-2 rounded-lg transition-colors shrink-0 ${
                         widget.enabled
                           ? 'bg-success/10 hover:bg-success/20 text-success dark:bg-success/20 dark:hover:bg-success/30'
                           : 'bg-background-tertiary hover:bg-surface-hover text-foreground-tertiary'

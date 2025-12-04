@@ -25,11 +25,12 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { ComplaintCard } from "./ComplaintCard";
+import { extractEmployeeIdsFromComplaints } from "@/lib/utils/project-utils";
 
 export default function ComplaintRequestsPage() {
   const [comment, setComment] = useState<string>("");
   const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
   const {
     complaints,
@@ -44,12 +45,18 @@ export default function ComplaintRequestsPage() {
   } = useComplaints();
 
   useEffect(() => {
-    fetchComplaintRequests();
-  }, []);
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
+    const initData = async () => {
+      const requests = await fetchComplaintRequests();
+      // Only fetch employees that are referenced in the requests
+      if (requests && requests.length > 0) {
+        const employeeIds = extractEmployeeIdsFromComplaints(requests);
+        if (employeeIds.length > 0) {
+          fetchEmployeesByIds(employeeIds);
+        }
+      }
+    };
+    initData();
+  }, [fetchComplaintRequests, fetchEmployeesByIds]);
 
   useEffect(() => {
     fetchComplaintTypes();

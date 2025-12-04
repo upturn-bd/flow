@@ -205,7 +205,7 @@ export function StatusDot({
         transition: { duration: 0.2, type: "spring", stiffness: 500 }
       } : {})}
       className={`
-        rounded-full flex-shrink-0
+        rounded-full shrink-0
         ${bgColor}
         ${sizeClasses[size]}
         ${className}

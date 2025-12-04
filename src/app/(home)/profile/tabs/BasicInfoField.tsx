@@ -93,7 +93,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
               <option key={option.value} value={option.value}>{option.label}</option>
             ))}
           </select>
-          {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-600" aria-live="polite">{error}</p>}
+          {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-error" aria-live="polite">{error}</p>}
         </div>
       );
     }
@@ -116,7 +116,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
               <option key={option.value} value={option.value}>{option.label}</option>
             ))}
           </select>
-          {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-600" aria-live="polite">{error}</p>}
+          {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-error" aria-live="polite">{error}</p>}
         </div>
       );
     }
@@ -151,7 +151,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               id={`${fieldId}-error`}
-              className="mt-1 text-xs text-red-600"
+              className="mt-1 text-xs text-error"
               aria-live="polite"
             >
               {error}
@@ -175,7 +175,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
             onBlur={onBlur}
             disabled={disabled}
           />
-          {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-600" aria-live="polite">{error}</p>}
+          {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-error" aria-live="polite">{error}</p>}
         </div>
       );
     }
@@ -204,7 +204,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               id={`${fieldId}-error`}
-              className="mt-1 text-xs text-red-600"
+              className="mt-1 text-xs text-error"
               aria-live="polite"
             >
               {error}
@@ -239,7 +239,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             id={`${fieldId}-error`}
-            className="mt-1 text-xs text-red-600"
+            className="mt-1 text-xs text-error"
             aria-live="polite"
           >
             {error}

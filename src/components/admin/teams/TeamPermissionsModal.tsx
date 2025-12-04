@@ -5,6 +5,7 @@ import { X, FloppyDisk } from '@/lib/icons';
 import { TeamWithPermissions, TeamPermission, PermissionCategory, Permission } from '@/lib/types';
 import { supabase } from '@/lib/supabase/client';
 import { useTeams } from '@/hooks/useTeams';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 import { 
   PERMISSION_ACTIONS, 
   MODULE_CATEGORIES,
@@ -242,7 +243,7 @@ export default function TeamPermissionsModal({
         <div className="p-6 overflow-y-auto flex-1">
           {loadingPermissions ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+              <InlineSpinner size="lg" color="violet" className="mb-4" />
               <div className="text-foreground-secondary font-medium">Loading permissions...</div>
             </div>
           ) : (

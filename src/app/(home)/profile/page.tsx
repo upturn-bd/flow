@@ -11,8 +11,9 @@ import {
   GraduationCap,
   BarChart2,
   FileCheck,
-  Loader,
 } from "@/lib/icons";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import PageHeader from "@/components/ui/PageHeader";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getEmployeeId } from "@/lib/utils/auth";
@@ -133,10 +134,10 @@ function ProfileContent() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-96">
-        <Loader className="w-12 h-12 text-primary-600 animate-spin mb-4" />
-        <p className="text-foreground-tertiary">Loading profile information...</p>
-      </div>
+      <LoadingSpinner
+        text="Loading profile information..."
+        height="h-screen"
+      />
     );
   }
 
@@ -158,19 +159,10 @@ function ProfileContent() {
       variants={pageVariants}
       className="w-full px-4 py-6 sm:px-6 lg:px-8"
     >
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="mb-8"
-      >
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground-primary">
-          My Profile
-        </h1>
-        <p className="text-sm sm:text-base text-foreground-tertiary mt-1">
-          View and update your profile information
-        </p>
-      </motion.div>
+      <PageHeader
+        title="My Profile"
+        description="View and update your profile information"
+      />
 
       <TabView tabs={TABS} activeTab={activeTab} setActiveTab={setActiveTab} />
     </motion.div>
@@ -182,10 +174,10 @@ export default function ProfilePage() {
   return (
     <Suspense
       fallback={
-        <div className="flex flex-col items-center justify-center h-96">
-          <Loader className="w-12 h-12 text-primary-600 animate-spin mb-4" />
-          <p className="text-foreground-tertiary">Loading profile data...</p>
-        </div>
+        <LoadingSpinner
+          text="Loading profile data..."
+          height="h-screen"
+        />
       }
     >
       <ProfileContent />

@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Bug, Send, CheckCircle } from "lucide-react";
+import { X, Bug, Send, CheckCircle } from "@/lib/icons";
 import { useAuth } from "@/lib/auth/auth-context";
 import { fadeIn, fadeInUp } from "./animations";
+import { InlineSpinner } from "@/components/ui";
+import { FormField, TextAreaField } from "@/components/forms";
 
 interface ReportProblemModalProps {
   isOpen: boolean;
@@ -238,38 +240,29 @@ export default function ReportProblemModal({
                     </div>
 
                     {/* Title */}
-                    <div>
-                      <label htmlFor="title" className="block text-sm font-medium text-foreground-primary dark:text-foreground-primary mb-1">
-                        Title <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id="title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Brief summary of the issue"
-                        className="w-full px-4 py-2.5 border border-border-primary dark:border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all bg-surface-primary dark:bg-surface-primary text-foreground-primary dark:text-foreground-primary"
-                        disabled={isSubmitting}
-                        maxLength={100}
-                      />
-                    </div>
+                    <FormField
+                      label="Title"
+                      required
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="Brief summary of the issue"
+                      disabled={isSubmitting}
+                      maxLength={100}
+                    />
 
                     {/* Description */}
                     <div>
-                      <label htmlFor="description" className="block text-sm font-medium text-foreground-primary dark:text-foreground-primary mb-1">
-                        Description <span className="text-red-500">*</span>
-                      </label>
-                      <textarea
-                        id="description"
+                      <TextAreaField
+                        label="Description"
+                        required
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="Please describe the issue in detail. What were you trying to do? What happened instead? Any steps to reproduce?"
                         rows={5}
-                        className="w-full px-4 py-2.5 border border-border-primary dark:border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all resize-none bg-surface-primary dark:bg-surface-primary text-foreground-primary dark:text-foreground-primary"
                         disabled={isSubmitting}
                         maxLength={2000}
                       />
-                      <p className="text-xs text-foreground-tertiary dark:text-foreground-tertiary mt-1 text-right">
+                      <p className="text-xs text-foreground-tertiary mt-1 text-right">
                         {description.length}/2000
                       </p>
                     </div>
@@ -279,14 +272,14 @@ export default function ReportProblemModal({
                       <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm"
+                        className="p-3 bg-error/10 border border-error/20 rounded-lg text-error text-sm"
                       >
                         {error}
                       </motion.div>
                     )}
 
                     {/* Info Note */}
-                    <div className="p-3 bg-background-secondary dark:bg-background-secondary border border-border-primary dark:border-border-primary rounded-lg text-sm text-foreground-secondary dark:text-foreground-secondary">
+                    <div className="p-3 bg-surface-secondary border border-border-primary rounded-lg text-sm text-foreground-secondary">
                       <p>
                         <strong>Note:</strong> Your feedback will include your name, email, and current page context to help us investigate the issue.
                       </p>
@@ -309,7 +302,7 @@ export default function ReportProblemModal({
                       >
                         {isSubmitting ? (
                           <>
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <InlineSpinner size="sm" color="white" />
                             Submitting...
                           </>
                         ) : (

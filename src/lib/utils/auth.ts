@@ -26,9 +26,11 @@ export async function getCompanyId(): Promise<number> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   
   if (userError || !user) {
-    console.error('[auth.ts] User not authenticated');
+    console.error('[auth.ts] User not authenticated:', userError?.message);
     throw new DatabaseError('User not authenticated');
   }
+
+  console.log('[auth.ts] Getting company ID for user:', user.id);
 
   const { data, error } = await supabase
     .from('employees')
@@ -37,15 +39,16 @@ export async function getCompanyId(): Promise<number> {
     .single();
 
   if (error) {
-    console.error('[auth.ts] Failed to get company ID:', error);
-    throw new DatabaseError('Failed to get company ID', error.code);
+    console.error('[auth.ts] Failed to get company ID:', error.message, 'Code:', error.code, 'Details:', error.details);
+    throw new DatabaseError(`Failed to get company ID: ${error.message}`, error.code, error.details);
   }
 
   if (!data || data.company_id == null) {
-    console.error('[auth.ts] No company ID found for user');
+    console.error('[auth.ts] No company ID found for user:', user.id);
     throw new DatabaseError('No company ID found for user');
   }
 
+  console.log('[auth.ts] Company ID found:', data.company_id);
   return data.company_id;
 }
 
@@ -124,6 +127,8 @@ export async function getCompanyInfo(): Promise<{
 }> {
   const companyId = await getCompanyId();
   
+  console.log('[auth.ts] Getting company info for company ID:', companyId);
+  
   const { data, error } = await supabase
     .from('companies')
     .select('*')
@@ -131,9 +136,11 @@ export async function getCompanyInfo(): Promise<{
     .single();
 
   if (error) {
-    throw new DatabaseError('Failed to get company info', error.code);
+    console.error('[auth.ts] Failed to get company info:', error.message, 'Code:', error.code);
+    throw new DatabaseError(`Failed to get company info: ${error.message}`, error.code);
   }
 
+  console.log('[auth.ts] Company info found:', data?.name);
   return data;
 }
 

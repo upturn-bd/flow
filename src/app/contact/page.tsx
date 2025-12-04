@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { EnvelopeSimple, Phone, MapPin, PaperPlaneTilt, Question, ChatCircleDots, BookOpen } from "@phosphor-icons/react";
+import { InlineSpinner } from "@/components/ui";
+import { FormField, TextAreaField, SelectField } from "@/components/forms";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -110,99 +112,68 @@ export default function ContactPage() {
             <h2 className="text-2xl font-bold text-foreground-primary mb-6">Send Us a Message</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-foreground-secondary mb-2">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-                    placeholder="John Doe"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-foreground-secondary mb-2">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-                    placeholder="john@company.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="company" className="block text-sm font-medium text-foreground-secondary mb-2">
-                  Company Name
-                </label>
-                <input
-                  type="text"
-                  id="company"
-                  name="company"
-                  value={formData.company}
+                <FormField
+                  name="name"
+                  label="Full Name"
+                  required
+                  value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-                  placeholder="Your Company Ltd."
+                  placeholder="John Doe"
+                />
+                <FormField
+                  name="email"
+                  label="Email Address"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="john@company.com"
                 />
               </div>
 
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-foreground-secondary mb-2">
-                  Subject *
-                </label>
-                <select
-                  id="subject"
-                  name="subject"
-                  required
-                  value={formData.subject}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-                >
-                  <option value="">Select a subject</option>
-                  <option value="general">General Inquiry</option>
-                  <option value="sales">Sales & Pricing</option>
-                  <option value="support">Technical Support</option>
-                  <option value="billing">Billing & Payments</option>
-                  <option value="partnership">Partnership Opportunities</option>
-                  <option value="feedback">Product Feedback</option>
-                </select>
-              </div>
+              <FormField
+                name="company"
+                label="Company Name"
+                value={formData.company}
+                onChange={handleChange}
+                placeholder="Your Company Ltd."
+              />
 
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-foreground-secondary mb-2">
-                  Message *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  rows={5}
-                  value={formData.message}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none"
-                  placeholder="How can we help you?"
-                />
-              </div>
+              <SelectField
+                name="subject"
+                label="Subject"
+                required
+                value={formData.subject}
+                onChange={handleChange}
+                placeholder="Select a subject"
+                options={[
+                  { value: "general", label: "General Inquiry" },
+                  { value: "sales", label: "Sales & Pricing" },
+                  { value: "support", label: "Technical Support" },
+                  { value: "billing", label: "Billing & Payments" },
+                  { value: "partnership", label: "Partnership Opportunities" },
+                  { value: "feedback", label: "Product Feedback" },
+                ]}
+              />
+
+              <TextAreaField
+                name="message"
+                label="Message"
+                required
+                rows={5}
+                value={formData.message}
+                onChange={handleChange}
+                placeholder="How can we help you?"
+              />
 
               {submitStatus === "success" && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                <div className="p-4 bg-success/10 border border-success/30 rounded-lg text-success">
                   Thank you for your message! We&apos;ll get back to you within 24 hours.
                 </div>
               )}
 
               {submitStatus === "error" && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                <div className="p-4 bg-error/10 border border-error/30 rounded-lg text-error">
                   Something went wrong. Please try again or email us directly.
                 </div>
               )}
@@ -214,7 +185,7 @@ export default function ContactPage() {
               >
                 {isSubmitting ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <InlineSpinner size="md" color="white" />
                     Sending...
                   </>
                 ) : (

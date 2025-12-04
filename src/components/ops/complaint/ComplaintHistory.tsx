@@ -19,9 +19,10 @@ import { useComplaintTypes } from "@/hooks/useConfigTypes";
 import { useComplaints } from "@/hooks/useComplaints";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { ComplaintCard } from "./ComplaintCard";
+import { extractEmployeeIdsFromComplaints } from "@/lib/utils/project-utils";
 
 export default function ComplaintHistoryPage() {
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployeesByIds } = useEmployees();
   const { complaintTypes, fetchComplaintTypes } = useComplaintTypes();
   const {
     complaintHistory: complaints,
@@ -31,12 +32,18 @@ export default function ComplaintHistoryPage() {
   } = useComplaints();
 
   useEffect(() => {
-    fetchComplaintHistory();
-  }, []);
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
+    const initData = async () => {
+      const history = await fetchComplaintHistory();
+      // Only fetch employees that are referenced in the history
+      if (history && history.length > 0) {
+        const employeeIds = extractEmployeeIdsFromComplaints(history);
+        if (employeeIds.length > 0) {
+          fetchEmployeesByIds(employeeIds);
+        }
+      }
+    };
+    initData();
+  }, [fetchComplaintHistory, fetchEmployeesByIds]);
 
   useEffect(() => {
     fetchComplaintTypes();
