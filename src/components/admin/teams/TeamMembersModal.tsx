@@ -240,7 +240,7 @@ export default function TeamMembersModal({
                         >
                           <div className="flex-1 min-w-0 pr-4">
                             <div className="flex items-center gap-2">
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-white font-semibold shadow-md">
+                              <div className="w-10 h-10 rounded-full bg-linear-to-br from-primary-500 to-purple-500 flex items-center justify-center text-white font-semibold shadow-md">
                                 {(member.employee_name || 'U').charAt(0).toUpperCase()}
                               </div>
                               <div className="flex-1 min-w-0">
@@ -267,7 +267,7 @@ export default function TeamMembersModal({
                           <button
                             onClick={() => handleRemoveMember(member.employee_id)}
                             disabled={teamLoading}
-                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 flex-shrink-0"
+                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 shrink-0"
                             title="Remove from team"
                           >
                             <Trash size={20} />

@@ -5,7 +5,7 @@ import { ShieldAlert } from "@/lib/icons";
 
 export default function UnauthorizedPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background-secondary to-background-tertiary">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-background-secondary to-background-tertiary">
       <div className="max-w-md w-full mx-4">
         <div className="bg-surface-primary rounded-2xl shadow-xl p-8 text-center">
           <div className="flex justify-center mb-6">

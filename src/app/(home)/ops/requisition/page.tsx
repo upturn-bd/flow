@@ -69,7 +69,7 @@ function RequisitionPageContent() {
           </p>
           <div className="bg-cyan-50 border border-cyan-100 rounded-lg p-4 max-w-md">
             <div className="flex gap-3">
-              <AlertTriangle className="h-5 w-5 text-cyan-500 flex-shrink-0 mt-0.5" />
+              <AlertTriangle className="h-5 w-5 text-cyan-500 shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-sm font-semibold text-cyan-800 mb-1">Important Information</h4>
                 <p className="text-sm text-cyan-700">

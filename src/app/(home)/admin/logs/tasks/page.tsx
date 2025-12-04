@@ -125,7 +125,7 @@ export default function CompanyTaskLogsPage() {
                      {/* Task info */}
                      {/* Task info */}
                      <div className="flex flex-col gap-2 w-full sm:w-2/3">
-                        <h3 className="font-semibold text-lg break-words">{task.task_title}</h3>
+                        <h3 className="font-semibold text-lg wrap-break-words">{task.task_title}</h3>
 
 
                         {/* Badges: Created At, Start Date, End Date */}

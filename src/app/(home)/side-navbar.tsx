@@ -94,7 +94,7 @@ export default function Sidebar() {
         title={collapsed ? displayLabel : undefined}
       >
         <span className={cn(
-          "flex-shrink-0 transition-transform duration-200",
+          "shrink-0 transition-transform duration-200",
           !isActive && "group-hover:scale-110"
         )}>
           <Icon size={20} weight={isActive ? "fill" : "regular"} />
@@ -132,7 +132,7 @@ export default function Sidebar() {
         collapsed ? "justify-start" : "justify-between pr-3"
       )}>
         <Link href="/home" className="flex items-center gap-2">
-          <div className="w-16 h-16 bg-primary-600 dark:bg-primary-800 flex items-center justify-center flex-shrink-0 overflow-hidden">
+          <div className="w-16 h-16 bg-primary-600 dark:bg-primary-800 flex items-center justify-center shrink-0 overflow-hidden">
             <Image
               src="/nav-logo.png"
               width={14}
@@ -155,7 +155,7 @@ export default function Sidebar() {
         {showCollapseButton && !collapsed && (
           <button
             onClick={toggleCollapse}
-            className="p-1.5 rounded-md text-foreground-tertiary hover:text-foreground-primary hover:bg-surface-hover transition-colors flex-shrink-0"
+            className="p-1.5 rounded-md text-foreground-tertiary hover:text-foreground-primary hover:bg-surface-hover transition-colors shrink-0"
             aria-label="Collapse sidebar"
           >
             <CaretLeft size={18} />
@@ -268,7 +268,7 @@ export default function Sidebar() {
         className={cn(
           "hidden md:flex md:flex-col md:h-screen md:sticky md:top-0",
           "bg-background-primary border-r border-border-primary",
-          "flex-shrink-0"
+          "shrink-0"
         )}
       >
         <SidebarContent collapsed={isCollapsed} />

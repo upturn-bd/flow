@@ -313,7 +313,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                   key={edu.id}
                   className="p-6 hover:bg-background-secondary flex flex-col md:flex-row md:items-start gap-4"
                 >
-                  <div className="flex-grow">
+                  <div className="grow">
                     <h3 className="font-semibold text-foreground-primary mb-1">{edu.institute}</h3>
                     <p className="text-foreground-primary">{edu.type}</p>
                     <div className="flex items-center text-foreground-tertiary text-sm mt-1">
@@ -419,7 +419,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                   key={exp.id}
                   className="p-6 hover:bg-background-secondary flex flex-col md:flex-row md:items-start gap-4"
                 >
-                  <div className="flex-grow">
+                  <div className="grow">
                     <h3 className="font-semibold text-foreground-primary mb-1">{exp.company_name}</h3>
                     <p className="text-foreground-primary">{exp.designation}</p>
                     <div className="flex flex-wrap items-center gap-x-4 text-foreground-tertiary text-sm mt-1">

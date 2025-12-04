@@ -299,7 +299,7 @@ function NotificationItem({
       className={`p-4 border-l-4 ${priorityStyle} ${!notification.is_read ? 'bg-blue-50' : ''}`}
     >
       <div className="flex items-start gap-3">
-        <div className={`flex-shrink-0 ${iconColor}`}>
+        <div className={`shrink-0 ${iconColor}`}>
           <IconComponent className="h-5 w-5" />
         </div>
 
@@ -327,7 +327,7 @@ function NotificationItem({
             </div>
 
             {!notification.is_read && (
-              <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-1"></div>
+              <div className="w-2 h-2 bg-primary-500 rounded-full shrink-0 mt-1"></div>
             )}
           </div>
 

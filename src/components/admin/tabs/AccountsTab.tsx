@@ -621,7 +621,7 @@ export default function AccountsTab() {
                         <td className="px-4 py-3">
                           {account.stakeholder ? (
                             <div className="flex items-center gap-1">
-                              <Users size={12} className="text-blue-500 flex-shrink-0" />
+                              <Users size={12} className="text-blue-500 shrink-0" />
                               <span className="text-xs text-gray-900 truncate max-w-[100px]" title={account.stakeholder.name}>
                                 {account.stakeholder.name}
                               </span>

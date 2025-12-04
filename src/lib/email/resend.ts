@@ -1,7 +1,21 @@
 import { Resend } from "resend";
+import * as Sentry from "@sentry/nextjs";
 
-// Initialize Resend client
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend client lazily to handle missing API key gracefully
+let resendClient: Resend | null = null;
+
+function getResendClient(): Resend {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error(
+        "RESEND_API_KEY environment variable is not set. Please add it to your .env.local file."
+      );
+    }
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+}
 
 export interface SendEmailOptions {
   to: string | string[];
@@ -45,6 +59,7 @@ export async function sendEmail(
   }
 
   try {
+    const resend = getResendClient();
     const { data, error } = await resend.emails.send({
       from,
       to: Array.isArray(to) ? to : [to],
@@ -57,12 +72,38 @@ export async function sendEmail(
 
     if (error) {
       console.error("Resend error:", error);
+      Sentry.withScope((scope) => {
+        scope.setLevel("error");
+        scope.setTag("error_type", "email");
+        scope.setTag("email_provider", "resend");
+        scope.setContext("email_details", {
+          to: Array.isArray(to) ? to.join(", ") : to,
+          subject,
+          from,
+        });
+        scope.setContext("resend_error", {
+          name: error.name,
+          message: error.message,
+        });
+        Sentry.captureException(new Error(`Resend API Error: ${error.message}`));
+      });
       return { success: false, error: error.message };
     }
 
     return { success: true, data: data ?? undefined };
   } catch (err) {
     console.error("Failed to send email:", err);
+    Sentry.withScope((scope) => {
+      scope.setLevel("error");
+      scope.setTag("error_type", "email");
+      scope.setTag("email_provider", "resend");
+      scope.setContext("email_details", {
+        to: Array.isArray(to) ? to.join(", ") : to,
+        subject,
+        from,
+      });
+      Sentry.captureException(err);
+    });
     return {
       success: false,
       error: err instanceof Error ? err.message : "Unknown error occurred",
@@ -82,4 +123,5 @@ export async function sendBatchEmails(
   return results;
 }
 
-export { resend };
+// Export the getter function for cases where direct access is needed
+export { getResendClient as resend };

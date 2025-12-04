@@ -396,7 +396,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           >
             {/* Search input */}
             <div className="flex items-center gap-3 px-4 py-3 border-b border-border-primary">
-              <Search className="h-5 w-5 text-foreground-tertiary flex-shrink-0" />
+              <Search className="h-5 w-5 text-foreground-tertiary shrink-0" />
               <input
                 ref={inputRef}
                 type="text"
@@ -456,7 +456,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                         >
                           <div
                             className={cn(
-                              "flex-shrink-0 p-2 rounded-lg",
+                              "shrink-0 p-2 rounded-lg",
                               isSelected
                                 ? "bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400"
                                 : "bg-surface-secondary text-foreground-secondary"
@@ -480,7 +480,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                             </p>
                           </div>
                           {isSelected && (
-                            <CaretRight className="h-4 w-4 text-primary-500 flex-shrink-0" />
+                            <CaretRight className="h-4 w-4 text-primary-500 shrink-0" />
                           )}
                         </button>
                       );

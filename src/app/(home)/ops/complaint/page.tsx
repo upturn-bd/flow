@@ -79,25 +79,25 @@ export default function ComplaintPage() {
             <h3 className="text-lg font-semibold text-foreground-secondary mt-4">Resolution Process</h3>
             <ol className="mt-2 space-y-2 text-foreground-secondary">
               <li className="flex items-start">
-                <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 flex-shrink-0">1</span>
+                <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 shrink-0">1</span>
                 <div>
                   <span className="font-medium">Initial Review (1-2 days):</span> Your complaint will be reviewed by HR and relevant department heads.
                 </div>
               </li>
               <li className="flex items-start">
-                <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 flex-shrink-0">2</span>
+                <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 shrink-0">2</span>
                 <div>
                   <span className="font-medium">Investigation (3-5 days):</span> Evidence will be gathered and interviews conducted as needed.
                 </div>
               </li>
               <li className="flex items-start">
-                <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 flex-shrink-0">3</span>
+                <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 shrink-0">3</span>
                 <div>
                   <span className="font-medium">Decision (2-3 days):</span> A resolution will be determined based on the investigation findings.
                 </div>
               </li>
               <li className="flex items-start">
-                <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 flex-shrink-0">4</span>
+                <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 shrink-0">4</span>
                 <div>
                   <span className="font-medium">Implementation:</span> The resolution will be implemented and all parties will be notified.
                 </div>

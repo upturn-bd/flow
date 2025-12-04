@@ -10,10 +10,10 @@ const Verify = () => {
     const email = searchParams.get("email");
 
     return (
-        <section className="bg-gradient-to-br from-background-secondary to-primary-50 text-foreground-primary min-h-screen flex flex-col">
+        <section className="bg-linear-to-br from-background-secondary to-primary-50 text-foreground-primary min-h-screen flex flex-col">
             <div className="flex flex-col md:flex-row h-full min-h-screen">
                 {/* Left Panel (Logo + Brand) */}
-                <div className="bg-[#001731] flex flex-col items-center justify-center text-white p-8 md:w-2/6 w-full min-h-[160px] md:min-h-0 relative">
+                <div className="bg-[#001731] flex flex-col items-center justify-center text-white p-8 md:w-2/6 w-full min-h-40 md:min-h-0 relative">
                     <Image
                         src="/Logo.png"
                         width={150}
@@ -34,7 +34,7 @@ const Verify = () => {
 
                 {/* Right Panel (Main Content) */}
                 <div className="flex flex-1 items-center justify-center px-6 py-12 md:px-16 lg:px-32">
-                    <div className="bg-surface-primary/70 backdrop-blur-xl border border-border-primary w-full max-w-md md:max-w-lg p-10 md:p-14 rounded-3xl shadow-xl text-center">
+                    <div className="bg-surface-primary/70 backdrop-blur-sm border border-border-primary w-full max-w-md md:max-w-lg p-10 md:p-14 rounded-3xl shadow-xl text-center">
                         <h1 className="text-3xl font-extrabold text-foreground-primary mb-3">
                             Verify Your Email
                         </h1>
