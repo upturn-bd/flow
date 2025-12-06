@@ -12,7 +12,7 @@ import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function AttendancePresentPage() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Filters state
   const [fromDate, setFromDate] = useState("");

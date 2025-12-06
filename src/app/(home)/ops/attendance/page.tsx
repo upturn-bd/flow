@@ -17,35 +17,136 @@ import {
   ClipboardCheck,
 } from "@/lib/icons";
 import { useSearchParams } from "next/navigation";
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect, useMemo } from "react";
 import { PERMISSION_MODULES } from "@/lib/constants";
+import { useSites } from "@/hooks/useAttendanceManagement";
+import { useAuth } from "@/lib/auth/auth-context";
+import { useAttendanceStatus } from "@/hooks/useAttendance";
+import { handleCheckIn, handleCheckOut } from "@/app/(home)/home/components/attendanceUtils";
+import AttendanceStatusModal from "@/components/ui/modals/AttendanceStatusModal";
+import SuccessModal from "@/components/ui/modals/SuccessModal";
+import ErrorModal from "@/components/ui/modals/ErrorModal";
+import { supabase } from "@/lib/supabase/client";
+import { getEmployeeInfo } from "@/lib/utils/auth";
 
 function AttendancePageContent() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState(tab || "today");
 
-  // Example placeholder states/handlers for AttendanceSection props
   const [attendanceRecord, setAttendanceRecord] = useState({
-    tag: "",
+    tag: "Present",
     site_id: undefined as number | undefined,
   });
-  const [sites, setSites] = useState<any[]>([]);
-  const [attendanceStatus, setAttendanceStatus] = useState({
-    checkIn: false,
-    checkOut: false,
-  });
+
+  const {sites, fetchSites, loading: sitesLoading} = useSites();
+  const {user} = useAuth();
+  const { today, todayLoading, getTodaysAttendance } = useAttendanceStatus();
+
+  // Modal states
+  const [attendanceLoading, setAttendanceLoading] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [attendanceStatus, setAttendanceStatus] = useState<'Present' | 'Late' | 'Wrong_Location'>('Present');
+  const [currentRecordId, setCurrentRecordId] = useState<number | undefined>();
+
+  // Derived attendance status
+  const attendanceCheckStatus = useMemo(() => ({
+    checkIn: !!today?.check_in_time,
+    checkOut: !!today?.check_out_time,
+  }), [today]);
+
+  useEffect(() => {
+    fetchSites();
+    getTodaysAttendance();
+  }, [user]);
+
+  // Send request to supervisor
+  const handleSendRequest = async (recordId: number, reason: string) => {
+    try {
+      const user = await getEmployeeInfo();
+      
+      const { error } = await supabase
+        .from('attendance_requests')
+        .insert({
+          attendance_record_id: recordId,
+          employee_id: user.id,
+          supervisor_id: user.supervisor_id,
+          company_id: user.company_id,
+          request_type: attendanceStatus === 'Late' ? 'late' : 'wrong_location',
+          status: 'pending',
+          reason: reason,
+        });
+
+      if (error) {
+        console.error('Failed to send request:', error);
+        setModalTitle('Request Failed');
+        setModalMessage('Failed to send request to supervisor. Please try again.');
+        setShowErrorModal(true);
+      } else {
+        setModalTitle('Request Sent!');
+        setModalMessage('Your request has been sent to your supervisor for approval.');
+        setShowSuccessModal(true);
+      }
+    } catch (error) {
+      console.error('Error sending request:', error);
+      setModalTitle('Request Failed');
+      setModalMessage('An error occurred while sending the request.');
+      setShowErrorModal(true);
+    }
+  };
+
+  const onCheckIn = async () => {
+    setAttendanceLoading(true);
+    try {
+      const result = await handleCheckIn(attendanceRecord, sites, getTodaysAttendance);
+      if (result.success && result.status) {
+        setAttendanceStatus(result.status as 'Present' | 'Late' | 'Wrong_Location');
+        setCurrentRecordId(result.recordId);
+        setShowStatusModal(true);
+      } else {
+        setModalTitle('Check-in Failed');
+        setModalMessage(result.message || 'Failed to record check-in.');
+        setShowErrorModal(true);
+      }
+    } finally {
+      setAttendanceLoading(false);
+    }
+  };
+
+  const onCheckOut = async () => {
+    setAttendanceLoading(true);
+    try {
+      if (today?.id) {
+        const result = await handleCheckOut(today.id);
+        if (result.success) {
+          if (result.isEarly) {
+            // Show warning modal for early checkout
+            setModalTitle('Early Check-out');
+            setModalMessage(result.message || 'You checked out early.');
+            setShowErrorModal(true); // Using error modal to show warning
+          } else {
+            // Show success modal for on-time checkout
+            setModalTitle('Check-out Successful!');
+            setModalMessage(result.message || 'Your check-out has been recorded.');
+            setShowSuccessModal(true);
+          }
+        } else {
+          setModalTitle('Check-out Failed');
+          setModalMessage(result.message || 'Failed to record check-out.');
+          setShowErrorModal(true);
+        }
+      }
+    } finally {
+      setAttendanceLoading(false);
+    }
+  };
 
   const handleRecordChange = (record: any) => {
     setAttendanceRecord(record);
-  };
-
-  const handleCheckIn = async () => {
-    console.log("Check-in triggered");
-  };
-
-  const handleCheckOut = async () => {
-    console.log("Check-out triggered");
   };
 
   // 🟦 Define all tabs including the new "Today" one
@@ -55,17 +156,24 @@ function AttendancePageContent() {
       label: "Today",
       icon: <Clock className="h-5 w-5" />,
       color: "text-blue-600",
-      content: (
+      content: todayLoading || sitesLoading ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-3">
+            <Clock className="h-8 w-8 text-blue-600 animate-pulse" />
+            <p className="text-sm text-foreground-secondary">Loading attendance...</p>
+          </div>
+        </div>
+      ) : (
         <AttendanceSection
-          loading={false}
-          attendanceLoading={false}
-          attendanceStatus={attendanceStatus}
+          loading={todayLoading}
+          attendanceLoading={attendanceLoading}
+          attendanceStatus={attendanceCheckStatus}
           attendanceRecord={attendanceRecord}
           sites={sites}
-          sitesLoading={false}
+          sitesLoading={sitesLoading}
           onRecordChange={handleRecordChange}
-          onCheckIn={handleCheckIn}
-          onCheckOut={handleCheckOut}
+          onCheckIn={onCheckIn}
+          onCheckOut={onCheckOut}
         />
       ),
       link: "/ops/attendance?tab=today",
@@ -89,18 +197,46 @@ function AttendancePageContent() {
   ];
 
   return (
-    <ServicePageTemplate
-      title="Attendance"
-      description="View and manage your attendance records, check your history, and submit attendance requests."
-      icon={<Calendar className="h-6 w-6" />}
-      primaryColor="text-blue-600"
-      tabs={tabs}
-      activeTab={activeTab}
-      setActiveTab={setActiveTab}
-      isLinked={true}
-      module={PERMISSION_MODULES.ATTENDANCE}
-      showPermissionBanner={true}
-    />
+    <>
+      <ServicePageTemplate
+        title="Attendance"
+        description="View and manage your attendance records, check your history, and submit attendance requests."
+        icon={<Calendar className="h-6 w-6" />}
+        primaryColor="text-blue-600"
+        tabs={tabs}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isLinked={true}
+        module={PERMISSION_MODULES.ATTENDANCE}
+        showPermissionBanner={true}
+      />
+
+      {/* Attendance Status Modal */}
+      <AttendanceStatusModal
+        isOpen={showStatusModal}
+        onClose={() => setShowStatusModal(false)}
+        status={attendanceStatus}
+        recordId={currentRecordId}
+        onSendRequest={handleSendRequest}
+      />
+
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title={modalTitle}
+        message={modalMessage}
+        autoCloseDuration={0}
+      />
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        title={modalTitle}
+        message={modalMessage}
+      />
+    </>
   );
 }
 

@@ -18,6 +18,16 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   turbopack: {},
+  // Prevent dev server from watching test-related directories
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.watchOptions = {
+        ...config.watchOptions,
+        ignored: ['**/tests/**', '**/test-results/**', '**/playwright-report/**', '**/.auth/**', '**/node_modules/**'],
+      };
+    }
+    return config;
+  },
 };
 
 export default withSentryConfig(withPWA(nextConfig), {

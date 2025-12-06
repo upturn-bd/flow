@@ -17,7 +17,7 @@ export function useAttendances() {
   });
 
   const [today, setToday] = useState<Attendance | null>(null);
-  const [todayLoading, setTodayLoading] = useState<boolean>(false);
+  const [todayLoading, setTodayLoading] = useState<boolean>(true);
 
   // Get attendance for a specific date
   const getAttendanceForDate = useCallback(async (date: string, employeeId?: string): Promise<Attendance | null> => {

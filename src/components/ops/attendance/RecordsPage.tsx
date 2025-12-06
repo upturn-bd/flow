@@ -11,7 +11,7 @@ import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function AttendanceRecordsPage() {
    const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
-   const [loading, setLoading] = useState(false);
+   const [loading, setLoading] = useState(true);
 
    // Filters
    const currentDate = new Date();
@@ -102,6 +102,7 @@ export default function AttendanceRecordsPage() {
                      <Calendar className="text-foreground-tertiary" />
                   </div>
                   <input
+                     data-testid="attendance-month-filter"
                      type="month"
                      value={selectedMonth}
                      onChange={(e) => setSelectedMonth(e.target.value)}
@@ -112,6 +113,7 @@ export default function AttendanceRecordsPage() {
                {/* Status Select */}
                <div className="relative w-full sm:w-auto min-w-[160px]">
                   <select
+                     data-testid="attendance-status-filter"
                      value={selectedStatus}
                      onChange={(e) => setSelectedStatus(e.target.value)}
                      className="appearance-none pl-4 pr-10 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-full text-sm"
@@ -162,7 +164,7 @@ export default function AttendanceRecordsPage() {
                />
             ) : (
                <div className="overflow-x-auto rounded-lg border border-border-primary">
-                  <table className="min-w-full divide-y divide-border-primary">
+                  <table data-testid="attendance-records-table" className="min-w-full divide-y divide-border-primary">
                      <thead>
                         <tr className="bg-background-secondary dark:bg-background-tertiary">
                            <th className="px-4 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
@@ -184,6 +186,7 @@ export default function AttendanceRecordsPage() {
                            attendanceData.map((entry, idx) => (
                               <tr
                                  key={idx}
+                                 data-testid="attendance-record-row"
                                  className="hover:bg-background-secondary dark:bg-background-tertiary transition-colors duration-150"
                               >
                                  <td className="px-4 py-3 text-sm text-foreground-primary whitespace-nowrap">

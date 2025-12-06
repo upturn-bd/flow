@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Building, Code, Briefcase, Globe } from "@/lib/icons";
+import { Building, Code, Briefcase, Globe, Loader } from "@/lib/icons";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -26,7 +26,6 @@ export default function BasicTab() {
   
   const [formValues, setFormValues] = useState<CompanyBasicsFormData>({
     company_name: "",
-    company_id: "",
     industry_id: "",
     country_id: "",
     // Operations Settings
@@ -61,7 +60,6 @@ export default function BasicTab() {
     if (companyInfo) {
       setFormValues({
         company_name: companyInfo.name || "",
-        company_id: companyInfo.code || "",
         industry_id: companyInfo.industry_id?.toString() || "",
         country_id: companyInfo.country_id?.toString() || "",
         // Operations Settings - add defaults if not present
@@ -119,16 +117,6 @@ export default function BasicTab() {
               onChange={handleChange}
               readOnly={true}
               error={errors.company_name}
-            />
-
-            <FormInputField
-              name="company_id"
-              label="Company Code"
-              icon={<Code size={18} />}
-              value={formValues.company_id}
-              onChange={handleChange}
-              readOnly={true}
-              error={errors.company_id}
             />
 
             <FormSelectField
