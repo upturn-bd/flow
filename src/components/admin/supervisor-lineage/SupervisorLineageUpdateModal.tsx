@@ -3,7 +3,7 @@ import { BaseModal } from '@/components/ui/modals';
 import { FormField, HierarchyField } from '@/components/forms';
 import { validateLineageForm, type LineageFormData } from '@/lib/validation';
 import { usePositions } from '@/hooks/usePositions';
-import { Buildings } from '@/lib/icons';
+import { Buildings } from "@phosphor-icons/react";
 import { Button } from '@/components/ui/button';
 
 interface HierarchyLevel {

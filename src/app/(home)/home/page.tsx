@@ -12,7 +12,7 @@ import ServicesWidget from "@/app/(home)/home/widgets/ServicesWidget";
 import DetailModals from "@/app/(home)/home/components/DetailModals";
 import WidgetCustomizationPanel from "@/app/(home)/home/components/WidgetCustomizationPanel";
 import Portal from "@/components/ui/Portal";
-import { Settings, GripVertical, Eye, EyeOff, ArrowDownRight } from "@/lib/icons";
+import { Gear, DotsNine, Eye, EyeSlash, ArrowDownRight } from "@phosphor-icons/react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import { WidgetConfig, WidgetSize } from "@/lib/types/widgets";
@@ -331,7 +331,7 @@ export default function HomePage() {
                   onClick={handleSaveLayout}
                   className="px-3 py-2 sm:px-4 text-sm sm:text-base text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
                 >
-                  Save Changes
+                  FloppyDisk Changes
                 </button>
               </>
             ) : (
@@ -339,7 +339,7 @@ export default function HomePage() {
                 onClick={() => isMobile ? setShowMobileCustomization(true) : setIsEditMode(true)}
                 className="flex items-center gap-2 px-3 py-2 sm:px-4 text-sm sm:text-base text-foreground-primary bg-surface-primary border border-border-primary rounded-lg hover:bg-surface-hover transition-colors"
               >
-                <Settings size={18} />
+                <Gear size={18} />
                 <span className="hidden sm:inline">Customize</span>
               </button>
             )}
@@ -370,7 +370,7 @@ export default function HomePage() {
               {(isEditMode ? homeLayout?.widgets : homeLayout?.widgets.filter(w => w.enabled))?.map((widget) => (
                 <div key={widget.id} className="h-full w-full relative">
                   {renderWidget(widget)}
-                  {/* Edit mode overlay with controls */}
+                  {/* PencilSimple mode overlay with controls */}
                   {isEditMode && (
                     <div className={`absolute inset-0 border-2 rounded-lg z-10 transition-all pointer-events-none ${
                       widget.enabled 
@@ -402,7 +402,7 @@ export default function HomePage() {
                             className="p-2 hover:bg-surface-primary/20 rounded transition-colors text-white"
                             title={widget.enabled ? 'Hide widget' : 'Show widget'}
                           >
-                            {widget.enabled ? <EyeOff size={20} /> : <Eye size={20} />}
+                            {widget.enabled ? <EyeSlash size={20} /> : <Eye size={20} />}
                           </button>
                         </div>
                       </div>

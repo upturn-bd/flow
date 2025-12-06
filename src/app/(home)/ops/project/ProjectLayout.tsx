@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-    FolderArchive,
-    FolderPlus,
-    FolderCheck,
-    FolderOpen,
-    Folder,
-} from "@/lib/icons";
+import { Archive, FolderPlus, Folder, FolderOpen } from "@phosphor-icons/react";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import { fadeInUp } from "@/components/ui/animations";
 import { getEmployeeInfo } from "@/lib/utils/auth";

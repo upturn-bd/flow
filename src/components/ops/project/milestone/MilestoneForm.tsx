@@ -2,15 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Calendar,
-  Users,
-  Search,
-  WarningCircle,
-  X,
-  Check,
-  Target,
-} from "@/lib/icons";
+import { Calendar, Users, MagnifyingGlass, WarningCircle, X, Check, Target } from "@phosphor-icons/react";
 import { Milestone } from "@/lib/types/schemas";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";

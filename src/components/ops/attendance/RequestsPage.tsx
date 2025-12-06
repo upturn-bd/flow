@@ -2,18 +2,7 @@
 
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import {
-  Calendar,
-  MapPin,
-  User,
-  Building,
-  Clock,
-  ExternalLink,
-  CheckCircle,
-  WarningCircle,
-  User2,
-  Note
-} from "@/lib/icons";
+import { Calendar, MapPin, User, Building, Clock, ArrowSquareOut, CheckCircle, WarningCircle, Note } from "@phosphor-icons/react";
 import {
   formatTimeFromISO,
   formatDateToDayMonth,
@@ -172,7 +161,7 @@ export default function AttendanceRequestsPage() {
   if (loading) {
     return <LoadingSection
       text="Loading attendance requests..."
-      icon={User2}
+      icon={User}
       color="blue"
     />;
   }
@@ -383,7 +372,7 @@ function AttendanceRequestCard({
               >
                 <MapPin size={14} />
                 Check-in Location
-                <ExternalLink size={12} />
+                <ArrowSquareOut size={12} />
               </a>
             )}
             {request.attendance_record.check_out_coordinates && (
@@ -395,7 +384,7 @@ function AttendanceRequestCard({
               >
                 <MapPin size={14} />
                 Check-out Location
-                <ExternalLink size={12} />
+                <ArrowSquareOut size={12} />
               </a>
             )}
           </div>

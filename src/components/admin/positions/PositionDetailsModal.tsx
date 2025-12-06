@@ -3,8 +3,8 @@
 import { Department } from "@/hooks/useDepartments";
 import { Grade } from "@/hooks/useGrades";
 import { Position } from "@/hooks/usePositions";
-import { PencilSimple, Trash } from "@/lib/icons";
-import { BriefcaseBusiness, Building, GraduationCap, FileText, X } from "@/lib/icons";
+import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
+import { Briefcase, Building, GraduationCap, FileText, X } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
@@ -116,14 +116,14 @@ export default function PositionDetailsModal({
             className="flex items-center gap-2 border border-border-primary text-foreground-secondary hover:bg-background-secondary dark:hover:bg-background-tertiary"
           >
             <PencilSimple size={18} weight="bold" />
-            Edit
+            PencilSimple
           </Button>
           <Button
             variant="danger"
             onClick={deletePosition}
             className="flex items-center gap-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:border-red-300"
           >
-            <Trash size={18} weight="bold" />
+            <TrashSimple size={18} weight="bold" />
             Delete
           </Button>
         </motion.div>

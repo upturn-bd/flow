@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, AlertTriangle, CheckCircle, XCircle, Users, DollarSign } from '@/lib/icons';
+import { Calendar, Warning, CheckCircle, XCircle, Users, CurrencyDollar } from "@phosphor-icons/react";
 import InlineSpinner from '@/components/ui/InlineSpinner';
 import { usePayroll } from '@/hooks/usePayroll';
 import { formatDate } from '@/lib/utils';
@@ -106,7 +106,7 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
 
               <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
                 <div className="flex">
-                  <AlertTriangle className="h-5 w-5 text-amber-400 mr-2" />
+                  <Warning className="h-5 w-5 text-amber-400 mr-2" />
                   <div className="text-sm text-amber-700">
                     <p className="font-medium">Before generating payroll:</p>
                     <ul className="mt-1 list-disc list-inside space-y-1">
@@ -146,7 +146,7 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
               >
                 <div className="text-center">
                   <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/30 mb-4">
-                    <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                    <Warning className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                   </div>
                   <h3 className="text-lg font-medium text-foreground-primary mb-2">
                     Confirm Payroll Generation

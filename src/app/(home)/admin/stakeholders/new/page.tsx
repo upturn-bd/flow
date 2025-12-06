@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useStakeholderTypes } from "@/hooks/useStakeholderTypes";
-import { ArrowLeft, WarningCircle, Plus, Trash } from "@/lib/icons";
+import { ArrowLeft, WarningCircle, Plus, TrashSimple } from "@phosphor-icons/react";
 import { ContactPerson } from "@/lib/types/schemas";
 import { FormField, TextAreaField, SelectField, ToggleField } from "@/components/forms";
 
@@ -321,7 +321,7 @@ export default function NewStakeholderPage() {
                         onClick={() => handleRemoveContactPerson(index)}
                         className="text-error hover:text-error/80 p-1"
                       >
-                        <Trash size={16} />
+                        <TrashSimple size={16} />
                       </button>
                     </div>
 

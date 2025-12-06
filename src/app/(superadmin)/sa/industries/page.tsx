@@ -3,15 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Industry } from "@/lib/types/schemas";
-import { 
-  Plus, 
-  Pencil, 
-  Trash, 
-  Factory,
-  Buildings,
-  Check,
-  X,
-} from "@/lib/icons";
+import { Plus, Pencil, TrashSimple, Factory, Buildings, Check, X } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, SearchBar, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
@@ -321,7 +313,7 @@ export default function IndustriesPage() {
           setFormData({ name: "" });
         }}
         onSubmit={handleSubmit}
-        title={editingIndustry ? "Edit Industry" : "Add Industry"}
+        title={editingIndustry ? "PencilSimple Industry" : "Add Industry"}
         subtitle={editingIndustry ? "Update industry name" : "Add a new industry"}
         icon={Factory}
         colorScheme="violet"

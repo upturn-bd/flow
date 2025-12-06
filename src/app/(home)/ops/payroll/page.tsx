@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  CreditCard, 
-  ClipboardCheck,
-  AlertTriangle,
-  Users
-} from "@/lib/icons";
+import { CreditCard, ClipboardText, Warning, Users } from "@phosphor-icons/react";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
 import PendingPayrolls from "@/components/ops/payroll/PendingPayrolls";
@@ -27,7 +22,7 @@ const tabs: TabItem[] = [
   { 
     key: "published", 
     label: "Published",
-    icon: <AlertTriangle className="h-5 w-5" />,
+    icon: <Warning className="h-5 w-5" />,
     color: "text-amber-600",
     content: <PublishedPayrolls />
   },

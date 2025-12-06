@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MagnifyingGlass as Search, X, Check } from '@/lib/icons';
+import { MagnifyingGlass as MagnifyingGlass, X, Check } from "@phosphor-icons/react";
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { matchesEmployeeSearch } from '@/lib/utils/user-search';
@@ -123,7 +123,7 @@ export default function AssigneeField({
       {/* Search Input */}
       <div className="relative" ref={dropdownRef}>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary dark:text-foreground-tertiary" size={18} />
+          <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary dark:text-foreground-tertiary" size={18} />
           <input
             ref={searchInputRef}
             type="text"

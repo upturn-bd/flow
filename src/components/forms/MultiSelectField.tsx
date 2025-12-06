@@ -1,4 +1,4 @@
-import { Check, CaretDown, X } from "@/lib/icons";
+import { Check, CaretDown, X } from "@phosphor-icons/react";
 import { forwardRef, useState, useRef, useEffect } from "react";
 import { Button } from "../ui/button";
 

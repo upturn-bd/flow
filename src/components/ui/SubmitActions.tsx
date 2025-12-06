@@ -1,6 +1,6 @@
 "use client";
 
-import { Save, X } from "@/lib/icons";
+import { FloppyDisk, X } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import LoadingSpinner from "./LoadingSpinner";
 
@@ -20,7 +20,7 @@ export default function SubmitActions({
   isDirty,
   isValid,
   onCancel,
-  submitText = "Save Changes",
+  submitText = "FloppyDisk Changes",
   cancelText = "Cancel",
   className = "",
   disabled = false,
@@ -61,7 +61,7 @@ export default function SubmitActions({
               ? "Action disabled"
               : isSubmitting
               ? "Saving..."
-              : "Save your changes"
+              : "FloppyDisk your changes"
           }
         >
           {isSubmitting ? (
@@ -71,7 +71,7 @@ export default function SubmitActions({
             </>
           ) : (
             <>
-              <Save className="h-4 w-4 mr-2" />
+              <FloppyDisk className="h-4 w-4 mr-2" />
               {submitText}
             </>
           )}

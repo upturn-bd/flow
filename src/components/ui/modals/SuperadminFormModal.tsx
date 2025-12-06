@@ -2,7 +2,7 @@
 
 import { ReactNode, ComponentType, isValidElement } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check } from "@/lib/icons";
+import { X, Check } from "@phosphor-icons/react";
 import { InlineSpinner } from "../InlineSpinner";
 
 type IconWeight = "regular" | "thin" | "light" | "bold" | "fill" | "duotone";

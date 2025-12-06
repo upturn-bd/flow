@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, ChangeEvent } from "react";
-import {
-  Calendar,
-  DollarSign,
-  X,
-  FileText,
-  User,
-  WarningCircle,
-  Paperclip,
-  CheckCircle
-} from "@/lib/icons";
+import { Calendar, CurrencyDollar, X, FileText, User, WarningCircle, Paperclip, CheckCircle } from "@phosphor-icons/react";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useSettlementRequests } from "@/hooks/useSettlement";
@@ -221,7 +212,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
             <FormInputField
               name="amount"
               label="Amount"
-              icon={<DollarSign size={18} />}
+              icon={<CurrencyDollar size={18} />}
               value={settlementState.amount !== null ? settlementState.amount.toString() : ""}
               onChange={handleInputChange}
               type="number"
@@ -385,7 +376,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
             className="flex items-center gap-2"
           >
             <FileText size={16} />
-            Save as Draft
+            FloppyDisk as Draft
           </Button>
 
           {/* Right side */}

@@ -1,20 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  PackageOpen,
-  CheckCheck,
-  XCircle,
-  Clock,
-  TagIcon,
-  Calendar,
-  User,
-  FileText,
-  MessageCircle,
-  Check,
-  X,
-  Pencil,
-} from "@/lib/icons";
+import { Package, Checks, XCircle, Clock, Tag, Calendar, User, FileText, ChatCircle, Check, X, Pencil } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { motion } from "framer-motion";
 
@@ -96,7 +83,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
 
         {mode === "history" ? (
           <div className="flex items-center gap-2">
-            {/* Edit button - only show for pending requisitions when user can edit */}
+            {/* PencilSimple button - only show for pending requisitions when user can edit */}
             {canEdit && req.status === "Pending" && onEdit && (
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -105,7 +92,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                 className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
               >
                 <Pencil size={12} />
-                <span>Edit</span>
+                <span>PencilSimple</span>
               </motion.button>
             )}
             <div
@@ -207,7 +194,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
             {/* Comment input */}
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-foreground-secondary">
-                <MessageCircle size={14} />
+                <ChatCircle size={14} />
                 <span>Add Comment</span>
               </label>
               <input
@@ -223,7 +210,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
 
           {/* Buttons */}
           <div className="flex flex-wrap justify-end gap-4 pt-4 border-t border-border-primary">
-            {/* Edit button for requests */}
+            {/* PencilSimple button for requests */}
             {canEdit && onEdit && (
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -232,7 +219,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                 className="flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors"
               >
                 <Pencil size={16} />
-                <span>Edit</span>
+                <span>PencilSimple</span>
               </motion.button>
             )}
             {canApprove && (

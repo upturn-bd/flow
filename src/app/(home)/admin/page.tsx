@@ -1,14 +1,13 @@
 "use client";
 
-import {
-    Settings, // Basic settings
-    Settings2, // Advanced settings
+import { 
+    Gear, // Basic/Advanced settings
     CreditCard, // Payroll
-    DollarSign, // Transaction
-    UsersRound, // Teams
-    ClipboardList, // Task Log
-    BarChart, // Project Log
-    LogIn, // Attendance Log
+    CurrencyDollar, // Transaction
+    Users, // Teams
+    ClipboardText, // Task Log
+    ChartBar, // Project Log
+    SignIn, // Attendance Log
     CalendarX, // Leave Log
     Bell, // Notice Log
     Clipboard, // Requisition Log
@@ -16,9 +15,9 @@ import {
     Building, // Stakeholder Log
     UserPlus, // Onboarding Log
     GitBranch, // Stakeholder Processes (workflow/branching)
-    FileIcon,
-    Download, // Data Export
-} from "@/lib/icons";
+    File, 
+    Download // Data Export 
+} from "@phosphor-icons/react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -37,16 +36,16 @@ const sections: NavigationSectionProps[] = [
         description: "Manage core company settings and rules",
         items: [
             {
-                name: "Basic Settings",
+                name: "Basic Gear",
                 path: "/admin/config/basic",
-                icon: Settings,
+                icon: Gear,
                 description: "General company information and essential settings",
                 iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
             },
             {
-                name: "Advanced Settings",
+                name: "Advanced Gear",
                 path: "/admin/config/advanced",
-                icon: Settings2,
+                icon: Gear,
                 description: "Configure system-wide and granular settings",
                 iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
             },
@@ -60,7 +59,7 @@ const sections: NavigationSectionProps[] = [
             {
                 name: "Teams",
                 path: "/admin/config/teams",
-                icon: UsersRound,
+                icon: Users,
                 description: "Manage teams and assign granular permissions",
                 iconColor: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400"
             },
@@ -87,21 +86,21 @@ const sections: NavigationSectionProps[] = [
             {
                 name: "Task",
                 path: "/admin/logs/tasks",
-                icon: ClipboardList,
+                icon: ClipboardText,
                 description: "View historical records for task management",
                 iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
             },
             {
                 name: "Project",
                 path: "/admin/logs/project",
-                icon: BarChart,
+                icon: ChartBar,
                 description: "View historical records for project tracking",
                 iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
             },
             {
                 name: "Attendance",
                 path: "/admin/logs/attendance",
-                icon: LogIn,
+                icon: SignIn,
                 description: "Review historical check-in and check-out data",
                 iconColor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
             },
@@ -143,7 +142,7 @@ const sections: NavigationSectionProps[] = [
             {
                 name: "Transaction",
                 path: "/admin/transaction",
-                icon: DollarSign,
+                icon: CurrencyDollar,
                 description: "Define and manage financial transaction types and flows",
                 iconColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
             },
@@ -223,7 +222,7 @@ export default function AdminManagementPage() {
                 <PageHeader
                     title="Admin Management"
                     description="Configure company settings and review historical logs and records"
-                    icon={Settings}
+                    icon={Gear}
                     iconColor="text-primary-600"
                 />
             </motion.div>
@@ -277,7 +276,7 @@ export default function AdminManagementPage() {
                     animate={{ opacity: 1, y: 0 }}
                 >
                     <EmptyState
-                        icon={FileIcon}
+                        icon={File}
                         title="No items found"
                         description="Try searching with different keywords or browse all items"
                         action={{

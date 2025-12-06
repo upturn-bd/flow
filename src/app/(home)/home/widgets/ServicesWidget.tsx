@@ -2,18 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Calendar, 
-  MessageCircle as MessageSquare, 
-  FileText, 
-  DollarSign, 
-  Briefcase,
-  UserPlus,
-  UserMinus,
-  CreditCard,
-  ArrowRight,
-  IconType,
-} from '@/lib/icons';
+import { Calendar, ChatCircle as MessageSquare, FileText, CurrencyDollar, Briefcase, UserPlus, UserMinus, CreditCard, ArrowRight, IconType } from "@phosphor-icons/react";
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import BaseWidget from './BaseWidget';
 import { WidgetProps } from '@/lib/types/widgets';
@@ -63,7 +52,7 @@ const services: Service[] = [
   {
     name: 'Settlement',
     description: 'Handle employee settlements',
-    icon: DollarSign,
+    icon: CurrencyDollar,
     route: '/ops/settlement',
     color: 'text-primary-600',
     bgColor: 'bg-surface-primary',

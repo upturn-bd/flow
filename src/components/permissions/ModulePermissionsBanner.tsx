@@ -4,7 +4,7 @@ import React from "react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { PermissionModule, PERMISSION_MODULES } from "@/lib/constants";
 import { PermissionsBadgeGroup } from "./PermissionBadge";
-import { Info } from "@/lib/icons";
+import { Info } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ModulePermissionsBannerProps {

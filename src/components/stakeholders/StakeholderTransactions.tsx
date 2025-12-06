@@ -2,23 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { 
-  DollarSign, 
-  Calendar, 
-  CheckCircle, 
-  Clock, 
-  TrendingUp,
-  TrendingDown,
-  Wallet,
-  Activity,
-  Search,
-  Filter,
-  Plus,
-  CreditCard,
-  Building,
-  Edit,
-  X
-} from "@/lib/icons";
+import { CurrencyDollar, Calendar, CheckCircle, Clock, TrendUp, TrendDown, Wallet, Pulse, MagnifyingGlass, FunnelSimple, Plus, CreditCard, Building, PencilSimple, X } from "@phosphor-icons/react";
 import { useAccounts } from "@/hooks/useAccounts";
 import { Account } from "@/lib/types/schemas";
 import { formatDate } from "@/lib/utils";
@@ -310,7 +294,7 @@ export default function StakeholderTransactions({
               </p>
             </div>
             <div className="p-2 sm:p-3 bg-primary-200 rounded-lg">
-              <Activity className="text-primary-700" size={20} />
+              <Pulse className="text-primary-700" size={20} />
             </div>
           </div>
         </motion.div>
@@ -488,7 +472,7 @@ export default function StakeholderTransactions({
           {/* Search and Status Filter */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="relative flex-1">
-              <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary" />
+              <MagnifyingGlass size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary" />
               <input
                 type="text"
                 placeholder="Search transactions..."
@@ -538,7 +522,7 @@ export default function StakeholderTransactions({
 
         {filteredTransactions.length === 0 ? (
           <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-            <DollarSign size={40} className="mx-auto text-foreground-tertiary mb-3" />
+            <CurrencyDollar size={40} className="mx-auto text-foreground-tertiary mb-3" />
             <p className="text-foreground-secondary text-xs sm:text-sm">
               {transactions.length === 0 
                 ? 'No transactions found' 
@@ -728,7 +712,7 @@ export default function StakeholderTransactions({
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInputField
-                icon={<DollarSign size={18} />}
+                icon={<CurrencyDollar size={18} />}
                 label="Transaction Title"
                 name="title"
                 value={values.title}
@@ -785,7 +769,7 @@ export default function StakeholderTransactions({
               />
 
               <FormInputField
-                icon={<DollarSign size={18} />}
+                icon={<CurrencyDollar size={18} />}
                 label="Amount"
                 name="amount"
                 type="number"
@@ -796,7 +780,7 @@ export default function StakeholderTransactions({
             </div>
 
             <FormSelectField
-              icon={<DollarSign size={18} />}
+              icon={<CurrencyDollar size={18} />}
               label="Currency"
               name="currency"
               value={values.currency}

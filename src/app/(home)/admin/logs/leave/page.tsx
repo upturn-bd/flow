@@ -6,7 +6,7 @@ import { useLeaveTypes } from "@/hooks/useLeaveManagement";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
-import { Check, X as CloseIcon, RotateCw } from "@/lib/icons";
+import { Check, X as CloseIcon, ArrowsClockwise } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";

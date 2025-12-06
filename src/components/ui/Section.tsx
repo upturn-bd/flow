@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { fadeInUp } from "./animations";
 import LoadingSpinner from "./LoadingSpinner";
 import { EmptyState } from "./EmptyState";
-import { Plus, IconType } from "@/lib/icons";
+import { Plus, IconType } from "@phosphor-icons/react";
 import { Button } from "./button";
 
 export interface SectionProps {

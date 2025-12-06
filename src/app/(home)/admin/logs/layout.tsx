@@ -3,7 +3,7 @@
 import { AdminDataProvider } from "@/contexts/AdminDataContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, CaretRight, ClipboardList, FileText } from "@/lib/icons";
+import { House, CaretRight, ClipboardText, FileText } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 
 // Helper function to capitalize and format the path segment

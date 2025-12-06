@@ -3,13 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useRequisitionRequests, RequisitionState } from "@/hooks/useRequisition";
 import { supabase } from "@/lib/supabase/client";
-import {
-  ClipboardList,
-  Clock,
-  AlertCircle,
-  Plus,
-  WarningCircle,
-} from "@/lib/icons";
+import { ClipboardText, Clock, WarningCircle, Plus } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import TabView from "@/components/ui/TabView";
@@ -239,7 +233,7 @@ export default function RequisitionPage() {
         onSuccess={refreshData}
       />
 
-      {/* Edit Modal */}
+      {/* PencilSimple Modal */}
       {editingRequisition && (
         <RequisitionEditModal
           isOpen={!!editingRequisition}

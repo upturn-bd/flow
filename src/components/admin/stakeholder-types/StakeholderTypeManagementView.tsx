@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
-import { Plus } from "@/lib/icons";
+import { Plus } from "@phosphor-icons/react";
 import { useStakeholderTypes } from "@/hooks/useStakeholderTypes";
 import { StakeholderTypeFormData } from "@/hooks/useStakeholderTypes";
 import StakeholderTypeFormModal from "./StakeholderTypeFormModal";
 import Collapsible from "../CollapsibleComponent";
 import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { Tag, Trash, PencilSimple } from "@/lib/icons";
+import { Tag, TrashSimple, PencilSimple } from "@phosphor-icons/react";
 
 export default function StakeholderTypeManagementView() {
   const {
@@ -130,7 +130,7 @@ export default function StakeholderTypeManagementView() {
                         disabled={deleteLoading === type.id}
                         className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
                       >
-                        <Trash size={16} weight="bold" />
+                        <TrashSimple size={16} weight="bold" />
                       </Button>
                     </div>
                   </div>

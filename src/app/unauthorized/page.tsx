@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShieldAlert } from "@/lib/icons";
+import { ShieldWarning } from "@phosphor-icons/react";
 
 export default function UnauthorizedPage() {
   return (
@@ -27,7 +27,7 @@ export default function UnauthorizedPage() {
               href="/home"
               className="block w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
             >
-              Go to Home
+              Go to House
             </Link>
             
             <Link

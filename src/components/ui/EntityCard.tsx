@@ -2,9 +2,9 @@
 
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
-import { Trash, Eye } from "@/lib/icons";
+import { TrashSimple, Eye } from "@phosphor-icons/react";
 import { Button } from "./button";
-import type { IconType } from "@/lib/icons";
+import type { IconType } from "@phosphor-icons/react";
 
 export type EntityCardProps = {
   /** Card title */
@@ -62,7 +62,7 @@ export function EntityCard({
             disabled={deleteLoading}
             className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
           >
-            <Trash size={16} weight="bold" />
+            <TrashSimple size={16} weight="bold" />
           </Button>
         )}
       </div>

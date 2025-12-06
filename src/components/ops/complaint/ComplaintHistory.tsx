@@ -2,17 +2,7 @@
 
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Loader,
-  XCircle,
-  Flag,
-  User,
-  CheckCheck,
-  MessageCircle,
-  FileText,
-  Clock,
-  List
-} from "@/lib/icons";
+import { CircleNotch, XCircle, Flag, User, Checks, ChatCircle, FileText, Clock, List } from "@phosphor-icons/react";
 import { extractFileNameFromStoragePath, extractFilenameFromUrl } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";

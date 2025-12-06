@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
-import { Calendar, DollarSign, User, FileText, Edit, Trash, ExternalLink, WarningCircle } from "@/lib/icons";
+import { Calendar, CurrencyDollar, User, FileText, PencilSimple, TrashSimple, ArrowSquareOut, WarningCircle } from "@phosphor-icons/react";
 import { Employee } from "@/lib/types/schemas";
 
 interface Settlement {
@@ -77,7 +77,7 @@ export default function SettlementCard({
           onClick={onEdit}
           className="p-2 h-8 w-8 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400"
         >
-          <Edit size={14} />
+          <PencilSimple size={14} />
         </Button>
       )}
       {showDelete && (
@@ -88,7 +88,7 @@ export default function SettlementCard({
           isLoading={isDeleting}
           className="p-2 h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600"
         >
-          <Trash size={14} />
+          <TrashSimple size={14} />
         </Button>
       )}
       {showDetails && (
@@ -98,7 +98,7 @@ export default function SettlementCard({
           onClick={onDetails}
           className="p-2 h-8 w-8 hover:bg-background-secondary dark:hover:bg-background-tertiary hover:text-foreground-primary"
         >
-          <ExternalLink size={14} />
+          <ArrowSquareOut size={14} />
         </Button>
       )}
     </div>
@@ -109,14 +109,14 @@ export default function SettlementCard({
       <CardHeader
         title={settlementType?.name || "Settlement Request"}
         subtitle={settlement.description}
-        icon={settlement.in_advance ? <WarningCircle size={20} className="text-orange-500" /> : <DollarSign size={20} className="text-green-500" />}
+        icon={settlement.in_advance ? <WarningCircle size={20} className="text-orange-500" /> : <CurrencyDollar size={20} className="text-green-500" />}
         action={actions}
       />
       
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
           <InfoRow
-            icon={<DollarSign size={16} />}
+            icon={<CurrencyDollar size={16} />}
             label="Amount"
             value={`$${settlement.amount.toLocaleString()}`}
           />

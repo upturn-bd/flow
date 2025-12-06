@@ -9,18 +9,7 @@ import { useModalState } from "@/hooks/core/useModalState";
 import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIssueForm";
 import BaseModal from "@/components/ui/modals/BaseModal";
 import Pagination from "@/components/ui/Pagination";
-import {
-  WarningCircle,
-  CheckCircle,
-  Clock,
-  Download,
-  Eye,
-  Plus,
-  Trash,
-  Building,
-  Tag,
-  UsersThree,
-} from "@/lib/icons";
+import { WarningCircle, CheckCircle, Clock, Download, Eye, Plus, TrashSimple, Building, Tag, UsersThree } from "@phosphor-icons/react";
 import { StakeholderIssue } from "@/lib/types/schemas";
 import { useAuth } from "@/lib/auth/auth-context";
 import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
@@ -447,7 +436,7 @@ export default function StakeholderIssuesPage() {
                         openCreateModal();
                       }}
                       className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
-                      title="Edit issue"
+                      title="PencilSimple issue"
                     >
                       <Eye size={18} />
                     </button>
@@ -456,7 +445,7 @@ export default function StakeholderIssuesPage() {
                       <button
                         disabled
                         className="p-2 text-foreground-tertiary rounded cursor-not-allowed opacity-50"
-                        title="Edit issue (no permission)"
+                        title="PencilSimple issue (no permission)"
                       >
                         <Eye size={18} />
                       </button>
@@ -469,7 +458,7 @@ export default function StakeholderIssuesPage() {
                       className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
                       title="Delete issue"
                     >
-                      <Trash size={18} />
+                      <TrashSimple size={18} />
                     </button>
                   ) : (
                     <PermissionTooltip message="You don't have permission to delete issues">
@@ -478,7 +467,7 @@ export default function StakeholderIssuesPage() {
                         className="p-2 text-foreground-tertiary rounded cursor-not-allowed opacity-50"
                         title="Delete issue (no permission)"
                       >
-                        <Trash size={18} />
+                        <TrashSimple size={18} />
                       </button>
                     </PermissionTooltip>
                   )}
@@ -496,7 +485,7 @@ export default function StakeholderIssuesPage() {
         </div>
       )}
 
-      {/* Edit Issue Modal */}
+      {/* PencilSimple Issue Modal */}
       {modalState.isOpen && selectedIssue && (
         <BaseModal isOpen={modalState.isOpen} onClose={closeModal} title="Update Issue">
           <StakeholderIssueForm

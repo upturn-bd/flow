@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { CloudUpload, X, FileIcon } from "@/lib/icons";
+import { CloudArrowUp, X, File } from "@phosphor-icons/react";
 import { extractFilenameFromUrl } from "@/lib/utils";
 
 interface FileUploadFieldProps {
@@ -116,7 +116,7 @@ export default function FileUploadField({
           {existingFiles.map((url, index) => (
             <div key={`existing-${index}`} className="flex items-center justify-between bg-blue-50 p-2 rounded-lg">
               <div className="flex items-center space-x-2">
-                <FileIcon className="text-blue-500" />
+                <File className="text-blue-500" />
                 <span className="text-sm text-blue-700">
                   {extractFilenameFromUrl(url)}
                 </span>
@@ -138,7 +138,7 @@ export default function FileUploadField({
           {files.map((file, index) => (
             <div key={`new-${index}`} className="flex items-center justify-between bg-background-secondary p-2 rounded-lg">
               <div className="flex items-center space-x-2">
-                <FileIcon className="text-foreground-tertiary" />
+                <File className="text-foreground-tertiary" />
                 <span className="text-sm text-foreground-secondary">{file.name}</span>
                 <span className="text-xs text-foreground-tertiary">
                   ({Math.round(file.size / 1024)} KB)

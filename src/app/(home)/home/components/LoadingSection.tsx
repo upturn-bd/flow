@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { IconType } from '@/lib/icons';
+import { IconType } from "@phosphor-icons/react";
 import LoadingSpinner, {ColorType} from '@/components/ui/LoadingSpinner';
 
 

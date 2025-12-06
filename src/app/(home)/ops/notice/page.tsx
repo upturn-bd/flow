@@ -2,7 +2,7 @@
 import { Notice, useNotices } from "@/hooks/useNotice";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Pencil, Trash, Plus, Clock, CalendarDays, Info } from "@/lib/icons";
+import { Bell, Pencil, TrashSimple, Plus, Clock, CalendarBlank, Info } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -252,7 +252,7 @@ export default function NoticePage() {
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => setEditNotice(notice)}
                                 className="p-2 text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded-full transition-colors"
-                                aria-label="Edit notice"
+                                aria-label="PencilSimple notice"
                               >
                                 <Pencil className="h-4 w-4" />
                               </motion.button>
@@ -261,7 +261,7 @@ export default function NoticePage() {
                                 <button
                                   disabled
                                   className="p-2 text-foreground-tertiary rounded-full cursor-not-allowed opacity-50"
-                                  aria-label="Edit notice (disabled)"
+                                  aria-label="PencilSimple notice (disabled)"
                                 >
                                   <Pencil className="h-4 w-4" />
                                 </button>
@@ -275,7 +275,7 @@ export default function NoticePage() {
                                 className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
                                 aria-label="Delete notice"
                               >
-                                <Trash className="h-4 w-4" />
+                                <TrashSimple className="h-4 w-4" />
                               </motion.button>
                             ) : (
                               <PermissionTooltip message="You don't have permission to delete notices">
@@ -284,7 +284,7 @@ export default function NoticePage() {
                                   className="p-2 text-foreground-tertiary rounded-full cursor-not-allowed opacity-50"
                                   aria-label="Delete notice (disabled)"
                                 >
-                                  <Trash className="h-4 w-4" />
+                                  <TrashSimple className="h-4 w-4" />
                                 </button>
                               </PermissionTooltip>
                             )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import SelectField from './SelectField';
 import { Button } from '@/components/ui/button';
-import { Trash, Plus } from '@/lib/icons';
+import { TrashSimple, Plus } from "@phosphor-icons/react";
 import { motion } from 'framer-motion';
 
 interface HierarchyLevel {
@@ -131,7 +131,7 @@ export default function HierarchyField({
                           disabled={disabled}
                           className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200"
                         >
-                          <Trash size={16} weight="duotone" />
+                          <TrashSimple size={16} weight="duotone" />
                         </Button>
                       )}
                     </div>

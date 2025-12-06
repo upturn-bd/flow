@@ -4,25 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import type { Team, TeamMember, TeamPermission, Permission } from "@/lib/types/schemas";
-import { 
-  ArrowLeft, 
-  UserPlus, 
-  Trash, 
-  MagnifyingGlass, 
-  Shield,
-  X, 
-  FloppyDisk,
-  Spinner,
-  Check,
-  AlertTriangle as Warning,
-  Star,
-  RotateCcw as ArrowCounterClockwise,
-  CaretDown,
-  CaretUp,
-  CheckCircle,
-  Pencil,
-  Users
-} from "@/lib/icons";
+import { ArrowLeft, UserPlus, TrashSimple, MagnifyingGlass, Shield, X, FloppyDisk, Spinner, Check, Warning as Warning, Star, ArrowCounterClockwise as ArrowCounterClockwise, CaretDown, CaretUp, CheckCircle, Pencil, Users } from "@phosphor-icons/react";
 import { filterEmployeesBySearch } from "@/lib/utils/user-search";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -286,7 +268,7 @@ export default function TeamDetailPage() {
     setPermissionsDirty(false);
   };
 
-  // Save team details
+  // FloppyDisk team details
   const saveTeamDetails = async () => {
     if (!editedTeam.name.trim()) {
       toast.error("Team name is required");
@@ -496,7 +478,7 @@ export default function TeamDetailPage() {
                   className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
                 >
                   {savingTeam ? <InlineSpinner size="sm" color="white" /> : <Check size={16} weight="bold" />}
-                  Save
+                  FloppyDisk
                 </button>
               </div>
             </div>
@@ -513,7 +495,7 @@ export default function TeamDetailPage() {
                 <button
                   onClick={() => setIsEditingTeam(true)}
                   className="p-1.5 text-foreground-tertiary hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 rounded-lg transition-colors"
-                  title="Edit team details"
+                  title="PencilSimple team details"
                 >
                   <Pencil size={18} />
                 </button>
@@ -580,7 +562,7 @@ export default function TeamDetailPage() {
                   className="p-2 text-foreground-tertiary hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   title="Remove member"
                 >
-                  <Trash size={18} />
+                  <TrashSimple size={18} />
                 </button>
               </div>
             ))}
@@ -599,7 +581,7 @@ export default function TeamDetailPage() {
             </div>
           </div>
           
-          {/* Save/Reset buttons */}
+          {/* FloppyDisk/Reset buttons */}
           <div className="flex items-center gap-2">
             {permissionsDirty && (
               <motion.div
@@ -631,7 +613,7 @@ export default function TeamDetailPage() {
               ) : (
                 <>
                   <FloppyDisk size={16} weight="bold" />
-                  Save Permissions
+                  FloppyDisk Permissions
                 </>
               )}
             </button>

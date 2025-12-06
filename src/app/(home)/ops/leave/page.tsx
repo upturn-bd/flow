@@ -6,16 +6,10 @@ import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
 import { useEffect, useState, Suspense } from "react";
 import { motion } from "framer-motion";
-import {
-  Clock,
-  FileCheck,
-  PlusCircle,
-  WarningCircle,
-  Calendar
-} from "@/lib/icons";
+import { Clock, FileText, PlusCircle, WarningCircle, Calendar } from "@phosphor-icons/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PERMISSION_MODULES } from "@/lib/constants";
-import { BookOpen } from "@/lib/icons";
+import { BookOpen } from "@phosphor-icons/react";
 
 function LeavePageContent() {
   const router = useRouter();

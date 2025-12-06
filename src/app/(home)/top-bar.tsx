@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { Bell, User, Search, LogOut, UserCircle, ShieldAlert, Moon, Sun, Bug } from "@/lib/icons";
+import { Bell, User, MagnifyingGlass, SignOut, UserCircle, ShieldWarning, Moon, Sun, Bug } from "@phosphor-icons/react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -179,7 +179,7 @@ export default function TopBar() {
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-primary hover:bg-surface-hover text-foreground-tertiary transition-colors"
                 title="Search (Ctrl+K)"
               >
-                <Search className="h-4 w-4" />
+                <MagnifyingGlass className="h-4 w-4" />
                 <span className="hidden md:inline text-sm">Search...</span>
                 <div className="hidden lg:inline-flex items-center gap-0.5">
                   <kbd className="px-1.5 py-0.5 text-[11px] font-medium bg-surface-secondary rounded border border-border-primary shadow-sm">Ctrl</kbd>
@@ -277,8 +277,8 @@ export default function TopBar() {
                   className=" px-4 py-2 text-sm text-foreground-secondary hover:bg-background-tertiary dark:bg-surface-secondary flex items-center"
                   onClick={() => setUserMenuOpen(false)}
                 >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
+                  <Gear className="h-4 w-4 mr-2" />
+                  Gear
                 </Link> */}
 
                 <div className="border-t border-border-primary mt-1">
@@ -289,7 +289,7 @@ export default function TopBar() {
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-error hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center"
                   >
-                    <LogOut className="h-4 w-4 mr-2" />
+                    <SignOut className="h-4 w-4 mr-2" />
                     Log Out
                   </button>
                 </div>

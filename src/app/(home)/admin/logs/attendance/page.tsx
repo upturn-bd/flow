@@ -6,7 +6,7 @@ import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
-import { Trash, Edit2, X } from "@/lib/icons";
+import { TrashSimple, PencilSimple, X } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
@@ -201,7 +201,7 @@ export default function AttendanceLogsPage() {
                       className="p-2 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
                       onClick={() => handleEdit(att)}
                     >
-                      <Edit2 size={16} />
+                      <PencilSimple size={16} />
                     </Button>
                   )}
 
@@ -212,7 +212,7 @@ export default function AttendanceLogsPage() {
                       className="p-2 hover:bg-red-100 transition-colors"
                       onClick={() => handleDelete(att)}
                     >
-                      <Trash size={16} />
+                      <TrashSimple size={16} />
                     </Button>
                   )}
                 </td>
@@ -270,7 +270,7 @@ export default function AttendanceLogsPage() {
         </CardContent>
       </Card>
 
-      {/* Edit Modal */}
+      {/* PencilSimple Modal */}
       {selectedAttendance && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-surface-primary rounded-lg shadow-lg max-w-md w-full p-6 relative">
@@ -280,7 +280,7 @@ export default function AttendanceLogsPage() {
             >
               <X size={20} />
             </button>
-            <h2 className="text-lg font-semibold mb-4">Edit Attendance</h2>
+            <h2 className="text-lg font-semibold mb-4">PencilSimple Attendance</h2>
 
             <div className="flex flex-col gap-3">
               <label className="flex flex-col">
@@ -319,7 +319,7 @@ export default function AttendanceLogsPage() {
 
               <div className="flex justify-end gap-2 mt-4">
                 <Button variant="secondary" onClick={() => setSelectedAttendance(null)}>Cancel</Button>
-                <Button variant="primary" onClick={handleSave}>Save</Button>
+                <Button variant="primary" onClick={handleSave}>FloppyDisk</Button>
               </div>
             </div>
           </div>

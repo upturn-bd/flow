@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { debounce } from "lodash";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Building, Plus, Search } from "@/lib/icons";
+import { Building, Plus, MagnifyingGlass } from "@phosphor-icons/react";
 
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";

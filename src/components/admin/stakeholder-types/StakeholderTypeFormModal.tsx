@@ -2,7 +2,7 @@
 
 import { StakeholderTypeFormData } from "@/hooks/useStakeholderTypes";
 import { validateStakeholderType } from "@/lib/validation/schemas/stakeholders";
-import { Tag } from "@/lib/icons";
+import { Tag } from "@phosphor-icons/react";
 import { FormModal } from "@/components/ui/modals";
 import { FormField, TextAreaField, ToggleField } from "@/components/forms";
 
@@ -29,7 +29,7 @@ export default function StakeholderTypeFormModal({
 
   return (
     <FormModal<StakeholderTypeFormData>
-      title={type ? "Edit Stakeholder Type" : "Add Stakeholder Type"}
+      title={type ? "PencilSimple Stakeholder Type" : "Add Stakeholder Type"}
       icon={<Tag size={24} weight="duotone" />}
       initialValues={initialValues}
       validationFn={validateStakeholderType}

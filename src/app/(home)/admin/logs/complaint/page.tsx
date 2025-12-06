@@ -2,13 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import { 
-  Loader, 
-  ClipboardList, 
-  Clock, 
-  WarningCircle, 
-  Flag 
-} from "@/lib/icons";
+import { CircleNotch, ClipboardText, Clock, WarningCircle, Flag } from "@phosphor-icons/react";
 import TabView from "@/components/ui/TabView";
 import { ComplaintCard } from "@/components/ops/complaint/ComplaintCard";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -99,7 +93,7 @@ export default function ComplaintLogsPage() {
                   {(requestLoading || loading) && (
                     <LoadingSection
                       text="Loading complaint requests..."
-                      icon={ClipboardList}
+                      icon={ClipboardText}
                       color="blue"
                     />
                   )}

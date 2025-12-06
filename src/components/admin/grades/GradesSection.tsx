@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import GradeModal from "./GradeModal";
-import { GraduationCap, Trash } from "@/lib/icons";
+import { GraduationCap, TrashSimple } from "@phosphor-icons/react";
 import { Section } from "@/components/ui";
 
 type GradesSectionProps = {
@@ -79,7 +79,7 @@ export default function GradesSection({ showNotification }: GradesSectionProps) 
                 onClick={() => handleDeleteGrade(grade.id ?? 0)}
                 disabled={gradeDeleteLoading === grade.id}
               >
-                <Trash size={12} />
+                <TrashSimple size={12} />
               </button>
             </div>
           ))}

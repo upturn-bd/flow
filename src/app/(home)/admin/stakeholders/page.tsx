@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { Plus, Eye, CheckCircle, Clock, Download, Building } from "@/lib/icons";
+import { Plus, Eye, CheckCircle, Clock, Download, Building } from "@phosphor-icons/react";
 import Pagination from "@/components/ui/Pagination";
 import { exportStakeholdersToCSV } from "@/lib/utils/csv-export";
 import { toast } from "sonner";

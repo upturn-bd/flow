@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, AlertCircle, User, Building, Tag, UsersThree } from '@/lib/icons';
+import { X, WarningCircle, User, Building, Tag, UsersThree } from "@phosphor-icons/react";
 import { useStakeholderIssues, StakeholderIssueFormData } from '@/hooks/useStakeholderIssues';
 import { useStakeholders } from '@/hooks/useStakeholders';
 import { useStakeholderIssueCategories } from '@/hooks/useStakeholderIssueCategories';
@@ -148,7 +148,7 @@ export default function StakeholderIssueModal({
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 text-red-600" />
               <h2 className="text-xl font-bold text-foreground-primary">
-                {issueId ? (isEditing ? 'Edit Issue' : 'Issue Details') : 'Create Stakeholder Issue'}
+                {issueId ? (isEditing ? 'PencilSimple Issue' : 'Issue Details') : 'Create Stakeholder Issue'}
               </h2>
             </div>
             <button
@@ -269,7 +269,7 @@ export default function StakeholderIssueModal({
                       onClick={() => setIsEditing(true)}
                       className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
                     >
-                      Edit Issue
+                      PencilSimple Issue
                     </button>
                   </div>
                 </div>

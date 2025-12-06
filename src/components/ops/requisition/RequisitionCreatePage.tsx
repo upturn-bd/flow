@@ -1,23 +1,11 @@
 "use client";
 
 import React, { useEffect, useState, ChangeEvent } from "react";
-import { CloudUpload, ToggleLeft, ToggleRight } from "@/lib/icons";
+import { CloudArrowUp, ToggleLeft, ToggleRight } from "@phosphor-icons/react";
 import { useEmployees } from "@/hooks/useEmployees";
 import { supabase } from "@/lib/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Upload,
-  Calendar,
-  Clock,
-  CaretLeft,
-  CaretDown,
-  PackageOpen,
-  WarningCircle,
-  Save,
-  Check,
-  X,
-  FileText,
-} from "@/lib/icons";
+import { Upload, Calendar, Clock, CaretLeft, CaretDown, Package, WarningCircle, FloppyDisk, Check, X, FileText } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
@@ -109,7 +97,7 @@ function saveDraftToLocalStorage(
     parsedDrafts.push(draftToSave);
   }
 
-  // Save back to localStorage
+  // FloppyDisk back to localStorage
   localStorage.setItem("requisition-drafts", JSON.stringify(parsedDrafts));
 }
 
@@ -606,8 +594,8 @@ export default function RequisitionCreatePage({
             onClick={handleSaveDraft}
             className="flex items-center gap-2 bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary px-6 py-2 rounded-lg hover:bg-surface-hover transition-colors disabled:opacity-50"
           >
-            <Save size={18} />
-            <span>Save as Draft</span>
+            <FloppyDisk size={18} />
+            <span>FloppyDisk as Draft</span>
           </motion.button>
 
           <motion.button
@@ -1107,7 +1095,7 @@ export function RequisitionDraftPage({
             onClick={handleSaveDraft}
             className="bg-[#001F4D] text-white px-6 py-2 rounded-full hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Submitting..." : "Save as Draft"}
+            {isSubmitting ? "Submitting..." : "FloppyDisk as Draft"}
           </button>
           <button
             type="submit"

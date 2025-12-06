@@ -3,29 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Search,
-  X,
-  ClipboardList,
-  BarChart,
-  LogIn,
-  CalendarX,
-  Bell,
-  Clipboard,
-  DollarSign,
-  WarningCircle,
-  UserPlus,
-  Users,
-  CreditCard,
-  Building,
-  Settings,
-  Settings2,
-  UsersRound,
-  GitBranch,
-  Download,
-  UserMinus,
-  CaretRight,
-} from "@/lib/icons";
+import { MagnifyingGlass, X, ClipboardText, ChartBar, SignIn, CalendarX, Bell, Clipboard, CurrencyDollar, WarningCircle, UserPlus, Users, CreditCard, Building, Gear, GitBranch, Download, UserMinus, CaretRight } from "@phosphor-icons/react";
 import { cn } from "@/components/ui/class";
 import { useAuth } from "@/lib/auth/auth-context";
 import Portal from "@/components/ui/Portal";
@@ -44,7 +22,7 @@ const opsItems: SearchItem[] = [
   {
     name: "Tasks",
     path: "/ops/tasks",
-    icon: ClipboardList,
+    icon: ClipboardText,
     description: "Assign, track and manage day-to-day tasks",
     category: "Operations",
     keywords: ["task", "todo", "work", "assign"],
@@ -52,7 +30,7 @@ const opsItems: SearchItem[] = [
   {
     name: "Projects",
     path: "/ops/project",
-    icon: BarChart,
+    icon: ChartBar,
     description: "Plan and execute complex projects with milestones",
     category: "Operations",
     keywords: ["project", "milestone", "plan"],
@@ -60,7 +38,7 @@ const opsItems: SearchItem[] = [
   {
     name: "Attendance",
     path: "/ops/attendance?tab=today",
-    icon: LogIn,
+    icon: SignIn,
     description: "Track and manage your daily attendance",
     category: "Operations",
     keywords: ["attendance", "check-in", "check-out", "time"],
@@ -92,7 +70,7 @@ const opsItems: SearchItem[] = [
   {
     name: "Settlement",
     path: "/ops/settlement?tab=create",
-    icon: DollarSign,
+    icon: CurrencyDollar,
     description: "Manage and track expense reimbursements",
     category: "Operations",
     keywords: ["settlement", "expense", "reimbursement", "money"],
@@ -150,17 +128,17 @@ const opsItems: SearchItem[] = [
 // Admin configuration items
 const adminConfigItems: SearchItem[] = [
   {
-    name: "Basic Settings",
+    name: "Basic Gear",
     path: "/admin/config/basic",
-    icon: Settings,
+    icon: Gear,
     description: "General company information and essential settings",
     category: "Admin Config",
     keywords: ["settings", "config", "company", "basic"],
   },
   {
-    name: "Advanced Settings",
+    name: "Advanced Gear",
     path: "/admin/config/advanced",
-    icon: Settings2,
+    icon: Gear,
     description: "Configure system-wide and granular settings",
     category: "Admin Config",
     keywords: ["settings", "advanced", "system"],
@@ -176,7 +154,7 @@ const adminConfigItems: SearchItem[] = [
   {
     name: "Teams",
     path: "/admin/config/teams",
-    icon: UsersRound,
+    icon: Users,
     description: "Manage teams and assign granular permissions",
     category: "Admin Config",
     keywords: ["teams", "permissions", "access"],
@@ -204,7 +182,7 @@ const adminLogItems: SearchItem[] = [
   {
     name: "Task Log",
     path: "/admin/logs/tasks",
-    icon: ClipboardList,
+    icon: ClipboardText,
     description: "View historical records for task management",
     category: "Admin Logs",
     keywords: ["task", "log", "history"],
@@ -212,7 +190,7 @@ const adminLogItems: SearchItem[] = [
   {
     name: "Project Log",
     path: "/admin/logs/project",
-    icon: BarChart,
+    icon: ChartBar,
     description: "View historical records for project tracking",
     category: "Admin Logs",
     keywords: ["project", "log", "history"],
@@ -220,7 +198,7 @@ const adminLogItems: SearchItem[] = [
   {
     name: "Attendance Log",
     path: "/admin/logs/attendance",
-    icon: LogIn,
+    icon: SignIn,
     description: "Review historical check-in and check-out data",
     category: "Admin Logs",
     keywords: ["attendance", "log", "history"],
@@ -268,7 +246,7 @@ const adminLogItems: SearchItem[] = [
   {
     name: "Transactions",
     path: "/admin/transaction",
-    icon: DollarSign,
+    icon: CurrencyDollar,
     description: "Manage financial transaction types and flows",
     category: "Admin Logs",
     keywords: ["transaction", "finance", "money"],
@@ -396,7 +374,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           >
             {/* Search input */}
             <div className="flex items-center gap-3 px-4 py-3 border-b border-border-primary">
-              <Search className="h-5 w-5 text-foreground-tertiary shrink-0" />
+              <MagnifyingGlass className="h-5 w-5 text-foreground-tertiary shrink-0" />
               <input
                 ref={inputRef}
                 type="text"
@@ -428,7 +406,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
             <div className="max-h-[60vh] overflow-y-auto">
               {flatItems.length === 0 ? (
                 <div className="px-4 py-8 text-center text-foreground-secondary">
-                  <Search className="h-8 w-8 mx-auto mb-2 text-foreground-tertiary" />
+                  <MagnifyingGlass className="h-8 w-8 mx-auto mb-2 text-foreground-tertiary" />
                   <p>No results found for &quot;{query}&quot;</p>
                 </div>
               ) : (

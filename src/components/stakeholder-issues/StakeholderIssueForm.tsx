@@ -12,7 +12,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { useTeams } from "@/hooks/useTeams";
 import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { useStakeholderIssueCategories } from "@/hooks/useStakeholderIssueCategories";
-import { X, Upload, Trash, Download, FileText, User, UsersThree, Tag, Link, CheckCircle } from "@/lib/icons";
+import { X, Upload, TrashSimple, Download, FileText, User, UsersThree, Tag, Link, CheckCircle } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { FormField, SelectField, TextAreaField } from "@/components/forms";
 import { captureError } from "@/lib/sentry";
@@ -568,7 +568,7 @@ export default function StakeholderIssueForm({
                           {deletingAttachment === attachment.path ? (
                             <InlineSpinner size="xs" color="red" />
                           ) : (
-                            <Trash size={16} />
+                            <TrashSimple size={16} />
                           )}
                         </button>
                       )}
@@ -628,7 +628,7 @@ export default function StakeholderIssueForm({
                       onClick={() => removeFile(index)}
                       className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/50 rounded transition-colors"
                     >
-                      <Trash size={16} />
+                      <TrashSimple size={16} />
                     </button>
                   </div>
                 ))}

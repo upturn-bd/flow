@@ -4,7 +4,7 @@ import { useState } from "react";
 import RequestsTab from "./tabs/RequestsTab";
 import NotificationsTab from "./tabs/NotificationsTab";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Bell } from "@/lib/icons";
+import { Bell } from "@phosphor-icons/react";
 
 const tabs = [
   { key: "requests", label: "Requests" },

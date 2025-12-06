@@ -139,7 +139,7 @@ export default function EducationModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title={initialData ? "Edit Education" : "Add Education"}
+      title={initialData ? "PencilSimple Education" : "Add Education"}
       size="md"
       preventBackdropClose={isSubmitting || uploading}
     >
@@ -236,7 +236,7 @@ export default function EducationModal({
           >
             {(isSubmitting || uploading) ? 
               (uploading ? "Uploading..." : "Saving...") : 
-              "Save Education"
+              "FloppyDisk Education"
             }
           </Button>
         </div>

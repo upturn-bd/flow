@@ -4,7 +4,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { Task, useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Calendar, CaretLeft, User, CheckCircle, XCircle, Clock, Target } from "@/lib/icons";
+import { Calendar, CaretLeft, User, CheckCircle, XCircle, Clock, Target } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
 import { Button } from "@/components/ui/button";

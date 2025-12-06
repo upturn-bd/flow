@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, X, Clock, MapPin, Send } from '@/lib/icons';
+import { CheckCircle, X, Clock, MapPin, PaperPlaneTilt } from "@phosphor-icons/react";
 import Portal from '@/components/ui/Portal';
 
 interface AttendanceStatusModalProps {

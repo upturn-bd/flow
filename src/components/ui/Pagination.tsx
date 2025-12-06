@@ -1,6 +1,6 @@
 "use client";
 
-import { CaretLeft, CaretRight } from "@/lib/icons";
+import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 
 interface PaginationProps {
   currentPage: number;

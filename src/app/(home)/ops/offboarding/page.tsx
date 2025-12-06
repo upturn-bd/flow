@@ -2,22 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  UserMinus,
-  User,
-  Search,
-  RefreshCw,
-  Users,
-  Check,
-  X,
-  Calendar,
-  Briefcase,
-  Building,
-  Phone,
-  Mail,
-  AlertTriangle,
-  RotateCcw,
-} from "@/lib/icons";
+import { UserMinus, User, MagnifyingGlass, ArrowsClockwise, Users, Check, X, Calendar, Briefcase, Building, Phone, Envelope, Warning, ArrowCounterClockwise } from "@phosphor-icons/react";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { SearchBar } from "@/components/ui/SearchBar";
@@ -271,7 +256,7 @@ export default function OffboardingPage() {
               className="flex items-center gap-2 px-3 py-2 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
               disabled={loading}
             >
-              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+              <ArrowsClockwise className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
               Refresh
             </button>
           </div>
@@ -345,7 +330,7 @@ export default function OffboardingPage() {
 
                 <div className="grid grid-cols-1 gap-2 text-sm">
                   <div className="flex items-center gap-2 text-foreground-secondary">
-                    <Mail className="h-4 w-4" />
+                    <Envelope className="h-4 w-4" />
                     <span>{emp.email}</span>
                   </div>
                   <div className="flex items-center gap-2 text-foreground-secondary">
@@ -380,7 +365,7 @@ export default function OffboardingPage() {
                             disabled
                             className="w-full bg-gray-300 text-foreground-tertiary rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center justify-center gap-2"
                           >
-                            <RotateCcw className="h-4 w-4" />
+                            <ArrowCounterClockwise className="h-4 w-4" />
                             Reactivate Employee
                           </button>
                         </PermissionTooltip>
@@ -391,7 +376,7 @@ export default function OffboardingPage() {
                         onClick={() => handleReactivate(emp.id)}
                         disabled={loading}
                       >
-                        <RotateCcw className="h-4 w-4" />
+                        <ArrowCounterClockwise className="h-4 w-4" />
                         Reactivate Employee
                       </Button>
                     </PermissionGate>
@@ -528,7 +513,7 @@ export default function OffboardingPage() {
                 </div>
               ) : (
                 <div className="bg-surface-primary rounded-xl p-10 shadow-sm border border-border-primary flex flex-col items-center justify-center text-center">
-                  <AlertTriangle className="h-12 w-12 text-foreground-tertiary mb-3" />
+                  <Warning className="h-12 w-12 text-foreground-tertiary mb-3" />
                   <h3 className="text-lg font-medium text-foreground-secondary mb-2">
                     No Employee Selected
                   </h3>

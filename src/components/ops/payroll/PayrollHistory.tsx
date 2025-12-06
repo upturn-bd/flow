@@ -3,22 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { usePayroll } from "@/hooks/usePayroll";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  CreditCard, 
-  Calendar, 
-  User, 
-  CheckCircle, 
-  Clock,
-  XCircle,
-  DollarSign,
-  AlertTriangle,
-  TrendingUp,
-  Minus,
-  Plus,
-  Edit,
-  Save,
-  X
-} from "@/lib/icons";
+import { CreditCard, Calendar, User, CheckCircle, Clock, XCircle, CurrencyDollar, Warning, TrendUp, Minus, Plus, PencilSimple, FloppyDisk, X } from "@phosphor-icons/react";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { formatDate } from "@/lib/utils";
@@ -53,7 +38,7 @@ const getStatusIcon = (status: string) => {
     case 'Paid':
       return <CheckCircle className="h-5 w-5 text-green-500" />;
     case 'Published': // Updated from 'Adjusted'
-      return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+      return <Warning className="h-5 w-5 text-amber-500" />;
     case 'Pending':
     default:
       return <Clock className="h-5 w-5 text-blue-500" />;
@@ -154,7 +139,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
       // Filter out empty adjustments
       const validAdjustments = adjustments.filter(adj => adj.type.trim() && adj.amount !== 0);
       
-      const status = 'Published'; // Save adjustments and publish
+      const status = 'Published'; // FloppyDisk adjustments and publish
       await updatePayrollStatus(editingPayroll, status, validAdjustments);
       
       setEditingPayroll(null);
@@ -255,7 +240,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                   <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                     <div className="flex items-center">
                       <div className="shrink-0">
-                        <AlertTriangle className="h-8 w-8 text-amber-600" />
+                        <Warning className="h-8 w-8 text-amber-600" />
                       </div>
                       <div className="ml-4">
                         <p className="text-sm font-medium text-foreground-secondary">Published</p>
@@ -278,7 +263,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                   <div className="shrink-0">
                     {statusFilter === 'Paid' && <CheckCircle className="h-8 w-8 text-green-600" />}
                     {statusFilter === 'Pending' && <Clock className="h-8 w-8 text-blue-600" />}
-                    {statusFilter === 'Published' && <AlertTriangle className="h-8 w-8 text-amber-600" />}
+                    {statusFilter === 'Published' && <Warning className="h-8 w-8 text-amber-600" />}
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-foreground-secondary">{statusFilter} Payrolls</p>
@@ -451,8 +436,8 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                                 </>
                               ) : (
                                 <>
-                                  <Save className="h-3 w-3 mr-1" />
-                                  Save & Publish
+                                  <FloppyDisk className="h-3 w-3 mr-1" />
+                                  FloppyDisk & Publish
                                 </>
                               )}
                             </button>
@@ -494,7 +479,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                                     disabled={processingUpdate}
                                     className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
                                   >
-                                    <Edit className="h-4 w-4 mr-2" />
+                                    <PencilSimple className="h-4 w-4 mr-2" />
                                     Add Adjustments
                                   </button>
                                   <button
@@ -509,7 +494,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                                       </>
                                     ) : (
                                       <>
-                                        <AlertTriangle className="h-4 w-4 mr-2" />
+                                        <Warning className="h-4 w-4 mr-2" />
                                         Publish As-Is
                                       </>
                                     )}

@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, RefreshCw, AlertCircle, Plus } from '@/lib/icons';
+import { Bell, ArrowsClockwise, WarningCircle, Plus } from "@phosphor-icons/react";
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import SectionHeader from './SectionHeader';
 import EmptyState from './EmptyState';
@@ -56,7 +56,7 @@ export default function NoticesSection({
     setReadNotices(prev => new Set(prev).add(noticeId));
     const readNoticesSet = new Set(readNotices);
     readNoticesSet.add(noticeId);
-    // Save updated read notices to localStorage
+    // FloppyDisk updated read notices to localStorage
     localStorage.setItem('readNotices', JSON.stringify(Array.from(readNoticesSet)));
     onNoticeClick(noticeId);
   };
@@ -138,7 +138,7 @@ export default function NoticesSection({
               onClick={onRefresh}
               className="rounded-full p-2 bg-surface-secondary hover:bg-surface-hover transition-colors"
             >
-              <RefreshCw size={16} className="text-foreground-secondary" />
+              <ArrowsClockwise size={16} className="text-foreground-secondary" />
             </motion.button>
             {canCreate && onCreateClick && (
               <motion.button

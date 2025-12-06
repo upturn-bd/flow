@@ -3,22 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useUserData } from "@/hooks/useUserData";
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Building, 
-  Calendar,
-  LogOut,
-  Shield,
-  Briefcase, 
-  RefreshCw,
-  CheckCircle,
-  WarningCircle,
-  Clock,
-  Settings,
-  LinkIcon
-} from "@/lib/icons";
+import { User, Envelope, Phone, Building, Calendar, SignOut, Shield, Briefcase, ArrowsClockwise, CheckCircle, WarningCircle, Clock, Gear, LinkSimple } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import Link from "next/link";
 
@@ -81,7 +66,7 @@ export default function AccountPage() {
           onClick={refreshUserData}
           className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
         >
-          <RefreshCw className="w-4 h-4" />
+          <ArrowsClockwise className="w-4 h-4" />
           Try Again
         </button>
       </div>
@@ -105,7 +90,7 @@ export default function AccountPage() {
               </>
             ) : (
               <>
-                <RefreshCw className="w-4 h-4" />
+                <ArrowsClockwise className="w-4 h-4" />
                 <span>Refresh</span>
               </>
             )}
@@ -115,7 +100,7 @@ export default function AccountPage() {
             onClick={handleLogout}
             className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
-            <LogOut className="w-4 h-4" />
+            <SignOut className="w-4 h-4" />
             <span>Logout</span>
           </button>
         </div>
@@ -176,7 +161,7 @@ export default function AccountPage() {
               </h3>
               <div className="space-y-4">
                 <div className="flex">
-                  <Mail className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
+                  <Envelope className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                   <div>
                     <p className="text-foreground-secondary">{userData.email}</p>
                     <p className="text-xs text-foreground-tertiary">Email</p>
@@ -262,9 +247,9 @@ export default function AccountPage() {
         <div className="bg-background-primary p-6 rounded-xl shadow-sm border border-border-primary hover:border-primary-300 hover:shadow transition-all">
           <div className="flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-3">
-              <Settings className="w-6 h-6" />
+              <Gear className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-foreground-primary mb-1">Account Settings</h3>
+            <h3 className="font-semibold text-foreground-primary mb-1">Account Gear</h3>
             <p className="text-sm text-foreground-tertiary">Manage your account preferences</p>
           </div>
         </div>

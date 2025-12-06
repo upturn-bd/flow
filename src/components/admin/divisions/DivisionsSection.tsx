@@ -5,7 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import DivisionModal from "./DivisionModal";
 import DivisionDetailsModal from "./DivisionDetailsModal";
-import { Layers } from "@/lib/icons";
+import { Stack } from "@phosphor-icons/react";
 import { Section, EntityListItem, EntityList } from "@/components/ui";
 
 type DivisionsSectionProps = {
@@ -71,7 +71,7 @@ export default function DivisionsSection({ showNotification }: DivisionsSectionP
       description="Manage organization divisions"
       loading={divisionsLoading}
       loadingText="Loading divisions..."
-      loadingIcon={Layers}
+      loadingIcon={Stack}
       emptyState={{
         show: divisions.length === 0,
         message: "No divisions added yet. Click the plus button to add one.",

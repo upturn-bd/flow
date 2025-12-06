@@ -1,4 +1,4 @@
-import { IconType } from "@/lib/icons";
+import { IconType } from "@phosphor-icons/react";
 import { cn } from "./class";
 
 export type ColorType = "blue" | "emerald" | "purple" | "amber" | "red" | "gray";

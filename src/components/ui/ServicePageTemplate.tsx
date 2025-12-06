@@ -3,7 +3,7 @@
 import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import TabView, { TabItem } from './TabView';
-import { IconType } from '@/lib/icons';
+import { IconType } from "@phosphor-icons/react";
 import { useAuth } from '@/lib/auth/auth-context';
 import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from '@/components/permissions';
 import { PermissionModule } from '@/lib/constants';

@@ -2,16 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Users, 
-  User, 
-  Mail, 
-  Phone, 
-  Building,
-  Calendar,
-  Filter,
-  Search
-} from "@/lib/icons";
+import { Users, User, Envelope, Phone, Building, Calendar, FunnelSimple, MagnifyingGlass } from "@phosphor-icons/react";
 import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
 import { matchesEmployeeSearch } from "@/lib/utils/user-search";
@@ -102,7 +93,7 @@ export default function FinderPage() {
       <motion.div variants={fadeIn} className="bg-surface-primary rounded-xl shadow-sm mb-8">
         <div className="border-b border-border-primary px-6 py-4 flex justify-between items-center">
           <h2 className="text-lg font-semibold text-indigo-700 flex items-center">
-            <Search className="w-5 h-5 mr-2" />
+            <MagnifyingGlass className="w-5 h-5 mr-2" />
             Search Employees
           </h2>
           <motion.button
@@ -225,7 +216,7 @@ export default function FinderPage() {
                   
                   <div className="p-5 space-y-3">
                     <div className="flex">
-                      <Mail className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
+                      <Envelope className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                       <span className="text-foreground-secondary text-sm">{employee.email}</span>
                     </div>
                     <div className="flex">

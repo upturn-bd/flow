@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Check, X, CaretDown } from "@/lib/icons";
+import { Check, X, CaretDown } from "@phosphor-icons/react";
 
 export interface DropdownOption {
   label: string;

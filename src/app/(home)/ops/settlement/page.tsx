@@ -2,15 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { motion } from "framer-motion";
-import {
-  Receipt,
-  ClipboardCheck,
-  History,
-  BookOpen,
-  DollarSign,
-  AlertTriangle,
-  FilePlus
-} from "@/lib/icons";
+import { Receipt, ClipboardText, ClockCounterClockwise, BookOpen, CurrencyDollar, Warning, FilePlus } from "@phosphor-icons/react";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
 import SettlementHistoryPage from "@/components/ops/settlement/SettlementHistory";
@@ -71,7 +63,7 @@ function SettlementPageContent() {
           </p>
           <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-4 max-w-md">
             <div className="flex gap-3">
-              <AlertTriangle className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+              <Warning className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-sm font-semibold text-emerald-800 mb-1">Important Information</h4>
                 <p className="text-sm text-emerald-700">
@@ -90,7 +82,7 @@ function SettlementPageContent() {
     <ServicePageTemplate
       title="Claim Settlement"
       description="Submit, track, and manage reimbursement claims for business expenses efficiently."
-      icon={<DollarSign className="h-7 w-7" />}
+      icon={<CurrencyDollar className="h-7 w-7" />}
       primaryColor="text-emerald-600"
       tabs={tabs}
       activeTab={activeTab}
@@ -110,7 +102,7 @@ export default function SettlementPage() {
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
-          <DollarSign className="h-8 w-8 text-emerald-600 animate-pulse" />
+          <CurrencyDollar className="h-8 w-8 text-emerald-600 animate-pulse" />
           <p className="text-sm text-foreground-secondary">Loading settlement...</p>
         </div>
       </div>

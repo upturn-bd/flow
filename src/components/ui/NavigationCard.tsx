@@ -3,8 +3,8 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { CaretRight } from "@/lib/icons";
-import type { IconType } from "@/lib/icons";
+import { CaretRight } from "@phosphor-icons/react";
+import type { IconType } from "@phosphor-icons/react";
 
 export type NavigationCardProps = {
   /** Card title/name */

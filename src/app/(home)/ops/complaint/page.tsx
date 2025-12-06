@@ -6,14 +6,7 @@ import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  WarningCircle,
-  History,
-  BookOpen,
-  FilePlus,
-  ClipboardCheck,
-  AlertTriangle
-} from "@/lib/icons";
+import { WarningCircle, ClockCounterClockwise, BookOpen, FilePlus, ClipboardText, Warning } from "@phosphor-icons/react";
 import { PERMISSION_MODULES } from "@/lib/constants";
 
 
@@ -50,7 +43,7 @@ export default function ComplaintPage() {
       content: (
         <div className="p-6">
           <h2 className="text-xl font-bold text-foreground-primary mb-4 flex items-center">
-            <AlertTriangle className="mr-2 h-5 w-5 text-red-500" />
+            <Warning className="mr-2 h-5 w-5 text-red-500" />
             Complaint Policy
           </h2>
           <div className="prose prose-red max-w-none">

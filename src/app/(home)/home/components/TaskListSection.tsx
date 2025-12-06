@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckSquare, Clock } from '@/lib/icons';
+import { CheckSquare, Clock } from "@phosphor-icons/react";
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import { cn } from '@/components/ui/class';
 import { formatDateToDayMonth } from '@/lib/utils';

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Bug, Send, CheckCircle } from "@/lib/icons";
+import { X, Bug, PaperPlaneTilt, CheckCircle } from "@phosphor-icons/react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { fadeIn, fadeInUp } from "./animations";
 import { InlineSpinner } from "@/components/ui";

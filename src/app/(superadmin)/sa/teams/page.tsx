@@ -3,20 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Company, Team } from "@/lib/types/schemas";
-import { 
-  MagnifyingGlass, 
-  Users, 
-  Pencil, 
-  Trash, 
-  Plus,
-  Buildings,
-  CaretDown,
-  X,
-  Spinner,
-  Check,
-  Star,
-  Star as StarHalf,
-} from "@/lib/icons";
+import { MagnifyingGlass, Users, Pencil, TrashSimple, Plus, Buildings, CaretDown, X, Spinner, Check, Star, Star as StarHalf } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, SearchBar, EmptyState, InlineSpinner, LoadingSpinner } from "@/components/ui";
@@ -153,7 +140,7 @@ export default function TeamsManagementPage() {
     setEditingTeam(null);
   };
 
-  // Save team changes
+  // FloppyDisk team changes
   const saveTeamChanges = async () => {
     if (!editingTeam) return;
 
@@ -462,7 +449,7 @@ export default function TeamsManagementPage() {
                             ) : (
                               <Check size={16} weight="bold" />
                             )}
-                            Save
+                            FloppyDisk
                           </button>
                         </div>
                       </div>
@@ -518,7 +505,7 @@ export default function TeamsManagementPage() {
                           <button
                             onClick={() => startEditing(team)}
                             className="p-2 text-foreground-tertiary hover:bg-background-tertiary dark:hover:bg-surface-secondary hover:text-primary-600 dark:hover:text-primary-400 rounded-lg transition-colors"
-                            title="Edit team"
+                            title="PencilSimple team"
                           >
                             <Pencil size={18} />
                           </button>
@@ -541,7 +528,7 @@ export default function TeamsManagementPage() {
                               {deletingTeamId === team.id ? (
                                 <InlineSpinner size="sm" color="red" />
                               ) : (
-                                <Trash size={18} />
+                                <TrashSimple size={18} />
                               )}
                             </button>
                           )}

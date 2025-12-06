@@ -2,23 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  CreditCard,
-  Plus,
-  Search,
-  Filter,
-  Eye,
-  Edit,
-  Trash,
-  DollarSign,
-  Calendar,
-  Building,
-  CheckCircle,
-  Clock,
-  X,
-  Minus,
-  Users
-} from "@/lib/icons";
+import { CreditCard, Plus, MagnifyingGlass, FunnelSimple, Eye, PencilSimple, TrashSimple, CurrencyDollar, Calendar, Building, CheckCircle, Clock, X, Minus, Users } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { staggerContainer, fadeInUp } from "@/components/ui/animations";
 import { useAccounts, AccountFilters } from "@/hooks/useAccounts";
@@ -408,7 +392,7 @@ export default function AccountsTab() {
             </div>
             <div className="bg-surface-primary/10 rounded-lg p-3 sm:p-4 col-span-2 lg:col-span-1">
               <div className="flex items-center gap-1 sm:gap-2 mb-1">
-                <DollarSign size={14} className="sm:w-4 sm:h-4" />
+                <CurrencyDollar size={14} className="sm:w-4 sm:h-4" />
                 <span className="text-xs sm:text-sm opacity-90">Net Amount</span>
               </div>
               <span className="text-lg sm:text-xl font-bold">
@@ -428,7 +412,7 @@ export default function AccountsTab() {
         >
           {/* Search Bar */}
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary" />
+            <MagnifyingGlass size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary" />
             <input
               type="text"
               placeholder="Search transactions..."
@@ -525,7 +509,7 @@ export default function AccountsTab() {
             {/* Min Amount Filter */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                <DollarSign size={12} className="inline mr-1" />
+                <CurrencyDollar size={12} className="inline mr-1" />
                 Min Amount
               </label>
               <input
@@ -540,7 +524,7 @@ export default function AccountsTab() {
             {/* Max Amount Filter */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                <DollarSign size={12} className="inline mr-1" />
+                <CurrencyDollar size={12} className="inline mr-1" />
                 Max Amount
               </label>
               <input
@@ -669,16 +653,16 @@ export default function AccountsTab() {
                             <button
                               onClick={() => handleEditClick(account)}
                               className="text-blue-600 hover:text-blue-800 transition-colors"
-                              title="Edit"
+                              title="PencilSimple"
                             >
-                              <Edit size={14} />
+                              <PencilSimple size={14} />
                             </button>
                             <button
                               onClick={() => handleDeleteClick(account)}
                               className="text-red-600 hover:text-red-800 transition-colors"
                               title="Delete"
                             >
-                              <Trash size={14} />
+                              <TrashSimple size={14} />
                             </button>
                           </div>
                         </td>
@@ -764,14 +748,14 @@ export default function AccountsTab() {
                         onClick={() => handleEditClick(account)}
                         className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
                       >
-                        <Edit size={14} />
-                        Edit
+                        <PencilSimple size={14} />
+                        PencilSimple
                       </button>
                       <button
                         onClick={() => handleDeleteClick(account)}
                         className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
                       >
-                        <Trash size={14} />
+                        <TrashSimple size={14} />
                         Delete
                       </button>
                     </div>
@@ -823,7 +807,7 @@ export default function AccountsTab() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInputField
-                icon={<DollarSign size={18} />}
+                icon={<CurrencyDollar size={18} />}
                 label="Transaction Title"
                 name="title"
                 value={values.title}
@@ -899,7 +883,7 @@ export default function AccountsTab() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInputField
-                icon={<DollarSign size={18} />}
+                icon={<CurrencyDollar size={18} />}
                 label="Amount"
                 name="amount"
                 type="number"
@@ -909,7 +893,7 @@ export default function AccountsTab() {
               />
 
               <FormSelectField
-                icon={<DollarSign size={18} />}
+                icon={<CurrencyDollar size={18} />}
                 label="Currency"
                 name="currency"
                 value={values.currency}
@@ -938,11 +922,11 @@ export default function AccountsTab() {
         )}
       </FormModal>
 
-      {/* Edit Account Modal */}
+      {/* PencilSimple Account Modal */}
       {selectedAccount && (
         <FormModal<AccountFormData>
-          title="Edit Transaction"
-          icon={<Edit size={24} />}
+          title="PencilSimple Transaction"
+          icon={<PencilSimple size={24} />}
           isOpen={isEditModalOpen}
           initialValues={{
             title: selectedAccount.title,
@@ -983,7 +967,7 @@ export default function AccountsTab() {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormInputField
-                  icon={<DollarSign size={18} />}
+                  icon={<CurrencyDollar size={18} />}
                   label="Transaction Title"
                   name="title"
                   value={values.title}
@@ -1057,7 +1041,7 @@ export default function AccountsTab() {
                 />
 
                 <FormInputField
-                  icon={<DollarSign size={18} />}
+                  icon={<CurrencyDollar size={18} />}
                   label="Amount"
                   name="amount"
                   type="number"
@@ -1067,7 +1051,7 @@ export default function AccountsTab() {
                 />
 
                 <FormSelectField
-                  icon={<DollarSign size={18} />}
+                  icon={<CurrencyDollar size={18} />}
                   label="Currency"
                   name="currency"
                   value={values.currency}

@@ -3,7 +3,7 @@
 import { useEmployees } from "@/hooks/useEmployees";
 import { Task, useTasks} from "@/hooks/useTasks";
 import { useEffect, useState } from "react";
-import { Calendar, CaretLeft, User, XCircle, Clock, Target } from "@/lib/icons";
+import { Calendar, CaretLeft, User, XCircle, Clock, Target } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
 import { Button } from "@/components/ui/button";

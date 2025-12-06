@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { Calendar, User, FileText, Clock } from "@/lib/icons";
+import { Calendar, User, FileText, Clock } from "@phosphor-icons/react";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getCompanyId, getEmployeeInfo } from "@/lib/utils/auth";

@@ -7,24 +7,7 @@ import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getPublicFileUrl } from "@/lib/utils/files";
 import { calculateFieldValue, formatCalculatedValue, formulaToReadable } from "@/lib/utils/formula-evaluator";
-import {
-  ArrowLeft,
-  CheckCircle,
-  Clock,
-  Calendar,
-  MapPin,
-  Mail,
-  Phone,
-  User,
-  Edit,
-  Trash,
-  WarningCircle,
-  FileText,
-  Download,
-  DollarSign,
-  Database,
-  Calculator,
-} from "@/lib/icons";
+import { ArrowLeft, CheckCircle, Clock, Calendar, MapPin, Envelope, Phone, User, PencilSimple, TrashSimple, WarningCircle, FileText, Download, CurrencyDollar, Database, Calculator } from "@phosphor-icons/react";
 import { Stakeholder, StakeholderProcessStep, StakeholderStepData } from "@/lib/types/schemas";
 import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
 import StakeholderIssuesTab from "@/components/stakeholder-issues/StakeholderIssuesTab";
@@ -386,14 +369,14 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               onClick={() => router.push(`/admin/stakeholders/${stakeholder.id}/edit`)}
               className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-foreground-secondary border border-border-secondary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
             >
-              <Edit size={14} />
-              <span className="hidden sm:inline">Edit</span>
+              <PencilSimple size={14} />
+              <span className="hidden sm:inline">PencilSimple</span>
             </button>
             <button
               onClick={() => setShowDeleteConfirm(true)}
               className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
             >
-              <Trash size={14} />
+              <TrashSimple size={14} />
               <span className="hidden sm:inline">Delete</span>
             </button>
           </div>
@@ -576,7 +559,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                     </div>
                     {contact.email && (
                       <div className="flex items-center gap-3 ml-9 mb-1">
-                        <Mail className="text-foreground-tertiary" size={16} />
+                        <Envelope className="text-foreground-tertiary" size={16} />
                         <a
                           href={`mailto:${contact.email}`}
                           className="text-sm text-blue-600 hover:underline"
@@ -613,8 +596,8 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   onClick={() => setShowAdditionalDataModal(true)}
                   className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950 transition-colors"
                 >
-                  <Edit size={16} />
-                  <span className="hidden sm:inline">Edit</span>
+                  <PencilSimple size={16} />
+                  <span className="hidden sm:inline">PencilSimple</span>
                 </button>
               </div>
 
@@ -671,7 +654,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 </div>
               ) : (
                 <p className="text-xs sm:text-sm text-foreground-tertiary">
-                  No additional data added. Click "Edit" to add data.
+                  No additional data added. Click "PencilSimple" to add data.
                 </p>
               )}
             </div>
@@ -709,7 +692,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                       : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary"
                     }`}
                 >
-                  <DollarSign size={16} />
+                  <CurrencyDollar size={16} />
                   Transactions
                 </button>
               </div>
@@ -1141,7 +1124,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
         processSteps={stakeholder?.process?.steps || []}
         existingData={stakeholder?.additional_data || {}}
         title={stakeholder?.additional_data && Object.keys(stakeholder.additional_data).length > 0 
-          ? "Edit Additional Data" 
+          ? "PencilSimple Additional Data" 
           : "Select Additional Data"}
       />
     </div>

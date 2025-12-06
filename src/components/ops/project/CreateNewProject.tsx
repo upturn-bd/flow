@@ -8,7 +8,7 @@ import { Department, useDepartments } from "@/hooks/useDepartments";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { useProjects } from "@/hooks/useProjects";
 import { useMilestones } from "@/hooks/useMilestones";
-import { WarningCircle, Building, X, Loader } from "@/lib/icons";
+import { WarningCircle, Building, X, CircleNotch } from "@phosphor-icons/react";
 import ProjectForm, { type ProjectDetails } from "./ProjectForm";
 import MilestoneList from "./milestone/MilestoneList";
 import MilestoneForm, { type Milestone } from "./milestone/MilestoneForm";

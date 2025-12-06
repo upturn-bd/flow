@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { WarningCircle, CaretDown } from "@/lib/icons";
+import { WarningCircle, CaretDown } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { fadeInUp } from "./animations";
 

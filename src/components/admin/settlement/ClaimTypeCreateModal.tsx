@@ -4,7 +4,7 @@ import { FormField, SelectField, NumberField, SingleEmployeeSelector } from '@/c
 import { validateClaimType, type ClaimTypeData } from '@/lib/validation';
 import { useEmployees } from '@/hooks/useEmployees';
 import { usePositions } from '@/hooks/usePositions';
-import { Receipt, UserPlus, Money } from '@/lib/icons';
+import { Receipt, UserPlus, CurrencyDollar } from "@phosphor-icons/react";
 
 interface ClaimTypeCreateModalProps {
   isOpen: boolean;

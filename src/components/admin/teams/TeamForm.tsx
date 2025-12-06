@@ -51,7 +51,7 @@ export default function TeamForm({ team, onClose, onSubmit }: TeamFormProps) {
     <BaseModal
       isOpen={true}
       onClose={onClose}
-      title={team ? "Edit Team" : "Create New Team"}
+      title={team ? "PencilSimple Team" : "Create New Team"}
     >
       <form onSubmit={handleSubmit} className="p-6">
         <div className="space-y-4">

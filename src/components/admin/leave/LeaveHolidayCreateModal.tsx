@@ -2,7 +2,7 @@ import React from 'react';
 import { FormModal } from '@/components/ui/modals';
 import { FormField, DateField } from '@/components/forms';
 import { validateHolidayConfig, type HolidayConfigData } from '@/lib/validation';
-import { CalendarBlank } from '@/lib/icons';
+import { CalendarBlank } from "@phosphor-icons/react";
 
 interface LeaveHolidayCreateModalProps {
   isOpen: boolean;

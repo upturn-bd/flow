@@ -2,19 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Bell,
-  X,
-  Check,
-  Clock,
-  WarningCircle,
-  Calendar,
-  Briefcase,
-  User,
-  Trash,
-  CheckCheck,
-  ExternalLink
-} from "@/lib/icons";
+import { Bell, X, Check, Clock, WarningCircle, Calendar, Briefcase, User, TrashSimple, Checks, ArrowSquareOut } from "@phosphor-icons/react";
 import { useNotifications, Notification } from "@/hooks/useNotifications";
 import { formatRelativeTime } from "@/lib/utils";
 import { Z_INDEX } from "@/lib/theme";
@@ -350,7 +338,7 @@ function NotificationItem({
                 className="text-green-600 hover:bg-green-100 p-1 rounded text-xs flex items-center gap-1"
                 title="View details"
               >
-                <ExternalLink className="h-3 w-3" />
+                <ArrowSquareOut className="h-3 w-3" />
                 View
               </Link>
             )}
@@ -360,7 +348,7 @@ function NotificationItem({
               className="text-red-600 hover:bg-red-100 p-1 rounded text-xs flex items-center gap-1"
               title="Delete"
             >
-              <Trash className="h-3 w-3" />
+              <TrashSimple className="h-3 w-3" />
               Delete
             </button>
           </div>

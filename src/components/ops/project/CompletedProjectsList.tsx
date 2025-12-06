@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { debounce } from "lodash";
 import { toast } from "sonner";
-import { CheckCircle, Search } from "@/lib/icons";
+import { CheckCircle, MagnifyingGlass } from "@phosphor-icons/react";
 
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";

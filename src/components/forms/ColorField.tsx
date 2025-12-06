@@ -1,4 +1,4 @@
-import { Palette } from "@/lib/icons";
+import { Palette } from "@phosphor-icons/react";
 import { forwardRef, useState, useRef, useEffect } from "react";
 
 export interface ColorFieldProps {

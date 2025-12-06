@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { fadeInUp } from "./animations";
 import { Button } from "./button";
 import Link from "next/link";
-import { CaretRight } from "@/lib/icons";
+import { CaretRight } from "@phosphor-icons/react";
 
 // Match Phosphor's IconWeight type for better compatibility
 type IconWeight = "regular" | "thin" | "light" | "bold" | "fill" | "duotone";

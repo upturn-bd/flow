@@ -4,21 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Company } from "@/lib/types/schemas";
 import { filterEmployeesBySearch } from "@/lib/utils/user-search";
-import { 
-  Plus, 
-  Trash, 
-  ShieldCheck, 
-  X,
-  Check,
-  User,
-  Buildings,
-  Calendar,
-  Lightning as Power,
-  AlertTriangle as Warning,
-  Star as Crown,
-  CaretDown,
-  MagnifyingGlass
-} from "@/lib/icons";
+import { Plus, TrashSimple, ShieldCheck, X, Check, User, Buildings, Calendar, Lightning as Power, Warning as Warning, Star as Crown, CaretDown, MagnifyingGlass } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner, SearchBar } from "@/components/ui";

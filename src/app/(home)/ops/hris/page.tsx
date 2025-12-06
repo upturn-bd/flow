@@ -2,16 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Users,
-  User,
-  Mail,
-  Phone,
-  Building,
-  Calendar,
-  Filter,
-  Download,
-} from "@/lib/icons";
+import { Users, User, Envelope, Phone, Building, Calendar, FunnelSimple, Download } from "@phosphor-icons/react";
 import SearchBar from "@/components/ui/SearchBar";
 import PageHeader from "@/components/ui/PageHeader";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -346,7 +337,7 @@ useEffect(() => {
 
                     <div className="p-5 space-y-3">
                       <div className="flex">
-                        <Mail className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
+                        <Envelope className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                         <span className="text-foreground-secondary text-sm">
                           {employee.email}
                         </span>

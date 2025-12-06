@@ -373,7 +373,7 @@ export interface CompanyBasics {
   company_id?: string;
   industry_id: string;
   country_id: string;
-  // Operations Settings
+  // Operations Gear
   live_absent_enabled: boolean;
   fiscal_year_start: string; // Date format: YYYY-MM-DD (e.g., "2024-01-01")
 }

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MagnifyingGlass as Search, X, CaretDown, User } from '@/lib/icons';
+import { MagnifyingGlass as MagnifyingGlass, X, CaretDown, User } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from 'framer-motion';
 import { matchesEmployeeSearch } from '@/lib/utils/user-search';
 import { Employee } from '@/lib/types/schemas';
@@ -96,7 +96,7 @@ export default function SingleEmployeeSelector({
           onClick={!disabled ? handleInputClick : undefined}
         >
           <div className="flex items-center p-3">
-            <Search className="h-4 w-4 text-foreground-tertiary dark:text-foreground-tertiary mr-3 shrink-0" />
+            <MagnifyingGlass className="h-4 w-4 text-foreground-tertiary dark:text-foreground-tertiary mr-3 shrink-0" />
             
             {selectedEmployee && !isDropdownOpen ? (
               <div className="flex items-center justify-between w-full">

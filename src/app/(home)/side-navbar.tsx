@@ -7,12 +7,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
-import {
-  CaretLeft,
-  CaretRight,
-  List,
-  X,
-} from "@/lib/icons";
+import { CaretLeft, CaretRight, List, X } from "@phosphor-icons/react";
 
 export default function Sidebar() {
   const { isApproved, getAuthorizedNavItems } = useAuth();

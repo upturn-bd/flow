@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { StakeholderProcessStep, FieldType, FieldDefinition, DropdownOption } from "@/lib/types/schemas";
 import { useTeams } from "@/hooks/useTeams";
-import { Plus, Trash, Calendar, CaretDown, CaretUp, ArrowUp, ArrowDown, List, X, Calculator, WarningCircle } from "@/lib/icons";
+import { Plus, TrashSimple, Calendar, CaretDown, CaretUp, ArrowUp, ArrowDown, List, X, Calculator, WarningCircle } from "@phosphor-icons/react";
 import { FIELD_TYPES, generateFieldKey } from "@/lib/constants";
 import Toggle from "@/components/ui/Toggle";
 import FormulaEditor from "./FormulaEditor";
@@ -193,14 +193,14 @@ export default function StepManager({
                       onClick={() => handleEditStep(step)}
                       className="px-3 py-1.5 text-xs sm:text-sm text-primary-600 bg-primary-50 hover:bg-primary-100 rounded transition-colors font-medium"
                     >
-                      Edit
+                      PencilSimple
                     </button>
                     <button
                       onClick={() => handleDeleteStep(step)}
                       className="p-1.5 sm:p-1 text-error hover:bg-error/10 rounded transition-colors"
                       aria-label="Delete step"
                     >
-                      <Trash size={16} />
+                      <TrashSimple size={16} />
                     </button>
                   </div>
                 </div>
@@ -210,7 +210,7 @@ export default function StepManager({
         </div>
       )}
 
-      {/* Add/Edit Step Modal */}
+      {/* Add/PencilSimple Step Modal */}
       {showAddStep && (
         <StepFormModal
           processId={processId}
@@ -418,7 +418,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
       <div className="bg-surface-primary rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border-primary sticky top-0 bg-surface-primary z-10">
           <h3 className="text-lg sm:text-xl font-bold text-foreground-primary">
-            {step ? "Edit Step" : "Add New Step"}
+            {step ? "PencilSimple Step" : "Add New Step"}
           </h3>
           <button 
             onClick={onClose} 
@@ -1000,7 +1000,7 @@ function FieldEditor({
                   ? 'bg-primary-600 text-white hover:bg-primary-700' 
                   : 'bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100'
               }`}
-              title={isEditing ? "Collapse options" : "Edit options"}
+              title={isEditing ? "Collapse options" : "PencilSimple options"}
             >
               {isEditing ? <CaretUp size={16} /> : <CaretDown size={16} />}
               <span>{isEditing ? "Collapse" : "Options"}</span>
@@ -1015,7 +1015,7 @@ function FieldEditor({
                   ? 'bg-green-600 text-white hover:bg-green-700' 
                   : 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
               }`}
-              title={showFormulaEditor ? "Hide formula editor" : "Edit formula"}
+              title={showFormulaEditor ? "Hide formula editor" : "PencilSimple formula"}
             >
               <Calculator size={16} />
               <span>{showFormulaEditor ? "Hide" : "Formula"}</span>
@@ -1040,7 +1040,7 @@ function FieldEditor({
             className="p-2 text-error hover:bg-error/10 rounded transition-colors"
             aria-label="Remove field"
           >
-            <Trash size={16} />
+            <TrashSimple size={16} />
           </button>
         </div>
       </div>

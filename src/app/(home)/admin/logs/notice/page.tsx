@@ -4,13 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useNotices, useNoticeTypes } from "@/hooks/useNotice";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
-import {
-  Search,
-  WarningCircle,
-  FileText,
-  Pencil,
-  Trash,
-} from "@/lib/icons";
+import { MagnifyingGlass, WarningCircle, FileText, Pencil, TrashSimple } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { motion } from "framer-motion";
@@ -139,7 +133,7 @@ export default function NoticePage() {
 
       {/* Search bar */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-2.5 text-foreground-tertiary" size={16} />
+        <MagnifyingGlass className="absolute left-3 top-2.5 text-foreground-tertiary" size={16} />
         <input
           placeholder="Search notices..."
           className="pl-8 w-full px-3 py-2 border border-border-primary rounded-lg"
@@ -227,7 +221,7 @@ export default function NoticePage() {
                       variant="outline"
                       size="sm"
                       className="border-border-secondary hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-600"
-                      title="Edit Notice"
+                      title="PencilSimple Notice"
                       onClick={() => setEditingNotice(notice)}
                     >
                       <Pencil size={16} />
@@ -244,7 +238,7 @@ export default function NoticePage() {
                       title="Delete Notice"
                       onClick={() => handleDelete(notice.id)}
                     >
-                      <Trash size={16} />
+                      <TrashSimple size={16} />
                     </Button>
                   )}
 

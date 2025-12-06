@@ -2,12 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  ClipboardList,
-  CheckSquare,
-  ArchiveIcon,
-  PlusSquare
-} from "@/lib/icons";
+import { ClipboardText, CheckSquare, Archive, Plus } from "@phosphor-icons/react";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import OngoingTaskPage from "@/components/ops/tasks/OngoingTasks";
 import CompletedTasksList from "@/components/ops/tasks/CompletedTasks";

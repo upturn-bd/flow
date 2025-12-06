@@ -1,22 +1,22 @@
 "use client";
 
-import {
-  ClipboardList, // Task
-  BarChart, // Project
-  LogIn, // Attendance
+import { 
+  ClipboardText, // Task
+  ChartBar, // Project
+  SignIn, // Attendance
   CalendarX, // Leave
   Bell, // Notice
   Clipboard, // Requisition
-  DollarSign,
-  WarningCircle,
+  CurrencyDollar, 
+  WarningCircle, 
   UserPlus, // Onboarding
-  FileIcon,
-  Users,
+  File, 
+  Users, 
   CreditCard, // Payroll
-  Building,
+  Building, 
   UserMinus, // Stakeholder
-  Briefcase, // Operations icon
-} from "@/lib/icons";
+  Briefcase // Operations icon 
+} from "@phosphor-icons/react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -36,14 +36,14 @@ const sections: NavigationSectionProps[] = [
       {
         name: "Task",
         path: "/ops/tasks",
-        icon: ClipboardList,
+        icon: ClipboardText,
         description: "Assign, track and manage day-to-day tasks",
         iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
       },
       {
         name: "Project",
         path: "/ops/project",
-        icon: BarChart,
+        icon: ChartBar,
         description: "Plan and execute complex projects with milestones",
         iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
       },
@@ -56,7 +56,7 @@ const sections: NavigationSectionProps[] = [
       {
         name: "Attendance",
         path: "/ops/attendance?tab=today",
-        icon: LogIn,
+        icon: SignIn,
         description: "Track and manage your daily attendance",
         iconColor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
       },
@@ -84,7 +84,7 @@ const sections: NavigationSectionProps[] = [
       {
         name: "Settlement",
         path: "/ops/settlement?tab=create",
-        icon: DollarSign,
+        icon: CurrencyDollar,
         description: "Manage and track expense reimbursements",
         iconColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
       },
@@ -259,7 +259,7 @@ export default function ServicesPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <EmptyState
-            icon={FileIcon}
+            icon={File}
             title="No services found"
             description="Try searching with different keywords or browse all services"
             action={{

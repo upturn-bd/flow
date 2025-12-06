@@ -3,23 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Calendar, 
-  Building, 
-  User, 
-  Mail, 
-  Phone, 
-  Briefcase, 
-  Users, 
-  CircleCheck, 
-  WarningCircle, 
-  CheckCircle, 
-  Clock, 
-  XCircle, 
-  BadgeCheck, 
-  Send,
-  LogOut
-} from "@/lib/icons";
+import { Calendar, Building, User, Envelope, Phone, Briefcase, Users, CheckCircle, WarningCircle, Clock, XCircle, SealCheck, PaperPlaneTilt, SignOut } from "@phosphor-icons/react";
 import { logout } from "@/app/(auth)/auth-actions";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
@@ -299,7 +283,7 @@ export default function EmployeeOnboarding() {
                 onClick={logout}
                 className="flex items-center px-6 py-2 bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary rounded-lg hover:bg-surface-hover transition-colors"
               >
-                <LogOut className="mr-2 h-5 w-5" />
+                <SignOut className="mr-2 h-5 w-5" />
                 Logout
               </button>
             </div>
@@ -412,7 +396,7 @@ export default function EmployeeOnboarding() {
             onClick={logout}
             className="flex items-center px-4 py-2 text-sm bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary rounded-lg hover:bg-surface-hover transition-colors"
           >
-            <LogOut className="h-4 w-4 mr-2" />
+            <SignOut className="h-4 w-4 mr-2" />
             Logout
           </button>
         </motion.div>
@@ -542,7 +526,7 @@ export default function EmployeeOnboarding() {
                       <FormInputField
                         name="email"
                         label="Email Address"
-                        icon={<Mail size={18} />}
+                        icon={<Envelope size={18} />}
                         value={formData.email}
                         onChange={handleChange}
                         type="email"

@@ -2,7 +2,7 @@
 import { useLineage } from "@/hooks/useSupervisorLineage";
 import { Lineage } from "@/lib/types/schemas";
 import { useEffect, useState } from "react";
-import { Trash, Plus, Buildings } from "@/lib/icons";
+import { TrashSimple, Plus, Buildings } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
@@ -218,7 +218,7 @@ export default function LineageCreateModal({
                             size="sm"
                             className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200"
                           >
-                            <Trash size={16} weight="duotone" />
+                            <TrashSimple size={16} weight="duotone" />
                           </Button>
                         )}
                       </div>
@@ -269,7 +269,7 @@ export default function LineageCreateModal({
               }
               className="bg-primary-600 hover:bg-primary-700 text-white"
             >
-              Save
+              FloppyDisk
             </Button>
           </motion.div>
         </motion.div>
@@ -436,7 +436,7 @@ export function LineageUpdateModal({
       >
         <motion.div variants={fadeInUp} className="flex items-center gap-3">
           <Buildings size={24} weight="duotone" className="text-blue-600" />
-          <h2 className="text-xl font-semibold text-blue-800">Edit Lineage</h2>
+          <h2 className="text-xl font-semibold text-blue-800">PencilSimple Lineage</h2>
         </motion.div>
 
         <motion.div variants={fadeInUp} className="mb-4">
@@ -505,7 +505,7 @@ export function LineageUpdateModal({
                             size="sm"
                             className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200"
                           >
-                            <Trash size={16} weight="duotone" />
+                            <TrashSimple size={16} weight="duotone" />
                           </Button>
                         )}
                       </div>
@@ -562,7 +562,7 @@ export function LineageUpdateModal({
               }
               className="bg-primary-600 hover:bg-primary-700 text-white"
             >
-              Save
+              FloppyDisk
             </Button>
           </motion.div>
         </motion.div>

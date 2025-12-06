@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { Plus, Settings, Trash, Edit } from "@/lib/icons";
+import { Plus, Gear, TrashSimple, PencilSimple } from "@phosphor-icons/react";
 import { StakeholderProcess } from "@/lib/types/schemas";
 import ProcessForm from "@/components/stakeholder-processes/ProcessForm";
 import { InlineSpinner } from "@/components/ui";
@@ -69,7 +69,7 @@ export default function StakeholderProcessesPage() {
       {/* Empty State */}
       {!loading && processes.length === 0 && (
         <div className="text-center py-12 bg-background-secondary dark:bg-background-tertiary rounded-lg border-2 border-dashed border-border-secondary">
-          <Settings className="mx-auto h-12 w-12 text-foreground-tertiary" />
+          <Gear className="mx-auto h-12 w-12 text-foreground-tertiary" />
           <h3 className="mt-2 text-sm font-semibold text-foreground-primary">No processes</h3>
           <p className="mt-1 text-sm text-foreground-tertiary">
             Get started by creating a new stakeholder process.
@@ -146,9 +146,9 @@ export default function StakeholderProcessesPage() {
                       router.push(`/admin/config/stakeholder-process/${process.id}`);
                     }}
                     className="p-2 text-foreground-secondary hover:text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
-                    title="Edit process"
+                    title="PencilSimple process"
                   >
-                    <Edit size={18} />
+                    <PencilSimple size={18} />
                   </button>
                   <button
                     onClick={() => handleDelete(process.id!)}
@@ -159,7 +159,7 @@ export default function StakeholderProcessesPage() {
                     {processingId === process.id ? (
                       <InlineSpinner size="sm" color="red" />
                     ) : (
-                      <Trash size={18} />
+                      <TrashSimple size={18} />
                     )}
                   </button>
                 </div>
@@ -169,7 +169,7 @@ export default function StakeholderProcessesPage() {
         </div>
       )}
 
-      {/* TODO: Add Create/Edit Modal */}
+      {/* TODO: Add Create/PencilSimple Modal */}
       {showCreateModal && (
         <ProcessForm
           process={null}

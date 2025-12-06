@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { X, MagnifyingGlass, UserPlus, Trash, Users } from '@/lib/icons';
+import { X, MagnifyingGlass, UserPlus, TrashSimple, Users } from "@phosphor-icons/react";
 import { TeamWithMembers } from '@/lib/types';
 import { useEmployees, ExtendedEmployee } from '@/hooks/useEmployees';
 import { useTeams } from '@/hooks/useTeams';
@@ -270,7 +270,7 @@ export default function TeamMembersModal({
                             className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 shrink-0"
                             title="Remove from team"
                           >
-                            <Trash size={20} />
+                            <TrashSimple size={20} />
                           </button>
                         </div>
                       ))}
