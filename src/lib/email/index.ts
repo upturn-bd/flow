@@ -10,3 +10,11 @@ export {
   sendNotificationEmail,
   type NotificationEmailData,
 } from "./notification-email";
+
+// Re-export server actions for client-side use
+// These are the recommended way to send emails from client components
+export {
+  sendEmailAction,
+  sendNotificationEmailAction,
+  sendBatchEmailsAction,
+} from "../actions/email-actions";

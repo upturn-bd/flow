@@ -2,9 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, AlertCircle, User, Building } from '@/lib/icons';
+import { X, AlertCircle, User, Building, Tag, UsersThree } from '@/lib/icons';
 import { useStakeholderIssues, StakeholderIssueFormData } from '@/hooks/useStakeholderIssues';
 import { useStakeholders } from '@/hooks/useStakeholders';
+import { useStakeholderIssueCategories } from '@/hooks/useStakeholderIssueCategories';
+import { useTeams } from '@/hooks/useTeams';
+import { useEmployees } from '@/hooks/useEmployees';
 import { useAuth } from '@/lib/auth/auth-context';
 import { cn } from '@/components/ui/class';
 import { LoadingSpinner } from '@/components/ui';
@@ -26,10 +29,14 @@ export default function StakeholderIssueModal({
   const { employeeInfo } = useAuth();
   const { createIssue, updateIssue, fetchIssueById, loading } = useStakeholderIssues();
   const { stakeholders, fetchStakeholders } = useStakeholders();
+  const { categories, fetchCategories } = useStakeholderIssueCategories();
+  const { teams, fetchTeams } = useTeams();
+  const { employees, fetchEmployees } = useEmployees();
   const [issue, setIssue] = useState<any>(null);
   const [loadingIssue, setLoadingIssue] = useState(!!issueId);
   const [isEditing, setIsEditing] = useState(false);
   const [showResolveConfirm, setShowResolveConfirm] = useState(false);
+  const [assignmentType, setAssignmentType] = useState<'employee' | 'team'>('employee');
   const [formData, setFormData] = useState<Partial<StakeholderIssueFormData>>({
     stakeholder_id: 0,
     title: '',
@@ -37,14 +44,24 @@ export default function StakeholderIssueModal({
     status: 'Pending',
     priority: 'Medium',
     assigned_to: employeeInfo?.id,
+    assigned_team_id: undefined,
+    category_id: undefined,
+    subcategory_id: undefined,
   });
   const [submitting, setSubmitting] = useState(false);
+
+  // Get subcategories for selected category
+  const selectedCategory = categories.find(c => c.id === formData.category_id);
+  const availableSubcategories = selectedCategory?.subcategories?.filter(s => s.is_active) || [];
 
   useEffect(() => {
     if (issueId) {
       loadIssue();
     }
     loadStakeholders();
+    fetchCategories();
+    fetchTeams();
+    fetchEmployees();
   }, [issueId]);
 
   const loadIssue = async () => {
@@ -53,6 +70,8 @@ export default function StakeholderIssueModal({
     const data = await fetchIssueById(issueId);
     if (data) {
       setIssue(data);
+      // Set assignment type based on existing data
+      setAssignmentType(data.assigned_team_id ? 'team' : 'employee');
       // Populate form data for editing
       setFormData({
         stakeholder_id: data.stakeholder_id,
@@ -61,6 +80,9 @@ export default function StakeholderIssueModal({
         status: data.status,
         priority: data.priority,
         assigned_to: data.assigned_to,
+        assigned_team_id: data.assigned_team_id,
+        category_id: data.category_id,
+        subcategory_id: data.subcategory_id,
       });
     }
     setLoadingIssue(false);
@@ -192,12 +214,41 @@ export default function StakeholderIssueModal({
                   </div>
                 </div>
 
-                {issue.assigned_employee && (
+                {/* Category & Subcategory */}
+                {issue.category && (
+                  <div>
+                    <label className="block text-sm font-medium text-foreground-secondary mb-1">Category</label>
+                    <div className="flex items-center gap-2">
+                      <span 
+                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium text-white"
+                        style={{ backgroundColor: issue.category.color }}
+                      >
+                        <Tag className="w-3 h-3" />
+                        {issue.category.name}
+                        {issue.subcategory && (
+                          <span className="opacity-75">/ {issue.subcategory.name}</span>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Assignment - Employee or Team */}
+                {(issue.assigned_employee || issue.assigned_team) && (
                   <div>
                     <label className="block text-sm font-medium text-foreground-secondary mb-1">Assigned To</label>
                     <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-foreground-tertiary" />
-                      <span>{issue.assigned_employee.name}</span>
+                      {issue.assigned_team ? (
+                        <>
+                          <UsersThree className="w-4 h-4 text-foreground-tertiary" />
+                          <span>{issue.assigned_team.name} (Team)</span>
+                        </>
+                      ) : issue.assigned_employee ? (
+                        <>
+                          <User className="w-4 h-4 text-foreground-tertiary" />
+                          <span>{issue.assigned_employee.name}</span>
+                        </>
+                      ) : null}
                     </div>
                   </div>
                 )}
@@ -300,6 +351,116 @@ export default function StakeholderIssueModal({
                       <option value="Resolved">Resolved</option>
                     </select>
                   </div>
+                </div>
+
+                {/* Category & Subcategory */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-foreground-primary mb-1">Category</label>
+                    <select
+                      value={formData.category_id || ''}
+                      onChange={(e) => {
+                        const categoryId = e.target.value ? Number(e.target.value) : undefined;
+                        setFormData({ 
+                          ...formData, 
+                          category_id: categoryId,
+                          subcategory_id: undefined // Reset subcategory when category changes
+                        });
+                      }}
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                    >
+                      <option value="">No category</option>
+                      {categories.filter(c => c.is_active).map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-foreground-primary mb-1">Subcategory</label>
+                    <select
+                      value={formData.subcategory_id || ''}
+                      onChange={(e) => setFormData({ ...formData, subcategory_id: e.target.value ? Number(e.target.value) : undefined })}
+                      disabled={!formData.category_id || availableSubcategories.length === 0}
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary disabled:opacity-50"
+                    >
+                      <option value="">No subcategory</option>
+                      {availableSubcategories.map((subcategory) => (
+                        <option key={subcategory.id} value={subcategory.id}>
+                          {subcategory.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Assignment Type Toggle */}
+                <div>
+                  <label className="block text-sm font-medium text-foreground-primary mb-2">Assign To</label>
+                  <div className="flex gap-2 mb-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAssignmentType('employee');
+                        setFormData({ ...formData, assigned_team_id: undefined });
+                      }}
+                      className={cn(
+                        'flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition-colors flex items-center justify-center gap-2',
+                        assignmentType === 'employee'
+                          ? 'bg-primary-100 border-primary-500 text-primary-700'
+                          : 'border-border-primary text-foreground-secondary hover:bg-surface-hover'
+                      )}
+                    >
+                      <User className="w-4 h-4" />
+                      Employee
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAssignmentType('team');
+                        setFormData({ ...formData, assigned_to: undefined });
+                      }}
+                      className={cn(
+                        'flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition-colors flex items-center justify-center gap-2',
+                        assignmentType === 'team'
+                          ? 'bg-primary-100 border-primary-500 text-primary-700'
+                          : 'border-border-primary text-foreground-secondary hover:bg-surface-hover'
+                      )}
+                    >
+                      <UsersThree className="w-4 h-4" />
+                      Team
+                    </button>
+                  </div>
+
+                  {assignmentType === 'employee' ? (
+                    <select
+                      value={formData.assigned_to || ''}
+                      onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value || undefined })}
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                    >
+                      <option value="">No assignee</option>
+                      {employees.map((employee) => (
+                        <option key={employee.id} value={employee.id}>
+                          {employee.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <select
+                      value={formData.assigned_team_id || ''}
+                      onChange={(e) => setFormData({ ...formData, assigned_team_id: e.target.value ? Number(e.target.value) : undefined })}
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                    >
+                      <option value="">No team assigned</option>
+                      {teams.map((team) => (
+                        <option key={team.id} value={team.id}>
+                          {team.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4">

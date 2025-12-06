@@ -321,23 +321,25 @@ export const createSystemNotification = async (
     // Send email for high priority notifications
     const priority = options.priority || 'normal';
     if (priority === 'high' || priority === 'urgent') {
-      // Import dynamically to avoid circular dependencies
-      const { sendNotificationEmail } = await import('@/lib/email/notification-email');
+      // Import server action for email sending (ensures server-side execution)
+      const { sendNotificationEmailAction } = await import('@/lib/actions/email-actions');
       
       // Fetch recipient email from employees table
       const { data: employee, error: employeeError } = await supabase
         .from('employees')
-        .select('email, name')
+        .select('email, first_name, last_name')
         .eq('id', recipientId)
         .single();
 
       if (employeeError) {
         console.error('Failed to fetch employee for notification email:', employeeError);
       } else if (employee?.email) {
+        const recipientName = `${employee.first_name} ${employee.last_name}`.trim();
         // Send email asynchronously without blocking the notification creation
-        sendNotificationEmail({
+        // Using server action ensures email is sent from server where API key is available
+        sendNotificationEmailAction({
           recipientEmail: employee.email,
-          recipientName: employee.name,
+          recipientName,
           title,
           message,
           priority: priority as 'high' | 'urgent',

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   ClipboardList, // Task
   BarChart, // Project
@@ -20,9 +19,16 @@ import {
 } from "@/lib/icons";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SearchBar, EmptyState, PageHeader } from "@/components/ui";
+import { 
+  SearchBar, 
+  EmptyState, 
+  PageHeader, 
+  NavigationCard, 
+  NavigationCardGrid,
+  NavigationSectionProps 
+} from "@/components/ui";
 
-const sections = [
+const sections: NavigationSectionProps[] = [
   {
     title: "Workflow",
     description: "Manage tasks, projects and work processes",
@@ -32,14 +38,14 @@ const sections = [
         path: "/ops/tasks",
         icon: ClipboardList,
         description: "Assign, track and manage day-to-day tasks",
-        color: "bg-indigo-100 text-indigo-700"
+        iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
       },
       {
         name: "Project",
         path: "/ops/project",
         icon: BarChart,
         description: "Plan and execute complex projects with milestones",
-        color: "bg-blue-100 text-blue-700"
+        iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
       },
     ],
   },
@@ -52,56 +58,56 @@ const sections = [
         path: "/ops/attendance?tab=today",
         icon: LogIn,
         description: "Track and manage your daily attendance",
-        color: "bg-green-100 text-green-700"
+        iconColor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
       },
       {
         name: "Leave",
         path: "/ops/leave?tab=apply",
         icon: CalendarX,
         description: "Apply and manage time off and leaves",
-        color: "bg-blue-100 text-blue-700"
+        iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
       },
       {
         name: "Notice",
         path: "/ops/notice",
         icon: Bell,
         description: "Important company announcements and notices",
-        color: "bg-amber-100 text-amber-700"
+        iconColor: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
       },
       {
         name: "Requisition",
         path: "/ops/requisition?tab=create",
         icon: Clipboard,
         description: "Request equipment, supplies and services",
-        color: "bg-cyan-100 text-cyan-700"
+        iconColor: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400"
       },
       {
         name: "Settlement",
         path: "/ops/settlement?tab=create",
         icon: DollarSign,
         description: "Manage and track expense reimbursements",
-        color: "bg-emerald-100 text-emerald-700"
+        iconColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
       },
       {
         name: "Complaint",
         path: "/ops/complaint",
         icon: WarningCircle,
         description: "Submit and track workplace issues and concerns",
-        color: "bg-red-100 text-red-700"
+        iconColor: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
       },
       {
         name: "Payroll",
         path: "/ops/payroll",
         icon: CreditCard,
         description: "View payroll history and manage salary information",
-        color: "bg-indigo-100 text-indigo-700"
+        iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
       },
       {
         name: "Stakeholder Issues",
         path: "/ops/stakeholder-issues",
         icon: Building,
         description: "Manage stakeholder relationships and track issues",
-        color: "bg-purple-100 text-purple-700"
+        iconColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
       },
     ],
   },
@@ -114,21 +120,21 @@ const sections = [
         path: "/ops/onboarding",
         icon: UserPlus,
         description: "Employee onboarding workflow and tasks",
-        color: "bg-purple-100 text-purple-700"
+        iconColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
       },
       {
         name: "Offboarding",
         path: "/ops/offboarding",
         icon: UserMinus,
         description: "Employee offboarding workflow and tasks",
-        color: "bg-red-100 text-red-700"
+        iconColor: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
       },
       {
         name: "HRIS",
         path: "/ops/hris",
         icon: Users,
         description: "Human Resource Information System",
-        color: "bg-blue-100 text-blue-700"
+        iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
       }
     ],
   },
@@ -222,7 +228,7 @@ export default function ServicesPage() {
             onClick={() => setSelectedSection(null)}
             className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
               ${!selectedSection 
-                ? 'bg-primary-600 text-white shadow-sm' 
+                ? 'bg-primary-100 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:text-primary-400' 
                 : 'bg-surface-secondary text-foreground-secondary hover:bg-surface-hover'}`
             }
           >
@@ -237,7 +243,7 @@ export default function ServicesPage() {
               onClick={() => setSelectedSection(section.title)}
               className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
                 ${selectedSection === section.title 
-                  ? 'bg-primary-600 text-white shadow-sm' 
+                  ? 'bg-primary-100 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:text-primary-400' 
                   : 'bg-surface-secondary text-foreground-secondary hover:bg-surface-hover'}`
               }
             >
@@ -293,54 +299,17 @@ export default function ServicesPage() {
                 {section.description}
               </motion.p>
               
-              <motion.div 
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4"
-                variants={sectionVariants}
-              >
-                {section.items.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <motion.div
-                      key={item.name}
-                      variants={itemVariants}
-                      layout
-                    >
-                      <Link
-                        href={item.path}
-                        className="group flex-col sm:flex-row items-start sm:items-center p-3 sm:p-4 bg-surface-primary rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 block min-h-[100px] sm:h-24"
-                      >
-                        <motion.div 
-                          whileHover={{ scale: 1.1 }}
-                          className={`shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-md ${item.color.split(' ').filter(c => !c.startsWith('border-')).join(' ')} flex items-center justify-center mb-2 sm:mb-0 sm:mr-3 transition-transform`}
-                        >
-                          <Icon size={24} className="text-current sm:w-7 sm:h-7" />
-                        </motion.div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start sm:items-center justify-between">
-                            <h3 className="text-sm sm:text-base font-semibold text-foreground-primary group-hover:text-primary-700 transition-colors line-clamp-1">
-                              {item.name}
-                            </h3>
-                            <motion.svg 
-                              initial={{ x: 0 }}
-                              whileHover={{ x: 3 }}
-                              xmlns="http://www.w3.org/2000/svg" 
-                              className="hidden sm:block h-4 w-4 text-primary-600 ml-2 transition-all shrink-0" 
-                              fill="none" 
-                              viewBox="0 0 24 24" 
-                              stroke="currentColor"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </motion.svg>
-                          </div>
-                          <p className="text-xs sm:text-sm text-foreground-secondary mt-0.5 line-clamp-2">
-                            {item.description}
-                          </p>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
+              <NavigationCardGrid columns={4}>
+                {section.items.map((item) => (
+                  <motion.div
+                    key={item.name}
+                    variants={itemVariants}
+                    layout
+                  >
+                    <NavigationCard {...item} />
+                  </motion.div>
+                ))}
+              </NavigationCardGrid>
             </motion.div>
           ))}
         </AnimatePresence>

@@ -4,13 +4,18 @@ import * as Sentry from "@sentry/nextjs";
 // Initialize Resend client lazily to handle missing API key gracefully
 let resendClient: Resend | null = null;
 
-function getResendClient(): Resend {
+function getResendClient(): Resend | null {
   if (!resendClient) {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
-      throw new Error(
-        "RESEND_API_KEY environment variable is not set. Please add it to your .env.local file."
-      );
+      // Log to Sentry that API key is missing
+      Sentry.withScope((scope) => {
+        scope.setLevel("error");
+        scope.setTag("email_issue", "missing_api_key");
+        Sentry.captureMessage("RESEND_API_KEY environment variable is not set");
+      });
+      console.error("RESEND_API_KEY environment variable is not set");
+      return null;
     }
     resendClient = new Resend(apiKey);
   }
@@ -60,6 +65,12 @@ export async function sendEmail(
 
   try {
     const resend = getResendClient();
+    
+    // If no client available (missing API key), return error
+    if (!resend) {
+      return { success: false, error: 'Email service not configured' };
+    }
+    
     const { data, error } = await resend.emails.send({
       from,
       to: Array.isArray(to) ? to : [to],

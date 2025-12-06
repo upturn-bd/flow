@@ -67,6 +67,9 @@ export { default as ServicePageTemplate } from './ServicePageTemplate';
 // Entity Components (EntityCard for card grids, EntityListItem for vertical lists)
 export { EntityCard, EntityCardGrid, EntityCardMetaItem, EntityCardBadge } from './EntityCard';
 
+// Navigation Components (for admin/ops pages with link cards)
+export { NavigationCard, NavigationCardGrid, NavigationSection } from './NavigationCard';
+
 // Types
 export type { SearchBarProps } from './SearchBar';
 export type { StatCardProps, StatCardGridProps } from './StatCard';
@@ -74,6 +77,7 @@ export type { PageHeaderProps, PageHeaderAction, BreadcrumbItem } from './PageHe
 export type { SectionProps, SectionHeaderProps } from './Section';
 export type { EntityListItemProps, EntityListProps } from './EntityListItem';
 export type { EntityCardProps, EntityCardGridProps, EntityCardMetaItemProps, EntityCardBadgeProps } from './EntityCard';
+export type { NavigationCardProps, NavigationCardGridProps, NavigationSectionProps } from './NavigationCard';
 export type { DataTableProps, DataTableColumn } from './DataTable';
 export type { BadgeProps, StatusBadgeProps, PriorityBadgeProps, RoleBadgeProps, CountBadgeProps } from './Badge';
 
