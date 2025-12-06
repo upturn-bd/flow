@@ -6,7 +6,7 @@ import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, FileText, MessageCircle, Check, X, CalendarDays } from "@/lib/icons";
+import { Calendar, User, FileText, ChatCircle, Check, X, CalendarBlank } from "@phosphor-icons/react";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
 import { extractEmployeeIdsFromRequests } from "@/lib/utils/project-utils";
@@ -105,7 +105,7 @@ export default function LeaveRequestsPage() {
         })
       ) : (
         <EmptyState
-          icon={<CalendarDays className="w-12 h-12" />}
+          icon={<CalendarBlank className="w-12 h-12" />}
           title="No leave requests"
           description="There are no pending leave requests at the moment."
         />
@@ -199,7 +199,7 @@ function LeaveRequestCard({
 
           <div>
             <label className="block text-sm font-medium text-foreground-secondary mb-2">
-              <MessageCircle size={16} className="inline mr-2" />
+              <ChatCircle size={16} className="inline mr-2" />
               Comment
             </label>
             <textarea

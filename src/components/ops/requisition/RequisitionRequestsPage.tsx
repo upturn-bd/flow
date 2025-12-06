@@ -2,10 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  PackageOpen, 
-  Truck 
-} from "@/lib/icons";
+import { Package, Truck } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
@@ -159,7 +156,7 @@ export default function RequisitionRequestsPage() {
         </>
       )}
 
-      {/* Edit Modal */}
+      {/* PencilSimple Modal */}
       {editingRequisition && (
         <RequisitionEditModal
           isOpen={!!editingRequisition}

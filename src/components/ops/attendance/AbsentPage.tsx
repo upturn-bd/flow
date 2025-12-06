@@ -3,7 +3,7 @@
 import { Attendance } from "@/hooks/useAttendance";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { CaretDown, Calendar, Search, Ban } from "@/lib/icons";
+import { CaretDown, Calendar, MagnifyingGlass, Prohibit } from "@phosphor-icons/react";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
@@ -107,14 +107,14 @@ export default function AttendanceAbsentPage() {
             onClick={fetchAttendanceData}
             className="bg-[#192D46] text-white rounded-lg px-4 py-2.5 font-medium hover:bg-[#0f1c2d] transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
           >
-            <Search />
+            <MagnifyingGlass />
             <span>Search</span>
           </button>
         </div>
 
         {/* Table */}
         {loading ? (
-          <LoadingSection text="Loading attendance records..." icon={Ban} color="blue" />
+          <LoadingSection text="Loading attendance records..." icon={Prohibit} color="blue" />
         ) : (
           <div className="overflow-x-auto rounded-lg border border-border-primary">
             <table className="min-w-full divide-y divide-border-primary">

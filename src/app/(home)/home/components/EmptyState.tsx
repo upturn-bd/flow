@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { IconType } from '@/lib/icons';
+import { Icon } from "@phosphor-icons/react";
 import { motion } from 'framer-motion';
 
 interface EmptyStateProps {
-  icon: IconType;
+  icon: Icon;
   message: string;
   iconSize?: number;
 }

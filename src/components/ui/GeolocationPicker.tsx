@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { MapPin } from "@/lib/icons";
+import { MapPin } from "@phosphor-icons/react";
 import { LoadingSpinner } from "@/components/ui";
 
 // Dynamically import the map component to avoid SSR issues

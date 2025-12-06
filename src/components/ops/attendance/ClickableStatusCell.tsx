@@ -5,7 +5,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { useState, useRef, useEffect } from "react";
-import { DotsThree } from "@/lib/icons";
+import { DotsThree } from "@phosphor-icons/react";
 
 const ClickableStatusCell = ({
     tag, id }: {

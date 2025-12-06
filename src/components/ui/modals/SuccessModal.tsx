@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, X } from '@/lib/icons';
+import { CheckCircle, X } from "@phosphor-icons/react";
 import Portal from '@/components/ui/Portal';
 
 interface SuccessModalProps {

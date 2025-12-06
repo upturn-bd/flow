@@ -1,4 +1,4 @@
-import { Calendar, Bell, CheckSquare, FolderKanban, AlertCircle, Briefcase } from '@/lib/icons';
+import { Calendar, Bell, CheckSquare, FolderOpen, WarningCircle, Briefcase } from "@phosphor-icons/react";
 import { WidgetDefinition } from '@/lib/types/widgets';
 import AttendanceWidget from './AttendanceWidget';
 import NoticesWidget from './NoticesWidget';
@@ -49,7 +49,7 @@ export const WIDGET_REGISTRY: Record<string, WidgetDefinition> = {
     type: 'projects',
     name: 'Projects',
     description: 'View your ongoing projects and milestones',
-    icon: FolderKanban,
+    icon: FolderOpen,
     defaultSize: 'medium',
     minSize: 'medium',
     maxSize: 'large',
@@ -60,7 +60,7 @@ export const WIDGET_REGISTRY: Record<string, WidgetDefinition> = {
     type: 'stakeholder-issues',
     name: 'Stakeholder Issues',
     description: 'View and manage stakeholder issues assigned to you',
-    icon: AlertCircle,
+    icon: WarningCircle,
     defaultSize: 'medium',
     minSize: 'medium',
     maxSize: 'large',

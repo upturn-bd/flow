@@ -2,7 +2,7 @@
  * Widget System Type Definitions
  */
 
-import { IconType } from '@/lib/icons';
+import { Icon } from "@phosphor-icons/react";
 import { ReactNode } from 'react';
 
 // Widget types available in the system
@@ -37,7 +37,7 @@ export interface WidgetConfig {
   settings?: Record<string, unknown>; // Widget-specific settings
 }
 
-// Home page layout configuration
+// House page layout configuration
 export interface HomeLayoutConfig {
   id?: number;
   employee_id: string;
@@ -53,7 +53,7 @@ export interface WidgetDefinition {
   type: WidgetType;
   name: string;
   description: string;
-  icon: IconType;
+  icon: Icon;
   defaultSize: WidgetSize;
   minSize?: WidgetSize;
   maxSize?: WidgetSize;

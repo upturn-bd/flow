@@ -6,16 +6,10 @@ import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
 import { useEffect, useState, Suspense } from "react";
 import { motion } from "framer-motion";
-import {
-  Clock,
-  FileCheck,
-  PlusCircle,
-  WarningCircle,
-  Calendar
-} from "@/lib/icons";
+import { Clock, FileText, PlusCircle, WarningCircle, Calendar } from "@phosphor-icons/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PERMISSION_MODULES } from "@/lib/constants";
-import { BookOpen } from "@/lib/icons";
+import { BookOpen } from "@phosphor-icons/react";
 
 function LeavePageContent() {
   const router = useRouter();
@@ -35,7 +29,7 @@ function LeavePageContent() {
     {
       key: "history",
       label: "History",
-      icon: <FileCheck className="h-5 w-5" />,
+      icon: <FileText className="h-5 w-5" />,
       color: "text-green-600",
       content: <LeaveHistoryPage />,
       link: "/ops/leave?tab=history",

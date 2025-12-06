@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { EyeOff, Eye } from "@/lib/icons";
+import { EyeSlash, Eye } from "@phosphor-icons/react";
 import Link from "next/link";
 
 interface FormData {
@@ -70,7 +70,7 @@ const page = () => {
                                     className="absolute top-5 right-3"
                                     onClick={togglePasswordVisibility}
                                 >
-                                    {showPassword ? <EyeOff className="text-2xl" /> : <Eye className="text-2xl" />}
+                                    {showPassword ? <EyeSlash className="text-2xl" /> : <Eye className="text-2xl" />}
                                 </button>
                             </div>
                             {errors.password && <p className="text-error">{errors.password.message}</p>}
@@ -90,7 +90,7 @@ const page = () => {
                                     className="absolute top-5 right-3"
                                     onClick={toggleConfirmPasswordVisibility}
                                 >
-                                    {showConfirmPassword ? <EyeOff className="text-2xl" /> : <Eye className="text-2xl" />}
+                                    {showConfirmPassword ? <EyeSlash className="text-2xl" /> : <Eye className="text-2xl" />}
                                 </button>
                             </div>
                             {errors.confirmPassword && <p className="text-error">{errors.confirmPassword.message}</p>}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Building, Code, Briefcase, Globe, Loader } from "@/lib/icons";
+import { Building, Code, Briefcase, Globe, CircleNotch } from "@phosphor-icons/react";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -28,9 +28,9 @@ export default function BasicTab() {
     company_name: "",
     industry_id: "",
     country_id: "",
-    // Operations Settings
+    // Operations Gear
     live_absent_enabled: false,
-    // Payroll Settings
+    // Payroll Gear
     fiscal_year_start: "2024-01-01",
   });
   const [errors, setErrors] = useState<Partial<Record<keyof CompanyBasicsFormData, string>>>({});
@@ -62,7 +62,7 @@ export default function BasicTab() {
         company_name: companyInfo.name || "",
         industry_id: companyInfo.industry_id?.toString() || "",
         country_id: companyInfo.country_id?.toString() || "",
-        // Operations Settings - add defaults if not present
+        // Operations Gear - add defaults if not present
         live_absent_enabled: companyInfo.live_absent_enabled ?? false,
         fiscal_year_start: companyInfo.fiscal_year_start ?? "2024-01-01",
       });

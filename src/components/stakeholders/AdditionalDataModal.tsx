@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { X, Plus, Trash, Save, CaretDown, CaretRight, CheckSquare, MapPin } from "@/lib/icons";
+import { X, Plus, TrashSimple, FloppyDisk, CaretDown, CaretRight, CheckSquare, MapPin } from "@phosphor-icons/react";
 import { StakeholderStepData, StakeholderProcessStep } from "@/lib/types/schemas";
 
 interface AdditionalDataModalProps {
@@ -530,7 +530,7 @@ export default function AdditionalDataModal({
                             onClick={() => handleRemoveField(field.key)}
                             className="shrink-0 p-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
                           >
-                            <Trash size={16} />
+                            <TrashSimple size={16} />
                           </button>
                         </div>
                       ))}
@@ -598,7 +598,7 @@ export default function AdditionalDataModal({
                           onClick={() => handleRemoveCustomField(index)}
                           className="shrink-0 px-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                         >
-                          <Trash size={18} />
+                          <TrashSimple size={18} />
                         </button>
                       </div>
                     </div>
@@ -623,8 +623,8 @@ export default function AdditionalDataModal({
             disabled={saving || (selectedFields.length === 0 && customFields.length === 0)}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Save size={16} />
-            {saving ? "Saving..." : "Save"}
+            <FloppyDisk size={16} />
+            {saving ? "Saving..." : "FloppyDisk"}
           </button>
         </div>
       </div>

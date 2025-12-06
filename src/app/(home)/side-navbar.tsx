@@ -7,12 +7,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
-import {
-  CaretLeft,
-  CaretRight,
-  List,
-  X,
-} from "@/lib/icons";
+import { CaretLeft, CaretRight, List, X } from "@phosphor-icons/react";
 
 export default function Sidebar() {
   const { isApproved, getAuthorizedNavItems } = useAuth();
@@ -176,7 +171,7 @@ export default function Sidebar() {
         </div>
       )}
 
-      {/* Navigation */}
+      {/* NavigationArrow */}
       <nav className={cn(
         "flex-1 overflow-y-auto overflow-x-hidden py-4",
         collapsed ? "px-2" : "px-3"
@@ -243,7 +238,7 @@ export default function Sidebar() {
               )}
               role="dialog"
               aria-modal="true"
-              aria-label="Navigation menu"
+              aria-label="NavigationArrow menu"
             >
               {/* Close button inside mobile sidebar */}
               <button

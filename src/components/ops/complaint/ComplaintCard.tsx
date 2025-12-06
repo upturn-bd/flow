@@ -1,17 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Flag,
-  CheckCheck,
-  XCircle,
-  Clock,
-  User,
-  MessageCircle,
-  FileText,
-  X,
-  Check
-} from "@/lib/icons";
+import { Flag, Checks, XCircle, Clock, User, ChatCircle, FileText, X, Check } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
@@ -135,7 +125,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
       {mode === "history" && complaint.comment && (
         <div className="mt-3 text-sm text-foreground-secondary bg-primary-50 dark:bg-primary-900/30 p-3 rounded-md">
           <div className="flex items-center gap-2 mb-1">
-            <MessageCircle size={14} />
+            <ChatCircle size={14} />
             <p className="font-medium">Feedback:</p>
           </div>
           <p>{complaint.comment}</p>
@@ -170,7 +160,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
             {canComment && (
               <div>
                 <label className="block text-sm font-medium text-foreground-secondary mb-2">
-                  <MessageCircle size={16} className="inline mr-2" />
+                  <ChatCircle size={16} className="inline mr-2" />
                   Add Comment
                 </label>
                 <textarea

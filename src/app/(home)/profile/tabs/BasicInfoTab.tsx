@@ -10,7 +10,7 @@ import {
 import { validateBasicInfo, validationErrorsToObject } from "@/lib/utils/validation";
 import { BasicInfoField } from "./BasicInfoField";
 import { motion } from "framer-motion";
-import { User, Briefcase, Calendar, CheckCircle, WarningCircle, DollarSign } from "@/lib/icons";
+import { User, Briefcase, Calendar, CheckCircle, WarningCircle, CurrencyDollar } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { fadeIn } from "@/components/ui/animations";
 import { useProfile } from "@/hooks/useProfile";
@@ -308,7 +308,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
               />
             </button>
             <span className="text-sm font-medium text-foreground-secondary">
-              {isEditMode ? 'Edit Mode On' : 'Edit Mode Off'}
+              {isEditMode ? 'PencilSimple Mode On' : 'PencilSimple Mode Off'}
             </span>
           </div>
         )}

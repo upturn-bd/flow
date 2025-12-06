@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "@/lib/icons";
+import { X } from "@phosphor-icons/react";
 import { fadeIn, fadeInUp } from "../animations";
 import { BaseModalProps } from "./types";
 

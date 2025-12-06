@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Settings, Calendar, DollarSign, Clock, Activity, Timer } from "@/lib/icons";
+import { Gear, Calendar, CurrencyDollar, Clock, Pulse, Timer } from "@phosphor-icons/react";
 import { staggerContainer } from "@/components/ui/animations";
 import FormToggleField from "@/components/ui/FormToggleField";
 import FormNumberField from "@/components/ui/FormNumberField";
@@ -50,7 +50,7 @@ export default function CompanySettingsConfigView({
       variants={staggerContainer}
       className="space-y-6"
     >
-      {/* Operations Settings */}
+      {/* Operations Gear */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -59,8 +59,8 @@ export default function CompanySettingsConfigView({
       >
         <div className="border-b border-border-primary px-3 py-4">
           <h3 className="text-lg font-semibold text-foreground-secondary flex items-center">
-            <Activity className="w-5 h-5 mr-2 text-foreground-tertiary" />
-            Operations Settings
+            <Pulse className="w-5 h-5 mr-2 text-foreground-tertiary" />
+            Operations Gear
           </h3>
         </div>
         
@@ -77,7 +77,7 @@ export default function CompanySettingsConfigView({
         </div>
       </motion.div>
 
-      {/* Time Settings */}
+      {/* Time Gear */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -87,7 +87,7 @@ export default function CompanySettingsConfigView({
         <div className="border-b border-border-primary px-3 py-4">
           <h3 className="text-lg font-semibold text-foreground-secondary flex items-center">
             <Timer className="w-5 h-5 mr-2 text-foreground-tertiary" />
-            Time Settings
+            Time Gear
           </h3>
         </div>
         

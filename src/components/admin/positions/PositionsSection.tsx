@@ -5,7 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import PositionDetailsModal from "./PositionDetailsModal";
 import PositionModal from "./PositionModal";
-import { Briefcase } from "@/lib/icons";
+import { Briefcase } from "@phosphor-icons/react";
 import { Section, EntityListItem, EntityList, BaseModal, Button } from "@/components/ui";
 
 type PositionsSectionProps = {

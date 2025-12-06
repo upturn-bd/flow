@@ -3,17 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { 
-  Buildings, 
-  GlobeHemisphereWest, 
-  Factory,
-  Users,
-  UserGear,
-  Home as House,
-  SignOut,
-  X,
-  List,
-} from "@/lib/icons";
+import { Buildings, GlobeHemisphereWest, Factory, Users, UserGear, House as House, SignOut, X, List } from "@phosphor-icons/react";
 import { ROUTES } from "@/lib/constants";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -69,7 +59,7 @@ export default function SuperadminNav() {
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* Desktop NavigationArrow */}
             <div className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -119,7 +109,7 @@ export default function SuperadminNav() {
         </div>
       </nav>
 
-      {/* Mobile Navigation */}
+      {/* Mobile NavigationArrow */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>

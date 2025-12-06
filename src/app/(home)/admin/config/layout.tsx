@@ -4,7 +4,7 @@
 import { AdminDataProvider } from "@/contexts/AdminDataContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation"; // Hook to get the current URL
-import { Home, CaretRight, Settings } from "@/lib/icons";
+import { House, CaretRight, Gear } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 
 // Helper function to capitalize and format the path segment
@@ -21,9 +21,9 @@ const ConfigurationBreadcrumbs = () => {
     const pathname = usePathname();
     const pathSegments = pathname.split('/').filter(segment => segment); // Split and remove empty strings
 
-    // The complete base path for configurations, including Home
+    // The complete base path for configurations, including House
     const baseBreadcrumbs = [
-        // Added Home back for the start of the trail
+        // Added House back for the start of the trail
         { href: "/admin", label: "Admin Management" },
         // This is the item that was being excluded by the old logic:
         { href: "/admin", label: "Company Configurations" }, 
@@ -31,14 +31,14 @@ const ConfigurationBreadcrumbs = () => {
     
     // The current page is the last segment of the path
     const currentSegment = pathSegments[pathSegments.length - 1];
-    // Example: /basic -> Basic Settings
-    const currentPageLabel = formatSegment(currentSegment) + " Settings";
+    // Example: /basic -> Basic Gear
+    const currentPageLabel = formatSegment(currentSegment) + " Gear";
     
     return (
         <nav className="flex mb-6 text-sm font-medium text-foreground-tertiary" aria-label="Breadcrumb">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
                 
-                {/* 1. Render Base Breadcrumbs (Home, Admin Management, Company Configurations) */}
+                {/* 1. Render Base Breadcrumbs (House, Admin Management, Company Configurations) */}
                 {baseBreadcrumbs.map((item, index) => (
                     <li key={index} className="inline-flex items-center">
                         {/* Corrected Logic: 
@@ -51,7 +51,7 @@ const ConfigurationBreadcrumbs = () => {
                             
                             <Link 
                                 href={item.href} 
-                                // Adjust margin for items after Home
+                                // Adjust margin for items after House
                                 className={`ml-1 ${index > 0 ? 'md:ml-3' : 'md:ml-0'} text-foreground-tertiary hover:text-blue-600 transition-colors inline-flex items-center`}
                             >
                                 {item.label}
@@ -65,7 +65,7 @@ const ConfigurationBreadcrumbs = () => {
                     <div className="flex items-center">
                         <CaretRight className="w-4 h-4 text-foreground-tertiary" />
                         <span className="ml-1 text-blue-600 md:ml-3 flex items-center">
-                            <Settings className="w-4 h-4 mr-1.5" />
+                            <Gear className="w-4 h-4 mr-1.5" />
                             {currentPageLabel}
                         </span>
                     </div>

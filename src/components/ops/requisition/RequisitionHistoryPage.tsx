@@ -2,13 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Loader,
-  XCircle,
-  PackageOpen,
-  Calendar,
-  Plus,
-} from "@/lib/icons";
+import { CircleNotch, XCircle, Package, Calendar, Plus } from "@phosphor-icons/react";
 import { extractFileNameFromStoragePath } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
@@ -170,7 +164,7 @@ export default function RequisitionHistoryPage() {
         )}
       </AnimatePresence>
 
-      {/* Edit Modal */}
+      {/* PencilSimple Modal */}
       {editingRequisition && (
         <RequisitionEditModal
           isOpen={!!editingRequisition}

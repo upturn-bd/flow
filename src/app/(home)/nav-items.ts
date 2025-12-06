@@ -1,15 +1,4 @@
-import {
-    UserCircle as UserCircleIcon,
-    ShoppingBag as ShoppingBagIcon,
-    GridFour as GridFourIcon,
-    NotePencil as NotePencilIcon,
-    Envelope as EnvelopeIcon,
-    Scroll as ScrollIcon,
-    UserGear as UserGearIcon,
-    MagnifyingGlass as MagnifyingGlassIcon,
-    User as UserIcon,
-    Bell as BellIcon,
-  } from "@phosphor-icons/react";
+import { UserCircle as UserCircleIcon, ShoppingBag as ShoppingBagIcon, GridFour as GridFourIcon, NotePencil as NotePencilIcon, Envelope as EnvelopeIcon, Scroll as ScrollIcon, UserGear as UserGearIcon, MagnifyingGlass as MagnifyingGlassIcon, User as UserIcon, Bell as BellIcon } from "@phosphor-icons/react";
 
 export type NavItem = {
   label: string;
@@ -23,7 +12,7 @@ export const navItems: NavItem[] = [
       label: "home",
       href: "/home",
       icon: GridFourIcon, 
-      requiredPermissions: [], // Home accessible to all approved users
+      requiredPermissions: [], // House accessible to all approved users
     },
     {
       label: "operations-and-services",

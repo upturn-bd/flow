@@ -2,16 +2,7 @@
 
 import React, { use, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Calendar,
-  Pencil,
-  Trash,
-  Plus,
-  Target,
-  Users,
-  ArrowUpRight,
-  CaretLeft,
-} from "@/lib/icons";
+import { Calendar, Pencil, TrashSimple, Plus, Target, Users, ArrowUpRight, CaretLeft } from "@phosphor-icons/react";
 import { Employee } from "@/lib/types/schemas";
 import { Milestone } from "@/hooks/useMilestones";
 import { Task, useTasks } from "@/hooks/useTasks";
@@ -352,7 +343,7 @@ export default function MilestoneDetails({
                             onClick={() => task.id !== null && handleDeleteTask(task.id!)}
                             className="p-1.5 text-foreground-secondary hover:text-red-600 hover:bg-red-50 rounded-full transition-colors duration-150"
                           >
-                            <Trash size={15} strokeWidth={2} />
+                            <TrashSimple size={15} strokeWidth={2} />
                           </motion.button>
                         </>
                       )}

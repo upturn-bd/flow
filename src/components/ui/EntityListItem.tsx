@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
-import { Eye, Trash, PencilSimple } from "@/lib/icons";
+import { Eye, TrashSimple, PencilSimple } from "@phosphor-icons/react";
 import LoadingSpinner from "./LoadingSpinner";
 
 export interface EntityListItemProps {
@@ -168,7 +168,7 @@ export function EntityListItem({
             </button>
           )}
 
-          {/* Edit button */}
+          {/* PencilSimple button */}
           {actions.onEdit && (
             <button
               onClick={(e) => {
@@ -184,7 +184,7 @@ export function EntityListItem({
               `}
             >
               <PencilSimple size={sizes.iconSize - 2} />
-              <span className="hidden xs:inline">{actions.editLabel || "Edit"}</span>
+              <span className="hidden xs:inline">{actions.editLabel || "PencilSimple"}</span>
             </button>
           )}
 
@@ -205,7 +205,7 @@ export function EntityListItem({
                 ${deleteLoading ? "opacity-50 cursor-not-allowed" : ""}
               `}
             >
-              <Trash size={sizes.iconSize - 2} />
+              <TrashSimple size={sizes.iconSize - 2} />
               <span className="hidden xs:inline">
                 {deleteLoading ? "Deleting..." : (actions.deleteLabel || "Delete")}
               </span>

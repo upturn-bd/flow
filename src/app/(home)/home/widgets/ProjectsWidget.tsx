@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FolderKanban, Clock, ArrowsClockwise, Plus } from '@/lib/icons';
+import { FolderOpen, Clock, ArrowsClockwise, Plus } from "@phosphor-icons/react";
 import SectionHeader from '@/app/(home)/home/components/SectionHeader';
 import LoadingSection from '@/app/(home)/home/components/LoadingSection';
 import EmptyState from '@/app/(home)/home/components/EmptyState';
@@ -57,14 +57,14 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
     <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
       <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
         <div className="p-5 shrink-0">
-          <SectionHeader title="My Projects" icon={FolderKanban} iconColor="text-purple-600" />
+          <SectionHeader title="My Projects" icon={FolderOpen} iconColor="text-purple-600" />
         </div>
         
         {!canViewProjects ? (
           <NoPermissionMessage moduleName="projects" />
         ) : loading || ongoingLoading ? (
           <div className="flex-1 flex items-center justify-center overflow-hidden">
-            <LoadingSection text="Loading projects..." icon={FolderKanban} />
+            <LoadingSection text="Loading projects..." icon={FolderOpen} />
           </div>
         ) : (
           <div
@@ -120,7 +120,7 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
                 ))
               ) : (
                 <EmptyState 
-                  icon={FolderKanban} 
+                  icon={FolderOpen} 
                   message="No ongoing projects at this time" 
                 />
               )}

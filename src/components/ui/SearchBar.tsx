@@ -1,6 +1,6 @@
 "use client";
 
-import { MagnifyingGlass, X } from "@/lib/icons";
+import { MagnifyingGlass, X } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { forwardRef, InputHTMLAttributes } from "react";
 

@@ -2,17 +2,7 @@
 
 import React, { useEffect, useState, ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Upload,
-  Calendar,
-  Clock,
-  CaretDown,
-  PackageOpen,
-  WarningCircle,
-  Check,
-  X,
-  FileText,
-} from "@/lib/icons";
+import { Upload, Calendar, Clock, CaretDown, Package, WarningCircle, Check, X, FileText } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import BaseModal from "@/components/ui/modals/BaseModal";
@@ -236,7 +226,7 @@ export default function RequisitionEditModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Edit Requisition"
+      title="PencilSimple Requisition"
       icon={<PackageOpen className="text-blue-600" size={24} />}
       size="lg"
     >

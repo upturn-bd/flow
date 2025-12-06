@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, CheckSquare, MapPin, Navigation, AlertTriangle, AlertCircle, CheckCircle } from '@/lib/icons';
+import { Calendar, Clock, CheckSquare, MapPin, NavigationArrow, Warning, WarningCircle, CheckCircle } from "@phosphor-icons/react";
 import { cn } from '@/components/ui/class';
 import SectionHeader from './SectionHeader';
 import LoadingSection from './LoadingSection';
@@ -280,14 +280,14 @@ export default function AttendanceSection({
                   <div className="space-y-3">
                     {locationLoading && (
                       <div className="flex items-center gap-2 text-primary-600 text-sm">
-                        <Navigation className="w-4 h-4 animate-spin" />
+                        <NavigationArrow className="w-4 h-4 animate-spin" />
                         Getting your location...
                       </div>
                     )}
 
                     {locationError && (
                       <div className="flex items-center gap-2 text-red-600 text-sm">
-                        <AlertCircle className="w-4 h-4" />
+                        <WarningCircle className="w-4 h-4" />
                         {locationError}
                       </div>
                     )}
@@ -308,7 +308,7 @@ export default function AttendanceSection({
 
                         {getDistanceToSite() && getDistanceToSite()! > 100 && (
                           <div className="flex items-center gap-2 mt-2 text-amber-700 text-xs">
-                            <AlertTriangle className="w-3 h-3" />
+                            <Warning className="w-3 h-3" />
                             You are more than 100m away from the site
                           </div>
                         )}

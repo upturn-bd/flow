@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Lock, LockOpen, Eye, PencilSimple, Trash, CheckCircle, ChatCircle } from "@/lib/icons";
+import { LockKey, LockKeyOpen, Eye, PencilSimple, TrashSimple, CheckCircle, ChatCircle } from "@phosphor-icons/react";
 import { PermissionAction, PERMISSION_ACTIONS } from "@/lib/constants";
 
 interface PermissionBadgeProps {
@@ -24,12 +24,12 @@ const actionConfig = {
   },
   [PERMISSION_ACTIONS.WRITE]: {
     icon: PencilSimple,
-    label: "Edit",
+    label: "PencilSimple",
     colorGranted: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800",
     colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   },
   [PERMISSION_ACTIONS.DELETE]: {
-    icon: Trash,
+    icon: TrashSimple,
     label: "Delete",
     colorGranted: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800",
     colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
@@ -82,7 +82,7 @@ export function PermissionBadge({
   iconOnly = false,
 }: PermissionBadgeProps) {
   const config = actionConfig[action as keyof typeof actionConfig] || {
-    icon: Lock,
+    icon: LockKey,
     label: "Unknown",
     colorGranted: "bg-background-secondary dark:bg-background-tertiary text-foreground-primary border-border-primary",
     colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",

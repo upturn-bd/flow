@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, X, Trash } from "@/lib/icons";
+import { Check, X, TrashSimple } from "@phosphor-icons/react";
 
 interface InlineDeleteConfirmProps {
   /** Whether this item is in delete confirmation mode */
@@ -82,7 +82,7 @@ export function InlineDeleteConfirm({
       disabled={disabled}
       title={disabled ? disabledTitle : title}
     >
-      <Trash size={size} />
+      <TrashSimple size={size} />
     </button>
   );
 }

@@ -3,11 +3,11 @@
 import { Attendance } from "@/hooks/useAttendance";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { CaretDown, Calendar, Search } from "@/lib/icons";
+import { CaretDown, Calendar, MagnifyingGlass } from "@phosphor-icons/react";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { Clock } from "@/lib/icons";
+import { Clock } from "@phosphor-icons/react";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function AttendancePresentPage() {
@@ -108,7 +108,7 @@ export default function AttendancePresentPage() {
             onClick={fetchAttendanceData}
             className="bg-[#192D46] text-white rounded-lg px-4 py-2.5 font-medium hover:bg-[#0f1c2d] transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
           >
-            <Search />
+            <MagnifyingGlass />
             <span>Search</span>
           </button>
         </div>

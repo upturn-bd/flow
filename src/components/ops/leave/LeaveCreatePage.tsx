@@ -5,7 +5,7 @@ import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { Leave } from "@/lib/types";
 import { validateLeave, validationErrorsToObject } from "@/lib/utils/validation";
 import React, { useEffect, useState } from "react";
-import { Calendar, CheckCircle, Clock, Info } from "@/lib/icons";
+import { Calendar, CheckCircle, Clock, Info } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { getEmployeeInfo } from "@/lib/utils/auth";

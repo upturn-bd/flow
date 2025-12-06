@@ -2,7 +2,7 @@
 
 import { IssueCategoryFormData, IssueSubcategoryFormData } from "@/hooks/useStakeholderIssueCategories";
 import { validateIssueCategory, validateIssueSubcategory } from "@/lib/validation/schemas/stakeholder-issue-categories";
-import { Tag, FolderOpen } from "@/lib/icons";
+import { Tag, FolderOpen } from "@phosphor-icons/react";
 import { FormModal } from "@/components/ui/modals";
 import { FormField, TextAreaField, ToggleField, ColorField, SelectField } from "@/components/forms";
 import { StakeholderIssueCategory } from "@/lib/types/schemas";
@@ -31,7 +31,7 @@ export function IssueCategoryFormModal({
 
   return (
     <FormModal<IssueCategoryFormData>
-      title={category ? "Edit Issue Category" : "Add Issue Category"}
+      title={category ? "PencilSimple Issue Category" : "Add Issue Category"}
       icon={<Tag size={24} weight="duotone" />}
       initialValues={initialValues}
       validationFn={validateIssueCategory}
@@ -118,7 +118,7 @@ export function IssueSubcategoryFormModal({
 
   return (
     <FormModal<IssueSubcategoryFormData>
-      title={subcategory ? "Edit Subcategory" : "Add Subcategory"}
+      title={subcategory ? "PencilSimple Subcategory" : "Add Subcategory"}
       icon={<FolderOpen size={24} weight="duotone" />}
       initialValues={initialValues}
       validationFn={validateIssueSubcategory}

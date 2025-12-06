@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, X } from "@/lib/icons";
+import { ArrowLeft, FloppyDisk, X } from "@phosphor-icons/react";
 import { ReactNode } from "react";
 
 interface FormLayoutProps {
@@ -29,7 +29,7 @@ export function FormLayout({
   onCancel,
   children,
   isLoading = false,
-  saveLabel = "Save",
+  saveLabel = "FloppyDisk",
   cancelLabel = "Cancel",
   className = "",
   showBackButton = true,
@@ -83,7 +83,7 @@ export function FormLayout({
               isLoading={isLoading}
               className="flex items-center gap-2"
             >
-              <Save size={16} />
+              <FloppyDisk size={16} />
               {saveLabel}
             </Button>
           )}

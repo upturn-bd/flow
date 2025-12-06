@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, X, Clock, MapPin, Send } from '@/lib/icons';
+import { CheckCircle, X, Clock, MapPin, PaperPlaneTilt } from "@phosphor-icons/react";
 import Portal from '@/components/ui/Portal';
 
 interface AttendanceStatusModalProps {
@@ -221,7 +221,7 @@ export default function AttendanceStatusModal({
                           isSendingRequest ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                       >
-                        <Send size={18} className={isSendingRequest ? 'animate-spin' : ''} />
+                        <PaperPlaneTilt size={18} className={isSendingRequest ? 'animate-spin' : ''} />
                         {isSendingRequest ? 'Sending...' : 'Send Request'}
                       </button>
                     )}

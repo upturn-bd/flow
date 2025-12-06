@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Lock } from "@/lib/icons";
+import { LockKey } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface PermissionTooltipProps {

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { WarningCircle, Plus, ArrowsClockwise, FileText, Tag, UsersThree, User } from '@/lib/icons';
+import { WarningCircle, Plus, ArrowsClockwise, FileText, Tag, UsersThree, User } from "@phosphor-icons/react";
 import SectionHeader from '@/app/(home)/home/components/SectionHeader';
 import LoadingSection from '@/app/(home)/home/components/LoadingSection';
 import EmptyState from '@/app/(home)/home/components/EmptyState';

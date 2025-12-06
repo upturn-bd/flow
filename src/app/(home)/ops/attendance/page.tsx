@@ -9,13 +9,7 @@ import AttendanceSection from "@/app/(home)/home/components/AttendanceSection";
 
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
-import {
-  Calendar,
-  UserCheck,
-  UserX,
-  Clock,
-  ClipboardCheck,
-} from "@/lib/icons";
+import { Calendar, UserCheck, UserMinus, Clock, ClipboardText } from "@phosphor-icons/react";
 import { useSearchParams } from "next/navigation";
 import { useState, Suspense, useEffect, useMemo } from "react";
 import { PERMISSION_MODULES } from "@/lib/constants";
@@ -189,7 +183,7 @@ function AttendancePageContent() {
     {
       key: "request",
       label: "Request",
-      icon: <ClipboardCheck className="h-5 w-5" />,
+      icon: <ClipboardText className="h-5 w-5" />,
       color: "text-blue-600",
       content: <AttendanceRequestsPage />,
       link: "/ops/attendance?tab=request",

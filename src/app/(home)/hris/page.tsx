@@ -6,14 +6,7 @@ import { motion } from "framer-motion";
 import BasicInfoTab from "./tabs/BasicInfoTab";
 import PersonalInfoTab from "./tabs/PersonalInfoTab";
 import EducationExperienceTab from "./tabs/EducationExperienceTab";
-import {
-  User,
-  ClipboardList,
-  GraduationCap,
-  BarChart2,
-  FileCheck,
-  ArrowLeft,
-} from "@/lib/icons";
+import { User, ClipboardText, GraduationCap, ChartBarHorizontal, FileText, ArrowLeft } from "@phosphor-icons/react";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import Link from "next/link";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -84,7 +77,7 @@ function ProfileContent() {
       {
         key: "personal",
         label: "Personal Information",
-        icon: <ClipboardList className="h-5 w-5" />,
+        icon: <ClipboardText className="h-5 w-5" />,
         color: "text-purple-600",
         content: <PersonalInfoTab uid={uid} />,
       },
@@ -98,7 +91,7 @@ function ProfileContent() {
       {
         key: "key-performance-indicator",
         label: "Key Performance Indicator",
-        icon: <BarChart2 className="h-5 w-5" />,
+        icon: <ChartBarHorizontal className="h-5 w-5" />,
         color: "text-amber-600",
         content: (
           <div className="flex flex-col items-center justify-center py-16 text-foreground-tertiary">
@@ -107,7 +100,7 @@ function ProfileContent() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <BarChart2 className="h-16 w-16 text-amber-200 mb-4" />
+              <ChartBarHorizontal className="h-16 w-16 text-amber-200 mb-4" />
             </motion.div>
             <h3 className="text-xl font-medium mb-2">
               Key Performance Indicator
@@ -122,7 +115,7 @@ function ProfileContent() {
       {
         key: "performance-evaluation",
         label: "Performance Evaluation",
-        icon: <FileCheck className="h-5 w-5" />,
+        icon: <FileText className="h-5 w-5" />,
         color: "text-indigo-600",
         content: (
           <div className="flex flex-col items-center justify-center py-16 text-foreground-tertiary">
@@ -131,7 +124,7 @@ function ProfileContent() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <FileCheck className="h-16 w-16 text-indigo-200 mb-4" />
+              <FileText className="h-16 w-16 text-indigo-200 mb-4" />
             </motion.div>
             <h3 className="text-xl font-medium mb-2">Performance Evaluation</h3>
             <p className="mt-2 text-center max-w-md">

@@ -2,16 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  FileText,
-  Target,
-  Building,
-  UserCircle,
-  Calendar,
-  Check,
-  X,
-  WarningCircle,
-} from "@/lib/icons";
+import { FileText, Target, Building, UserCircle, Calendar, Check, X, WarningCircle } from "@phosphor-icons/react";
 import {
   validateProject,
   validationErrorsToObject,

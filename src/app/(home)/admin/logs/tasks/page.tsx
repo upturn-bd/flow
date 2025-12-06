@@ -5,7 +5,7 @@ import { useTasks } from "@/hooks/useTasks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
-import { Trash, RotateCcw, CheckCircle, Edit } from "@/lib/icons";
+import { TrashSimple, ArrowCounterClockwise, CheckCircle, PencilSimple } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import TaskUpdateModal from "@/components/ops/tasks/shared/TaskUpdateModal";
@@ -170,7 +170,7 @@ export default function CompanyTaskLogsPage() {
                                     onClick={() => task.id && handleReopen(task.id)}
                                     className="p-2"
                                  >
-                                    <RotateCcw size={16} />
+                                    <ArrowCounterClockwise size={16} />
                                  </Button>
                               )}
                            </>
@@ -187,7 +187,7 @@ export default function CompanyTaskLogsPage() {
                                  onClick={() => handleEdit(task)}
                                  className="p-2"
                               >
-                                 <Edit size={16} />
+                                 <PencilSimple size={16} />
                               </Button>
                            )}
 
@@ -199,7 +199,7 @@ export default function CompanyTaskLogsPage() {
                               onClick={() => task.id && handleDelete(task.id)}
                               className="p-2"
                            >
-                              <Trash size={16} />
+                              <TrashSimple size={16} />
                            </Button>
                         )}
                      </div>

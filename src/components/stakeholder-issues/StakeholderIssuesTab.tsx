@@ -5,15 +5,7 @@ import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { useModalState } from "@/hooks/core/useModalState";
 import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIssueForm";
 import BaseModal from "@/components/ui/modals/BaseModal";
-import {
-  Plus,
-  WarningCircle,
-  Download,
-  Trash,
-  Eye,
-  CheckCircle,
-  Clock,
-} from "@/lib/icons";
+import { Plus, WarningCircle, Download, TrashSimple, Eye, CheckCircle, Clock } from "@phosphor-icons/react";
 import { StakeholderIssue } from "@/lib/types/schemas";
 import { InlineSpinner } from "@/components/ui";
 
@@ -262,7 +254,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                       openCreateModal();
                     }}
                     className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded transition-colors"
-                    title="Edit issue"
+                    title="PencilSimple issue"
                   >
                     <Eye size={18} />
                   </button>
@@ -271,7 +263,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                     className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
                     title="Delete issue"
                   >
-                    <Trash size={18} />
+                    <TrashSimple size={18} />
                   </button>
                 </div>
               </div>
@@ -280,7 +272,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
         </div>
       )}
 
-      {/* Create/Edit Issue Modal */}
+      {/* Create/PencilSimple Issue Modal */}
       {modalState.isOpen && (
         <BaseModal isOpen={modalState.isOpen} onClose={closeModal} title={selectedIssue ? "Update Issue" : "Create New Issue"}>
           <StakeholderIssueForm

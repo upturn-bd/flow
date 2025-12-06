@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bug } from "@/lib/icons";
+import { Bug } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import ReportProblemModal from "./ReportProblemModal";
 

@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XCircle, X } from '@/lib/icons';
+import { XCircle, X } from "@phosphor-icons/react";
 import Portal from '@/components/ui/Portal';
 
 interface ErrorModalProps {

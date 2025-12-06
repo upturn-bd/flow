@@ -4,7 +4,7 @@ import { FormField, SelectField, TextAreaField, NumberField, SingleEmployeeSelec
 import { validateRequisitionInventory, type RequisitionInventoryData } from '@/lib/validation';
 import { useDepartments } from '@/hooks/useDepartments';
 import { useEmployees } from '@/hooks/useEmployees';
-import { Package, UserPlus, Buildings, Tag } from '@/lib/icons';
+import { Package, UserPlus, Buildings, Tag } from "@phosphor-icons/react";
 
 interface RequisitionInventoryCreateModalProps {
   isOpen: boolean;

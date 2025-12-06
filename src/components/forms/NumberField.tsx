@@ -1,5 +1,5 @@
 import React from 'react';
-import { Hash, Plus, Minus } from '@/lib/icons';
+import { Hash, Plus, Minus } from "@phosphor-icons/react";
 import { Button } from '@/components/ui/button';
 
 interface NumberFieldProps {

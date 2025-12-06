@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Plus, Tag, Trash, PencilSimple, FolderOpen, CaretDown, CaretRight } from "@/lib/icons";
+import { Plus, Tag, TrashSimple, PencilSimple, FolderOpen, CaretDown, CaretRight } from "@phosphor-icons/react";
 import { useStakeholderIssueCategories, IssueCategoryFormData, IssueSubcategoryFormData } from "@/hooks/useStakeholderIssueCategories";
 import { IssueCategoryFormModal, IssueSubcategoryFormModal } from "./IssueCategoryFormModal";
 import Collapsible from "../CollapsibleComponent";
@@ -232,7 +232,7 @@ export default function IssueCategoryManagementView() {
                           size="sm"
                           onClick={() => handleEditCategory(category)}
                           className="p-1.5 rounded-full text-foreground-tertiary hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-600"
-                          title="Edit Category"
+                          title="PencilSimple Category"
                         >
                           <PencilSimple size={16} weight="bold" />
                         </Button>
@@ -245,7 +245,7 @@ export default function IssueCategoryManagementView() {
                           className="p-1.5 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-500"
                           title="Delete Category"
                         >
-                          <Trash size={16} weight="bold" />
+                          <TrashSimple size={16} weight="bold" />
                         </Button>
                       </div>
                     </div>
@@ -283,7 +283,7 @@ export default function IssueCategoryManagementView() {
                                     size="sm"
                                     onClick={() => handleEditSubcategory(subcategory)}
                                     className="p-1 rounded-full text-foreground-tertiary hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-600"
-                                    title="Edit Subcategory"
+                                    title="PencilSimple Subcategory"
                                   >
                                     <PencilSimple size={14} weight="bold" />
                                   </Button>
@@ -296,7 +296,7 @@ export default function IssueCategoryManagementView() {
                                     className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-500"
                                     title="Delete Subcategory"
                                   >
-                                    <Trash size={14} weight="bold" />
+                                    <TrashSimple size={14} weight="bold" />
                                   </Button>
                                 </div>
                               </div>

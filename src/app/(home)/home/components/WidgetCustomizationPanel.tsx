@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Save, RotateCcw, Eye, EyeOff, GripVertical, CaretUp as ChevronUp, CaretDown as ChevronDown } from '@/lib/icons';
+import { X, FloppyDisk, ArrowCounterClockwise, Eye, EyeSlash, DotsNine, CaretUp as ChevronUp, CaretDown as ChevronDown } from "@phosphor-icons/react";
 import { WidgetConfig, WidgetSize } from '@/lib/types/widgets';
 import { getWidgetDefinition } from '@/app/(home)/home/widgets/widgetRegistry';
 
@@ -263,7 +263,7 @@ export default function WidgetCustomizationPanel({
                         }`}
                         aria-label={widget.enabled ? 'Hide widget' : 'Show widget'}
                       >
-                        {widget.enabled ? <Eye size={18} /> : <EyeOff size={18} />}
+                        {widget.enabled ? <Eye size={18} /> : <EyeSlash size={18} />}
                       </button>
                     </div>
                     {/* Bottom row: Reorder buttons, Size selector */}
@@ -311,7 +311,7 @@ export default function WidgetCustomizationPanel({
                       >
                         <ChevronUp size={16} className="text-foreground-tertiary" />
                       </button>
-                      <GripVertical size={16} className="text-foreground-tertiary" />
+                      <DotsNine size={16} className="text-foreground-tertiary" />
                       <button
                         onClick={() => moveWidgetDown(index)}
                         disabled={index === localWidgets.length - 1}
@@ -356,7 +356,7 @@ export default function WidgetCustomizationPanel({
                       }`}
                       aria-label={widget.enabled ? 'Hide widget' : 'Show widget'}
                     >
-                      {widget.enabled ? <Eye size={18} /> : <EyeOff size={18} />}
+                      {widget.enabled ? <Eye size={18} /> : <EyeSlash size={18} />}
                     </button>
                   </div>
                 </motion.div>
@@ -371,7 +371,7 @@ export default function WidgetCustomizationPanel({
             onClick={handleReset}
             className="px-4 py-2 text-sm font-medium text-foreground-secondary hover:bg-surface-hover rounded-lg transition-colors flex items-center justify-center gap-2"
           >
-            <RotateCcw size={16} />
+            <ArrowCounterClockwise size={16} />
             <span className="hidden sm:inline">Reset to Default</span>
             <span className="sm:hidden">Reset</span>
           </button>
@@ -388,8 +388,8 @@ export default function WidgetCustomizationPanel({
               disabled={!hasChanges || saving}
               className="flex-1 sm:flex-none px-6 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
             >
-              <Save size={16} />
-              {saving ? 'Saving...' : 'Save Changes'}
+              <FloppyDisk size={16} />
+              {saving ? 'Saving...' : 'FloppyDisk Changes'}
             </button>
           </div>
         </div>

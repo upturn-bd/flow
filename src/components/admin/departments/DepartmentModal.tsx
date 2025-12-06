@@ -144,7 +144,7 @@ export default function DepartmentModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title={initialData ? "Edit Department" : "Create Department"}
+      title={initialData ? "PencilSimple Department" : "Create Department"}
       size="sm"
       preventBackdropClose={isSubmitting}
     >

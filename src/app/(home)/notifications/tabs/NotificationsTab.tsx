@@ -2,17 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import {
-  Bell,
-  Clock,
-  WarningCircle,
-  Calendar,
-  Briefcase,
-  User,
-  Trash,
-  Check,
-  ExternalLink
-} from "@/lib/icons";
+import { Bell, Clock, WarningCircle, Calendar, Briefcase, User, TrashSimple, Check, ArrowSquareOut } from "@phosphor-icons/react";
 import { useNotifications, Notification } from "@/hooks/useNotifications";
 import { formatRelativeTime } from "@/lib/utils";
 import Link from "next/link";
@@ -211,7 +201,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
               className="text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded"
               title="View details"
             >
-              <ExternalLink className="h-4 w-4" />
+              <ArrowSquareOut className="h-4 w-4" />
             </Link>
           )}
 
@@ -230,7 +220,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
             className="text-red-600 hover:bg-red-50 p-1.5 rounded"
             title="Delete notification"
           >
-            <Trash className="h-4 w-4" />
+            <TrashSimple className="h-4 w-4" />
           </button>
         </div>
       </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
 import NoticesCreateModal from "./NoticeModal";
-import { NewspaperClipping, Trash, Plus } from "@/lib/icons";
+import { NewspaperClipping, TrashSimple, Plus } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 
@@ -86,7 +86,7 @@ export default function NoticeView() {
                         disabled={deleteLoading === type.id}
                         className="ml-2 p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
                       >
-                        <Trash size={16} weight="bold" />
+                        <TrashSimple size={16} weight="bold" />
                       </Button>
                     </div>
                   ))}

@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Users } from "@/lib/icons";
+import { MagnifyingGlass, X, Users } from "@phosphor-icons/react";
 import { matchesEmployeeSearch } from "@/lib/utils/user-search";
 
 interface AssigneeSelectProps {
@@ -73,7 +73,7 @@ export default function AssigneeSelect({
           placeholder="Search for assignees..."
           className="w-full rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-background-secondary p-3 pr-10 text-foreground-primary"
         />
-        <Search 
+        <MagnifyingGlass 
           size={16} 
           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
           strokeWidth={2}

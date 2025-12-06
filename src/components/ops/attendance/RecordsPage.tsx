@@ -3,10 +3,10 @@
 import { Attendance } from "@/hooks/useAttendance";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState, useMemo } from "react";
-import { CaretDown, Calendar } from "@/lib/icons";
+import { CaretDown, Calendar } from "@phosphor-icons/react";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { Clock } from "@/lib/icons";
+import { Clock } from "@phosphor-icons/react";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 
 export default function AttendanceRecordsPage() {

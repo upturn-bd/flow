@@ -3,7 +3,7 @@ import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEffect, useState } from "react";
 import SettlementCreatePage from "./SettlementCreatePage";
 import SettlementDraftPage from "./SettlementDraftPage";
-import { Receipt, FileEdit, Trash, Clock } from "@/lib/icons";
+import { Receipt, FileText, TrashSimple, Clock } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -110,7 +110,7 @@ export default function UpcomingPage({setActiveTab} : {setActiveTab: (tab:string
                           <button
                             onClick={() => setDisplayDraftId(item.draft_id)}
                             className="p-1.5 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-full transition-colors"
-                            aria-label="Edit draft"
+                            aria-label="PencilSimple draft"
                           >
                             <FileEdit className="h-5 w-5" />
                           </button>
@@ -119,7 +119,7 @@ export default function UpcomingPage({setActiveTab} : {setActiveTab: (tab:string
                             className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-colors"
                             aria-label="Delete draft"
                           >
-                            <Trash className="h-5 w-5" />
+                            <TrashSimple className="h-5 w-5" />
                           </button>
                         </div>
                       </div>

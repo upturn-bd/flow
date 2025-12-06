@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckSquare, Clock, Plus, CheckCircle, Circle } from '@/lib/icons';
+import { CheckSquare, Clock, Plus, CheckCircle, Circle } from "@phosphor-icons/react";
 import { cn } from '@/components/ui/class';
 import { formatDateToDayMonth } from '@/lib/utils';
 import BaseWidget from './BaseWidget';

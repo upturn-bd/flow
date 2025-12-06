@@ -31,10 +31,10 @@ export interface StakeholderIssueSearchOptions {
   pageSize?: number;
   filterStatus?: "all" | "Pending" | "In Progress" | "Resolved";
   filterPriority?: "all" | "Low" | "Medium" | "High" | "Urgent";
-  filterCategoryId?: number | "all"; // Filter by category
-  filterSubcategoryId?: number | "all"; // Filter by subcategory
-  assignedToId?: string; // Filter by assigned employee
-  assignedTeamId?: number; // Filter by assigned team
+  filterCategoryId?: number | "all"; // FunnelSimple by category
+  filterSubcategoryId?: number | "all"; // FunnelSimple by subcategory
+  assignedToId?: string; // FunnelSimple by assigned employee
+  assignedTeamId?: number; // FunnelSimple by assigned team
 }
 
 export interface StakeholderIssueSearchResult {
@@ -259,7 +259,7 @@ export function useStakeholderIssues() {
 
       // Build OR filter for assigned_to or assigned_team_id
       if (targetAssignedToId && assignedTeamIds && assignedTeamIds.length > 0) {
-        // Filter by either employee OR any of the teams
+        // FunnelSimple by either employee OR any of the teams
         const teamIdList = assignedTeamIds.join(',');
         query = query.or(`assigned_to.eq.${targetAssignedToId},assigned_team_id.in.(${teamIdList})`);
       } else if (targetAssignedToId) {

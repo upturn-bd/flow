@@ -6,7 +6,7 @@ import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
-import { Trash, Edit } from "@/lib/icons";
+import { TrashSimple, PencilSimple } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
@@ -165,7 +165,7 @@ export default function CompanyProjectsPage() {
                               onClick={() => handleEdit(project)}
                               className="p-2"
                            >
-                              <Edit size={16} />
+                              <PencilSimple size={16} />
                            </Button>
                         )}
 
@@ -176,7 +176,7 @@ export default function CompanyProjectsPage() {
                               onClick={() => project.id && handleDelete(project.id)}
                               className="p-2"
                            >
-                              <Trash size={16} />
+                              <TrashSimple size={16} />
                            </Button>
                         )}
                      </div>

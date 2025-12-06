@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { MailCheck } from "@/lib/icons";
+import { EnvelopeSimple } from "@phosphor-icons/react";
 import { useSearchParams } from "next/navigation";
 
 const Verify = () => {
@@ -49,7 +49,7 @@ const Verify = () => {
 
                         {/* Lucide Icon with gentle animation */}
                         <div className="flex justify-center mb-8">
-                            <MailCheck
+                            <EnvelopeSimple
                                 className="text-foreground-primary w-24 h-24 md:w-28 md:h-28 animate-bounce-slow"
                                 strokeWidth={1.5}
                             />

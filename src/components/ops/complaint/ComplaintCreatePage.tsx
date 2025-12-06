@@ -2,18 +2,7 @@
 
 import React, { useEffect, useState, ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Upload,
-  CaretLeft,
-  CaretDown,
-  WarningCircle,
-  Check,
-  X,
-  FileText,
-  MessageCircle,
-  User,
-  Flag
-} from "@/lib/icons";
+import { Upload, CaretLeft, CaretDown, WarningCircle, Check, X, FileText, ChatCircle, User, Flag } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { supabase } from "@/lib/supabase/client";
 import { ComplaintRecord } from "@/lib/types/schemas";

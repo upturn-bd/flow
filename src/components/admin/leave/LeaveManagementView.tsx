@@ -9,7 +9,7 @@ import {
   LeaveTypeUpdateModal,
 } from ".";
 import { useLeaveTypes } from "@/hooks/useConfigTypes";
-import { Tag, CalendarCheck, CalendarBlank, Plus, Clock } from "@/lib/icons";
+import { Tag, CalendarCheck, CalendarBlank, Plus, Clock } from "@phosphor-icons/react";
 import { useHolidayConfigs, useWeeklyHolidayConfigs } from "@/hooks/useLeaveManagement";
 import { HolidayConfig, LeaveType } from "@/hooks/useLeaveManagement";
 import { Button } from "@/components/ui/button";

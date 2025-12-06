@@ -67,7 +67,7 @@ export { default as ServicePageTemplate } from './ServicePageTemplate';
 // Entity Components (EntityCard for card grids, EntityListItem for vertical lists)
 export { EntityCard, EntityCardGrid, EntityCardMetaItem, EntityCardBadge } from './EntityCard';
 
-// Navigation Components (for admin/ops pages with link cards)
+// NavigationArrow Components (for admin/ops pages with link cards)
 export { NavigationCard, NavigationCardGrid, NavigationSection } from './NavigationCard';
 
 // Types

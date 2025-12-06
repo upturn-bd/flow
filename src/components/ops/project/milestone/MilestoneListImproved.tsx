@@ -2,15 +2,7 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Calendar,
-  ArrowRight,
-  Pencil,
-  Trash,
-  Plus,
-  Target,
-  Users,
-} from "@/lib/icons";
+import { Calendar, ArrowRight, Pencil, TrashSimple, Plus, Target, Users } from "@phosphor-icons/react";
 import { type Milestone as MilestoneType } from "./MilestoneForm";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -87,7 +79,7 @@ export default function MilestoneList({
                           size="sm"
                           onClick={() => m.id && onDelete(m.id)}
                         >
-                          <Trash size={14} />
+                          <TrashSimple size={14} />
                         </Button>
                       </div>
                     </div>

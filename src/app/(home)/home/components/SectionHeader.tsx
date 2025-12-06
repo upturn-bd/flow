@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { IconType } from '@/lib/icons';
+import { Icon } from "@phosphor-icons/react";
 
 interface SectionHeaderProps {
   title: string;
-  icon: IconType;
+  icon: Icon;
   iconColor?: string;
 }
 

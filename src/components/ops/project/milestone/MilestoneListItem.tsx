@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Pencil, ExternalLink } from "@/lib/icons";
+import { Pencil, ArrowSquareOut } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Milestone, Project } from "@/lib/types/schemas";
 
@@ -105,7 +105,7 @@ const MilestoneListItem: React.FC<MilestoneListItemProps> = ({
                   milestone.id && setMilestoneDetailsId(milestone.id)
                 }
               >
-                <ExternalLink size={14} />
+                <ArrowSquareOut size={14} />
               </Button>
             </div>
           )}

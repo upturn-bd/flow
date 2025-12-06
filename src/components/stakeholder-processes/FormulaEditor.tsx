@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import { StakeholderProcessStep, FieldDefinition } from "@/lib/types/schemas";
-import { X, Plus, Calculator, WarningCircle } from "@/lib/icons";
+import { X, Plus, Calculator, WarningCircle } from "@phosphor-icons/react";
 
 interface CellReference {
   stepOrder: number;
@@ -49,7 +49,7 @@ export default function FormulaEditor({
   const containerRef = useRef<HTMLDivElement>(null);
   const fieldPickerRef = useRef<HTMLDivElement>(null);
 
-  // Filter to only show previous steps (for sequential processes)
+  // FunnelSimple to only show previous steps (for sequential processes)
   const previousSteps = availableSteps.filter(
     (step) => step.step_order < currentStepOrder
   );
@@ -308,7 +308,7 @@ export default function FormulaEditor({
     ));
   };
 
-  // Save and restore cursor position
+  // FloppyDisk and restore cursor position
   const saveCursorPosition = (element: HTMLElement) => {
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return null;
@@ -524,7 +524,7 @@ export default function FormulaEditor({
     }
   };
 
-  // Filter fields by search query
+  // FunnelSimple fields by search query
   const filteredFields = searchQuery
     ? availableFields.filter(f => 
         f.fieldLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -862,7 +862,7 @@ export default function FormulaEditor({
         )}
       </div>
 
-      {/* Save Button */}
+      {/* FloppyDisk Button */}
       <div className="flex justify-end gap-2 pt-2 border-t border-border-primary">
         {onClose && (
           <button
@@ -879,7 +879,7 @@ export default function FormulaEditor({
           disabled={!elementsToFormula(elements).trim()}
           className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Save Formula
+          FloppyDisk Formula
         </button>
       </div>
     </div>

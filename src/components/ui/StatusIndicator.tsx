@@ -1,15 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { 
-  CheckCircle, 
-  Clock, 
-  XCircle, 
-  WarningCircle, 
-  FileText, 
-  Loader,
-  Circle
-} from "@/lib/icons";
+import { CheckCircle, Clock, XCircle, WarningCircle, FileText, CircleNotch, Circle } from "@phosphor-icons/react";
 
 interface StatusIndicatorProps {
   status: string;
@@ -61,7 +53,7 @@ export function StatusIndicator({
     
     if (statusLower.includes("in progress") || statusLower.includes("ongoing") || statusLower.includes("processing")) {
       return {
-        icon: Loader,
+        icon: CircleNotch,
         bgColor: "bg-blue-100",
         textColor: "text-blue-800",
         borderColor: "border-blue-200",

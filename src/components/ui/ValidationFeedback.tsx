@@ -1,6 +1,6 @@
 "use client";
 
-import { WarningCircle, CheckCircle, Info } from "@/lib/icons";
+import { WarningCircle, CheckCircle, Info } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ValidationFeedbackProps {

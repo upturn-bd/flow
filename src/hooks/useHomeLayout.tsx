@@ -87,7 +87,7 @@ export function useHomeLayout() {
     }
   }, [employeeInfo]);
 
-  // Save layout configuration
+  // FloppyDisk layout configuration
   const saveLayout = useCallback(async (widgets: WidgetConfig[]) => {
     if (!employeeInfo || !layout) return;
 

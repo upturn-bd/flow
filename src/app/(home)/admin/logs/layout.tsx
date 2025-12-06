@@ -3,7 +3,7 @@
 import { AdminDataProvider } from "@/contexts/AdminDataContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, CaretRight, ClipboardList, FileText } from "@/lib/icons";
+import { House, CaretRight, ClipboardText, FileText } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 
 // Helper function to capitalize and format the path segment
@@ -60,9 +60,9 @@ const LogsBreadcrumbs = () => {
                 <li aria-current="page">
                     <div className="flex items-center">
                         <CaretRight className="w-4 h-4 text-foreground-tertiary" />
-                        {/* Using ClipboardList icon for log-related pages */}
+                        {/* Using ClipboardText icon for log-related pages */}
                         <span className="ml-1 text-primary-600 md:ml-3 flex items-center font-semibold">
-                            <ClipboardList className="w-4 h-4 mr-1.5" />
+                            <ClipboardText className="w-4 h-4 mr-1.5" />
                             {currentPageLabel}
                         </span>
                     </div>

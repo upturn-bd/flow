@@ -6,17 +6,7 @@ import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useSettlementRequests } from "@/hooks/useSettlement";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  FileText, 
-  DollarSign, 
-  Calendar, 
-  User, 
-  CheckCheck, 
-  XCircle,
-  Clock,
-  MessageCircle,
-  FormInput
-} from "@/lib/icons";
+import { FileText, CurrencyDollar, Calendar, User, Checks, XCircle, Clock, ChatCircle, Textbox } from "@phosphor-icons/react";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { extractEmployeeIds } from "@/lib/utils/project-utils";
 
@@ -67,7 +57,7 @@ export default function SettlementHistoryPage() {
       {loading && (
         <LoadingSection 
           text="Loading settlement history..."
-          icon={FormInput}
+          icon={Textbox}
           color="blue"
           />
       )}
@@ -108,7 +98,7 @@ export default function SettlementHistoryPage() {
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex items-start gap-2">
-                        <DollarSign size={18} className="text-green-600 mt-1 shrink-0" />
+                        <CurrencyDollar size={18} className="text-green-600 mt-1 shrink-0" />
                         <div>
                           <h3 className="font-medium text-foreground-primary">
                             {claimTypes.find(type => type.id === settlement.settlement_type_id)?.settlement_item || "Unknown"}
@@ -170,7 +160,7 @@ export default function SettlementHistoryPage() {
                     {settlement.comment && (
                       <div className="mt-3 text-sm text-foreground-secondary bg-primary-50 dark:bg-primary-900/30 p-3 rounded-md">
                         <div className="flex items-center gap-2 mb-1">
-                          <MessageCircle size={14} />
+                          <ChatCircle size={14} />
                           <p className="font-medium">Feedback:</p>
                         </div>
                         <p>{settlement.comment}</p>
@@ -206,7 +196,7 @@ export default function SettlementHistoryPage() {
               className="flex flex-col items-center justify-center py-12 text-center"
             >
               <div className="bg-background-secondary dark:bg-background-tertiary rounded-full p-4 mb-4">
-                <DollarSign className="h-12 w-12 text-foreground-tertiary" />
+                <CurrencyDollar className="h-12 w-12 text-foreground-tertiary" />
               </div>
               <h3 className="text-lg font-medium text-foreground-primary">No settlement history</h3>
               <p className="mt-1 text-foreground-tertiary">Completed settlement requests will appear here</p>

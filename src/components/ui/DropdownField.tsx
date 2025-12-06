@@ -1,6 +1,6 @@
 "use client";
 
-import { CaretDown } from "@/lib/icons";
+import { CaretDown } from "@phosphor-icons/react";
 
 export interface DropdownOption {
   label: string;

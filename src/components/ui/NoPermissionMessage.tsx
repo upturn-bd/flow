@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Lock } from '@/lib/icons';
+import { LockKey } from "@phosphor-icons/react";
 import { motion } from 'framer-motion';
 import { fadeInUp } from './animations';
 

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
-import { UserPlus, Loader, Check, X, AlertTriangle, Users, User, RefreshCw } from "@/lib/icons";
+import { UserPlus, CircleNotch, Check, X, Warning, Users, User, ArrowsClockwise } from "@phosphor-icons/react";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -192,7 +192,7 @@ export default function OnboardingApprovalPage() {
                 className="flex items-center gap-2 px-3 py-2 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
                 disabled={loading}
               >
-                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                <ArrowsClockwise className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
               </button>
               <div className="text-sm text-foreground-tertiary">

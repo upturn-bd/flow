@@ -1,17 +1,7 @@
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  CaretLeft,
-  Loader,
-  XCircle,
-  Calendar,
-  Bell,
-  WarningCircle,
-  Building,
-  FileText,
-  AlertCircleIcon,
-} from "@/lib/icons";
+import { CaretLeft, CircleNotch, XCircle, Calendar, Bell, WarningCircle, Building, FileText } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { useNotices, useNoticeTypes } from "@/hooks/useNotice";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow, PriorityBadge } from "@/components/ui/Card";
@@ -88,7 +78,7 @@ export default function NoticeDetails({ id, onClose }: NoticeDetailsProps) {
       >
         <LoadingSection 
           text="Loading notice details..."
-          icon={AlertCircleIcon}
+          icon={WarningCircle}
           color="blue"
         />
       </BaseModal>

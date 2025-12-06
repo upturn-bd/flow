@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check, Eye, Trash, AlertCircle, Calendar, Briefcase, User, Clock, Bell } from "@/lib/icons";
+import { X, Check, Eye, TrashSimple, WarningCircle, Calendar, Briefcase, User, Clock, Bell } from "@phosphor-icons/react";
 import { Notification } from "@/hooks/useNotifications";
 import { formatRelativeTime } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -16,7 +16,7 @@ interface NewNotificationModalProps {
 }
 
 const iconMap = {
-  'alert-circle': AlertCircle,
+  'alert-circle': WarningCircle,
   'calendar': Calendar,
   'briefcase': Briefcase,
   'user': User,
@@ -175,7 +175,7 @@ export default function NewNotificationModal({
                 onClick={handleDelete}
                 className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm border border-red-200"
               >
-                <Trash className="h-4 w-4" />
+                <TrashSimple className="h-4 w-4" />
                 Delete
               </button>
             </div>

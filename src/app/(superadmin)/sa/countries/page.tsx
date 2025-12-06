@@ -3,15 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Country } from "@/lib/types/schemas";
-import { 
-  Plus, 
-  Pencil, 
-  Trash, 
-  GlobeHemisphereWest,
-  Buildings,
-  Check,
-  X,
-} from "@/lib/icons";
+import { Plus, Pencil, TrashSimple, GlobeHemisphereWest, Buildings, Check, X } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, SearchBar, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
@@ -296,7 +288,7 @@ export default function CountriesPage() {
           setFormData({ name: "" });
         }}
         onSubmit={handleSubmit}
-        title={editingCountry ? "Edit Country" : "Add Country"}
+        title={editingCountry ? "PencilSimple Country" : "Add Country"}
         subtitle={editingCountry ? "Update country name" : "Add a new country"}
         icon={GlobeHemisphereWest}
         colorScheme="emerald"

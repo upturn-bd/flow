@@ -2,7 +2,7 @@
 
 import { NoticeType } from "@/lib/types";
 import { validateNewsAndNoticeType } from "@/lib/utils/validation";
-import { NewspaperClipping } from "@/lib/icons";
+import { NewspaperClipping } from "@phosphor-icons/react";
 import { FormModal } from "@/components/ui/modals";
 import { FormField } from "@/components/forms";
 

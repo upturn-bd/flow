@@ -11,21 +11,7 @@ import {
 } from "@/lib/utils/validation";
 import { type MilestoneData } from "@/lib/validation/schemas/advanced";
 import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
-import {
-  Plus,
-  Building,
-  User,
-  Clock,
-  Users,
-  CheckCircle,
-  X,
-  Target,
-  Calendar,
-  Pencil,
-  Trash,
-  Projector,
-  ExternalLink,
-} from "@/lib/icons";
+import { Plus, Building, User, Clock, Users, CheckCircle, X, Target, Calendar, Pencil, TrashSimple, Monitor, ArrowSquareOut } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -371,7 +357,7 @@ export default function ProjectDetails({
     return (
       <LoadingSection
         text="Loading project details..."
-        icon={Projector}
+        icon={Monitor}
         color="blue"
       />
     );
@@ -545,7 +531,7 @@ export default function ProjectDetails({
                 {loadingMilestones ? (
                   <LoadingSection
                     text="Loading milestones..."
-                    icon={Projector}
+                    icon={Monitor}
                     color="blue"
                   />
                 ) : milestones.length > 0 ? (

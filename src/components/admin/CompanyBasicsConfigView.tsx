@@ -1,6 +1,6 @@
 "use client";
 
-import { Info, X } from "@/lib/icons";
+import { Info, X } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useState } from "react";
 

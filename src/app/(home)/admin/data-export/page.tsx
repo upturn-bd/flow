@@ -2,18 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
-import {
-  Download,
-  Users,
-  Building,
-  CheckCircle,
-  FileSpreadsheet,
-  WarningCircle,
-  FolderKanban,
-  ListTodo,
-  Calendar,
-  ClipboardCheck,
-} from "@/lib/icons";
+import { Download, Users, Building, CheckCircle, FileXls, WarningCircle, FolderOpen, ListChecks, Calendar, ClipboardText } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import PageHeader from "@/components/ui/PageHeader";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -405,7 +394,7 @@ export default function DataExportPage() {
       type: "projects" as ExportType,
       title: "Project Data",
       description: "Export project records including status, progress, and assignees",
-      icon: FolderKanban,
+      icon: FolderOpen,
       color: "bg-green-100 text-green-700 border-green-200",
       count: ongoingProjects.length + completedProjects.length,
       loading: false,
@@ -414,7 +403,7 @@ export default function DataExportPage() {
       type: "tasks" as ExportType,
       title: "Task Data",
       description: "Export task records with priority, status, and assignment details",
-      icon: ListTodo,
+      icon: ListChecks,
       color: "bg-orange-100 text-orange-700 border-orange-200",
       count: ongoingTasks.length + completedTasks.length,
       loading: false,
@@ -432,7 +421,7 @@ export default function DataExportPage() {
       type: "attendance" as ExportType,
       title: "Attendance Data",
       description: "Export attendance records with check-in/out times and locations",
-      icon: ClipboardCheck,
+      icon: ClipboardText,
       color: "bg-indigo-100 text-indigo-700 border-indigo-200",
       count: attendanceRecords.length,
       loading: attendanceLoading,
@@ -477,7 +466,7 @@ export default function DataExportPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 rounded-lg">
-          <FileSpreadsheet className="text-primary-600" size={20} />
+          <FileXls className="text-primary-600" size={20} />
           <span className="text-sm font-medium text-primary-900 dark:text-primary-100">CSV Format</span>
         </div>
       </motion.div>

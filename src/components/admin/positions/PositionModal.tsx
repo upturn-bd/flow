@@ -4,7 +4,7 @@ import { Position } from "@/lib/types/schemas";
 import { validatePosition } from "@/lib/utils/validation";
 import { FormModal } from "@/components/ui/modals";
 import { FormField, SelectField, TextAreaField } from "@/components/forms";
-import { Briefcase } from "@/lib/icons";
+import { Briefcase } from "@phosphor-icons/react";
 
 interface PositionModalProps {
   initialData?: Position | null;
@@ -51,7 +51,7 @@ export default function PositionModal({
 
   return (
     <FormModal<Position>
-      title={initialData ? "Edit Position" : "Create Position"}
+      title={initialData ? "PencilSimple Position" : "Create Position"}
       icon={<Briefcase size={24} weight="duotone" />}
       initialValues={initialValues}
       validationFn={validatePosition}

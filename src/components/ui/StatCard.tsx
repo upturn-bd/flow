@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ComponentType, ReactNode, isValidElement } from "react";
-import { TrendUp, TrendDown } from "@/lib/icons";
+import { TrendUp, TrendDown } from "@phosphor-icons/react";
 import { cn } from "./class";
 
 export type StatCardColor =
