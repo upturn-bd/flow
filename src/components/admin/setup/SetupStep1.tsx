@@ -156,7 +156,7 @@ export default function SetupStep1({
               name="company_id"
               label="Company Code"
               icon={<Code size={18} />}
-              value={formValues.company_id}
+              value={formValues.company_id || ""}
               onChange={handleChange}
               readOnly={true}
               error={errors.company_id}
