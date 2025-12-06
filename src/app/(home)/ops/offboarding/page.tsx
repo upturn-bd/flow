@@ -143,7 +143,7 @@ export default function OffboardingPage() {
     }
   };
 
-  // Filter employees based on search query
+  // FunnelSimple employees based on search query
   const filteredActiveEmployees = activeEmployees.filter((emp) => {
     const searchLower = searchQuery.toLowerCase();
     return (

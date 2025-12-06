@@ -2,7 +2,7 @@
  * Widget System Type Definitions
  */
 
-import { IconType } from "@phosphor-icons/react";
+import { Icon } from "@phosphor-icons/react";
 import { ReactNode } from 'react';
 
 // Widget types available in the system
@@ -53,7 +53,7 @@ export interface WidgetDefinition {
   type: WidgetType;
   name: string;
   description: string;
-  icon: IconType;
+  icon: Icon;
   defaultSize: WidgetSize;
   minSize?: WidgetSize;
   maxSize?: WidgetSize;

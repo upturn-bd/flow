@@ -4,13 +4,13 @@ import { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { TrashSimple, Eye } from "@phosphor-icons/react";
 import { Button } from "./button";
-import type { IconType } from "@phosphor-icons/react";
+import type { Icon } from "@phosphor-icons/react";
 
 export type EntityCardProps = {
   /** Card title */
   title: string;
   /** Icon component to display next to the title */
-  icon?: IconType;
+  icon?: Icon;
   /** Optional subtitle or description */
   description?: string;
   /** Additional metadata items to display */
@@ -123,7 +123,7 @@ export function EntityCardGrid({ children, columns = 3 }: EntityCardGridProps) {
 }
 
 export type EntityCardMetaItemProps = {
-  icon?: IconType;
+  icon?: Icon;
   children: ReactNode;
   className?: string;
 };
@@ -141,7 +141,7 @@ export function EntityCardMetaItem({ icon: Icon, children, className = "" }: Ent
 }
 
 export type EntityCardBadgeProps = {
-  icon?: IconType;
+  icon?: Icon;
   children: ReactNode;
   className?: string;
 };

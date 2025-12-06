@@ -158,7 +158,7 @@ export default function SalaryManagementModal({
                     onClick={handleShowHistory}
                     className="flex-1 px-4 py-2 text-sm font-medium text-foreground-secondary bg-surface-secondary border border-border-secondary rounded-md hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary-500 flex items-center justify-center transition-colors"
                   >
-                    <History className="h-4 w-4 mr-1" />
+                    <ClockCounterClockwise className="h-4 w-4 mr-1" />
                     View History
                   </button>
                   <button
@@ -203,7 +203,7 @@ export default function SalaryManagementModal({
 
                   {salaryHistory.length === 0 ? (
                     <div className="text-center py-6">
-                      <History className="h-8 w-8 text-foreground-tertiary mx-auto mb-2" />
+                      <ClockCounterClockwise className="h-8 w-8 text-foreground-tertiary mx-auto mb-2" />
                       <p className="text-sm text-foreground-tertiary">No salary change history found</p>
                     </div>
                   ) : (

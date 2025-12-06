@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { ModulePermissionsBanner } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
 
-// Filter options
+// FunnelSimple options
 type FilterOptions = {
   department: string;
   designation: string;
@@ -146,7 +146,7 @@ useEffect(() => {
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
           >
-            <Filter size={16} />
+            <FunnelSimple size={16} />
             {showFilters ? "Hide Filters" : "Show Filters"}
           </motion.button>
         </div>

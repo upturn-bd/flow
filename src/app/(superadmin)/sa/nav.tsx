@@ -59,7 +59,7 @@ export default function SuperadminNav() {
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* Desktop NavigationArrow */}
             <div className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -109,7 +109,7 @@ export default function SuperadminNav() {
         </div>
       </nav>
 
-      {/* Mobile Navigation */}
+      {/* Mobile NavigationArrow */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>

@@ -311,7 +311,7 @@ export default function WidgetCustomizationPanel({
                       >
                         <ChevronUp size={16} className="text-foreground-tertiary" />
                       </button>
-                      <GripVertical size={16} className="text-foreground-tertiary" />
+                      <DotsNine size={16} className="text-foreground-tertiary" />
                       <button
                         onClick={() => moveWidgetDown(index)}
                         disabled={index === localWidgets.length - 1}

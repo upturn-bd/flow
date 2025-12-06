@@ -40,14 +40,14 @@ export default function TeamMembersModal({
     [team.members]
   );
 
-  // Filter available employees (not already members) - use extendedEmployees for more info
+  // FunnelSimple available employees (not already members) - use extendedEmployees for more info
   const availableEmployees = useMemo(() => {
     const employeeList = extendedEmployees.length > 0 ? extendedEmployees : employees;
     if (!employeeList) return [];
     return employeeList.filter((emp) => !memberIds.has(emp.id));
   }, [employees, extendedEmployees, memberIds]);
 
-  // Filter employees by search term
+  // FunnelSimple employees by search term
   const filteredEmployees = useMemo(() => {
     if (!searchTerm) return availableEmployees;
     return availableEmployees.filter(emp => 

@@ -280,14 +280,14 @@ export default function AttendanceSection({
                   <div className="space-y-3">
                     {locationLoading && (
                       <div className="flex items-center gap-2 text-primary-600 text-sm">
-                        <Navigation className="w-4 h-4 animate-spin" />
+                        <NavigationArrow className="w-4 h-4 animate-spin" />
                         Getting your location...
                       </div>
                     )}
 
                     {locationError && (
                       <div className="flex items-center gap-2 text-red-600 text-sm">
-                        <AlertCircle className="w-4 h-4" />
+                        <WarningCircle className="w-4 h-4" />
                         {locationError}
                       </div>
                     )}

@@ -275,7 +275,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
     ...(hasAdminAccess ? adminLogItems : []),
   ];
 
-  // Filter items based on query
+  // FunnelSimple items based on query
   const filteredItems = query.trim()
     ? allItems.filter((item) => {
         const searchLower = query.toLowerCase();

@@ -24,14 +24,14 @@ export default function ComplaintPage() {
     {
       key: "history",
       label: "History",
-      icon: <History className="h-5 w-5" />,
+      icon: <ClockCounterClockwise className="h-5 w-5" />,
       color: "text-primary-600",
       content: <ComplaintHistoryPage />
     },
         {
       key: "requests",
       label: "Requests",
-      icon: <ClipboardCheck className="h-5 w-5" />,
+      icon: <ClipboardText className="h-5 w-5" />,
       color: "text-amber-600",
       content: <ComplaintRequestsPage />
     },

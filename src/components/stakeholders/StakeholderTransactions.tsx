@@ -181,7 +181,7 @@ export default function StakeholderTransactions({
     setTransactions(filtered);
   }, [allTransactions, dateRangeFilter]);
 
-  // Filter and search transactions
+  // FunnelSimple and search transactions
   const filteredTransactions = useMemo(() => {
     return transactions.filter(txn => {
       const matchesSearch = 
@@ -381,9 +381,9 @@ export default function StakeholderTransactions({
           </div>
         </div>
 
-        {/* Search and Filter */}
+        {/* Search and FunnelSimple */}
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border-primary bg-surface-secondary space-y-3 sm:space-y-4">
-          {/* Time Range Filter Buttons */}
+          {/* Time Range FunnelSimple Buttons */}
           <div className="flex flex-wrap gap-2 items-center">
             <span className="text-xs sm:text-sm font-medium text-foreground-secondary shrink-0">Time Period:</span>
             <button
@@ -432,7 +432,7 @@ export default function StakeholderTransactions({
             </button>
           </div>
 
-          {/* Amount Type Filter Buttons */}
+          {/* Amount Type FunnelSimple Buttons */}
           <div className="flex flex-wrap gap-2 items-center">
             <span className="text-xs sm:text-sm font-medium text-foreground-secondary shrink-0">Type:</span>
             <button
@@ -469,7 +469,7 @@ export default function StakeholderTransactions({
             </button>
           </div>
 
-          {/* Search and Status Filter */}
+          {/* Search and Status FunnelSimple */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="relative flex-1">
               <MagnifyingGlass size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary" />
@@ -483,7 +483,7 @@ export default function StakeholderTransactions({
             </div>
             
             <div className="flex items-center gap-2 shrink-0">
-              <Filter size={16} className="text-foreground-tertiary" />
+              <FunnelSimple size={16} className="text-foreground-tertiary" />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}

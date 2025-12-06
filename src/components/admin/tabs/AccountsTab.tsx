@@ -422,12 +422,12 @@ export default function AccountsTab() {
             />
           </div>
 
-          {/* Filter Grid */}
+          {/* FunnelSimple Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {/* Status Filter */}
+            {/* Status FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                <Filter size={12} className="inline mr-1" />
+                <FunnelSimple size={12} className="inline mr-1" />
                 Status
               </label>
               <select
@@ -441,7 +441,7 @@ export default function AccountsTab() {
               </select>
             </div>
 
-            {/* Payment Method Filter */}
+            {/* Payment Method FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <CreditCard size={12} className="inline mr-1" />
@@ -459,7 +459,7 @@ export default function AccountsTab() {
               </select>
             </div>
 
-            {/* Start Date Filter */}
+            {/* Start Date FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Calendar size={12} className="inline mr-1" />
@@ -473,7 +473,7 @@ export default function AccountsTab() {
               />
             </div>
 
-            {/* End Date Filter */}
+            {/* End Date FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Calendar size={12} className="inline mr-1" />
@@ -487,7 +487,7 @@ export default function AccountsTab() {
               />
             </div>
 
-            {/* Stakeholder Filter */}
+            {/* Stakeholder FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Users size={12} className="inline mr-1" />
@@ -506,7 +506,7 @@ export default function AccountsTab() {
               </select>
             </div>
 
-            {/* Min Amount Filter */}
+            {/* Min Amount FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <CurrencyDollar size={12} className="inline mr-1" />
@@ -521,7 +521,7 @@ export default function AccountsTab() {
               />
             </div>
 
-            {/* Max Amount Filter */}
+            {/* Max Amount FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <CurrencyDollar size={12} className="inline mr-1" />
@@ -560,7 +560,7 @@ export default function AccountsTab() {
 
           {/* Active Filters Summary */}
           <div className="flex items-center gap-2 text-xs text-foreground-secondary bg-blue-50 p-3 rounded-lg">
-            <Filter size={12} className="text-blue-600" />
+            <FunnelSimple size={12} className="text-blue-600" />
             <span className="font-medium text-blue-900">
               Showing {filteredAccounts.length} transaction{filteredAccounts.length !== 1 ? 's' : ''} from {startDate} to {endDate}
             </span>

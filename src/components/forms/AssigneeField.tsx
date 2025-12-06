@@ -31,7 +31,7 @@ export default function AssigneeField({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Filter employees based on search term and exclude already selected
+  // FunnelSimple employees based on search term and exclude already selected
   const filteredEmployees = employees.filter(employee => {
     const matchesSearch = matchesEmployeeSearch(employee, searchTerm);
     const notSelected = !assignees.includes(employee.id.toString());

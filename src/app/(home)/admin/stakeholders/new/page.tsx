@@ -92,7 +92,7 @@ export default function NewStakeholderPage() {
     setSubmitting(true);
 
     try {
-      // Filter out empty contact persons
+      // FunnelSimple out empty contact persons
       const validContactPersons = contactPersons.filter(
         (cp) => cp.name.trim() && (cp.email?.trim() || cp.phone?.trim())
       );

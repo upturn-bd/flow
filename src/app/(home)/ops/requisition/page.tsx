@@ -29,7 +29,7 @@ function RequisitionPageContent() {
     {
       key: "history",
       label: "History",
-      icon: <History className="h-5 w-5" />,
+      icon: <ClockCounterClockwise className="h-5 w-5" />,
       color: "text-indigo-600",
       content: <RequisitionHistoryPage />,
       link: "/ops/requisition?tab=history",
@@ -37,7 +37,7 @@ function RequisitionPageContent() {
     {
       key: "requests",
       label: "Requests",
-      icon: <ClipboardCheck className="h-5 w-5" />,
+      icon: <ClipboardText className="h-5 w-5" />,
       color: "text-green-600",
       content: <RequisitionRequestsPage />,
       link: "/ops/requisition?tab=requests",
@@ -81,7 +81,7 @@ function RequisitionPageContent() {
     <ServicePageTemplate
       title="Requisition Management"
       description="Create, track, and manage requisition requests for your workplace needs efficiently."
-      icon={<ScrollText className="h-7 w-7" />}
+      icon={<Scroll className="h-7 w-7" />}
       primaryColor="text-cyan-600"
       tabs={tabs}
       activeTab={activeTab}
@@ -103,7 +103,7 @@ export default function RequisitionPage() {
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
-          <ScrollText className="h-8 w-8 text-cyan-600 animate-pulse" />
+          <Scroll className="h-8 w-8 text-cyan-600 animate-pulse" />
           <p className="text-sm text-foreground-secondary">Loading requisition...</p>
         </div>
       </div>

@@ -266,7 +266,7 @@ export default function StakeholderIssuesPage() {
             />
           </div>
 
-          {/* Status Filter */}
+          {/* Status FunnelSimple */}
           <SelectField
             name="filterStatus"
             value={filterStatus}
@@ -280,7 +280,7 @@ export default function StakeholderIssuesPage() {
             containerClassName="w-48"
           />
 
-          {/* Priority Filter */}
+          {/* Priority FunnelSimple */}
           <SelectField
             name="filterPriority"
             value={filterPriority}
@@ -295,7 +295,7 @@ export default function StakeholderIssuesPage() {
             containerClassName="w-48"
           />
 
-          {/* Category Filter */}
+          {/* Category FunnelSimple */}
           <SelectField
             name="filterCategory"
             value={filterCategoryId.toString()}

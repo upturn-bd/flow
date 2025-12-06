@@ -302,7 +302,7 @@ export default function NoticePage() {
                             </span>
                           </div>
                           <div className="flex items-center text-sm text-foreground-secondary">
-                            <CalendarDays className="h-4 w-4 mr-1.5" />
+                            <CalendarBlank className="h-4 w-4 mr-1.5" />
                             <span>
                               Valid: {formatDate(notice.valid_from)} → {formatDate(notice.valid_till)}
                             </span>

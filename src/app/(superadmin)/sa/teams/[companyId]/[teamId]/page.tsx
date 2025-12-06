@@ -360,7 +360,7 @@ export default function TeamDetailPage() {
     }
   };
 
-  // Filter employees for search (exclude already members)
+  // FunnelSimple employees for search (exclude already members)
   const filteredEmployees = useMemo(() => {
     const memberIds = new Set(members.map(m => m.employee_id));
     const availableEmployees = employees.filter(e => !memberIds.has(e.id));

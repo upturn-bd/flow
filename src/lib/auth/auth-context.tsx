@@ -345,7 +345,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return [];
     }
     
-    // Filter nav items based on required permissions
+    // FunnelSimple nav items based on required permissions
     return navItems.filter(item => {
       // Permission-based filtering
       if (item.requiredPermissions && item.requiredPermissions.length > 0) {

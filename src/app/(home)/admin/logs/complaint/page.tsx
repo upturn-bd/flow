@@ -73,7 +73,7 @@ export default function ComplaintLogsPage() {
     <div className="w-full space-y-6">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <ClipboardList className="text-primary-600" size={26} />
+        <ClipboardText className="text-primary-600" size={26} />
         <h1 className="text-2xl font-semibold">Complaint Logs</h1>
       </div>
 
@@ -86,7 +86,7 @@ export default function ComplaintLogsPage() {
             {
               key: "requests",
               label: "Requests",
-              icon: <ClipboardList />,
+              icon: <ClipboardText />,
               color: "text-primary-500",
               content: (
                 <>

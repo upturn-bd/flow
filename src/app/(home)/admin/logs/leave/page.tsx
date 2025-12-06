@@ -183,7 +183,7 @@ export default function LeaveLogsPage() {
                               )}
                               {isHistory && leave.status !== "Pending" && (
                                  <Button size="sm" variant="outline" className="p-2 hover:bg-yellow-100 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Pending"); }}>
-                                    <RotateCw size={16} />
+                                    <ArrowsClockwise size={16} />
                                  </Button>
                               )}
                            </td>
@@ -198,7 +198,7 @@ export default function LeaveLogsPage() {
 
    const tabs: TabItem[] = [
       { key: "requests", label: "Requests", icon: <Check size={16} />, color: "text-green-600", content: renderTable(false) },
-      { key: "history", label: "History", icon: <RotateCw size={16} />, color: "text-yellow-600", content: renderTable(true) },
+      { key: "history", label: "History", icon: <ArrowsClockwise size={16} />, color: "text-yellow-600", content: renderTable(true) },
    ];
 
    return (
@@ -255,7 +255,7 @@ export default function LeaveLogsPage() {
                                  onClick={() => handleUpdateStatus(selectedLeave, "Pending")}
                               >
                                  <span className="flex items-center gap-2">
-                                    <RotateCw size={16} /> Mark Pending
+                                    <ArrowsClockwise size={16} /> Mark Pending
                                  </span>
                               </Button>
                            )}

@@ -439,7 +439,7 @@ export default function EmployeeOnboarding() {
                     <FormInputField
                       name="companyCode"
                       label="Company Code"
-                      icon={<BadgeCheck size={18} />}
+                      icon={<SealCheck size={18} />}
                       value={companyCode}
                       onChange={(e) => setCompanyCode(e.target.value)}
                       readOnly={!!status || isCompanyCodeValid}
@@ -455,7 +455,7 @@ export default function EmployeeOnboarding() {
                           type="button"
                           className="flex items-center justify-center w-full sm:w-auto px-6 py-2 rounded-lg bg-green-100 text-green-700 cursor-default"
                         >
-                          <CircleCheck className="mr-2 h-5 w-5" />
+                          <CheckCircle className="mr-2 h-5 w-5" />
                           Verified Successfully
                         </button>
                       ) : (
@@ -472,7 +472,7 @@ export default function EmployeeOnboarding() {
                             </>
                           ) : (
                             <>
-                              <BadgeCheck className="mr-2 h-5 w-5" />
+                              <SealCheck className="mr-2 h-5 w-5" />
                               Verify Company Code
                             </>
                           )}
@@ -619,12 +619,12 @@ export default function EmployeeOnboarding() {
                           </>
                         ) : status === "rejected" ? (
                           <>
-                            <Send className="mr-2 h-5 w-5" />
+                            <PaperPlaneTilt className="mr-2 h-5 w-5" />
                             Resubmit Application
                           </>
                         ) : (
                           <>
-                            <Send className="mr-2 h-5 w-5" />
+                            <PaperPlaneTilt className="mr-2 h-5 w-5" />
                             Submit Application
                           </>
                         )}

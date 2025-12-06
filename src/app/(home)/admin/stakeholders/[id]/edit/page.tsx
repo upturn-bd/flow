@@ -125,7 +125,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
     setSubmitting(true);
 
     try {
-      // Filter out empty contact persons
+      // FunnelSimple out empty contact persons
       const validContactPersons = contactPersons.filter(
         (cp) => cp.name.trim() && (cp.email?.trim() || cp.phone?.trim())
       );

@@ -29,7 +29,7 @@ function LeavePageContent() {
     {
       key: "history",
       label: "History",
-      icon: <FileCheck className="h-5 w-5" />,
+      icon: <FileText className="h-5 w-5" />,
       color: "text-green-600",
       content: <LeaveHistoryPage />,
       link: "/ops/leave?tab=history",

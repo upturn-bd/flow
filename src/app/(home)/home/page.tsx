@@ -93,7 +93,7 @@ export default function HomePage() {
   const gridLayout = useMemo(() => {
     if (!homeLayout?.widgets) return [];
     
-    // Filter out hidden widgets when not in edit mode
+    // FunnelSimple out hidden widgets when not in edit mode
     const visibleWidgets = isEditMode 
       ? homeLayout.widgets 
       : homeLayout.widgets.filter(w => w.enabled);
@@ -384,7 +384,7 @@ export default function HomePage() {
                           : 'bg-foreground-tertiary/90'
                       }`}>
                         <div className="flex items-center gap-3">
-                          <GripVertical size={20} className="text-white cursor-grab active:cursor-grabbing" />
+                          <DotsNine size={20} className="text-white cursor-grab active:cursor-grabbing" />
                           <span className="text-white text-base font-semibold">
                             {widget.type.charAt(0).toUpperCase() + widget.type.slice(1).replace('-', ' ')}
                           </span>

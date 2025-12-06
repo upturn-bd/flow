@@ -93,7 +93,7 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      // Filter out undefined values and empty objects
+      // FunnelSimple out undefined values and empty objects
       const updateData = Object.fromEntries(
         Object.entries(data).filter(([_, value]) => value !== undefined && value !== null)
       );
@@ -233,7 +233,7 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      // Filter out empty values and enum fields that are empty strings
+      // FunnelSimple out empty values and enum fields that are empty strings
       const cleanData = Object.fromEntries(
         Object.entries(data).filter(([key, value]) => {
           // Remove completely empty values

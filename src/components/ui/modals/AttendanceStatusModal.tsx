@@ -221,7 +221,7 @@ export default function AttendanceStatusModal({
                           isSendingRequest ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                       >
-                        <Send size={18} className={isSendingRequest ? 'animate-spin' : ''} />
+                        <PaperPlaneTilt size={18} className={isSendingRequest ? 'animate-spin' : ''} />
                         {isSendingRequest ? 'Sending...' : 'Send Request'}
                       </button>
                     )}

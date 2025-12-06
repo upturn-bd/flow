@@ -19,7 +19,7 @@ const TABS = [
   {
     key: "ongoing",
     label: "Ongoing",
-    icon: <ClipboardList className="h-5 w-5" />,
+    icon: <ClipboardText className="h-5 w-5" />,
     color: "text-indigo-600",
   },
   {
@@ -189,7 +189,7 @@ export default function TaskLayout({
       <motion.div className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-foreground-primary flex items-center mb-2">
-            <ClipboardList className="mr-2 h-6 w-6 text-indigo-500" />
+            <ClipboardText className="mr-2 h-6 w-6 text-indigo-500" />
             Task Management
           </h1>
           <p className="text-foreground-secondary max-w-3xl">

@@ -83,7 +83,7 @@ export default function SuperadminUsersPage() {
 
         if (error) throw error;
         
-        // Filter out employees who are already superadmins
+        // FunnelSimple out employees who are already superadmins
         const superadminUserIds = superadmins.map(sa => sa.user_id);
         const availableEmployees = (data || []).filter(
           emp => !superadminUserIds.includes(emp.id)
@@ -165,7 +165,7 @@ export default function SuperadminUsersPage() {
     setEmployees([]);
   };
 
-  // Filter employees based on search term using unified search utility
+  // FunnelSimple employees based on search term using unified search utility
   const filteredEmployees = filterEmployeesBySearch(
     employees.map(emp => ({
       id: emp.id,

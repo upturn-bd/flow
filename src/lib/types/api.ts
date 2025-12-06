@@ -25,7 +25,7 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-// Query and Filter types
+// Query and FunnelSimple types
 export interface BaseQuery {
   search?: string;
   limit?: number;

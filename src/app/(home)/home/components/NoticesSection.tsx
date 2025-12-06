@@ -61,7 +61,7 @@ export default function NoticesSection({
     onNoticeClick(noticeId);
   };
 
-  // Filter notices based on active tab
+  // FunnelSimple notices based on active tab
   const filteredNotices = useMemo(() => {
     switch (activeTab) {
       case 'unread':
@@ -189,19 +189,19 @@ export default function NoticesSection({
                     <div className="flex items-center space-x-2">
                       {(item.urgency === "high" || item.urgency === "urgent") && (
                         <div className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full flex items-center">
-                          <AlertCircle size={12} className="mr-1" />
+                          <WarningCircle size={12} className="mr-1" />
                           {item.urgency === "urgent" ? "Urgent" : "High"}
                         </div>
                       )}
                       {item.urgency === "normal" && (
                         <div className="bg-yellow-100 text-yellow-600 text-xs px-2 py-1 rounded-full flex items-center">
-                          <AlertCircle size={12} className="mr-1" />
+                          <WarningCircle size={12} className="mr-1" />
                           Normal
                         </div>
                       )}
                       {item.urgency === "low" && (
                         <div className="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full flex items-center">
-                          <AlertCircle size={12} className="mr-1" />
+                          <WarningCircle size={12} className="mr-1" />
                           Low
                         </div>
                       )}

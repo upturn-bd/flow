@@ -174,7 +174,7 @@ export default function OngoingTaskPage({
 
           {displayTasks.length === 0 && !loading && !searching && hasLoaded && (
             <EmptyState
-              icon={<ClipboardList className="w-12 h-12" />}
+              icon={<ClipboardText className="w-12 h-12" />}
               title="No tasks found"
               description="Try a different keyword to search tasks."
             />

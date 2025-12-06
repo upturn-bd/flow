@@ -15,7 +15,7 @@ const tabs: TabItem[] = [
   { 
     key: "pending", 
     label: "Pending",
-    icon: <ClipboardCheck className="h-5 w-5" />,
+    icon: <ClipboardText className="h-5 w-5" />,
     color: "text-primary-600",
     content: <PendingPayrolls />
   },

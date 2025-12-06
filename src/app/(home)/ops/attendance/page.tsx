@@ -183,7 +183,7 @@ function AttendancePageContent() {
     {
       key: "request",
       label: "Request",
-      icon: <ClipboardCheck className="h-5 w-5" />,
+      icon: <ClipboardText className="h-5 w-5" />,
       color: "text-blue-600",
       content: <AttendanceRequestsPage />,
       link: "/ops/attendance?tab=request",

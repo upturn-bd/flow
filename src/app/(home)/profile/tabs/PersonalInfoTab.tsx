@@ -231,7 +231,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
     },
     {
       title: "Emergency Contact",
-      icon: <PhoneCall className="h-5 w-5 text-blue-600" />,
+      icon: <Phone className="h-5 w-5 text-blue-600" />,
       fields: [
         {
           name: "emergency_contact_name",

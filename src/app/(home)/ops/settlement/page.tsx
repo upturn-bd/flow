@@ -30,7 +30,7 @@ function SettlementPageContent() {
     {
       key: "history",
       label: "History",
-      icon: <History className="h-5 w-5" />,
+      icon: <ClockCounterClockwise className="h-5 w-5" />,
       color: "text-primary-600",
       content: <SettlementHistoryPage />,
       link: "/ops/settlement?tab=history",
@@ -38,7 +38,7 @@ function SettlementPageContent() {
     {
       key: "requests",
       label: "Requests",
-      icon: <ClipboardCheck className="h-5 w-5" />,
+      icon: <ClipboardText className="h-5 w-5" />,
       color: "text-amber-600",
       content: <SettlementRequestsPage />,
       link: "/ops/settlement?tab=requests",

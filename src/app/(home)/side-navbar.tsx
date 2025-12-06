@@ -171,7 +171,7 @@ export default function Sidebar() {
         </div>
       )}
 
-      {/* Navigation */}
+      {/* NavigationArrow */}
       <nav className={cn(
         "flex-1 overflow-y-auto overflow-x-hidden py-4",
         collapsed ? "px-2" : "px-3"
@@ -238,7 +238,7 @@ export default function Sidebar() {
               )}
               role="dialog"
               aria-modal="true"
-              aria-label="Navigation menu"
+              aria-label="NavigationArrow menu"
             >
               {/* Close button inside mobile sidebar */}
               <button

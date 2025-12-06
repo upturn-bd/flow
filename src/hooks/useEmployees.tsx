@@ -117,7 +117,7 @@ export function useEmployees() {
       return [];
     }
 
-    // Filter out null/undefined and deduplicate
+    // FunnelSimple out null/undefined and deduplicate
     const uniqueIds = [...new Set(ids.filter(Boolean))];
     if (uniqueIds.length === 0) {
       return [];

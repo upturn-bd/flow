@@ -307,7 +307,7 @@ export default function ReportProblemModal({
                           </>
                         ) : (
                           <>
-                            <Send size={18} />
+                            <PaperPlaneTilt size={18} />
                             Submit Report
                           </>
                         )}

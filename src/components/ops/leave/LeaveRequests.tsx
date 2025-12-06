@@ -105,7 +105,7 @@ export default function LeaveRequestsPage() {
         })
       ) : (
         <EmptyState
-          icon={<CalendarDays className="w-12 h-12" />}
+          icon={<CalendarBlank className="w-12 h-12" />}
           title="No leave requests"
           description="There are no pending leave requests at the moment."
         />

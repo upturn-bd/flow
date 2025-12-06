@@ -11,7 +11,7 @@ import { SearchBar } from "@/components/ui/SearchBar";
 import { EmptyState } from "@/components/ui/EmptyState";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-// Filter options
+// FunnelSimple options
 type FilterOptions = {
   department: string;
   designation: string;
@@ -34,7 +34,7 @@ export default function FinderPage() {
     fetchExtendedEmployees();
   }, [fetchExtendedEmployees]);
 
-  // Filter employees when search query or filters change
+  // FunnelSimple employees when search query or filters change
   useEffect(() => {
     if (extendedEmployees.length === 0) return;
 
@@ -102,7 +102,7 @@ export default function FinderPage() {
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
           >
-            <Filter size={16} />
+            <FunnelSimple size={16} />
             {showFilters ? "Hide Filters" : "Show Filters"}
           </motion.button>
         </div>

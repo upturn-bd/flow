@@ -79,7 +79,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
     fetchPayrollHistory();
   }, [fetchPayrollHistory]);
 
-  // Filter payrolls based on status
+  // FunnelSimple payrolls based on status
   const filteredPayrolls = statusFilter 
     ? payrolls.filter(payroll => payroll.status === statusFilter)
     : payrolls;
@@ -136,7 +136,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
     
     setProcessingUpdate(true);
     try {
-      // Filter out empty adjustments
+      // FunnelSimple out empty adjustments
       const validAdjustments = adjustments.filter(adj => adj.type.trim() && adj.amount !== 0);
       
       const status = 'Published'; // FloppyDisk adjustments and publish

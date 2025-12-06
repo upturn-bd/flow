@@ -49,7 +49,7 @@ export default function FormulaEditor({
   const containerRef = useRef<HTMLDivElement>(null);
   const fieldPickerRef = useRef<HTMLDivElement>(null);
 
-  // Filter to only show previous steps (for sequential processes)
+  // FunnelSimple to only show previous steps (for sequential processes)
   const previousSteps = availableSteps.filter(
     (step) => step.step_order < currentStepOrder
   );
@@ -524,7 +524,7 @@ export default function FormulaEditor({
     }
   };
 
-  // Filter fields by search query
+  // FunnelSimple fields by search query
   const filteredFields = searchQuery
     ? availableFields.filter(f => 
         f.fieldLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||

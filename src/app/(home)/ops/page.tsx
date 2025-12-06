@@ -144,7 +144,7 @@ export default function ServicesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
 
-  // Filter items based on search query
+  // FunnelSimple items based on search query
   const filteredSections = sections
     .map((section) => ({
       ...section,

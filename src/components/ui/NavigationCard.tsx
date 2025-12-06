@@ -4,15 +4,15 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { CaretRight } from "@phosphor-icons/react";
-import type { IconType } from "@phosphor-icons/react";
+import type { Icon } from "@phosphor-icons/react";
 
 export type NavigationCardProps = {
   /** Card title/name */
   name: string;
-  /** Navigation path */
+  /** NavigationArrow path */
   path: string;
   /** Icon component */
-  icon: IconType;
+  icon: Icon;
   /** Description text */
   description?: string;
   /** Icon container color classes (e.g., "bg-blue-100 text-blue-700") */
@@ -89,7 +89,7 @@ export type NavigationSectionProps = {
   title: string;
   /** Section description */
   description?: string;
-  /** Navigation items */
+  /** NavigationArrow items */
   items: NavigationCardProps[];
   /** Number of columns for grid */
   columns?: 2 | 3 | 4;

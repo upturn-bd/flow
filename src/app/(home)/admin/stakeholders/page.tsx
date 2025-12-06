@@ -161,7 +161,7 @@ export default function StakeholdersPage() {
             withContainer={false}
           />
 
-          {/* Status Filter */}
+          {/* Status FunnelSimple */}
           <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
             <button
               onClick={() => handleFilterChange("all")}

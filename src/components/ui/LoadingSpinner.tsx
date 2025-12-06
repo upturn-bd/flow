@@ -1,11 +1,11 @@
-import { IconType } from "@phosphor-icons/react";
+import { Icon } from "@phosphor-icons/react";
 import { cn } from "./class";
 
 export type ColorType = "blue" | "emerald" | "purple" | "amber" | "red" | "gray";
 
 type LoadingSpinnerProps = {
   /** Optional icon to display in the center of the spinner */
-  icon?: IconType;
+  icon?: Icon;
   /** Text to display alongside the spinner */
   text?: string;
   /** Color theme for the spinner (blue, emerald, purple, amber, red, gray) */

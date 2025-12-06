@@ -46,7 +46,7 @@ export default function TeamsPage() {
   const canManageTeams = canWrite('teams');
   const canDeleteTeams = canDelete('teams');
 
-  // Filter teams based on search query
+  // FunnelSimple teams based on search query
   const filteredTeams = useMemo(() => {
     if (!searchQuery.trim()) return teams;
     

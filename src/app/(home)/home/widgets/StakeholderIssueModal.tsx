@@ -146,7 +146,7 @@ export default function StakeholderIssueModal({
         >
           <div className="sticky top-0 bg-surface-primary border-b border-border-primary px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600" />
+              <WarningCircle className="w-5 h-5 text-red-600" />
               <h2 className="text-xl font-bold text-foreground-primary">
                 {issueId ? (isEditing ? 'PencilSimple Issue' : 'Issue Details') : 'Create Stakeholder Issue'}
               </h2>

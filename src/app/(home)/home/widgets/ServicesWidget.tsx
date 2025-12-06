@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, ChatCircle as MessageSquare, FileText, CurrencyDollar, Briefcase, UserPlus, UserMinus, CreditCard, ArrowRight, IconType } from "@phosphor-icons/react";
+import { Calendar, ChatCircle as MessageSquare, FileText, CurrencyDollar, Briefcase, UserPlus, UserMinus, CreditCard, ArrowRight, Icon } from "@phosphor-icons/react";
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import BaseWidget from './BaseWidget';
 import { WidgetProps } from '@/lib/types/widgets';
@@ -14,7 +14,7 @@ import { cn } from '@/components/ui/class';
 interface Service {
   name: string;
   description: string;
-  icon: IconType;
+  icon: Icon;
   route: string;
   color: string;
   bgColor: string;

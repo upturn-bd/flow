@@ -30,7 +30,7 @@ export default function SingleEmployeeSelector({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Filter employees based on search term
+  // FunnelSimple employees based on search term
   const filteredEmployees = employees.filter(employee => 
     matchesEmployeeSearch(employee, searchTerm)
   );
