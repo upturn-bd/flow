@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
+import { useStakeholderIssueCategories } from "@/hooks/useStakeholderIssueCategories";
+import { useTeams } from "@/hooks/useTeams";
 import { useModalState } from "@/hooks/core/useModalState";
 import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIssueForm";
 import BaseModal from "@/components/ui/modals/BaseModal";
@@ -16,6 +18,8 @@ import {
   Plus,
   Trash,
   Building,
+  Tag,
+  UsersThree,
 } from "@/lib/icons";
 import { StakeholderIssue } from "@/lib/types/schemas";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -23,10 +27,11 @@ import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permiss
 import { PERMISSION_MODULES } from "@/lib/constants";
 import { PageHeader, SearchBar, StatCard, StatCardGrid, EmptyState, InlineSpinner } from "@/components/ui";
 import { SelectField } from "@/components/forms";
+import { captureError } from "@/lib/sentry";
 
 export default function StakeholderIssuesPage() {
   const router = useRouter();
-  const { canWrite, canDelete } = useAuth();
+  const { employeeInfo, canWrite, canDelete } = useAuth();
   const {
     issues,
     loading,
@@ -36,17 +41,23 @@ export default function StakeholderIssuesPage() {
     resolvedIssues,
     highPriorityIssues,
     searchIssues,
+    fetchIssuesByAssignedEmployee,
     updateIssue,
     deleteIssue,
     getAttachmentUrl,
   } = useStakeholderIssues();
+  
+  const { categories, fetchCategories } = useStakeholderIssueCategories();
+  const { getEmployeeTeamIds } = useTeams();
 
   const { modalState, openCreateModal, closeModal } = useModalState();
   const [selectedIssue, setSelectedIssue] = useState<StakeholderIssue | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "Pending" | "In Progress" | "Resolved">("all");
   const [filterPriority, setFilterPriority] = useState<"all" | "Low" | "Medium" | "High" | "Urgent">("all");
+  const [filterCategoryId, setFilterCategoryId] = useState<number | "all">("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [userTeamIds, setUserTeamIds] = useState<number[]>([]);
   const [searchResult, setSearchResult] = useState<{
     totalCount: number;
     totalPages: number;
@@ -55,20 +66,58 @@ export default function StakeholderIssuesPage() {
 
   const pageSize = 25;
 
+  // Load user's teams and categories on mount
+  useEffect(() => {
+    const loadInitialData = async () => {
+      await fetchCategories();
+      if (employeeInfo?.id) {
+        const teamIds = await getEmployeeTeamIds(employeeInfo.id);
+        setUserTeamIds(teamIds);
+      }
+    };
+    loadInitialData();
+  }, [fetchCategories, getEmployeeTeamIds, employeeInfo?.id]);
+
+  // Load issues with user's teams for assignment filtering
   useEffect(() => {
     const loadIssues = async () => {
-      const result = await searchIssues({
-        searchQuery: searchTerm,
-        page: currentPage,
-        pageSize,
-        filterStatus,
-        filterPriority,
-      });
-      setSearchResult(result);
+      // Fetch issues assigned to user or their teams
+      if (employeeInfo?.id) {
+        await fetchIssuesByAssignedEmployee(employeeInfo.id, userTeamIds);
+      }
     };
     
     loadIssues();
-  }, [searchTerm, currentPage, filterStatus, filterPriority]);
+  }, [employeeInfo?.id, userTeamIds, fetchIssuesByAssignedEmployee]);
+
+  // Apply client-side filters (category, status, priority, search)
+  const filteredIssues = issues.filter(issue => {
+    // Search filter
+    if (searchTerm.trim()) {
+      const search = searchTerm.toLowerCase();
+      if (!issue.title.toLowerCase().includes(search) && 
+          !issue.description?.toLowerCase().includes(search)) {
+        return false;
+      }
+    }
+    
+    // Status filter
+    if (filterStatus !== "all" && issue.status !== filterStatus) {
+      return false;
+    }
+    
+    // Priority filter
+    if (filterPriority !== "all" && issue.priority !== filterPriority) {
+      return false;
+    }
+    
+    // Category filter
+    if (filterCategoryId !== "all" && issue.category_id !== filterCategoryId) {
+      return false;
+    }
+    
+    return true;
+  });
 
   const handleSearch = (query: string) => {
     setSearchTerm(query);
@@ -85,6 +134,11 @@ export default function StakeholderIssuesPage() {
     setCurrentPage(1); // Reset to first page when filtering
   };
 
+  const handleCategoryFilterChange = (categoryId: number | "all") => {
+    setFilterCategoryId(categoryId);
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -97,16 +151,12 @@ export default function StakeholderIssuesPage() {
       closeModal();
       setSelectedIssue(null);
       // Refresh the list
-      const result = await searchIssues({
-        searchQuery: searchTerm,
-        page: currentPage,
-        pageSize,
-        filterStatus,
-        filterPriority,
-      });
-      setSearchResult(result);
-    } catch (error) {
-      console.error("Error updating issue:", error);
+      if (employeeInfo?.id) {
+        await fetchIssuesByAssignedEmployee(employeeInfo.id, userTeamIds);
+      }
+    } catch (err) {
+      captureError(err, { operation: "updateIssue" });
+      console.error("Error updating issue:", err);
     }
   };
 
@@ -116,16 +166,12 @@ export default function StakeholderIssuesPage() {
     try {
       await deleteIssue(issueId);
       // Refresh the list
-      const result = await searchIssues({
-        searchQuery: searchTerm,
-        page: currentPage,
-        pageSize,
-        filterStatus,
-        filterPriority,
-      });
-      setSearchResult(result);
-    } catch (error) {
-      console.error("Error deleting issue:", error);
+      if (employeeInfo?.id) {
+        await fetchIssuesByAssignedEmployee(employeeInfo.id, userTeamIds);
+      }
+    } catch (err) {
+      captureError(err, { operation: "deleteIssue" });
+      console.error("Error deleting issue:", err);
     }
   };
 
@@ -259,6 +305,21 @@ export default function StakeholderIssuesPage() {
             ]}
             containerClassName="w-48"
           />
+
+          {/* Category Filter */}
+          <SelectField
+            name="filterCategory"
+            value={filterCategoryId.toString()}
+            onChange={(e) => handleCategoryFilterChange(e.target.value === "all" ? "all" : parseInt(e.target.value))}
+            options={[
+              { value: "all", label: "All Categories" },
+              ...categories.filter(c => c.is_active).map(cat => ({
+                value: cat.id?.toString() || "",
+                label: cat.name,
+              }))
+            ]}
+            containerClassName="w-48"
+          />
         </div>
       </div>
 
@@ -277,11 +338,11 @@ export default function StakeholderIssuesPage() {
       )}
 
       {/* Empty State */}
-      {!loading && issues.length === 0 && (
+      {!loading && filteredIssues.length === 0 && (
         <div className="text-center py-12 bg-background-secondary dark:bg-background-tertiary rounded-lg border-2 border-dashed border-border-secondary">
           <h3 className="text-lg font-semibold text-foreground-primary">No issues found</h3>
           <p className="text-sm text-foreground-tertiary mt-1">
-            {searchTerm || filterStatus !== "all" || filterPriority !== "all"
+            {searchTerm || filterStatus !== "all" || filterPriority !== "all" || filterCategoryId !== "all"
               ? "Try adjusting your search or filters"
               : "You don't have any stakeholder issues assigned yet"}
           </p>
@@ -289,16 +350,16 @@ export default function StakeholderIssuesPage() {
       )}
 
       {/* Issues List */}
-      {!loading && issues.length > 0 && (
+      {!loading && filteredIssues.length > 0 && (
         <div className="space-y-4">
-          {issues.map((issue) => (
+          {filteredIssues.map((issue) => (
             <div
               key={issue.id}
               className="bg-surface-primary rounded-lg border border-border-primary p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
                     <h3 className="text-lg font-semibold text-foreground-primary">{issue.title}</h3>
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(issue.status)}`}>
                       {issue.status}
@@ -306,6 +367,19 @@ export default function StakeholderIssuesPage() {
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(issue.priority)}`}>
                       {issue.priority}
                     </span>
+                    {/* Category Badge */}
+                    {issue.category && (
+                      <span 
+                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
+                        style={{ backgroundColor: issue.category.color }}
+                      >
+                        <Tag size={12} />
+                        {issue.category.name}
+                        {issue.subcategory && (
+                          <span className="opacity-75">/ {issue.subcategory.name}</span>
+                        )}
+                      </span>
+                    )}
                   </div>
 
                   {/* Stakeholder Info */}
@@ -313,12 +387,23 @@ export default function StakeholderIssuesPage() {
                     <span className="font-medium">Stakeholder:</span> {issue.stakeholder?.name}
                   </div>
 
-                  {/* Assigned Employee Info */}
-                  {issue.assigned_employee && (
-                    <div className="text-sm text-foreground-secondary mb-2">
-                      <span className="font-medium">Assigned to:</span> {issue.assigned_employee.name}
-                      {issue.assigned_employee.email && (
-                        <span className="text-foreground-tertiary"> ({issue.assigned_employee.email})</span>
+                  {/* Assignment Info */}
+                  {(issue.assigned_employee || issue.assigned_team) && (
+                    <div className="text-sm text-foreground-secondary mb-2 flex items-center gap-1">
+                      <span className="font-medium">Assigned to:</span>
+                      {issue.assigned_employee ? (
+                        <>
+                          {issue.assigned_employee.name}
+                          {issue.assigned_employee.email && (
+                            <span className="text-foreground-tertiary"> ({issue.assigned_employee.email})</span>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <UsersThree size={14} className="text-foreground-tertiary" />
+                          {issue.assigned_team?.name}
+                          <span className="text-foreground-tertiary">(Team)</span>
+                        </>
                       )}
                     </div>
                   )}
@@ -402,15 +487,11 @@ export default function StakeholderIssuesPage() {
             </div>
           ))}
           
-          {/* Pagination */}
-          {searchResult && (
-            <Pagination
-              currentPage={searchResult.currentPage}
-              totalPages={searchResult.totalPages}
-              totalCount={searchResult.totalCount}
-              pageSize={pageSize}
-              onPageChange={handlePageChange}
-            />
+          {/* Pagination - using filteredIssues length */}
+          {filteredIssues.length > 0 && (
+            <div className="text-sm text-foreground-tertiary text-center py-2">
+              Showing {filteredIssues.length} issue{filteredIssues.length !== 1 ? 's' : ''}
+            </div>
           )}
         </div>
       )}
@@ -427,6 +508,10 @@ export default function StakeholderIssuesPage() {
               status: selectedIssue.status,
               priority: selectedIssue.priority,
               assigned_to: selectedIssue.assigned_to,
+              assigned_team_id: selectedIssue.assigned_team_id,
+              category_id: selectedIssue.category_id,
+              subcategory_id: selectedIssue.subcategory_id,
+              linked_step_data_ids: selectedIssue.linked_step_data_ids || [],
               attachments: selectedIssue.attachments,
             }}
             onSubmit={handleUpdateIssue}

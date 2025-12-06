@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
 import { StakeholderIssue, StakeholderIssueAttachment } from "@/lib/types/schemas";
 import { createStakeholderIssueNotification } from "@/lib/utils/notifications";
+import { captureSupabaseError, logError } from "@/lib/sentry";
 
 // ==============================================================================
 // Form Data Interfaces
@@ -17,6 +18,10 @@ export interface StakeholderIssueFormData {
   status: 'Pending' | 'In Progress' | 'Resolved';
   priority: 'Low' | 'Medium' | 'High' | 'Urgent';
   assigned_to?: string; // Employee ID assigned to handle this issue
+  assigned_team_id?: number; // Team ID assigned to handle this issue (either employee OR team)
+  category_id?: number; // Optional category
+  subcategory_id?: number; // Optional subcategory
+  linked_step_data_ids?: number[]; // Array of stakeholder_step_data IDs linked to this issue
   attachments?: File[];
 }
 
@@ -26,7 +31,10 @@ export interface StakeholderIssueSearchOptions {
   pageSize?: number;
   filterStatus?: "all" | "Pending" | "In Progress" | "Resolved";
   filterPriority?: "all" | "Low" | "Medium" | "High" | "Urgent";
+  filterCategoryId?: number | "all"; // Filter by category
+  filterSubcategoryId?: number | "all"; // Filter by subcategory
   assignedToId?: string; // Filter by assigned employee
+  assignedTeamId?: number; // Filter by assigned team
 }
 
 export interface StakeholderIssueSearchResult {
@@ -77,6 +85,19 @@ export function useStakeholderIssues() {
             first_name,
             last_name,
             email
+          ),
+          assigned_team:teams!stakeholder_issues_assigned_team_id_fkey(
+            id,
+            name
+          ),
+          category:stakeholder_issue_categories(
+            id,
+            name,
+            color
+          ),
+          subcategory:stakeholder_issue_subcategories(
+            id,
+            name
           )
         `)
         .eq("company_id", company_id);
@@ -85,11 +106,12 @@ export function useStakeholderIssues() {
         query = query.eq("stakeholder_id", stakeholderId);
       }
 
-      const { data, error } = await query.order("created_at", { ascending: false });
+      const { data, error: fetchError } = await query.order("created_at", { ascending: false });
 
-      if (error) {
+      if (fetchError) {
+        captureSupabaseError(fetchError, "fetchIssues", { company_id, stakeholderId });
         setError("Failed to fetch issues");
-        throw error;
+        throw fetchError;
       }
 
       // Transform employee data to combine first_name and last_name
@@ -104,8 +126,8 @@ export function useStakeholderIssues() {
 
       setIssues(transformedData);
       return transformedData;
-    } catch (error) {
-      console.error("Error fetching stakeholder issues:", error);
+    } catch (err) {
+      logError("Error fetching stakeholder issues", err);
       setError("Failed to fetch issues");
       return [];
     } finally {
@@ -124,7 +146,7 @@ export function useStakeholderIssues() {
         return null;
       }
 
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from("stakeholder_issues")
         .select(`
           *,
@@ -140,15 +162,29 @@ export function useStakeholderIssues() {
             first_name,
             last_name,
             email
+          ),
+          assigned_team:teams!stakeholder_issues_assigned_team_id_fkey(
+            id,
+            name
+          ),
+          category:stakeholder_issue_categories(
+            id,
+            name,
+            color
+          ),
+          subcategory:stakeholder_issue_subcategories(
+            id,
+            name
           )
         `)
         .eq("company_id", company_id)
         .eq("id", issueId)
         .single();
 
-      if (error) {
+      if (fetchError) {
+        captureSupabaseError(fetchError, "fetchIssueById", { company_id, issueId });
         setError("Failed to fetch issue");
-        throw error;
+        throw fetchError;
       }
 
       // Transform employee data to combine first_name and last_name
@@ -162,8 +198,8 @@ export function useStakeholderIssues() {
       } : null;
 
       return transformedData;
-    } catch (error) {
-      console.error("Error fetching issue:", error);
+    } catch (err) {
+      logError("Error fetching issue", err);
       setError("Failed to fetch issue");
       return null;
     } finally {
@@ -171,7 +207,7 @@ export function useStakeholderIssues() {
     }
   }, [employeeInfo]);
 
-  const fetchIssuesByAssignedEmployee = useCallback(async (assignedToId?: string) => {
+  const fetchIssuesByAssignedEmployee = useCallback(async (assignedToId?: string, assignedTeamIds?: number[]) => {
     setLoading(true);
     setError(null);
 
@@ -184,12 +220,12 @@ export function useStakeholderIssues() {
       
       const targetAssignedToId = assignedToId || employeeInfo?.id;
 
-      if (!targetAssignedToId) {
+      if (!targetAssignedToId && (!assignedTeamIds || assignedTeamIds.length === 0)) {
         setLoading(false);
         return [];
       }
 
-      const { data, error } = await supabase
+      let query = supabase
         .from("stakeholder_issues")
         .select(`
           *,
@@ -204,15 +240,40 @@ export function useStakeholderIssues() {
             first_name,
             last_name,
             email
+          ),
+          assigned_team:teams!stakeholder_issues_assigned_team_id_fkey(
+            id,
+            name
+          ),
+          category:stakeholder_issue_categories(
+            id,
+            name,
+            color
+          ),
+          subcategory:stakeholder_issue_subcategories(
+            id,
+            name
           )
         `)
-        .eq("company_id", company_id)
-        .eq("assigned_to", targetAssignedToId)
-        .order("created_at", { ascending: false });
+        .eq("company_id", company_id);
 
-      if (error) {
+      // Build OR filter for assigned_to or assigned_team_id
+      if (targetAssignedToId && assignedTeamIds && assignedTeamIds.length > 0) {
+        // Filter by either employee OR any of the teams
+        const teamIdList = assignedTeamIds.join(',');
+        query = query.or(`assigned_to.eq.${targetAssignedToId},assigned_team_id.in.(${teamIdList})`);
+      } else if (targetAssignedToId) {
+        query = query.eq("assigned_to", targetAssignedToId);
+      } else if (assignedTeamIds && assignedTeamIds.length > 0) {
+        query = query.in("assigned_team_id", assignedTeamIds);
+      }
+
+      const { data, error: fetchError } = await query.order("created_at", { ascending: false });
+
+      if (fetchError) {
+        captureSupabaseError(fetchError, "fetchIssuesByAssignedEmployee", { company_id, targetAssignedToId });
         setError("Failed to fetch issues");
-        throw error;
+        throw fetchError;
       }
 
       // Transform employee data to combine first_name and last_name
@@ -227,8 +288,8 @@ export function useStakeholderIssues() {
 
       setIssues(transformedData);
       return transformedData;
-    } catch (error) {
-      console.error("Error fetching issues by assigned employee:", error);
+    } catch (err) {
+      logError("Error fetching issues by assigned employee", err);
       setError("Failed to fetch issues");
       return [];
     } finally {
@@ -243,7 +304,10 @@ export function useStakeholderIssues() {
       pageSize = 25, 
       filterStatus = "all",
       filterPriority = "all",
-      assignedToId
+      filterCategoryId = "all",
+      filterSubcategoryId = "all",
+      assignedToId,
+      assignedTeamId
     } = options;
     
     setLoading(true);
@@ -264,7 +328,7 @@ export function useStakeholderIssues() {
       
       const targetAssignedToId = assignedToId || employeeInfo?.id;
 
-      if (!targetAssignedToId) {
+      if (!targetAssignedToId && !assignedTeamId) {
         const emptyResult: StakeholderIssueSearchResult = {
           issues: [],
           totalCount: 0,
@@ -291,10 +355,31 @@ export function useStakeholderIssues() {
             first_name,
             last_name,
             email
+          ),
+          assigned_team:teams!stakeholder_issues_assigned_team_id_fkey(
+            id,
+            name
+          ),
+          category:stakeholder_issue_categories(
+            id,
+            name,
+            color
+          ),
+          subcategory:stakeholder_issue_subcategories(
+            id,
+            name
           )
         `, { count: 'exact' })
-        .eq("company_id", company_id)
-        .eq("assigned_to", targetAssignedToId);
+        .eq("company_id", company_id);
+
+      // Add assignment filter
+      if (targetAssignedToId && assignedTeamId) {
+        query = query.or(`assigned_to.eq.${targetAssignedToId},assigned_team_id.eq.${assignedTeamId}`);
+      } else if (targetAssignedToId) {
+        query = query.eq("assigned_to", targetAssignedToId);
+      } else if (assignedTeamId) {
+        query = query.eq("assigned_team_id", assignedTeamId);
+      }
       
       // Add search filter if provided
       if (searchQuery.trim()) {
@@ -311,6 +396,16 @@ export function useStakeholderIssues() {
       if (filterPriority !== "all") {
         query = query.eq("priority", filterPriority);
       }
+
+      // Add category filter
+      if (filterCategoryId !== "all" && typeof filterCategoryId === "number") {
+        query = query.eq("category_id", filterCategoryId);
+      }
+
+      // Add subcategory filter
+      if (filterSubcategoryId !== "all" && typeof filterSubcategoryId === "number") {
+        query = query.eq("subcategory_id", filterSubcategoryId);
+      }
       
       // Add pagination
       const startIndex = (page - 1) * pageSize;
@@ -319,9 +414,12 @@ export function useStakeholderIssues() {
       // Order by created_at for consistent results
       query = query.order('created_at', { ascending: false });
       
-      const { data, error, count } = await query;
+      const { data, error: fetchError, count } = await query;
       
-      if (error) throw error;
+      if (fetchError) {
+        captureSupabaseError(fetchError, "searchIssues", { company_id });
+        throw fetchError;
+      }
       
       // Transform employee data to combine first_name and last_name
       const transformedData = data?.map((issue) => ({
@@ -345,8 +443,8 @@ export function useStakeholderIssues() {
       
       setIssues(transformedData);
       return result;
-    } catch (error) {
-      console.error("Error searching issues:", error);
+    } catch (err) {
+      logError("Error searching issues", err);
       setError("Failed to search issues");
       return {
         issues: [],
@@ -416,7 +514,7 @@ export function useStakeholderIssues() {
           }
         }
 
-        const { data, error } = await supabase
+        const { data, error: insertError } = await supabase
           .from("stakeholder_issues")
           .insert([
             {
@@ -425,7 +523,11 @@ export function useStakeholderIssues() {
               description: issueData.description,
               status: issueData.status,
               priority: issueData.priority,
-              assigned_to: issueData.assigned_to,
+              assigned_to: issueData.assigned_to || null,
+              assigned_team_id: issueData.assigned_team_id || null,
+              category_id: issueData.category_id || null,
+              subcategory_id: issueData.subcategory_id || null,
+              linked_step_data_ids: issueData.linked_step_data_ids || [],
               attachments,
               company_id,
               created_by: employeeInfo?.id,
@@ -434,7 +536,10 @@ export function useStakeholderIssues() {
           .select()
           .single();
 
-        if (error) throw error;
+        if (insertError) {
+          captureSupabaseError(insertError, "createIssue", { company_id });
+          throw insertError;
+        }
 
         console.log('Issue created with attachments:', data);
 
@@ -561,20 +666,35 @@ export function useStakeholderIssues() {
         delete updateData.attachments;
         updateData.attachments = attachments;
 
+        // Handle either/or assignment - if one is set, clear the other
+        if (issueData.assigned_to) {
+          updateData.assigned_team_id = null;
+        } else if (issueData.assigned_team_id) {
+          updateData.assigned_to = null;
+        }
+
+        // Handle linked step data IDs
+        if (issueData.linked_step_data_ids !== undefined) {
+          updateData.linked_step_data_ids = issueData.linked_step_data_ids;
+        }
+
         // If status is being changed to Resolved, add resolved metadata
         if (issueData.status === 'Resolved') {
           updateData.resolved_at = new Date().toISOString();
           updateData.resolved_by = employeeInfo?.id;
         }
 
-        const { data, error } = await supabase
+        const { data, error: updateError } = await supabase
           .from("stakeholder_issues")
           .update(updateData)
           .eq("id", issueId)
           .select()
           .single();
 
-        if (error) throw error;
+        if (updateError) {
+          captureSupabaseError(updateError, "updateIssue", { issueId });
+          throw updateError;
+        }
 
         // Send notifications based on what changed
         try {
@@ -674,10 +794,10 @@ export function useStakeholderIssues() {
 
         await fetchIssues(currentIssue?.stakeholder_id);
         return data;
-      } catch (error) {
-        console.error("Error updating issue:", error);
+      } catch (err) {
+        logError("Error updating issue", err);
         setError("Failed to update issue");
-        throw error;
+        throw err;
       } finally {
         setProcessingId(null);
       }
@@ -707,17 +827,20 @@ export function useStakeholderIssues() {
             .remove(filePaths);
         }
 
-        const { error } = await supabase
+        const { error: deleteError } = await supabase
           .from("stakeholder_issues")
           .delete()
           .eq("id", issueId);
 
-        if (error) throw error;
+        if (deleteError) {
+          captureSupabaseError(deleteError, "deleteIssue", { issueId });
+          throw deleteError;
+        }
 
         await fetchIssues(issue?.stakeholder_id);
         return true;
-      } catch (error) {
-        console.error("Error deleting issue:", error);
+      } catch (err) {
+        logError("Error deleting issue", err);
         setError("Failed to delete issue");
         return false;
       } finally {
@@ -752,16 +875,19 @@ export function useStakeholderIssues() {
           .remove([attachmentPath]);
 
         // Update issue
-        const { error } = await supabase
+        const { error: updateError } = await supabase
           .from("stakeholder_issues")
           .update({ attachments: updatedAttachments })
           .eq("id", issueId);
 
-        if (error) throw error;
+        if (updateError) {
+          captureSupabaseError(updateError, "deleteAttachment", { issueId, attachmentPath });
+          throw updateError;
+        }
 
         return true;
-      } catch (error) {
-        console.error("Error deleting attachment:", error);
+      } catch (err) {
+        logError("Error deleting attachment", err);
         setError("Failed to delete attachment");
         return false;
       }
@@ -786,8 +912,8 @@ export function useStakeholderIssues() {
         }
 
         return null;
-      } catch (error) {
-        console.error("Error getting attachment URL:", error);
+      } catch (err) {
+        logError("Error getting attachment URL", err);
         return null;
       }
     },
@@ -800,13 +926,13 @@ export function useStakeholderIssues() {
         console.log('Downloading file:', filePath, 'as', originalName);
 
         // Download the file as a blob
-        const { data, error } = await supabase.storage
+        const { data, error: downloadError } = await supabase.storage
           .from('stakeholder-documents')
           .download(filePath);
 
-        if (error) {
-          console.error('Download error:', error);
-          throw error;
+        if (downloadError) {
+          logError("Download error", downloadError);
+          throw downloadError;
         }
 
         if (!data) {
@@ -825,12 +951,86 @@ export function useStakeholderIssues() {
         window.URL.revokeObjectURL(url);
 
         return true;
-      } catch (error) {
-        console.error("Error downloading attachment:", error);
-        throw error;
+      } catch (err) {
+        logError("Error downloading attachment", err);
+        throw err;
       }
     },
     []
+  );
+
+  // ==========================================================================
+  // LINKED STEP DATA OPERATIONS
+  // ==========================================================================
+
+  /**
+   * Fetch available step data for a stakeholder (for linking to issues)
+   */
+  const fetchStakeholderStepData = useCallback(
+    async (stakeholderId: number) => {
+      try {
+        const { data, error } = await supabase
+          .from("stakeholder_step_data")
+          .select(`
+            id,
+            stakeholder_id,
+            step_id,
+            data,
+            is_completed,
+            completed_at,
+            step:stakeholder_process_steps(id, name, step_order, field_definitions)
+          `)
+          .eq("stakeholder_id", stakeholderId)
+          .order("id", { ascending: true });
+
+        if (error) {
+          captureSupabaseError(error, "fetchStakeholderStepData", { stakeholderId });
+          throw error;
+        }
+
+        return data || [];
+      } catch (err) {
+        logError("Error fetching stakeholder step data", err);
+        throw err;
+      }
+    },
+    []
+  );
+
+  /**
+   * Update linked step data from an issue
+   * This allows editing stakeholder step data directly from the issue
+   */
+  const updateLinkedStepData = useCallback(
+    async (stepDataId: number, newData: Record<string, any>) => {
+      if (!employeeInfo) {
+        console.warn('Cannot update step data: Employee info not available');
+        return null;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("stakeholder_step_data")
+          .update({
+            data: newData,
+            updated_by: employeeInfo.id,
+          })
+          .eq("id", stepDataId)
+          .select()
+          .single();
+
+        if (error) {
+          captureSupabaseError(error, "updateLinkedStepData", { stepDataId });
+          throw error;
+        }
+
+        return data;
+      } catch (err) {
+        logError("Error updating linked step data", err);
+        throw err;
+      }
+    },
+    [employeeInfo]
   );
 
   // ==========================================================================
@@ -885,5 +1085,9 @@ export function useStakeholderIssues() {
     deleteAttachment,
     getAttachmentUrl,
     downloadAttachment,
+    
+    // Linked Step Data Operations
+    fetchStakeholderStepData,
+    updateLinkedStepData,
   };
 }

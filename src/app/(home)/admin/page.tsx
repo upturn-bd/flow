@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
     Settings, // Basic settings
     Settings2, // Advanced settings
@@ -22,10 +21,17 @@ import {
 } from "@/lib/icons";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SearchBar, EmptyState, PageHeader } from "@/components/ui";
+import { 
+    SearchBar, 
+    EmptyState, 
+    PageHeader, 
+    NavigationCard, 
+    NavigationCardGrid,
+    NavigationSectionProps 
+} from "@/components/ui";
 
 // --- New Structure for Admin Management ---
-const sections = [
+const sections: NavigationSectionProps[] = [
     {
         title: "Company Configurations",
         description: "Manage core company settings and rules",
@@ -35,42 +41,42 @@ const sections = [
                 path: "/admin/config/basic",
                 icon: Settings,
                 description: "General company information and essential settings",
-                color: "bg-blue-100 text-blue-700"
+                iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
             },
             {
                 name: "Advanced Settings",
                 path: "/admin/config/advanced",
                 icon: Settings2,
                 description: "Configure system-wide and granular settings",
-                color: "bg-indigo-100 text-indigo-700"
+                iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
             },
             {
                 name: "Payroll",
                 path: "/admin/config/payroll",
                 icon: CreditCard,
                 description: "Manage salary structures, deductions, and payment rules",
-                color: "bg-green-100 text-green-700"
+                iconColor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
             },
             {
                 name: "Teams",
                 path: "/admin/config/teams",
                 icon: UsersRound,
                 description: "Manage teams and assign granular permissions",
-                color: "bg-violet-100 text-violet-700"
+                iconColor: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400"
             },
             {
                 name: "Stakeholder Process",
                 path: "/admin/config/stakeholder-process",
                 icon: GitBranch,
                 description: "Manage workflow processes for stakeholders and leads",
-                color: "bg-teal-100 text-teal-700"
+                iconColor: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400"
             },
             {
                 name: "Data Export",
                 path: "/admin/data-export",
                 icon: Download,
                 description: "Export HRIS and stakeholder data to CSV format",
-                color: "bg-emerald-100 text-emerald-700"
+                iconColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
             },
         ],
     },
@@ -83,70 +89,70 @@ const sections = [
                 path: "/admin/logs/tasks",
                 icon: ClipboardList,
                 description: "View historical records for task management",
-                color: "bg-indigo-100 text-indigo-700"
+                iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
             },
             {
                 name: "Project",
                 path: "/admin/logs/project",
                 icon: BarChart,
                 description: "View historical records for project tracking",
-                color: "bg-blue-100 text-blue-700"
+                iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
             },
             {
                 name: "Attendance",
                 path: "/admin/logs/attendance",
                 icon: LogIn,
                 description: "Review historical check-in and check-out data",
-                color: "bg-green-100 text-green-700"
+                iconColor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
             },
             {
                 name: "Leave",
                 path: "/admin/logs/leave",
                 icon: CalendarX,
                 description: "Review all past and pending leave requests",
-                color: "bg-blue-100 text-blue-700"
+                iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
             },
             {
                 name: "Notice",
                 path: "/admin/logs/notice",
                 icon: Bell,
                 description: "Archive and history of all published company notices",
-                color: "bg-amber-100 text-amber-700"
+                iconColor: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
             },
             {
                 name: "Requisition",
                 path: "/admin/logs/requisition",
                 icon: Clipboard,
                 description: "History of all equipment/supply requisition requests",
-                color: "bg-cyan-100 text-cyan-700"
+                iconColor: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400"
             },
             {
                 name: "Complaint",
                 path: "/admin/logs/complaint",
                 icon: WarningCircle,
                 description: "Archive of all submitted workplace complaints",
-                color: "bg-red-100 text-red-700"
+                iconColor: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
             },
             {
                 name: "Stakeholder",
                 path: "/admin/stakeholders",
                 icon: Building,
                 description: "Records of all stakeholder interactions and issues",
-                color: "bg-purple-100 text-purple-700"
+                iconColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
             },
             {
                 name: "Transaction",
                 path: "/admin/transaction",
                 icon: DollarSign,
                 description: "Define and manage financial transaction types and flows",
-                color: "bg-emerald-100 text-emerald-700 border-emerald-200"
+                iconColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
             },
             {
                 name: "Onboarding",
                 path: "/admin/logs/onboarding",
                 icon: UserPlus,
                 description: "Archive of all employee onboarding processes",
-                color: "bg-purple-100 text-purple-700 border-purple-200"
+                iconColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
             },
         ],
     }
@@ -311,54 +317,17 @@ export default function AdminManagementPage() {
                                 {section.description}
                             </motion.p>
 
-                            <motion.div
-                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-                                variants={sectionVariants}
-                            >
-                                {section.items.map((item) => {
-                                    const Icon = item.icon;
-                                    return (
-                                        <motion.div
-                                            key={item.name}
-                                            variants={itemVariants}
-                                            layout
-                                        >
-                                            <Link
-                                                href={item.path}
-                                                className="group items-center p-4 bg-surface-primary rounded-lg border border-border-primary shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 block h-28"
-                                            >
-                                                <motion.div
-                                                    whileHover={{ scale: 1.1 }}
-                                                    className={`shrink-0 w-12 h-12 rounded-md ${item.color.split(' ').filter(c => !c.startsWith('border-')).join(' ')} flex items-center justify-center mr-4 transition-transform`}
-                                                >
-                                                    <Icon size={28} className="text-current" />
-                                                </motion.div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <h3 className="text-base font-semibold text-foreground-primary group-hover:text-primary-700 transition-colors truncate">
-                                                            {item.name}
-                                                        </h3>
-                                                        <motion.svg
-                                                            initial={{ x: 0 }}
-                                                            whileHover={{ x: 3 }}
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-4 w-4 text-primary-600 ml-2 transition-all shrink-0"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            stroke="currentColor"
-                                                        >
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                                        </motion.svg>
-                                                    </div>
-                                                    <p className="text-sm text-foreground-secondary mt-0.5 line-clamp-2">
-                                                        {item.description}
-                                                    </p>
-                                                </div>
-                                            </Link>
-                                        </motion.div>
-                                    );
-                                })}
-                            </motion.div>
+                            <NavigationCardGrid columns={3}>
+                                {section.items.map((item) => (
+                                    <motion.div
+                                        key={item.name}
+                                        variants={itemVariants}
+                                        layout
+                                    >
+                                        <NavigationCard {...item} />
+                                    </motion.div>
+                                ))}
+                            </NavigationCardGrid>
                         </motion.div>
                     ))}
                 </AnimatePresence>

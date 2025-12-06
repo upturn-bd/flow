@@ -305,7 +305,14 @@ export default function StakeholdersPage() {
                       {stakeholder.process?.name || "N/A"}
                     </td>
                     <td className="px-6 py-4">
-                      {stakeholder.current_step ? (
+                      {stakeholder.status === 'Permanent' || stakeholder.is_completed ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <CheckCircle size={14} />
+                          Complete
+                        </span>
+                      ) : stakeholder.status === 'Rejected' ? (
+                        <span className="text-sm text-foreground-tertiary">—</span>
+                      ) : stakeholder.current_step ? (
                         <div className="flex flex-col gap-1">
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                             Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}
@@ -425,7 +432,14 @@ export default function StakeholdersPage() {
                   
                   <div>
                     <p className="text-foreground-tertiary text-[10px] uppercase tracking-wide mb-0.5">Current Step</p>
-                    {stakeholder.current_step ? (
+                    {stakeholder.status === 'Permanent' || stakeholder.is_completed ? (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-800">
+                        <CheckCircle size={10} />
+                        Complete
+                      </span>
+                    ) : stakeholder.status === 'Rejected' ? (
+                      <p className="text-foreground-tertiary">—</p>
+                    ) : stakeholder.current_step ? (
                       <div className="flex flex-wrap gap-1">
                         <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
                           Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}

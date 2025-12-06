@@ -199,7 +199,27 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                     <span className={`px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(issue.priority)}`}>
                       {issue.priority}
                     </span>
+                    {/* Category Badge */}
+                    {issue.category && (
+                      <span 
+                        className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
+                        style={{ backgroundColor: issue.category.color }}
+                      >
+                        {issue.category.name}
+                        {issue.subcategory && (
+                          <span className="opacity-75">/ {issue.subcategory.name}</span>
+                        )}
+                      </span>
+                    )}
                   </div>
+
+                  {/* Assignment Info */}
+                  {(issue.assigned_employee || issue.assigned_team) && (
+                    <div className="text-xs text-foreground-tertiary mb-2">
+                      Assigned to: {issue.assigned_employee?.name || issue.assigned_team?.name}
+                      {issue.assigned_team && <span className="ml-1">(Team)</span>}
+                    </div>
+                  )}
 
                   {/* Description */}
                   {issue.description && (
@@ -272,6 +292,10 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
               status: selectedIssue.status,
               priority: selectedIssue.priority,
               assigned_to: selectedIssue.assigned_to,
+              assigned_team_id: selectedIssue.assigned_team_id,
+              category_id: selectedIssue.category_id,
+              subcategory_id: selectedIssue.subcategory_id,
+              linked_step_data_ids: selectedIssue.linked_step_data_ids || [],
               attachments: selectedIssue.attachments || [],
             } : undefined}
             onSubmit={selectedIssue ? handleUpdateIssue : handleCreateIssue}

@@ -633,8 +633,27 @@ export function useStakeholders() {
         throw error;
       }
 
+      // Sort steps and fetch teams for each step based on team_ids array
       if (data.process?.steps) {
         data.process.steps.sort((a: any, b: any) => a.step_order - b.step_order);
+        
+        // Fetch teams for each step with team_ids
+        data.process.steps = await Promise.all(
+          data.process.steps.map(async (step: any) => {
+            if (step.team_ids && Array.isArray(step.team_ids) && step.team_ids.length > 0) {
+              const { data: teams, error: teamsError } = await supabase
+                .from("teams")
+                .select("id, name")
+                .in("id", step.team_ids);
+
+              if (!teamsError && teams) {
+                return { ...step, teams };
+              }
+            }
+            // If no team_ids but has team relation, use that
+            return step;
+          })
+        );
       }
 
       if(data.kam) {
@@ -1153,23 +1172,43 @@ export function useStakeholders() {
 
             if (nextStep && nextStep.id) {
               // Update to next step
-              await supabase
+              const { error: updateError } = await supabase
                 .from("stakeholders")
                 .update({
                   current_step_id: nextStep.id,
                   current_step_order: nextStep.step_order,
                 })
                 .eq("id", stakeholderId);
+              
+              if (updateError) {
+                console.error("Error updating current step:", updateError);
+              }
             }
           }
         }
 
-        // Re-fetch to get updated data
-        const updatedStakeholderData = await fetchStakeholderById(stakeholderId);
+        // Re-fetch to get updated data (use fresh query to avoid cache issues)
+        const { data: freshStakeholderData, error: fetchError } = await supabase
+          .from("stakeholders")
+          .select(`
+            *,
+            process:stakeholder_processes(
+              *,
+              steps:stakeholder_process_steps(*)
+            ),
+            step_data:stakeholder_step_data(id, stakeholder_id, step_id, data, is_completed)
+          `)
+          .eq("id", stakeholderId)
+          .single();
+
+        if (fetchError) {
+          console.error("Error fetching updated stakeholder data:", fetchError);
+          throw fetchError;
+        }
         
-        if (updatedStakeholderData?.process?.steps) {
-          const allStepsCount = updatedStakeholderData.process.steps.length;
-          const completedSteps = updatedStakeholderData.step_data?.filter(
+        if (freshStakeholderData?.process?.steps) {
+          const allStepsCount = freshStakeholderData.process.steps.length;
+          const completedSteps = freshStakeholderData.step_data?.filter(
             (sd: StakeholderStepData) => sd.is_completed
           ) || [];
           
@@ -1181,6 +1220,8 @@ export function useStakeholders() {
                 is_completed: true,
                 completed_at: new Date().toISOString(),
                 status: 'Permanent', // Stakeholder becomes permanent when all steps completed
+                current_step_id: null, // Clear current step when fully completed
+                current_step_order: null,
               })
               .eq("id", stakeholderId);
 

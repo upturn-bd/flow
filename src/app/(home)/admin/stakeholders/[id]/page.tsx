@@ -735,15 +735,19 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         const isSequential = stakeholder.process?.is_sequential || false;
 
                         // Check if user can edit this step:
-                        // Both sequential and independent processes: allow editing incomplete steps
-                        // Sequential: only current step
-                        // Independent: any incomplete step
-                        const stepTeamIds = step.team_ids && step.team_ids.length > 0 
+                        // Step has assigned teams -> user must be in one of those teams
+                        // Step has NO assigned teams -> any user with write permission can work on it
+                        const stepTeamIds = step.team_ids && Array.isArray(step.team_ids) && step.team_ids.length > 0 
                           ? step.team_ids 
-                          : (step.team_ids ? step.team_ids : []);
-                        const isTeamMember = stepTeamIds.some(teamId => userTeamIds.includes(teamId));
+                          : [];
+                        const stepHasTeams = stepTeamIds.length > 0;
+                        const isTeamMember = stepHasTeams && stepTeamIds.some(teamId => userTeamIds.includes(teamId));
                         const hasFullWritePermission = hasPermission('stakeholders', 'can_write');
-                        const hasTeamAccess = isTeamMember || hasFullWritePermission;
+                        
+                        // Team access logic:
+                        // - If step has teams: user must be a team member
+                        // - If step has NO teams: user needs write permission (any team member with write access)
+                        const hasTeamAccess = stepHasTeams ? isTeamMember : hasFullWritePermission;
 
                         // Determine if step can be edited based on completion status and access
                         const canEdit = !isCompleted &&
