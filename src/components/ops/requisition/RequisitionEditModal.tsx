@@ -227,7 +227,7 @@ export default function RequisitionEditModal({
       isOpen={isOpen}
       onClose={onClose}
       title="PencilSimple Requisition"
-      icon={<PackageOpen className="text-blue-600" size={24} />}
+      icon={<Package className="text-blue-600" size={24} />}
       size="lg"
     >
       <div className="space-y-6">
@@ -256,7 +256,7 @@ export default function RequisitionEditModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
-              <PackageOpen size={16} className="mr-2" />
+              <Package size={16} className="mr-2" />
               Category
             </label>
             <div className="relative">

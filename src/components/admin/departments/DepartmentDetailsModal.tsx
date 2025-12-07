@@ -92,7 +92,7 @@ export default function DepartmentDetailsModal({
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
-            <StackSimple size={20} weight="duotone" className="text-foreground-secondary shrink-0" />
+            <Stack size={20} weight="duotone" className="text-foreground-secondary shrink-0" />
             <div>
               <div className="text-sm text-foreground-secondary font-medium">Division</div>
               <div className="font-medium text-foreground-primary">{divisionName || "None"}</div>

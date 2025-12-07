@@ -59,7 +59,7 @@ export default function PositionDetailsModal({
       >
         <motion.div variants={fadeInUp} className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <BriefcaseBusiness className="w-6 h-6 text-foreground-secondary" />
+            <Briefcase className="w-6 h-6 text-foreground-secondary" />
             <h2 className="text-xl font-semibold text-foreground-primary">Position Details</h2>
           </div>
           <Button
@@ -73,7 +73,7 @@ export default function PositionDetailsModal({
 
         <motion.div variants={fadeInUp} className="mt-6 space-y-4">
           <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
-            <BriefcaseBusiness className="h-5 w-5 text-foreground-secondary shrink-0" />
+            <Briefcase className="h-5 w-5 text-foreground-secondary shrink-0" />
             <div>
               <div className="text-sm text-foreground-secondary font-medium">Position Name</div>
               <div className="font-medium text-foreground-primary">{position?.name}</div>

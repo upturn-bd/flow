@@ -118,7 +118,7 @@ export default function RequisitionRequestsPage() {
       
       {error && !loading && (
         <EmptyState 
-          icon={<PackageOpen className="h-12 w-12" />}
+          icon={<Package className="h-12 w-12" />}
           title="Error loading requests"
           description={error}
         />
@@ -148,7 +148,7 @@ export default function RequisitionRequestsPage() {
             </div>
           ) : (
             <EmptyState 
-              icon={<PackageOpen className="h-12 w-12" />}
+              icon={<Package className="h-12 w-12" />}
               title="No pending requisition requests"
               description="When users submit requisition requests, they'll appear here"
             />

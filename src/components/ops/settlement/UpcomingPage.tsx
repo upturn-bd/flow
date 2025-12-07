@@ -3,7 +3,7 @@ import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEffect, useState } from "react";
 import SettlementCreatePage from "./SettlementCreatePage";
 import SettlementDraftPage from "./SettlementDraftPage";
-import { Receipt, FileText, TrashSimple, Clock } from "@phosphor-icons/react";
+import { Receipt, FileText, TrashSimple, Clock, NotePencil } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -112,7 +112,7 @@ export default function UpcomingPage({setActiveTab} : {setActiveTab: (tab:string
                             className="p-1.5 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-full transition-colors"
                             aria-label="PencilSimple draft"
                           >
-                            <FileEdit className="h-5 w-5" />
+                            <NotePencil className="h-5 w-5" />
                           </button>
                           <button
                             onClick={() => handleDeleteDraft(item.draft_id)}

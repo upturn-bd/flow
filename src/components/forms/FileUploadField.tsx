@@ -90,7 +90,7 @@ export default function FileUploadField({
         onClick={() => fileInputRef.current?.click()}
       >
         <div className="text-center">
-          <CloudUpload className="mx-auto h-8 w-8 text-foreground-tertiary mb-2" />
+          <CloudArrowUp className="mx-auto h-8 w-8 text-foreground-tertiary mb-2" />
           <p className="text-sm text-foreground-secondary">
             Click to upload or drag and drop files here
           </p>

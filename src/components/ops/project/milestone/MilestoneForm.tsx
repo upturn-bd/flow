@@ -287,10 +287,9 @@ export default function MilestoneForm({
                 placeholder="Search for assignees..."
                 className="w-full rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-background-secondary dark:bg-background-tertiary p-3 pr-10"
               />
-              <Search
+              <MagnifyingGlass
                 size={16}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
-                strokeWidth={2}
               />
 
               <AnimatePresence>

@@ -35,7 +35,7 @@ export function PermissionEmptyState({
   actionRequired = "access",
   icon = "lock",
 }: PermissionEmptyStateProps) {
-  const IconComponent = icon === "lock" ? Lock : ShieldWarning;
+  const IconComponent = icon === "lock" ? LockKey : ShieldWarning;
   const defaultMessage = message || `You don't have permission to ${actionRequired} ${moduleName}. Please contact your administrator if you believe you should have access.`;
 
   return (

@@ -88,7 +88,7 @@ export default function MilestoneList({
                 onClick={onDistributeEvenly}
                 title="Distribute weightage evenly"
               >
-                <Scale size={16} className="mr-1" />
+                <Scales size={16} className="mr-1" />
                 Distribute
               </Button>
             )}

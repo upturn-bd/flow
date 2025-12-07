@@ -117,7 +117,7 @@ export default function SettlementHistoryPage() {
                           : 'bg-yellow-100 text-yellow-800'
                         }`}>
                         {settlement.status === 'Approved' ? (
-                          <CheckCheck size={12} />
+                          <Checks size={12} />
                         ) : settlement.status === 'Rejected' ? (
                           <XCircle size={12} />
                         ) : (

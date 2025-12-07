@@ -113,7 +113,7 @@ export function StatusIndicator({
   };
 
   const Component = animate ? motion.span : "span";
-  const iconProps = animate && Icon === Loader ? {
+  const iconProps = animate && Icon === CircleNotch ? {
     animate: { rotate: 360 },
     transition: { duration: 1, repeat: Infinity }
   } : {};

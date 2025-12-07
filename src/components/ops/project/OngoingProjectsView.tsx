@@ -204,7 +204,7 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
         >
           {/* Search Bar */}
           <motion.div variants={fadeInUp} className="relative mb-4">
-            <Search
+            <MagnifyingGlass
               size={16}
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
             />

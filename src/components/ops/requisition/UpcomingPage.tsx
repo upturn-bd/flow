@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import RequisitionCreatePage, { RequisitionDraftPage } from "./RequisitionCreatePage";
 import { useRequisitionTypes } from "@/hooks/useConfigTypes";
-import { Clock, FileText, TrashSimple, Scroll } from "@phosphor-icons/react";
+import { Clock, FileText, TrashSimple, Scroll, NotePencil } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -111,7 +111,7 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
                             className="p-1.5 text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded-full transition-colors"
                             aria-label="PencilSimple draft"
                           >
-                            <FileEdit className="h-5 w-5" />
+                            <NotePencil className="h-5 w-5" />
                           </button>
                           <button
                             onClick={() => handleDeleteDraft(item.draft_id)}

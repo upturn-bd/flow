@@ -66,7 +66,7 @@ export default function DivisionsSection({ showNotification }: DivisionsSectionP
 
   return (
     <Section
-      icon={<Layers size={20} />}
+      icon={<Stack size={20} />}
       title="Divisions"
       description="Manage organization divisions"
       loading={divisionsLoading}
@@ -86,7 +86,7 @@ export default function DivisionsSection({ showNotification }: DivisionsSectionP
         {divisions.map((div) => (
           <EntityListItem
             key={div.id}
-            icon={<Layers size={16} />}
+            icon={<Stack size={16} />}
             name={div.name || "Unnamed Division"}
             actions={{
               onView: () => setViewDivision(div.id ?? null),

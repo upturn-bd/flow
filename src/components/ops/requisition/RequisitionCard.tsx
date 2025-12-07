@@ -67,7 +67,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
       {/* Header */}
       <div className="flex justify-between items-start">
         <div className="flex items-start gap-3">
-          <PackageOpen className="text-blue-600 mt-1" size={20} />
+          <Package className="text-blue-600 mt-1" size={20} />
           <div>
             <h3 className="font-semibold text-foreground-primary">
               {requisitionTypes.find(
@@ -101,7 +101,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
               )}`}
             >
               {req.status === "Approved" ? (
-                <CheckCheck size={12} />
+                <Checks size={12} />
               ) : req.status === "Rejected" ? (
                 <XCircle size={12} />
               ) : (
@@ -123,7 +123,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
       {/* Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
         <div className="flex items-center gap-2 text-sm text-foreground-secondary">
-          <TagIcon size={14} />
+          <Tag size={14} />
           <span>
             Quantity: <span className="font-medium">{req.quantity}</span>
           </span>

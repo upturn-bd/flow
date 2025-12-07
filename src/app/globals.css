@@ -26,8 +26,8 @@
 
   /* Background colors */
   --color-background-primary: var(--theme-bg-primary, #ffffff);
-  --color-background-secondary: var(--theme-bg-secondary, #f9fafb);
-  --color-background-tertiary: var(--theme-bg-tertiary, #f3f4f6);
+  --color-background-secondary: var(--theme-bg-secondary, #ebeef2);
+  --color-background-tertiary: var(--theme-bg-tertiary, #cdd2dd);
 
   /* Foreground/text colors */
   --color-foreground-primary: var(--theme-fg-primary, #111827);
@@ -68,8 +68,8 @@
 
     /* Light mode colors */
     --theme-bg-primary: #ffffff;
-    --theme-bg-secondary: #f9fafb;
-    --theme-bg-tertiary: #f3f4f6;
+    --theme-bg-secondary: #ebeef2;
+    --theme-bg-tertiary: #cdd2dd;
 
     --theme-fg-primary: #111827;
     --theme-fg-secondary: #4b5563;
@@ -86,7 +86,7 @@
   /* Dark mode */
   .dark {
     --theme-bg-primary: #0f172a;
-    --theme-bg-secondary: #1e293b;
+    --theme-bg-secondary: #162338;
     --theme-bg-tertiary: #334155;
 
     --theme-fg-primary: #f1f5f9;

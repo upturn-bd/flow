@@ -150,7 +150,7 @@ export default function RequisitionHistoryPage() {
                 className="flex flex-col items-center justify-center py-12 text-center"
               >
                 <div className="bg-background-tertiary dark:bg-background-tertiary rounded-full p-4 mb-4">
-                  <PackageOpen className="h-12 w-12 text-foreground-tertiary dark:text-foreground-tertiary" />
+                  <Package className="h-12 w-12 text-foreground-tertiary dark:text-foreground-tertiary" />
                 </div>
                 <h3 className="text-lg font-medium text-foreground-primary dark:text-foreground-primary">
                   No requisition history

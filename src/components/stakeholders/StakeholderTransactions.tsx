@@ -311,7 +311,7 @@ export default function StakeholderTransactions({
               </p>
             </div>
             <div className="p-2 sm:p-3 bg-success/30 rounded-lg shrink-0">
-              <TrendingUp className="text-success" size={20} />
+              <TrendUp className="text-success" size={20} />
             </div>
           </div>
         </motion.div>
@@ -328,7 +328,7 @@ export default function StakeholderTransactions({
               </p>
             </div>
             <div className="p-2 sm:p-3 bg-error/30 rounded-lg shrink-0">
-              <TrendingDown className="text-error" size={20} />
+              <TrendDown className="text-error" size={20} />
             </div>
           </div>
         </motion.div>

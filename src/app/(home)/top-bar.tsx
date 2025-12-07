@@ -157,13 +157,13 @@ export default function TopBar() {
 
   return (
     <>
-    <header className="bg-background-primary border-b border-border-primary shadow-sm sticky top-0 z-40 h-16">
+    <header className="bg-background-secondary border-b border-border-primary shadow-sm sticky top-0 z-40 h-16">
       <div className="pr-4 md:pr-6 h-full flex items-center justify-between">
         {/* Left side */}
         <div className="flex items-center">
           {!isApproved && (
             <div className="flex items-center text-amber-600">
-              <ShieldAlert className="h-5 w-5 mr-2" />
+              <ShieldWarning className="h-5 w-5 mr-2" />
               <span className="text-sm font-medium hidden md:inline">Restricted access</span>
             </div>
           )}
@@ -254,7 +254,7 @@ export default function TopBar() {
 
             {/* User dropdown */}
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-surface-primary rounded-md shadow-lg py-1 z-[1100] border border-border-primary">
+              <div className="absolute right-0 mt-2 w-48 bg-surface-primary rounded-md shadow-lg py-1 z-1100 border border-border-primary">
                 <div className="px-4 py-2 border-b border-border-primary">
                   <p className="text-sm font-medium text-foreground-primary">{employeeInfo?.name || 'User'}</p>
                   <p className="text-xs text-foreground-tertiary">{employeeInfo?.role || 'Role'}</p>

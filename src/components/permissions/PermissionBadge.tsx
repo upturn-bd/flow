@@ -89,7 +89,7 @@ export function PermissionBadge({
   };
 
   const sizeSettings = sizeConfig[size];
-  const Icon = hasPermission ? config.icon : Lock;
+  const Icon = hasPermission ? config.icon : LockKey;
   const colorClass = hasPermission ? config.colorGranted : config.colorDenied;
 
   return (

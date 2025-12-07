@@ -146,7 +146,7 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
           variants={fadeInUp}
           className="flex items-center gap-2 px-4 py-3 mb-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg text-primary-700 dark:text-primary-300"
         >
-          <Loader size={16} className="animate-spin" />
+          <CircleNotch size={16} className="animate-spin" />
           <span className="text-sm">Loading departments and employees...</span>
         </motion.div>
       )}

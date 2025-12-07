@@ -83,7 +83,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
           )}`}
         >
           {complaint.status === "Accepted" ? (
-            <CheckCheck size={12} />
+            <Checks size={12} />
           ) : complaint.status === "Rejected" ? (
             <XCircle size={12} />
           ) : (

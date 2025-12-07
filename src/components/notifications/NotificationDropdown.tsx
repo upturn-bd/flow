@@ -209,7 +209,7 @@ export default function NotificationDropdown({
                   className="text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 p-1 rounded"
                   title="Mark all as read"
                 >
-                  <CheckCheck className="h-4 w-4" />
+                  <Checks className="h-4 w-4" />
                 </button>
               )}
               <button

@@ -73,7 +73,7 @@ export const ClaimTypeCreateModal: React.FC<ClaimTypeCreateModalProps> = ({
             required
             min={1}
             placeholder="Enter allowance amount"
-            icon={<Money size={18} weight="duotone" className="text-foreground-tertiary" />}
+            icon={<CurrencyDollar size={18} weight="duotone" className="text-foreground-tertiary" />}
           />
 
           <SingleEmployeeSelector

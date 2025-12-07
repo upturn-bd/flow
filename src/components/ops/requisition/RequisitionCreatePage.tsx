@@ -330,7 +330,7 @@ export default function RequisitionCreatePage({
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium text-foreground-secondary mb-1 flex items-center">
-              <PackageOpen size={16} className="mr-2" />
+              <Package size={16} className="mr-2" />
               Category
             </label>
             <div className="relative">
@@ -1042,7 +1042,7 @@ export function RequisitionDraftPage({
             Attachment
           </label>
           <div className="bg-background-tertiary dark:bg-surface-secondary rounded-md border border-border-secondary p-6 text-center text-sm text-foreground-tertiary">
-            <CloudUpload className="mx-auto mb-4 text-2xl" />
+            <CloudArrowUp className="mx-auto mb-4 text-2xl" />
             <label
               htmlFor="file_upload"
               className="px-4 py-2 bg-surface-primary border border-border-secondary text-sm rounded-md cursor-pointer hover:bg-surface-hover transition"

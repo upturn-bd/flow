@@ -24,7 +24,7 @@ export default function NoPermissionMessage({
       className="flex flex-col items-center justify-center p-8 text-center h-full"
     >
       <div className="bg-surface-secondary rounded-full p-4 mb-4">
-        <Lock size={32} weight="duotone" className="text-foreground-tertiary" />
+        <LockKey size={32} weight="duotone" className="text-foreground-tertiary" />
       </div>
       <h3 className="text-lg font-semibold text-foreground-primary mb-2">
         Access Restricted
