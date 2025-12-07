@@ -2,7 +2,7 @@
 
 import { IssueCategoryFormData, IssueSubcategoryFormData } from "@/hooks/useStakeholderIssueCategories";
 import { validateIssueCategory, validateIssueSubcategory } from "@/lib/validation/schemas/stakeholder-issue-categories";
-import { Tag, FolderOpen } from "@/lib/icons";
+import { Tag, FolderOpen } from "@phosphor-icons/react";
 import { FormModal } from "@/components/ui/modals";
 import { FormField, TextAreaField, ToggleField, ColorField, SelectField } from "@/components/forms";
 import { StakeholderIssueCategory } from "@/lib/types/schemas";

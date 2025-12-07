@@ -2,13 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Loader,
-  XCircle,
-  PackageOpen,
-  Calendar,
-  Plus,
-} from "@/lib/icons";
+import { CircleNotch, XCircle, Package, Calendar, Plus } from "@phosphor-icons/react";
 import { extractFileNameFromStoragePath } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
@@ -105,8 +99,8 @@ export default function RequisitionHistoryPage() {
             exit={{ opacity: 0 }}
             className="flex flex-col items-center justify-center py-16"
           >
-            <XCircle className="h-12 w-12 text-red-500 mb-2" />
-            <p className="text-red-500 font-medium">{error}</p>
+            <XCircle className="h-12 w-12 text-error mb-2" />
+            <p className="text-error font-medium">{error}</p>
           </motion.div>
         )}
 
@@ -156,7 +150,7 @@ export default function RequisitionHistoryPage() {
                 className="flex flex-col items-center justify-center py-12 text-center"
               >
                 <div className="bg-background-tertiary dark:bg-background-tertiary rounded-full p-4 mb-4">
-                  <PackageOpen className="h-12 w-12 text-foreground-tertiary dark:text-foreground-tertiary" />
+                  <Package className="h-12 w-12 text-foreground-tertiary dark:text-foreground-tertiary" />
                 </div>
                 <h3 className="text-lg font-medium text-foreground-primary dark:text-foreground-primary">
                   No requisition history

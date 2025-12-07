@@ -21,7 +21,7 @@ export default function GlobalError({
           <div className="max-w-md text-center">
             <div className="mb-6">
               <svg
-                className="mx-auto h-16 w-16 text-red-500 dark:text-red-400"
+                className="mx-auto h-16 w-16 text-error"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

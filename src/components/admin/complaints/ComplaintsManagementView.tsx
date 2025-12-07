@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
 import ComplaintTypeCreateModal from "./ComplaintsModal";
 import { useComplaintTypes } from "@/hooks/useConfigTypes";
-import { Tag, Plus, Trash } from "@/lib/icons";
+import { Tag, Plus, TrashSimple } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 
@@ -84,9 +84,9 @@ export default function ComplaintsView() {
                         onClick={() => type.id !== undefined && handleDeleteComplaintType(type.id)}
                         isLoading={deleteLoading === type.id}
                         disabled={deleteLoading === type.id}
-                        className="ml-2 p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
+                        className="ml-2 p-1 rounded-full text-foreground-tertiary hover:bg-error/10 hover:text-error"
                       >
-                        <Trash size={16} weight="bold" />
+                        <TrashSimple size={16} weight="bold" />
                       </Button>
                     </div>
                   ))}

@@ -1,6 +1,6 @@
 'use client';
 
-import { CaretDown } from '@/lib/icons';
+import { CaretDown } from "@phosphor-icons/react";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 

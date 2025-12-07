@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { WarningCircle, Plus, ArrowsClockwise, FileText, Tag, UsersThree, User } from '@/lib/icons';
+import { WarningCircle, Plus, ArrowsClockwise, FileText, Tag, UsersThree, User, Link as LinkIcon } from "@phosphor-icons/react";
 import SectionHeader from '@/app/(home)/home/components/SectionHeader';
 import LoadingSection from '@/app/(home)/home/components/LoadingSection';
 import EmptyState from '@/app/(home)/home/components/EmptyState';
@@ -18,16 +18,16 @@ import NoPermissionMessage from '@/components/ui/NoPermissionMessage';
 import Portal from '@/components/ui/Portal';
 
 const priorityColors = {
-  Low: 'bg-green-100 text-green-700',
-  Medium: 'bg-yellow-100 text-yellow-700',
-  High: 'bg-orange-100 text-orange-700',
-  Urgent: 'bg-red-100 text-red-700',
+  Low: 'bg-success/10 text-success dark:bg-success/20',
+  Medium: 'bg-warning/10 text-warning dark:bg-warning/20',
+  High: 'bg-warning/20 text-warning dark:bg-warning/30',
+  Urgent: 'bg-error/10 text-error dark:bg-error/20',
 };
 
 const statusColors = {
   Pending: 'bg-background-tertiary text-foreground-primary',
-  'In Progress': 'bg-primary-100 text-primary-700',
-  Resolved: 'bg-green-100 text-green-700',
+  'In Progress': 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300',
+  Resolved: 'bg-success/10 text-success dark:bg-success/20',
 };
 
 export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, onSizeChange }: WidgetProps) {
@@ -178,6 +178,34 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
                                   <span>{issue.assigned_employee.name}</span>
                                 </>
                               ) : null}
+                              {/* Linked Fields indicator (new format) */}
+                              {issue.linked_fields && issue.linked_fields.length > 0 && (
+                                <span className="ml-2 inline-flex items-center gap-0.5 text-primary-600 dark:text-primary-400">
+                                  <LinkIcon size={10} />
+                                  <span>{issue.linked_fields.length}</span>
+                                </span>
+                              )}
+                              {/* Legacy: Linked Step Data indicator */}
+                              {(!issue.linked_fields || issue.linked_fields.length === 0) && issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
+                                <span className="ml-2 inline-flex items-center gap-0.5 text-primary-600 dark:text-primary-400">
+                                  <LinkIcon size={10} />
+                                  <span>{issue.linked_step_data_ids.length}</span>
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          {/* Show linked data even if no assignment - new format */}
+                          {!issue.assigned_employee && !issue.assigned_team && issue.linked_fields && issue.linked_fields.length > 0 && (
+                            <div className="flex items-center gap-1 mt-1 text-[10px] text-primary-600 dark:text-primary-400">
+                              <LinkIcon size={10} />
+                              <span>{issue.linked_fields.length} linked field{issue.linked_fields.length > 1 ? 's' : ''}</span>
+                            </div>
+                          )}
+                          {/* Legacy: Show linked data even if no assignment */}
+                          {!issue.assigned_employee && !issue.assigned_team && (!issue.linked_fields || issue.linked_fields.length === 0) && issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
+                            <div className="flex items-center gap-1 mt-1 text-[10px] text-primary-600 dark:text-primary-400">
+                              <LinkIcon size={10} />
+                              <span>{issue.linked_step_data_ids.length} linked step{issue.linked_step_data_ids.length > 1 ? 's' : ''}</span>
                             </div>
                           )}
                         </div>

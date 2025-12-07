@@ -4,7 +4,7 @@ import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useEmployees } from "@/hooks/useEmployees";
-import { ArrowLeft, WarningCircle, Plus, Trash } from "@/lib/icons";
+import { ArrowLeft, WarningCircle, Plus, TrashSimple } from "@phosphor-icons/react";
 import { ContactPerson, Stakeholder } from "@/lib/types/schemas";
 import { LoadingSpinner } from "@/components/ui";
 
@@ -125,7 +125,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
     setSubmitting(true);
 
     try {
-      // Filter out empty contact persons
+      // FunnelSimple out empty contact persons
       const validContactPersons = contactPersons.filter(
         (cp) => cp.name.trim() && (cp.email?.trim() || cp.phone?.trim())
       );
@@ -190,9 +190,9 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
         </button>
 
         <div className="max-w-2xl mx-auto">
-          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-8 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
-              <WarningCircle className="text-yellow-600" size={32} />
+          <div className="bg-warning/10 border-2 border-warning/30 dark:bg-warning/20 rounded-lg p-8 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-warning/20 rounded-full mb-4">
+              <WarningCircle className="text-warning" size={32} />
             </div>
             <h2 className="text-xl font-bold text-foreground-primary mb-2">
               No Stakeholder Processes Found
@@ -224,7 +224,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
       </button>
 
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold text-foreground-primary mb-6">Edit Stakeholder</h1>
+        <h1 className="text-2xl font-bold text-foreground-primary mb-6">PencilSimple Stakeholder</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
@@ -233,19 +233,19 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
 
             <div>
               <label className="block text-sm font-medium text-foreground-secondary mb-2">
-                Name <span className="text-red-500">*</span>
+                Name <span className="text-error">*</span>
               </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                  errors.name ? "border-red-500" : "border-border-secondary"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none ${
+                  errors.name ? "border-error" : "border-border-secondary"
                 }`}
                 placeholder="Enter stakeholder/company name"
               />
               {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                <p className="text-error text-sm mt-1">{errors.name}</p>
               )}
             </div>
 
@@ -257,20 +257,20 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
                 placeholder="Enter full address (optional)"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-foreground-secondary mb-2">
-                Process <span className="text-red-500">*</span>
+                Process <span className="text-error">*</span>
               </label>
               <select
                 value={formData.process_id}
                 onChange={(e) => setFormData({ ...formData, process_id: e.target.value })}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                  errors.process_id ? "border-red-500" : "border-border-secondary"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none ${
+                  errors.process_id ? "border-error" : "border-border-secondary"
                 }`}
               >
                 <option value="">Select a process</option>
@@ -281,7 +281,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                 ))}
               </select>
               {errors.process_id && (
-                <p className="text-red-500 text-sm mt-1">{errors.process_id}</p>
+                <p className="text-error text-sm mt-1">{errors.process_id}</p>
               )}
               <p className="text-foreground-tertiary text-sm mt-1">
                 Select the workflow process this stakeholder follows
@@ -295,7 +295,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
               <select
                 value={formData.parent_stakeholder_id}
                 onChange={(e) => setFormData({ ...formData, parent_stakeholder_id: e.target.value })}
-                className="w-full px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
               >
                 <option value="">None (No parent stakeholder)</option>
                 {stakeholders.filter(s => s.id !== stakeholderId && s.status !== 'Rejected').map((s) => (
@@ -316,7 +316,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
               <select
                 value={formData.kam_id}
                 onChange={(e) => setFormData({ ...formData, kam_id: e.target.value })}
-                className="w-full px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
               >
                 <option value="">None (No KAM assigned)</option>
                 {employees.map((employee) => (
@@ -336,7 +336,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                 id="is_active"
                 checked={formData.is_active}
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                className="w-4 h-4 text-blue-600 rounded border-border-secondary focus:ring-2 focus:ring-blue-500"
+                className="w-4 h-4 text-primary-600 rounded border-border-secondary focus:ring-2 focus:ring-primary-500"
               />
               <label htmlFor="is_active" className="text-sm font-medium text-foreground-secondary">
                 Active
@@ -379,9 +379,9 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                       <button
                         type="button"
                         onClick={() => handleRemoveContactPerson(index)}
-                        className="text-red-600 hover:text-red-700 p-1"
+                        className="text-error hover:text-error/80 p-1"
                       >
-                        <Trash size={16} />
+                        <TrashSimple size={16} />
                       </button>
                     </div>
 
@@ -396,7 +396,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                           onChange={(e) =>
                             handleContactPersonChange(index, "name", e.target.value)
                           }
-                          className="w-full px-3 py-2 text-sm border border-border-secondary rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                          className="w-full px-3 py-2 text-sm border border-border-secondary rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
                           placeholder="Full name"
                         />
                       </div>
@@ -411,15 +411,15 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                           onChange={(e) =>
                             handleContactPersonChange(index, "email", e.target.value)
                           }
-                          className={`w-full px-3 py-2 text-sm border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
+                          className={`w-full px-3 py-2 text-sm border rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none ${
                             errors[`contact_${index}_email`]
-                              ? "border-red-500"
+                              ? "border-error"
                               : "border-border-secondary"
                           }`}
                           placeholder="email@example.com"
                         />
                         {errors[`contact_${index}_email`] && (
-                          <p className="text-red-500 text-xs mt-1">
+                          <p className="text-error text-xs mt-1">
                             {errors[`contact_${index}_email`]}
                           </p>
                         )}
@@ -435,14 +435,14 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                           onChange={(e) =>
                             handleContactPersonChange(index, "phone", e.target.value)
                           }
-                          className="w-full px-3 py-2 text-sm border border-border-secondary rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                          className="w-full px-3 py-2 text-sm border border-border-secondary rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
                           placeholder="+1234567890"
                         />
                       </div>
                     </div>
 
                     {errors[`contact_${index}`] && (
-                      <p className="text-red-500 text-xs">{errors[`contact_${index}`]}</p>
+                      <p className="text-error text-xs">{errors[`contact_${index}`]}</p>
                     )}
                   </div>
                 ))}
@@ -452,7 +452,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
 
           {/* Error Message */}
           {errors.submit && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg dark:bg-error/20">
               {errors.submit}
             </div>
           )}
@@ -472,7 +472,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
               disabled={submitting || loading}
               className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {submitting ? "Saving..." : "Save Changes"}
+              {submitting ? "Saving..." : "FloppyDisk Changes"}
             </button>
           </div>
         </form>

@@ -3,7 +3,7 @@
 import { useEmployees } from "@/hooks/useEmployees";
 import { Task, useTasks} from "@/hooks/useTasks";
 import { useEffect, useState } from "react";
-import { Calendar, CaretLeft, User, XCircle, Clock, Target } from "@/lib/icons";
+import { Calendar, CaretLeft, User, XCircle, Clock, Target } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { createClient } from '@/lib/supabase/client';
 import { Button } from "@/components/ui/button";
@@ -264,10 +264,10 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
                 value={
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     taskDetails.priority === 'high' 
-                      ? 'bg-red-100 text-red-800' 
+                      ? 'bg-error/10 text-error dark:bg-error/20' 
                       : taskDetails.priority === 'normal' 
-                      ? 'bg-yellow-100 text-yellow-800' 
-                      : 'bg-green-100 text-green-800'
+                      ? 'bg-warning/10 text-warning dark:bg-warning/20' 
+                      : 'bg-success/10 text-success dark:bg-success/20'
                   }`}>
                     {taskDetails.priority}
                   </span>

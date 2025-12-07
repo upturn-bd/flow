@@ -191,7 +191,7 @@ export default function ClientMap({ value, onChange, type }: ClientMapProps) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search for a location..."
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
         {loading && (
           <div className="absolute right-3 top-2.5">

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Lock, LockOpen, Eye, PencilSimple, Trash, CheckCircle, ChatCircle } from "@/lib/icons";
+import { LockKey, LockKeyOpen, Eye, PencilSimple, TrashSimple, CheckCircle, ChatCircle } from "@phosphor-icons/react";
 import { PermissionAction, PERMISSION_ACTIONS } from "@/lib/constants";
 
 interface PermissionBadgeProps {
@@ -25,25 +25,25 @@ const actionConfig = {
   [PERMISSION_ACTIONS.WRITE]: {
     icon: PencilSimple,
     label: "Edit",
-    colorGranted: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800",
+    colorGranted: "bg-success/10 dark:bg-success/20 text-success border-success/30 dark:border-success/40",
     colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   },
   [PERMISSION_ACTIONS.DELETE]: {
-    icon: Trash,
+    icon: TrashSimple,
     label: "Delete",
-    colorGranted: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800",
+    colorGranted: "bg-error/10 dark:bg-error/20 text-error border-error/30 dark:border-error/40",
     colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   },
   [PERMISSION_ACTIONS.APPROVE]: {
     icon: CheckCircle,
     label: "Approve",
-    colorGranted: "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800",
+    colorGranted: "bg-info/10 dark:bg-info/20 text-info border-info/30 dark:border-info/40",
     colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   },
   [PERMISSION_ACTIONS.COMMENT]: {
     icon: ChatCircle,
     label: "Comment",
-    colorGranted: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800",
+    colorGranted: "bg-warning/10 dark:bg-warning/20 text-warning border-warning/30 dark:border-warning/40",
     colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   },
 };
@@ -82,14 +82,14 @@ export function PermissionBadge({
   iconOnly = false,
 }: PermissionBadgeProps) {
   const config = actionConfig[action as keyof typeof actionConfig] || {
-    icon: Lock,
+    icon: LockKey,
     label: "Unknown",
     colorGranted: "bg-background-secondary dark:bg-background-tertiary text-foreground-primary border-border-primary",
     colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   };
 
   const sizeSettings = sizeConfig[size];
-  const Icon = hasPermission ? config.icon : Lock;
+  const Icon = hasPermission ? config.icon : LockKey;
   const colorClass = hasPermission ? config.colorGranted : config.colorDenied;
 
   return (

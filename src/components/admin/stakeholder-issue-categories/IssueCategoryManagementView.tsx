@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Plus, Tag, Trash, PencilSimple, FolderOpen, CaretDown, CaretRight } from "@/lib/icons";
+import { Plus, Tag, TrashSimple, PencilSimple, FolderOpen, CaretDown, CaretRight } from "@phosphor-icons/react";
 import { useStakeholderIssueCategories, IssueCategoryFormData, IssueSubcategoryFormData } from "@/hooks/useStakeholderIssueCategories";
 import { IssueCategoryFormModal, IssueSubcategoryFormModal } from "./IssueCategoryFormModal";
 import Collapsible from "../CollapsibleComponent";
@@ -153,7 +153,7 @@ export default function IssueCategoryManagementView() {
         </p>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
+          <div className="bg-error/10 dark:bg-error/20 border border-error/20 text-error px-4 py-3 rounded-lg">
             {error}
           </div>
         )}
@@ -242,10 +242,10 @@ export default function IssueCategoryManagementView() {
                           onClick={() => category.id && handleDeleteCategory(category.id)}
                           isLoading={deleteLoading === category.id}
                           disabled={deleteLoading === category.id}
-                          className="p-1.5 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-500"
+                          className="p-1.5 rounded-full text-foreground-tertiary hover:bg-error/10 dark:hover:bg-error/20 hover:text-error"
                           title="Delete Category"
                         >
-                          <Trash size={16} weight="bold" />
+                          <TrashSimple size={16} weight="bold" />
                         </Button>
                       </div>
                     </div>
@@ -293,10 +293,10 @@ export default function IssueCategoryManagementView() {
                                     onClick={() => subcategory.id && handleDeleteSubcategory(subcategory.id)}
                                     isLoading={deleteLoading === subcategory.id}
                                     disabled={deleteLoading === subcategory.id}
-                                    className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-500"
+                                    className="p-1 rounded-full text-foreground-tertiary hover:bg-error/10 dark:hover:bg-error/20 hover:text-error"
                                     title="Delete Subcategory"
                                   >
-                                    <Trash size={14} weight="bold" />
+                                    <TrashSimple size={14} weight="bold" />
                                   </Button>
                                 </div>
                               </div>

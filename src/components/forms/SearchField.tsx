@@ -1,4 +1,4 @@
-import { Search, X } from "@/lib/icons";
+import { MagnifyingGlass, X } from "@phosphor-icons/react";
 import { forwardRef, useState } from "react";
 import { Button } from "../ui/button";
 
@@ -33,7 +33,7 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(
     return (
       <div className={`relative ${className}`}>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-tertiary" />
+          <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-tertiary" />
           <input
             ref={ref}
             type="search"

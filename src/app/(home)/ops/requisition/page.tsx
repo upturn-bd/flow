@@ -6,14 +6,7 @@ import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
 import { useState, Suspense } from "react";
 import { motion } from "framer-motion";
-import {
-  FilePlus,
-  ClipboardCheck,
-  History,
-  BookOpen,
-  AlertTriangle,
-  ScrollText
-} from "@/lib/icons";
+import { FilePlus, ClipboardText, ClockCounterClockwise, BookOpen, Warning, Scroll } from "@phosphor-icons/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PERMISSION_MODULES } from "@/lib/constants";
 
@@ -36,7 +29,7 @@ function RequisitionPageContent() {
     {
       key: "history",
       label: "History",
-      icon: <History className="h-5 w-5" />,
+      icon: <ClockCounterClockwise className="h-5 w-5" />,
       color: "text-indigo-600",
       content: <RequisitionHistoryPage />,
       link: "/ops/requisition?tab=history",
@@ -44,8 +37,8 @@ function RequisitionPageContent() {
     {
       key: "requests",
       label: "Requests",
-      icon: <ClipboardCheck className="h-5 w-5" />,
-      color: "text-green-600",
+      icon: <ClipboardText className="h-5 w-5" />,
+      color: "text-success",
       content: <RequisitionRequestsPage />,
       link: "/ops/requisition?tab=requests",
     },
@@ -69,7 +62,7 @@ function RequisitionPageContent() {
           </p>
           <div className="bg-cyan-50 border border-cyan-100 rounded-lg p-4 max-w-md">
             <div className="flex gap-3">
-              <AlertTriangle className="h-5 w-5 text-cyan-500 shrink-0 mt-0.5" />
+              <Warning className="h-5 w-5 text-cyan-500 shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-sm font-semibold text-cyan-800 mb-1">Important Information</h4>
                 <p className="text-sm text-cyan-700">
@@ -88,7 +81,7 @@ function RequisitionPageContent() {
     <ServicePageTemplate
       title="Requisition Management"
       description="Create, track, and manage requisition requests for your workplace needs efficiently."
-      icon={<ScrollText className="h-7 w-7" />}
+      icon={<Scroll className="h-7 w-7" />}
       primaryColor="text-cyan-600"
       tabs={tabs}
       activeTab={activeTab}
@@ -110,7 +103,7 @@ export default function RequisitionPage() {
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
-          <ScrollText className="h-8 w-8 text-cyan-600 animate-pulse" />
+          <Scroll className="h-8 w-8 text-cyan-600 animate-pulse" />
           <p className="text-sm text-foreground-secondary">Loading requisition...</p>
         </div>
       </div>

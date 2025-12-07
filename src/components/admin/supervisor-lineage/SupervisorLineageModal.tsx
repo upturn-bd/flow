@@ -2,7 +2,7 @@
 import { useLineage } from "@/hooks/useSupervisorLineage";
 import { Lineage } from "@/lib/types/schemas";
 import { useEffect, useState } from "react";
-import { Trash, Plus, Buildings } from "@/lib/icons";
+import { TrashSimple, Plus, Buildings } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
@@ -160,7 +160,7 @@ export default function LineageCreateModal({
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-md bg-blue-50 p-2 border border-blue-200 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 outline-none transition-all"
+            className="w-full rounded-md bg-blue-50 p-2 border border-blue-200 focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none transition-all"
             placeholder="Enter Lineage Name"
           />
         </motion.div>
@@ -200,7 +200,7 @@ export default function LineageCreateModal({
                               parseInt(e.target.value)
                             )
                           }
-                          className="w-full rounded-md bg-blue-50 px-4 py-2 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          className="w-full rounded-md bg-blue-50 px-4 py-2 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                         >
                           <option>
                             Select position for Level {level.level}
@@ -216,9 +216,9 @@ export default function LineageCreateModal({
                             onClick={() => removeLevel(index)}
                             variant="danger"
                             size="sm"
-                            className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200"
+                            className="bg-error/10 hover:bg-error/20 text-error border border-error/30"
                           >
-                            <Trash size={16} weight="duotone" />
+                            <TrashSimple size={16} weight="duotone" />
                           </Button>
                         )}
                       </div>
@@ -269,7 +269,7 @@ export default function LineageCreateModal({
               }
               className="bg-primary-600 hover:bg-primary-700 text-white"
             >
-              Save
+              FloppyDisk
             </Button>
           </motion.div>
         </motion.div>
@@ -436,7 +436,7 @@ export function LineageUpdateModal({
       >
         <motion.div variants={fadeInUp} className="flex items-center gap-3">
           <Buildings size={24} weight="duotone" className="text-blue-600" />
-          <h2 className="text-xl font-semibold text-blue-800">Edit Lineage</h2>
+          <h2 className="text-xl font-semibold text-blue-800">PencilSimple Lineage</h2>
         </motion.div>
 
         <motion.div variants={fadeInUp} className="mb-4">
@@ -447,7 +447,7 @@ export function LineageUpdateModal({
             type="text"
             value={name}
             readOnly
-            className="w-full rounded-md bg-blue-50 p-2 border border-blue-200 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 outline-none transition-all cursor-not-allowed"
+            className="w-full rounded-md bg-blue-50 p-2 border border-blue-200 focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none transition-all cursor-not-allowed"
             placeholder="Enter Lineage Name"
           />
         </motion.div>
@@ -487,7 +487,7 @@ export function LineageUpdateModal({
                               parseInt(e.target.value)
                             )
                           }
-                          className="w-full rounded-md bg-blue-50 px-4 py-2 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          className="w-full rounded-md bg-blue-50 px-4 py-2 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                         >
                           <option>
                             Select position for Level {level.level}
@@ -503,9 +503,9 @@ export function LineageUpdateModal({
                             onClick={() => removeLevel(index)}
                             variant="danger"
                             size="sm"
-                            className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200"
+                            className="bg-error/10 hover:bg-error/20 text-error border border-error/30"
                           >
-                            <Trash size={16} weight="duotone" />
+                            <TrashSimple size={16} weight="duotone" />
                           </Button>
                         )}
                       </div>
@@ -562,7 +562,7 @@ export function LineageUpdateModal({
               }
               className="bg-primary-600 hover:bg-primary-700 text-white"
             >
-              Save
+              FloppyDisk
             </Button>
           </motion.div>
         </motion.div>

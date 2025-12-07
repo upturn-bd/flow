@@ -85,7 +85,7 @@ export const ToggleField = forwardRef<HTMLButtonElement, ToggleFieldProps>(
                 className={`
                   block text-sm font-medium cursor-pointer
                   ${disabled ? 'text-foreground-tertiary dark:text-foreground-tertiary' : 'text-foreground-primary dark:text-foreground-primary'}
-                  ${error ? 'text-red-600' : ''}
+                  ${error ? 'text-error' : ''}
                 `}
                 onClick={() => !disabled && onChange(!checked)}
               >
@@ -101,7 +101,7 @@ export const ToggleField = forwardRef<HTMLButtonElement, ToggleFieldProps>(
               </p>
             )}
             {error && (
-              <p className="mt-1 text-sm text-red-600">{error}</p>
+              <p className="mt-1 text-sm text-error">{error}</p>
             )}
           </div>
         )}

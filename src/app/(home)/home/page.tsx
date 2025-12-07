@@ -12,7 +12,7 @@ import ServicesWidget from "@/app/(home)/home/widgets/ServicesWidget";
 import DetailModals from "@/app/(home)/home/components/DetailModals";
 import WidgetCustomizationPanel from "@/app/(home)/home/components/WidgetCustomizationPanel";
 import Portal from "@/components/ui/Portal";
-import { Settings, GripVertical, Eye, EyeOff, ArrowDownRight } from "@/lib/icons";
+import { Gear, DotsNine, Eye, EyeSlash, ArrowDownRight } from "@phosphor-icons/react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import { WidgetConfig, WidgetSize } from "@/lib/types/widgets";
@@ -93,7 +93,7 @@ export default function HomePage() {
   const gridLayout = useMemo(() => {
     if (!homeLayout?.widgets) return [];
     
-    // Filter out hidden widgets when not in edit mode
+    // FunnelSimple out hidden widgets when not in edit mode
     const visibleWidgets = isEditMode 
       ? homeLayout.widgets 
       : homeLayout.widgets.filter(w => w.enabled);
@@ -331,7 +331,7 @@ export default function HomePage() {
                   onClick={handleSaveLayout}
                   className="px-3 py-2 sm:px-4 text-sm sm:text-base text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
                 >
-                  Save Changes
+                  FloppyDisk Changes
                 </button>
               </>
             ) : (
@@ -339,7 +339,7 @@ export default function HomePage() {
                 onClick={() => isMobile ? setShowMobileCustomization(true) : setIsEditMode(true)}
                 className="flex items-center gap-2 px-3 py-2 sm:px-4 text-sm sm:text-base text-foreground-primary bg-surface-primary border border-border-primary rounded-lg hover:bg-surface-hover transition-colors"
               >
-                <Settings size={18} />
+                <Gear size={18} />
                 <span className="hidden sm:inline">Customize</span>
               </button>
             )}
@@ -384,7 +384,7 @@ export default function HomePage() {
                           : 'bg-foreground-tertiary/90'
                       }`}>
                         <div className="flex items-center gap-3">
-                          <GripVertical size={20} className="text-white cursor-grab active:cursor-grabbing" />
+                          <DotsNine size={20} className="text-white cursor-grab active:cursor-grabbing" />
                           <span className="text-white text-base font-semibold">
                             {widget.type.charAt(0).toUpperCase() + widget.type.slice(1).replace('-', ' ')}
                           </span>
@@ -402,7 +402,7 @@ export default function HomePage() {
                             className="p-2 hover:bg-surface-primary/20 rounded transition-colors text-white"
                             title={widget.enabled ? 'Hide widget' : 'Show widget'}
                           >
-                            {widget.enabled ? <EyeOff size={20} /> : <Eye size={20} />}
+                            {widget.enabled ? <EyeSlash size={20} /> : <Eye size={20} />}
                           </button>
                         </div>
                       </div>

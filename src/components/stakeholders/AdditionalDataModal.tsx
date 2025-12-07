@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { X, Plus, Trash, Save, CaretDown, CaretRight, CheckSquare, MapPin } from "@/lib/icons";
+import { X, Plus, TrashSimple, FloppyDisk, CaretDown, CaretRight, CheckSquare, MapPin } from "@phosphor-icons/react";
 import { StakeholderStepData, StakeholderProcessStep } from "@/lib/types/schemas";
 
 interface AdditionalDataModalProps {
@@ -398,7 +398,7 @@ export default function AdditionalDataModal({
                       <div
                         className={`flex items-center justify-between p-3 cursor-pointer transition-colors ${
                           isFullySelected
-                            ? "bg-green-50 dark:bg-green-900/20"
+                            ? "bg-success/10 dark:bg-success/20"
                             : isPartiallySelected
                               ? "bg-primary-50 dark:bg-primary-900/20"
                               : "bg-background-secondary hover:bg-surface-hover"
@@ -429,7 +429,7 @@ export default function AdditionalDataModal({
                           }}
                           className={`flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors ${
                             isFullySelected
-                              ? "text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30"
+                              ? "text-success hover:bg-success/10 dark:hover:bg-success/20"
                               : "text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/30"
                           }`}
                         >
@@ -456,7 +456,7 @@ export default function AdditionalDataModal({
                                   }}
                                   className={`text-left p-3 rounded-lg border transition-all ${
                                     isSelected
-                                      ? "border-green-400 bg-green-50 dark:bg-green-900/30 ring-1 ring-green-400"
+                                      ? "border-success bg-success/10 dark:bg-success/20 ring-1 ring-success"
                                       : "border-border-secondary hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/30"
                                   }`}
                                 >
@@ -470,7 +470,7 @@ export default function AdditionalDataModal({
                                       </p>
                                     </div>
                                     {isSelected && (
-                                      <span className="shrink-0 w-5 h-5 flex items-center justify-center bg-green-500 text-white rounded-full text-xs">
+                                      <span className="shrink-0 w-5 h-5 flex items-center justify-center bg-success text-white rounded-full text-xs">
                                         ✓
                                       </span>
                                     )}
@@ -528,9 +528,9 @@ export default function AdditionalDataModal({
                           </div>
                           <button
                             onClick={() => handleRemoveField(field.key)}
-                            className="shrink-0 p-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
+                            className="shrink-0 p-1 text-error hover:text-error hover:bg-error/10 dark:hover:bg-error/20 rounded transition-colors"
                           >
-                            <Trash size={16} />
+                            <TrashSimple size={16} />
                           </button>
                         </div>
                       ))}
@@ -596,9 +596,9 @@ export default function AdditionalDataModal({
                         />
                         <button
                           onClick={() => handleRemoveCustomField(index)}
-                          className="shrink-0 px-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                          className="shrink-0 px-2 text-error hover:text-error transition-colors"
                         >
-                          <Trash size={18} />
+                          <TrashSimple size={18} />
                         </button>
                       </div>
                     </div>
@@ -623,8 +623,8 @@ export default function AdditionalDataModal({
             disabled={saving || (selectedFields.length === 0 && customFields.length === 0)}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Save size={16} />
-            {saving ? "Saving..." : "Save"}
+            <FloppyDisk size={16} />
+            {saving ? "Saving..." : "FloppyDisk"}
           </button>
         </div>
       </div>

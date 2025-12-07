@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useStakeholderTypes } from "@/hooks/useStakeholderTypes";
-import { ArrowLeft, WarningCircle, Plus, Trash } from "@/lib/icons";
+import { ArrowLeft, WarningCircle, Plus, TrashSimple } from "@phosphor-icons/react";
 import { ContactPerson } from "@/lib/types/schemas";
 import { FormField, TextAreaField, SelectField, ToggleField } from "@/components/forms";
 
@@ -92,7 +92,7 @@ export default function NewStakeholderPage() {
     setSubmitting(true);
 
     try {
-      // Filter out empty contact persons
+      // FunnelSimple out empty contact persons
       const validContactPersons = contactPersons.filter(
         (cp) => cp.name.trim() && (cp.email?.trim() || cp.phone?.trim())
       );
@@ -131,9 +131,9 @@ export default function NewStakeholderPage() {
         </button>
 
         <div className="max-w-2xl mx-auto">
-          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 sm:p-8 text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-yellow-100 rounded-full mb-3 sm:mb-4">
-              <WarningCircle className="text-yellow-600" size={24} />
+          <div className="bg-warning/10 border-2 border-warning/30 dark:bg-warning/20 rounded-lg p-6 sm:p-8 text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-warning/20 rounded-full mb-3 sm:mb-4">
+              <WarningCircle className="text-warning" size={24} />
             </div>
             <h2 className="text-lg sm:text-xl font-bold text-foreground-primary mb-2">
               No Stakeholder Processes Found
@@ -321,7 +321,7 @@ export default function NewStakeholderPage() {
                         onClick={() => handleRemoveContactPerson(index)}
                         className="text-error hover:text-error/80 p-1"
                       >
-                        <Trash size={16} />
+                        <TrashSimple size={16} />
                       </button>
                     </div>
 

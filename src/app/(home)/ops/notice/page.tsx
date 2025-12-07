@@ -2,7 +2,7 @@
 import { Notice, useNotices } from "@/hooks/useNotice";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Pencil, Trash, Plus, Clock, CalendarDays, Info } from "@/lib/icons";
+import { Bell, Pencil, TrashSimple, Plus, Clock, CalendarBlank, Info } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -185,7 +185,7 @@ export default function NoticePage() {
                 <PermissionTooltip message="You don't have permission to create notices">
                   <button
                     disabled
-                    className="flex items-center justify-center gap-2 bg-gray-300 text-foreground-tertiary px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-60"
+                    className="flex items-center justify-center gap-2 bg-background-tertiary text-foreground-tertiary px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-60"
                   >
                     <Plus className="h-4 w-4" />
                     <span>Create Notice</span>
@@ -251,7 +251,7 @@ export default function NoticePage() {
                                 whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.1)" }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => setEditNotice(notice)}
-                                className="p-2 text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded-full transition-colors"
+                                className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded-full transition-colors"
                                 aria-label="Edit notice"
                               >
                                 <Pencil className="h-4 w-4" />
@@ -272,10 +272,10 @@ export default function NoticePage() {
                                 whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => handleDeleteNotice(notice.id!)}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                                className="p-2 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded-full transition-colors"
                                 aria-label="Delete notice"
                               >
-                                <Trash className="h-4 w-4" />
+                                <TrashSimple className="h-4 w-4" />
                               </motion.button>
                             ) : (
                               <PermissionTooltip message="You don't have permission to delete notices">
@@ -284,7 +284,7 @@ export default function NoticePage() {
                                   className="p-2 text-foreground-tertiary rounded-full cursor-not-allowed opacity-50"
                                   aria-label="Delete notice (disabled)"
                                 >
-                                  <Trash className="h-4 w-4" />
+                                  <TrashSimple className="h-4 w-4" />
                                 </button>
                               </PermissionTooltip>
                             )}
@@ -302,7 +302,7 @@ export default function NoticePage() {
                             </span>
                           </div>
                           <div className="flex items-center text-sm text-foreground-secondary">
-                            <CalendarDays className="h-4 w-4 mr-1.5" />
+                            <CalendarBlank className="h-4 w-4 mr-1.5" />
                             <span>
                               Valid: {formatDate(notice.valid_from)} → {formatDate(notice.valid_till)}
                             </span>

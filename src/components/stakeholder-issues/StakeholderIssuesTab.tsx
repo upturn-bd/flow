@@ -5,15 +5,7 @@ import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { useModalState } from "@/hooks/core/useModalState";
 import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIssueForm";
 import BaseModal from "@/components/ui/modals/BaseModal";
-import {
-  Plus,
-  WarningCircle,
-  Download,
-  Trash,
-  Eye,
-  CheckCircle,
-  Clock,
-} from "@/lib/icons";
+import { Plus, WarningCircle, Download, TrashSimple, Eye, CheckCircle, Clock, Link as LinkIcon } from "@phosphor-icons/react";
 import { StakeholderIssue } from "@/lib/types/schemas";
 import { InlineSpinner } from "@/components/ui";
 
@@ -83,11 +75,11 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Pending":
-        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
+        return "bg-warning/10 dark:bg-warning/20 text-warning";
       case "In Progress":
         return "bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300";
       case "Resolved":
-        return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
+        return "bg-success/10 dark:bg-success/20 text-success";
       default:
         return "bg-background-secondary dark:bg-background-tertiary text-foreground-primary";
     }
@@ -96,9 +88,9 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "Urgent":
-        return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
+        return "bg-error/10 dark:bg-error/20 text-error";
       case "High":
-        return "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300";
+        return "bg-warning/10 dark:bg-warning/20 text-warning";
       case "Medium":
         return "bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300";
       case "Low":
@@ -154,7 +146,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-error/10 dark:bg-error/20 border border-error/30 text-error px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
@@ -221,6 +213,25 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                     </div>
                   )}
 
+                  {/* Linked Fields Info (new format) */}
+                  {issue.linked_fields && issue.linked_fields.length > 0 && (
+                    <div className="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 mb-2">
+                      <LinkIcon size={12} />
+                      <span>
+                        {issue.linked_fields.length} linked field{issue.linked_fields.length > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  )}
+                  {/* Legacy: Linked Step Data Info */}
+                  {(!issue.linked_fields || issue.linked_fields.length === 0) && issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
+                    <div className="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 mb-2">
+                      <LinkIcon size={12} />
+                      <span>
+                        {issue.linked_step_data_ids.length} linked step{issue.linked_step_data_ids.length > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  )}
+
                   {/* Description */}
                   {issue.description && (
                     <p className="text-xs sm:text-sm text-foreground-tertiary mt-2 wrap-break-words">{issue.description}</p>
@@ -262,16 +273,16 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                       openCreateModal();
                     }}
                     className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded transition-colors"
-                    title="Edit issue"
+                    title="Edit Issue"
                   >
                     <Eye size={18} />
                   </button>
                   <button
                     onClick={() => issue.id && handleDeleteIssue(issue.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
+                    className="p-2 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded transition-colors"
                     title="Delete issue"
                   >
-                    <Trash size={18} />
+                    <TrashSimple size={18} />
                   </button>
                 </div>
               </div>
@@ -296,6 +307,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
               category_id: selectedIssue.category_id,
               subcategory_id: selectedIssue.subcategory_id,
               linked_step_data_ids: selectedIssue.linked_step_data_ids || [],
+              linked_fields: selectedIssue.linked_fields || [],
               attachments: selectedIssue.attachments || [],
             } : undefined}
             onSubmit={selectedIssue ? handleUpdateIssue : handleCreateIssue}

@@ -2,15 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Calendar,
-  Users,
-  Search,
-  WarningCircle,
-  X,
-  Check,
-  Target,
-} from "@/lib/icons";
+import { Calendar, Users, MagnifyingGlass, WarningCircle, X, Check, Target } from "@phosphor-icons/react";
 import { Milestone } from "@/lib/types/schemas";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
@@ -268,7 +260,7 @@ export default function MilestoneForm({
               className="w-full rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-background-secondary dark:bg-background-tertiary p-3"
             />
             {errors.weightage && (
-              <p className="mt-1 text-red-500 text-sm flex items-center">
+              <p className="mt-1 text-error text-sm flex items-center">
                 <WarningCircle size={14} className="mr-1" strokeWidth={2} />
                 {errors.weightage}
               </p>
@@ -295,10 +287,9 @@ export default function MilestoneForm({
                 placeholder="Search for assignees..."
                 className="w-full rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-background-secondary dark:bg-background-tertiary p-3 pr-10"
               />
-              <Search
+              <MagnifyingGlass
                 size={16}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
-                strokeWidth={2}
               />
 
               <AnimatePresence>

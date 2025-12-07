@@ -1,24 +1,6 @@
 "use client";
 
-import {
-    Settings, // Basic settings
-    Settings2, // Advanced settings
-    CreditCard, // Payroll
-    DollarSign, // Transaction
-    UsersRound, // Teams
-    ClipboardList, // Task Log
-    BarChart, // Project Log
-    LogIn, // Attendance Log
-    CalendarX, // Leave Log
-    Bell, // Notice Log
-    Clipboard, // Requisition Log
-    WarningCircle, // Complaint Log
-    Building, // Stakeholder Log
-    UserPlus, // Onboarding Log
-    GitBranch, // Stakeholder Processes (workflow/branching)
-    FileIcon,
-    Download, // Data Export
-} from "@/lib/icons";
+import { Gear, File } from "@phosphor-icons/react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -27,143 +9,15 @@ import {
     PageHeader, 
     NavigationCard, 
     NavigationCardGrid,
-    NavigationSectionProps 
 } from "@/components/ui";
-
-// --- New Structure for Admin Management ---
-const sections: NavigationSectionProps[] = [
-    {
-        title: "Company Configurations",
-        description: "Manage core company settings and rules",
-        items: [
-            {
-                name: "Basic Settings",
-                path: "/admin/config/basic",
-                icon: Settings,
-                description: "General company information and essential settings",
-                iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-            },
-            {
-                name: "Advanced Settings",
-                path: "/admin/config/advanced",
-                icon: Settings2,
-                description: "Configure system-wide and granular settings",
-                iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
-            },
-            {
-                name: "Payroll",
-                path: "/admin/config/payroll",
-                icon: CreditCard,
-                description: "Manage salary structures, deductions, and payment rules",
-                iconColor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-            },
-            {
-                name: "Teams",
-                path: "/admin/config/teams",
-                icon: UsersRound,
-                description: "Manage teams and assign granular permissions",
-                iconColor: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400"
-            },
-            {
-                name: "Stakeholder Process",
-                path: "/admin/config/stakeholder-process",
-                icon: GitBranch,
-                description: "Manage workflow processes for stakeholders and leads",
-                iconColor: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400"
-            },
-            {
-                name: "Data Export",
-                path: "/admin/data-export",
-                icon: Download,
-                description: "Export HRIS and stakeholder data to CSV format",
-                iconColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-            },
-        ],
-    },
-    {
-        title: "Company Logs",
-        description: "View system records, audit trails, and historical data",
-        items: [
-            {
-                name: "Task",
-                path: "/admin/logs/tasks",
-                icon: ClipboardList,
-                description: "View historical records for task management",
-                iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
-            },
-            {
-                name: "Project",
-                path: "/admin/logs/project",
-                icon: BarChart,
-                description: "View historical records for project tracking",
-                iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-            },
-            {
-                name: "Attendance",
-                path: "/admin/logs/attendance",
-                icon: LogIn,
-                description: "Review historical check-in and check-out data",
-                iconColor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-            },
-            {
-                name: "Leave",
-                path: "/admin/logs/leave",
-                icon: CalendarX,
-                description: "Review all past and pending leave requests",
-                iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-            },
-            {
-                name: "Notice",
-                path: "/admin/logs/notice",
-                icon: Bell,
-                description: "Archive and history of all published company notices",
-                iconColor: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-            },
-            {
-                name: "Requisition",
-                path: "/admin/logs/requisition",
-                icon: Clipboard,
-                description: "History of all equipment/supply requisition requests",
-                iconColor: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400"
-            },
-            {
-                name: "Complaint",
-                path: "/admin/logs/complaint",
-                icon: WarningCircle,
-                description: "Archive of all submitted workplace complaints",
-                iconColor: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-            },
-            {
-                name: "Stakeholder",
-                path: "/admin/stakeholders",
-                icon: Building,
-                description: "Records of all stakeholder interactions and issues",
-                iconColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
-            },
-            {
-                name: "Transaction",
-                path: "/admin/transaction",
-                icon: DollarSign,
-                description: "Define and manage financial transaction types and flows",
-                iconColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-            },
-            {
-                name: "Onboarding",
-                path: "/admin/logs/onboarding",
-                icon: UserPlus,
-                description: "Archive of all employee onboarding processes",
-                iconColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
-            },
-        ],
-    }
-];
+import { ADMIN_SECTIONS } from "@/lib/constants/navigation";
 
 export default function AdminManagementPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedSection, setSelectedSection] = useState<string | null>(null);
 
-    // Filter items based on search query
-    const filteredSections = sections
+    // FunnelSimple items based on search query
+    const filteredSections = ADMIN_SECTIONS
         .map((section) => ({
             ...section,
             items: section.items.filter((item) =>
@@ -223,7 +77,7 @@ export default function AdminManagementPage() {
                 <PageHeader
                     title="Admin Management"
                     description="Configure company settings and review historical logs and records"
-                    icon={Settings}
+                    icon={Gear}
                     iconColor="text-primary-600"
                 />
             </motion.div>
@@ -253,7 +107,7 @@ export default function AdminManagementPage() {
                         All
                     </motion.button>
 
-                    {sections.map((section) => (
+                    {ADMIN_SECTIONS.map((section) => (
                         <motion.button
                             key={section.title}
                             whileHover={{ scale: 1.05 }}
@@ -277,7 +131,7 @@ export default function AdminManagementPage() {
                     animate={{ opacity: 1, y: 0 }}
                 >
                     <EmptyState
-                        icon={FileIcon}
+                        icon={File}
                         title="No items found"
                         description="Try searching with different keywords or browse all items"
                         action={{

@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
-import { Eye, Trash, PencilSimple } from "@/lib/icons";
+import { Eye, TrashSimple, PencilSimple } from "@phosphor-icons/react";
 import LoadingSpinner from "./LoadingSpinner";
 
 export interface EntityListItemProps {
@@ -198,14 +198,14 @@ export function EntityListItem({
               disabled={deleteLoading}
               className={`
                 ${sizes.button}
-                rounded-md bg-red-50 dark:bg-red-900/30
-                text-red-600 dark:text-red-400 flex items-center gap-1
-                hover:bg-red-100 dark:hover:bg-red-900/50
+                rounded-md bg-error/10 dark:bg-error/20
+                text-error dark:text-error flex items-center gap-1
+                hover:bg-error/20 dark:hover:bg-error/30
                 transition-colors
                 ${deleteLoading ? "opacity-50 cursor-not-allowed" : ""}
               `}
             >
-              <Trash size={sizes.iconSize - 2} />
+              <TrashSimple size={sizes.iconSize - 2} />
               <span className="hidden xs:inline">
                 {deleteLoading ? "Deleting..." : (actions.deleteLabel || "Delete")}
               </span>

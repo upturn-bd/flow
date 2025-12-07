@@ -11,21 +11,7 @@ import {
 } from "@/lib/utils/validation";
 import { type MilestoneData } from "@/lib/validation/schemas/advanced";
 import { useTasks, TaskStatus, TaskScope } from "@/hooks/useTasks";
-import {
-  Plus,
-  Building,
-  User,
-  Clock,
-  Users,
-  CheckCircle,
-  X,
-  Target,
-  Calendar,
-  Pencil,
-  Trash,
-  Projector,
-  ExternalLink,
-} from "@/lib/icons";
+import { Plus, Building, User, Clock, Users, CheckCircle, X, Target, Calendar, Pencil, TrashSimple, Monitor, ArrowSquareOut } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -371,7 +357,7 @@ export default function ProjectDetails({
     return (
       <LoadingSection
         text="Loading project details..."
-        icon={Projector}
+        icon={Monitor}
         color="blue"
       />
     );
@@ -545,7 +531,7 @@ export default function ProjectDetails({
                 {loadingMilestones ? (
                   <LoadingSection
                     text="Loading milestones..."
-                    icon={Projector}
+                    icon={Monitor}
                     color="blue"
                   />
                 ) : milestones.length > 0 ? (
@@ -603,7 +589,7 @@ export default function ProjectDetails({
                 value={remark}
                 onChange={(e) => setRemark(e.target.value)}
                 placeholder="Add your final remarks about the project..."
-                className="w-full h-32 rounded-md border border-border-secondary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full h-32 rounded-md border border-border-secondary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 required
               />
             </div>

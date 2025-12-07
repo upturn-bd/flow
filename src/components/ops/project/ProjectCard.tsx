@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter, StatusBadge, InfoRow } from "@/components/ui/Card";
-import { ExternalLink, Trash, Edit, Clock, Calendar, Building, User, Target } from "@/lib/icons";
+import { ArrowSquareOut, TrashSimple, PencilSimple, Clock, Calendar, Building, User, Target } from "@phosphor-icons/react";
 import { Project } from "@/hooks/useProjects";
 import Link from "next/link";
 import { Employee } from "@/lib/types/schemas";
@@ -70,7 +70,7 @@ export default function ProjectCard({
           onClick={onEdit}
           className="p-2 h-8 w-8 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600"
         >
-          <Edit size={14} />
+          <PencilSimple size={14} />
         </Button>
       )}
 
@@ -81,9 +81,9 @@ export default function ProjectCard({
           size="sm"
           onClick={onDelete}
           isLoading={isDeleting}
-          className="p-2 h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600"
+          className="p-2 h-8 w-8 hover:bg-error/10 dark:hover:bg-error/20 hover:text-error"
         >
-          <Trash size={14} />
+          <TrashSimple size={14} />
         </Button>
       )}
       {showDetails && (
@@ -94,7 +94,7 @@ export default function ProjectCard({
             size="sm"
             className="p-2 h-8 w-8 hover:bg-surface-hover hover:text-foreground-primary"
           >
-            <ExternalLink size={14} />
+            <ArrowSquareOut size={14} />
           </Button>
 
         </Link>

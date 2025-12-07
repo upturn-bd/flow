@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check, Eye, Trash, AlertCircle, Calendar, Briefcase, User, Clock, Bell } from "@/lib/icons";
+import { X, Check, Eye, TrashSimple, WarningCircle, Calendar, Briefcase, User, Clock, Bell } from "@phosphor-icons/react";
 import { Notification } from "@/hooks/useNotifications";
 import { formatRelativeTime } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -16,7 +16,7 @@ interface NewNotificationModalProps {
 }
 
 const iconMap = {
-  'alert-circle': AlertCircle,
+  'alert-circle': WarningCircle,
   'calendar': Calendar,
   'briefcase': Briefcase,
   'user': User,
@@ -25,17 +25,17 @@ const iconMap = {
 };
 
 const colorMap = {
-  'red': 'text-red-500 bg-red-50 dark:bg-red-900/30',
+  'red': 'text-error bg-error/10 dark:bg-error/20',
   'blue': 'text-blue-500 bg-blue-50 dark:bg-blue-900/30',
-  'green': 'text-green-500 bg-green-50 dark:bg-green-900/30',
+  'green': 'text-success bg-success/10 dark:bg-success/20',
   'purple': 'text-purple-500 bg-purple-50 dark:bg-purple-900/30',
-  'orange': 'text-orange-500 bg-orange-50 dark:bg-orange-900/30',
+  'orange': 'text-warning bg-warning/10 dark:bg-warning/20',
   'gray': 'text-foreground-tertiary bg-background-secondary dark:bg-background-tertiary',
 };
 
 const priorityColors = {
-  'urgent': 'border-red-500 bg-red-50',
-  'high': 'border-orange-500 bg-orange-50',
+  'urgent': 'border-error bg-error/10',
+  'high': 'border-warning bg-warning/10',
   'normal': 'border-blue-500 bg-blue-50',
   'low': 'border-border-secondary bg-surface-secondary',
 };
@@ -164,7 +164,7 @@ export default function NewNotificationModal({
               {!notification.is_read && (
                 <button
                   onClick={handleMarkAsRead}
-                  className="flex-1 min-w-[120px] flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm shadow-sm"
+                  className="flex-1 min-w-[120px] flex items-center justify-center gap-2 px-4 py-2.5 bg-success text-white rounded-lg hover:bg-success/90 transition-colors font-medium text-sm shadow-sm"
                 >
                   <Check className="h-4 w-4" />
                   Mark as Read
@@ -173,9 +173,9 @@ export default function NewNotificationModal({
               
               <button
                 onClick={handleDelete}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm border border-red-200"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors font-medium text-sm border border-error/30"
               >
-                <Trash className="h-4 w-4" />
+                <TrashSimple className="h-4 w-4" />
                 Delete
               </button>
             </div>

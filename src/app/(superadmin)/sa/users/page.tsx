@@ -4,21 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Company } from "@/lib/types/schemas";
 import { filterEmployeesBySearch } from "@/lib/utils/user-search";
-import { 
-  Plus, 
-  Trash, 
-  ShieldCheck, 
-  X,
-  Check,
-  User,
-  Buildings,
-  Calendar,
-  Lightning as Power,
-  AlertTriangle as Warning,
-  Star as Crown,
-  CaretDown,
-  MagnifyingGlass
-} from "@/lib/icons";
+import { Plus, TrashSimple, ShieldCheck, X, Check, User, Buildings, Calendar, Lightning as Power, Warning as Warning, Star as Crown, CaretDown, MagnifyingGlass } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner, SearchBar } from "@/components/ui";
@@ -97,7 +83,7 @@ export default function SuperadminUsersPage() {
 
         if (error) throw error;
         
-        // Filter out employees who are already superadmins
+        // FunnelSimple out employees who are already superadmins
         const superadminUserIds = superadmins.map(sa => sa.user_id);
         const availableEmployees = (data || []).filter(
           emp => !superadminUserIds.includes(emp.id)
@@ -179,7 +165,7 @@ export default function SuperadminUsersPage() {
     setEmployees([]);
   };
 
-  // Filter employees based on search term using unified search utility
+  // FunnelSimple employees based on search term using unified search utility
   const filteredEmployees = filterEmployeesBySearch(
     employees.map(emp => ({
       id: emp.id,

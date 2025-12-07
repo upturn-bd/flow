@@ -5,13 +5,7 @@ import { Task } from "@/lib/types/schemas";
 import { useEffect, useState, useCallback } from "react";
 import TaskDetails from "./shared/TaskDetails";
 import { AnimatePresence } from "framer-motion";
-import {
-  Edit,
-  Trash,
-  ExternalLink,
-  ClipboardList,
-  Calendar,
-} from "@/lib/icons";
+import { PencilSimple, TrashSimple, ArrowSquareOut, ClipboardText, Calendar } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import {
   Card,
@@ -180,7 +174,7 @@ export default function OngoingTaskPage({
 
           {displayTasks.length === 0 && !loading && !searching && hasLoaded && (
             <EmptyState
-              icon={<ClipboardList className="w-12 h-12" />}
+              icon={<ClipboardText className="w-12 h-12" />}
               title="No tasks found"
               description="Try a different keyword to search tasks."
             />
@@ -255,7 +249,7 @@ function TaskCard({
           onClick={onEdit}
           className="p-2 h-8 w-8 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400"
         >
-          <Edit size={14} />
+          <PencilSimple size={14} />
         </Button>
       )}
 
@@ -268,7 +262,7 @@ function TaskCard({
             disabled
             className="p-2 h-8 w-8 opacity-50 cursor-not-allowed"
           >
-            <Edit size={14} />
+            <PencilSimple size={14} />
           </Button>
         </PermissionTooltip>
       )}
@@ -280,9 +274,9 @@ function TaskCard({
           size="sm"
           onClick={onDelete}
           isLoading={isDeleting}
-          className="p-2 h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600"
+          className="p-2 h-8 w-8 hover:bg-error/10 dark:hover:bg-error/20 hover:text-error"
         >
-          <Trash size={14} />
+          <TrashSimple size={14} />
         </Button>
       )}
 
@@ -294,7 +288,7 @@ function TaskCard({
             disabled
             className="p-2 h-8 w-8 opacity-50 cursor-not-allowed"
           >
-            <Trash size={14} />
+            <TrashSimple size={14} />
           </Button>
         </PermissionTooltip>
       )}
@@ -307,7 +301,7 @@ function TaskCard({
           onClick={onDetails}
           className="p-2 h-8 w-8 hover:bg-background-secondary dark:hover:bg-background-tertiary hover:text-foreground-primary view-button"
         >
-          <ExternalLink size={14} />
+          <ArrowSquareOut size={14} />
         </Button>
       </Link>
     </div>

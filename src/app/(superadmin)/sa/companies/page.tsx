@@ -3,27 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Company, Country, Industry } from "@/lib/types/schemas";
-import { 
-  Plus, 
-  Pencil, 
-  Trash, 
-  Buildings,
-  Users,
-  UsersThree,
-  X,
-  Check,
-  Factory,
-  Globe,
-  Lightning,
-  DollarSign as CurrencyDollar,
-  LayoutGrid as TreeStructure,
-  List,
-  LayoutGrid as SquaresFour,
-  Settings as Gear,
-  CaretUp,
-  CaretDown,
-  AlertTriangle as Warning,
-} from "@/lib/icons";
+import { Plus, Pencil, TrashSimple, Buildings, Users, UsersThree, X, Check, Factory, Globe, Lightning, CurrencyDollar as CurrencyDollar, SquaresFour as TreeStructure, List, SquaresFour as SquaresFour, Gear as Gear, CaretUp, CaretDown, Warning as Warning } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, SearchBar, StatCard, StatCardGrid, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
@@ -278,8 +258,8 @@ export default function CompaniesPage() {
           title="Total Employees"
           value={Object.values(companyStats).reduce((a, b) => a + b.employees, 0)}
           icon={Users}
-          iconColor="text-green-600"
-          iconBgColor="bg-green-100"
+          iconColor="text-success"
+          iconBgColor="bg-success/10"
         />
         <StatCard
           title="Total Teams"
@@ -292,8 +272,8 @@ export default function CompaniesPage() {
           title="Payroll Active"
           value={companies.filter(c => c.live_payroll_enabled).length}
           icon={Lightning}
-          iconColor="text-orange-600"
-          iconBgColor="bg-orange-100"
+          iconColor="text-warning"
+          iconBgColor="bg-warning/10"
         />
       </StatCardGrid>
 
@@ -381,7 +361,7 @@ export default function CompaniesPage() {
                   >
                     <span className="flex items-center gap-1">
                       <Gear size={14} />
-                      Settings
+                      Gear
                     </span>
                     {expandedCard === company.id ? <CaretUp size={14} /> : <CaretDown size={14} />}
                   </button>
@@ -565,7 +545,7 @@ export default function CompaniesPage() {
           resetForm();
         }}
         onSubmit={handleSubmit}
-        title={editingCompany ? "Edit Company" : "Add Company"}
+        title={editingCompany ? "PencilSimple Company" : "Add Company"}
         subtitle={editingCompany ? "Update company details" : "Create a new company"}
         icon={Buildings}
         colorScheme="blue"
@@ -647,11 +627,11 @@ export default function CompaniesPage() {
         </div>
 
         <div className="bg-background-secondary rounded-xl p-4 space-y-3">
-          <h3 className="text-sm font-medium text-foreground-secondary mb-2">Feature Settings</h3>
+          <h3 className="text-sm font-medium text-foreground-secondary mb-2">Feature Gear</h3>
           <label className="flex items-center justify-between p-3 bg-surface-primary rounded-lg cursor-pointer hover:bg-background-secondary transition-colors">
             <div className="flex items-center gap-3">
-              <div className="p-1.5 bg-green-100 dark:bg-green-900/50 rounded-lg">
-                <Lightning size={18} className="text-green-600 dark:text-green-400" />
+              <div className="p-1.5 bg-success/10 dark:bg-success/20 rounded-lg">
+                <Lightning size={18} className="text-success" />
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground-primary">Live Absent Tracking</p>

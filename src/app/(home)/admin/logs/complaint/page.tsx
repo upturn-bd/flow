@@ -2,13 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import { 
-  Loader, 
-  ClipboardList, 
-  Clock, 
-  WarningCircle, 
-  Flag 
-} from "@/lib/icons";
+import { CircleNotch, ClipboardText, Clock, WarningCircle, Flag } from "@phosphor-icons/react";
 import TabView from "@/components/ui/TabView";
 import { ComplaintCard } from "@/components/ops/complaint/ComplaintCard";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -79,7 +73,7 @@ export default function ComplaintLogsPage() {
     <div className="w-full space-y-6">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <ClipboardList className="text-primary-600" size={26} />
+        <ClipboardText className="text-primary-600" size={26} />
         <h1 className="text-2xl font-semibold">Complaint Logs</h1>
       </div>
 
@@ -92,14 +86,14 @@ export default function ComplaintLogsPage() {
             {
               key: "requests",
               label: "Requests",
-              icon: <ClipboardList />,
+              icon: <ClipboardText />,
               color: "text-primary-500",
               content: (
                 <>
                   {(requestLoading || loading) && (
                     <LoadingSection
                       text="Loading complaint requests..."
-                      icon={ClipboardList}
+                      icon={ClipboardText}
                       color="blue"
                     />
                   )}

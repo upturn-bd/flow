@@ -2,19 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Bell,
-  X,
-  Check,
-  Clock,
-  WarningCircle,
-  Calendar,
-  Briefcase,
-  User,
-  Trash,
-  CheckCheck,
-  ExternalLink
-} from "@/lib/icons";
+import { Bell, X, Check, Clock, WarningCircle, Calendar, Briefcase, User, TrashSimple, Checks, ArrowSquareOut } from "@phosphor-icons/react";
 import { useNotifications, Notification } from "@/hooks/useNotifications";
 import { formatRelativeTime } from "@/lib/utils";
 import { Z_INDEX } from "@/lib/theme";
@@ -39,17 +27,17 @@ const iconMap = {
 };
 
 const colorMap = {
-  'red': 'text-red-500',
+  'red': 'text-error',
   'blue': 'text-primary-500',
-  'green': 'text-green-500',
+  'green': 'text-success',
   'purple': 'text-purple-500',
-  'orange': 'text-orange-500',
+  'orange': 'text-warning',
   'gray': 'text-foreground-tertiary',
 };
 
 const priorityColors = {
-  'urgent': 'border-l-red-500 bg-red-50 dark:bg-red-950/30',
-  'high': 'border-l-orange-500 bg-black-50 dark:bg-orange-950/30',
+  'urgent': 'border-l-error bg-error/10 dark:bg-error/20',
+  'high': 'border-l-warning bg-warning/10 dark:bg-warning/20',
   'normal': 'border-l-primary-500 bg-primary-50 dark:bg-primary-950/30',
   'low': 'border-l-border-secondary bg-background-secondary',
 };
@@ -209,7 +197,7 @@ export default function NotificationDropdown({
               <Bell className="h-5 w-5 text-foreground-secondary dark:text-foreground-secondary" />
               <h3 className="font-semibold text-foreground-primary dark:text-foreground-primary">Notifications</h3>
               {unreadNotifications.length > 0 && (
-                <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
+                <span className="bg-error text-white text-xs rounded-full px-2 py-0.5">
                   {unreadNotifications.length}
                 </span>
               )}
@@ -221,7 +209,7 @@ export default function NotificationDropdown({
                   className="text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 p-1 rounded"
                   title="Mark all as read"
                 >
-                  <CheckCheck className="h-4 w-4" />
+                  <Checks className="h-4 w-4" />
                 </button>
               )}
               <button
@@ -347,20 +335,20 @@ function NotificationItem({
             {notification.action_url && (
               <Link
                 href={notification.action_url}
-                className="text-green-600 hover:bg-green-100 p-1 rounded text-xs flex items-center gap-1"
+                className="text-success hover:bg-success/10 p-1 rounded text-xs flex items-center gap-1"
                 title="View details"
               >
-                <ExternalLink className="h-3 w-3" />
+                <ArrowSquareOut className="h-3 w-3" />
                 View
               </Link>
             )}
 
             <button
               onClick={() => onDelete(notification.id!)}
-              className="text-red-600 hover:bg-red-100 p-1 rounded text-xs flex items-center gap-1"
+              className="text-error hover:bg-error/10 p-1 rounded text-xs flex items-center gap-1"
               title="Delete"
             >
-              <Trash className="h-3 w-3" />
+              <TrashSimple className="h-3 w-3" />
               Delete
             </button>
           </div>

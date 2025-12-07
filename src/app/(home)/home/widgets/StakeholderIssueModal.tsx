@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, AlertCircle, User, Building, Tag, UsersThree } from '@/lib/icons';
+import { X, WarningCircle, User, Building, Tag, UsersThree, Link as LinkIcon, CaretDown, CaretRight } from "@phosphor-icons/react";
 import { useStakeholderIssues, StakeholderIssueFormData } from '@/hooks/useStakeholderIssues';
 import { useStakeholders } from '@/hooks/useStakeholders';
 import { useStakeholderIssueCategories } from '@/hooks/useStakeholderIssueCategories';
@@ -11,6 +11,8 @@ import { useEmployees } from '@/hooks/useEmployees';
 import { useAuth } from '@/lib/auth/auth-context';
 import { cn } from '@/components/ui/class';
 import { LoadingSpinner } from '@/components/ui';
+import { formatDisplayValue, getFieldLabel } from '@/lib/utils/step-data-utils';
+import { FieldDefinitionsSchema, LinkedStepField } from '@/lib/types/schemas';
 
 // Alias for backward compatibility
 const Building2 = Building;
@@ -21,13 +23,28 @@ interface StakeholderIssueModalProps {
   onSuccess: () => void;
 }
 
+// Interface for enriched linked field data display
+interface EnrichedLinkedField extends LinkedStepField {
+  currentValue?: any; // Current value from step data (may have changed since linking)
+}
+
+// Interface for linked step data display (for legacy support)
+interface LinkedStepDataItem {
+  id: number;
+  stepName: string;
+  stepOrder: number;
+  isCompleted: boolean;
+  data: Record<string, any>;
+  fieldDefinitions?: FieldDefinitionsSchema;
+}
+
 export default function StakeholderIssueModal({
   issueId,
   onClose,
   onSuccess,
 }: StakeholderIssueModalProps) {
   const { employeeInfo } = useAuth();
-  const { createIssue, updateIssue, fetchIssueById, loading } = useStakeholderIssues();
+  const { createIssue, updateIssue, fetchIssueById, fetchStakeholderStepData, loading } = useStakeholderIssues();
   const { stakeholders, fetchStakeholders } = useStakeholders();
   const { categories, fetchCategories } = useStakeholderIssueCategories();
   const { teams, fetchTeams } = useTeams();
@@ -37,6 +54,9 @@ export default function StakeholderIssueModal({
   const [isEditing, setIsEditing] = useState(false);
   const [showResolveConfirm, setShowResolveConfirm] = useState(false);
   const [assignmentType, setAssignmentType] = useState<'employee' | 'team'>('employee');
+  const [linkedFields, setLinkedFields] = useState<EnrichedLinkedField[]>([]);
+  const [linkedStepData, setLinkedStepData] = useState<LinkedStepDataItem[]>([]); // Legacy support
+  const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
   const [formData, setFormData] = useState<Partial<StakeholderIssueFormData>>({
     stakeholder_id: 0,
     title: '',
@@ -63,6 +83,79 @@ export default function StakeholderIssueModal({
     fetchTeams();
     fetchEmployees();
   }, [issueId]);
+
+  // Load linked step data when issue is loaded
+  useEffect(() => {
+    const loadLinkedData = async () => {
+      if (!issue?.stakeholder_id) {
+        setLinkedFields([]);
+        setLinkedStepData([]);
+        return;
+      }
+      
+      try {
+        const allStepData = await fetchStakeholderStepData(issue.stakeholder_id);
+        
+        // Handle new linked_fields format
+        if (issue.linked_fields && issue.linked_fields.length > 0) {
+          const enrichedFields: EnrichedLinkedField[] = issue.linked_fields.map((field: LinkedStepField) => {
+            const stepData = allStepData.find((sd: any) => sd.id === field.stepDataId);
+            // Get step info - handle both array and object formats from Supabase
+            const stepInfo = Array.isArray(stepData?.step) ? stepData?.step[0] : stepData?.step;
+            return {
+              ...field,
+              stepName: field.stepName || stepInfo?.name || `Step ${field.stepDataId}`,
+              stepOrder: field.stepOrder || stepInfo?.step_order || 0,
+              fieldLabel: field.fieldLabel || getFieldLabel(field.fieldKey, stepInfo?.field_definitions),
+              currentValue: stepData?.data?.[field.fieldKey],
+            };
+          });
+          setLinkedFields(enrichedFields);
+          setLinkedStepData([]);
+        }
+        // Legacy support: handle old linked_step_data_ids format
+        else if (issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0) {
+          const linked = allStepData
+            .filter((sd: any) => issue.linked_step_data_ids.includes(sd.id))
+            .map((sd: any) => {
+              // Get step info - handle both array and object formats from Supabase
+              const stepInfo = Array.isArray(sd.step) ? sd.step[0] : sd.step;
+              return {
+                id: sd.id,
+                stepName: stepInfo?.name || `Step ${sd.step_id}`,
+                stepOrder: stepInfo?.step_order || 0,
+                isCompleted: sd.is_completed,
+                data: sd.data || {},
+                fieldDefinitions: stepInfo?.field_definitions,
+              };
+            })
+            .sort((a: LinkedStepDataItem, b: LinkedStepDataItem) => a.stepOrder - b.stepOrder);
+          
+          setLinkedStepData(linked);
+          setLinkedFields([]);
+        } else {
+          setLinkedFields([]);
+          setLinkedStepData([]);
+        }
+      } catch (err) {
+        console.error("Error loading linked data:", err);
+      }
+    };
+    
+    loadLinkedData();
+  }, [issue, fetchStakeholderStepData]);
+
+  const toggleStepExpansion = (stepId: number) => {
+    setExpandedSteps(prev => {
+      const next = new Set(prev);
+      if (next.has(stepId)) {
+        next.delete(stepId);
+      } else {
+        next.add(stepId);
+      }
+      return next;
+    });
+  };
 
   const loadIssue = async () => {
     if (!issueId) return;
@@ -146,7 +239,7 @@ export default function StakeholderIssueModal({
         >
           <div className="sticky top-0 bg-surface-primary border-b border-border-primary px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600" />
+              <WarningCircle className="w-5 h-5 text-warning" />
               <h2 className="text-xl font-bold text-foreground-primary">
                 {issueId ? (isEditing ? 'Edit Issue' : 'Issue Details') : 'Create Stakeholder Issue'}
               </h2>
@@ -194,7 +287,7 @@ export default function StakeholderIssueModal({
                       'inline-block px-3 py-1 rounded-full text-sm font-medium',
                       issue.status === 'Pending' && 'bg-background-tertiary text-foreground-primary',
                       issue.status === 'In Progress' && 'bg-primary-100 text-primary-700',
-                      issue.status === 'Resolved' && 'bg-green-100 text-green-700'
+                      issue.status === 'Resolved' && 'bg-success/10 text-success'
                     )}>
                       {issue.status}
                     </span>
@@ -204,10 +297,10 @@ export default function StakeholderIssueModal({
                     <label className="block text-sm font-medium text-foreground-secondary mb-1">Priority</label>
                     <span className={cn(
                       'inline-block px-3 py-1 rounded-full text-sm font-medium',
-                      issue.priority === 'Low' && 'bg-green-100 text-green-700',
-                      issue.priority === 'Medium' && 'bg-yellow-100 text-yellow-700',
-                      issue.priority === 'High' && 'bg-orange-100 text-orange-700',
-                      issue.priority === 'Urgent' && 'bg-red-100 text-red-700'
+                      issue.priority === 'Low' && 'bg-success/10 text-success',
+                      issue.priority === 'Medium' && 'bg-warning/10 text-warning',
+                      issue.priority === 'High' && 'bg-warning/20 text-warning',
+                      issue.priority === 'Urgent' && 'bg-error/10 text-error'
                     )}>
                       {issue.priority}
                     </span>
@@ -253,12 +346,143 @@ export default function StakeholderIssueModal({
                   </div>
                 )}
 
+                {/* Linked Fields (new format) */}
+                {linkedFields.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-foreground-secondary mb-2">
+                      <div className="flex items-center gap-2">
+                        <LinkIcon className="w-4 h-4" />
+                        <span>Linked Fields ({linkedFields.length})</span>
+                      </div>
+                    </label>
+                    <div className="space-y-2 border border-border-primary rounded-lg p-3 bg-background-secondary">
+                      {/* Group fields by step */}
+                      {(() => {
+                        const groupedByStep = linkedFields.reduce((acc, field) => {
+                          const key = field.stepDataId;
+                          if (!acc[key]) {
+                            acc[key] = {
+                              stepName: field.stepName || `Step ${field.stepDataId}`,
+                              stepOrder: field.stepOrder || 0,
+                              fields: [],
+                            };
+                          }
+                          acc[key].fields.push(field);
+                          return acc;
+                        }, {} as Record<number, { stepName: string; stepOrder: number; fields: EnrichedLinkedField[] }>);
+                        
+                        return Object.entries(groupedByStep)
+                          .sort(([, a], [, b]) => a.stepOrder - b.stepOrder)
+                          .map(([stepDataId, group]) => (
+                            <div key={stepDataId} className="bg-surface-primary rounded-lg border border-border-secondary overflow-hidden">
+                              <div className="px-3 py-2 bg-surface-secondary border-b border-border-secondary">
+                                <span className="text-xs font-medium text-foreground-secondary">
+                                  {group.stepName}
+                                </span>
+                              </div>
+                              <div className="p-3 space-y-2">
+                                {group.fields.map((field) => (
+                                  <div key={`${field.stepDataId}-${field.fieldKey}`} className="flex justify-between gap-4 text-sm">
+                                    <span className="text-foreground-secondary font-medium">
+                                      {field.fieldLabel || field.fieldKey}:
+                                    </span>
+                                    <span className="text-foreground-primary text-right">
+                                      {formatDisplayValue(field.currentValue ?? field.fieldValue)}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ));
+                      })()}
+                    </div>
+                  </div>
+                )}
+
+                {/* Legacy: Linked Step Data (old format - for backward compatibility) */}
+                {linkedStepData.length > 0 && linkedFields.length === 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-foreground-secondary mb-2">
+                      <div className="flex items-center gap-2">
+                        <LinkIcon className="w-4 h-4" />
+                        <span>Linked Step Data ({linkedStepData.length})</span>
+                      </div>
+                    </label>
+                    <div className="space-y-2 max-h-60 overflow-y-auto border border-border-primary rounded-lg p-3 bg-background-secondary">
+                      {linkedStepData.map((stepItem) => {
+                        const isExpanded = expandedSteps.has(stepItem.id);
+                        return (
+                          <div
+                            key={stepItem.id}
+                            className="bg-surface-primary rounded-lg border border-border-secondary overflow-hidden"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => toggleStepExpansion(stepItem.id)}
+                              className="w-full flex items-center gap-2 p-3 hover:bg-surface-hover transition-colors text-left"
+                            >
+                              {isExpanded ? (
+                                <CaretDown className="w-4 h-4 text-foreground-tertiary shrink-0" />
+                              ) : (
+                                <CaretRight className="w-4 h-4 text-foreground-tertiary shrink-0" />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-sm font-medium text-foreground-primary">
+                                    Step {stepItem.stepOrder}: {stepItem.stepName}
+                                  </span>
+                                  {stepItem.isCompleted && (
+                                    <span className="px-1.5 py-0.5 text-xs bg-success/10 dark:bg-success/20 text-success rounded">
+                                      Completed
+                                    </span>
+                                  )}
+                                </div>
+                                {!isExpanded && (
+                                  <p className="text-xs text-foreground-tertiary mt-1">
+                                    {Object.keys(stepItem.data).length} field{Object.keys(stepItem.data).length !== 1 ? 's' : ''}
+                                  </p>
+                                )}
+                              </div>
+                            </button>
+                            
+                            {isExpanded && Object.keys(stepItem.data).length > 0 && (
+                              <div className="px-3 pb-3 border-t border-border-secondary">
+                                <div className="pt-3 space-y-2">
+                                  {Object.entries(stepItem.data)
+                                    .filter(([, value]) => {
+                                      // Skip file fields
+                                      if (typeof value === 'object' && value !== null && 'path' in (value as Record<string, unknown>)) {
+                                        return false;
+                                      }
+                                      return true;
+                                    })
+                                    .map(([key, value]) => (
+                                      <div key={key} className="flex justify-between gap-4 text-sm">
+                                        <span className="text-foreground-secondary font-medium">
+                                          {getFieldLabel(key, stepItem.fieldDefinitions)}:
+                                        </span>
+                                        <span className="text-foreground-primary text-right">
+                                          {formatDisplayValue(value)}
+                                        </span>
+                                      </div>
+                                    ))
+                                  }
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-center pt-4 border-t border-border-primary">
                   {issue.status !== 'Resolved' && (
                     <button
                       type="button"
                       onClick={() => setShowResolveConfirm(true)}
-                      className="px-4 py-2 text-green-700 bg-green-100 hover:bg-green-200 rounded-lg transition-colors font-medium"
+                      className="px-4 py-2 text-success bg-success/10 hover:bg-success/20 rounded-lg transition-colors font-medium"
                     >
                       Mark as Resolved
                     </button>
@@ -267,7 +491,7 @@ export default function StakeholderIssueModal({
                     <button
                       type="button"
                       onClick={() => setIsEditing(true)}
-                      className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                      className="px-4 py-2 text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
                     >
                       Edit Issue
                     </button>
@@ -279,14 +503,14 @@ export default function StakeholderIssueModal({
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-foreground-primary mb-1">
-                    Stakeholder <span className="text-red-500">*</span>
+                    Stakeholder <span className="text-error">*</span>
                   </label>
                   <div className="relative">
                     <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-tertiary" />
                     <select
                       value={formData.stakeholder_id}
                       onChange={(e) => setFormData({ ...formData, stakeholder_id: Number(e.target.value) })}
-                      className="w-full pl-10 pr-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                      className="w-full pl-10 pr-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                       required
                     >
                       <option value={0}>Select a stakeholder</option>
@@ -301,13 +525,13 @@ export default function StakeholderIssueModal({
 
                 <div>
                   <label className="block text-sm font-medium text-foreground-primary mb-1">
-                    Title <span className="text-red-500">*</span>
+                    Title <span className="text-error">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                    className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     placeholder="Enter issue title"
                     required
                   />
@@ -318,7 +542,7 @@ export default function StakeholderIssueModal({
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                    className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     placeholder="Enter issue description"
                     rows={4}
                   />
@@ -330,7 +554,7 @@ export default function StakeholderIssueModal({
                     <select
                       value={formData.priority}
                       onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     >
                       <option value="Low">Low</option>
                       <option value="Medium">Medium</option>
@@ -344,7 +568,7 @@ export default function StakeholderIssueModal({
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     >
                       <option value="Pending">Pending</option>
                       <option value="In Progress">In Progress</option>
@@ -367,7 +591,7 @@ export default function StakeholderIssueModal({
                           subcategory_id: undefined // Reset subcategory when category changes
                         });
                       }}
-                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     >
                       <option value="">No category</option>
                       {categories.filter(c => c.is_active).map((category) => (
@@ -384,7 +608,7 @@ export default function StakeholderIssueModal({
                       value={formData.subcategory_id || ''}
                       onChange={(e) => setFormData({ ...formData, subcategory_id: e.target.value ? Number(e.target.value) : undefined })}
                       disabled={!formData.category_id || availableSubcategories.length === 0}
-                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary disabled:opacity-50"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary disabled:opacity-50"
                     >
                       <option value="">No subcategory</option>
                       {availableSubcategories.map((subcategory) => (
@@ -438,7 +662,7 @@ export default function StakeholderIssueModal({
                     <select
                       value={formData.assigned_to || ''}
                       onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value || undefined })}
-                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     >
                       <option value="">No assignee</option>
                       {employees.map((employee) => (
@@ -451,7 +675,7 @@ export default function StakeholderIssueModal({
                     <select
                       value={formData.assigned_team_id || ''}
                       onChange={(e) => setFormData({ ...formData, assigned_team_id: e.target.value ? Number(e.target.value) : undefined })}
-                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     >
                       <option value="">No team assigned</option>
                       {teams.map((team) => (
@@ -481,7 +705,7 @@ export default function StakeholderIssueModal({
                     type="submit"
                     disabled={submitting || !formData.title || !formData.stakeholder_id}
                     className={cn(
-                      'px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors',
+                      'px-4 py-2 text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors',
                       (submitting || !formData.title || !formData.stakeholder_id) && 'opacity-50 cursor-not-allowed'
                     )}
                   >
@@ -527,7 +751,7 @@ export default function StakeholderIssueModal({
                   onClick={handleMarkAsResolved}
                   disabled={submitting}
                   className={cn(
-                    'px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors',
+                    'px-4 py-2 text-white bg-success hover:bg-success/90 rounded-lg transition-colors',
                     submitting && 'opacity-50 cursor-not-allowed'
                   )}
                 >

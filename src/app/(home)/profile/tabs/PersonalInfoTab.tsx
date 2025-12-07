@@ -17,13 +17,7 @@ const validatePersonalInfo = (data: PersonalFormData) => ({
 const validationErrorsToObject = (errors: any[]) => ({});
 import { PersonalInfoField } from "./PersonalInfoField";
 import { motion } from "framer-motion";
-import {
-  User,
-  Heart,
-  Users,
-  PhoneCall,
-  MapPin,
-} from "@/lib/icons";
+import { User, Heart, Users, Phone, MapPin } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { fadeIn } from "@/components/ui/animations";
 import { useProfile } from "@/hooks/useProfile";
@@ -237,7 +231,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
     },
     {
       title: "Emergency Contact",
-      icon: <PhoneCall className="h-5 w-5 text-blue-600" />,
+      icon: <Phone className="h-5 w-5 text-blue-600" />,
       fields: [
         {
           name: "emergency_contact_name",

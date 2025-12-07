@@ -3,277 +3,33 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Search,
-  X,
-  ClipboardList,
-  BarChart,
-  LogIn,
-  CalendarX,
-  Bell,
-  Clipboard,
-  DollarSign,
-  WarningCircle,
-  UserPlus,
-  Users,
-  CreditCard,
-  Building,
-  Settings,
-  Settings2,
-  UsersRound,
-  GitBranch,
-  Download,
-  UserMinus,
-  CaretRight,
-} from "@/lib/icons";
+import { MagnifyingGlass, X, CaretRight } from "@phosphor-icons/react";
 import { cn } from "@/components/ui/class";
 import { useAuth } from "@/lib/auth/auth-context";
 import Portal from "@/components/ui/Portal";
+import { 
+  ALL_OPS_ITEMS, 
+  ADMIN_CONFIG_ITEMS, 
+  ADMIN_LOG_ITEMS,
+  NavigationItem 
+} from "@/lib/constants/navigation";
 
-interface SearchItem {
-  name: string;
-  path: string;
-  icon: any;
-  description: string;
+interface SearchItem extends NavigationItem {
   category: string;
-  keywords?: string[];
 }
 
+// Transform navigation items to search items with category
+const transformToSearchItems = (items: NavigationItem[], category: string): SearchItem[] =>
+  items.map(item => ({ ...item, category }));
+
 // Operations modules
-const opsItems: SearchItem[] = [
-  {
-    name: "Tasks",
-    path: "/ops/tasks",
-    icon: ClipboardList,
-    description: "Assign, track and manage day-to-day tasks",
-    category: "Operations",
-    keywords: ["task", "todo", "work", "assign"],
-  },
-  {
-    name: "Projects",
-    path: "/ops/project",
-    icon: BarChart,
-    description: "Plan and execute complex projects with milestones",
-    category: "Operations",
-    keywords: ["project", "milestone", "plan"],
-  },
-  {
-    name: "Attendance",
-    path: "/ops/attendance?tab=today",
-    icon: LogIn,
-    description: "Track and manage your daily attendance",
-    category: "Operations",
-    keywords: ["attendance", "check-in", "check-out", "time"],
-  },
-  {
-    name: "Leave",
-    path: "/ops/leave?tab=apply",
-    icon: CalendarX,
-    description: "Apply and manage time off and leaves",
-    category: "Operations",
-    keywords: ["leave", "vacation", "time off", "holiday"],
-  },
-  {
-    name: "Notices",
-    path: "/ops/notice",
-    icon: Bell,
-    description: "Important company announcements and notices",
-    category: "Operations",
-    keywords: ["notice", "announcement", "news"],
-  },
-  {
-    name: "Requisition",
-    path: "/ops/requisition?tab=create",
-    icon: Clipboard,
-    description: "Request equipment, supplies and services",
-    category: "Operations",
-    keywords: ["requisition", "request", "equipment", "supplies"],
-  },
-  {
-    name: "Settlement",
-    path: "/ops/settlement?tab=create",
-    icon: DollarSign,
-    description: "Manage and track expense reimbursements",
-    category: "Operations",
-    keywords: ["settlement", "expense", "reimbursement", "money"],
-  },
-  {
-    name: "Complaints",
-    path: "/ops/complaint",
-    icon: WarningCircle,
-    description: "Submit and track workplace issues and concerns",
-    category: "Operations",
-    keywords: ["complaint", "issue", "concern", "problem"],
-  },
-  {
-    name: "Payroll",
-    path: "/ops/payroll",
-    icon: CreditCard,
-    description: "View payroll history and manage salary information",
-    category: "Operations",
-    keywords: ["payroll", "salary", "payment", "wage"],
-  },
-  {
-    name: "Stakeholder Issues",
-    path: "/ops/stakeholder-issues",
-    icon: Building,
-    description: "Manage stakeholder relationships and track issues",
-    category: "Operations",
-    keywords: ["stakeholder", "client", "vendor", "partner"],
-  },
-  {
-    name: "Onboarding",
-    path: "/ops/onboarding",
-    icon: UserPlus,
-    description: "Employee onboarding workflow and tasks",
-    category: "Operations",
-    keywords: ["onboarding", "new employee", "hire"],
-  },
-  {
-    name: "Offboarding",
-    path: "/ops/offboarding",
-    icon: UserMinus,
-    description: "Employee offboarding workflow and tasks",
-    category: "Operations",
-    keywords: ["offboarding", "exit", "leaving"],
-  },
-  {
-    name: "HRIS",
-    path: "/ops/hris",
-    icon: Users,
-    description: "Human Resource Information System",
-    category: "Operations",
-    keywords: ["hris", "hr", "employee", "human resource"],
-  },
-];
+const opsSearchItems: SearchItem[] = transformToSearchItems(ALL_OPS_ITEMS, "Operations");
 
 // Admin configuration items
-const adminConfigItems: SearchItem[] = [
-  {
-    name: "Basic Settings",
-    path: "/admin/config/basic",
-    icon: Settings,
-    description: "General company information and essential settings",
-    category: "Admin Config",
-    keywords: ["settings", "config", "company", "basic"],
-  },
-  {
-    name: "Advanced Settings",
-    path: "/admin/config/advanced",
-    icon: Settings2,
-    description: "Configure system-wide and granular settings",
-    category: "Admin Config",
-    keywords: ["settings", "advanced", "system"],
-  },
-  {
-    name: "Payroll Config",
-    path: "/admin/config/payroll",
-    icon: CreditCard,
-    description: "Manage salary structures, deductions, and payment rules",
-    category: "Admin Config",
-    keywords: ["payroll", "salary", "config"],
-  },
-  {
-    name: "Teams",
-    path: "/admin/config/teams",
-    icon: UsersRound,
-    description: "Manage teams and assign granular permissions",
-    category: "Admin Config",
-    keywords: ["teams", "permissions", "access"],
-  },
-  {
-    name: "Stakeholder Process",
-    path: "/admin/config/stakeholder-process",
-    icon: GitBranch,
-    description: "Manage workflow processes for stakeholders",
-    category: "Admin Config",
-    keywords: ["stakeholder", "workflow", "process"],
-  },
-  {
-    name: "Data Export",
-    path: "/admin/data-export",
-    icon: Download,
-    description: "Export HRIS and stakeholder data to CSV format",
-    category: "Admin Config",
-    keywords: ["export", "data", "csv", "download"],
-  },
-];
+const adminConfigSearchItems: SearchItem[] = transformToSearchItems(ADMIN_CONFIG_ITEMS, "Admin Config");
 
 // Admin log items
-const adminLogItems: SearchItem[] = [
-  {
-    name: "Task Log",
-    path: "/admin/logs/tasks",
-    icon: ClipboardList,
-    description: "View historical records for task management",
-    category: "Admin Logs",
-    keywords: ["task", "log", "history"],
-  },
-  {
-    name: "Project Log",
-    path: "/admin/logs/project",
-    icon: BarChart,
-    description: "View historical records for project tracking",
-    category: "Admin Logs",
-    keywords: ["project", "log", "history"],
-  },
-  {
-    name: "Attendance Log",
-    path: "/admin/logs/attendance",
-    icon: LogIn,
-    description: "Review historical check-in and check-out data",
-    category: "Admin Logs",
-    keywords: ["attendance", "log", "history"],
-  },
-  {
-    name: "Leave Log",
-    path: "/admin/logs/leave",
-    icon: CalendarX,
-    description: "Review all past and pending leave requests",
-    category: "Admin Logs",
-    keywords: ["leave", "log", "history"],
-  },
-  {
-    name: "Notice Log",
-    path: "/admin/logs/notice",
-    icon: Bell,
-    description: "Archive and history of all published notices",
-    category: "Admin Logs",
-    keywords: ["notice", "log", "history"],
-  },
-  {
-    name: "Requisition Log",
-    path: "/admin/logs/requisition",
-    icon: Clipboard,
-    description: "History of all requisition requests",
-    category: "Admin Logs",
-    keywords: ["requisition", "log", "history"],
-  },
-  {
-    name: "Complaint Log",
-    path: "/admin/logs/complaint",
-    icon: WarningCircle,
-    description: "Archive of all submitted complaints",
-    category: "Admin Logs",
-    keywords: ["complaint", "log", "history"],
-  },
-  {
-    name: "Stakeholders",
-    path: "/admin/stakeholders",
-    icon: Building,
-    description: "Records of all stakeholder interactions",
-    category: "Admin Logs",
-    keywords: ["stakeholder", "log", "history"],
-  },
-  {
-    name: "Transactions",
-    path: "/admin/transaction",
-    icon: DollarSign,
-    description: "Manage financial transaction types and flows",
-    category: "Admin Logs",
-    keywords: ["transaction", "finance", "money"],
-  },
-];
+const adminLogSearchItems: SearchItem[] = transformToSearchItems(ADMIN_LOG_ITEMS, "Admin Logs");
 
 interface GlobalSearchProps {
   isOpen: boolean;
@@ -291,13 +47,13 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
   const hasAdminAccess = hasPermission("teams","can_write") || hasPermission("admin_config","can_write");
 
   // Build searchable items based on permissions
-  const allItems = [
-    ...opsItems,
-    ...(hasAdminAccess ? adminConfigItems : []),
-    ...(hasAdminAccess ? adminLogItems : []),
+  const allItems: SearchItem[] = [
+    ...opsSearchItems,
+    ...(hasAdminAccess ? adminConfigSearchItems : []),
+    ...(hasAdminAccess ? adminLogSearchItems : []),
   ];
 
-  // Filter items based on query
+  // FunnelSimple items based on query
   const filteredItems = query.trim()
     ? allItems.filter((item) => {
         const searchLower = query.toLowerCase();
@@ -396,7 +152,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           >
             {/* Search input */}
             <div className="flex items-center gap-3 px-4 py-3 border-b border-border-primary">
-              <Search className="h-5 w-5 text-foreground-tertiary shrink-0" />
+              <MagnifyingGlass className="h-5 w-5 text-foreground-tertiary shrink-0" />
               <input
                 ref={inputRef}
                 type="text"
@@ -428,7 +184,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
             <div className="max-h-[60vh] overflow-y-auto">
               {flatItems.length === 0 ? (
                 <div className="px-4 py-8 text-center text-foreground-secondary">
-                  <Search className="h-8 w-8 mx-auto mb-2 text-foreground-tertiary" />
+                  <MagnifyingGlass className="h-8 w-8 mx-auto mb-2 text-foreground-tertiary" />
                   <p>No results found for &quot;{query}&quot;</p>
                 </div>
               ) : (

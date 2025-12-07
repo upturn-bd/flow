@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, Plus, Settings, Trash, Edit, UserPlus, Shield, Search, X } from "@/lib/icons";
+import { Users, Plus, Gear, TrashSimple, PencilSimple, UserPlus, Shield, MagnifyingGlass, X } from "@phosphor-icons/react";
 import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/lib/auth/auth-context";
 import type { Team, TeamWithMembers, TeamWithPermissions } from "@/lib/types/schemas";
@@ -46,7 +46,7 @@ export default function TeamsPage() {
   const canManageTeams = canWrite('teams');
   const canDeleteTeams = canDelete('teams');
 
-  // Filter teams based on search query
+  // FunnelSimple teams based on search query
   const filteredTeams = useMemo(() => {
     if (!searchQuery.trim()) return teams;
     
@@ -269,15 +269,15 @@ export default function TeamsPage() {
                           className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors"
                           title="Edit team"
                         >
-                          <Edit className="h-4 w-4 text-foreground-secondary" />
+                          <PencilSimple className="h-4 w-4 text-foreground-secondary" />
                         </button>
                         {canDeleteTeams && (
                           <button
                             onClick={() => handleDeleteClick(team)}
-                            className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-1.5 hover:bg-error/10 dark:hover:bg-error/20 rounded-lg transition-colors"
                             title="Delete team"
                           >
-                            <Trash className="h-4 w-4 text-red-600" />
+                            <TrashSimple className="h-4 w-4 text-error" />
                           </button>
                         )}
                       </div>
@@ -306,7 +306,7 @@ export default function TeamsPage() {
                       onClick={() => handleManagePermissions(team)}
                       className="flex-1 px-3 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 hover:shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                     >
-                      <Settings className="h-4 w-4" />
+                      <Gear className="h-4 w-4" />
                       <span className="hidden sm:inline">Permissions</span>
                     </button>
                   </div>
@@ -316,7 +316,7 @@ export default function TeamsPage() {
           ) : searchQuery ? (
             <div className="text-center py-16 px-4">
               <div className="bg-background-tertiary dark:bg-surface-secondary rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                <Search className="h-10 w-10 text-foreground-tertiary" />
+                <MagnifyingGlass className="h-10 w-10 text-foreground-tertiary" />
               </div>
               <p className="text-foreground-secondary text-lg font-semibold">No teams found</p>
               <p className="text-foreground-tertiary text-sm mt-2 max-w-md mx-auto">
@@ -448,7 +448,7 @@ export default function TeamsPage() {
               variant="primary"
               onClick={handleDeleteTeam}
               disabled={isLoadingAction}
-              className="bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-error hover:bg-error/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoadingAction ? (
                 <>

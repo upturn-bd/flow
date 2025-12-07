@@ -8,7 +8,7 @@ import { Department, useDepartments } from "@/hooks/useDepartments";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { useProjects } from "@/hooks/useProjects";
 import { useMilestones } from "@/hooks/useMilestones";
-import { WarningCircle, Building, X, Loader } from "@/lib/icons";
+import { WarningCircle, Building, X, CircleNotch } from "@phosphor-icons/react";
 import ProjectForm, { type ProjectDetails } from "./ProjectForm";
 import MilestoneList from "./milestone/MilestoneList";
 import MilestoneForm, { type Milestone } from "./milestone/MilestoneForm";
@@ -146,7 +146,7 @@ export default function CreateNewProjectPage({ setActiveTab }: { setActiveTab: (
           variants={fadeInUp}
           className="flex items-center gap-2 px-4 py-3 mb-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg text-primary-700 dark:text-primary-300"
         >
-          <Loader size={16} className="animate-spin" />
+          <CircleNotch size={16} className="animate-spin" />
           <span className="text-sm">Loading departments and employees...</span>
         </motion.div>
       )}
@@ -229,7 +229,7 @@ export function UpdateProjectPage({
         <Button
           variant="ghost"
           onClick={onClose}
-          className="p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-foreground-tertiary dark:text-foreground-tertiary hover:text-red-500 dark:hover:text-red-400"
+          className="p-1 rounded-full hover:bg-error/10 dark:hover:bg-error/20 text-foreground-tertiary dark:text-foreground-tertiary hover:text-error"
         >
           <X size={20} strokeWidth={2} />
         </Button>

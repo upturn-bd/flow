@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { StakeholderProcess } from "@/lib/types/schemas";
-import { X } from "@/lib/icons";
+import { X } from "@phosphor-icons/react";
 import Toggle from "@/components/ui/Toggle";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 

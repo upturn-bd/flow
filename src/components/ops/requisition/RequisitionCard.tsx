@@ -1,20 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  PackageOpen,
-  CheckCheck,
-  XCircle,
-  Clock,
-  TagIcon,
-  Calendar,
-  User,
-  FileText,
-  MessageCircle,
-  Check,
-  X,
-  Pencil,
-} from "@/lib/icons";
+import { Package, Checks, XCircle, Clock, Tag, Calendar, User, FileText, ChatCircle, Check, X, Pencil } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { motion } from "framer-motion";
 
@@ -60,11 +47,11 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
   const getStatusStyle = (status: string) => {
     switch (status) {
       case "Approved":
-        return "bg-green-100 text-green-800";
+        return "bg-success/10 text-success dark:bg-success/20";
       case "Rejected":
-        return "bg-red-100 text-red-800";
+        return "bg-error/10 text-error dark:bg-error/20";
       default:
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-warning/10 text-warning dark:bg-warning/20";
     }
   };
 
@@ -80,7 +67,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
       {/* Header */}
       <div className="flex justify-between items-start">
         <div className="flex items-start gap-3">
-          <PackageOpen className="text-blue-600 mt-1" size={20} />
+          <Package className="text-blue-600 mt-1" size={20} />
           <div>
             <h3 className="font-semibold text-foreground-primary">
               {requisitionTypes.find(
@@ -114,7 +101,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
               )}`}
             >
               {req.status === "Approved" ? (
-                <CheckCheck size={12} />
+                <Checks size={12} />
               ) : req.status === "Rejected" ? (
                 <XCircle size={12} />
               ) : (
@@ -125,7 +112,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
           </div>
         ) : (
           <div
-            className={`flex items-center gap-2 text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800`}
+            className={`flex items-center gap-2 text-xs px-2 py-1 rounded-full bg-warning/10 text-warning dark:bg-warning/20`}
           >
             <Clock size={12} />
             <span>Pending</span>
@@ -136,7 +123,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
       {/* Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
         <div className="flex items-center gap-2 text-sm text-foreground-secondary">
-          <TagIcon size={14} />
+          <Tag size={14} />
           <span>
             Quantity: <span className="font-medium">{req.quantity}</span>
           </span>
@@ -207,7 +194,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
             {/* Comment input */}
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-foreground-secondary">
-                <MessageCircle size={14} />
+                <ChatCircle size={14} />
                 <span>Add Comment</span>
               </label>
               <input
@@ -216,7 +203,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Add your feedback here..."
                 value={comment}
-                className="w-full px-4 py-2 rounded-md border border-border-secondary bg-surface-primary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="w-full px-4 py-2 rounded-md border border-border-secondary bg-surface-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
               />
             </div>
           </div>
@@ -244,7 +231,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                     handleUpdateRequest?.("Rejected", req.id, req.employee_id, comment)
                   }
                   disabled={processingId === req.id}
-                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 bg-error hover:bg-error/90 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                 >
                   {processingId === req.id ? (
                     <InlineSpinner size="xs" color="white" />

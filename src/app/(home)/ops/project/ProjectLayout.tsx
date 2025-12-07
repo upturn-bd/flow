@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-    FolderArchive,
-    FolderPlus,
-    FolderCheck,
-    FolderOpen,
-    Folder,
-} from "@/lib/icons";
+import { Archive, FolderPlus, Folder, FolderOpen } from "@phosphor-icons/react";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import { fadeInUp } from "@/components/ui/animations";
 import { getEmployeeInfo } from "@/lib/utils/auth";
@@ -33,8 +27,8 @@ const TABS = [
     {
         key: "completed",
         label: "Completed",
-        icon: <FolderCheck size={16} />,
-        color: "text-green-600",
+        icon: <Folder size={16} />,
+        color: "text-success",
     },
     {
         key: "create",
@@ -45,7 +39,7 @@ const TABS = [
     {
         key: "archived",
         label: "Archived",
-        icon: <FolderArchive size={16} />,
+        icon: <Archive size={16} />,
         color: "text-foreground-secondary",
     },
 ];
@@ -89,7 +83,7 @@ export default function ProjectLayout({
                 const retrievedUser = await getEmployeeInfo();
                 setUser(retrievedUser);
 
-                // Filter tabs based on role AND permissions
+                // FunnelSimple tabs based on role AND permissions
                 const hasWritePermission = canWrite(PERMISSION_MODULES.PROJECTS);
                 const visibleTabs =
                     retrievedUser.role === "Admin" || hasWritePermission
@@ -121,7 +115,7 @@ export default function ProjectLayout({
             case "archived":
                 return (
                     <div className="flex flex-col items-center justify-center p-12 bg-background-secondary dark:bg-background-tertiary rounded-xl border border-border-primary text-center">
-                        <FolderArchive className="h-16 w-16 text-foreground-tertiary mb-4" />
+                        <Archive className="h-16 w-16 text-foreground-tertiary mb-4" />
                         <h3 className="text-xl font-semibold text-foreground-primary mb-2">
                             Archived Projects
                         </h3>

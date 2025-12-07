@@ -8,7 +8,7 @@ export default function AdvancedSettingsPage() {
   return (
     <>
       <h1 className="text-3xl font-bold text-foreground-primary mb-8">
-          Advanced Settings Configuration
+          Advanced Configuration
       </h1>
       
       {/* Permission Banner */}

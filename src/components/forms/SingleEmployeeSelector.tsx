@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MagnifyingGlass as Search, X, CaretDown, User } from '@/lib/icons';
+import { MagnifyingGlass as MagnifyingGlass, X, CaretDown, User } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from 'framer-motion';
 import { matchesEmployeeSearch } from '@/lib/utils/user-search';
 import { Employee } from '@/lib/types/schemas';
@@ -30,7 +30,7 @@ export default function SingleEmployeeSelector({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Filter employees based on search term
+  // FunnelSimple employees based on search term
   const filteredEmployees = employees.filter(employee => 
     matchesEmployeeSearch(employee, searchTerm)
   );
@@ -81,7 +81,7 @@ export default function SingleEmployeeSelector({
     <div className="space-y-2">
       {label && (
         <label className="block text-sm font-medium text-foreground-primary dark:text-foreground-primary">
-          {label} {required && <span className="text-red-500">*</span>}
+          {label} {required && <span className="text-error">*</span>}
         </label>
       )}
       
@@ -90,13 +90,13 @@ export default function SingleEmployeeSelector({
         <div 
           className={`w-full border rounded-lg bg-surface-primary dark:bg-surface-primary cursor-pointer ${
             error
-              ? 'border-red-300 focus-within:ring-red-500 focus-within:border-red-500'
+              ? 'border-error focus-within:ring-error focus-within:border-error'
               : 'border-border-primary dark:border-border-primary focus-within:ring-primary-500 focus-within:border-primary-500'
           } ${disabled ? 'bg-background-secondary dark:bg-background-secondary cursor-not-allowed' : ''}`}
           onClick={!disabled ? handleInputClick : undefined}
         >
           <div className="flex items-center p-3">
-            <Search className="h-4 w-4 text-foreground-tertiary dark:text-foreground-tertiary mr-3 shrink-0" />
+            <MagnifyingGlass className="h-4 w-4 text-foreground-tertiary dark:text-foreground-tertiary mr-3 shrink-0" />
             
             {selectedEmployee && !isDropdownOpen ? (
               <div className="flex items-center justify-between w-full">
@@ -187,7 +187,7 @@ export default function SingleEmployeeSelector({
       </div>
 
       {error && (
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="text-sm text-error">{error}</p>
       )}
     </div>
   );

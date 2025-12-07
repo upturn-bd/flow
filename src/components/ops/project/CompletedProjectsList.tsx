@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { debounce } from "lodash";
 import { toast } from "sonner";
-import { CheckCircle, Search } from "@/lib/icons";
+import { CheckCircle, MagnifyingGlass } from "@phosphor-icons/react";
 
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -174,7 +174,7 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
         >
           {/* Search Bar */}
           <motion.div variants={fadeInUp} className="relative mb-4">
-            <Search
+            <MagnifyingGlass
               size={16}
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
             />
@@ -220,10 +220,10 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
                           statusIcon={
                             <CheckCircle
                               size={18}
-                              className="text-green-500 mt-1 shrink-0"
+                              className="text-success mt-1 shrink-0"
                             />
                           }
-                          progressColor="bg-green-100 text-green-800"
+                          progressColor="bg-success/10 text-success dark:bg-success/20"
                         />
                       )
                   )}

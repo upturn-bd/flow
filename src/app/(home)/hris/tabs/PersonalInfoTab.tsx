@@ -17,13 +17,7 @@ const validatePersonalInfo = (data: PersonalFormData) => ({
 const validationErrorsToObject = (errors: any[]) => ({});
 import { PersonalInfoField } from "./PersonalInfoField";
 import { motion } from "framer-motion";
-import {
-  User,
-  Heart,
-  Users,
-  PhoneCall,
-  MapPin,
-} from "@/lib/icons";
+import { User, Heart, Users, Phone, MapPin } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { fadeIn } from "@/components/ui/animations";
 import { useProfile } from "@/hooks/useProfile";
@@ -237,7 +231,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
     },
     {
       title: "Emergency Contact",
-      icon: <PhoneCall className="h-5 w-5 text-primary-600" />,
+      icon: <Phone className="h-5 w-5 text-primary-600" />,
       fields: [
         {
           name: "emergency_contact_name",
@@ -285,7 +279,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsEditMode((prev) => !prev)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 ${
                 isEditMode ? "bg-primary-600" : "bg-gray-200"
               }`}
               role="switch"

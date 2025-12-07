@@ -7,12 +7,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
-import {
-  CaretLeft,
-  CaretRight,
-  List,
-  X,
-} from "@/lib/icons";
+import { CaretLeft, CaretRight, List, X } from "@phosphor-icons/react";
 
 export default function Sidebar() {
   const { isApproved, getAuthorizedNavItems } = useAuth();
@@ -176,7 +171,7 @@ export default function Sidebar() {
         </div>
       )}
 
-      {/* Navigation */}
+      {/* NavigationArrow */}
       <nav className={cn(
         "flex-1 overflow-y-auto overflow-x-hidden py-4",
         collapsed ? "px-2" : "px-3"
@@ -217,7 +212,6 @@ export default function Sidebar() {
       </button>
 
       {/* Mobile sidebar overlay and panel */}
-      <AnimatePresence>
         {mobileOpen && (
           <>
             {/* Backdrop */}
@@ -236,29 +230,28 @@ export default function Sidebar() {
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
               className={cn(
-                "fixed top-0 left-0 h-full w-72 z-50",
-                "bg-background-primary border-r border-border-primary shadow-2xl"
+              "fixed top-0 left-0 h-full w-72 z-50",
+              "bg-background-tertiary border-r border-border-primary shadow-2xl"
               )}
               role="dialog"
               aria-modal="true"
-              aria-label="Navigation menu"
+              aria-label="NavigationArrow menu"
             >
               {/* Close button inside mobile sidebar */}
               <button
-                className="absolute top-4 right-4 p-2 rounded-lg text-foreground-tertiary hover:text-foreground-primary hover:bg-surface-hover transition-colors"
-                onClick={() => setMobileOpen(false)}
-                aria-label="Close menu"
+              className="absolute top-4 right-4 p-2 rounded-lg text-foreground-tertiary hover:text-foreground-primary hover:bg-surface-hover transition-colors"
+              onClick={() => setMobileOpen(false)}
+              aria-label="Close menu"
               >
-                <X size={20} />
+              <X size={20} />
               </button>
               
               <SidebarContent collapsed={false} showCollapseButton={false} />
             </motion.aside>
           </>
         )}
-      </AnimatePresence>
 
       {/* Desktop sidebar */}
       <motion.aside
@@ -267,7 +260,7 @@ export default function Sidebar() {
         transition={{ duration: 0.2, ease: "easeInOut" }}
         className={cn(
           "hidden md:flex md:flex-col md:h-screen md:sticky md:top-0",
-          "bg-background-primary border-r border-border-primary",
+          "bg-background-secondary border-r border-border-primary",
           "shrink-0"
         )}
       >

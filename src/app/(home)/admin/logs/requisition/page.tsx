@@ -3,13 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useRequisitionRequests, RequisitionState } from "@/hooks/useRequisition";
 import { supabase } from "@/lib/supabase/client";
-import {
-  ClipboardList,
-  Clock,
-  AlertCircle,
-  Plus,
-  WarningCircle,
-} from "@/lib/icons";
+import { ClipboardText, Clock, WarningCircle, Plus } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import TabView from "@/components/ui/TabView";
@@ -96,7 +90,7 @@ export default function RequisitionPage() {
     load();
   }, [activeTab]);
 
-  // Filter requisitions (optional searchTerm can be added here)
+  // FunnelSimple requisitions (optional searchTerm can be added here)
   useEffect(() => {
     setFiltered(requisitionRequests);
   }, [requisitionRequests]);
@@ -126,7 +120,7 @@ export default function RequisitionPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-2">
-          <ClipboardList className="text-primary-600" size={26} />
+          <ClipboardText className="text-primary-600" size={26} />
           <h1 className="text-2xl font-semibold">Requisition Logs</h1>
         </div>
         <button
@@ -144,7 +138,7 @@ export default function RequisitionPage() {
             {
               key: "requests",
               label: "Requests",
-              icon: <ClipboardList />,
+              icon: <ClipboardText />,
               color: "text-blue-500",
               content: (
                 <>

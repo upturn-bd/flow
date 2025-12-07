@@ -9,18 +9,7 @@ import { useModalState } from "@/hooks/core/useModalState";
 import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIssueForm";
 import BaseModal from "@/components/ui/modals/BaseModal";
 import Pagination from "@/components/ui/Pagination";
-import {
-  WarningCircle,
-  CheckCircle,
-  Clock,
-  Download,
-  Eye,
-  Plus,
-  Trash,
-  Building,
-  Tag,
-  UsersThree,
-} from "@/lib/icons";
+import { WarningCircle, CheckCircle, Clock, Download, Eye, Plus, TrashSimple, Building, Tag, UsersThree, Link as LinkIcon } from "@phosphor-icons/react";
 import { StakeholderIssue } from "@/lib/types/schemas";
 import { useAuth } from "@/lib/auth/auth-context";
 import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
@@ -194,11 +183,11 @@ export default function StakeholderIssuesPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-warning/10 text-warning dark:bg-warning/20";
       case "In Progress":
-        return "bg-blue-100 text-blue-800";
+        return "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300";
       case "Resolved":
-        return "bg-green-100 text-green-800";
+        return "bg-success/10 text-success dark:bg-success/20";
       default:
         return "bg-background-tertiary dark:bg-surface-secondary text-foreground-primary";
     }
@@ -207,11 +196,11 @@ export default function StakeholderIssuesPage() {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "Urgent":
-        return "bg-red-100 text-red-800";
+        return "bg-error/10 text-error dark:bg-error/20";
       case "High":
-        return "bg-orange-100 text-orange-800";
+        return "bg-warning/20 text-warning dark:bg-warning/30";
       case "Medium":
-        return "bg-blue-100 text-blue-800";
+        return "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300";
       case "Low":
         return "bg-background-tertiary dark:bg-surface-secondary text-foreground-primary";
       default:
@@ -238,29 +227,29 @@ export default function StakeholderIssuesPage() {
           title="Pending"
           value={pendingIssues.length}
           icon={Clock}
-          iconColor="text-yellow-600"
-          iconBgColor="bg-yellow-100"
+          iconColor="text-warning"
+          iconBgColor="bg-warning/10 dark:bg-warning/20"
         />
         <StatCard
           title="In Progress"
           value={inProgressIssues.length}
           icon={WarningCircle}
           iconColor="text-primary-600"
-          iconBgColor="bg-blue-100"
+          iconBgColor="bg-primary-100 dark:bg-primary-900/30"
         />
         <StatCard
           title="Resolved"
           value={resolvedIssues.length}
           icon={CheckCircle}
-          iconColor="text-green-600"
-          iconBgColor="bg-green-100"
+          iconColor="text-success"
+          iconBgColor="bg-success/10 dark:bg-success/20"
         />
         <StatCard
           title="High Priority"
           value={highPriorityIssues.length}
           icon={WarningCircle}
-          iconColor="text-red-600"
-          iconBgColor="bg-red-100"
+          iconColor="text-error"
+          iconBgColor="bg-error/10 dark:bg-error/20"
         />
       </StatCardGrid>
 
@@ -277,7 +266,7 @@ export default function StakeholderIssuesPage() {
             />
           </div>
 
-          {/* Status Filter */}
+          {/* Status FunnelSimple */}
           <SelectField
             name="filterStatus"
             value={filterStatus}
@@ -291,7 +280,7 @@ export default function StakeholderIssuesPage() {
             containerClassName="w-48"
           />
 
-          {/* Priority Filter */}
+          {/* Priority FunnelSimple */}
           <SelectField
             name="filterPriority"
             value={filterPriority}
@@ -306,7 +295,7 @@ export default function StakeholderIssuesPage() {
             containerClassName="w-48"
           />
 
-          {/* Category Filter */}
+          {/* Category FunnelSimple */}
           <SelectField
             name="filterCategory"
             value={filterCategoryId.toString()}
@@ -408,6 +397,25 @@ export default function StakeholderIssuesPage() {
                     </div>
                   )}
 
+                  {/* Linked Fields Info (new format) */}
+                  {issue.linked_fields && issue.linked_fields.length > 0 && (
+                    <div className="text-sm text-foreground-secondary mb-2 flex items-center gap-1">
+                      <LinkIcon size={14} className="text-primary-600" />
+                      <span className="text-primary-600 dark:text-primary-400 font-medium">
+                        {issue.linked_fields.length} linked field{issue.linked_fields.length > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  )}
+                  {/* Legacy: Linked Step Data Info */}
+                  {(!issue.linked_fields || issue.linked_fields.length === 0) && issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
+                    <div className="text-sm text-foreground-secondary mb-2 flex items-center gap-1">
+                      <LinkIcon size={14} className="text-primary-600" />
+                      <span className="text-primary-600 dark:text-primary-400 font-medium">
+                        {issue.linked_step_data_ids.length} linked step{issue.linked_step_data_ids.length > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  )}
+
                   {/* Description */}
                   {issue.description && (
                     <p className="text-sm text-foreground-secondary mt-2 line-clamp-2">{issue.description}</p>
@@ -456,7 +464,7 @@ export default function StakeholderIssuesPage() {
                       <button
                         disabled
                         className="p-2 text-foreground-tertiary rounded cursor-not-allowed opacity-50"
-                        title="Edit issue (no permission)"
+                        title="Edit Issue (no permission)"
                       >
                         <Eye size={18} />
                       </button>
@@ -466,10 +474,10 @@ export default function StakeholderIssuesPage() {
                   {canDelete(PERMISSION_MODULES.STAKEHOLDERS) ? (
                     <button
                       onClick={() => issue.id && handleDeleteIssue(issue.id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                      className="p-2 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded transition-colors"
                       title="Delete issue"
                     >
-                      <Trash size={18} />
+                      <TrashSimple size={18} />
                     </button>
                   ) : (
                     <PermissionTooltip message="You don't have permission to delete issues">
@@ -478,7 +486,7 @@ export default function StakeholderIssuesPage() {
                         className="p-2 text-foreground-tertiary rounded cursor-not-allowed opacity-50"
                         title="Delete issue (no permission)"
                       >
-                        <Trash size={18} />
+                        <TrashSimple size={18} />
                       </button>
                     </PermissionTooltip>
                   )}
@@ -512,6 +520,7 @@ export default function StakeholderIssuesPage() {
               category_id: selectedIssue.category_id,
               subcategory_id: selectedIssue.subcategory_id,
               linked_step_data_ids: selectedIssue.linked_step_data_ids || [],
+              linked_fields: selectedIssue.linked_fields || [],
               attachments: selectedIssue.attachments,
             }}
             onSubmit={handleUpdateIssue}

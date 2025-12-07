@@ -7,17 +7,20 @@ import {
   validationErrorsToObject,
 } from "@/lib/validation/schemas/stakeholder-issues";
 import { StakeholderIssueFormData } from "@/hooks/useStakeholderIssues";
-import { StakeholderIssueAttachment, StakeholderIssueCategory, StakeholderIssueSubcategory } from "@/lib/types/schemas";
+import { StakeholderIssueAttachment, StakeholderIssueCategory, StakeholderIssueSubcategory, LinkedStepField } from "@/lib/types/schemas";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useTeams } from "@/hooks/useTeams";
 import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { useStakeholderIssueCategories } from "@/hooks/useStakeholderIssueCategories";
-import { X, Upload, Trash, Download, FileText, User, UsersThree, Tag, Link, CheckCircle } from "@/lib/icons";
+import { X, Upload, TrashSimple, Download, FileText, User, UsersThree, Tag, Link, CheckCircle, CaretDown, CaretRight, CheckSquare, Square } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { FormField, SelectField, TextAreaField } from "@/components/forms";
 import { captureError } from "@/lib/sentry";
+import { formatDisplayValue, getFieldLabel } from "@/lib/utils/step-data-utils";
 
 type AssignmentType = 'employee' | 'team';
+
+import { FieldDefinitionsSchema } from "@/lib/types/schemas";
 
 interface StakeholderStepDataOption {
   id: number;
@@ -25,6 +28,7 @@ interface StakeholderStepDataOption {
   stepOrder: number;
   isCompleted: boolean;
   data: Record<string, any>;
+  fieldDefinitions?: FieldDefinitionsSchema;
 }
 
 interface StakeholderIssueFormProps {
@@ -40,6 +44,7 @@ interface StakeholderIssueFormProps {
     category_id?: number;
     subcategory_id?: number;
     linked_step_data_ids?: number[];
+    linked_fields?: LinkedStepField[];
     attachments?: StakeholderIssueAttachment[];
   };
   onSubmit: (data: StakeholderIssueFormData) => Promise<void>;
@@ -90,11 +95,14 @@ export default function StakeholderIssueForm({
     assigned_team_id: initialData?.assigned_team_id,
     category_id: initialData?.category_id,
     subcategory_id: initialData?.subcategory_id,
-    linked_step_data_ids: initialData?.linked_step_data_ids || [],
+    linked_fields: initialData?.linked_fields || [],
     attachments: [],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Track which steps are expanded for field selection
+  const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
 
   // Get subcategories for selected category
   const selectedCategory = categories.find(c => c.id === formData.category_id);
@@ -119,6 +127,7 @@ export default function StakeholderIssueForm({
           stepOrder: sd.step?.step_order || 0,
           isCompleted: sd.is_completed,
           data: sd.data || {},
+          fieldDefinitions: sd.step?.field_definitions,
         }));
         setAvailableStepData(stepDataOptions.sort((a, b) => a.stepOrder - b.stepOrder));
       } catch (err) {
@@ -170,21 +179,107 @@ export default function StakeholderIssueForm({
     }
   };
 
-  const handleLinkedStepDataToggle = (stepDataId: number) => {
+  // Toggle step expansion for field selection
+  const toggleStepExpansion = (stepDataId: number) => {
+    setExpandedSteps(prev => {
+      const next = new Set(prev);
+      if (next.has(stepDataId)) {
+        next.delete(stepDataId);
+      } else {
+        next.add(stepDataId);
+      }
+      return next;
+    });
+  };
+
+  // Check if a specific field is linked
+  const isFieldLinked = (stepDataId: number, fieldKey: string): boolean => {
+    return formData.linked_fields?.some(
+      f => f.stepDataId === stepDataId && f.fieldKey === fieldKey
+    ) ?? false;
+  };
+
+  // Toggle a specific field's linked state
+  const handleFieldToggle = (stepDataId: number, fieldKey: string, stepData: StakeholderStepDataOption) => {
     setFormData(prev => {
-      const currentLinkedIds = prev.linked_step_data_ids || [];
-      if (currentLinkedIds.includes(stepDataId)) {
+      const currentLinkedFields = prev.linked_fields || [];
+      const existingIndex = currentLinkedFields.findIndex(
+        f => f.stepDataId === stepDataId && f.fieldKey === fieldKey
+      );
+      
+      if (existingIndex >= 0) {
+        // Remove the field
         return {
           ...prev,
-          linked_step_data_ids: currentLinkedIds.filter(id => id !== stepDataId),
+          linked_fields: currentLinkedFields.filter((_, i) => i !== existingIndex),
         };
       } else {
+        // Add the field with metadata
+        const newField: LinkedStepField = {
+          stepDataId,
+          fieldKey,
+          stepName: stepData.stepName,
+          stepOrder: stepData.stepOrder,
+          fieldLabel: getFieldLabel(fieldKey, stepData.fieldDefinitions),
+          fieldValue: stepData.data[fieldKey],
+        };
         return {
           ...prev,
-          linked_step_data_ids: [...currentLinkedIds, stepDataId],
+          linked_fields: [...currentLinkedFields, newField],
         };
       }
     });
+  };
+
+  // Select all fields from a step
+  const selectAllFieldsFromStep = (stepData: StakeholderStepDataOption) => {
+    const fieldKeys = Object.keys(stepData.data).filter(key => {
+      // Skip file fields
+      const value = stepData.data[key];
+      return !(typeof value === 'object' && value !== null && 'path' in value);
+    });
+    
+    setFormData(prev => {
+      const currentLinkedFields = prev.linked_fields || [];
+      // Remove any existing fields from this step
+      const withoutThisStep = currentLinkedFields.filter(f => f.stepDataId !== stepData.id);
+      // Add all fields from this step
+      const newFields: LinkedStepField[] = fieldKeys.map(fieldKey => ({
+        stepDataId: stepData.id,
+        fieldKey,
+        stepName: stepData.stepName,
+        stepOrder: stepData.stepOrder,
+        fieldLabel: getFieldLabel(fieldKey, stepData.fieldDefinitions),
+        fieldValue: stepData.data[fieldKey],
+      }));
+      return {
+        ...prev,
+        linked_fields: [...withoutThisStep, ...newFields],
+      };
+    });
+  };
+
+  // Deselect all fields from a step
+  const deselectAllFieldsFromStep = (stepDataId: number) => {
+    setFormData(prev => ({
+      ...prev,
+      linked_fields: (prev.linked_fields || []).filter(f => f.stepDataId !== stepDataId),
+    }));
+  };
+
+  // Count linked fields for a step
+  const getLinkedFieldCount = (stepDataId: number): number => {
+    return (formData.linked_fields || []).filter(f => f.stepDataId === stepDataId).length;
+  };
+
+  // Check if all fields in a step are linked
+  const areAllFieldsLinked = (stepData: StakeholderStepDataOption): boolean => {
+    const fieldKeys = Object.keys(stepData.data).filter(key => {
+      const value = stepData.data[key];
+      return !(typeof value === 'object' && value !== null && 'path' in value);
+    });
+    if (fieldKeys.length === 0) return false;
+    return fieldKeys.every(key => isFieldLinked(stepData.id, key));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -434,16 +529,16 @@ export default function StakeholderIssueForm({
           ]}
         />
 
-        {/* Linked Step Data */}
+        {/* Linked Step Data - Field Level Selection */}
         <div>
           <label className="block text-sm font-medium text-foreground-primary mb-2">
             <div className="flex items-center gap-2">
               <Link size={16} />
-              <span>Link Step Data</span>
+              <span>Link Step Data Fields</span>
             </div>
           </label>
           <p className="text-xs text-foreground-tertiary mb-3">
-            Select step data to link to this issue. Linked data can be viewed and edited from the issue.
+            Expand steps to select specific fields to link to this issue.
           </p>
           
           {loadingStepData ? (
@@ -455,54 +550,168 @@ export default function StakeholderIssueForm({
               No step data available for this stakeholder.
             </p>
           ) : (
-            <div className="space-y-2 max-h-60 overflow-y-auto border border-border-primary rounded-lg p-3">
+            <div className="space-y-2 max-h-80 overflow-y-auto border border-border-primary rounded-lg p-3">
               {availableStepData.map((stepData) => {
-                const isLinked = formData.linked_step_data_ids?.includes(stepData.id);
+                const isExpanded = expandedSteps.has(stepData.id);
+                const linkedCount = getLinkedFieldCount(stepData.id);
+                const allLinked = areAllFieldsLinked(stepData);
+                const fieldKeys = Object.keys(stepData.data).filter(key => {
+                  const value = stepData.data[key];
+                  return !(typeof value === 'object' && value !== null && 'path' in value);
+                });
+                
                 return (
                   <div
                     key={stepData.id}
-                    onClick={() => handleLinkedStepDataToggle(stepData.id)}
-                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                      isLinked
-                        ? 'bg-primary-50 dark:bg-primary-900/30 border border-primary-300 dark:border-primary-700'
-                        : 'bg-surface-secondary hover:bg-surface-hover border border-border-secondary'
-                    }`}
+                    className="bg-surface-secondary rounded-lg border border-border-secondary overflow-hidden"
                   >
-                    <div className={`shrink-0 w-5 h-5 rounded border flex items-center justify-center ${
-                      isLinked
-                        ? 'bg-primary-600 border-primary-600 text-white'
-                        : 'border-border-primary'
-                    }`}>
-                      {isLinked && <CheckCircle size={14} weight="bold" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-foreground-primary">
-                          Step {stepData.stepOrder}: {stepData.stepName}
-                        </span>
-                        {stepData.isCompleted && (
-                          <span className="px-1.5 py-0.5 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded">
-                            Completed
+                    {/* Step Header */}
+                    <div
+                      className="flex items-center gap-2 p-3 cursor-pointer hover:bg-surface-hover transition-colors"
+                      onClick={() => toggleStepExpansion(stepData.id)}
+                    >
+                      {isExpanded ? (
+                        <CaretDown size={16} className="text-foreground-tertiary shrink-0" />
+                      ) : (
+                        <CaretRight size={16} className="text-foreground-tertiary shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium text-foreground-primary">
+                            Step {stepData.stepOrder}: {stepData.stepName}
                           </span>
+                          {stepData.isCompleted && (
+                            <span className="px-1.5 py-0.5 text-xs bg-success/10 dark:bg-success/20 text-success rounded">
+                              Completed
+                            </span>
+                          )}
+                          {linkedCount > 0 && (
+                            <span className="px-1.5 py-0.5 text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded">
+                              {linkedCount} field{linkedCount > 1 ? 's' : ''} linked
+                            </span>
+                          )}
+                        </div>
+                        {!isExpanded && fieldKeys.length > 0 && (
+                          <p className="text-xs text-foreground-tertiary mt-1">
+                            {fieldKeys.length} field{fieldKeys.length > 1 ? 's' : ''} available
+                          </p>
                         )}
                       </div>
-                      {Object.keys(stepData.data).length > 0 && (
-                        <p className="text-xs text-foreground-tertiary mt-1 truncate">
-                          {Object.keys(stepData.data).slice(0, 3).join(', ')}
-                          {Object.keys(stepData.data).length > 3 && ` +${Object.keys(stepData.data).length - 3} more`}
-                        </p>
-                      )}
                     </div>
+                    
+                    {/* Fields List (expanded) */}
+                    {isExpanded && fieldKeys.length > 0 && (
+                      <div className="border-t border-border-secondary">
+                        {/* Select All / Deselect All */}
+                        <div className="px-3 py-2 bg-background-secondary flex items-center justify-between">
+                          <span className="text-xs text-foreground-tertiary">
+                            {linkedCount} of {fieldKeys.length} fields selected
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                selectAllFieldsFromStep(stepData);
+                              }}
+                              className="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                            >
+                              Select All
+                            </button>
+                            <span className="text-foreground-tertiary">|</span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deselectAllFieldsFromStep(stepData.id);
+                              }}
+                              className="text-xs text-foreground-tertiary hover:text-foreground-secondary"
+                            >
+                              Deselect All
+                            </button>
+                          </div>
+                        </div>
+                        
+                        {/* Individual Fields */}
+                        <div className="p-2 space-y-1">
+                          {fieldKeys.map(fieldKey => {
+                            const isLinked = isFieldLinked(stepData.id, fieldKey);
+                            const fieldLabel = getFieldLabel(fieldKey, stepData.fieldDefinitions);
+                            const fieldValue = stepData.data[fieldKey];
+                            
+                            return (
+                              <div
+                                key={fieldKey}
+                                onClick={() => handleFieldToggle(stepData.id, fieldKey, stepData)}
+                                className={`flex items-start gap-2 p-2 rounded cursor-pointer transition-colors ${
+                                  isLinked
+                                    ? 'bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700'
+                                    : 'hover:bg-surface-hover border border-transparent'
+                                }`}
+                              >
+                                <div className={`shrink-0 mt-0.5 w-4 h-4 rounded border flex items-center justify-center ${
+                                  isLinked
+                                    ? 'bg-primary-600 border-primary-600 text-white'
+                                    : 'border-border-primary bg-surface-primary'
+                                }`}>
+                                  {isLinked && <CheckCircle size={12} weight="bold" />}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm font-medium text-foreground-primary">
+                                    {fieldLabel}
+                                  </div>
+                                  <div className="text-xs text-foreground-tertiary truncate mt-0.5">
+                                    {formatDisplayValue(fieldValue)}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* No fields message */}
+                    {isExpanded && fieldKeys.length === 0 && (
+                      <div className="px-3 py-4 text-center text-sm text-foreground-tertiary border-t border-border-secondary">
+                        No fields available in this step
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
           )}
           
-          {formData.linked_step_data_ids && formData.linked_step_data_ids.length > 0 && (
-            <p className="text-xs text-primary-600 mt-2">
-              {formData.linked_step_data_ids.length} step{formData.linked_step_data_ids.length > 1 ? 's' : ''} linked
-            </p>
+          {/* Summary of linked fields */}
+          {formData.linked_fields && formData.linked_fields.length > 0 && (
+            <div className="mt-3 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-200 dark:border-primary-800">
+              <p className="text-xs font-medium text-primary-700 dark:text-primary-300 mb-2">
+                {formData.linked_fields.length} field{formData.linked_fields.length > 1 ? 's' : ''} linked:
+              </p>
+              <div className="flex flex-wrap gap-1">
+                {formData.linked_fields.map((field, idx) => (
+                  <span
+                    key={`${field.stepDataId}-${field.fieldKey}`}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-200 text-xs rounded"
+                  >
+                    <span className="font-medium">{field.fieldLabel || field.fieldKey}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const stepData = availableStepData.find(s => s.id === field.stepDataId);
+                        if (stepData) {
+                          handleFieldToggle(field.stepDataId, field.fieldKey, stepData);
+                        }
+                      }}
+                      className="ml-1 hover:text-error transition-colors"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
           )}
         </div>
 
@@ -562,13 +771,13 @@ export default function StakeholderIssueForm({
                           type="button"
                           onClick={() => handleRemoveExistingAttachment(attachment.path)}
                           disabled={deletingAttachment === attachment.path}
-                          className="p-1.5 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50 rounded transition-colors disabled:opacity-50"
+                          className="p-1.5 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded transition-colors disabled:opacity-50"
                           title="Delete"
                         >
                           {deletingAttachment === attachment.path ? (
                             <InlineSpinner size="xs" color="red" />
                           ) : (
-                            <Trash size={16} />
+                            <TrashSimple size={16} />
                           )}
                         </button>
                       )}
@@ -602,7 +811,7 @@ export default function StakeholderIssueForm({
 
             {/* File Error */}
             {fileError && (
-              <p className="text-sm text-red-600">{fileError}</p>
+              <p className="text-sm text-error">{fileError}</p>
             )}
 
             {/* New File List */}
@@ -612,10 +821,10 @@ export default function StakeholderIssueForm({
                 {files.map((file, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-900/30 rounded border border-green-200 dark:border-green-800"
+                    className="flex items-center justify-between p-2 bg-success/10 dark:bg-success/20 rounded border border-success/30 dark:border-success/40"
                   >
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileText size={16} className="text-green-600 dark:text-green-400 shrink-0" />
+                      <FileText size={16} className="text-success shrink-0" />
                       <span className="text-sm text-foreground-secondary truncate">
                         {file.name}
                       </span>
@@ -626,9 +835,9 @@ export default function StakeholderIssueForm({
                     <button
                       type="button"
                       onClick={() => removeFile(index)}
-                      className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/50 rounded transition-colors"
+                      className="p-1 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded transition-colors"
                     >
-                      <Trash size={16} />
+                      <TrashSimple size={16} />
                     </button>
                   </div>
                 ))}

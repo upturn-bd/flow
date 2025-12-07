@@ -2,15 +2,15 @@
 
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
-import { Trash, Eye } from "@/lib/icons";
+import { TrashSimple, Eye } from "@phosphor-icons/react";
 import { Button } from "./button";
-import type { IconType } from "@/lib/icons";
+import type { Icon } from "@phosphor-icons/react";
 
 export type EntityCardProps = {
   /** Card title */
   title: string;
   /** Icon component to display next to the title */
-  icon?: IconType;
+  icon?: Icon;
   /** Optional subtitle or description */
   description?: string;
   /** Additional metadata items to display */
@@ -60,9 +60,9 @@ export function EntityCard({
             onClick={onDelete}
             isLoading={deleteLoading}
             disabled={deleteLoading}
-            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+            className="p-1 rounded-full text-foreground-tertiary hover:bg-error/10 hover:text-error dark:hover:bg-error/20"
           >
-            <Trash size={16} weight="bold" />
+            <TrashSimple size={16} weight="bold" />
           </Button>
         )}
       </div>
@@ -123,7 +123,7 @@ export function EntityCardGrid({ children, columns = 3 }: EntityCardGridProps) {
 }
 
 export type EntityCardMetaItemProps = {
-  icon?: IconType;
+  icon?: Icon;
   children: ReactNode;
   className?: string;
 };
@@ -141,7 +141,7 @@ export function EntityCardMetaItem({ icon: Icon, children, className = "" }: Ent
 }
 
 export type EntityCardBadgeProps = {
-  icon?: IconType;
+  icon?: Icon;
   children: ReactNode;
   className?: string;
 };

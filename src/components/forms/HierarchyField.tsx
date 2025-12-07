@@ -1,7 +1,7 @@
 import React from 'react';
 import SelectField from './SelectField';
 import { Button } from '@/components/ui/button';
-import { Trash, Plus } from '@/lib/icons';
+import { TrashSimple, Plus } from "@phosphor-icons/react";
 import { motion } from 'framer-motion';
 
 interface HierarchyLevel {
@@ -129,15 +129,15 @@ export default function HierarchyField({
                           variant="outline"
                           size="sm"
                           disabled={disabled}
-                          className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200"
+                          className="bg-error/10 hover:bg-error/20 text-error border border-error/20"
                         >
-                          <Trash size={16} weight="duotone" />
+                          <TrashSimple size={16} weight="duotone" />
                         </Button>
                       )}
                     </div>
                     {index < hierarchy.length - 1 && (
                       <div className="flex justify-center">
-                        <div className="h-6 w-0.5 bg-blue-300 absolute left-1/2 transform -translate-x-1/2"></div>
+                        <div className="h-6 w-0.5 bg-primary-300 dark:bg-primary-700 absolute left-1/2 transform -translate-x-1/2"></div>
                       </div>
                     )}
                   </motion.div>
@@ -150,7 +150,7 @@ export default function HierarchyField({
                 size="sm"
                 onClick={addNewLevel}
                 disabled={disabled}
-                className="mt-2 flex items-center gap-1 border-blue-200 text-blue-700 hover:bg-primary-50 dark:hover:bg-primary-950"
+                className="mt-2 flex items-center gap-1 border-primary-200 text-primary-700 hover:bg-primary-50 dark:hover:bg-primary-950"
               >
                 <Plus size={16} weight="bold" />
                 Add Level
@@ -161,7 +161,7 @@ export default function HierarchyField({
       </div>
       
       {error && (
-        <p className="text-red-600 text-sm mt-1">{error}</p>
+        <p className="text-error text-sm mt-1">{error}</p>
       )}
     </div>
   );

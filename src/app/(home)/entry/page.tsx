@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Note as NoteIcon,
-  ChartBar as ChartBarIcon,
-  ArrowsClockwise as ArrowsClockwiseIcon,
-  Users as UsersIcon,
-  FileText as FileTextIcon,
-  CurrencyDollar as CurrencyDollarIcon,
-  Buildings as BuildingsIcon,
-} from "@/lib/icons";
+import { Note as NoteIcon, ChartBar as ChartBarIcon, ArrowsClockwise as ArrowsClockwiseIcon, Users as UsersIcon, FileText as FileTextIcon, CurrencyDollar as CurrencyDollarIcon, Buildings as BuildingsIcon } from "@phosphor-icons/react";
 
 const navItems = [
   {

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { debounce } from "lodash";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Building, Plus, Search } from "@/lib/icons";
+import { Building, Plus, MagnifyingGlass } from "@phosphor-icons/react";
 
 import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -204,7 +204,7 @@ function ProjectsList({ setActiveTab }: { setActiveTab: (key: string) => void })
         >
           {/* Search Bar */}
           <motion.div variants={fadeInUp} className="relative mb-4">
-            <Search
+            <MagnifyingGlass
               size={16}
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary"
             />

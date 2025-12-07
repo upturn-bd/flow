@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { ArrowLeft, Edit, Play, Pause, ToggleRight, ToggleLeft } from "@/lib/icons";
+import { ArrowLeft, PencilSimple, Play, Pause, ToggleRight, ToggleLeft } from "@phosphor-icons/react";
 import ProcessForm from "@/components/stakeholder-processes/ProcessForm";
 import StepManager from "@/components/stakeholder-processes/StepManager";
 import { InlineSpinner } from "@/components/ui";
@@ -94,7 +94,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary wrap-break-words">{process.name}</h1>
               {process.is_active ? (
-                <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded whitespace-nowrap">
+                <span className="px-2 py-1 text-xs font-medium bg-success/10 text-success dark:bg-success/20 rounded whitespace-nowrap">
                   Active
                 </span>
               ) : (
@@ -142,7 +142,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
             onClick={() => setShowEditModal(true)}
             className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
           >
-            <Edit size={20} />
+            <PencilSimple size={20} />
             Edit Process
           </button>
         </div>

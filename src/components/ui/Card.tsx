@@ -132,9 +132,9 @@ export function StatusBadge({ status, variant, size = "sm" }: StatusBadgeProps) 
   const getVariantClasses = (status: string, variant?: string) => {
     if (variant) {
       const variantMap = {
-        success: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800",
-        warning: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800",
-        error: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800",
+        success: "bg-success/10 text-success border-success/30 dark:bg-success/20 dark:border-success/40",
+        warning: "bg-warning/10 text-warning border-warning/30 dark:bg-warning/20 dark:border-warning/40",
+        error: "bg-error/10 text-error border-error/30 dark:bg-error/20 dark:border-error/40",
         info: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800",
         pending: "bg-surface-secondary text-foreground-secondary border-border-primary",
       };
@@ -144,13 +144,13 @@ export function StatusBadge({ status, variant, size = "sm" }: StatusBadgeProps) 
     // Auto-detect based on status text
     const statusLower = status.toLowerCase();
     if (statusLower.includes("completed") || statusLower.includes("approved") || statusLower.includes("success")) {
-      return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
+      return "bg-success/10 text-success border-success/30 dark:bg-success/20 dark:border-success/40";
     }
     if (statusLower.includes("pending") || statusLower.includes("draft")) {
-      return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800";
+      return "bg-warning/10 text-warning border-warning/30 dark:bg-warning/20 dark:border-warning/40";
     }
     if (statusLower.includes("rejected") || statusLower.includes("failed") || statusLower.includes("error") || statusLower.includes("not started")) {
-      return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800";
+      return "bg-error/10 text-error border-error/30 dark:bg-error/20 dark:border-error/40";
     }
     if (statusLower.includes("in progress") || statusLower.includes("ongoing")) {
       return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800";
@@ -176,8 +176,8 @@ export function StatusBadge({ status, variant, size = "sm" }: StatusBadgeProps) 
 
 export function PriorityBadge({ priority, size = "sm" }: PriorityBadgeProps) {
   const priorityClasses = {
-    urgent: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800",
-    high: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800",
+    urgent: "bg-error/10 text-error border-error/30 dark:bg-error/20 dark:border-error/40",
+    high: "bg-warning/10 text-warning border-warning/30 dark:bg-warning/20 dark:border-warning/40",
     normal: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800",
     low: "bg-surface-secondary text-foreground-tertiary border-border-primary",
   };

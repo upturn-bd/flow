@@ -2,12 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  ClipboardList,
-  CheckSquare,
-  ArchiveIcon,
-  PlusSquare
-} from "@/lib/icons";
+import { ClipboardText, CheckSquare, Archive, Plus, PlusSquare } from "@phosphor-icons/react";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import OngoingTaskPage from "@/components/ops/tasks/OngoingTasks";
 import CompletedTasksList from "@/components/ops/tasks/CompletedTasks";
@@ -24,19 +19,19 @@ const TABS = [
   {
     key: "ongoing",
     label: "Ongoing",
-    icon: <ClipboardList className="h-5 w-5" />,
+    icon: <ClipboardText className="h-5 w-5" />,
     color: "text-indigo-600",
   },
   {
     key: "completed",
     label: "Completed",
     icon: <CheckSquare className="h-5 w-5" />,
-    color: "text-green-600",
+    color: "text-success",
   },
   {
     key: "archived",
     label: "Archived",
-    icon: <ArchiveIcon className="h-5 w-5" />,
+    icon: <Archive className="h-5 w-5" />,
     color: "text-foreground-secondary",
   },
 ];
@@ -128,7 +123,7 @@ export default function TaskLayout({
   const archivedContent = useMemo(
     () => (
       <div className="flex flex-col items-center justify-center p-12 bg-background-secondary rounded-xl border border-border-primary text-center">
-        <ArchiveIcon className="h-16 w-16 text-foreground-tertiary mb-4" />
+        <Archive className="h-16 w-16 text-foreground-tertiary mb-4" />
         <h3 className="text-xl font-semibold text-foreground-primary mb-2">
           Archived Tasks
         </h3>
@@ -194,7 +189,7 @@ export default function TaskLayout({
       <motion.div className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-foreground-primary flex items-center mb-2">
-            <ClipboardList className="mr-2 h-6 w-6 text-indigo-500" />
+            <ClipboardText className="mr-2 h-6 w-6 text-indigo-500" />
             Task Management
           </h1>
           <p className="text-foreground-secondary max-w-3xl">

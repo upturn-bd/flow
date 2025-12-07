@@ -1,4 +1,4 @@
-import { Palette } from "@/lib/icons";
+import { Palette } from "@phosphor-icons/react";
 import { forwardRef, useState, useRef, useEffect } from "react";
 
 export interface ColorFieldProps {
@@ -84,7 +84,7 @@ export const ColorField = forwardRef<HTMLInputElement, ColorFieldProps>(
               focus:ring-2 focus:ring-primary-500 focus:border-primary-500
               disabled:bg-background-secondary disabled:cursor-not-allowed
               flex items-center gap-3 px-3
-              ${error ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''}
+              ${error ? 'border-error focus:ring-error focus:border-error' : ''}
               ${disabled ? 'cursor-not-allowed' : 'cursor-pointer hover:border-border-primary'}
             `}
           >
@@ -155,7 +155,7 @@ export const ColorField = forwardRef<HTMLInputElement, ColorFieldProps>(
         </div>
 
         {error && (
-          <p className="mt-1 text-sm text-red-600">{error}</p>
+          <p className="mt-1 text-sm text-error">{error}</p>
         )}
       </div>
     );

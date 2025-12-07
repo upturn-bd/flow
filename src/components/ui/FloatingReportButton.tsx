@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Bug } from "@/lib/icons";
+import { Bug } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReportProblemModal from "./ReportProblemModal";
 
@@ -64,7 +64,7 @@ export default function FloatingReportButton() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsModalOpen(true)}
-          className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-40 flex items-center gap-2 px-4 py-3 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-40 flex items-center gap-2 px-4 py-3 bg-error text-white rounded-full shadow-lg hover:bg-error/90 transition-colors focus:outline-none focus:ring-2 focus:ring-error focus:ring-offset-2"
           title="Report a problem"
         >
           <Bug size={20} />

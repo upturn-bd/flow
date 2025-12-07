@@ -2,23 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  CreditCard,
-  Plus,
-  Search,
-  Filter,
-  Eye,
-  Edit,
-  Trash,
-  DollarSign,
-  Calendar,
-  Building,
-  CheckCircle,
-  Clock,
-  X,
-  Minus,
-  Users
-} from "@/lib/icons";
+import { CreditCard, Plus, MagnifyingGlass, FunnelSimple, Eye, PencilSimple, TrashSimple, CurrencyDollar, Calendar, Building, CheckCircle, Clock, X, Minus, Users } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { staggerContainer, fadeInUp } from "@/components/ui/animations";
 import { useAccounts, AccountFilters } from "@/hooks/useAccounts";
@@ -124,7 +108,7 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
       )}
 
       {error && (
-        <p className="text-red-600 text-xs mt-1">{error}</p>
+        <p className="text-error text-xs mt-1">{error}</p>
       )}
     </div>
   );
@@ -408,7 +392,7 @@ export default function AccountsTab() {
             </div>
             <div className="bg-surface-primary/10 rounded-lg p-3 sm:p-4 col-span-2 lg:col-span-1">
               <div className="flex items-center gap-1 sm:gap-2 mb-1">
-                <DollarSign size={14} className="sm:w-4 sm:h-4" />
+                <CurrencyDollar size={14} className="sm:w-4 sm:h-4" />
                 <span className="text-xs sm:text-sm opacity-90">Net Amount</span>
               </div>
               <span className="text-lg sm:text-xl font-bold">
@@ -428,28 +412,28 @@ export default function AccountsTab() {
         >
           {/* Search Bar */}
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary" />
+            <MagnifyingGlass size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary" />
             <input
               type="text"
               placeholder="Search transactions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
             />
           </div>
 
-          {/* Filter Grid */}
+          {/* FunnelSimple Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {/* Status Filter */}
+            {/* Status FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                <Filter size={12} className="inline mr-1" />
+                <FunnelSimple size={12} className="inline mr-1" />
                 Status
               </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               >
                 <option value="All">All Status</option>
                 <option value="Complete">Complete</option>
@@ -457,7 +441,7 @@ export default function AccountsTab() {
               </select>
             </div>
 
-            {/* Payment Method Filter */}
+            {/* Payment Method FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <CreditCard size={12} className="inline mr-1" />
@@ -466,7 +450,7 @@ export default function AccountsTab() {
               <select
                 value={methodFilter}
                 onChange={(e) => setMethodFilter(e.target.value)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               >
                 <option value="All">All Methods</option>
                 {PAYMENT_METHODS.map(method => (
@@ -475,7 +459,7 @@ export default function AccountsTab() {
               </select>
             </div>
 
-            {/* Start Date Filter */}
+            {/* Start Date FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Calendar size={12} className="inline mr-1" />
@@ -485,11 +469,11 @@ export default function AccountsTab() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               />
             </div>
 
-            {/* End Date Filter */}
+            {/* End Date FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Calendar size={12} className="inline mr-1" />
@@ -499,11 +483,11 @@ export default function AccountsTab() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               />
             </div>
 
-            {/* Stakeholder Filter */}
+            {/* Stakeholder FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
                 <Users size={12} className="inline mr-1" />
@@ -512,7 +496,7 @@ export default function AccountsTab() {
               <select
                 value={stakeholderFilter}
                 onChange={(e) => setStakeholderFilter(e.target.value)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               >
                 <option value="All">All Stakeholders</option>
                 <option value="none">No Stakeholder</option>
@@ -522,10 +506,10 @@ export default function AccountsTab() {
               </select>
             </div>
 
-            {/* Min Amount Filter */}
+            {/* Min Amount FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                <DollarSign size={12} className="inline mr-1" />
+                <CurrencyDollar size={12} className="inline mr-1" />
                 Min Amount
               </label>
               <input
@@ -533,14 +517,14 @@ export default function AccountsTab() {
                 placeholder="Min"
                 value={minAmount}
                 onChange={(e) => setMinAmount(e.target.value)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               />
             </div>
 
-            {/* Max Amount Filter */}
+            {/* Max Amount FunnelSimple */}
             <div>
               <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                <DollarSign size={12} className="inline mr-1" />
+                <CurrencyDollar size={12} className="inline mr-1" />
                 Max Amount
               </label>
               <input
@@ -548,7 +532,7 @@ export default function AccountsTab() {
                 placeholder="Max"
                 value={maxAmount}
                 onChange={(e) => setMaxAmount(e.target.value)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               />
             </div>
 
@@ -576,7 +560,7 @@ export default function AccountsTab() {
 
           {/* Active Filters Summary */}
           <div className="flex items-center gap-2 text-xs text-foreground-secondary bg-blue-50 p-3 rounded-lg">
-            <Filter size={12} className="text-blue-600" />
+            <FunnelSimple size={12} className="text-blue-600" />
             <span className="font-medium text-blue-900">
               Showing {filteredAccounts.length} transaction{filteredAccounts.length !== 1 ? 's' : ''} from {startDate} to {endDate}
             </span>
@@ -645,14 +629,14 @@ export default function AccountsTab() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-xs font-medium whitespace-nowrap">
-                          <span className={account.amount >= 0 ? 'text-green-600' : 'text-red-600'}>
+                          <span className={account.amount >= 0 ? 'text-success' : 'text-error'}>
                             {formatAmount(account.amount, account.currency)}
                           </span>
                         </td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${account.status === 'Complete'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-success/10 text-success dark:bg-success/20'
+                            : 'bg-warning/10 text-warning dark:bg-warning/20'
                             }`}>
                             {account.status === 'Complete' ? (
                               <><CheckCircle size={10} className="mr-1" />Complete</>
@@ -668,17 +652,17 @@ export default function AccountsTab() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleEditClick(account)}
-                              className="text-blue-600 hover:text-blue-800 transition-colors"
+                              className="text-primary-600 hover:text-primary-800 transition-colors"
                               title="Edit"
                             >
-                              <Edit size={14} />
+                              <PencilSimple size={14} />
                             </button>
                             <button
                               onClick={() => handleDeleteClick(account)}
-                              className="text-red-600 hover:text-red-800 transition-colors"
+                              className="text-error hover:text-error/80 transition-colors"
                               title="Delete"
                             >
-                              <Trash size={14} />
+                              <TrashSimple size={14} />
                             </button>
                           </div>
                         </td>
@@ -706,8 +690,8 @@ export default function AccountsTab() {
                         </div>
                       </div>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ml-2 ${account.status === 'Complete'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-success/10 text-success dark:bg-success/20'
+                        : 'bg-warning/10 text-warning dark:bg-warning/20'
                         }`}>
                         {account.status === 'Complete' ? (
                           <><CheckCircle size={10} className="mr-1" />Complete</>
@@ -720,7 +704,7 @@ export default function AccountsTab() {
                     <div className="space-y-2 mb-3">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-foreground-secondary">Amount:</span>
-                        <span className={`font-semibold ${account.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <span className={`font-semibold ${account.amount >= 0 ? 'text-success' : 'text-error'}`}>
                           {formatAmount(account.amount, account.currency)}
                         </span>
                       </div>
@@ -762,16 +746,16 @@ export default function AccountsTab() {
                     <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                       <button
                         onClick={() => handleEditClick(account)}
-                        className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 bg-primary-50 hover:bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:hover:bg-primary-900/50 dark:text-primary-300 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
                       >
-                        <Edit size={14} />
-                        Edit
+                        <PencilSimple size={14} />
+                        PencilSimple
                       </button>
                       <button
                         onClick={() => handleDeleteClick(account)}
-                        className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 bg-error/10 hover:bg-error/20 text-error px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
                       >
-                        <Trash size={14} />
+                        <TrashSimple size={14} />
                         Delete
                       </button>
                     </div>
@@ -823,7 +807,7 @@ export default function AccountsTab() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInputField
-                icon={<DollarSign size={18} />}
+                icon={<CurrencyDollar size={18} />}
                 label="Transaction Title"
                 name="title"
                 value={values.title}
@@ -899,7 +883,7 @@ export default function AccountsTab() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInputField
-                icon={<DollarSign size={18} />}
+                icon={<CurrencyDollar size={18} />}
                 label="Amount"
                 name="amount"
                 type="number"
@@ -909,7 +893,7 @@ export default function AccountsTab() {
               />
 
               <FormSelectField
-                icon={<DollarSign size={18} />}
+                icon={<CurrencyDollar size={18} />}
                 label="Currency"
                 name="currency"
                 value={values.currency}
@@ -942,7 +926,7 @@ export default function AccountsTab() {
       {selectedAccount && (
         <FormModal<AccountFormData>
           title="Edit Transaction"
-          icon={<Edit size={24} />}
+          icon={<PencilSimple size={24} />}
           isOpen={isEditModalOpen}
           initialValues={{
             title: selectedAccount.title,
@@ -983,7 +967,7 @@ export default function AccountsTab() {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormInputField
-                  icon={<DollarSign size={18} />}
+                  icon={<CurrencyDollar size={18} />}
                   label="Transaction Title"
                   name="title"
                   value={values.title}
@@ -1057,7 +1041,7 @@ export default function AccountsTab() {
                 />
 
                 <FormInputField
-                  icon={<DollarSign size={18} />}
+                  icon={<CurrencyDollar size={18} />}
                   label="Amount"
                   name="amount"
                   type="number"
@@ -1067,7 +1051,7 @@ export default function AccountsTab() {
                 />
 
                 <FormSelectField
-                  icon={<DollarSign size={18} />}
+                  icon={<CurrencyDollar size={18} />}
                   label="Currency"
                   name="currency"
                   value={values.currency}

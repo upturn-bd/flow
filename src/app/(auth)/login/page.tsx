@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { EyeOff, Eye, GoogleLogo } from "@/lib/icons";
+import { EyeSlash, Eye, GoogleLogo } from "@phosphor-icons/react";
 import Link from "next/link";
 
 import { googleSignIn, login } from "../auth-actions";
@@ -108,7 +108,7 @@ const SignIn = () => {
                   tabIndex={-1}
                 >
                   {showPassword ? (
-                    <EyeOff className="text-2xl" />
+                    <EyeSlash className="text-2xl" />
                   ) : (
                     <Eye className="text-2xl" />
                   )}

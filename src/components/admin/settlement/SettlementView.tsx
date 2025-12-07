@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Collapsible from "../CollapsibleComponent";
-import { Receipt, Plus, MoneyIcon } from "@/lib/icons";
+import { Receipt, Plus, CurrencyDollar } from "@phosphor-icons/react";
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { ClaimType } from "@/lib/types/schemas";
 import {
@@ -121,7 +121,7 @@ export default function ClaimSettlementView() {
                     onView={settlementType.id !== undefined ? () => setEditClaimType(settlementType.id!) : undefined}
                   >
                     <div className="mt-2">
-                      <EntityCardBadge icon={MoneyIcon}>
+                      <EntityCardBadge icon={CurrencyDollar}>
                         Allowance: {formatCurrency(settlementType.allowance)}
                       </EntityCardBadge>
                     </div>

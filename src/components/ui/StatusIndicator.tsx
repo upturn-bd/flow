@@ -1,15 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { 
-  CheckCircle, 
-  Clock, 
-  XCircle, 
-  WarningCircle, 
-  FileText, 
-  Loader,
-  Circle
-} from "@/lib/icons";
+import { CheckCircle, Clock, XCircle, WarningCircle, FileText, CircleNotch, Circle } from "@phosphor-icons/react";
 
 interface StatusIndicatorProps {
   status: string;
@@ -32,40 +24,40 @@ export function StatusIndicator({
     if (statusLower.includes("completed") || statusLower.includes("approved") || statusLower.includes("success")) {
       return {
         icon: CheckCircle,
-        bgColor: "bg-green-100",
-        textColor: "text-green-800",
-        borderColor: "border-green-200",
-        dotColor: "bg-green-500"
+        bgColor: "bg-success/10 dark:bg-success/20",
+        textColor: "text-success",
+        borderColor: "border-success/30",
+        dotColor: "bg-success"
       };
     }
     
     if (statusLower.includes("pending") || statusLower.includes("waiting")) {
       return {
         icon: Clock,
-        bgColor: "bg-yellow-100",
-        textColor: "text-yellow-800",
-        borderColor: "border-yellow-200",
-        dotColor: "bg-yellow-500"
+        bgColor: "bg-warning/10 dark:bg-warning/20",
+        textColor: "text-warning",
+        borderColor: "border-warning/30",
+        dotColor: "bg-warning"
       };
     }
     
     if (statusLower.includes("rejected") || statusLower.includes("failed") || statusLower.includes("error")) {
       return {
         icon: XCircle,
-        bgColor: "bg-red-100",
-        textColor: "text-red-800",
-        borderColor: "border-red-200",
-        dotColor: "bg-red-500"
+        bgColor: "bg-error/10 dark:bg-error/20",
+        textColor: "text-error",
+        borderColor: "border-error/30",
+        dotColor: "bg-error"
       };
     }
     
     if (statusLower.includes("in progress") || statusLower.includes("ongoing") || statusLower.includes("processing")) {
       return {
-        icon: Loader,
-        bgColor: "bg-blue-100",
-        textColor: "text-blue-800",
-        borderColor: "border-blue-200",
-        dotColor: "bg-blue-500"
+        icon: CircleNotch,
+        bgColor: "bg-info/10 dark:bg-info/20",
+        textColor: "text-info",
+        borderColor: "border-info/30",
+        dotColor: "bg-info"
       };
     }
     
@@ -121,7 +113,7 @@ export function StatusIndicator({
   };
 
   const Component = animate ? motion.span : "span";
-  const iconProps = animate && Icon === Loader ? {
+  const iconProps = animate && Icon === CircleNotch ? {
     animate: { rotate: 360 },
     transition: { duration: 1, repeat: Infinity }
   } : {};
@@ -167,16 +159,16 @@ export function StatusDot({
     const statusLower = status.toLowerCase();
     
     if (statusLower.includes("completed") || statusLower.includes("approved") || statusLower.includes("success")) {
-      return "bg-green-500";
+      return "bg-success";
     }
     if (statusLower.includes("pending") || statusLower.includes("waiting")) {
-      return "bg-yellow-500";
+      return "bg-warning";
     }
     if (statusLower.includes("rejected") || statusLower.includes("failed") || statusLower.includes("error")) {
-      return "bg-red-500";
+      return "bg-error";
     }
     if (statusLower.includes("in progress") || statusLower.includes("ongoing") || statusLower.includes("processing")) {
-      return "bg-blue-500";
+      return "bg-info";
     }
     if (statusLower.includes("draft")) {
       return "bg-gray-500";

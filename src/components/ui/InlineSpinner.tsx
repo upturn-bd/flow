@@ -43,7 +43,7 @@ const colorMap: Record<SpinnerColor, string> = {
  * // In a button
  * <button disabled={loading}>
  *   {loading && <InlineSpinner size="sm" color="white" className="mr-2" />}
- *   Save
+ *   FloppyDisk
  * </button>
  * 
  * @example

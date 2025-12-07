@@ -4,13 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useNotices, useNoticeTypes } from "@/hooks/useNotice";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
-import {
-  Search,
-  WarningCircle,
-  FileText,
-  Pencil,
-  Trash,
-} from "@/lib/icons";
+import { MagnifyingGlass, WarningCircle, FileText, Pencil, TrashSimple } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { motion } from "framer-motion";
@@ -94,13 +88,13 @@ export default function NoticePage() {
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case "high":
-        return "bg-red-100 text-red-700";
+        return "bg-error/10 text-error dark:bg-error/20";
       case "normal":
-        return "bg-yellow-100 text-yellow-700";
+        return "bg-warning/10 text-warning dark:bg-warning/20";
       case "low":
-        return "bg-green-100 text-green-700";
+        return "bg-success/10 text-success dark:bg-success/20";
       case "urgent":
-        return "bg-red-200 text-red-800 font-semibold";
+        return "bg-error/20 text-error font-semibold dark:bg-error/30";
       default:
         return "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary";
     }
@@ -139,7 +133,7 @@ export default function NoticePage() {
 
       {/* Search bar */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-2.5 text-foreground-tertiary" size={16} />
+        <MagnifyingGlass className="absolute left-3 top-2.5 text-foreground-tertiary" size={16} />
         <input
           placeholder="Search notices..."
           className="pl-8 w-full px-3 py-2 border border-border-primary rounded-lg"
@@ -240,11 +234,11 @@ export default function NoticePage() {
                     <Button
                       variant="danger"
                       size="sm"
-                      className="bg-red-500 hover:bg-red-600 text-white"
+                      className="bg-error hover:bg-error/90 text-white"
                       title="Delete Notice"
                       onClick={() => handleDelete(notice.id)}
                     >
-                      <Trash size={16} />
+                      <TrashSimple size={16} />
                     </Button>
                   )}
 

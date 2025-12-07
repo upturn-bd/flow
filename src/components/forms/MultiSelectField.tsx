@@ -1,4 +1,4 @@
-import { Check, CaretDown, X } from "@/lib/icons";
+import { Check, CaretDown, X } from "@phosphor-icons/react";
 import { forwardRef, useState, useRef, useEffect } from "react";
 import { Button } from "../ui/button";
 
@@ -97,7 +97,7 @@ export const MultiSelectField = forwardRef<HTMLDivElement, MultiSelectFieldProps
               focus:ring-2 focus:ring-primary-500 focus:border-primary-500
               disabled:bg-background-secondary disabled:cursor-not-allowed
               cursor-pointer flex flex-wrap gap-1 items-center
-              ${error ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''}
+              ${error ? 'border-error focus:ring-error focus:border-error' : ''}
               ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
             `}
             onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -203,7 +203,7 @@ export const MultiSelectField = forwardRef<HTMLDivElement, MultiSelectFieldProps
         </div>
 
         {error && (
-          <p className="mt-1 text-sm text-red-600">{error}</p>
+          <p className="mt-1 text-sm text-error">{error}</p>
         )}
         
         {maxSelections && (

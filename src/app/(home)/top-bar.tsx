@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { Bell, User, Search, LogOut, UserCircle, ShieldAlert, Moon, Sun, Bug } from "@/lib/icons";
+import { Bell, User, MagnifyingGlass, SignOut, UserCircle, ShieldWarning, Moon, Sun, Bug } from "@phosphor-icons/react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -157,13 +157,13 @@ export default function TopBar() {
 
   return (
     <>
-    <header className="bg-background-primary border-b border-border-primary shadow-sm sticky top-0 z-40 h-16">
+    <header className="bg-background-secondary border-b border-border-primary shadow-sm sticky top-0 z-40 h-16">
       <div className="pr-4 md:pr-6 h-full flex items-center justify-between">
         {/* Left side */}
         <div className="flex items-center">
           {!isApproved && (
             <div className="flex items-center text-amber-600">
-              <ShieldAlert className="h-5 w-5 mr-2" />
+              <ShieldWarning className="h-5 w-5 mr-2" />
               <span className="text-sm font-medium hidden md:inline">Restricted access</span>
             </div>
           )}
@@ -179,7 +179,7 @@ export default function TopBar() {
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-primary hover:bg-surface-hover text-foreground-tertiary transition-colors"
                 title="Search (Ctrl+K)"
               >
-                <Search className="h-4 w-4" />
+                <MagnifyingGlass className="h-4 w-4" />
                 <span className="hidden md:inline text-sm">Search...</span>
                 <div className="hidden lg:inline-flex items-center gap-0.5">
                   <kbd className="px-1.5 py-0.5 text-[11px] font-medium bg-surface-secondary rounded border border-border-primary shadow-sm">Ctrl</kbd>
@@ -207,7 +207,7 @@ export default function TopBar() {
                 <div className="relative">
                   <button 
                     onClick={() => setReportProblemModalOpen(true)}
-                    className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 dark:text-red-400 transition-colors"
+                    className="p-2 rounded-full hover:bg-error/10 dark:hover:bg-error/20 text-error transition-colors"
                     title="Report a problem"
                   >
                     <Bug className="h-5 w-5" />
@@ -223,7 +223,7 @@ export default function TopBar() {
                 >
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    <span className="absolute top-1 right-1 bg-error text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
@@ -254,7 +254,7 @@ export default function TopBar() {
 
             {/* User dropdown */}
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-surface-primary rounded-md shadow-lg py-1 z-[1100] border border-border-primary">
+              <div className="absolute right-0 mt-2 w-48 bg-surface-primary rounded-md shadow-lg py-1 z-1100 border border-border-primary">
                 <div className="px-4 py-2 border-b border-border-primary">
                   <p className="text-sm font-medium text-foreground-primary">{employeeInfo?.name || 'User'}</p>
                   <p className="text-xs text-foreground-tertiary">{employeeInfo?.role || 'Role'}</p>
@@ -277,8 +277,8 @@ export default function TopBar() {
                   className=" px-4 py-2 text-sm text-foreground-secondary hover:bg-background-tertiary dark:bg-surface-secondary flex items-center"
                   onClick={() => setUserMenuOpen(false)}
                 >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
+                  <Gear className="h-4 w-4 mr-2" />
+                  Gear
                 </Link> */}
 
                 <div className="border-t border-border-primary mt-1">
@@ -287,9 +287,9 @@ export default function TopBar() {
                       setUserMenuOpen(false);
                       handleLogout();
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-error hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center"
+                    className="w-full text-left px-4 py-2 text-sm text-error hover:bg-error/10 dark:hover:bg-error/20 flex items-center"
                   >
-                    <LogOut className="h-4 w-4 mr-2" />
+                    <SignOut className="h-4 w-4 mr-2" />
                     Log Out
                   </button>
                 </div>

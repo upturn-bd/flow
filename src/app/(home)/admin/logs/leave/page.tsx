@@ -6,7 +6,7 @@ import { useLeaveTypes } from "@/hooks/useLeaveManagement";
 import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
-import { Check, X as CloseIcon, RotateCw } from "@/lib/icons";
+import { Check, X as CloseIcon, ArrowsClockwise } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
@@ -80,9 +80,9 @@ export default function LeaveLogsPage() {
    };
 
    const statusStyles: Record<string, string> = {
-      Pending: "bg-yellow-100 text-yellow-800",
-      Accepted: "bg-green-100 text-green-800",
-      Rejected: "bg-red-100 text-red-800",
+      Pending: "bg-warning/10 text-warning dark:bg-warning/20",
+      Accepted: "bg-success/10 text-success dark:bg-success/20",
+      Rejected: "bg-error/10 text-error dark:bg-error/20",
    };
 
    const handleUpdateStatus = async (
@@ -173,17 +173,17 @@ export default function LeaveLogsPage() {
                            <td className="px-4 py-3 border-b flex gap-2">
                               {!isHistory && leave.status === "Pending" && (
                                  <>
-                                    <Button size="sm" variant="complete" className="p-2 hover:bg-green-100 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Accepted"); }}>
+                                    <Button size="sm" variant="complete" className="p-2 hover:bg-success/10 dark:hover:bg-success/20 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Accepted"); }}>
                                        <Check size={16} />
                                     </Button>
-                                    <Button size="sm" variant="danger" className="p-2 hover:bg-red-100 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Rejected"); }}>
+                                    <Button size="sm" variant="danger" className="p-2 hover:bg-error/10 dark:hover:bg-error/20 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Rejected"); }}>
                                        <CloseIcon size={16} />
                                     </Button>
                                  </>
                               )}
                               {isHistory && leave.status !== "Pending" && (
-                                 <Button size="sm" variant="outline" className="p-2 hover:bg-yellow-100 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Pending"); }}>
-                                    <RotateCw size={16} />
+                                 <Button size="sm" variant="outline" className="p-2 hover:bg-warning/10 dark:hover:bg-warning/20 transition-colors" onClick={(e) => { e.stopPropagation(); handleUpdateStatus(leave, "Pending"); }}>
+                                    <ArrowsClockwise size={16} />
                                  </Button>
                               )}
                            </td>
@@ -197,8 +197,8 @@ export default function LeaveLogsPage() {
    };
 
    const tabs: TabItem[] = [
-      { key: "requests", label: "Requests", icon: <Check size={16} />, color: "text-green-600", content: renderTable(false) },
-      { key: "history", label: "History", icon: <RotateCw size={16} />, color: "text-yellow-600", content: renderTable(true) },
+      { key: "requests", label: "Requests", icon: <Check size={16} />, color: "text-success", content: renderTable(false) },
+      { key: "history", label: "History", icon: <ArrowsClockwise size={16} />, color: "text-warning", content: renderTable(true) },
    ];
 
    return (
@@ -255,7 +255,7 @@ export default function LeaveLogsPage() {
                                  onClick={() => handleUpdateStatus(selectedLeave, "Pending")}
                               >
                                  <span className="flex items-center gap-2">
-                                    <RotateCw size={16} /> Mark Pending
+                                    <ArrowsClockwise size={16} /> Mark Pending
                                  </span>
                               </Button>
                            )}

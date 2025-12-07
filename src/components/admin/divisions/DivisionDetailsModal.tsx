@@ -3,8 +3,8 @@
 "use client";
 
 import { Division } from "@/hooks/useDivisions";
-import { PencilSimple, Trash, User, FileText, X } from "@/lib/icons";
-import { Layers } from "@/lib/icons";
+import { PencilSimple, TrashSimple, User, FileText, X } from "@phosphor-icons/react";
+import { Stack } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { fadeIn, fadeInUp } from "@/components/ui/animations";
@@ -57,13 +57,13 @@ export default function DivisionDetailsModal({
       >
         <motion.div variants={fadeInUp} className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Layers size={24} className="text-foreground-secondary" />
+            <Stack size={24} className="text-foreground-secondary" />
             <h2 className="text-xl font-semibold text-foreground-primary">Division Details</h2>
           </div>
           <Button
             variant="ghost"
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 text-foreground-tertiary hover:text-red-500"
+            className="p-1 rounded-full hover:bg-error/10 dark:hover:bg-error/20 text-foreground-tertiary hover:text-error"
           >
             <X size={20} weight="bold" />
           </Button>
@@ -71,7 +71,7 @@ export default function DivisionDetailsModal({
 
         <motion.div variants={fadeInUp} className="mt-6 space-y-4">
           <div className="flex items-center gap-3 p-3 rounded-lg bg-background-secondary dark:bg-background-tertiary border border-border-primary">
-            <Layers size={20} className="text-foreground-secondary shrink-0" />
+            <Stack size={20} className="text-foreground-secondary shrink-0" />
             <div>
               <div className="text-sm text-foreground-secondary font-medium">Division Name</div>
               <div className="font-medium text-foreground-primary">{division?.name}</div>
@@ -96,14 +96,14 @@ export default function DivisionDetailsModal({
             className="flex items-center gap-2 border border-border-primary text-foreground-secondary hover:bg-background-secondary dark:hover:bg-background-tertiary"
           >
             <PencilSimple size={18} weight="bold" />
-            Edit
+            PencilSimple
           </Button>
           <Button
             variant="danger"
             onClick={deleteDivision}
-            className="flex items-center gap-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:border-red-300"
+            className="flex items-center gap-2 bg-error/10 dark:bg-error/20 hover:bg-error/20 dark:hover:bg-error/30 text-error border border-error/20 hover:border-error/30"
           >
-            <Trash size={18} weight="bold" />
+            <TrashSimple size={18} weight="bold" />
             Delete
           </Button>
         </motion.div>

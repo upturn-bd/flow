@@ -6,7 +6,7 @@ export default function PayrollSettingsPage() {
   return (
     <>
       <h1 className="text-3xl font-bold text-foreground-primary mb-8">
-          Payroll Settings Configuration
+          Payroll Configuration
       </h1>
       {/* Assuming PayrollTab contains the specific configuration logic */}
       <EmployeeSalaryList />

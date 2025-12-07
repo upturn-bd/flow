@@ -3,11 +3,11 @@
 import { Attendance } from "@/hooks/useAttendance";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { CaretDown, Calendar, Search } from "@/lib/icons";
+import { CaretDown, Calendar, MagnifyingGlass } from "@phosphor-icons/react";
 import { formatTimeFromISO, formatDateToDayMonth } from "@/lib/utils";
 import { useSites } from "@/hooks/useAttendanceManagement";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { Clock } from "@/lib/icons";
+import { Clock } from "@phosphor-icons/react";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import ClickableStatusCell from "./ClickableStatusCell";
 
@@ -72,7 +72,7 @@ export default function AttendanceLatePage() {
               type="date"
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
-              className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
+              className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-full sm:w-auto min-w-[160px] text-sm"
             />
           </div>
 
@@ -84,7 +84,7 @@ export default function AttendanceLatePage() {
               type="date"
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
-              className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
+              className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-full sm:w-auto min-w-[160px] text-sm"
             />
           </div>
 
@@ -108,7 +108,7 @@ export default function AttendanceLatePage() {
             onClick={fetchAttendanceData}
             className="bg-[#192D46] text-white rounded-lg px-4 py-2.5 font-medium hover:bg-[#0f1c2d] transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
           >
-            <Search />
+            <MagnifyingGlass />
             <span>Search</span>
           </button>
         </div>

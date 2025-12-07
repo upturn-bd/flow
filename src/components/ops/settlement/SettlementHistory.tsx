@@ -6,17 +6,7 @@ import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useSettlementRequests } from "@/hooks/useSettlement";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  FileText, 
-  DollarSign, 
-  Calendar, 
-  User, 
-  CheckCheck, 
-  XCircle,
-  Clock,
-  MessageCircle,
-  FormInput
-} from "@/lib/icons";
+import { FileText, CurrencyDollar, Calendar, User, Checks, XCircle, Clock, ChatCircle, Textbox } from "@phosphor-icons/react";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { extractEmployeeIds } from "@/lib/utils/project-utils";
 
@@ -67,7 +57,7 @@ export default function SettlementHistoryPage() {
       {loading && (
         <LoadingSection 
           text="Loading settlement history..."
-          icon={FormInput}
+          icon={Textbox}
           color="blue"
           />
       )}
@@ -80,8 +70,8 @@ export default function SettlementHistoryPage() {
           exit={{ opacity: 0 }}
           className="flex flex-col items-center justify-center py-16"
         >
-          <XCircle className="h-12 w-12 text-red-500 mb-2" />
-          <p className="text-red-500 font-medium">{error}</p>
+          <XCircle className="h-12 w-12 text-error mb-2" />
+          <p className="text-error font-medium">{error}</p>
         </motion.div>
       )}
       
@@ -108,7 +98,7 @@ export default function SettlementHistoryPage() {
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex items-start gap-2">
-                        <DollarSign size={18} className="text-green-600 mt-1 shrink-0" />
+                        <CurrencyDollar size={18} className="text-success mt-1 shrink-0" />
                         <div>
                           <h3 className="font-medium text-foreground-primary">
                             {claimTypes.find(type => type.id === settlement.settlement_type_id)?.settlement_item || "Unknown"}
@@ -121,13 +111,13 @@ export default function SettlementHistoryPage() {
                       
                       <div className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full
                         ${settlement.status === 'Approved' 
-                          ? 'bg-green-100 text-green-800' 
+                          ? 'bg-success/10 text-success dark:bg-success/20' 
                           : settlement.status === 'Rejected'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-yellow-100 text-yellow-800'
+                          ? 'bg-error/10 text-error dark:bg-error/20'
+                          : 'bg-warning/10 text-warning dark:bg-warning/20'
                         }`}>
                         {settlement.status === 'Approved' ? (
-                          <CheckCheck size={12} />
+                          <Checks size={12} />
                         ) : settlement.status === 'Rejected' ? (
                           <XCircle size={12} />
                         ) : (
@@ -170,7 +160,7 @@ export default function SettlementHistoryPage() {
                     {settlement.comment && (
                       <div className="mt-3 text-sm text-foreground-secondary bg-primary-50 dark:bg-primary-900/30 p-3 rounded-md">
                         <div className="flex items-center gap-2 mb-1">
-                          <MessageCircle size={14} />
+                          <ChatCircle size={14} />
                           <p className="font-medium">Feedback:</p>
                         </div>
                         <p>{settlement.comment}</p>
@@ -206,7 +196,7 @@ export default function SettlementHistoryPage() {
               className="flex flex-col items-center justify-center py-12 text-center"
             >
               <div className="bg-background-secondary dark:bg-background-tertiary rounded-full p-4 mb-4">
-                <DollarSign className="h-12 w-12 text-foreground-tertiary" />
+                <CurrencyDollar className="h-12 w-12 text-foreground-tertiary" />
               </div>
               <h3 className="text-lg font-medium text-foreground-primary">No settlement history</h3>
               <p className="mt-1 text-foreground-tertiary">Completed settlement requests will appear here</p>

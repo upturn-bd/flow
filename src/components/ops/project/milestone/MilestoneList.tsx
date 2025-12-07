@@ -2,17 +2,7 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Calendar,
-  ArrowRight,
-  Pencil,
-  Trash,
-  Plus,
-  Target,
-  Users,
-  Scale,
-  Copy,
-} from "@/lib/icons";
+import { Calendar, ArrowRight, Pencil, TrashSimple, Plus, Target, Users, Scales, Copy } from "@phosphor-icons/react";
 import { type Milestone as MilestoneType } from "./MilestoneForm";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -32,21 +22,21 @@ interface MilestoneListProps {
 // Weightage progress bar component
 function WeightageProgressBar({ total }: { total: number }) {
   const getProgressColor = () => {
-    if (total === 100) return "bg-green-500";
-    if (total > 100) return "bg-red-500";
-    return "bg-blue-500";
+    if (total === 100) return "bg-success";
+    if (total > 100) return "bg-error";
+    return "bg-primary-500";
   };
 
   const getTextColor = () => {
-    if (total === 100) return "text-green-700";
-    if (total > 100) return "text-red-700";
-    return "text-blue-700";
+    if (total === 100) return "text-success";
+    if (total > 100) return "text-error";
+    return "text-primary-600 dark:text-primary-400";
   };
 
   const getBgColor = () => {
-    if (total === 100) return "bg-green-50 border-green-200";
-    if (total > 100) return "bg-red-50 border-red-200";
-    return "bg-blue-50 border-blue-200";
+    if (total === 100) return "bg-success/10 border-success/30 dark:bg-success/20";
+    if (total > 100) return "bg-error/10 border-error/30 dark:bg-error/20";
+    return "bg-primary-50 border-primary-200 dark:bg-primary-900/20 dark:border-primary-700";
   };
 
   return (
@@ -98,7 +88,7 @@ export default function MilestoneList({
                 onClick={onDistributeEvenly}
                 title="Distribute weightage evenly"
               >
-                <Scale size={16} className="mr-1" />
+                <Scales size={16} className="mr-1" />
                 Distribute
               </Button>
             )}
@@ -172,7 +162,7 @@ export default function MilestoneList({
                           onClick={() => m.milestone_title && onDelete(m.milestone_title)}
                           title="Delete milestone"
                         >
-                          <Trash size={14} />
+                          <TrashSimple size={14} />
                         </Button>
                       </div>
                     </div>

@@ -4,7 +4,7 @@ import { FormField, SelectField, NumberField, SingleEmployeeSelector } from '@/c
 import { validateClaimType, type ClaimTypeData } from '@/lib/validation';
 import { useEmployees } from '@/hooks/useEmployees';
 import { usePositions } from '@/hooks/usePositions';
-import { Receipt, UserPlus, Money } from '@/lib/icons';
+import { Receipt, UserPlus, CurrencyDollar } from "@phosphor-icons/react";
 
 interface ClaimTypeUpdateModalProps {
   isOpen: boolean;
@@ -68,7 +68,7 @@ export const ClaimTypeUpdateModal: React.FC<ClaimTypeUpdateModalProps> = ({
             required
             min={1}
             placeholder="Enter allowance amount"
-            icon={<Money size={18} weight="duotone" className="text-foreground-tertiary" />}
+            icon={<CurrencyDollar size={18} weight="duotone" className="text-foreground-tertiary" />}
           />
 
           <SingleEmployeeSelector

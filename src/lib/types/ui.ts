@@ -39,7 +39,7 @@ export interface GridLayoutProps extends BaseComponentProps {
   minColumnWidth?: string;
 }
 
-// Navigation types
+// NavigationArrow types
 export interface BreadcrumbItem {
   label: string;
   href?: string;

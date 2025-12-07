@@ -12,7 +12,7 @@ export default function BasicSettingsPage() {
     <>
       {/* The layout handles the main title now, but you can keep a page-specific title if needed */}
       <h1 className="text-3xl font-bold text-foreground-primary mb-8">
-          Basic Settings Configuration
+          Basic Configuration
       </h1>
       
       {/* Permission Banner */}

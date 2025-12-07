@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckSquare, Clock } from '@/lib/icons';
+import { CheckSquare, Clock } from "@phosphor-icons/react";
 import { staggerContainer, fadeInUp } from '@/components/ui/animations';
 import { cn } from '@/components/ui/class';
 import { formatDateToDayMonth } from '@/lib/utils';
@@ -53,7 +53,7 @@ export default function TaskListSection({
                   <div className="flex items-center space-x-3">
                     <div className={cn(
                       "w-2 h-2 rounded-full",
-                      new Date(task.end_date) < new Date() ? "bg-red-500" : "bg-green-500"
+                      new Date(task.end_date) < new Date() ? "bg-error" : "bg-success"
                     )}></div>
                     <span>{task.task_title}</span>
                   </div>

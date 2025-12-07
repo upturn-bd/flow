@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
-import { Plus, Settings, Trash, Edit } from "@/lib/icons";
+import { Plus, Gear, TrashSimple, PencilSimple } from "@phosphor-icons/react";
 import { StakeholderProcess } from "@/lib/types/schemas";
 import ProcessForm from "@/components/stakeholder-processes/ProcessForm";
 import { InlineSpinner } from "@/components/ui";
@@ -54,7 +54,7 @@ export default function StakeholderProcessesPage() {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-error/10 border border-error/30 text-error dark:bg-error/20 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
@@ -69,7 +69,7 @@ export default function StakeholderProcessesPage() {
       {/* Empty State */}
       {!loading && processes.length === 0 && (
         <div className="text-center py-12 bg-background-secondary dark:bg-background-tertiary rounded-lg border-2 border-dashed border-border-secondary">
-          <Settings className="mx-auto h-12 w-12 text-foreground-tertiary" />
+          <Gear className="mx-auto h-12 w-12 text-foreground-tertiary" />
           <h3 className="mt-2 text-sm font-semibold text-foreground-primary">No processes</h3>
           <p className="mt-1 text-sm text-foreground-tertiary">
             Get started by creating a new stakeholder process.
@@ -99,7 +99,7 @@ export default function StakeholderProcessesPage() {
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-semibold text-foreground-primary">{process.name}</h3>
                     {process.is_active ? (
-                      <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded">
+                      <span className="px-2 py-0.5 text-xs font-medium bg-success/10 text-success dark:bg-success/20 rounded">
                         Active
                       </span>
                     ) : (
@@ -148,18 +148,18 @@ export default function StakeholderProcessesPage() {
                     className="p-2 text-foreground-secondary hover:text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
                     title="Edit process"
                   >
-                    <Edit size={18} />
+                    <PencilSimple size={18} />
                   </button>
                   <button
                     onClick={() => handleDelete(process.id!)}
                     disabled={processingId === process.id}
-                    className="p-2 text-foreground-secondary hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                    className="p-2 text-foreground-secondary hover:text-error hover:bg-error/10 dark:hover:bg-error/20 rounded transition-colors disabled:opacity-50"
                     title="Delete process"
                   >
                     {processingId === process.id ? (
                       <InlineSpinner size="sm" color="red" />
                     ) : (
-                      <Trash size={18} />
+                      <TrashSimple size={18} />
                     )}
                   </button>
                 </div>

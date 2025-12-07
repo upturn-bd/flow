@@ -1,6 +1,6 @@
 "use client";
 
-import { Info, X } from "@/lib/icons";
+import { Info, X } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useState } from "react";
 
@@ -45,7 +45,7 @@ export default function CompanyBasicsConfigView() {
       {/* Notification */}
       {notification.visible && (
         <div
-          className={`fixed top-4 right-4 z-50 p-3 sm:p-4 rounded-lg shadow-lg flex items-center gap-2 max-w-[90vw] sm:max-w-md ${notification.isError ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+          className={`fixed top-4 right-4 z-50 p-3 sm:p-4 rounded-lg shadow-lg flex items-center gap-2 max-w-[90vw] sm:max-w-md ${notification.isError ? 'bg-error/10 text-error dark:bg-error/20' : 'bg-success/10 text-success dark:bg-success/20'
             }`}
         >
           {notification.isError ? <X className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" /> : <Info className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />}

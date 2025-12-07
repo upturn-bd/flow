@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { EyeOff, Eye } from "@/lib/icons";
+import { EyeSlash, Eye } from "@phosphor-icons/react";
 import Link from "next/link";
 
 import { signup } from "../auth-actions";
@@ -135,7 +135,7 @@ const Signup = () => {
                   tabIndex={-1}
                 >
                   {showPassword ? (
-                    <EyeOff className="text-2xl" />
+                    <EyeSlash className="text-2xl" />
                   ) : (
                     <Eye className="text-2xl" />
                   )}
@@ -166,7 +166,7 @@ const Signup = () => {
                   tabIndex={-1}
                 >
                   {showConfirmPassword ? (
-                    <EyeOff className="text-2xl" />
+                    <EyeSlash className="text-2xl" />
                   ) : (
                     <Eye className="text-2xl" />
                   )}

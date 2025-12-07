@@ -9,7 +9,7 @@ import {
 } from ".";
 import { RequisitionInventory, useRequisitionTypes } from "@/hooks/useConfigTypes";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
-import { Trash, Package, Tag, Plus } from "@/lib/icons";
+import { TrashSimple, Package, Tag, Plus } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -164,9 +164,9 @@ export default function InventoryManagementView() {
                         onClick={() => type.id !== undefined && handleDeleteRequisitionType(type.id)}
                         isLoading={deleteLoading === type.id}
                         disabled={deleteLoading === type.id}
-                        className="ml-2 p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+                        className="ml-2 p-1 rounded-full text-foreground-tertiary hover:bg-error/10 hover:text-error dark:hover:bg-error/20"
                       >
-                        <Trash size={16} weight="bold" />
+                        <TrashSimple size={16} weight="bold" />
                       </Button>
                     </div>
                   ))}

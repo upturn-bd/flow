@@ -2,10 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  PackageOpen, 
-  Truck 
-} from "@/lib/icons";
+import { Package, Truck } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useRequisitionInventories } from "@/hooks/useConfigTypes";
@@ -121,7 +118,7 @@ export default function RequisitionRequestsPage() {
       
       {error && !loading && (
         <EmptyState 
-          icon={<PackageOpen className="h-12 w-12" />}
+          icon={<Package className="h-12 w-12" />}
           title="Error loading requests"
           description={error}
         />
@@ -151,7 +148,7 @@ export default function RequisitionRequestsPage() {
             </div>
           ) : (
             <EmptyState 
-              icon={<PackageOpen className="h-12 w-12" />}
+              icon={<Package className="h-12 w-12" />}
               title="No pending requisition requests"
               description="When users submit requisition requests, they'll appear here"
             />

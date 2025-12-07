@@ -4,21 +4,11 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import EducationModal from "@/components/education-and-experience/EducationModal";
 import ExperienceModal from "@/components/education-and-experience/ExperienceModal";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  GraduationCap, 
-  Briefcase, 
-  Plus, 
-  Pencil, 
-  Trash, 
-  FileText, 
-  BookOpen,
-  Building,
-  Calendar 
-} from "@/lib/icons";
+import { GraduationCap, Briefcase, Plus, Pencil, TrashSimple, FileText, BookOpen, Building, Calendar } from "@phosphor-icons/react";
 import { Education } from "@/hooks/useProfile";
 import { Experience } from "@/lib/types";
 import { extractFilenameFromUrl } from "@/lib/utils";
-import { FilePdf } from "@/lib/icons";
+import { FilePdf } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useProfile } from "@/hooks/useProfile";
 import { showNotification } from "@/lib/utils/notifications";
@@ -223,7 +213,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
   const getFileIcon = (filename: string) => {
     const extension = filename.split('.').pop()?.toLowerCase() || '';
     if (['pdf'].includes(extension)) {
-      return <FilePdf className="text-red-600 h-5 w-5" />;
+      return <FilePdf className="text-error h-5 w-5" />;
     }
     return <FileText className="text-primary-600 h-5 w-5" />;
   };
@@ -350,10 +340,10 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                       </button>
                       <button
                         onClick={() => handleDeleteEducation(edu.id ?? 0)}
-                        className="p-1.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                        className="p-1.5 text-slate-600 hover:text-error hover:bg-error/10 dark:hover:bg-error/20 rounded-full transition-colors"
                         disabled={isEducationActionLoading}
                       >
-                        <Trash className="h-4 w-4" />
+                        <TrashSimple className="h-4 w-4" />
                       </button>
                     </div>
                   )}
@@ -448,10 +438,10 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                       </button>
                       <button
                         onClick={() => handleDeleteExperience(exp.id ?? 0)}
-                        className="p-1.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                        className="p-1.5 text-slate-600 hover:text-error hover:bg-error/10 dark:hover:bg-error/20 rounded-full transition-colors"
                         disabled={isExperienceActionLoading}
                       >
-                        <Trash className="h-4 w-4" />
+                        <TrashSimple className="h-4 w-4" />
                       </button>
                     </div>
                   )}

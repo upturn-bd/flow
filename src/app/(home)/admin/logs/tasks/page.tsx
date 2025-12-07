@@ -5,7 +5,7 @@ import { useTasks } from "@/hooks/useTasks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
-import { Trash, RotateCcw, CheckCircle, Edit } from "@/lib/icons";
+import { TrashSimple, ArrowCounterClockwise, CheckCircle, PencilSimple } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import TaskUpdateModal from "@/components/ops/tasks/shared/TaskUpdateModal";
@@ -133,7 +133,7 @@ export default function CompanyTaskLogsPage() {
                            <span className="bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full">
                               Start: {task.start_date ? task.start_date : "N/A"}
                            </span>
-                           <span className={`px-2 py-0.5 rounded-full ${completed ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                           <span className={`px-2 py-0.5 rounded-full ${completed ? 'bg-success/10 text-success dark:bg-success/20' : 'bg-warning/10 text-warning dark:bg-warning/20'}`}>
                               Due: {task.end_date ? task.end_date : "No due date"}
                            </span>
                         </div>
@@ -170,7 +170,7 @@ export default function CompanyTaskLogsPage() {
                                     onClick={() => task.id && handleReopen(task.id)}
                                     className="p-2"
                                  >
-                                    <RotateCcw size={16} />
+                                    <ArrowCounterClockwise size={16} />
                                  </Button>
                               )}
                            </>
@@ -187,7 +187,7 @@ export default function CompanyTaskLogsPage() {
                                  onClick={() => handleEdit(task)}
                                  className="p-2"
                               >
-                                 <Edit size={16} />
+                                 <PencilSimple size={16} />
                               </Button>
                            )}
 
@@ -199,7 +199,7 @@ export default function CompanyTaskLogsPage() {
                               onClick={() => task.id && handleDelete(task.id)}
                               className="p-2"
                            >
-                              <Trash size={16} />
+                              <TrashSimple size={16} />
                            </Button>
                         )}
                      </div>
@@ -225,7 +225,7 @@ export default function CompanyTaskLogsPage() {
                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setSearch(e.target.value)
                      }
-                     className="w-full sm:w-1/3 px-3 py-2 border border-border-secondary rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                     className="w-full sm:w-1/3 px-3 py-2 border border-border-secondary rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                   />
                </div>
 
@@ -243,7 +243,7 @@ export default function CompanyTaskLogsPage() {
                                     <InlineSpinner size="md" color="primary" />
                                  </div>
                               ) : error ? (
-                                 <p className="text-red-500">
+                                 <p className="text-error">
                                     Error loading tasks: {error.message}
                                  </p>
                               ) : (
@@ -256,7 +256,7 @@ export default function CompanyTaskLogsPage() {
                         key: "completed",
                         label: "Completed Tasks",
                         icon: <></>,
-                        color: "text-green-500",
+                        color: "text-success",
                         content: (
                            <>
                               {loading ? (
@@ -264,7 +264,7 @@ export default function CompanyTaskLogsPage() {
                                     <InlineSpinner size="md" color="primary" />
                                  </div>
                               ) : error ? (
-                                 <p className="text-red-500">
+                                 <p className="text-error">
                                     Error loading tasks: {error.message}
                                  </p>
                               ) : (

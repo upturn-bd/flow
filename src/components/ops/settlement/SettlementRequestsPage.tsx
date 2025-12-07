@@ -5,23 +5,13 @@ import { extractFileNameFromStoragePath, extractFilenameFromUrl } from "@/lib/ut
 import { useClaimTypes } from "@/hooks/useConfigTypes";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useSettlementRequests } from "@/hooks/useSettlement";
-import { 
-  FileText, 
-  DollarSign, 
-  Calendar, 
-  User, 
-  Clock, 
-  Check, 
-  X,
-  MessageCircle,
-  List
-} from "@/lib/icons";
+import { FileText, CurrencyDollar, Calendar, User, Clock, Check, X, ChatCircle, List } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
-import { ArrowArcLeft } from "@/lib/icons";
+import { ArrowBendUpLeft } from "@phosphor-icons/react";
 import { extractEmployeeIds } from "@/lib/utils/project-utils";
 
 // Define the structure of a settlement request
@@ -94,7 +84,7 @@ export default function SettlementRequestsPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
-        <div className="text-red-500 mb-2">Error loading settlement requests</div>
+        <div className="text-error mb-2">Error loading settlement requests</div>
         <p className="text-foreground-secondary">{error}</p>
       </div>
     );
@@ -118,7 +108,7 @@ export default function SettlementRequestsPage() {
         ))
       ) : (
         <EmptyState
-          icon={<DollarSign className="w-12 h-12" />}
+          icon={<CurrencyDollar className="w-12 h-12" />}
           title="No pending settlement requests"
           description="When users submit settlement requests, they'll appear here for review."
         />
@@ -156,7 +146,7 @@ function SettlementRequestCard({
         size="sm"
         onClick={onReject}
         disabled={isProcessing}
-        className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+        className="flex items-center gap-2 text-error border-error/20 hover:bg-error/10"
       >
         <X size={14} />
         Reject
@@ -180,7 +170,7 @@ function SettlementRequestCard({
       <CardHeader
         title={claimType?.settlement_item || "Unknown Settlement Type"}
         subtitle={`Amount: ${settlement.amount} BDT${settlement.in_advance ? " (Advance)" : ""}`}
-        icon={<DollarSign size={20} className="text-green-500" />}
+        icon={<CurrencyDollar size={20} className="text-success" />}
         action={actions}
       />
       
@@ -217,7 +207,7 @@ function SettlementRequestCard({
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground-primary mb-2">
-              <MessageCircle size={16} className="inline mr-2" />
+              <ChatCircle size={16} className="inline mr-2" />
               Add Comment
             </label>
             <textarea

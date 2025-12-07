@@ -12,19 +12,19 @@ export interface BadgeProps {
 }
 
 const variantClasses = {
-  success: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800",
-  warning: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800",
-  error: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800",
-  info: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800",
+  success: "bg-success/10 text-success border-success/30 dark:bg-success/20",
+  warning: "bg-warning/10 text-warning border-warning/30 dark:bg-warning/20",
+  error: "bg-error/10 text-error border-error/30 dark:bg-error/20",
+  info: "bg-info/10 text-info border-info/30 dark:bg-info/20",
   default: "bg-surface-secondary text-foreground-secondary border-border-primary",
   primary: "bg-primary-100 text-primary-800 border-primary-200 dark:bg-primary-900/30 dark:text-primary-400 dark:border-primary-800",
 };
 
 const dotVariantClasses = {
-  success: "bg-green-500",
-  warning: "bg-yellow-500",
-  error: "bg-red-500",
-  info: "bg-blue-500",
+  success: "bg-success",
+  warning: "bg-warning",
+  error: "bg-error",
+  info: "bg-info",
   default: "bg-foreground-tertiary",
   primary: "bg-primary-500",
 };

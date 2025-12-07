@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { DollarSign, Edit, Save, X, AlertTriangle, CheckCircle, Users, History } from '@/lib/icons';
+import { CurrencyDollar, PencilSimple, FloppyDisk, X, Warning, CheckCircle, Users, ClockCounterClockwise } from "@phosphor-icons/react";
 import { useSalaryManagement } from '@/hooks/useSalaryManagement';
 import { useEmployees } from '@/hooks/useEmployees';
 import { formatDate } from '@/lib/utils';
@@ -89,7 +89,7 @@ export default function SalaryManagementModal({
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <DollarSign className="h-6 w-6 text-green-600 mr-2" />
+              <CurrencyDollar className="h-6 w-6 text-success mr-2" />
               <h2 className="text-xl font-semibold text-foreground-primary">Manage Salary</h2>
             </div>
             <button
@@ -118,7 +118,7 @@ export default function SalaryManagementModal({
                   placeholder="Enter new salary amount"
                   min={0}
                   step={100}
-                  icon={<DollarSign size={18} className="text-foreground-tertiary" />}
+                  icon={<CurrencyDollar size={18} className="text-foreground-tertiary" />}
                 />
                   
                 {/* Salary Change Indicator */}
@@ -128,7 +128,7 @@ export default function SalaryManagementModal({
                       ? 'bg-success/10 text-success border border-success/20' 
                       : 'bg-error/10 text-error border border-error/20'
                   }`}>
-                    <AlertTriangle className="h-4 w-4 mr-1" />
+                    <Warning className="h-4 w-4 mr-1" />
                     {isIncrease ? 'Increase' : 'Decrease'} of ৳{Math.abs(salaryDifference).toLocaleString()}
                   </div>
                 )}
@@ -144,10 +144,10 @@ export default function SalaryManagementModal({
 
                 {/* Error Display */}
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                  <div className="bg-error/10 border border-error/30 rounded-md p-3">
                     <div className="flex">
-                      <AlertTriangle className="h-5 w-5 text-red-400 mr-2" />
-                      <p className="text-sm text-red-700">{error.message}</p>
+                      <Warning className="h-5 w-5 text-error mr-2" />
+                      <p className="text-sm text-error">{error.message}</p>
                     </div>
                   </div>
                 )}
@@ -158,7 +158,7 @@ export default function SalaryManagementModal({
                     onClick={handleShowHistory}
                     className="flex-1 px-4 py-2 text-sm font-medium text-foreground-secondary bg-surface-secondary border border-border-secondary rounded-md hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary-500 flex items-center justify-center transition-colors"
                   >
-                    <History className="h-4 w-4 mr-1" />
+                    <ClockCounterClockwise className="h-4 w-4 mr-1" />
                     View History
                   </button>
                   <button
@@ -171,7 +171,7 @@ export default function SalaryManagementModal({
                   <button
                     onClick={handleSaveSalary}
                     disabled={loading || newSalary === currentSalary.toString()}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 flex items-center justify-center"
+                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 flex items-center justify-center"
                   >
                     {loading ? (
                       <>
@@ -180,7 +180,7 @@ export default function SalaryManagementModal({
                       </>
                     ) : (
                       <>
-                        <Save className="h-4 w-4 mr-1" />
+                        <FloppyDisk className="h-4 w-4 mr-1" />
                         Update Salary
                       </>
                     )}
@@ -197,13 +197,13 @@ export default function SalaryManagementModal({
                       onClick={() => setShowHistory(false)}
                       className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                     >
-                      Back to Edit
+                      Back to PencilSimple
                     </button>
                   </div>
 
                   {salaryHistory.length === 0 ? (
                     <div className="text-center py-6">
-                      <History className="h-8 w-8 text-foreground-tertiary mx-auto mb-2" />
+                      <ClockCounterClockwise className="h-8 w-8 text-foreground-tertiary mx-auto mb-2" />
                       <p className="text-sm text-foreground-tertiary">No salary change history found</p>
                     </div>
                   ) : (
@@ -223,8 +223,8 @@ export default function SalaryManagementModal({
                                   </span>
                                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                                     isIncrease 
-                                      ? 'bg-green-100 text-green-700' 
-                                      : 'bg-red-100 text-red-700'
+                                      ? 'bg-success/10 text-success' 
+                                      : 'bg-error/10 text-error'
                                   }`}>
                                     {isIncrease ? '+' : ''}৳{difference.toLocaleString()}
                                   </span>
@@ -299,7 +299,7 @@ export function EmployeeSalaryList() {
       <div className="bg-surface-primary rounded-lg shadow">
         <div className="px-6 py-4 border-b border-border-primary">
           <h3 className="text-lg font-medium text-foreground-primary flex items-center">
-            <DollarSign className="h-5 w-5 text-green-600 mr-2" />
+            <CurrencyDollar className="h-5 w-5 text-success mr-2" />
             Employee Salary Management
           </h3>
         </div>
@@ -348,8 +348,8 @@ export function EmployeeSalaryList() {
                           onClick={() => handleEditSalary(employee)}
                           className="inline-flex items-center px-3 py-1 border border-primary-300 dark:border-primary-600 rounded-md text-sm text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 hover:bg-primary-100 dark:hover:bg-primary-900/50 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
                         >
-                          <Edit className="h-3 w-3 mr-1" />
-                          Edit Salary
+                          <PencilSimple className="h-3 w-3 mr-1" />
+                          PencilSimple Salary
                         </button>
                       </td>
                     </tr>

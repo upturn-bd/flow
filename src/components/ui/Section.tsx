@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { fadeInUp } from "./animations";
 import LoadingSpinner from "./LoadingSpinner";
 import { EmptyState } from "./EmptyState";
-import { Plus, IconType } from "@/lib/icons";
+import { Plus, Icon } from "@phosphor-icons/react";
 import { Button } from "./button";
 
 export interface SectionProps {
@@ -21,7 +21,7 @@ export interface SectionProps {
   children: ReactNode;
   loading?: boolean;
   loadingText?: string;
-  loadingIcon?: IconType;
+  loadingIcon?: Icon;
   emptyState?: {
     show: boolean;
     icon?: ReactNode;

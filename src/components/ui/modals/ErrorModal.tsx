@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XCircle, X } from '@/lib/icons';
+import { XCircle, X } from "@phosphor-icons/react";
 import Portal from '@/components/ui/Portal';
 
 interface ErrorModalProps {
@@ -74,7 +74,7 @@ export default function ErrorModal({
                       stiffness: 200,
                       delay: 0.1 
                     }}
-                    className="mx-auto w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-6"
+                    className="mx-auto w-20 h-20 bg-error/10 dark:bg-error/20 rounded-full flex items-center justify-center mb-6"
                   >
                     <motion.div
                       initial={{ scale: 0, rotate: -180 }}
@@ -86,7 +86,7 @@ export default function ErrorModal({
                         delay: 0.2 
                       }}
                     >
-                      <XCircle className="w-12 h-12 text-red-600 dark:text-red-400" weight="fill" />
+                      <XCircle className="w-12 h-12 text-error" weight="fill" />
                     </motion.div>
                   </motion.div>
 
@@ -125,7 +125,7 @@ export default function ErrorModal({
                           initial={{ width: '100%' }}
                           animate={{ width: '0%' }}
                           transition={{ duration: autoCloseDuration / 1000, ease: 'linear' }}
-                          className="h-full bg-red-500"
+                          className="h-full bg-error"
                         />
                       </div>
                     </motion.div>
@@ -137,7 +137,7 @@ export default function ErrorModal({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
                     onClick={onClose}
-                    className="mt-6 px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors w-full sm:w-auto"
+                    className="mt-6 px-8 py-3 bg-error hover:bg-error/90 text-white font-medium rounded-lg transition-colors w-full sm:w-auto"
                   >
                     OK
                   </motion.button>

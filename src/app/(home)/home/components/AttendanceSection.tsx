@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, CheckSquare, MapPin, Navigation, AlertTriangle, AlertCircle, CheckCircle } from '@/lib/icons';
+import { Calendar, Clock, CheckSquare, MapPin, NavigationArrow, Warning, WarningCircle, CheckCircle } from "@phosphor-icons/react";
 import { cn } from '@/components/ui/class';
 import SectionHeader from './SectionHeader';
 import LoadingSection from './LoadingSection';
@@ -213,14 +213,14 @@ export default function AttendanceSection({
           <div className="space-y-6">
             {/* Status Messages */}
             {checkOutCompleted && checkInCompleted && (
-              <div className="flex items-center text-green-600 font-medium">
+              <div className="flex items-center text-success font-medium">
                 <CheckCircle className="mr-2 h-5 w-5" />
                 <span>Both check-in and check-out completed for today</span>
               </div>
             )}
 
             {!checkOutCompleted && checkInCompleted && (
-              <div className="flex items-center text-green-600 font-medium">
+              <div className="flex items-center text-success font-medium">
                 <CheckCircle className="mr-2 h-5 w-5" />
                 <span>Check-in completed for today</span>
               </div>
@@ -280,14 +280,14 @@ export default function AttendanceSection({
                   <div className="space-y-3">
                     {locationLoading && (
                       <div className="flex items-center gap-2 text-primary-600 text-sm">
-                        <Navigation className="w-4 h-4 animate-spin" />
+                        <NavigationArrow className="w-4 h-4 animate-spin" />
                         Getting your location...
                       </div>
                     )}
 
                     {locationError && (
-                      <div className="flex items-center gap-2 text-red-600 text-sm">
-                        <AlertCircle className="w-4 h-4" />
+                      <div className="flex items-center gap-2 text-error text-sm">
+                        <WarningCircle className="w-4 h-4" />
                         {locationError}
                       </div>
                     )}
@@ -308,7 +308,7 @@ export default function AttendanceSection({
 
                         {getDistanceToSite() && getDistanceToSite()! > 100 && (
                           <div className="flex items-center gap-2 mt-2 text-amber-700 text-xs">
-                            <AlertTriangle className="w-3 h-3" />
+                            <Warning className="w-3 h-3" />
                             You are more than 100m away from the site
                           </div>
                         )}
@@ -326,22 +326,22 @@ export default function AttendanceSection({
 
                       if (selectedSite) {
                         return (
-                          <div className={`border rounded-lg p-3 ${isLate ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
+                          <div className={`border rounded-lg p-3 ${isLate ? 'bg-error/5 border-error/30 dark:bg-error/10' : 'bg-success/5 border-success/30 dark:bg-success/10'}`}>
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <Clock className={`w-4 h-4 ${isLate ? 'text-red-600' : 'text-green-600'}`} />
-                                <span className={`text-sm font-medium ${isLate ? 'text-red-800' : 'text-green-800'}`}>
+                                <Clock className={`w-4 h-4 ${isLate ? 'text-error' : 'text-success'}`} />
+                                <span className={`text-sm font-medium ${isLate ? 'text-error' : 'text-success'}`}>
                                   Current Time: {currentTime}
                                 </span>
                               </div>
                               <span className={`text-xs px-2 py-1 rounded-full font-medium ${isLate
-                                  ? 'bg-red-100 text-red-800'
-                                  : 'bg-green-100 text-green-800'
+                                  ? 'bg-error/10 text-error dark:bg-error/20'
+                                  : 'bg-success/10 text-success dark:bg-success/20'
                                 }`}>
                                 {isLate ? 'Late' : 'On Time'}
                               </span>
                             </div>
-                            <div className={`text-xs mt-1 ${isLate ? 'text-red-700' : 'text-green-700'}`}>
+                            <div className={`text-xs mt-1 ${isLate ? 'text-error' : 'text-success'}`}>
                               Expected check-in: {selectedSite.check_in}
                             </div>
                           </div>
@@ -364,7 +364,7 @@ export default function AttendanceSection({
                   type="button"
                   disabled={isCheckingOut}
                   className={cn(
-                    "bg-yellow-500 text-white font-medium rounded-lg px-6 py-2.5 flex items-center gap-2 w-full sm:w-auto",
+                    "bg-warning text-white font-medium rounded-lg px-6 py-2.5 flex items-center gap-2 w-full sm:w-auto",
                     isCheckingOut && "opacity-50 cursor-not-allowed"
                   )}
                 >
@@ -423,8 +423,8 @@ export default function AttendanceSection({
                             );
                             return (
                               <span className={`text-xs px-2 py-1 rounded-full font-medium ${lateStatus === 'late'
-                                  ? 'bg-red-100 text-red-800'
-                                  : 'bg-green-100 text-green-800'
+                                  ? 'bg-error/10 text-error dark:bg-error/20'
+                                  : 'bg-success/10 text-success dark:bg-success/20'
                                 }`}>
                                 {lateStatus === 'late' ? 'Late' : 'On Time'}
                               </span>
@@ -448,8 +448,8 @@ export default function AttendanceSection({
                             );
                             return (
                               <span className={`text-xs px-2 py-1 rounded-full font-medium ${earlyStatus === 'early'
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : 'bg-green-100 text-green-800'
+                                  ? 'bg-warning/10 text-warning dark:bg-warning/20'
+                                  : 'bg-success/10 text-success dark:bg-success/20'
                                 }`}>
                                 {earlyStatus === 'early' ? 'Early' : 'On Time'}
                               </span>
@@ -464,7 +464,7 @@ export default function AttendanceSection({
                   </td>
                   <td className="px-4 py-3 text-sm">
                     {entry.tag === "Present" ? (
-                      <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-success/10 text-success dark:bg-success/20">
                         Present
                       </span>
                     ) : (

@@ -37,11 +37,11 @@ export default function ComplaintsTable({
                   onClick={() => onEdit(complaint.id)}
                   className="text-blue-600 hover:text-blue-900"
                 >
-                  Edit
+                  PencilSimple
                 </button>
                 <button
                   onClick={() => onDelete(complaint.id)}
-                  className="text-red-600 hover:text-red-900"
+                  className="text-error hover:text-error/80"
                 >
                   Delete
                 </button>

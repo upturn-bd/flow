@@ -5,7 +5,7 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { deleteFile, getPublicFileUrl } from "@/lib/utils/files";
 import { getEmployeeInfo } from "@/lib/utils/auth";
 import { StakeholderProcessStep, StakeholderStepData, FieldDefinition, NestedFieldValue } from "@/lib/types/schemas";
-import { Upload, X, CheckCircle, FileIcon, Loader, XCircle, Calculator, WarningCircle } from "@/lib/icons";
+import { Upload, X, CheckCircle, File, CircleNotch, XCircle, Calculator, WarningCircle } from "@phosphor-icons/react";
 import GeolocationPicker, { GeolocationValue } from "@/components/ui/GeolocationPicker";
 import DropdownField from "@/components/ui/DropdownField";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
@@ -948,7 +948,7 @@ export default function StepDataForm({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between bg-background-secondary p-3 rounded-lg">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileIcon className="text-primary-600 shrink-0" size={20} />
+                      <File className="text-primary-600 shrink-0" size={20} />
                       <span className="text-sm text-foreground-secondary truncate">
                         {getFileName()}
                       </span>
@@ -1253,7 +1253,7 @@ export default function StepDataForm({
               disabled={submitting || rejecting}
               className="w-full sm:w-auto px-4 py-2 text-sm border border-primary-300 text-primary-700 rounded-lg hover:bg-primary-50"
             >
-              Save Draft
+              FloppyDisk Draft
             </button>
             <button
               type="button"

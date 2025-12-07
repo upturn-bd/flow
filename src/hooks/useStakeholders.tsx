@@ -1147,7 +1147,7 @@ export function useStakeholders() {
         const isSequential = stakeholderData.process?.is_sequential || false;
         const allSteps = stakeholderData.process?.steps || [];
 
-        // Save the step data as completed
+        // FloppyDisk the step data as completed
         await saveStepData({
           stakeholder_id: stakeholderId,
           step_id: stepId,

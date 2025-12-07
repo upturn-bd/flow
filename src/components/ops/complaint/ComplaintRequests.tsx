@@ -2,19 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Loader,
-  XCircle,
-  Flag,
-  User,
-  Clock,
-  Check,
-  X,
-  MessageCircle,
-  FileText,
-  AlertTriangle,
-  List
-} from "@/lib/icons";
+import { CircleNotch, XCircle, Flag, User, Clock, Check, X, ChatCircle, FileText, Warning, List } from "@phosphor-icons/react";
 import { extractFileNameFromStoragePath, extractFilenameFromUrl } from "@/lib/utils";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useComplaints } from "@/hooks/useComplaints";
@@ -96,8 +84,8 @@ export default function ComplaintRequestsPage() {
 
       {error && !requestLoading && (
         <div className="flex flex-col items-center justify-center py-16">
-          <XCircle className="h-12 w-12 text-red-500 mb-4" />
-          <p className="text-red-500 font-medium">{error}</p>
+          <XCircle className="h-12 w-12 text-error mb-4" />
+          <p className="text-error font-medium">{error}</p>
         </div>
       )}
 

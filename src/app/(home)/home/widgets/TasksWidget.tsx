@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckSquare, Clock, Plus, CheckCircle, Circle } from '@/lib/icons';
+import { CheckSquare, Clock, Plus, CheckCircle, Circle } from "@phosphor-icons/react";
 import { cn } from '@/components/ui/class';
 import { formatDateToDayMonth } from '@/lib/utils';
 import BaseWidget from './BaseWidget';
@@ -139,7 +139,7 @@ export default function TasksWidget({ config, isEditMode, onToggle, onSizeChange
                   className={cn(
                     "flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-sm font-medium border cursor-pointer",
                     activeTab === 'completed'
-                      ? "bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 border-green-100 dark:border-green-800"
+                      ? "bg-success/10 dark:bg-success/20 hover:bg-success/20 dark:hover:bg-success/30 border-success/20 dark:border-success/30"
                       : "bg-background-secondary dark:bg-background-tertiary hover:bg-primary-50 dark:hover:bg-primary-900/30 border-border-primary"
                   )}
                 >

@@ -3,23 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Calendar, 
-  Building, 
-  User, 
-  Mail, 
-  Phone, 
-  Briefcase, 
-  Users, 
-  CircleCheck, 
-  WarningCircle, 
-  CheckCircle, 
-  Clock, 
-  XCircle, 
-  BadgeCheck, 
-  Send,
-  LogOut
-} from "@/lib/icons";
+import { Calendar, Building, User, Envelope, Phone, Briefcase, Users, CheckCircle, WarningCircle, Clock, XCircle, SealCheck, PaperPlaneTilt, SignOut } from "@phosphor-icons/react";
 import { logout } from "@/app/(auth)/auth-actions";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
@@ -299,7 +283,7 @@ export default function EmployeeOnboarding() {
                 onClick={logout}
                 className="flex items-center px-6 py-2 bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary rounded-lg hover:bg-surface-hover transition-colors"
               >
-                <LogOut className="mr-2 h-5 w-5" />
+                <SignOut className="mr-2 h-5 w-5" />
                 Logout
               </button>
             </div>
@@ -339,11 +323,11 @@ export default function EmployeeOnboarding() {
             <div className="relative">
               <div className="flex items-center">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  activeSection === "company" ? "bg-primary-600" : isCompanyCodeValid ? "bg-green-600" : "bg-gray-300"
+                  activeSection === "company" ? "bg-primary-600" : isCompanyCodeValid ? "bg-success" : "bg-gray-300"
                 } text-white font-medium`}>
                   {isCompanyCodeValid ? <CheckCircle size={18} /> : 1}
                 </div>
-                <div className={`h-1 w-20 sm:w-32 ${isCompanyCodeValid ? "bg-green-600" : "bg-gray-300"}`}></div>
+                <div className={`h-1 w-20 sm:w-32 ${isCompanyCodeValid ? "bg-success" : "bg-gray-300"}`}></div>
               </div>
               <div className="absolute -bottom-6 left-5 transform -translate-x-1/2 text-sm font-medium">
                 Company
@@ -382,19 +366,19 @@ export default function EmployeeOnboarding() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mb-8 bg-red-50 border-l-4 border-red-400 p-4 rounded-md shadow-sm"
+            className="mb-8 bg-error/10 border-l-4 border-error dark:bg-error/20 p-4 rounded-md shadow-sm"
           >
             <div className="flex items-start">
-              <XCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5" />
+              <XCircle className="h-5 w-5 text-error mr-3 mt-0.5" />
               <div>
-                <h3 className="text-lg font-medium text-red-800">Application Rejected</h3>
-                <p className="mt-1 text-red-700">
+                <h3 className="text-lg font-medium text-error">Application Rejected</h3>
+                <p className="mt-1 text-error/80">
                   Your application was rejected for the following reason:
                 </p>
-                <p className="mt-2 text-red-600 bg-red-100 p-2 rounded font-medium">
+                <p className="mt-2 text-error bg-error/10 dark:bg-error/20 p-2 rounded font-medium">
                   {reason || "No specific reason provided. Please reach out to HR for more details."}
                 </p>
-                <p className="mt-3 text-sm text-red-600">
+                <p className="mt-3 text-sm text-error">
                   Please update your information and resubmit your application.
                 </p>
               </div>
@@ -412,7 +396,7 @@ export default function EmployeeOnboarding() {
             onClick={logout}
             className="flex items-center px-4 py-2 text-sm bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary rounded-lg hover:bg-surface-hover transition-colors"
           >
-            <LogOut className="h-4 w-4 mr-2" />
+            <SignOut className="h-4 w-4 mr-2" />
             Logout
           </button>
         </motion.div>
@@ -455,7 +439,7 @@ export default function EmployeeOnboarding() {
                     <FormInputField
                       name="companyCode"
                       label="Company Code"
-                      icon={<BadgeCheck size={18} />}
+                      icon={<SealCheck size={18} />}
                       value={companyCode}
                       onChange={(e) => setCompanyCode(e.target.value)}
                       readOnly={!!status || isCompanyCodeValid}
@@ -469,9 +453,9 @@ export default function EmployeeOnboarding() {
                       {isCompanyCodeValid ? (
                         <button
                           type="button"
-                          className="flex items-center justify-center w-full sm:w-auto px-6 py-2 rounded-lg bg-green-100 text-green-700 cursor-default"
+                          className="flex items-center justify-center w-full sm:w-auto px-6 py-2 rounded-lg bg-success/10 text-success dark:bg-success/20 cursor-default"
                         >
-                          <CircleCheck className="mr-2 h-5 w-5" />
+                          <CheckCircle className="mr-2 h-5 w-5" />
                           Verified Successfully
                         </button>
                       ) : (
@@ -488,7 +472,7 @@ export default function EmployeeOnboarding() {
                             </>
                           ) : (
                             <>
-                              <BadgeCheck className="mr-2 h-5 w-5" />
+                              <SealCheck className="mr-2 h-5 w-5" />
                               Verify Company Code
                             </>
                           )}
@@ -542,7 +526,7 @@ export default function EmployeeOnboarding() {
                       <FormInputField
                         name="email"
                         label="Email Address"
-                        icon={<Mail size={18} />}
+                        icon={<Envelope size={18} />}
                         value={formData.email}
                         onChange={handleChange}
                         type="email"
@@ -635,12 +619,12 @@ export default function EmployeeOnboarding() {
                           </>
                         ) : status === "rejected" ? (
                           <>
-                            <Send className="mr-2 h-5 w-5" />
+                            <PaperPlaneTilt className="mr-2 h-5 w-5" />
                             Resubmit Application
                           </>
                         ) : (
                           <>
-                            <Send className="mr-2 h-5 w-5" />
+                            <PaperPlaneTilt className="mr-2 h-5 w-5" />
                             Submit Application
                           </>
                         )}
@@ -651,7 +635,7 @@ export default function EmployeeOnboarding() {
                       <motion.div 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm"
+                        className="mt-4 p-3 bg-error/10 border border-error/30 dark:bg-error/20 rounded-md text-error text-sm"
                       >
                         <div className="flex items-start">
                           <WarningCircle className="h-5 w-5 mr-2 shrink-0" />

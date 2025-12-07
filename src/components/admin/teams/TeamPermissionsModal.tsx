@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, FloppyDisk } from '@/lib/icons';
+import { X, FloppyDisk } from "@phosphor-icons/react";
 import { TeamWithPermissions, TeamPermission, PermissionCategory, Permission } from '@/lib/types';
 import { supabase } from '@/lib/supabase/client';
 import { useTeams } from '@/hooks/useTeams';
@@ -389,7 +389,7 @@ export default function TeamPermissionsModal({
               className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-lg hover:from-primary-700 hover:to-purple-700 active:scale-[0.98] transition-all disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed font-medium shadow-md hover:shadow-lg"
             >
               <FloppyDisk size={20} />
-              {isSaving ? 'Saving...' : 'Save Permissions'}
+              {isSaving ? 'Saving...' : 'FloppyDisk Permissions'}
             </button>
           </div>
         </div>

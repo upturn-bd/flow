@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { X, MagnifyingGlass, UserPlus, Trash, Users } from '@/lib/icons';
+import { X, MagnifyingGlass, UserPlus, TrashSimple, Users } from "@phosphor-icons/react";
 import { TeamWithMembers } from '@/lib/types';
 import { useEmployees, ExtendedEmployee } from '@/hooks/useEmployees';
 import { useTeams } from '@/hooks/useTeams';
@@ -40,14 +40,14 @@ export default function TeamMembersModal({
     [team.members]
   );
 
-  // Filter available employees (not already members) - use extendedEmployees for more info
+  // FunnelSimple available employees (not already members) - use extendedEmployees for more info
   const availableEmployees = useMemo(() => {
     const employeeList = extendedEmployees.length > 0 ? extendedEmployees : employees;
     if (!employeeList) return [];
     return employeeList.filter((emp) => !memberIds.has(emp.id));
   }, [employees, extendedEmployees, memberIds]);
 
-  // Filter employees by search term
+  // FunnelSimple employees by search term
   const filteredEmployees = useMemo(() => {
     if (!searchTerm) return availableEmployees;
     return availableEmployees.filter(emp => 
@@ -267,10 +267,10 @@ export default function TeamMembersModal({
                           <button
                             onClick={() => handleRemoveMember(member.employee_id)}
                             disabled={teamLoading}
-                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 shrink-0"
+                            className="p-2 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded-lg transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 shrink-0"
                             title="Remove from team"
                           >
-                            <Trash size={20} />
+                            <TrashSimple size={20} />
                           </button>
                         </div>
                       ))}

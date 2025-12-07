@@ -3,20 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Company, Team } from "@/lib/types/schemas";
-import { 
-  MagnifyingGlass, 
-  Users, 
-  Pencil, 
-  Trash, 
-  Plus,
-  Buildings,
-  CaretDown,
-  X,
-  Spinner,
-  Check,
-  Star,
-  Star as StarHalf,
-} from "@/lib/icons";
+import { MagnifyingGlass, Users, Pencil, TrashSimple, Plus, Buildings, CaretDown, X, Spinner, Check, Star, Star as StarHalf } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, SearchBar, EmptyState, InlineSpinner, LoadingSpinner } from "@/components/ui";
@@ -153,7 +140,7 @@ export default function TeamsManagementPage() {
     setEditingTeam(null);
   };
 
-  // Save team changes
+  // FloppyDisk team changes
   const saveTeamChanges = async () => {
     if (!editingTeam) return;
 
@@ -462,7 +449,7 @@ export default function TeamsManagementPage() {
                             ) : (
                               <Check size={16} weight="bold" />
                             )}
-                            Save
+                            FloppyDisk
                           </button>
                         </div>
                       </div>
@@ -535,13 +522,13 @@ export default function TeamsManagementPage() {
                             <button
                               onClick={() => setTeamToDelete(team)}
                               disabled={deletingTeamId === team.id}
-                              className="p-2 text-foreground-tertiary hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+                              className="p-2 text-foreground-tertiary hover:bg-error/10 hover:text-error rounded-lg transition-colors"
                               title="Delete team"
                             >
                               {deletingTeamId === team.id ? (
                                 <InlineSpinner size="sm" color="red" />
                               ) : (
-                                <Trash size={18} />
+                                <TrashSimple size={18} />
                               )}
                             </button>
                           )}
@@ -622,7 +609,7 @@ export default function TeamsManagementPage() {
             <p className="text-foreground-secondary mb-4">
               Are you sure you want to delete <span className="font-semibold text-foreground-primary">{teamToDelete?.name}</span>?
             </p>
-            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-3 text-sm text-red-700 dark:text-red-300">
+            <div className="bg-error/10 dark:bg-error/20 border border-error/30 dark:border-error/40 rounded-lg p-3 text-sm text-error">
               <p className="font-medium">This action cannot be undone.</p>
               <p className="mt-1">All team members and permissions will be removed.</p>
             </div>

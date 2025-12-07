@@ -2,23 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { 
-  DollarSign, 
-  Calendar, 
-  CheckCircle, 
-  Clock, 
-  TrendingUp,
-  TrendingDown,
-  Wallet,
-  Activity,
-  Search,
-  Filter,
-  Plus,
-  CreditCard,
-  Building,
-  Edit,
-  X
-} from "@/lib/icons";
+import { CurrencyDollar, Calendar, CheckCircle, Clock, TrendUp, TrendDown, Wallet, Pulse, MagnifyingGlass, FunnelSimple, Plus, CreditCard, Building, PencilSimple, X } from "@phosphor-icons/react";
 import { useAccounts } from "@/hooks/useAccounts";
 import { Account } from "@/lib/types/schemas";
 import { formatDate } from "@/lib/utils";
@@ -197,7 +181,7 @@ export default function StakeholderTransactions({
     setTransactions(filtered);
   }, [allTransactions, dateRangeFilter]);
 
-  // Filter and search transactions
+  // FunnelSimple and search transactions
   const filteredTransactions = useMemo(() => {
     return transactions.filter(txn => {
       const matchesSearch = 
@@ -310,7 +294,7 @@ export default function StakeholderTransactions({
               </p>
             </div>
             <div className="p-2 sm:p-3 bg-primary-200 rounded-lg">
-              <Activity className="text-primary-700" size={20} />
+              <Pulse className="text-primary-700" size={20} />
             </div>
           </div>
         </motion.div>
@@ -327,7 +311,7 @@ export default function StakeholderTransactions({
               </p>
             </div>
             <div className="p-2 sm:p-3 bg-success/30 rounded-lg shrink-0">
-              <TrendingUp className="text-success" size={20} />
+              <TrendUp className="text-success" size={20} />
             </div>
           </div>
         </motion.div>
@@ -344,7 +328,7 @@ export default function StakeholderTransactions({
               </p>
             </div>
             <div className="p-2 sm:p-3 bg-error/30 rounded-lg shrink-0">
-              <TrendingDown className="text-error" size={20} />
+              <TrendDown className="text-error" size={20} />
             </div>
           </div>
         </motion.div>
@@ -397,9 +381,9 @@ export default function StakeholderTransactions({
           </div>
         </div>
 
-        {/* Search and Filter */}
+        {/* Search and FunnelSimple */}
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border-primary bg-surface-secondary space-y-3 sm:space-y-4">
-          {/* Time Range Filter Buttons */}
+          {/* Time Range FunnelSimple Buttons */}
           <div className="flex flex-wrap gap-2 items-center">
             <span className="text-xs sm:text-sm font-medium text-foreground-secondary shrink-0">Time Period:</span>
             <button
@@ -448,7 +432,7 @@ export default function StakeholderTransactions({
             </button>
           </div>
 
-          {/* Amount Type Filter Buttons */}
+          {/* Amount Type FunnelSimple Buttons */}
           <div className="flex flex-wrap gap-2 items-center">
             <span className="text-xs sm:text-sm font-medium text-foreground-secondary shrink-0">Type:</span>
             <button
@@ -485,10 +469,10 @@ export default function StakeholderTransactions({
             </button>
           </div>
 
-          {/* Search and Status Filter */}
+          {/* Search and Status FunnelSimple */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="relative flex-1">
-              <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary" />
+              <MagnifyingGlass size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary" />
               <input
                 type="text"
                 placeholder="Search transactions..."
@@ -499,7 +483,7 @@ export default function StakeholderTransactions({
             </div>
             
             <div className="flex items-center gap-2 shrink-0">
-              <Filter size={16} className="text-foreground-tertiary" />
+              <FunnelSimple size={16} className="text-foreground-tertiary" />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
@@ -538,7 +522,7 @@ export default function StakeholderTransactions({
 
         {filteredTransactions.length === 0 ? (
           <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-            <DollarSign size={40} className="mx-auto text-foreground-tertiary mb-3" />
+            <CurrencyDollar size={40} className="mx-auto text-foreground-tertiary mb-3" />
             <p className="text-foreground-secondary text-xs sm:text-sm">
               {transactions.length === 0 
                 ? 'No transactions found' 
@@ -728,7 +712,7 @@ export default function StakeholderTransactions({
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInputField
-                icon={<DollarSign size={18} />}
+                icon={<CurrencyDollar size={18} />}
                 label="Transaction Title"
                 name="title"
                 value={values.title}
@@ -785,7 +769,7 @@ export default function StakeholderTransactions({
               />
 
               <FormInputField
-                icon={<DollarSign size={18} />}
+                icon={<CurrencyDollar size={18} />}
                 label="Amount"
                 name="amount"
                 type="number"
@@ -796,7 +780,7 @@ export default function StakeholderTransactions({
             </div>
 
             <FormSelectField
-              icon={<DollarSign size={18} />}
+              icon={<CurrencyDollar size={18} />}
               label="Currency"
               name="currency"
               value={values.currency}

@@ -6,7 +6,7 @@ import { useEffect, useState, memo, useCallback } from "react";
 import { Department } from "@/lib/types/schemas";
 import TaskDetails from "./shared/TaskDetails";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash, ExternalLink, CheckCircle, Calendar } from "@/lib/icons";
+import { TrashSimple, ArrowSquareOut, CheckCircle, Calendar } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import {
   Card,
@@ -77,9 +77,9 @@ function TaskCard({
           size="sm"
           onClick={handleDelete}
           isLoading={isDeleting}
-          className="p-2 h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400"
+          className="p-2 h-8 w-8 hover:bg-error/10 dark:hover:bg-error/20 hover:text-error"
         >
-          <Trash size={14} />
+          <TrashSimple size={14} />
         </Button>
       )}
 
@@ -91,7 +91,7 @@ function TaskCard({
             disabled
             className="p-2 h-8 w-8 opacity-50 cursor-not-allowed"
           >
-            <Trash size={14} />
+            <TrashSimple size={14} />
           </Button>
         </PermissionTooltip>
       )}
@@ -102,7 +102,7 @@ function TaskCard({
         onClick={onDetails}
         className="p-2 h-8 w-8 hover:bg-background-secondary dark:hover:bg-background-tertiary hover:text-foreground-primary"
       >
-        <ExternalLink size={14} />
+        <ArrowSquareOut size={14} />
       </Button>
     </div>
   );
@@ -112,7 +112,7 @@ function TaskCard({
       <CardHeader
         title={task_title}
         subtitle={task_description}
-        icon={<CheckCircle size={20} className="text-green-500" />}
+        icon={<CheckCircle size={20} className="text-success" />}
         action={actions}
       />
 

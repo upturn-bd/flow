@@ -6,7 +6,7 @@ import { useEmployeeInfo } from "@/hooks/useEmployeeInfo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TabView from "@/components/ui/TabView";
-import { Trash, Edit2, X } from "@/lib/icons";
+import { TrashSimple, PencilSimple, X } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { toast } from "sonner";
 import { getEmployeeName } from "@/lib/utils/auth";
@@ -151,12 +151,12 @@ export default function AttendanceLogsPage() {
 
     // Tag color styles
     const tagStyles: Record<string, string> = {
-      Present: "bg-green-100 text-green-800",
-      Absent: "bg-red-100 text-red-800",
-      Late: "bg-yellow-100 text-yellow-800",
-      On_Leave: "bg-blue-100 text-blue-800",
-      Wrong_Location: "bg-purple-100 text-purple-800",
-      Pending: "bg-yellow-100 text-yellow-800",
+      Present: "bg-success/10 text-success dark:bg-success/20",
+      Absent: "bg-error/10 text-error dark:bg-error/20",
+      Late: "bg-warning/10 text-warning dark:bg-warning/20",
+      On_Leave: "bg-info/10 text-info dark:bg-info/20",
+      Wrong_Location: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+      Pending: "bg-warning/10 text-warning dark:bg-warning/20",
     };
 
 
@@ -201,7 +201,7 @@ export default function AttendanceLogsPage() {
                       className="p-2 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
                       onClick={() => handleEdit(att)}
                     >
-                      <Edit2 size={16} />
+                      <PencilSimple size={16} />
                     </Button>
                   )}
 
@@ -209,10 +209,10 @@ export default function AttendanceLogsPage() {
                     <Button
                       size="sm"
                       variant="danger"
-                      className="p-2 hover:bg-red-100 transition-colors"
+                      className="p-2 hover:bg-error/10 dark:hover:bg-error/20 transition-colors"
                       onClick={() => handleDelete(att)}
                     >
-                      <Trash size={16} />
+                      <TrashSimple size={16} />
                     </Button>
                   )}
                 </td>
@@ -237,7 +237,7 @@ export default function AttendanceLogsPage() {
               placeholder="Search by employee..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full sm:w-1/3 px-4 py-2 border border-border-secondary rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full sm:w-1/3 px-4 py-2 border border-border-secondary rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
           </div>
 
@@ -260,7 +260,7 @@ export default function AttendanceLogsPage() {
                 key: "all",
                 label: "All Records",
                 icon: <></>,
-                color: "text-green-500",
+                color: "text-success",
                 content: renderTable(filteredAll),
               },
             ]}
@@ -280,7 +280,7 @@ export default function AttendanceLogsPage() {
             >
               <X size={20} />
             </button>
-            <h2 className="text-lg font-semibold mb-4">Edit Attendance</h2>
+            <h2 className="text-lg font-semibold mb-4">PencilSimple Attendance</h2>
 
             <div className="flex flex-col gap-3">
               <label className="flex flex-col">
@@ -319,7 +319,7 @@ export default function AttendanceLogsPage() {
 
               <div className="flex justify-end gap-2 mt-4">
                 <Button variant="secondary" onClick={() => setSelectedAttendance(null)}>Cancel</Button>
-                <Button variant="primary" onClick={handleSave}>Save</Button>
+                <Button variant="primary" onClick={handleSave}>FloppyDisk</Button>
               </div>
             </div>
           </div>

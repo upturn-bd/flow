@@ -1,11 +1,11 @@
-import { IconType } from "@/lib/icons";
+import { Icon } from "@phosphor-icons/react";
 import { cn } from "./class";
 
 export type ColorType = "blue" | "emerald" | "purple" | "amber" | "red" | "gray";
 
 type LoadingSpinnerProps = {
   /** Optional icon to display in the center of the spinner */
-  icon?: IconType;
+  icon?: Icon;
   /** Text to display alongside the spinner */
   text?: string;
   /** Color theme for the spinner (blue, emerald, purple, amber, red, gray) */
@@ -28,11 +28,11 @@ export default function LoadingSpinner({
 }: LoadingSpinnerProps) {
   // Map color to tailwind classes to avoid string interpolation security issues
   const colorMap: Record<ColorType, { spinner: string; icon: string }> = {
-    blue: { spinner: "border-blue-500", icon: "text-blue-500" },
-    emerald: { spinner: "border-emerald-500", icon: "text-emerald-500" },
+    blue: { spinner: "border-primary-500", icon: "text-primary-500" },
+    emerald: { spinner: "border-success", icon: "text-success" },
     purple: { spinner: "border-purple-500", icon: "text-purple-500" },
-    amber: { spinner: "border-amber-500", icon: "text-amber-500" },
-    red: { spinner: "border-red-500", icon: "text-red-500" },
+    amber: { spinner: "border-warning", icon: "text-warning" },
+    red: { spinner: "border-error", icon: "text-error" },
     gray: { spinner: "border-foreground-tertiary", icon: "text-foreground-tertiary" },
   };
 

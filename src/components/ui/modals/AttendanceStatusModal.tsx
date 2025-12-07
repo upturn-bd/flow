@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, X, Clock, MapPin, Send } from '@/lib/icons';
+import { CheckCircle, X, Clock, MapPin, PaperPlaneTilt } from "@phosphor-icons/react";
 import Portal from '@/components/ui/Portal';
 
 interface AttendanceStatusModalProps {
@@ -29,8 +29,8 @@ export default function AttendanceStatusModal({
       case 'Present':
         return {
           icon: CheckCircle,
-          iconColor: 'text-green-600 dark:text-green-400',
-          bgColor: 'bg-green-100 dark:bg-green-900/30',
+          iconColor: 'text-success',
+          bgColor: 'bg-success/10 dark:bg-success/20',
           title: 'Check-in Successful!',
           message: 'Your attendance has been recorded. You checked in on time at the correct location.',
           showRequestButton: false,
@@ -47,8 +47,8 @@ export default function AttendanceStatusModal({
       case 'Wrong_Location':
         return {
           icon: MapPin,
-          iconColor: 'text-red-600 dark:text-red-400',
-          bgColor: 'bg-red-100 dark:bg-red-900/30',
+          iconColor: 'text-error',
+          bgColor: 'bg-error/10 dark:bg-error/20',
           title: 'Check-in Recorded (Wrong Location)',
           message: 'You checked in from outside the designated area. If you have a valid reason, you can send a request to your supervisor for approval.',
           showRequestButton: true,
@@ -56,8 +56,8 @@ export default function AttendanceStatusModal({
       default:
         return {
           icon: CheckCircle,
-          iconColor: 'text-green-600',
-          bgColor: 'bg-green-100',
+          iconColor: 'text-success',
+          bgColor: 'bg-success/10 dark:bg-success/20',
           title: 'Check-in Successful',
           message: 'Your attendance has been recorded.',
           showRequestButton: false,
@@ -183,7 +183,7 @@ export default function AttendanceStatusModal({
                         htmlFor="reason" 
                         className="block text-sm font-medium text-foreground-primary mb-2"
                       >
-                        Reason for Request <span className="text-red-500">*</span>
+                        Reason for Request <span className="text-error">*</span>
                       </label>
                       <textarea
                         id="reason"
@@ -196,12 +196,12 @@ export default function AttendanceStatusModal({
                         placeholder="Please explain why you were late or at the wrong location..."
                         className={`w-full px-4 py-3 rounded-lg border ${
                           reasonError 
-                            ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                            ? 'border-error focus:ring-error focus:border-error' 
                             : 'border-border-primary focus:ring-primary-500 focus:border-primary-500'
                         } bg-surface-primary text-foreground-primary placeholder-foreground-tertiary resize-none focus:outline-none focus:ring-2 transition-colors`}
                       />
                       {reasonError && (
-                        <p className="mt-2 text-sm text-red-600">{reasonError}</p>
+                        <p className="mt-2 text-sm text-error">{reasonError}</p>
                       )}
                     </motion.div>
                   )}
@@ -221,7 +221,7 @@ export default function AttendanceStatusModal({
                           isSendingRequest ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                       >
-                        <Send size={18} className={isSendingRequest ? 'animate-spin' : ''} />
+                        <PaperPlaneTilt size={18} className={isSendingRequest ? 'animate-spin' : ''} />
                         {isSendingRequest ? 'Sending...' : 'Send Request'}
                       </button>
                     )}
@@ -231,7 +231,7 @@ export default function AttendanceStatusModal({
                       className={`px-6 py-3 font-medium rounded-lg transition-colors ${
                         config.showRequestButton
                           ? 'bg-background-secondary hover:bg-surface-hover text-foreground-primary border border-border-primary'
-                          : 'bg-green-600 hover:bg-green-700 text-white'
+                          : 'bg-success hover:bg-success/90 text-white'
                       }`}
                     >
                       {config.showRequestButton ? 'Close' : 'OK'}

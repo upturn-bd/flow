@@ -6,7 +6,7 @@ import { useLeaveTypes } from "@/hooks/useConfigTypes";
 import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, FileText, MessageCircle, Check, X, CalendarDays } from "@/lib/icons";
+import { Calendar, User, FileText, ChatCircle, Check, X, CalendarBlank } from "@phosphor-icons/react";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { useLeaveRequests } from "@/hooks/useLeaveManagement";
 import { extractEmployeeIdsFromRequests } from "@/lib/utils/project-utils";
@@ -78,7 +78,7 @@ export default function LeaveRequestsPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="text-red-500 mb-2">Error loading leave requests</div>
+        <div className="text-error mb-2">Error loading leave requests</div>
         <p className="text-foreground-secondary">{error}</p>
       </div>
     );
@@ -105,7 +105,7 @@ export default function LeaveRequestsPage() {
         })
       ) : (
         <EmptyState
-          icon={<CalendarDays className="w-12 h-12" />}
+          icon={<CalendarBlank className="w-12 h-12" />}
           title="No leave requests"
           description="There are no pending leave requests at the moment."
         />
@@ -143,7 +143,7 @@ function LeaveRequestCard({
         size="sm"
         onClick={onReject}
         disabled={isProcessing}
-        className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+        className="flex items-center gap-2 text-error border-error/30 hover:bg-error/10"
       >
         <X size={14} />
         Reject
@@ -199,7 +199,7 @@ function LeaveRequestCard({
 
           <div>
             <label className="block text-sm font-medium text-foreground-secondary mb-2">
-              <MessageCircle size={16} className="inline mr-2" />
+              <ChatCircle size={16} className="inline mr-2" />
               Comment
             </label>
             <textarea

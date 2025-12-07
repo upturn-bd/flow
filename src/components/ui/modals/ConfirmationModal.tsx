@@ -7,15 +7,15 @@ import { ConfirmationModalProps } from "./types";
 
 const variantStyles = {
   danger: {
-    iconColor: "text-red-600",
+    iconColor: "text-error",
     buttonVariant: "danger" as const,
   },
   warning: {
-    iconColor: "text-yellow-600", 
+    iconColor: "text-warning", 
     buttonVariant: "primary" as const,
   },
   info: {
-    iconColor: "text-blue-600",
+    iconColor: "text-info",
     buttonVariant: "primary" as const,
   },
 };

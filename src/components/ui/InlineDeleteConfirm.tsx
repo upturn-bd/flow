@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, X, Trash } from "@/lib/icons";
+import { Check, X, TrashSimple } from "@phosphor-icons/react";
 
 interface InlineDeleteConfirmProps {
   /** Whether this item is in delete confirmation mode */
@@ -25,19 +25,19 @@ interface InlineDeleteConfirmProps {
 
 const colorSchemes = {
   red: {
-    deleteHover: "hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30",
+    deleteHover: "hover:text-error hover:bg-error/10 dark:hover:bg-error/20",
   },
   violet: {
-    deleteHover: "hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30",
+    deleteHover: "hover:text-error hover:bg-error/10 dark:hover:bg-error/20",
   },
   blue: {
-    deleteHover: "hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30",
+    deleteHover: "hover:text-error hover:bg-error/10 dark:hover:bg-error/20",
   },
   emerald: {
-    deleteHover: "hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30",
+    deleteHover: "hover:text-error hover:bg-error/10 dark:hover:bg-error/20",
   },
   amber: {
-    deleteHover: "hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30",
+    deleteHover: "hover:text-error hover:bg-error/10 dark:hover:bg-error/20",
   },
 };
 
@@ -59,7 +59,7 @@ export function InlineDeleteConfirm({
       <div className="flex items-center gap-1">
         <button
           onClick={onConfirm}
-          className="p-1.5 text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+          className="p-1.5 text-white bg-error hover:bg-error/90 rounded-lg transition-colors"
           title="Confirm delete"
         >
           <Check size={size} />
@@ -82,7 +82,7 @@ export function InlineDeleteConfirm({
       disabled={disabled}
       title={disabled ? disabledTitle : title}
     >
-      <Trash size={size} />
+      <TrashSimple size={size} />
     </button>
   );
 }

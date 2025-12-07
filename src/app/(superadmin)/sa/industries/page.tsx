@@ -3,15 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { Industry } from "@/lib/types/schemas";
-import { 
-  Plus, 
-  Pencil, 
-  Trash, 
-  Factory,
-  Buildings,
-  Check,
-  X,
-} from "@/lib/icons";
+import { Plus, Pencil, TrashSimple, Factory, Buildings, Check, X } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, SearchBar, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
@@ -151,7 +143,7 @@ export default function IndustriesPage() {
     { bg: "bg-teal-50 dark:bg-teal-950/30", icon: "text-teal-600 dark:text-teal-400", hover: "group-hover:bg-teal-100 dark:group-hover:bg-teal-900/40" },
     { bg: "bg-emerald-50 dark:bg-emerald-950/30", icon: "text-emerald-600 dark:text-emerald-400", hover: "group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/40" },
     { bg: "bg-amber-50 dark:bg-amber-950/30", icon: "text-amber-600 dark:text-amber-400", hover: "group-hover:bg-amber-100 dark:group-hover:bg-amber-900/40" },
-    { bg: "bg-orange-50 dark:bg-orange-950/30", icon: "text-orange-600 dark:text-orange-400", hover: "group-hover:bg-orange-100 dark:group-hover:bg-orange-900/40" },
+    { bg: "bg-warning/10 dark:bg-warning/20", icon: "text-warning", hover: "group-hover:bg-warning/20 dark:group-hover:bg-warning/30" },
     { bg: "bg-rose-50 dark:bg-rose-950/30", icon: "text-rose-600 dark:text-rose-400", hover: "group-hover:bg-rose-100 dark:group-hover:bg-rose-900/40" },
   ];
 
@@ -321,7 +313,7 @@ export default function IndustriesPage() {
           setFormData({ name: "" });
         }}
         onSubmit={handleSubmit}
-        title={editingIndustry ? "Edit Industry" : "Add Industry"}
+        title={editingIndustry ? "PencilSimple Industry" : "Add Industry"}
         subtitle={editingIndustry ? "Update industry name" : "Add a new industry"}
         icon={Factory}
         colorScheme="violet"

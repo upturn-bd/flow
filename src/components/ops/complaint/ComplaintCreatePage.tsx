@@ -2,18 +2,7 @@
 
 import React, { useEffect, useState, ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Upload,
-  CaretLeft,
-  CaretDown,
-  WarningCircle,
-  Check,
-  X,
-  FileText,
-  MessageCircle,
-  User,
-  Flag
-} from "@/lib/icons";
+import { Upload, CaretLeft, CaretDown, WarningCircle, Check, X, FileText, ChatCircle, User, Flag } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { supabase } from "@/lib/supabase/client";
 import { ComplaintRecord } from "@/lib/types/schemas";
@@ -314,7 +303,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           type="button"
-                          className="text-foreground-tertiary hover:text-red-500"
+                          className="text-foreground-tertiary hover:text-error"
                           onClick={() => removeFile(file.name)}
                         >
                           <X size={16} />

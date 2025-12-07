@@ -2,7 +2,7 @@ import React from 'react';
 import { FormModal } from '@/components/ui/modals';
 import { FormField } from '@/components/forms';
 import { validateRequisitionType, type RequisitionTypeData } from '@/lib/validation';
-import { Tag } from '@/lib/icons';
+import { Tag } from "@phosphor-icons/react";
 
 interface RequisitionTypeModalProps {
   isOpen: boolean;

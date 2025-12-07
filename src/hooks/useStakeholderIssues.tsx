@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
-import { StakeholderIssue, StakeholderIssueAttachment } from "@/lib/types/schemas";
+import { StakeholderIssue, StakeholderIssueAttachment, LinkedStepField } from "@/lib/types/schemas";
 import { createStakeholderIssueNotification } from "@/lib/utils/notifications";
 import { captureSupabaseError, logError } from "@/lib/sentry";
 
@@ -21,7 +21,8 @@ export interface StakeholderIssueFormData {
   assigned_team_id?: number; // Team ID assigned to handle this issue (either employee OR team)
   category_id?: number; // Optional category
   subcategory_id?: number; // Optional subcategory
-  linked_step_data_ids?: number[]; // Array of stakeholder_step_data IDs linked to this issue
+  linked_step_data_ids?: number[]; // DEPRECATED: Array of stakeholder_step_data IDs linked to this issue
+  linked_fields?: LinkedStepField[]; // Array of specific field references linked to this issue
   attachments?: File[];
 }
 
@@ -31,10 +32,10 @@ export interface StakeholderIssueSearchOptions {
   pageSize?: number;
   filterStatus?: "all" | "Pending" | "In Progress" | "Resolved";
   filterPriority?: "all" | "Low" | "Medium" | "High" | "Urgent";
-  filterCategoryId?: number | "all"; // Filter by category
-  filterSubcategoryId?: number | "all"; // Filter by subcategory
-  assignedToId?: string; // Filter by assigned employee
-  assignedTeamId?: number; // Filter by assigned team
+  filterCategoryId?: number | "all"; // FunnelSimple by category
+  filterSubcategoryId?: number | "all"; // FunnelSimple by subcategory
+  assignedToId?: string; // FunnelSimple by assigned employee
+  assignedTeamId?: number; // FunnelSimple by assigned team
 }
 
 export interface StakeholderIssueSearchResult {
@@ -259,7 +260,7 @@ export function useStakeholderIssues() {
 
       // Build OR filter for assigned_to or assigned_team_id
       if (targetAssignedToId && assignedTeamIds && assignedTeamIds.length > 0) {
-        // Filter by either employee OR any of the teams
+        // FunnelSimple by either employee OR any of the teams
         const teamIdList = assignedTeamIds.join(',');
         query = query.or(`assigned_to.eq.${targetAssignedToId},assigned_team_id.in.(${teamIdList})`);
       } else if (targetAssignedToId) {
