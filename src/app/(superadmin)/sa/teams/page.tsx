@@ -505,7 +505,7 @@ export default function TeamsManagementPage() {
                           <button
                             onClick={() => startEditing(team)}
                             className="p-2 text-foreground-tertiary hover:bg-background-tertiary dark:hover:bg-surface-secondary hover:text-primary-600 dark:hover:text-primary-400 rounded-lg transition-colors"
-                            title="PencilSimple team"
+                            title="Edit team"
                           >
                             <Pencil size={18} />
                           </button>
@@ -522,7 +522,7 @@ export default function TeamsManagementPage() {
                             <button
                               onClick={() => setTeamToDelete(team)}
                               disabled={deletingTeamId === team.id}
-                              className="p-2 text-foreground-tertiary hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+                              className="p-2 text-foreground-tertiary hover:bg-error/10 hover:text-error rounded-lg transition-colors"
                               title="Delete team"
                             >
                               {deletingTeamId === team.id ? (
@@ -609,7 +609,7 @@ export default function TeamsManagementPage() {
             <p className="text-foreground-secondary mb-4">
               Are you sure you want to delete <span className="font-semibold text-foreground-primary">{teamToDelete?.name}</span>?
             </p>
-            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-3 text-sm text-red-700 dark:text-red-300">
+            <div className="bg-error/10 dark:bg-error/20 border border-error/30 dark:border-error/40 rounded-lg p-3 text-sm text-error">
               <p className="font-medium">This action cannot be undone.</p>
               <p className="mt-1">All team members and permissions will be removed.</p>
             </div>

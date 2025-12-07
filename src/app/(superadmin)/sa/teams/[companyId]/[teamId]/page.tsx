@@ -495,7 +495,7 @@ export default function TeamDetailPage() {
                 <button
                   onClick={() => setIsEditingTeam(true)}
                   className="p-1.5 text-foreground-tertiary hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 rounded-lg transition-colors"
-                  title="PencilSimple team details"
+                  title="Edit team details"
                 >
                   <Pencil size={18} />
                 </button>
@@ -559,7 +559,7 @@ export default function TeamDetailPage() {
                 </div>
                 <button
                   onClick={() => setMemberToRemove(member)}
-                  className="p-2 text-foreground-tertiary hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  className="p-2 text-foreground-tertiary hover:text-error hover:bg-error/10 rounded-lg transition-colors"
                   title="Remove member"
                 >
                   <TrashSimple size={18} />

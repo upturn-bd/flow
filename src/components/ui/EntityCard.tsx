@@ -60,7 +60,7 @@ export function EntityCard({
             onClick={onDelete}
             isLoading={deleteLoading}
             disabled={deleteLoading}
-            className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+            className="p-1 rounded-full text-foreground-tertiary hover:bg-error/10 hover:text-error dark:hover:bg-error/20"
           >
             <TrashSimple size={16} weight="bold" />
           </Button>

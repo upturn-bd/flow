@@ -18,17 +18,17 @@ const iconMap = {
 };
 
 const colorMap = {
-  'red': 'text-red-500',
-  'blue': 'text-blue-500',
-  'green': 'text-green-500',
+  'red': 'text-error',
+  'blue': 'text-info',
+  'green': 'text-success',
   'purple': 'text-purple-500',
-  'orange': 'text-orange-500',
+  'orange': 'text-warning',
   'gray': 'text-foreground-tertiary',
 };
 
 const priorityStyles = {
-  'urgent': 'border-l-red-500 bg-red-50 dark:bg-red-900/30',
-  'high': 'border-l-orange-500 bg-orange-50 dark:bg-orange-900/30',
+  'urgent': 'border-l-error bg-error/5 dark:bg-error/10',
+  'high': 'border-l-warning bg-warning/5 dark:bg-warning/10',
   'normal': 'border-l-primary-500 bg-surface-primary',
   'low': 'border-l-border-secondary bg-background-secondary dark:bg-background-tertiary',
 };
@@ -102,7 +102,7 @@ export default function NotificationsTab() {
           <Bell className="h-5 w-5 text-foreground-secondary" />
           <h2 className="text-lg font-semibold text-foreground-primary">All Notifications</h2>
           {unreadNotifications.length > 0 && (
-            <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
+            <span className="bg-error text-white text-xs rounded-full px-2 py-0.5">
               {unreadNotifications.length} unread
             </span>
           )}
@@ -208,7 +208,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
           {!notification.is_read && (
             <button
               onClick={() => onMarkAsRead(notification.id!)}
-              className="text-green-600 hover:bg-green-50 p-1.5 rounded"
+              className="text-success hover:bg-success/10 p-1.5 rounded dark:hover:bg-success/20"
               title="Mark as read"
             >
               <Check className="h-4 w-4" />
@@ -217,7 +217,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
 
           <button
             onClick={() => onDelete(notification.id!)}
-            className="text-red-600 hover:bg-red-50 p-1.5 rounded"
+            className="text-error hover:bg-error/10 p-1.5 rounded dark:hover:bg-error/20"
             title="Delete notification"
           >
             <TrashSimple className="h-4 w-4" />

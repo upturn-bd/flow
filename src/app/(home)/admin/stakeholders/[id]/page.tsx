@@ -343,17 +343,17 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
             <div className="flex items-start gap-2 sm:gap-3 flex-wrap">
               <h1 className="text-xl sm:text-2xl font-bold text-foreground-primary wrap-wrap-break-words">{stakeholder.name}</h1>
               {stakeholder.status === "Rejected" ? (
-                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-red-100 text-red-800 shrink-0">
+                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-error/10 text-error dark:bg-error/20 shrink-0">
                   <WarningCircle size={14} />
                   Rejected
                 </span>
               ) : stakeholder.is_completed || stakeholder.status === "Permanent" ? (
-                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800 shrink-0">
+                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-success/10 text-success dark:bg-success/20 shrink-0">
                   <CheckCircle size={14} />
                   Stakeholder
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800 shrink-0">
+                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-info/10 text-info dark:bg-info/20 shrink-0">
                   <Clock size={14} />
                   Lead
                 </span>
@@ -374,7 +374,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
             </button>
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
+              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-error border border-error/30 rounded-lg hover:bg-error/10 dark:hover:bg-error/20"
             >
               <TrashSimple size={14} />
               <span className="hidden sm:inline">Delete</span>
@@ -385,7 +385,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-error/5 border border-error/30 text-error px-4 py-3 rounded-lg dark:bg-error/10">
           {error}
         </div>
       )}
@@ -413,18 +413,18 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
       {/* Rejection Warning Banner */}
       {stakeholder.status === "Rejected" && (
-        <div className="bg-red-50 border-l-4 border-red-500 px-4 py-3 rounded-lg">
+        <div className="bg-error/5 border-l-4 border-error px-4 py-3 rounded-lg dark:bg-error/10">
           <div className="flex items-start gap-3">
-            <WarningCircle className="text-red-500 mt-0.5" size={20} />
+            <WarningCircle className="text-error mt-0.5" size={20} />
             <div>
-              <p className="font-medium text-red-800">This stakeholder has been rejected</p>
+              <p className="font-medium text-error">This stakeholder has been rejected</p>
               {stakeholder.rejection_reason && (
-                <p className="text-sm text-red-700 mt-1">
+                <p className="text-sm text-error/80 mt-1">
                   Reason: {stakeholder.rejection_reason}
                 </p>
               )}
               {stakeholder.rejected_at && (
-                <p className="text-xs text-red-600 mt-1">
+                <p className="text-xs text-error/70 mt-1">
                   Rejected on {new Date(stakeholder.rejected_at).toLocaleDateString()}
                 </p>
               )}
@@ -483,7 +483,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
             {stakeholder.completed_at && (
               <div className="flex items-start gap-3">
-                <CheckCircle className="text-green-500 mt-0.5" size={18} />
+                <CheckCircle className="text-success mt-0.5" size={18} />
                 <div>
                   <p className="text-sm font-medium text-foreground-secondary">Completed</p>
                   <p className="text-sm text-foreground-secondary mt-0.5">
@@ -498,7 +498,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               <>
                 {stakeholder.rejected_at && (
                   <div className="flex items-start gap-3">
-                    <WarningCircle className="text-red-500 mt-0.5" size={18} />
+                    <WarningCircle className="text-error mt-0.5" size={18} />
                     <div>
                       <p className="text-sm font-medium text-foreground-secondary">Rejected On</p>
                       <p className="text-sm text-foreground-secondary mt-0.5">
@@ -509,7 +509,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 )}
                 {stakeholder.rejected_by && (
                   <div className="flex items-start gap-3">
-                    <User className="text-red-400 mt-0.5" size={18} />
+                    <User className="text-error/70 mt-0.5" size={18} />
                     <div>
                       <p className="text-sm font-medium text-foreground-secondary">Rejected By</p>
                       <p className="text-sm text-foreground-secondary mt-0.5">
@@ -520,7 +520,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 )}
                 {stakeholder.rejection_reason && (
                   <div className="flex items-start gap-3">
-                    <FileText className="text-red-400 mt-0.5" size={18} />
+                    <FileText className="text-error/70 mt-0.5" size={18} />
                     <div>
                       <p className="text-sm font-medium text-foreground-secondary">Rejection Reason</p>
                       <p className="text-sm text-foreground-secondary mt-0.5">
@@ -754,7 +754,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                             key={step.id}
                             className={`border rounded-lg ${
                               isCompleted
-                                ? "border-green-300 bg-green-50"
+                                ? "border-success/50 bg-success/5 dark:bg-success/10"
                                 : isCurrent
                                   ? "border-primary-300 bg-primary-50 dark:bg-primary-950 dark:border-primary-700"
                                   : canEdit && !isSequential
@@ -767,9 +767,9 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                 <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
                                   <div
                                     className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-medium shrink-0 ${isCompleted
-                                        ? "bg-green-500 text-white"
+                                        ? "bg-success text-white"
                                         : isCurrent
-                                          ? "bg-blue-500 text-white"
+                                          ? "bg-info text-white"
                                           : "bg-gray-300 text-foreground-secondary"
                                       }`}
                                   >
@@ -985,7 +985,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                           <div key={key} className="col-span-2">
                                             <p className="text-xs font-medium text-foreground-tertiary uppercase">
                                               {fieldLabel}
-                                              <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded normal-case">
+                                              <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 bg-success/10 text-success dark:bg-success/20 text-xs rounded normal-case">
                                                 <Calculator size={12} />
                                                 Calculated
                                               </span>
@@ -1009,7 +1009,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                           <p className="text-xs font-medium text-foreground-tertiary uppercase">
                                             {fieldLabel}
                                             {isCalculated && (
-                                              <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded normal-case">
+                                              <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 bg-success/10 text-success dark:bg-success/20 text-xs rounded normal-case">
                                                 Calculated
                                               </span>
                                             )}
@@ -1106,7 +1106,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                className="w-full sm:w-auto px-4 py-2 bg-error text-white rounded-lg hover:bg-error/90 disabled:opacity-50"
               >
                 {deleting ? "Deleting..." : "Delete"}
               </button>

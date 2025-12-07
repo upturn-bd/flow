@@ -81,7 +81,7 @@ export default function StakeholderTypeManagementView() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-lg">
             {error}
           </div>
         )}
@@ -118,7 +118,7 @@ export default function StakeholderTypeManagementView() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(type)}
-                        className="p-1 rounded-full text-foreground-tertiary hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-blue-500"
+                        className="p-1 rounded-full text-foreground-tertiary hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-600"
                       >
                         <PencilSimple size={16} weight="bold" />
                       </Button>
@@ -128,7 +128,7 @@ export default function StakeholderTypeManagementView() {
                         onClick={() => type.id !== undefined && handleDelete(type.id)}
                         isLoading={deleteLoading === type.id}
                         disabled={deleteLoading === type.id}
-                        className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
+                        className="p-1 rounded-full text-foreground-tertiary hover:bg-error/10 hover:text-error"
                       >
                         <TrashSimple size={16} weight="bold" />
                       </Button>

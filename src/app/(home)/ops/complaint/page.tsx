@@ -18,7 +18,7 @@ export default function ComplaintPage() {
       key: "home",
       label: "New Complaint",
       icon: <FilePlus className="h-5 w-5" />,
-      color: "text-red-600",
+      color: "text-error",
       content: <ComplaintCreatePage onClose={() => { }} setActiveTab={setActiveTab} />
     },
     {
@@ -43,7 +43,7 @@ export default function ComplaintPage() {
       content: (
         <div className="p-6">
           <h2 className="text-xl font-bold text-foreground-primary mb-4 flex items-center">
-            <Warning className="mr-2 h-5 w-5 text-red-500" />
+            <Warning className="mr-2 h-5 w-5 text-error" />
             Complaint Policy
           </h2>
           <div className="prose prose-red max-w-none">
@@ -53,44 +53,44 @@ export default function ComplaintPage() {
             <h3 className="text-lg font-semibold text-foreground-secondary mt-4">Submission Guidelines</h3>
             <ul className="mt-2 space-y-1 text-foreground-secondary">
               <li className="flex items-start">
-                <span className="text-red-500 mr-2">•</span>
+                <span className="text-error mr-2">•</span>
                 All complaints must be factual and include specific details about the incident.
               </li>
               <li className="flex items-start">
-                <span className="text-red-500 mr-2">•</span>
+                <span className="text-error mr-2">•</span>
                 Submit complaints within 7 days of the incident for prompt resolution.
               </li>
               <li className="flex items-start">
-                <span className="text-red-500 mr-2">•</span>
+                <span className="text-error mr-2">•</span>
                 Maintain confidentiality regarding the complaint and involved parties.
               </li>
               <li className="flex items-start">
-                <span className="text-red-500 mr-2">•</span>
+                <span className="text-error mr-2">•</span>
                 Follow up through the appropriate channels as directed.
               </li>
             </ul>
             <h3 className="text-lg font-semibold text-foreground-secondary mt-4">Resolution Process</h3>
             <ol className="mt-2 space-y-2 text-foreground-secondary">
               <li className="flex items-start">
-                <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 shrink-0">1</span>
+                <span className="bg-error/10 text-error dark:bg-error/20 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 shrink-0">1</span>
                 <div>
                   <span className="font-medium">Initial Review (1-2 days):</span> Your complaint will be reviewed by HR and relevant department heads.
                 </div>
               </li>
               <li className="flex items-start">
-                <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 shrink-0">2</span>
+                <span className="bg-error/10 text-error dark:bg-error/20 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 shrink-0">2</span>
                 <div>
                   <span className="font-medium">Investigation (3-5 days):</span> Evidence will be gathered and interviews conducted as needed.
                 </div>
               </li>
               <li className="flex items-start">
-                <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 shrink-0">3</span>
+                <span className="bg-error/10 text-error dark:bg-error/20 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 shrink-0">3</span>
                 <div>
                   <span className="font-medium">Decision (2-3 days):</span> A resolution will be determined based on the investigation findings.
                 </div>
               </li>
               <li className="flex items-start">
-                <span className="bg-red-100 text-red-700 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 shrink-0">4</span>
+                <span className="bg-error/10 text-error dark:bg-error/20 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold mr-2 shrink-0">4</span>
                 <div>
                   <span className="font-medium">Implementation:</span> The resolution will be implemented and all parties will be notified.
                 </div>
@@ -108,7 +108,7 @@ export default function ComplaintPage() {
       title="Complaint Management"
       description="Submit, track, and manage workplace complaints and concerns. Our system ensures all issues are addressed promptly and fairly."
       icon={<WarningCircle className="h-6 w-6" />}
-      primaryColor="text-red-600"
+      primaryColor="text-error"
       tabs={tabs}
       activeTab={activeTab}
       setActiveTab={setActiveTab}

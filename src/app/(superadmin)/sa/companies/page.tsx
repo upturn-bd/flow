@@ -258,8 +258,8 @@ export default function CompaniesPage() {
           title="Total Employees"
           value={Object.values(companyStats).reduce((a, b) => a + b.employees, 0)}
           icon={Users}
-          iconColor="text-green-600"
-          iconBgColor="bg-green-100"
+          iconColor="text-success"
+          iconBgColor="bg-success/10"
         />
         <StatCard
           title="Total Teams"
@@ -272,8 +272,8 @@ export default function CompaniesPage() {
           title="Payroll Active"
           value={companies.filter(c => c.live_payroll_enabled).length}
           icon={Lightning}
-          iconColor="text-orange-600"
-          iconBgColor="bg-orange-100"
+          iconColor="text-warning"
+          iconBgColor="bg-warning/10"
         />
       </StatCardGrid>
 
@@ -630,8 +630,8 @@ export default function CompaniesPage() {
           <h3 className="text-sm font-medium text-foreground-secondary mb-2">Feature Gear</h3>
           <label className="flex items-center justify-between p-3 bg-surface-primary rounded-lg cursor-pointer hover:bg-background-secondary transition-colors">
             <div className="flex items-center gap-3">
-              <div className="p-1.5 bg-green-100 dark:bg-green-900/50 rounded-lg">
-                <Lightning size={18} className="text-green-600 dark:text-green-400" />
+              <div className="p-1.5 bg-success/10 dark:bg-success/20 rounded-lg">
+                <Lightning size={18} className="text-success" />
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground-primary">Live Absent Tracking</p>

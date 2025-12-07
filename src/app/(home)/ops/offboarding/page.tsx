@@ -44,7 +44,7 @@ const Textarea = ({
   ...props
 }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
   <textarea
-    className={`w-full p-3 text-sm border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${className}`}
+    className={`w-full p-3 text-sm border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${className}`}
     {...props}
   />
 );
@@ -217,7 +217,7 @@ export default function OffboardingPage() {
       {/* Header */}
       <motion.div variants={fadeInUp} className="flex items-center mb-8">
         <h1 className="text-2xl font-bold text-foreground-primary flex items-center">
-          <UserMinus className="mr-2 h-7 w-7 text-red-600" />
+          <UserMinus className="mr-2 h-7 w-7 text-error" />
           Employee Offboarding
         </h1>
       </motion.div>
@@ -234,7 +234,7 @@ export default function OffboardingPage() {
                 onClick={() => setActiveTab("active")}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   activeTab === "active"
-                    ? "bg-red-600 text-white"
+                    ? "bg-error text-white"
                     : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
                 }`}
               >
@@ -244,7 +244,7 @@ export default function OffboardingPage() {
                 onClick={() => setActiveTab("offboarded")}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   activeTab === "offboarded"
-                    ? "bg-red-600 text-white"
+                    ? "bg-error text-white"
                     : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
                 }`}
               >
@@ -253,7 +253,7 @@ export default function OffboardingPage() {
             </div>
             <button
               onClick={handleRefresh}
-              className="flex items-center gap-2 px-3 py-2 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors dark:bg-error/20 dark:hover:bg-error/30"
               disabled={loading}
             >
               <ArrowsClockwise className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -274,7 +274,7 @@ export default function OffboardingPage() {
 
       {/* Employee List */}
       {displayedEmployees.length === 0 ? (
-        <div className="mt-10 bg-red-50/50 rounded-xl border border-red-100">
+        <div className="mt-10 bg-error/5 rounded-xl border border-error/20 dark:bg-error/10">
           <EmptyState
             icon={Users}
             title={`No ${activeTab === "active" ? "Active" : "Offboarded"} Employees Found`}
@@ -302,14 +302,14 @@ export default function OffboardingPage() {
                 }}
                 className={`bg-surface-primary rounded-xl p-4 shadow-sm border ${
                   selectedEmployee?.id === emp.id
-                    ? "border-red-500 ring-2 ring-red-200"
+                    ? "border-error ring-2 ring-error/30"
                     : "border-border-primary"
-                } cursor-pointer transition-all`}
+                } cursor-pointer transition-all`}}
                 onClick={() => activeTab === "active" && setSelectedEmployee(emp)}
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                    <div className="shrink-0 w-10 h-10 rounded-full bg-error/10 flex items-center justify-center text-error dark:bg-error/20">
                       <User className="h-5 w-5" />
                     </div>
                     <div>
@@ -321,7 +321,7 @@ export default function OffboardingPage() {
                   </div>
                   {activeTab === "offboarded" && (
                     <div className={`text-xs font-medium text-white px-2 py-1 rounded-full ${
-                      emp.job_status === "Resigned" ? "bg-orange-500" : "bg-red-600"
+                      emp.job_status === "Resigned" ? "bg-warning" : "bg-error"
                     }`}>
                       {emp.job_status}
                     </div>
@@ -372,7 +372,7 @@ export default function OffboardingPage() {
                       }
                     >
                       <Button
-                        className="w-full bg-green-600 hover:bg-green-700 flex items-center justify-center gap-2"
+                        className="w-full bg-success hover:bg-success/90 flex items-center justify-center gap-2"
                         onClick={() => handleReactivate(emp.id)}
                         disabled={loading}
                       >
@@ -395,7 +395,7 @@ export default function OffboardingPage() {
               {selectedEmployee ? (
                 <div className="bg-surface-primary rounded-xl p-6 shadow-sm border border-border-primary space-y-4">
                   <div className="flex items-center gap-3 pb-4 border-b border-border-primary">
-                    <div className="shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                    <div className="shrink-0 w-12 h-12 rounded-full bg-error/10 flex items-center justify-center text-error dark:bg-error/20">
                       <User className="h-6 w-6" />
                     </div>
                     <div>
@@ -422,7 +422,7 @@ export default function OffboardingPage() {
                             | "Terminated",
                         })
                       }
-                      className="w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-foreground-secondary focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      className="w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-foreground-secondary focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     >
                       <option value="Resigned">Resignation</option>
                       <option value="Terminated">Termination</option>
@@ -442,7 +442,7 @@ export default function OffboardingPage() {
                           offboarding_date: e.target.value,
                         })
                       }
-                      className="w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-foreground-secondary focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      className="w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-foreground-secondary focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
 
@@ -501,7 +501,7 @@ export default function OffboardingPage() {
                       }
                     >
                       <Button
-                        className="flex-1 bg-red-600 hover:bg-red-700 flex items-center justify-center gap-2"
+                        className="flex-1 bg-error hover:bg-error/90 flex items-center justify-center gap-2"
                         onClick={handleOffboarding}
                         disabled={loading}
                       >

@@ -111,7 +111,7 @@ export default function AssigneeField({
                 type="button"
                 onClick={() => handleEmployeeRemove(employee.id.toString())}
                 disabled={disabled}
-                className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                className="hover:bg-primary-200 dark:hover:bg-primary-800 rounded-full p-0.5 transition-colors"
               >
                 <X size={14} />
               </button>
@@ -134,7 +134,7 @@ export default function AssigneeField({
             placeholder={placeholder}
             disabled={disabled || (maxAssignees ? assignees.length >= maxAssignees : false)}
             className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors bg-surface-primary dark:bg-surface-primary text-foreground-primary dark:text-foreground-primary ${
-              error ? 'border-red-300' : 'border-border-primary dark:border-border-primary'
+              error ? 'border-error' : 'border-border-primary dark:border-border-primary'
             } ${disabled ? 'bg-background-secondary dark:bg-background-secondary cursor-not-allowed' : ''}`}
           />
         </div>
@@ -164,7 +164,7 @@ export default function AssigneeField({
                       <div className="text-xs text-foreground-tertiary dark:text-foreground-tertiary">{employee.designation}</div>
                     )}
                   </div>
-                  <Check size={16} className="text-green-600" />
+                  <Check size={16} className="text-success" />
                 </button>
               ))}
             </motion.div>
@@ -173,7 +173,7 @@ export default function AssigneeField({
       </div>
 
       {error && (
-        <p className="text-red-600 text-sm mt-1">{error}</p>
+        <p className="text-error text-sm mt-1">{error}</p>
       )}
 
       {maxAssignees && assignees.length >= maxAssignees && (

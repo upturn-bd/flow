@@ -31,7 +31,7 @@ export function IssueCategoryFormModal({
 
   return (
     <FormModal<IssueCategoryFormData>
-      title={category ? "PencilSimple Issue Category" : "Add Issue Category"}
+      title={category ? "Edit Issue Category" : "Add Issue Category"}
       icon={<Tag size={24} weight="duotone" />}
       initialValues={initialValues}
       validationFn={validateIssueCategory}
@@ -118,7 +118,7 @@ export function IssueSubcategoryFormModal({
 
   return (
     <FormModal<IssueSubcategoryFormData>
-      title={subcategory ? "PencilSimple Subcategory" : "Add Subcategory"}
+      title={subcategory ? "Edit Subcategory" : "Add Subcategory"}
       icon={<FolderOpen size={24} weight="duotone" />}
       initialValues={initialValues}
       validationFn={validateIssueSubcategory}

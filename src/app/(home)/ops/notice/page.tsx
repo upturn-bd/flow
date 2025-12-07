@@ -185,7 +185,7 @@ export default function NoticePage() {
                 <PermissionTooltip message="You don't have permission to create notices">
                   <button
                     disabled
-                    className="flex items-center justify-center gap-2 bg-gray-300 text-foreground-tertiary px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-60"
+                    className="flex items-center justify-center gap-2 bg-background-tertiary text-foreground-tertiary px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-60"
                   >
                     <Plus className="h-4 w-4" />
                     <span>Create Notice</span>
@@ -251,8 +251,8 @@ export default function NoticePage() {
                                 whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.1)" }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => setEditNotice(notice)}
-                                className="p-2 text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded-full transition-colors"
-                                aria-label="PencilSimple notice"
+                                className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded-full transition-colors"
+                                aria-label="Edit notice"
                               >
                                 <Pencil className="h-4 w-4" />
                               </motion.button>
@@ -261,7 +261,7 @@ export default function NoticePage() {
                                 <button
                                   disabled
                                   className="p-2 text-foreground-tertiary rounded-full cursor-not-allowed opacity-50"
-                                  aria-label="PencilSimple notice (disabled)"
+                                  aria-label="Edit notice (disabled)"
                                 >
                                   <Pencil className="h-4 w-4" />
                                 </button>
@@ -272,7 +272,7 @@ export default function NoticePage() {
                                 whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => handleDeleteNotice(notice.id!)}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                                className="p-2 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded-full transition-colors"
                                 aria-label="Delete notice"
                               >
                                 <TrashSimple className="h-4 w-4" />

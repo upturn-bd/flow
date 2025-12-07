@@ -42,11 +42,11 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
   const getStatusStyle = (status: string) => {
     switch (status) {
       case "Accepted":
-        return "bg-green-100 text-green-800";
+        return "bg-success/10 text-success";
       case "Rejected":
-        return "bg-red-100 text-red-800";
+        return "bg-error/10 text-error";
       default:
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-warning/10 text-warning";
     }
   };
 
@@ -182,7 +182,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
                     size="sm"
                     onClick={() => onReject?.()}
                     disabled={isProcessing}
-                    className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                    className="flex items-center gap-2 text-error border-error/30 hover:bg-error/10"
                   >
                     <X size={14} /> Reject
                   </Button>

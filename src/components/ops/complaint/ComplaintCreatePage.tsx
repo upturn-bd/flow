@@ -303,7 +303,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           type="button"
-                          className="text-foreground-tertiary hover:text-red-500"
+                          className="text-foreground-tertiary hover:text-error"
                           onClick={() => removeFile(file.name)}
                         >
                           <X size={16} />

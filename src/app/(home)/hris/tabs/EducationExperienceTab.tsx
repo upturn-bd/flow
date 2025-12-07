@@ -213,7 +213,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
   const getFileIcon = (filename: string) => {
     const extension = filename.split('.').pop()?.toLowerCase() || '';
     if (['pdf'].includes(extension)) {
-      return <FilePdf className="text-red-600 h-5 w-5" />;
+      return <FilePdf className="text-error h-5 w-5" />;
     }
     return <FileText className="text-primary-600 h-5 w-5" />;
   };
@@ -340,7 +340,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                       </button>
                       <button
                         onClick={() => handleDeleteEducation(edu.id ?? 0)}
-                        className="p-1.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                        className="p-1.5 text-slate-600 hover:text-error hover:bg-error/10 dark:hover:bg-error/20 rounded-full transition-colors"
                         disabled={isEducationActionLoading}
                       >
                         <TrashSimple className="h-4 w-4" />
@@ -438,7 +438,7 @@ export default function EducationExperienceTab({ uid }: EducationExperienceTabPr
                       </button>
                       <button
                         onClick={() => handleDeleteExperience(exp.id ?? 0)}
-                        className="p-1.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                        className="p-1.5 text-slate-600 hover:text-error hover:bg-error/10 dark:hover:bg-error/20 rounded-full transition-colors"
                         disabled={isExperienceActionLoading}
                       >
                         <TrashSimple className="h-4 w-4" />

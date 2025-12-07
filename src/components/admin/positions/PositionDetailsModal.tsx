@@ -65,7 +65,7 @@ export default function PositionDetailsModal({
           <Button
             variant="ghost"
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 text-foreground-tertiary hover:text-red-500"
+            className="p-1 rounded-full hover:bg-error/10 dark:hover:bg-error/20 text-foreground-tertiary hover:text-error"
           >
             <X className="h-5 w-5" />
           </Button>
@@ -121,7 +121,7 @@ export default function PositionDetailsModal({
           <Button
             variant="danger"
             onClick={deletePosition}
-            className="flex items-center gap-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:border-red-300"
+            className="flex items-center gap-2 bg-error/10 dark:bg-error/20 hover:bg-error/20 dark:hover:bg-error/30 text-error border border-error/30 dark:border-error/40 hover:border-error/50"
           >
             <TrashSimple size={18} weight="bold" />
             Delete

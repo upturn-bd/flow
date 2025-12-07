@@ -58,7 +58,7 @@ export default function AccountPage() {
   if (error || !userData) {
     return (
       <div className="flex flex-col items-center justify-center h-96 p-4">
-        <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-4 max-w-md">
+        <div className="bg-error/10 text-error dark:bg-error/20 p-4 rounded-lg mb-4 max-w-md">
           <p className="font-medium">Failed to load account information</p>
           <p className="text-sm mt-1">{error || "User data not available"}</p>
         </div>
@@ -98,7 +98,7 @@ export default function AccountPage() {
           
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-error text-white rounded-lg hover:bg-error/90 transition-colors"
           >
             <SignOut className="w-4 h-4" />
             <span>Logout</span>
@@ -109,8 +109,8 @@ export default function AccountPage() {
       {notification && (
         <div className={`mb-6 p-4 rounded-lg border ${
           notification.type === 'success' 
-            ? 'bg-green-50 border-green-200 text-green-700' 
-            : 'bg-red-50 border-red-200 text-red-700'
+            ? 'bg-success/10 border-success/30 text-success dark:bg-success/20' 
+            : 'bg-error/10 border-error/30 text-error dark:bg-error/20'
         }`}>
           <div className="flex items-start">
             {notification.type === 'success' ? (
@@ -139,10 +139,10 @@ export default function AccountPage() {
                 {userData.job_status && (
                   <span className={`py-1 px-3 rounded-full ${
                     userData.job_status === "Active" 
-                      ? "bg-green-400/30" 
+                      ? "bg-success/30" 
                       : userData.job_status === "Pending" 
-                        ? "bg-yellow-400/30" 
-                        : "bg-red-400/30"
+                        ? "bg-warning/30" 
+                        : "bg-error/30"
                   }`}>
                     {userData.job_status}
                   </span>

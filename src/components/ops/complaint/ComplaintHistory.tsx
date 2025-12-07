@@ -57,8 +57,8 @@ export default function ComplaintHistoryPage() {
           exit={{ opacity: 0 }}
           className="flex flex-col items-center justify-center py-16"
         >
-          <XCircle className="h-12 w-12 text-red-500 mb-2" />
-          <p className="text-red-500 font-medium">{error}</p>
+          <XCircle className="h-12 w-12 text-error mb-2" />
+          <p className="text-error font-medium">{error}</p>
         </motion.div>
       )}
 

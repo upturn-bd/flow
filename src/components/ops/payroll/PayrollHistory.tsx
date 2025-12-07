@@ -36,7 +36,7 @@ interface ExtendedPayroll {
 const getStatusIcon = (status: string) => {
   switch (status) {
     case 'Paid':
-      return <CheckCircle className="h-5 w-5 text-green-500" />;
+      return <CheckCircle className="h-5 w-5 text-success" />;
     case 'Published': // Updated from 'Adjusted'
       return <Warning className="h-5 w-5 text-amber-500" />;
     case 'Pending':
@@ -48,7 +48,7 @@ const getStatusIcon = (status: string) => {
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'Paid':
-      return 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800';
+      return 'bg-success/10 dark:bg-success/20 text-success border-success/30';
     case 'Published': // Updated from 'Adjusted'
       return 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800';
     case 'Pending':
@@ -177,7 +177,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
           exit={{ opacity: 0 }}
           className="flex flex-col items-center justify-center py-16"
         >
-          <XCircle className="h-12 w-12 text-red-400 mb-4" />
+          <XCircle className="h-12 w-12 text-error mb-4" />
           <h3 className="text-lg font-medium text-foreground-primary mb-2">Error Loading Payroll</h3>
           <p className="text-foreground-tertiary mb-4">{error.message}</p>
           <button
@@ -218,7 +218,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
               <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
                   <div className="shrink-0">
-                    <CheckCircle className="h-8 w-8 text-green-600" />
+                    <CheckCircle className="h-8 w-8 text-success" />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-foreground-secondary">Paid</p>
@@ -261,9 +261,9 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
               <div className="bg-surface-primary rounded-lg border border-border-primary p-4">
                 <div className="flex items-center">
                   <div className="shrink-0">
-                    {statusFilter === 'Paid' && <CheckCircle className="h-8 w-8 text-green-600" />}
-                    {statusFilter === 'Pending' && <Clock className="h-8 w-8 text-blue-600" />}
-                    {statusFilter === 'Published' && <Warning className="h-8 w-8 text-amber-600" />}
+                    {statusFilter === 'Paid' && <CheckCircle className="h-8 w-8 text-success" />}
+                    {statusFilter === 'Pending' && <Clock className="h-8 w-8 text-info" />}
+                    {statusFilter === 'Published' && <Warning className="h-8 w-8 text-warning" />}
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-foreground-secondary">{statusFilter} Payrolls</p>
@@ -361,7 +361,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                           {(adjustmentTotal !== 0 || isEditing) && (
                             <div className={`text-sm flex items-center justify-end mt-1 ${
                               (isEditing ? adjustments.reduce((sum, adj) => sum + adj.amount, 0) : adjustmentTotal) > 0 
-                                ? 'text-green-600' : 'text-red-600'
+                                ? 'text-success' : 'text-error'
                             }`}>
                               {(isEditing ? adjustments.reduce((sum, adj) => sum + adj.amount, 0) : adjustmentTotal) > 0 ? (
                                 <Plus className="h-3 w-3 mr-1" />
@@ -454,7 +454,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                                   <div key={idx} className="flex items-center justify-between text-sm">
                                     <span className="text-foreground-secondary">{adjustment.type}</span>
                                     <span className={`font-medium flex items-center ${
-                                      adjustment.amount >= 0 ? 'text-green-600' : 'text-red-600'
+                                      adjustment.amount >= 0 ? 'text-success' : 'text-error'
                                     }`}>
                                       {adjustment.amount >= 0 ? (
                                         <Plus className="h-3 w-3 mr-1" />
@@ -477,7 +477,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                                   <button
                                     onClick={() => handleEditPayroll(payroll)}
                                     disabled={processingUpdate}
-                                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-primary-600 bg-primary-50 border border-primary-200 rounded-md hover:bg-primary-100 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50"
                                   >
                                     <PencilSimple className="h-4 w-4 mr-2" />
                                     Add Adjustments
@@ -505,7 +505,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                                 <button
                                   onClick={() => handleStatusUpdate(payroll.id!, 'Paid')}
                                   disabled={processingUpdate}
-                                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors disabled:opacity-50"
+                                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-success hover:bg-success/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-success transition-colors disabled:opacity-50"
                                 >
                                   {processingUpdate ? (
                                     <>

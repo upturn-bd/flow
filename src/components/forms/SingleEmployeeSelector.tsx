@@ -81,7 +81,7 @@ export default function SingleEmployeeSelector({
     <div className="space-y-2">
       {label && (
         <label className="block text-sm font-medium text-foreground-primary dark:text-foreground-primary">
-          {label} {required && <span className="text-red-500">*</span>}
+          {label} {required && <span className="text-error">*</span>}
         </label>
       )}
       
@@ -90,7 +90,7 @@ export default function SingleEmployeeSelector({
         <div 
           className={`w-full border rounded-lg bg-surface-primary dark:bg-surface-primary cursor-pointer ${
             error
-              ? 'border-red-300 focus-within:ring-red-500 focus-within:border-red-500'
+              ? 'border-error focus-within:ring-error focus-within:border-error'
               : 'border-border-primary dark:border-border-primary focus-within:ring-primary-500 focus-within:border-primary-500'
           } ${disabled ? 'bg-background-secondary dark:bg-background-secondary cursor-not-allowed' : ''}`}
           onClick={!disabled ? handleInputClick : undefined}
@@ -187,7 +187,7 @@ export default function SingleEmployeeSelector({
       </div>
 
       {error && (
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="text-sm text-error">{error}</p>
       )}
     </div>
   );

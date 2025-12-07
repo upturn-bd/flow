@@ -220,10 +220,10 @@ function CompletedProjectsList({ setActiveTab }: { setActiveTab: (key: string) =
                           statusIcon={
                             <CheckCircle
                               size={18}
-                              className="text-green-500 mt-1 shrink-0"
+                              className="text-success mt-1 shrink-0"
                             />
                           }
-                          progressColor="bg-green-100 text-green-800"
+                          progressColor="bg-success/10 text-success dark:bg-success/20"
                         />
                       )
                   )}

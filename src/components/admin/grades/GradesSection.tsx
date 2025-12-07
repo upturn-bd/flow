@@ -75,7 +75,7 @@ export default function GradesSection({ showNotification }: GradesSectionProps) 
               <GraduationCap className="h-3 w-3 sm:h-4 sm:w-4 text-foreground-tertiary mr-1.5 sm:mr-2" />
               <span className="text-foreground-primary">{grade.name}</span>
               <button
-                className="ml-1.5 sm:ml-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors disabled:opacity-50"
+                className="ml-1.5 sm:ml-2 text-error hover:text-error/80 transition-colors disabled:opacity-50"
                 onClick={() => handleDeleteGrade(grade.id ?? 0)}
                 disabled={gradeDeleteLoading === grade.id}
               >

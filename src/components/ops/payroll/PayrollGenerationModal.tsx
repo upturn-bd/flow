@@ -206,16 +206,16 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
             >
               <div className="text-center">
                 <div className={`mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 ${
-                  results.success ? 'bg-green-100' : 'bg-red-100'
+                  results.success ? 'bg-success/10 dark:bg-success/20' : 'bg-error/10 dark:bg-error/20'
                 }`}>
                   {results.success ? (
-                    <CheckCircle className="h-6 w-6 text-green-600" />
+                    <CheckCircle className="h-6 w-6 text-success" />
                   ) : (
-                    <XCircle className="h-6 w-6 text-red-600" />
+                    <XCircle className="h-6 w-6 text-error" />
                   )}
                 </div>
                 <h3 className={`text-lg font-medium mb-2 ${
-                  results.success ? 'text-green-900 dark:text-green-300' : 'text-red-900 dark:text-red-300'
+                  results.success ? 'text-success' : 'text-error'
                 }`}>
                   {results.success ? 'Payroll Generated Successfully!' : 'Payroll Generation Failed'}
                 </h3>
@@ -262,7 +262,7 @@ export default function PayrollGenerationModal({ isOpen, onClose, onSuccess }: P
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-red-600">{results.error}</p>
+                  <p className="text-sm text-error">{results.error}</p>
                 )}
               </div>
 

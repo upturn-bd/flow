@@ -90,8 +90,8 @@ const ClickableStatusCell = ({
         <div className="flex items-center justify-between w-full">
             <span
                 className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${tag === "Late"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : "bg-orange-100 text-orange-800"
+                    ? "bg-warning/10 text-warning dark:bg-warning/20"
+                    : "bg-warning/10 text-warning dark:bg-warning/20"
                     }`}
             >
                 {status.replace("_", " ")}

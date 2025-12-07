@@ -108,7 +108,7 @@ function KeyValueEditor({ pairs, onChange, error }: KeyValueEditorProps) {
       )}
 
       {error && (
-        <p className="text-red-600 text-xs mt-1">{error}</p>
+        <p className="text-error text-xs mt-1">{error}</p>
       )}
     </div>
   );
@@ -418,7 +418,7 @@ export default function AccountsTab() {
               placeholder="Search transactions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
             />
           </div>
 
@@ -433,7 +433,7 @@ export default function AccountsTab() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               >
                 <option value="All">All Status</option>
                 <option value="Complete">Complete</option>
@@ -450,7 +450,7 @@ export default function AccountsTab() {
               <select
                 value={methodFilter}
                 onChange={(e) => setMethodFilter(e.target.value)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               >
                 <option value="All">All Methods</option>
                 {PAYMENT_METHODS.map(method => (
@@ -469,7 +469,7 @@ export default function AccountsTab() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               />
             </div>
 
@@ -483,7 +483,7 @@ export default function AccountsTab() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               />
             </div>
 
@@ -496,7 +496,7 @@ export default function AccountsTab() {
               <select
                 value={stakeholderFilter}
                 onChange={(e) => setStakeholderFilter(e.target.value)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               >
                 <option value="All">All Stakeholders</option>
                 <option value="none">No Stakeholder</option>
@@ -517,7 +517,7 @@ export default function AccountsTab() {
                 placeholder="Min"
                 value={minAmount}
                 onChange={(e) => setMinAmount(e.target.value)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               />
             </div>
 
@@ -532,7 +532,7 @@ export default function AccountsTab() {
                 placeholder="Max"
                 value={maxAmount}
                 onChange={(e) => setMaxAmount(e.target.value)}
-                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full border border-border-secondary rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
               />
             </div>
 
@@ -629,14 +629,14 @@ export default function AccountsTab() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-xs font-medium whitespace-nowrap">
-                          <span className={account.amount >= 0 ? 'text-green-600' : 'text-red-600'}>
+                          <span className={account.amount >= 0 ? 'text-success' : 'text-error'}>
                             {formatAmount(account.amount, account.currency)}
                           </span>
                         </td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${account.status === 'Complete'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-success/10 text-success dark:bg-success/20'
+                            : 'bg-warning/10 text-warning dark:bg-warning/20'
                             }`}>
                             {account.status === 'Complete' ? (
                               <><CheckCircle size={10} className="mr-1" />Complete</>
@@ -652,14 +652,14 @@ export default function AccountsTab() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleEditClick(account)}
-                              className="text-blue-600 hover:text-blue-800 transition-colors"
+                              className="text-primary-600 hover:text-primary-800 transition-colors"
                               title="PencilSimple"
                             >
                               <PencilSimple size={14} />
                             </button>
                             <button
                               onClick={() => handleDeleteClick(account)}
-                              className="text-red-600 hover:text-red-800 transition-colors"
+                              className="text-error hover:text-error/80 transition-colors"
                               title="Delete"
                             >
                               <TrashSimple size={14} />
@@ -690,8 +690,8 @@ export default function AccountsTab() {
                         </div>
                       </div>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ml-2 ${account.status === 'Complete'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-success/10 text-success dark:bg-success/20'
+                        : 'bg-warning/10 text-warning dark:bg-warning/20'
                         }`}>
                         {account.status === 'Complete' ? (
                           <><CheckCircle size={10} className="mr-1" />Complete</>
@@ -704,7 +704,7 @@ export default function AccountsTab() {
                     <div className="space-y-2 mb-3">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-foreground-secondary">Amount:</span>
-                        <span className={`font-semibold ${account.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <span className={`font-semibold ${account.amount >= 0 ? 'text-success' : 'text-error'}`}>
                           {formatAmount(account.amount, account.currency)}
                         </span>
                       </div>
@@ -746,14 +746,14 @@ export default function AccountsTab() {
                     <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                       <button
                         onClick={() => handleEditClick(account)}
-                        className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 bg-primary-50 hover:bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:hover:bg-primary-900/50 dark:text-primary-300 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
                       >
                         <PencilSimple size={14} />
                         PencilSimple
                       </button>
                       <button
                         onClick={() => handleDeleteClick(account)}
-                        className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 bg-error/10 hover:bg-error/20 text-error px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
                       >
                         <TrashSimple size={14} />
                         Delete
@@ -922,10 +922,10 @@ export default function AccountsTab() {
         )}
       </FormModal>
 
-      {/* PencilSimple Account Modal */}
+      {/* Edit Account Modal */}
       {selectedAccount && (
         <FormModal<AccountFormData>
-          title="PencilSimple Transaction"
+          title="Edit Transaction"
           icon={<PencilSimple size={24} />}
           isOpen={isEditModalOpen}
           initialValues={{

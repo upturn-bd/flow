@@ -149,11 +149,11 @@ function AttendancePageContent() {
       key: "today",
       label: "Today",
       icon: <Clock className="h-5 w-5" />,
-      color: "text-blue-600",
+      color: "text-primary-600",
       content: todayLoading || sitesLoading ? (
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="flex flex-col items-center gap-3">
-            <Clock className="h-8 w-8 text-blue-600 animate-pulse" />
+            <Clock className="h-8 w-8 text-primary-600 animate-pulse" />
             <p className="text-sm text-foreground-secondary">Loading attendance...</p>
           </div>
         </div>
@@ -184,7 +184,7 @@ function AttendancePageContent() {
       key: "request",
       label: "Request",
       icon: <ClipboardText className="h-5 w-5" />,
-      color: "text-blue-600",
+      color: "text-primary-600",
       content: <AttendanceRequestsPage />,
       link: "/ops/attendance?tab=request",
     },
@@ -196,7 +196,7 @@ function AttendancePageContent() {
         title="Attendance"
         description="View and manage your attendance records, check your history, and submit attendance requests."
         icon={<Calendar className="h-6 w-6" />}
-        primaryColor="text-blue-600"
+        primaryColor="text-primary-600"
         tabs={tabs}
         activeTab={activeTab}
         setActiveTab={setActiveTab}

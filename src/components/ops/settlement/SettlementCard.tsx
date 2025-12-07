@@ -86,7 +86,7 @@ export default function SettlementCard({
           size="sm"
           onClick={onDelete}
           isLoading={isDeleting}
-          className="p-2 h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600"
+          className="p-2 h-8 w-8 hover:bg-error/10 dark:hover:bg-error/20 hover:text-error"
         >
           <TrashSimple size={14} />
         </Button>
@@ -109,7 +109,7 @@ export default function SettlementCard({
       <CardHeader
         title={settlementType?.name || "Settlement Request"}
         subtitle={settlement.description}
-        icon={settlement.in_advance ? <WarningCircle size={20} className="text-orange-500" /> : <CurrencyDollar size={20} className="text-green-500" />}
+        icon={settlement.in_advance ? <WarningCircle size={20} className="text-warning" /> : <CurrencyDollar size={20} className="text-success" />}
         action={actions}
       />
       
@@ -143,7 +143,7 @@ export default function SettlementCard({
             variant={getStatusVariant(settlement.status)}
           />
           {settlement.in_advance && (
-            <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full font-medium">
+            <span className="text-xs bg-warning/10 text-warning dark:bg-warning/20 px-2 py-1 rounded-full font-medium">
               Advance Payment
             </span>
           )}

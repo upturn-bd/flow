@@ -156,7 +156,7 @@ export default function RequisitionRequestsPage() {
         </>
       )}
 
-      {/* PencilSimple Modal */}
+      {/* Edit Modal */}
       {editingRequisition && (
         <RequisitionEditModal
           isOpen={!!editingRequisition}

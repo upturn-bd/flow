@@ -54,7 +54,7 @@ const sections: NavigationSectionProps[] = [
                 path: "/admin/config/payroll",
                 icon: CreditCard,
                 description: "Manage salary structures, deductions, and payment rules",
-                iconColor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                iconColor: "bg-success/10 text-success dark:bg-success/20"
             },
             {
                 name: "Teams",
@@ -102,7 +102,7 @@ const sections: NavigationSectionProps[] = [
                 path: "/admin/logs/attendance",
                 icon: SignIn,
                 description: "Review historical check-in and check-out data",
-                iconColor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                iconColor: "bg-success/10 text-success dark:bg-success/20"
             },
             {
                 name: "Leave",
@@ -130,7 +130,7 @@ const sections: NavigationSectionProps[] = [
                 path: "/admin/logs/complaint",
                 icon: WarningCircle,
                 description: "Archive of all submitted workplace complaints",
-                iconColor: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                iconColor: "bg-error/10 text-error dark:bg-error/20"
             },
             {
                 name: "Stakeholder",

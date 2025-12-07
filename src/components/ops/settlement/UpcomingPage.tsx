@@ -116,7 +116,7 @@ export default function UpcomingPage({setActiveTab} : {setActiveTab: (tab:string
                           </button>
                           <button
                             onClick={() => handleDeleteDraft(item.draft_id)}
-                            className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-colors"
+                            className="p-1.5 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded-full transition-colors"
                             aria-label="Delete draft"
                           >
                             <TrashSimple className="h-5 w-5" />
@@ -129,7 +129,7 @@ export default function UpcomingPage({setActiveTab} : {setActiveTab: (tab:string
                       </div>
                       
                       {item.amount && (
-                        <div className="mt-2 font-medium text-green-700 dark:text-green-500">
+                        <div className="mt-2 font-medium text-success">
                           Amount: ${parseFloat(item.amount).toFixed(2)}
                         </div>
                       )}

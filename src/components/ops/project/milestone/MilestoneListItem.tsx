@@ -40,17 +40,17 @@ const MilestoneListItem: React.FC<MilestoneListItemProps> = ({
           </span>
 
           {milestone.status === "Completed" && (
-            <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-1 rounded-full">
+            <span className="text-xs font-medium text-success bg-success/10 dark:bg-success/20 px-2 py-1 rounded-full">
               Completed
             </span>
           )}
           {milestone.status === "In Progress" && (
-            <span className="text-xs font-medium text-yellow-700 bg-yellow-100 px-2 py-1 rounded-full">
+            <span className="text-xs font-medium text-warning bg-warning/10 dark:bg-warning/20 px-2 py-1 rounded-full">
               In Progress
             </span>
           )}
           {milestone.status === "Not Started" && (
-            <span className="text-xs font-medium text-red-700 bg-red-100 px-2 py-1 rounded-full">
+            <span className="text-xs font-medium text-error bg-error/10 dark:bg-error/20 px-2 py-1 rounded-full">
               Not Started
             </span>
           )}

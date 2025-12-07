@@ -267,17 +267,17 @@ export default function TeamsPage() {
                         <button
                           onClick={() => handleEditTeam(team)}
                           className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors"
-                          title="PencilSimple team"
+                          title="Edit team"
                         >
                           <PencilSimple className="h-4 w-4 text-foreground-secondary" />
                         </button>
                         {canDeleteTeams && (
                           <button
                             onClick={() => handleDeleteClick(team)}
-                            className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-1.5 hover:bg-error/10 dark:hover:bg-error/20 rounded-lg transition-colors"
                             title="Delete team"
                           >
-                            <TrashSimple className="h-4 w-4 text-red-600" />
+                            <TrashSimple className="h-4 w-4 text-error" />
                           </button>
                         )}
                       </div>
@@ -362,7 +362,7 @@ export default function TeamsPage() {
         />
       )}
 
-      {/* PencilSimple Team Modal */}
+      {/* Edit Team Modal */}
       {isEditing && selectedTeam && (
         <TeamForm
           team={selectedTeam}
@@ -448,7 +448,7 @@ export default function TeamsPage() {
               variant="primary"
               onClick={handleDeleteTeam}
               disabled={isLoadingAction}
-              className="bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-error hover:bg-error/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoadingAction ? (
                 <>

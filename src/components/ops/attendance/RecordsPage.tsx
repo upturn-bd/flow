@@ -64,12 +64,12 @@ export default function AttendanceRecordsPage() {
 
    // Tag color styles
    const tagStyles: Record<string, string> = {
-      Present: "bg-green-100 text-green-800",
-      Absent: "bg-red-100 text-red-800",
-      Late: "bg-yellow-100 text-yellow-800",
-      On_Leave: "bg-blue-100 text-blue-800",
-      Wrong_Location: "bg-purple-100 text-purple-800",
-      Pending: "bg-yellow-100 text-yellow-800",
+      Present: "bg-success/10 text-success dark:bg-success/20",
+      Absent: "bg-error/10 text-error dark:bg-error/20",
+      Late: "bg-warning/10 text-warning dark:bg-warning/20",
+      On_Leave: "bg-info/10 text-info dark:bg-info/20",
+      Wrong_Location: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+      Pending: "bg-warning/10 text-warning dark:bg-warning/20",
    };
 
    // Summary counts for selected month

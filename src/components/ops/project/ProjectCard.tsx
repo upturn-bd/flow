@@ -81,7 +81,7 @@ export default function ProjectCard({
           size="sm"
           onClick={onDelete}
           isLoading={isDeleting}
-          className="p-2 h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600"
+          className="p-2 h-8 w-8 hover:bg-error/10 dark:hover:bg-error/20 hover:text-error"
         >
           <TrashSimple size={14} />
         </Button>

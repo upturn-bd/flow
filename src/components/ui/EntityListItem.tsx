@@ -168,7 +168,7 @@ export function EntityListItem({
             </button>
           )}
 
-          {/* PencilSimple button */}
+          {/* Edit button */}
           {actions.onEdit && (
             <button
               onClick={(e) => {
@@ -198,9 +198,9 @@ export function EntityListItem({
               disabled={deleteLoading}
               className={`
                 ${sizes.button}
-                rounded-md bg-red-50 dark:bg-red-900/30
-                text-red-600 dark:text-red-400 flex items-center gap-1
-                hover:bg-red-100 dark:hover:bg-red-900/50
+                rounded-md bg-error/10 dark:bg-error/20
+                text-error dark:text-error flex items-center gap-1
+                hover:bg-error/20 dark:hover:bg-error/30
                 transition-colors
                 ${deleteLoading ? "opacity-50 cursor-not-allowed" : ""}
               `}

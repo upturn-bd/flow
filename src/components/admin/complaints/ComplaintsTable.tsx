@@ -41,7 +41,7 @@ export default function ComplaintsTable({
                 </button>
                 <button
                   onClick={() => onDelete(complaint.id)}
-                  className="text-red-600 hover:text-red-900"
+                  className="text-error hover:text-error/80"
                 >
                   Delete
                 </button>

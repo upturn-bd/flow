@@ -260,7 +260,7 @@ export default function MilestoneForm({
               className="w-full rounded-md border border-border-secondary shadow-sm focus:border-border-secondary focus:ring focus:ring-gray-200 focus:ring-opacity-50 bg-background-secondary dark:bg-background-tertiary p-3"
             />
             {errors.weightage && (
-              <p className="mt-1 text-red-500 text-sm flex items-center">
+              <p className="mt-1 text-error text-sm flex items-center">
                 <WarningCircle size={14} className="mr-1" strokeWidth={2} />
                 {errors.weightage}
               </p>

@@ -281,7 +281,7 @@ export default function RequisitionEditModal({
               />
               {touchedFields.requisition_category_id &&
                 errors.requisition_category_id && (
-                  <p className="mt-1 text-red-500 text-sm flex items-center">
+                  <p className="mt-1 text-error text-sm flex items-center">
                     <WarningCircle size={14} className="mr-1" />
                     {errors.requisition_category_id}
                   </p>
@@ -320,7 +320,7 @@ export default function RequisitionEditModal({
                 size={16}
               />
               {touchedFields.item_id && errors.item_id && (
-                <p className="mt-1 text-red-500 text-sm flex items-center">
+                <p className="mt-1 text-error text-sm flex items-center">
                   <WarningCircle size={14} className="mr-1" />
                   {errors.item_id}
                 </p>
@@ -341,7 +341,7 @@ export default function RequisitionEditModal({
               className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-primary-500 focus:ring focus:ring-primary-200 dark:focus:ring-primary-900/50 transition-colors p-2"
             />
             {touchedFields.quantity && errors.quantity && (
-              <p className="mt-1 text-red-500 text-sm flex items-center">
+              <p className="mt-1 text-error text-sm flex items-center">
                 <WarningCircle size={14} className="mr-1" />
                 {errors.quantity}
               </p>
@@ -366,7 +366,7 @@ export default function RequisitionEditModal({
                 />
               </div>
               {touchedFields.date && errors.date && (
-                <p className="mt-1 text-red-500 text-sm flex items-center">
+                <p className="mt-1 text-error text-sm flex items-center">
                   <WarningCircle size={14} className="mr-1" />
                   {errors.date}
                 </p>
@@ -392,7 +392,7 @@ export default function RequisitionEditModal({
                     />
                   </div>
                   {touchedFields.from_time && errors.from_time && (
-                    <p className="mt-1 text-red-500 text-sm flex items-center">
+                    <p className="mt-1 text-error text-sm flex items-center">
                       <WarningCircle size={14} className="mr-1" />
                       {errors.from_time}
                     </p>
@@ -416,7 +416,7 @@ export default function RequisitionEditModal({
                     />
                   </div>
                   {touchedFields.to_time && errors.to_time && (
-                    <p className="mt-1 text-red-500 text-sm flex items-center">
+                    <p className="mt-1 text-error text-sm flex items-center">
                       <WarningCircle size={14} className="mr-1" />
                       {errors.to_time}
                     </p>
@@ -459,7 +459,7 @@ export default function RequisitionEditModal({
                     </span>
                     <button
                       type="button"
-                      className="text-foreground-tertiary hover:text-red-500 dark:hover:text-red-400"
+                      className="text-foreground-tertiary hover:text-error"
                       onClick={() => removeExistingAttachment(path)}
                     >
                       <X size={16} />
@@ -522,7 +522,7 @@ export default function RequisitionEditModal({
                         <span className="truncate max-w-xs">{file.name}</span>
                         <button
                           type="button"
-                          className="text-foreground-tertiary hover:text-red-500 dark:hover:text-red-400"
+                          className="text-foreground-tertiary hover:text-error"
                           onClick={() => removeFile(file.name)}
                         >
                           <X size={16} />

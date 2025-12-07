@@ -26,7 +26,7 @@ const TABS = [
     key: "completed",
     label: "Completed",
     icon: <CheckSquare className="h-5 w-5" />,
-    color: "text-green-600",
+    color: "text-success",
   },
   {
     key: "archived",

@@ -207,7 +207,7 @@ export default function TopBar() {
                 <div className="relative">
                   <button 
                     onClick={() => setReportProblemModalOpen(true)}
-                    className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 dark:text-red-400 transition-colors"
+                    className="p-2 rounded-full hover:bg-error/10 dark:hover:bg-error/20 text-error transition-colors"
                     title="Report a problem"
                   >
                     <Bug className="h-5 w-5" />
@@ -223,7 +223,7 @@ export default function TopBar() {
                 >
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    <span className="absolute top-1 right-1 bg-error text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
@@ -287,7 +287,7 @@ export default function TopBar() {
                       setUserMenuOpen(false);
                       handleLogout();
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-error hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center"
+                    className="w-full text-left px-4 py-2 text-sm text-error hover:bg-error/10 dark:hover:bg-error/20 flex items-center"
                   >
                     <SignOut className="h-4 w-4 mr-2" />
                     Log Out

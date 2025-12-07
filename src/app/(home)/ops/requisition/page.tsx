@@ -38,7 +38,7 @@ function RequisitionPageContent() {
       key: "requests",
       label: "Requests",
       icon: <ClipboardText className="h-5 w-5" />,
-      color: "text-green-600",
+      color: "text-success",
       content: <RequisitionRequestsPage />,
       link: "/ops/requisition?tab=requests",
     },

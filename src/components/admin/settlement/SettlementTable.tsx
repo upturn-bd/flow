@@ -47,7 +47,7 @@ export default function ClaimSettlementTable({
                 </button>
                 <button
                   onClick={() => onDelete(claim.id)}
-                  className="text-red-600 hover:text-red-900"
+                  className="text-error hover:text-error/80"
                 >
                   Delete
                 </button>

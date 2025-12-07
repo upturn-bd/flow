@@ -85,8 +85,8 @@ export default function ContactPage() {
             </div>
           </div>
           <div className="bg-surface-primary rounded-lg shadow-sm p-6 flex items-start gap-4 hover:shadow-md transition-shadow">
-            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <BookOpen className="w-6 h-6 text-green-600" weight="fill" />
+            <div className="p-3 bg-success/10 dark:bg-success/20 rounded-lg">
+              <BookOpen className="w-6 h-6 text-success" weight="fill" />
             </div>
             <div>
               <h3 className="font-semibold text-foreground-primary">Documentation</h3>
@@ -217,8 +217,8 @@ export default function ContactPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                    <Phone className="w-6 h-6 text-green-600" weight="fill" />
+                  <div className="p-3 bg-success/10 dark:bg-success/20 rounded-lg">
+                    <Phone className="w-6 h-6 text-success" weight="fill" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground-primary">Phone</h3>

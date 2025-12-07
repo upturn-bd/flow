@@ -153,7 +153,7 @@ export default function IssueCategoryManagementView() {
         </p>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
+          <div className="bg-error/10 dark:bg-error/20 border border-error/20 text-error px-4 py-3 rounded-lg">
             {error}
           </div>
         )}
@@ -232,7 +232,7 @@ export default function IssueCategoryManagementView() {
                           size="sm"
                           onClick={() => handleEditCategory(category)}
                           className="p-1.5 rounded-full text-foreground-tertiary hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-600"
-                          title="PencilSimple Category"
+                          title="Edit Category"
                         >
                           <PencilSimple size={16} weight="bold" />
                         </Button>
@@ -242,7 +242,7 @@ export default function IssueCategoryManagementView() {
                           onClick={() => category.id && handleDeleteCategory(category.id)}
                           isLoading={deleteLoading === category.id}
                           disabled={deleteLoading === category.id}
-                          className="p-1.5 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-500"
+                          className="p-1.5 rounded-full text-foreground-tertiary hover:bg-error/10 dark:hover:bg-error/20 hover:text-error"
                           title="Delete Category"
                         >
                           <TrashSimple size={16} weight="bold" />
@@ -283,7 +283,7 @@ export default function IssueCategoryManagementView() {
                                     size="sm"
                                     onClick={() => handleEditSubcategory(subcategory)}
                                     className="p-1 rounded-full text-foreground-tertiary hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-600"
-                                    title="PencilSimple Subcategory"
+                                    title="Edit Subcategory"
                                   >
                                     <PencilSimple size={14} weight="bold" />
                                   </Button>
@@ -293,7 +293,7 @@ export default function IssueCategoryManagementView() {
                                     onClick={() => subcategory.id && handleDeleteSubcategory(subcategory.id)}
                                     isLoading={deleteLoading === subcategory.id}
                                     disabled={deleteLoading === subcategory.id}
-                                    className="p-1 rounded-full text-foreground-tertiary hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-500"
+                                    className="p-1 rounded-full text-foreground-tertiary hover:bg-error/10 dark:hover:bg-error/20 hover:text-error"
                                     title="Delete Subcategory"
                                   >
                                     <TrashSimple size={14} weight="bold" />

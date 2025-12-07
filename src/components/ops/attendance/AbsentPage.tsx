@@ -71,7 +71,7 @@ export default function AttendanceAbsentPage() {
               type="date"
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
-              className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
+              className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-full sm:w-auto min-w-[160px] text-sm"
             />
           </div>
 
@@ -83,7 +83,7 @@ export default function AttendanceAbsentPage() {
               type="date"
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
-              className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto min-w-[160px] text-sm"
+              className="pl-10 pr-4 py-2.5 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-full sm:w-auto min-w-[160px] text-sm"
             />
           </div>
 
@@ -142,7 +142,7 @@ export default function AttendanceAbsentPage() {
                         {entry.check_out_time ? formatTimeFromISO(entry.check_out_time) : "N/A"}
                       </td>
                       <td className="px-4 py-3 text-sm">
-                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-error/10 text-error dark:bg-error/20">
                           Absent
                         </span>
                       </td>

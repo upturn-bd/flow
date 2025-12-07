@@ -308,7 +308,7 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
               />
             </button>
             <span className="text-sm font-medium text-foreground-secondary">
-              {isEditMode ? 'PencilSimple Mode On' : 'PencilSimple Mode Off'}
+              {isEditMode ? 'Edit Mode On' : 'Edit Mode Off'}
             </span>
           </div>
         )}
@@ -318,11 +318,11 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm"
+          className="mb-6 p-4 bg-error/10 border border-error/30 dark:bg-error/20 rounded-lg shadow-sm"
         >
           <div className="flex items-start">
-            <WarningCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3 shrink-0" />
-            <p className="text-sm font-medium text-red-700">{submitError}</p>
+            <WarningCircle className="h-5 w-5 text-error mt-0.5 mr-3 shrink-0" />
+            <p className="text-sm font-medium text-error">{submitError}</p>
           </div>
         </motion.div>
       )}
@@ -332,11 +332,11 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg shadow-sm"
+          className="mb-6 p-4 bg-success/10 border border-success/30 dark:bg-success/20 rounded-lg shadow-sm"
         >
           <div className="flex items-start">
-            <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-            <p className="text-sm font-medium text-green-700">Basic information updated successfully!</p>
+            <CheckCircle className="h-5 w-5 text-success mt-0.5 mr-3 shrink-0" />
+            <p className="text-sm font-medium text-success">Basic information updated successfully!</p>
           </div>
         </motion.div>
       )}

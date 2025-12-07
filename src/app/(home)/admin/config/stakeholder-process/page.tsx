@@ -54,7 +54,7 @@ export default function StakeholderProcessesPage() {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-error/10 border border-error/30 text-error dark:bg-error/20 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
@@ -99,7 +99,7 @@ export default function StakeholderProcessesPage() {
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-semibold text-foreground-primary">{process.name}</h3>
                     {process.is_active ? (
-                      <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded">
+                      <span className="px-2 py-0.5 text-xs font-medium bg-success/10 text-success dark:bg-success/20 rounded">
                         Active
                       </span>
                     ) : (
@@ -146,14 +146,14 @@ export default function StakeholderProcessesPage() {
                       router.push(`/admin/config/stakeholder-process/${process.id}`);
                     }}
                     className="p-2 text-foreground-secondary hover:text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
-                    title="PencilSimple process"
+                    title="Edit process"
                   >
                     <PencilSimple size={18} />
                   </button>
                   <button
                     onClick={() => handleDelete(process.id!)}
                     disabled={processingId === process.id}
-                    className="p-2 text-foreground-secondary hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                    className="p-2 text-foreground-secondary hover:text-error hover:bg-error/10 dark:hover:bg-error/20 rounded transition-colors disabled:opacity-50"
                     title="Delete process"
                   >
                     {processingId === process.id ? (
@@ -169,7 +169,7 @@ export default function StakeholderProcessesPage() {
         </div>
       )}
 
-      {/* TODO: Add Create/PencilSimple Modal */}
+      {/* TODO: Add Create/Edit Modal */}
       {showCreateModal && (
         <ProcessForm
           process={null}

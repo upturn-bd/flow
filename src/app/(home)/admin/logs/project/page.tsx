@@ -126,13 +126,13 @@ export default function CompanyProjectsPage() {
 
                         {/* Desktop badges */}
                         <div className="hidden sm:flex flex-wrap gap-2 text-sm text-foreground-secondary mt-1">
-                           <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                           <span className="bg-info/10 text-info dark:bg-info/20 px-2 py-0.5 rounded-full">
                               Start: {project.start_date || "N/A"}
                            </span>
-                           <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
+                           <span className="bg-warning/10 text-warning dark:bg-warning/20 px-2 py-0.5 rounded-full">
                               End: {project.end_date || "N/A"}
                            </span>
-                           <span className={`px-2 py-0.5 rounded-full ${project.status === "Completed" ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                           <span className={`px-2 py-0.5 rounded-full ${project.status === "Completed" ? 'bg-success/10 text-success dark:bg-success/20' : 'bg-warning/10 text-warning dark:bg-warning/20'}`}>
                               Status: {project.status || "N/A"}
                            </span>
                         </div>
@@ -202,7 +202,7 @@ export default function CompanyProjectsPage() {
                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setSearch(e.target.value)
                      }
-                     className="w-full sm:w-1/3 px-3 py-2 border border-border-secondary rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                     className="w-full sm:w-1/3 px-3 py-2 border border-border-secondary rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                   />
                </div>
 
@@ -229,7 +229,7 @@ export default function CompanyProjectsPage() {
                         key: "completed",
                         label: "Completed Projects",
                         icon: <></>,
-                        color: "text-green-500",
+                        color: "text-success",
                         content: (
                            <>
                               {ongoingLoading ? (

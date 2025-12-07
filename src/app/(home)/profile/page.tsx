@@ -138,7 +138,7 @@ function ProfileContent() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-96 p-4">
-        <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-4">
+        <div className="bg-error/10 text-error dark:bg-error/20 p-4 rounded-lg mb-4">
           <p className="font-medium">{error}</p>
           <p className="text-sm mt-1">Please try again later.</p>
         </div>

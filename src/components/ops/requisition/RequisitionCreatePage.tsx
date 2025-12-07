@@ -339,7 +339,7 @@ export default function RequisitionCreatePage({
                 value={requisitionState.requisition_category_id}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur('requisition_category_id')}
-                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-primary-500 focus:ring focus:ring-primary-200 transition-colors p-2 pr-8"
               >
                 <option value={undefined}>Select category</option>
                 {requisitionTypes.length > 0 &&
@@ -354,7 +354,7 @@ export default function RequisitionCreatePage({
                 size={16}
               />
               {touchedFields.requisition_category_id && errors.requisition_category_id && (
-                <p className="mt-1 text-red-500 text-sm flex items-center">
+                <p className="mt-1 text-error text-sm flex items-center">
                   <WarningCircle size={14} className="mr-1" />
                   {errors.requisition_category_id}
                 </p>
@@ -372,7 +372,7 @@ export default function RequisitionCreatePage({
                 value={requisitionState.item_id}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur('item_id')}
-                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-primary-500 focus:ring focus:ring-primary-200 transition-colors p-2 pr-8"
               >
                 <option value={undefined}>Select item</option>
                 {requisitionInventories.length > 0 &&
@@ -393,7 +393,7 @@ export default function RequisitionCreatePage({
                 size={16}
               />
               {touchedFields.item_id && errors.item_id && (
-                <p className="mt-1 text-red-500 text-sm flex items-center">
+                <p className="mt-1 text-error text-sm flex items-center">
                   <WarningCircle size={14} className="mr-1" />
                   {errors.item_id}
                 </p>
@@ -411,10 +411,10 @@ export default function RequisitionCreatePage({
               value={requisitionState.quantity || ""}
               onChange={handleInputChange}
               onBlur={() => handleFieldBlur('quantity')}
-              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-primary-500 focus:ring focus:ring-primary-200 transition-colors p-2"
             />
             {touchedFields.quantity && errors.quantity && (
-              <p className="mt-1 text-red-500 text-sm flex items-center">
+              <p className="mt-1 text-error text-sm flex items-center">
                 <WarningCircle size={14} className="mr-1" />
                 {errors.quantity}
               </p>
@@ -439,7 +439,7 @@ export default function RequisitionCreatePage({
                 />
               </div>
               {touchedFields.date && errors.date && (
-                <p className="mt-1 text-red-500 text-sm flex items-center">
+                <p className="mt-1 text-error text-sm flex items-center">
                   <WarningCircle size={14} className="mr-1" />
                   {errors.date}
                 </p>
@@ -465,7 +465,7 @@ export default function RequisitionCreatePage({
                     />
                   </div>
                   {touchedFields.from_time && errors.from_time && (
-                    <p className="mt-1 text-red-500 text-sm flex items-center">
+                    <p className="mt-1 text-error text-sm flex items-center">
                       <WarningCircle size={14} className="mr-1" />
                       {errors.from_time}
                     </p>
@@ -489,7 +489,7 @@ export default function RequisitionCreatePage({
                     />
                   </div>
                   {touchedFields.to_time && errors.to_time && (
-                    <p className="mt-1 text-red-500 text-sm flex items-center">
+                    <p className="mt-1 text-error text-sm flex items-center">
                       <WarningCircle size={14} className="mr-1" />
                       {errors.to_time}
                     </p>
@@ -510,7 +510,7 @@ export default function RequisitionCreatePage({
               value={requisitionState.description}
               onChange={handleInputChange}
               placeholder="Max 35 characters"
-              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-primary-500 focus:ring focus:ring-primary-200 transition-colors p-2"
             />
           </div>
 
@@ -571,7 +571,7 @@ export default function RequisitionCreatePage({
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           type="button"
-                          className="text-foreground-tertiary hover:text-red-500"
+                          className="text-foreground-tertiary hover:text-error"
                           onClick={() => removeFile(file.name)}
                         >
                           <X size={16} />
@@ -862,7 +862,7 @@ export function RequisitionDraftPage({
           <h1 className="text-xl font-bold text-blue-600">Requisition</h1>
           <button
             onClick={onClose}
-            className="bg-yellow-500 px-4 py-2 rounded-md"
+            className="bg-warning px-4 py-2 rounded-md"
           >
             Back
           </button>
@@ -908,7 +908,7 @@ export function RequisitionDraftPage({
             </div>
           </div>
           {touchedFields.requisition_category_id && errors.requisition_category_id && (
-            <p className="text-red-500 text-sm mt-1">
+            <p className="text-error text-sm mt-1">
               {errors.requisition_category_id}
             </p>
           )}
@@ -945,7 +945,7 @@ export function RequisitionDraftPage({
             </div>
           </div>
           {touchedFields.item_id && errors.item_id && (
-            <p className="text-red-500 text-sm mt-1">{errors.item_id}</p>
+            <p className="text-error text-sm mt-1">{errors.item_id}</p>
           )}
         </div>
         
@@ -962,7 +962,7 @@ export function RequisitionDraftPage({
             className="w-full bg-[#EAF4FF] px-4 py-2 rounded-md"
           />
           {touchedFields.quantity && errors.quantity && (
-            <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>
+            <p className="text-error text-sm mt-1">{errors.quantity}</p>
           )}
         </div>
 
@@ -981,7 +981,7 @@ export function RequisitionDraftPage({
               />
             </div>
             {touchedFields.date && errors.date && (
-              <p className="text-red-500 text-sm mt-1">{errors.date}</p>
+              <p className="text-error text-sm mt-1">{errors.date}</p>
             )}
           </div>
 
@@ -999,7 +999,7 @@ export function RequisitionDraftPage({
                 className="w-full bg-surface-primary shadow px-4 py-2 rounded-md"
               />
               {touchedFields.from_time && errors.from_time && (
-                <p className="text-red-500 text-sm mt-1">{errors.from_time}</p>
+                <p className="text-error text-sm mt-1">{errors.from_time}</p>
               )}
             </div>
           )}
@@ -1016,7 +1016,7 @@ export function RequisitionDraftPage({
                 className="w-full bg-surface-primary shadow px-4 py-2 rounded-md"
               />
               {touchedFields.to_time && errors.to_time && (
-                <p className="text-red-500 text-sm mt-1">{errors.to_time}</p>
+                <p className="text-error text-sm mt-1">{errors.to_time}</p>
               )}
             </div>
           )}
@@ -1076,7 +1076,7 @@ export function RequisitionDraftPage({
                     <span>{file.name}</span>
                     <button
                       type="button"
-                      className="ml-2 text-red-500 text-xl"
+                      className="ml-2 text-error text-xl"
                       onClick={() => removeFile(file.name)}
                     >
                       &times;

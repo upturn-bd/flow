@@ -115,7 +115,7 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
                           </button>
                           <button
                             onClick={() => handleDeleteDraft(item.draft_id)}
-                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                            className="p-1.5 text-error hover:bg-error/10 rounded-full transition-colors"
                             aria-label="Delete draft"
                           >
                             <TrashSimple className="h-5 w-5" />

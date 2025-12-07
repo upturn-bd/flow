@@ -481,7 +481,7 @@ export default function StakeholderIssueForm({
                           Step {stepData.stepOrder}: {stepData.stepName}
                         </span>
                         {stepData.isCompleted && (
-                          <span className="px-1.5 py-0.5 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded">
+                          <span className="px-1.5 py-0.5 text-xs bg-success/10 dark:bg-success/20 text-success rounded">
                             Completed
                           </span>
                         )}
@@ -562,7 +562,7 @@ export default function StakeholderIssueForm({
                           type="button"
                           onClick={() => handleRemoveExistingAttachment(attachment.path)}
                           disabled={deletingAttachment === attachment.path}
-                          className="p-1.5 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50 rounded transition-colors disabled:opacity-50"
+                          className="p-1.5 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded transition-colors disabled:opacity-50"
                           title="Delete"
                         >
                           {deletingAttachment === attachment.path ? (
@@ -602,7 +602,7 @@ export default function StakeholderIssueForm({
 
             {/* File Error */}
             {fileError && (
-              <p className="text-sm text-red-600">{fileError}</p>
+              <p className="text-sm text-error">{fileError}</p>
             )}
 
             {/* New File List */}
@@ -612,10 +612,10 @@ export default function StakeholderIssueForm({
                 {files.map((file, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-900/30 rounded border border-green-200 dark:border-green-800"
+                    className="flex items-center justify-between p-2 bg-success/10 dark:bg-success/20 rounded border border-success/30 dark:border-success/40"
                   >
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileText size={16} className="text-green-600 dark:text-green-400 shrink-0" />
+                      <FileText size={16} className="text-success shrink-0" />
                       <span className="text-sm text-foreground-secondary truncate">
                         {file.name}
                       </span>
@@ -626,7 +626,7 @@ export default function StakeholderIssueForm({
                     <button
                       type="button"
                       onClick={() => removeFile(index)}
-                      className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/50 rounded transition-colors"
+                      className="p-1 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded transition-colors"
                     >
                       <TrashSimple size={16} />
                     </button>

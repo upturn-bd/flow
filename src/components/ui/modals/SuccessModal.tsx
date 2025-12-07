@@ -74,7 +74,7 @@ export default function SuccessModal({
                       stiffness: 200,
                       delay: 0.1 
                     }}
-                    className="mx-auto w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6"
+                    className="mx-auto w-20 h-20 bg-success/10 dark:bg-success/20 rounded-full flex items-center justify-center mb-6"
                   >
                     <motion.div
                       initial={{ scale: 0, rotate: -180 }}
@@ -86,7 +86,7 @@ export default function SuccessModal({
                         delay: 0.2 
                       }}
                     >
-                      <CheckCircle className="w-12 h-12 text-green-600 dark:text-green-400" weight="fill" />
+                      <CheckCircle className="w-12 h-12 text-success" weight="fill" />
                     </motion.div>
                   </motion.div>
 
@@ -125,7 +125,7 @@ export default function SuccessModal({
                           initial={{ width: '100%' }}
                           animate={{ width: '0%' }}
                           transition={{ duration: autoCloseDuration / 1000, ease: 'linear' }}
-                          className="h-full bg-green-500"
+                          className="h-full bg-success"
                         />
                       </div>
                     </motion.div>
@@ -137,7 +137,7 @@ export default function SuccessModal({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
                     onClick={onClose}
-                    className="mt-6 px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors w-full sm:w-auto"
+                    className="mt-6 px-8 py-3 bg-success hover:bg-success/90 text-white font-medium rounded-lg transition-colors w-full sm:w-auto"
                   >
                     OK
                   </motion.button>

@@ -146,9 +146,9 @@ export default function StakeholderIssueModal({
         >
           <div className="sticky top-0 bg-surface-primary border-b border-border-primary px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <WarningCircle className="w-5 h-5 text-red-600" />
+              <WarningCircle className="w-5 h-5 text-warning" />
               <h2 className="text-xl font-bold text-foreground-primary">
-                {issueId ? (isEditing ? 'PencilSimple Issue' : 'Issue Details') : 'Create Stakeholder Issue'}
+                {issueId ? (isEditing ? 'Edit Issue' : 'Issue Details') : 'Create Stakeholder Issue'}
               </h2>
             </div>
             <button
@@ -194,7 +194,7 @@ export default function StakeholderIssueModal({
                       'inline-block px-3 py-1 rounded-full text-sm font-medium',
                       issue.status === 'Pending' && 'bg-background-tertiary text-foreground-primary',
                       issue.status === 'In Progress' && 'bg-primary-100 text-primary-700',
-                      issue.status === 'Resolved' && 'bg-green-100 text-green-700'
+                      issue.status === 'Resolved' && 'bg-success/10 text-success'
                     )}>
                       {issue.status}
                     </span>
@@ -204,10 +204,10 @@ export default function StakeholderIssueModal({
                     <label className="block text-sm font-medium text-foreground-secondary mb-1">Priority</label>
                     <span className={cn(
                       'inline-block px-3 py-1 rounded-full text-sm font-medium',
-                      issue.priority === 'Low' && 'bg-green-100 text-green-700',
-                      issue.priority === 'Medium' && 'bg-yellow-100 text-yellow-700',
-                      issue.priority === 'High' && 'bg-orange-100 text-orange-700',
-                      issue.priority === 'Urgent' && 'bg-red-100 text-red-700'
+                      issue.priority === 'Low' && 'bg-success/10 text-success',
+                      issue.priority === 'Medium' && 'bg-warning/10 text-warning',
+                      issue.priority === 'High' && 'bg-warning/20 text-warning',
+                      issue.priority === 'Urgent' && 'bg-error/10 text-error'
                     )}>
                       {issue.priority}
                     </span>
@@ -258,7 +258,7 @@ export default function StakeholderIssueModal({
                     <button
                       type="button"
                       onClick={() => setShowResolveConfirm(true)}
-                      className="px-4 py-2 text-green-700 bg-green-100 hover:bg-green-200 rounded-lg transition-colors font-medium"
+                      className="px-4 py-2 text-success bg-success/10 hover:bg-success/20 rounded-lg transition-colors font-medium"
                     >
                       Mark as Resolved
                     </button>
@@ -267,9 +267,9 @@ export default function StakeholderIssueModal({
                     <button
                       type="button"
                       onClick={() => setIsEditing(true)}
-                      className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                      className="px-4 py-2 text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
                     >
-                      PencilSimple Issue
+                      Edit Issue
                     </button>
                   </div>
                 </div>
@@ -279,14 +279,14 @@ export default function StakeholderIssueModal({
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-foreground-primary mb-1">
-                    Stakeholder <span className="text-red-500">*</span>
+                    Stakeholder <span className="text-error">*</span>
                   </label>
                   <div className="relative">
                     <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-tertiary" />
                     <select
                       value={formData.stakeholder_id}
                       onChange={(e) => setFormData({ ...formData, stakeholder_id: Number(e.target.value) })}
-                      className="w-full pl-10 pr-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                      className="w-full pl-10 pr-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                       required
                     >
                       <option value={0}>Select a stakeholder</option>
@@ -301,13 +301,13 @@ export default function StakeholderIssueModal({
 
                 <div>
                   <label className="block text-sm font-medium text-foreground-primary mb-1">
-                    Title <span className="text-red-500">*</span>
+                    Title <span className="text-error">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                    className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     placeholder="Enter issue title"
                     required
                   />
@@ -318,7 +318,7 @@ export default function StakeholderIssueModal({
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                    className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     placeholder="Enter issue description"
                     rows={4}
                   />
@@ -330,7 +330,7 @@ export default function StakeholderIssueModal({
                     <select
                       value={formData.priority}
                       onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     >
                       <option value="Low">Low</option>
                       <option value="Medium">Medium</option>
@@ -344,7 +344,7 @@ export default function StakeholderIssueModal({
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     >
                       <option value="Pending">Pending</option>
                       <option value="In Progress">In Progress</option>
@@ -367,7 +367,7 @@ export default function StakeholderIssueModal({
                           subcategory_id: undefined // Reset subcategory when category changes
                         });
                       }}
-                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     >
                       <option value="">No category</option>
                       {categories.filter(c => c.is_active).map((category) => (
@@ -384,7 +384,7 @@ export default function StakeholderIssueModal({
                       value={formData.subcategory_id || ''}
                       onChange={(e) => setFormData({ ...formData, subcategory_id: e.target.value ? Number(e.target.value) : undefined })}
                       disabled={!formData.category_id || availableSubcategories.length === 0}
-                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary disabled:opacity-50"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary disabled:opacity-50"
                     >
                       <option value="">No subcategory</option>
                       {availableSubcategories.map((subcategory) => (
@@ -438,7 +438,7 @@ export default function StakeholderIssueModal({
                     <select
                       value={formData.assigned_to || ''}
                       onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value || undefined })}
-                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     >
                       <option value="">No assignee</option>
                       {employees.map((employee) => (
@@ -451,7 +451,7 @@ export default function StakeholderIssueModal({
                     <select
                       value={formData.assigned_team_id || ''}
                       onChange={(e) => setFormData({ ...formData, assigned_team_id: e.target.value ? Number(e.target.value) : undefined })}
-                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-surface-primary"
+                      className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-surface-primary"
                     >
                       <option value="">No team assigned</option>
                       {teams.map((team) => (
@@ -481,7 +481,7 @@ export default function StakeholderIssueModal({
                     type="submit"
                     disabled={submitting || !formData.title || !formData.stakeholder_id}
                     className={cn(
-                      'px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors',
+                      'px-4 py-2 text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors',
                       (submitting || !formData.title || !formData.stakeholder_id) && 'opacity-50 cursor-not-allowed'
                     )}
                   >
@@ -527,7 +527,7 @@ export default function StakeholderIssueModal({
                   onClick={handleMarkAsResolved}
                   disabled={submitting}
                   className={cn(
-                    'px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors',
+                    'px-4 py-2 text-white bg-success hover:bg-success/90 rounded-lg transition-colors',
                     submitting && 'opacity-50 cursor-not-allowed'
                   )}
                 >

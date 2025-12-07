@@ -24,15 +24,15 @@ export default function ValidationFeedback({ isDirty, isValid, errors, className
         transition={{ duration: 0.2 }}
         className={`rounded-lg border p-3 ${className} ${
           isValid 
-            ? 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300' 
-            : 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300'
+            ? 'bg-success/10 dark:bg-success/20 border-success/30 dark:border-success/40 text-success' 
+            : 'bg-error/10 dark:bg-error/20 border-error/30 dark:border-error/40 text-error'
         }`}
       >
         <div className="flex items-start">
           {isValid ? (
-            <CheckCircle className="h-5 w-5 mt-0.5 mr-3 shrink-0 text-green-600" />
+            <CheckCircle className="h-5 w-5 mt-0.5 mr-3 shrink-0 text-success" />
           ) : (
-            <WarningCircle className="h-5 w-5 mt-0.5 mr-3 shrink-0 text-red-600" />
+            <WarningCircle className="h-5 w-5 mt-0.5 mr-3 shrink-0 text-error" />
           )}
           <div className="flex-1">
             {isValid ? (

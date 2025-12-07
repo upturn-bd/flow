@@ -245,7 +245,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
           </FormGrid>
 
           {/* Advance Payment Toggle */}
-          <div className="flex items-center p-4 bg-orange-50 border border-orange-200 rounded-lg">
+          <div className="flex items-center p-4 bg-warning/10 dark:bg-warning/20 border border-warning/20 rounded-lg">
             <input
               type="checkbox"
               id="in_advance"
@@ -254,10 +254,10 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
                 ...prev,
                 in_advance: e.target.checked
               }))}
-              className="w-4 h-4 text-orange-600 bg-surface-secondary border-border-secondary rounded focus:ring-orange-500"
+              className="w-4 h-4 text-warning bg-surface-secondary border-border-secondary rounded focus:ring-warning"
               style={{ display: 'block', flex: 'none' }}
             />
-            <label htmlFor="in_advance" className="flex items-center gap-2 text-sm font-medium text-orange-800 ml-2">
+            <label htmlFor="in_advance" className="flex items-center gap-2 text-sm font-medium text-foreground-primary ml-2">
               <WarningCircle size={16} />
               Request as advance payment
             </label>
@@ -278,12 +278,12 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
               value={settlementState.description}
               onChange={handleInputChange}
               rows={4}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.description ? 'border-red-300 ring-1 ring-red-300' : 'border-border-secondary'
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${errors.description ? 'border-error ring-1 ring-error' : 'border-border-secondary'
                 }`}
               placeholder="Describe the reason for this settlement request..."
             />
             {errors.description && (
-              <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+              <p className="mt-1 text-sm text-error">{errors.description}</p>
             )}
           </div>
 
@@ -296,7 +296,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
               value={settlementState.comment}
               onChange={handleInputChange}
               rows={3}
-              className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="Any additional comments or notes..."
             />
           </div>
@@ -345,7 +345,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
                       variant="ghost"
                       size="sm"
                       onClick={() => removeFile(index)}
-                      className="p-1 h-6 w-6 hover:bg-red-100 hover:text-red-600"
+                      className="p-1 h-6 w-6 hover:bg-error/10 hover:text-error"
                     >
                       <X size={12} />
                     </Button>

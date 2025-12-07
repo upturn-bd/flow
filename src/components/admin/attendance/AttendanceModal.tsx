@@ -143,7 +143,7 @@ export default function AttendanceCreateModal({
           <Button
             variant="ghost"
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-red-50 text-foreground-tertiary hover:text-red-500"
+            className="p-1 rounded-full hover:bg-error/10 text-foreground-tertiary hover:text-error"
           >
             <X size={20} weight="bold" />
           </Button>
@@ -166,7 +166,7 @@ export default function AttendanceCreateModal({
                 placeholder="Enter Site Name"
               />
             </div>
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {errors.name && <p className="text-error text-sm mt-1">{errors.name}</p>}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -187,7 +187,7 @@ export default function AttendanceCreateModal({
                 />
               </div>
               {errors.check_in && (
-                <p className="text-red-500 text-sm mt-1">{errors.check_in}</p>
+                <p className="text-error text-sm mt-1">{errors.check_in}</p>
               )}
             </div>
 
@@ -208,7 +208,7 @@ export default function AttendanceCreateModal({
                 />
               </div>
               {errors.check_out && (
-                <p className="text-red-500 text-sm mt-1">{errors.check_out}</p>
+                <p className="text-error text-sm mt-1">{errors.check_out}</p>
               )}
             </div>
           </div>
@@ -381,7 +381,7 @@ export function AttendanceUpdateModal({
           <Button
             variant="ghost"
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-red-50 text-foreground-tertiary hover:text-red-500"
+            className="p-1 rounded-full hover:bg-error/10 text-foreground-tertiary hover:text-error"
           >
             <X size={20} weight="bold" />
           </Button>
@@ -404,7 +404,7 @@ export function AttendanceUpdateModal({
                 placeholder="Enter Site Name"
               />
             </div>
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {errors.name && <p className="text-error text-sm mt-1">{errors.name}</p>}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -425,7 +425,7 @@ export function AttendanceUpdateModal({
                 />
               </div>
               {errors.check_in && (
-                <p className="text-red-500 text-sm mt-1">{errors.check_in}</p>
+                <p className="text-error text-sm mt-1">{errors.check_in}</p>
               )}
             </div>
 
@@ -446,7 +446,7 @@ export function AttendanceUpdateModal({
                 />
               </div>
               {errors.check_out && (
-                <p className="text-red-500 text-sm mt-1">{errors.check_out}</p>
+                <p className="text-error text-sm mt-1">{errors.check_out}</p>
               )}
             </div>
           </div>

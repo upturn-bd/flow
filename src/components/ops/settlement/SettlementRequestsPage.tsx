@@ -84,7 +84,7 @@ export default function SettlementRequestsPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
-        <div className="text-red-500 mb-2">Error loading settlement requests</div>
+        <div className="text-error mb-2">Error loading settlement requests</div>
         <p className="text-foreground-secondary">{error}</p>
       </div>
     );
@@ -146,7 +146,7 @@ function SettlementRequestCard({
         size="sm"
         onClick={onReject}
         disabled={isProcessing}
-        className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+        className="flex items-center gap-2 text-error border-error/20 hover:bg-error/10"
       >
         <X size={14} />
         Reject
@@ -170,7 +170,7 @@ function SettlementRequestCard({
       <CardHeader
         title={claimType?.settlement_item || "Unknown Settlement Type"}
         subtitle={`Amount: ${settlement.amount} BDT${settlement.in_advance ? " (Advance)" : ""}`}
-        icon={<CurrencyDollar size={20} className="text-green-500" />}
+        icon={<CurrencyDollar size={20} className="text-success" />}
         action={actions}
       />
       

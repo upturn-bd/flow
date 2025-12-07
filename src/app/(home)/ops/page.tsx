@@ -58,7 +58,7 @@ const sections: NavigationSectionProps[] = [
         path: "/ops/attendance?tab=today",
         icon: SignIn,
         description: "Track and manage your daily attendance",
-        iconColor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+        iconColor: "bg-success/10 text-success dark:bg-success/20"
       },
       {
         name: "Leave",
@@ -93,7 +93,7 @@ const sections: NavigationSectionProps[] = [
         path: "/ops/complaint",
         icon: WarningCircle,
         description: "Submit and track workplace issues and concerns",
-        iconColor: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+        iconColor: "bg-error/10 text-error dark:bg-error/20"
       },
       {
         name: "Payroll",
@@ -127,7 +127,7 @@ const sections: NavigationSectionProps[] = [
         path: "/ops/offboarding",
         icon: UserMinus,
         description: "Employee offboarding workflow and tasks",
-        iconColor: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+        iconColor: "bg-error/10 text-error dark:bg-error/20"
       },
       {
         name: "HRIS",

@@ -46,9 +46,9 @@ const weightClasses = {
 const colorClasses = {
   primary: "text-foreground-primary",
   secondary: "text-foreground-secondary",
-  success: "text-green-600 dark:text-green-400",
-  warning: "text-yellow-600 dark:text-yellow-400",
-  error: "text-red-600 dark:text-red-400",
+  success: "text-success",
+  warning: "text-warning",
+  error: "text-error",
   muted: "text-foreground-tertiary",
   white: "text-white"
 };
@@ -157,7 +157,7 @@ export function Label({
       {...props}
     >
       {children}
-      {required && <span className="text-red-500 ml-1">*</span>}
+      {required && <span className="text-error ml-1">*</span>}
     </Text>
   );
 }

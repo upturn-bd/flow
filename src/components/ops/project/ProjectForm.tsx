@@ -439,7 +439,7 @@ export default function ProjectForm({
           value={projectDetails.description}
           className={`p-3 w-full h-32 rounded-md border-2 bg-surface-primary dark:bg-surface-primary text-foreground-primary dark:text-foreground-primary
     ${errors.description
-              ? "border-red-300 ring-1 ring-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50"
+              ? "border-error/50 ring-1 ring-error/50 focus:ring-error focus:border-error bg-error/5"
               : "border-border-primary dark:border-border-primary"
             }
     focus:ring-primary-500 focus:border-primary-500 focus:outline-none
@@ -454,7 +454,7 @@ export default function ProjectForm({
             initial="hidden"
             animate="visible"
             exit="hidden"
-            className="mt-1 text-sm text-red-600"
+            className="mt-1 text-sm text-error"
           >
             {errors.description}
           </motion.p>
@@ -517,7 +517,7 @@ export default function ProjectForm({
                       return { ...prev, department_ids: newDepartments };
                     })
                   }
-                  className="text-red-500 p-1 rounded bg-red-100 transition-colors"
+                  className="text-error p-1 rounded bg-error/10 dark:bg-error/20 transition-colors"
                 >
                   <X size={16} />
                 </button>
@@ -539,7 +539,7 @@ export default function ProjectForm({
           </div>
 
           {errors.department_ids && (
-            <p className="mt-1 text-sm text-red-600">{errors.department_ids}</p>
+            <p className="mt-1 text-sm text-error">{errors.department_ids}</p>
           )}
         </motion.div>
 
@@ -641,8 +641,8 @@ export default function ProjectForm({
       )}
 
       {errors.milestone_weightage && (
-        <div className="bg-red-50 border border-red-200 p-4 rounded-md mb-4">
-          <p className="text-red-700 flex items-center">
+        <div className="bg-error/10 border border-error/30 dark:bg-error/20 p-4 rounded-md mb-4">
+          <p className="text-error flex items-center">
             {errors.milestone_weightage}
           </p>
         </div>

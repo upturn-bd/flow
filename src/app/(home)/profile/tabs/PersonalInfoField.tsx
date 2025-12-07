@@ -38,7 +38,7 @@ export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
     w-full rounded-md border 
     ${
       showError
-        ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+        ? "border-error focus:border-error focus:ring-error"
         : "border-border-secondary focus:border-primary-500 focus:ring-primary-500"
     }
     px-3 py-2 text-sm

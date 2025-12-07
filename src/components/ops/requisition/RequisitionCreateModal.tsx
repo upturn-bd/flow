@@ -272,7 +272,7 @@ export default function RequisitionCreateModal({
                 value={formState.requisition_category_id ?? ""}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur("requisition_category_id")}
-                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-primary-500 focus:ring focus:ring-primary-200 transition-colors p-2 pr-8"
               >
                 <option value="">Select category</option>
                 {requisitionTypes.length > 0 &&
@@ -288,7 +288,7 @@ export default function RequisitionCreateModal({
               />
               {touchedFields.requisition_category_id &&
                 errors.requisition_category_id && (
-                  <p className="mt-1 text-red-500 text-sm flex items-center">
+                  <p className="mt-1 text-error text-sm flex items-center">
                     <WarningCircle size={14} className="mr-1" />
                     {errors.requisition_category_id}
                   </p>
@@ -306,7 +306,7 @@ export default function RequisitionCreateModal({
                 value={formState.item_id ?? ""}
                 onChange={handleInputChange}
                 onBlur={() => handleFieldBlur("item_id")}
-                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2 pr-8"
+                className="w-full appearance-none rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-primary-500 focus:ring focus:ring-primary-200 transition-colors p-2 pr-8"
               >
                 <option value="">Select item</option>
                 {requisitionInventories.length > 0 &&
@@ -327,7 +327,7 @@ export default function RequisitionCreateModal({
                 size={16}
               />
               {touchedFields.item_id && errors.item_id && (
-                <p className="mt-1 text-red-500 text-sm flex items-center">
+                <p className="mt-1 text-error text-sm flex items-center">
                   <WarningCircle size={14} className="mr-1" />
                   {errors.item_id}
                 </p>
@@ -345,10 +345,10 @@ export default function RequisitionCreateModal({
               value={formState.quantity ?? ""}
               onChange={handleInputChange}
               onBlur={() => handleFieldBlur("quantity")}
-              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-primary-500 focus:ring focus:ring-primary-200 transition-colors p-2"
             />
             {touchedFields.quantity && errors.quantity && (
-              <p className="mt-1 text-red-500 text-sm flex items-center">
+              <p className="mt-1 text-error text-sm flex items-center">
                 <WarningCircle size={14} className="mr-1" />
                 {errors.quantity}
               </p>
@@ -361,7 +361,7 @@ export default function RequisitionCreateModal({
                 <Calendar size={16} className="mr-2" />
                 Date
               </label>
-              <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-500">
+              <div className="relative bg-background-secondary dark:bg-background-tertiary border border-border-secondary rounded-md flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-primary-300 focus-within:border-primary-500">
                 <Calendar size={16} className="ml-3 text-foreground-tertiary" />
                 <input
                   type="date"
@@ -373,7 +373,7 @@ export default function RequisitionCreateModal({
                 />
               </div>
               {touchedFields.date && errors.date && (
-                <p className="mt-1 text-red-500 text-sm flex items-center">
+                <p className="mt-1 text-error text-sm flex items-center">
                   <WarningCircle size={14} className="mr-1" />
                   {errors.date}
                 </p>
@@ -399,7 +399,7 @@ export default function RequisitionCreateModal({
                     />
                   </div>
                   {touchedFields.from_time && errors.from_time && (
-                    <p className="mt-1 text-red-500 text-sm flex items-center">
+                    <p className="mt-1 text-error text-sm flex items-center">
                       <WarningCircle size={14} className="mr-1" />
                       {errors.from_time}
                     </p>
@@ -423,7 +423,7 @@ export default function RequisitionCreateModal({
                     />
                   </div>
                   {touchedFields.to_time && errors.to_time && (
-                    <p className="mt-1 text-red-500 text-sm flex items-center">
+                    <p className="mt-1 text-error text-sm flex items-center">
                       <WarningCircle size={14} className="mr-1" />
                       {errors.to_time}
                     </p>
@@ -444,7 +444,7 @@ export default function RequisitionCreateModal({
               value={formState.description}
               onChange={handleInputChange}
               placeholder="Max 35 characters"
-              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-blue-500 focus:ring focus:ring-blue-200 transition-colors p-2"
+              className="w-full rounded-md border-border-secondary bg-background-secondary dark:bg-background-tertiary focus:border-primary-500 focus:ring focus:ring-primary-200 transition-colors p-2"
             />
           </div>
 
@@ -500,7 +500,7 @@ export default function RequisitionCreateModal({
                         <span className="truncate max-w-xs">{file.name}</span>
                         <button
                           type="button"
-                          className="text-foreground-tertiary hover:text-red-500"
+                          className="text-foreground-tertiary hover:text-error"
                           onClick={() => removeFile(file.name)}
                         >
                           <X size={16} />

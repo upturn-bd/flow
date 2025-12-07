@@ -229,7 +229,7 @@ export function UpdateProjectPage({
         <Button
           variant="ghost"
           onClick={onClose}
-          className="p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-foreground-tertiary dark:text-foreground-tertiary hover:text-red-500 dark:hover:text-red-400"
+          className="p-1 rounded-full hover:bg-error/10 dark:hover:bg-error/20 text-foreground-tertiary dark:text-foreground-tertiary hover:text-error"
         >
           <X size={20} strokeWidth={2} />
         </Button>

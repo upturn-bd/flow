@@ -77,7 +77,7 @@ function TaskCard({
           size="sm"
           onClick={handleDelete}
           isLoading={isDeleting}
-          className="p-2 h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400"
+          className="p-2 h-8 w-8 hover:bg-error/10 dark:hover:bg-error/20 hover:text-error"
         >
           <TrashSimple size={14} />
         </Button>
@@ -112,7 +112,7 @@ function TaskCard({
       <CardHeader
         title={task_title}
         subtitle={task_description}
-        icon={<CheckCircle size={20} className="text-green-500" />}
+        icon={<CheckCircle size={20} className="text-success" />}
         action={actions}
       />
 

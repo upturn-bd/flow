@@ -47,11 +47,11 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
   const getStatusStyle = (status: string) => {
     switch (status) {
       case "Approved":
-        return "bg-green-100 text-green-800";
+        return "bg-success/10 text-success dark:bg-success/20";
       case "Rejected":
-        return "bg-red-100 text-red-800";
+        return "bg-error/10 text-error dark:bg-error/20";
       default:
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-warning/10 text-warning dark:bg-warning/20";
     }
   };
 
@@ -83,7 +83,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
 
         {mode === "history" ? (
           <div className="flex items-center gap-2">
-            {/* PencilSimple button - only show for pending requisitions when user can edit */}
+            {/* Edit button - only show for pending requisitions when user can edit */}
             {canEdit && req.status === "Pending" && onEdit && (
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -112,7 +112,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
           </div>
         ) : (
           <div
-            className={`flex items-center gap-2 text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800`}
+            className={`flex items-center gap-2 text-xs px-2 py-1 rounded-full bg-warning/10 text-warning dark:bg-warning/20`}
           >
             <Clock size={12} />
             <span>Pending</span>
@@ -203,14 +203,14 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Add your feedback here..."
                 value={comment}
-                className="w-full px-4 py-2 rounded-md border border-border-secondary bg-surface-primary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="w-full px-4 py-2 rounded-md border border-border-secondary bg-surface-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
               />
             </div>
           </div>
 
           {/* Buttons */}
           <div className="flex flex-wrap justify-end gap-4 pt-4 border-t border-border-primary">
-            {/* PencilSimple button for requests */}
+            {/* Edit button for requests */}
             {canEdit && onEdit && (
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -231,7 +231,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                     handleUpdateRequest?.("Rejected", req.id, req.employee_id, comment)
                   }
                   disabled={processingId === req.id}
-                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 bg-error hover:bg-error/90 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
                 >
                   {processingId === req.id ? (
                     <InlineSpinner size="xs" color="white" />

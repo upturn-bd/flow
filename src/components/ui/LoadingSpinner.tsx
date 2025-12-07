@@ -28,11 +28,11 @@ export default function LoadingSpinner({
 }: LoadingSpinnerProps) {
   // Map color to tailwind classes to avoid string interpolation security issues
   const colorMap: Record<ColorType, { spinner: string; icon: string }> = {
-    blue: { spinner: "border-blue-500", icon: "text-blue-500" },
-    emerald: { spinner: "border-emerald-500", icon: "text-emerald-500" },
+    blue: { spinner: "border-primary-500", icon: "text-primary-500" },
+    emerald: { spinner: "border-success", icon: "text-success" },
     purple: { spinner: "border-purple-500", icon: "text-purple-500" },
-    amber: { spinner: "border-amber-500", icon: "text-amber-500" },
-    red: { spinner: "border-red-500", icon: "text-red-500" },
+    amber: { spinner: "border-warning", icon: "text-warning" },
+    red: { spinner: "border-error", icon: "text-error" },
     gray: { spinner: "border-foreground-tertiary", icon: "text-foreground-tertiary" },
   };
 

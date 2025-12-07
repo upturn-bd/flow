@@ -165,8 +165,8 @@ export default function ReportProblemModal({
               {/* Header */}
               <div className="flex items-center justify-between p-5 sm:p-6 border-b border-border-primary dark:border-border-primary">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                    <Bug size={20} className="text-red-600 dark:text-red-400" />
+                  <div className="p-2 bg-error/10 dark:bg-error/20 rounded-lg">
+                    <Bug size={20} className="text-error" />
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-foreground-primary dark:text-foreground-primary">
@@ -197,8 +197,8 @@ export default function ReportProblemModal({
                     animate={{ opacity: 1, scale: 1 }}
                     className="flex flex-col items-center justify-center py-8 text-center"
                   >
-                    <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-                      <CheckCircle size={40} className="text-green-600 dark:text-green-400" />
+                    <div className="p-3 bg-success/10 dark:bg-success/20 rounded-full mb-4">
+                      <CheckCircle size={40} className="text-success" />
                     </div>
                     <h3 className="text-lg font-semibold text-foreground-primary dark:text-foreground-primary mb-2">
                       Thank you for your feedback!

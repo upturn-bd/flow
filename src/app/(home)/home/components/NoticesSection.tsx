@@ -188,19 +188,19 @@ export default function NoticesSection({
                     </div>
                     <div className="flex items-center space-x-2">
                       {(item.urgency === "high" || item.urgency === "urgent") && (
-                        <div className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full flex items-center">
+                        <div className="bg-error/10 text-error dark:bg-error/20 text-xs px-2 py-1 rounded-full flex items-center">
                           <WarningCircle size={12} className="mr-1" />
                           {item.urgency === "urgent" ? "Urgent" : "High"}
                         </div>
                       )}
                       {item.urgency === "normal" && (
-                        <div className="bg-yellow-100 text-yellow-600 text-xs px-2 py-1 rounded-full flex items-center">
+                        <div className="bg-warning/10 text-warning dark:bg-warning/20 text-xs px-2 py-1 rounded-full flex items-center">
                           <WarningCircle size={12} className="mr-1" />
                           Normal
                         </div>
                       )}
                       {item.urgency === "low" && (
-                        <div className="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full flex items-center">
+                        <div className="bg-success/10 text-success dark:bg-success/20 text-xs px-2 py-1 rounded-full flex items-center">
                           <WarningCircle size={12} className="mr-1" />
                           Low
                         </div>

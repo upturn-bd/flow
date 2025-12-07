@@ -66,13 +66,13 @@ export default function StakeholdersPage() {
   const getStepStatusColor = (status: string) => {
     switch (status) {
       case "Lead":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-warning/10 text-warning dark:bg-warning/20";
       case "Permanent":
-        return "bg-green-100 text-green-800";
+        return "bg-success/10 text-success dark:bg-success/20";
       case "Rejected":
-        return "bg-red-100 text-red-800";
+        return "bg-error/10 text-error dark:bg-error/20";
       default:
-        return "bg-blue-100 text-blue-800";
+        return "bg-info/10 text-info dark:bg-info/20";
     }
   };
 
@@ -115,7 +115,7 @@ export default function StakeholdersPage() {
         <button
           onClick={handleExportCSV}
           disabled={loading || stakeholders.length === 0}
-          className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs sm:text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs sm:text-sm bg-success text-white rounded-lg hover:bg-success/90 active:bg-success/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Download size={16} className="sm:w-[18px] sm:h-[18px]" />
           <span>Export</span>
@@ -138,8 +138,8 @@ export default function StakeholdersPage() {
           title="Stakeholders"
           value={completedStakeholders.length}
           icon={CheckCircle}
-          iconColor="text-green-600"
-          iconBgColor="bg-green-100"
+          iconColor="text-success"
+          iconBgColor="bg-success/10 dark:bg-success/20"
         />
         <StatCard
           title="Total Records"
@@ -209,7 +209,7 @@ export default function StakeholdersPage() {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-error/10 border border-error/30 text-error dark:bg-error/20 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
@@ -306,7 +306,7 @@ export default function StakeholdersPage() {
                     </td>
                     <td className="px-6 py-4">
                       {stakeholder.status === 'Permanent' || stakeholder.is_completed ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success dark:bg-success/20">
                           <CheckCircle size={14} />
                           Complete
                         </span>
@@ -329,7 +329,7 @@ export default function StakeholdersPage() {
                                 opt => opt.value === stepStatus
                               );
                               return (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success dark:bg-success/20">
                                   {statusOption?.label || stepStatus}
                                 </span>
                               );
@@ -433,7 +433,7 @@ export default function StakeholdersPage() {
                   <div>
                     <p className="text-foreground-tertiary text-[10px] uppercase tracking-wide mb-0.5">Current Step</p>
                     {stakeholder.status === 'Permanent' || stakeholder.is_completed ? (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-800">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-success/10 text-success dark:bg-success/20">
                         <CheckCircle size={10} />
                         Complete
                       </span>
@@ -455,7 +455,7 @@ export default function StakeholdersPage() {
                               opt => opt.value === stepStatus
                             );
                             return (
-                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-800">
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-success/10 text-success dark:bg-success/20">
                                 {statusOption?.label || stepStatus}
                               </span>
                             );

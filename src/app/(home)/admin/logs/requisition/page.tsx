@@ -233,7 +233,7 @@ export default function RequisitionPage() {
         onSuccess={refreshData}
       />
 
-      {/* PencilSimple Modal */}
+      {/* Edit Modal */}
       {editingRequisition && (
         <RequisitionEditModal
           isOpen={!!editingRequisition}

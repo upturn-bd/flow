@@ -9,8 +9,8 @@ export default function UnauthorizedPage() {
       <div className="max-w-md w-full mx-4">
         <div className="bg-surface-primary rounded-2xl shadow-xl p-8 text-center">
           <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-              <ShieldWarning className="w-10 h-10 text-red-600 dark:text-red-400" />
+            <div className="w-20 h-20 bg-error/10 dark:bg-error/20 rounded-full flex items-center justify-center">
+              <ShieldWarning className="w-10 h-10 text-error" />
             </div>
           </div>
           

@@ -73,7 +73,7 @@ export default function FileUploadField({
     <div className={containerClassName}>
       <label className="block font-medium text-foreground-secondary mb-1 text-sm sm:text-base">
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
+        {required && <span className="text-error ml-1">*</span>}
       </label>
 
       {/* File Drop Zone */}
@@ -81,7 +81,7 @@ export default function FileUploadField({
         className={`
           border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer
           ${dragOver ? 'border-primary-500 bg-primary-50' : 'border-border-secondary hover:border-border-primary'}
-          ${error ? 'border-red-500' : ''}
+          ${error ? 'border-error' : ''}
           ${className}
         `}
         onDrop={handleDrop}
@@ -114,19 +114,19 @@ export default function FileUploadField({
         <div className="mt-3 space-y-2">
           {/* Existing Files */}
           {existingFiles.map((url, index) => (
-            <div key={`existing-${index}`} className="flex items-center justify-between bg-blue-50 p-2 rounded-lg">
+            <div key={`existing-${index}`} className="flex items-center justify-between bg-info/10 dark:bg-info/20 p-2 rounded-lg">
               <div className="flex items-center space-x-2">
-                <File className="text-blue-500" />
-                <span className="text-sm text-blue-700">
+                <File className="text-info" />
+                <span className="text-sm text-foreground-primary">
                   {extractFilenameFromUrl(url)}
                 </span>
-                <span className="text-xs text-blue-500">(existing)</span>
+                <span className="text-xs text-info">(existing)</span>
               </div>
               {onExistingFileRemove && (
                 <button
                   type="button"
                   onClick={() => removeExistingFile(url)}
-                  className="text-red-500 hover:text-red-700 p-1"
+                  className="text-error hover:text-error/80 p-1"
                 >
                   <X size={14} />
                 </button>
@@ -147,7 +147,7 @@ export default function FileUploadField({
               <button
                 type="button"
                 onClick={() => removeFile(file.name)}
-                className="text-red-500 hover:text-red-700 p-1"
+                className="text-error hover:text-error/80 p-1"
               >
                 <X size={14} />
               </button>
@@ -157,7 +157,7 @@ export default function FileUploadField({
       )}
 
       {error && (
-        <p className="text-red-500 text-xs sm:text-sm mt-1">{error}</p>
+        <p className="text-error text-xs sm:text-sm mt-1">{error}</p>
       )}
     </div>
   );

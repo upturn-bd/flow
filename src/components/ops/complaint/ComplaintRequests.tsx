@@ -84,8 +84,8 @@ export default function ComplaintRequestsPage() {
 
       {error && !requestLoading && (
         <div className="flex flex-col items-center justify-center py-16">
-          <XCircle className="h-12 w-12 text-red-500 mb-4" />
-          <p className="text-red-500 font-medium">{error}</p>
+          <XCircle className="h-12 w-12 text-error mb-4" />
+          <p className="text-error font-medium">{error}</p>
         </div>
       )}
 

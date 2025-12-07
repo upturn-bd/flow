@@ -30,7 +30,7 @@ function LeavePageContent() {
       key: "history",
       label: "History",
       icon: <FileText className="h-5 w-5" />,
-      color: "text-green-600",
+      color: "text-success",
       content: <LeaveHistoryPage />,
       link: "/ops/leave?tab=history",
     },
@@ -54,18 +54,18 @@ function LeavePageContent() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <BookOpen className="h-12 w-12 sm:h-16 sm:w-16 text-blue-200 mb-4" />
+            <BookOpen className="h-12 w-12 sm:h-16 sm:w-16 text-primary-200 mb-4" />
           </motion.div>
           <h3 className="text-lg sm:text-xl font-medium mb-2">Leave Policy</h3>
           <p className="mt-2 text-center max-w-md mb-6 text-sm sm:text-base px-2">
             Company leave policies and guidelines will appear here. Please check back later or contact HR for more information.
           </p>
-          <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 sm:p-4 max-w-md mx-2">
+          <div className="bg-info/10 dark:bg-info/20 border border-info/20 rounded-lg p-3 sm:p-4 max-w-md mx-2">
             <div className="flex gap-2 sm:gap-3">
-              <WarningCircle className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+              <WarningCircle className="h-5 w-5 text-info shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-semibold text-blue-800 mb-1">Policy Information</h4>
-                <p className="text-xs sm:text-sm text-blue-700">
+                <h4 className="text-sm font-semibold text-foreground-primary mb-1">Policy Information</h4>
+                <p className="text-xs sm:text-sm text-foreground-secondary">
                   Leave policies typically include annual leave allowance, sick leave limits, maternity/paternity leave, and other special leave arrangements.
                 </p>
               </div>

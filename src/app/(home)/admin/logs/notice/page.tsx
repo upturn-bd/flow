@@ -88,13 +88,13 @@ export default function NoticePage() {
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case "high":
-        return "bg-red-100 text-red-700";
+        return "bg-error/10 text-error dark:bg-error/20";
       case "normal":
-        return "bg-yellow-100 text-yellow-700";
+        return "bg-warning/10 text-warning dark:bg-warning/20";
       case "low":
-        return "bg-green-100 text-green-700";
+        return "bg-success/10 text-success dark:bg-success/20";
       case "urgent":
-        return "bg-red-200 text-red-800 font-semibold";
+        return "bg-error/20 text-error font-semibold dark:bg-error/30";
       default:
         return "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary";
     }
@@ -221,7 +221,7 @@ export default function NoticePage() {
                       variant="outline"
                       size="sm"
                       className="border-border-secondary hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-600"
-                      title="PencilSimple Notice"
+                      title="Edit Notice"
                       onClick={() => setEditingNotice(notice)}
                     >
                       <Pencil size={16} />
@@ -234,7 +234,7 @@ export default function NoticePage() {
                     <Button
                       variant="danger"
                       size="sm"
-                      className="bg-red-500 hover:bg-red-600 text-white"
+                      className="bg-error hover:bg-error/90 text-white"
                       title="Delete Notice"
                       onClick={() => handleDelete(notice.id)}
                     >

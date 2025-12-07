@@ -89,7 +89,7 @@ export default function SalaryManagementModal({
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <CurrencyDollar className="h-6 w-6 text-green-600 mr-2" />
+              <CurrencyDollar className="h-6 w-6 text-success mr-2" />
               <h2 className="text-xl font-semibold text-foreground-primary">Manage Salary</h2>
             </div>
             <button
@@ -144,10 +144,10 @@ export default function SalaryManagementModal({
 
                 {/* Error Display */}
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                  <div className="bg-error/10 border border-error/30 rounded-md p-3">
                     <div className="flex">
-                      <Warning className="h-5 w-5 text-red-400 mr-2" />
-                      <p className="text-sm text-red-700">{error.message}</p>
+                      <Warning className="h-5 w-5 text-error mr-2" />
+                      <p className="text-sm text-error">{error.message}</p>
                     </div>
                   </div>
                 )}
@@ -171,7 +171,7 @@ export default function SalaryManagementModal({
                   <button
                     onClick={handleSaveSalary}
                     disabled={loading || newSalary === currentSalary.toString()}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 flex items-center justify-center"
+                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 flex items-center justify-center"
                   >
                     {loading ? (
                       <>
@@ -223,8 +223,8 @@ export default function SalaryManagementModal({
                                   </span>
                                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                                     isIncrease 
-                                      ? 'bg-green-100 text-green-700' 
-                                      : 'bg-red-100 text-red-700'
+                                      ? 'bg-success/10 text-success' 
+                                      : 'bg-error/10 text-error'
                                   }`}>
                                     {isIncrease ? '+' : ''}৳{difference.toLocaleString()}
                                   </span>
@@ -299,7 +299,7 @@ export function EmployeeSalaryList() {
       <div className="bg-surface-primary rounded-lg shadow">
         <div className="px-6 py-4 border-b border-border-primary">
           <h3 className="text-lg font-medium text-foreground-primary flex items-center">
-            <CurrencyDollar className="h-5 w-5 text-green-600 mr-2" />
+            <CurrencyDollar className="h-5 w-5 text-success mr-2" />
             Employee Salary Management
           </h3>
         </div>

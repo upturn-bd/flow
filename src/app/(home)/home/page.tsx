@@ -370,7 +370,7 @@ export default function HomePage() {
               {(isEditMode ? homeLayout?.widgets : homeLayout?.widgets.filter(w => w.enabled))?.map((widget) => (
                 <div key={widget.id} className="h-full w-full relative">
                   {renderWidget(widget)}
-                  {/* PencilSimple mode overlay with controls */}
+                  {/* Edit mode overlay with controls */}
                   {isEditMode && (
                     <div className={`absolute inset-0 border-2 rounded-lg z-10 transition-all pointer-events-none ${
                       widget.enabled 

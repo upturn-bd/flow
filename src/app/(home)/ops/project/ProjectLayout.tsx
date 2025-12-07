@@ -28,7 +28,7 @@ const TABS = [
         key: "completed",
         label: "Completed",
         icon: <Folder size={16} />,
-        color: "text-green-600",
+        color: "text-success",
     },
     {
         key: "create",

@@ -131,9 +131,9 @@ export default function NewStakeholderPage() {
         </button>
 
         <div className="max-w-2xl mx-auto">
-          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 sm:p-8 text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-yellow-100 rounded-full mb-3 sm:mb-4">
-              <WarningCircle className="text-yellow-600" size={24} />
+          <div className="bg-warning/10 border-2 border-warning/30 dark:bg-warning/20 rounded-lg p-6 sm:p-8 text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-warning/20 rounded-full mb-3 sm:mb-4">
+              <WarningCircle className="text-warning" size={24} />
             </div>
             <h2 className="text-lg sm:text-xl font-bold text-foreground-primary mb-2">
               No Stakeholder Processes Found

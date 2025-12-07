@@ -18,16 +18,16 @@ import NoPermissionMessage from '@/components/ui/NoPermissionMessage';
 import Portal from '@/components/ui/Portal';
 
 const priorityColors = {
-  Low: 'bg-green-100 text-green-700',
-  Medium: 'bg-yellow-100 text-yellow-700',
-  High: 'bg-orange-100 text-orange-700',
-  Urgent: 'bg-red-100 text-red-700',
+  Low: 'bg-success/10 text-success dark:bg-success/20',
+  Medium: 'bg-warning/10 text-warning dark:bg-warning/20',
+  High: 'bg-warning/20 text-warning dark:bg-warning/30',
+  Urgent: 'bg-error/10 text-error dark:bg-error/20',
 };
 
 const statusColors = {
   Pending: 'bg-background-tertiary text-foreground-primary',
-  'In Progress': 'bg-primary-100 text-primary-700',
-  Resolved: 'bg-green-100 text-green-700',
+  'In Progress': 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300',
+  Resolved: 'bg-success/10 text-success dark:bg-success/20',
 };
 
 export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, onSizeChange }: WidgetProps) {

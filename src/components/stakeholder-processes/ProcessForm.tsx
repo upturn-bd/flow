@@ -80,7 +80,7 @@ export default function ProcessForm({ process, onSubmit, onClose }: ProcessFormP
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border-primary sticky top-0 bg-surface-primary z-10">
           <h2 className="text-lg sm:text-xl font-bold text-foreground-primary">
-            {process ? "PencilSimple Process" : "Create New Process"}
+            {process ? "Edit Process" : "Create New Process"}
           </h2>
           <button
             onClick={onClose}

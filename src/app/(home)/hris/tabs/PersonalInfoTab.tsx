@@ -279,7 +279,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsEditMode((prev) => !prev)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 ${
                 isEditMode ? "bg-primary-600" : "bg-gray-200"
               }`}
               role="switch"
@@ -292,7 +292,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
               />
             </button>
             <span className="text-sm font-medium text-foreground-secondary">
-              {isEditMode ? "PencilSimple Mode On" : "PencilSimple Mode Off"}
+              {isEditMode ? "Edit Mode On" : "Edit Mode Off"}
             </span>
           </div>
         )}

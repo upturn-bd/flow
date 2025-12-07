@@ -124,7 +124,7 @@ useEffect(() => {
           whileTap={{ scale: 0.95 }}
           onClick={handleExportCSV}
           disabled={loading || filteredEmployees.length === 0}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-4 py-2 bg-success text-white rounded-lg hover:bg-success/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Download size={18} />
           Export CSV

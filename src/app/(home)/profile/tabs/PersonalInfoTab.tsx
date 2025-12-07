@@ -292,7 +292,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
               />
             </button>
             <span className="text-sm font-medium text-foreground-secondary">
-              {isEditMode ? "PencilSimple Mode On" : "PencilSimple Mode Off"}
+              {isEditMode ? "Edit Mode On" : "Edit Mode Off"}
             </span>
           </div>
         )}

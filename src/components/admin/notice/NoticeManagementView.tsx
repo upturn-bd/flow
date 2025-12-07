@@ -84,7 +84,7 @@ export default function NoticeView() {
                         onClick={() => type.id !== undefined && handleDeleteNewsAndNoticeType(type.id)}
                         isLoading={deleteLoading === type.id}
                         disabled={deleteLoading === type.id}
-                        className="ml-2 p-1 rounded-full text-foreground-tertiary hover:bg-red-50 hover:text-red-500"
+                        className="ml-2 p-1 rounded-full text-foreground-tertiary hover:bg-error/10 hover:text-error"
                       >
                         <TrashSimple size={16} weight="bold" />
                       </Button>

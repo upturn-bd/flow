@@ -30,7 +30,7 @@ const tabs: TabItem[] = [
     key: "paid", 
     label: "Paid",
     icon: <CreditCard className="h-5 w-5" />,
-    color: "text-green-600",
+    color: "text-success",
     content: <PaidPayrolls />
   },
 ];

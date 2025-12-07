@@ -60,9 +60,9 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 p-6">
+        <div className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border border-error/20 bg-error/10 dark:bg-error/20 p-6">
           <svg
-            className="mb-4 h-12 w-12 text-red-500 dark:text-red-400"
+            className="mb-4 h-12 w-12 text-error"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -87,7 +87,7 @@ export class ErrorBoundary extends Component<Props, State> {
           )}
           <button
             onClick={() => this.setState({ hasError: false, error: null, eventId: null })}
-            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
+            className="rounded-lg bg-error px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-error/90"
           >
             Try again
           </button>

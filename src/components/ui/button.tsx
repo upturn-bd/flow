@@ -16,9 +16,9 @@ const variantClasses = {
   secondary: "bg-surface-secondary hover:bg-surface-hover text-foreground-primary shadow-sm border border-border-primary",
   outline: "border border-border-primary hover:bg-surface-hover text-foreground-primary shadow-sm",
   ghost: "hover:bg-surface-hover text-foreground-primary",
-  danger: "bg-red-600 hover:bg-red-700 text-white shadow-sm dark:bg-red-500 dark:hover:bg-red-600",
-  pending: "bg-yellow-100 hover:bg-yellow-200 text-yellow-700 shadow-sm dark:bg-yellow-900/30 dark:hover:bg-yellow-900/50 dark:text-yellow-400",
-  complete: "bg-green-100 hover:bg-green-200 text-green-700 shadow-sm dark:bg-green-900/30 dark:hover:bg-green-900/50 dark:text-green-400",
+  danger: "bg-error hover:bg-error/90 text-white shadow-sm",
+  pending: "bg-warning/10 hover:bg-warning/20 text-warning shadow-sm dark:bg-warning/20 dark:hover:bg-warning/30",
+  complete: "bg-success/10 hover:bg-success/20 text-success shadow-sm dark:bg-success/20 dark:hover:bg-success/30",
 };
 
 const sizeClasses = {

@@ -20,12 +20,12 @@ export default function ReportProblemButton({
 }: ReportProblemButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const baseClasses = "inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2";
+  const baseClasses = "inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-error focus:ring-offset-2";
   
   const variantClasses = {
-    default: "px-4 py-2 text-sm bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800",
-    compact: "px-3 py-1.5 text-xs bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800",
-    "icon-only": "p-2 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800",
+    default: "px-4 py-2 text-sm bg-error/10 dark:bg-error/20 text-error dark:text-error hover:bg-error/20 dark:hover:bg-error/30 border border-error/30 dark:border-error/40",
+    compact: "px-3 py-1.5 text-xs bg-error/10 dark:bg-error/20 text-error dark:text-error hover:bg-error/20 dark:hover:bg-error/30 border border-error/30 dark:border-error/40",
+    "icon-only": "p-2 bg-error/10 dark:bg-error/20 text-error dark:text-error hover:bg-error/20 dark:hover:bg-error/30 border border-error/30 dark:border-error/40",
   };
 
   return (

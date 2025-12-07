@@ -24,40 +24,40 @@ export function StatusIndicator({
     if (statusLower.includes("completed") || statusLower.includes("approved") || statusLower.includes("success")) {
       return {
         icon: CheckCircle,
-        bgColor: "bg-green-100",
-        textColor: "text-green-800",
-        borderColor: "border-green-200",
-        dotColor: "bg-green-500"
+        bgColor: "bg-success/10 dark:bg-success/20",
+        textColor: "text-success",
+        borderColor: "border-success/30",
+        dotColor: "bg-success"
       };
     }
     
     if (statusLower.includes("pending") || statusLower.includes("waiting")) {
       return {
         icon: Clock,
-        bgColor: "bg-yellow-100",
-        textColor: "text-yellow-800",
-        borderColor: "border-yellow-200",
-        dotColor: "bg-yellow-500"
+        bgColor: "bg-warning/10 dark:bg-warning/20",
+        textColor: "text-warning",
+        borderColor: "border-warning/30",
+        dotColor: "bg-warning"
       };
     }
     
     if (statusLower.includes("rejected") || statusLower.includes("failed") || statusLower.includes("error")) {
       return {
         icon: XCircle,
-        bgColor: "bg-red-100",
-        textColor: "text-red-800",
-        borderColor: "border-red-200",
-        dotColor: "bg-red-500"
+        bgColor: "bg-error/10 dark:bg-error/20",
+        textColor: "text-error",
+        borderColor: "border-error/30",
+        dotColor: "bg-error"
       };
     }
     
     if (statusLower.includes("in progress") || statusLower.includes("ongoing") || statusLower.includes("processing")) {
       return {
         icon: CircleNotch,
-        bgColor: "bg-blue-100",
-        textColor: "text-blue-800",
-        borderColor: "border-blue-200",
-        dotColor: "bg-blue-500"
+        bgColor: "bg-info/10 dark:bg-info/20",
+        textColor: "text-info",
+        borderColor: "border-info/30",
+        dotColor: "bg-info"
       };
     }
     
@@ -159,16 +159,16 @@ export function StatusDot({
     const statusLower = status.toLowerCase();
     
     if (statusLower.includes("completed") || statusLower.includes("approved") || statusLower.includes("success")) {
-      return "bg-green-500";
+      return "bg-success";
     }
     if (statusLower.includes("pending") || statusLower.includes("waiting")) {
-      return "bg-yellow-500";
+      return "bg-warning";
     }
     if (statusLower.includes("rejected") || statusLower.includes("failed") || statusLower.includes("error")) {
-      return "bg-red-500";
+      return "bg-error";
     }
     if (statusLower.includes("in progress") || statusLower.includes("ongoing") || statusLower.includes("processing")) {
-      return "bg-blue-500";
+      return "bg-info";
     }
     if (statusLower.includes("draft")) {
       return "bg-gray-500";

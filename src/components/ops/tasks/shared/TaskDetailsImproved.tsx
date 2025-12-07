@@ -192,11 +192,11 @@ export default function TaskDetails({ id, onClose }: TaskDetailsProps) {
   const getPriorityColor = (priority: string) => {
     switch (priority?.toLowerCase()) {
       case 'high':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+        return 'bg-error/10 text-error dark:bg-error/20';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+        return 'bg-warning/10 text-warning dark:bg-warning/20';
       case 'low':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-success/10 text-success dark:bg-success/20';
       default:
         return 'bg-background-tertiary dark:bg-background-tertiary text-foreground-primary dark:text-foreground-primary';
     }

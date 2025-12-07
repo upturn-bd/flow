@@ -285,14 +285,14 @@ export default function OnboardingApprovalPage() {
                       <div className="flex gap-4">
                         <button
                           disabled
-                          className="bg-gray-300 text-foreground-tertiary rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center gap-2"
+                          className="bg-background-tertiary text-foreground-tertiary rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center gap-2"
                         >
                           <X className="h-4 w-4" />
                           Reject
                         </button>
                         <button
                           disabled
-                          className="bg-gray-300 text-foreground-tertiary rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center gap-2"
+                          className="bg-background-tertiary text-foreground-tertiary rounded-lg px-4 py-2 text-sm font-semibold cursor-not-allowed opacity-60 flex items-center gap-2"
                         >
                           <Check className="h-4 w-4" />
                           Accept
@@ -302,7 +302,7 @@ export default function OnboardingApprovalPage() {
                   }
                 >
                   <Button
-                    className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+                    className="bg-error hover:bg-error/90 flex items-center gap-2"
                     onClick={() => handleAction(emp.id, "REJECTED")}
                     disabled={loading}
                   >

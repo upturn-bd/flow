@@ -1012,8 +1012,8 @@ function FieldEditor({
               onClick={() => setShowFormulaEditor(!showFormulaEditor)}
               className={`flex-1 sm:flex-initial px-3 py-2 rounded-lg transition-colors font-medium text-sm flex items-center justify-center gap-1.5 ${
                 showFormulaEditor 
-                  ? 'bg-green-600 text-white hover:bg-green-700' 
-                  : 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
+                  ? 'bg-success text-white hover:bg-success/90' 
+                  : 'bg-success/10 text-success border border-success/20 hover:bg-success/20'
               }`}
               title={showFormulaEditor ? "Hide formula editor" : "PencilSimple formula"}
             >
@@ -1296,12 +1296,12 @@ function FieldEditor({
                       updateNestedField(nestedIdx, updates);
                     }}
                     placeholder="Field Label"
-                    className="flex-1 px-2 py-1.5 sm:py-1 text-xs border border-border-secondary rounded focus:ring-1 focus:ring-blue-500 outline-none"
+                    className="flex-1 px-2 py-1.5 sm:py-1 text-xs border border-border-secondary rounded focus:ring-1 focus:ring-primary-500 outline-none"
                   />
                   <select
                     value={nestedField.type}
                     onChange={(e) => updateNestedField(nestedIdx, { type: e.target.value as FieldType })}
-                    className="w-full sm:w-auto px-2 py-1.5 sm:py-1 text-xs border border-border-secondary rounded focus:ring-1 focus:ring-blue-500 outline-none"
+                    className="w-full sm:w-auto px-2 py-1.5 sm:py-1 text-xs border border-border-secondary rounded focus:ring-1 focus:ring-primary-500 outline-none"
                   >
                     {Object.values(FIELD_TYPES).map((type) => (
                       <option key={type} value={type}>
@@ -1321,7 +1321,7 @@ function FieldEditor({
                   <button
                     type="button"
                     onClick={() => removeNestedField(nestedIdx)}
-                    className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded font-medium"
+                    className="px-2 py-1 text-xs text-error hover:bg-error/10 rounded font-medium"
                   >
                     Remove
                   </button>

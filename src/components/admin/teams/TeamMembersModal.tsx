@@ -267,7 +267,7 @@ export default function TeamMembersModal({
                           <button
                             onClick={() => handleRemoveMember(member.employee_id)}
                             disabled={teamLoading}
-                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 shrink-0"
+                            className="p-2 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded-lg transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 shrink-0"
                             title="Remove from team"
                           >
                             <TrashSimple size={20} />
