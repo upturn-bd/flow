@@ -213,8 +213,17 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                     </div>
                   )}
 
-                  {/* Linked Step Data Info */}
-                  {issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
+                  {/* Linked Fields Info (new format) */}
+                  {issue.linked_fields && issue.linked_fields.length > 0 && (
+                    <div className="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 mb-2">
+                      <LinkIcon size={12} />
+                      <span>
+                        {issue.linked_fields.length} linked field{issue.linked_fields.length > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  )}
+                  {/* Legacy: Linked Step Data Info */}
+                  {(!issue.linked_fields || issue.linked_fields.length === 0) && issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
                     <div className="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 mb-2">
                       <LinkIcon size={12} />
                       <span>
@@ -298,6 +307,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
               category_id: selectedIssue.category_id,
               subcategory_id: selectedIssue.subcategory_id,
               linked_step_data_ids: selectedIssue.linked_step_data_ids || [],
+              linked_fields: selectedIssue.linked_fields || [],
               attachments: selectedIssue.attachments || [],
             } : undefined}
             onSubmit={selectedIssue ? handleUpdateIssue : handleCreateIssue}

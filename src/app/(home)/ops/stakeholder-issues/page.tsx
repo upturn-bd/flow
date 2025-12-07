@@ -397,8 +397,17 @@ export default function StakeholderIssuesPage() {
                     </div>
                   )}
 
-                  {/* Linked Step Data Info */}
-                  {issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
+                  {/* Linked Fields Info (new format) */}
+                  {issue.linked_fields && issue.linked_fields.length > 0 && (
+                    <div className="text-sm text-foreground-secondary mb-2 flex items-center gap-1">
+                      <LinkIcon size={14} className="text-primary-600" />
+                      <span className="text-primary-600 dark:text-primary-400 font-medium">
+                        {issue.linked_fields.length} linked field{issue.linked_fields.length > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  )}
+                  {/* Legacy: Linked Step Data Info */}
+                  {(!issue.linked_fields || issue.linked_fields.length === 0) && issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
                     <div className="text-sm text-foreground-secondary mb-2 flex items-center gap-1">
                       <LinkIcon size={14} className="text-primary-600" />
                       <span className="text-primary-600 dark:text-primary-400 font-medium">
@@ -511,6 +520,7 @@ export default function StakeholderIssuesPage() {
               category_id: selectedIssue.category_id,
               subcategory_id: selectedIssue.subcategory_id,
               linked_step_data_ids: selectedIssue.linked_step_data_ids || [],
+              linked_fields: selectedIssue.linked_fields || [],
               attachments: selectedIssue.attachments,
             }}
             onSubmit={handleUpdateIssue}

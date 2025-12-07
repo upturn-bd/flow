@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
-import { StakeholderIssue, StakeholderIssueAttachment } from "@/lib/types/schemas";
+import { StakeholderIssue, StakeholderIssueAttachment, LinkedStepField } from "@/lib/types/schemas";
 import { createStakeholderIssueNotification } from "@/lib/utils/notifications";
 import { captureSupabaseError, logError } from "@/lib/sentry";
 
@@ -21,7 +21,8 @@ export interface StakeholderIssueFormData {
   assigned_team_id?: number; // Team ID assigned to handle this issue (either employee OR team)
   category_id?: number; // Optional category
   subcategory_id?: number; // Optional subcategory
-  linked_step_data_ids?: number[]; // Array of stakeholder_step_data IDs linked to this issue
+  linked_step_data_ids?: number[]; // DEPRECATED: Array of stakeholder_step_data IDs linked to this issue
+  linked_fields?: LinkedStepField[]; // Array of specific field references linked to this issue
   attachments?: File[];
 }
 

@@ -11,8 +11,8 @@ import { useEmployees } from '@/hooks/useEmployees';
 import { useAuth } from '@/lib/auth/auth-context';
 import { cn } from '@/components/ui/class';
 import { LoadingSpinner } from '@/components/ui';
-import { formatDisplayValue, getFieldLabel, formatStepDataBrief } from '@/lib/utils/step-data-utils';
-import { FieldDefinitionsSchema } from '@/lib/types/schemas';
+import { formatDisplayValue, getFieldLabel } from '@/lib/utils/step-data-utils';
+import { FieldDefinitionsSchema, LinkedStepField } from '@/lib/types/schemas';
 
 // Alias for backward compatibility
 const Building2 = Building;
@@ -23,7 +23,12 @@ interface StakeholderIssueModalProps {
   onSuccess: () => void;
 }
 
-// Interface for linked step data display
+// Interface for enriched linked field data display
+interface EnrichedLinkedField extends LinkedStepField {
+  currentValue?: any; // Current value from step data (may have changed since linking)
+}
+
+// Interface for linked step data display (for legacy support)
 interface LinkedStepDataItem {
   id: number;
   stepName: string;
@@ -49,7 +54,8 @@ export default function StakeholderIssueModal({
   const [isEditing, setIsEditing] = useState(false);
   const [showResolveConfirm, setShowResolveConfirm] = useState(false);
   const [assignmentType, setAssignmentType] = useState<'employee' | 'team'>('employee');
-  const [linkedStepData, setLinkedStepData] = useState<LinkedStepDataItem[]>([]);
+  const [linkedFields, setLinkedFields] = useState<EnrichedLinkedField[]>([]);
+  const [linkedStepData, setLinkedStepData] = useState<LinkedStepDataItem[]>([]); // Legacy support
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
   const [formData, setFormData] = useState<Partial<StakeholderIssueFormData>>({
     stakeholder_id: 0,
@@ -80,33 +86,63 @@ export default function StakeholderIssueModal({
 
   // Load linked step data when issue is loaded
   useEffect(() => {
-    const loadLinkedStepData = async () => {
-      if (!issue?.stakeholder_id || !issue?.linked_step_data_ids?.length) {
+    const loadLinkedData = async () => {
+      if (!issue?.stakeholder_id) {
+        setLinkedFields([]);
         setLinkedStepData([]);
         return;
       }
       
       try {
         const allStepData = await fetchStakeholderStepData(issue.stakeholder_id);
-        const linked = allStepData
-          .filter((sd: any) => issue.linked_step_data_ids.includes(sd.id))
-          .map((sd: any) => ({
-            id: sd.id,
-            stepName: sd.step?.name || `Step ${sd.step_id}`,
-            stepOrder: sd.step?.step_order || 0,
-            isCompleted: sd.is_completed,
-            data: sd.data || {},
-            fieldDefinitions: sd.step?.field_definitions,
-          }))
-          .sort((a: LinkedStepDataItem, b: LinkedStepDataItem) => a.stepOrder - b.stepOrder);
         
-        setLinkedStepData(linked);
+        // Handle new linked_fields format
+        if (issue.linked_fields && issue.linked_fields.length > 0) {
+          const enrichedFields: EnrichedLinkedField[] = issue.linked_fields.map((field: LinkedStepField) => {
+            const stepData = allStepData.find((sd: any) => sd.id === field.stepDataId);
+            // Get step info - handle both array and object formats from Supabase
+            const stepInfo = Array.isArray(stepData?.step) ? stepData?.step[0] : stepData?.step;
+            return {
+              ...field,
+              stepName: field.stepName || stepInfo?.name || `Step ${field.stepDataId}`,
+              stepOrder: field.stepOrder || stepInfo?.step_order || 0,
+              fieldLabel: field.fieldLabel || getFieldLabel(field.fieldKey, stepInfo?.field_definitions),
+              currentValue: stepData?.data?.[field.fieldKey],
+            };
+          });
+          setLinkedFields(enrichedFields);
+          setLinkedStepData([]);
+        }
+        // Legacy support: handle old linked_step_data_ids format
+        else if (issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0) {
+          const linked = allStepData
+            .filter((sd: any) => issue.linked_step_data_ids.includes(sd.id))
+            .map((sd: any) => {
+              // Get step info - handle both array and object formats from Supabase
+              const stepInfo = Array.isArray(sd.step) ? sd.step[0] : sd.step;
+              return {
+                id: sd.id,
+                stepName: stepInfo?.name || `Step ${sd.step_id}`,
+                stepOrder: stepInfo?.step_order || 0,
+                isCompleted: sd.is_completed,
+                data: sd.data || {},
+                fieldDefinitions: stepInfo?.field_definitions,
+              };
+            })
+            .sort((a: LinkedStepDataItem, b: LinkedStepDataItem) => a.stepOrder - b.stepOrder);
+          
+          setLinkedStepData(linked);
+          setLinkedFields([]);
+        } else {
+          setLinkedFields([]);
+          setLinkedStepData([]);
+        }
       } catch (err) {
-        console.error("Error loading linked step data:", err);
+        console.error("Error loading linked data:", err);
       }
     };
     
-    loadLinkedStepData();
+    loadLinkedData();
   }, [issue, fetchStakeholderStepData]);
 
   const toggleStepExpansion = (stepId: number) => {
@@ -310,8 +346,61 @@ export default function StakeholderIssueModal({
                   </div>
                 )}
 
-                {/* Linked Step Data */}
-                {linkedStepData.length > 0 && (
+                {/* Linked Fields (new format) */}
+                {linkedFields.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-foreground-secondary mb-2">
+                      <div className="flex items-center gap-2">
+                        <LinkIcon className="w-4 h-4" />
+                        <span>Linked Fields ({linkedFields.length})</span>
+                      </div>
+                    </label>
+                    <div className="space-y-2 border border-border-primary rounded-lg p-3 bg-background-secondary">
+                      {/* Group fields by step */}
+                      {(() => {
+                        const groupedByStep = linkedFields.reduce((acc, field) => {
+                          const key = field.stepDataId;
+                          if (!acc[key]) {
+                            acc[key] = {
+                              stepName: field.stepName || `Step ${field.stepDataId}`,
+                              stepOrder: field.stepOrder || 0,
+                              fields: [],
+                            };
+                          }
+                          acc[key].fields.push(field);
+                          return acc;
+                        }, {} as Record<number, { stepName: string; stepOrder: number; fields: EnrichedLinkedField[] }>);
+                        
+                        return Object.entries(groupedByStep)
+                          .sort(([, a], [, b]) => a.stepOrder - b.stepOrder)
+                          .map(([stepDataId, group]) => (
+                            <div key={stepDataId} className="bg-surface-primary rounded-lg border border-border-secondary overflow-hidden">
+                              <div className="px-3 py-2 bg-surface-secondary border-b border-border-secondary">
+                                <span className="text-xs font-medium text-foreground-secondary">
+                                  {group.stepName}
+                                </span>
+                              </div>
+                              <div className="p-3 space-y-2">
+                                {group.fields.map((field) => (
+                                  <div key={`${field.stepDataId}-${field.fieldKey}`} className="flex justify-between gap-4 text-sm">
+                                    <span className="text-foreground-secondary font-medium">
+                                      {field.fieldLabel || field.fieldKey}:
+                                    </span>
+                                    <span className="text-foreground-primary text-right">
+                                      {formatDisplayValue(field.currentValue ?? field.fieldValue)}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ));
+                      })()}
+                    </div>
+                  </div>
+                )}
+
+                {/* Legacy: Linked Step Data (old format - for backward compatibility) */}
+                {linkedStepData.length > 0 && linkedFields.length === 0 && (
                   <div>
                     <label className="block text-sm font-medium text-foreground-secondary mb-2">
                       <div className="flex items-center gap-2">
@@ -348,9 +437,9 @@ export default function StakeholderIssueModal({
                                     </span>
                                   )}
                                 </div>
-                                {!isExpanded && Object.keys(stepItem.data).length > 0 && (
-                                  <p className="text-xs text-foreground-tertiary mt-1 truncate">
-                                    {formatStepDataBrief(stepItem.data, stepItem.fieldDefinitions, 2)}
+                                {!isExpanded && (
+                                  <p className="text-xs text-foreground-tertiary mt-1">
+                                    {Object.keys(stepItem.data).length} field{Object.keys(stepItem.data).length !== 1 ? 's' : ''}
                                   </p>
                                 )}
                               </div>

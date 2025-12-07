@@ -703,6 +703,17 @@ export interface StakeholderIssueSubcategory {
   category?: StakeholderIssueCategory;
 }
 
+// Linked Step Field - represents a specific field from a step linked to an issue
+export interface LinkedStepField {
+  stepDataId: number; // ID of the stakeholder_step_data record
+  fieldKey: string; // Key of the specific field in the step data
+  // Optional cached values for display (populated when fetching)
+  stepName?: string;
+  stepOrder?: number;
+  fieldLabel?: string;
+  fieldValue?: any;
+}
+
 export interface StakeholderIssue {
   id?: number;
   stakeholder_id: number;
@@ -715,7 +726,8 @@ export interface StakeholderIssue {
   assigned_team_id?: number; // Team ID assigned to handle this issue (either employee OR team)
   category_id?: number; // Optional category for organization
   subcategory_id?: number; // Optional subcategory (must belong to selected category)
-  linked_step_data_ids?: number[]; // Array of stakeholder_step_data IDs linked to this issue
+  linked_step_data_ids?: number[]; // DEPRECATED: Array of stakeholder_step_data IDs linked to this issue
+  linked_fields?: LinkedStepField[]; // Array of specific field references linked to this issue
   company_id: number;
   created_at?: string;
   updated_at?: string;

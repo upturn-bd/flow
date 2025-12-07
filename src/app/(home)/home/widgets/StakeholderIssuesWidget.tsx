@@ -178,8 +178,15 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
                                   <span>{issue.assigned_employee.name}</span>
                                 </>
                               ) : null}
-                              {/* Linked Step Data indicator */}
-                              {issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
+                              {/* Linked Fields indicator (new format) */}
+                              {issue.linked_fields && issue.linked_fields.length > 0 && (
+                                <span className="ml-2 inline-flex items-center gap-0.5 text-primary-600 dark:text-primary-400">
+                                  <LinkIcon size={10} />
+                                  <span>{issue.linked_fields.length}</span>
+                                </span>
+                              )}
+                              {/* Legacy: Linked Step Data indicator */}
+                              {(!issue.linked_fields || issue.linked_fields.length === 0) && issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
                                 <span className="ml-2 inline-flex items-center gap-0.5 text-primary-600 dark:text-primary-400">
                                   <LinkIcon size={10} />
                                   <span>{issue.linked_step_data_ids.length}</span>
@@ -187,8 +194,15 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
                               )}
                             </div>
                           )}
-                          {/* Show linked data even if no assignment */}
-                          {!issue.assigned_employee && !issue.assigned_team && issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
+                          {/* Show linked data even if no assignment - new format */}
+                          {!issue.assigned_employee && !issue.assigned_team && issue.linked_fields && issue.linked_fields.length > 0 && (
+                            <div className="flex items-center gap-1 mt-1 text-[10px] text-primary-600 dark:text-primary-400">
+                              <LinkIcon size={10} />
+                              <span>{issue.linked_fields.length} linked field{issue.linked_fields.length > 1 ? 's' : ''}</span>
+                            </div>
+                          )}
+                          {/* Legacy: Show linked data even if no assignment */}
+                          {!issue.assigned_employee && !issue.assigned_team && (!issue.linked_fields || issue.linked_fields.length === 0) && issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
                             <div className="flex items-center gap-1 mt-1 text-[10px] text-primary-600 dark:text-primary-400">
                               <LinkIcon size={10} />
                               <span>{issue.linked_step_data_ids.length} linked step{issue.linked_step_data_ids.length > 1 ? 's' : ''}</span>
