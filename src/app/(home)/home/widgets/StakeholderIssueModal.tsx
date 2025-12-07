@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, WarningCircle, User, Building, Tag, UsersThree } from "@phosphor-icons/react";
+import { X, WarningCircle, User, Building, Tag, UsersThree, Link as LinkIcon, CaretDown, CaretRight } from "@phosphor-icons/react";
 import { useStakeholderIssues, StakeholderIssueFormData } from '@/hooks/useStakeholderIssues';
 import { useStakeholders } from '@/hooks/useStakeholders';
 import { useStakeholderIssueCategories } from '@/hooks/useStakeholderIssueCategories';
@@ -11,6 +11,8 @@ import { useEmployees } from '@/hooks/useEmployees';
 import { useAuth } from '@/lib/auth/auth-context';
 import { cn } from '@/components/ui/class';
 import { LoadingSpinner } from '@/components/ui';
+import { formatDisplayValue, getFieldLabel, formatStepDataBrief } from '@/lib/utils/step-data-utils';
+import { FieldDefinitionsSchema } from '@/lib/types/schemas';
 
 // Alias for backward compatibility
 const Building2 = Building;
@@ -21,13 +23,23 @@ interface StakeholderIssueModalProps {
   onSuccess: () => void;
 }
 
+// Interface for linked step data display
+interface LinkedStepDataItem {
+  id: number;
+  stepName: string;
+  stepOrder: number;
+  isCompleted: boolean;
+  data: Record<string, any>;
+  fieldDefinitions?: FieldDefinitionsSchema;
+}
+
 export default function StakeholderIssueModal({
   issueId,
   onClose,
   onSuccess,
 }: StakeholderIssueModalProps) {
   const { employeeInfo } = useAuth();
-  const { createIssue, updateIssue, fetchIssueById, loading } = useStakeholderIssues();
+  const { createIssue, updateIssue, fetchIssueById, fetchStakeholderStepData, loading } = useStakeholderIssues();
   const { stakeholders, fetchStakeholders } = useStakeholders();
   const { categories, fetchCategories } = useStakeholderIssueCategories();
   const { teams, fetchTeams } = useTeams();
@@ -37,6 +49,8 @@ export default function StakeholderIssueModal({
   const [isEditing, setIsEditing] = useState(false);
   const [showResolveConfirm, setShowResolveConfirm] = useState(false);
   const [assignmentType, setAssignmentType] = useState<'employee' | 'team'>('employee');
+  const [linkedStepData, setLinkedStepData] = useState<LinkedStepDataItem[]>([]);
+  const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
   const [formData, setFormData] = useState<Partial<StakeholderIssueFormData>>({
     stakeholder_id: 0,
     title: '',
@@ -63,6 +77,49 @@ export default function StakeholderIssueModal({
     fetchTeams();
     fetchEmployees();
   }, [issueId]);
+
+  // Load linked step data when issue is loaded
+  useEffect(() => {
+    const loadLinkedStepData = async () => {
+      if (!issue?.stakeholder_id || !issue?.linked_step_data_ids?.length) {
+        setLinkedStepData([]);
+        return;
+      }
+      
+      try {
+        const allStepData = await fetchStakeholderStepData(issue.stakeholder_id);
+        const linked = allStepData
+          .filter((sd: any) => issue.linked_step_data_ids.includes(sd.id))
+          .map((sd: any) => ({
+            id: sd.id,
+            stepName: sd.step?.name || `Step ${sd.step_id}`,
+            stepOrder: sd.step?.step_order || 0,
+            isCompleted: sd.is_completed,
+            data: sd.data || {},
+            fieldDefinitions: sd.step?.field_definitions,
+          }))
+          .sort((a: LinkedStepDataItem, b: LinkedStepDataItem) => a.stepOrder - b.stepOrder);
+        
+        setLinkedStepData(linked);
+      } catch (err) {
+        console.error("Error loading linked step data:", err);
+      }
+    };
+    
+    loadLinkedStepData();
+  }, [issue, fetchStakeholderStepData]);
+
+  const toggleStepExpansion = (stepId: number) => {
+    setExpandedSteps(prev => {
+      const next = new Set(prev);
+      if (next.has(stepId)) {
+        next.delete(stepId);
+      } else {
+        next.add(stepId);
+      }
+      return next;
+    });
+  };
 
   const loadIssue = async () => {
     if (!issueId) return;
@@ -249,6 +306,84 @@ export default function StakeholderIssueModal({
                           <span>{issue.assigned_employee.name}</span>
                         </>
                       ) : null}
+                    </div>
+                  </div>
+                )}
+
+                {/* Linked Step Data */}
+                {linkedStepData.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-foreground-secondary mb-2">
+                      <div className="flex items-center gap-2">
+                        <LinkIcon className="w-4 h-4" />
+                        <span>Linked Step Data ({linkedStepData.length})</span>
+                      </div>
+                    </label>
+                    <div className="space-y-2 max-h-60 overflow-y-auto border border-border-primary rounded-lg p-3 bg-background-secondary">
+                      {linkedStepData.map((stepItem) => {
+                        const isExpanded = expandedSteps.has(stepItem.id);
+                        return (
+                          <div
+                            key={stepItem.id}
+                            className="bg-surface-primary rounded-lg border border-border-secondary overflow-hidden"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => toggleStepExpansion(stepItem.id)}
+                              className="w-full flex items-center gap-2 p-3 hover:bg-surface-hover transition-colors text-left"
+                            >
+                              {isExpanded ? (
+                                <CaretDown className="w-4 h-4 text-foreground-tertiary shrink-0" />
+                              ) : (
+                                <CaretRight className="w-4 h-4 text-foreground-tertiary shrink-0" />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-sm font-medium text-foreground-primary">
+                                    Step {stepItem.stepOrder}: {stepItem.stepName}
+                                  </span>
+                                  {stepItem.isCompleted && (
+                                    <span className="px-1.5 py-0.5 text-xs bg-success/10 dark:bg-success/20 text-success rounded">
+                                      Completed
+                                    </span>
+                                  )}
+                                </div>
+                                {!isExpanded && Object.keys(stepItem.data).length > 0 && (
+                                  <p className="text-xs text-foreground-tertiary mt-1 truncate">
+                                    {formatStepDataBrief(stepItem.data, stepItem.fieldDefinitions, 2)}
+                                  </p>
+                                )}
+                              </div>
+                            </button>
+                            
+                            {isExpanded && Object.keys(stepItem.data).length > 0 && (
+                              <div className="px-3 pb-3 border-t border-border-secondary">
+                                <div className="pt-3 space-y-2">
+                                  {Object.entries(stepItem.data)
+                                    .filter(([, value]) => {
+                                      // Skip file fields
+                                      if (typeof value === 'object' && value !== null && 'path' in (value as Record<string, unknown>)) {
+                                        return false;
+                                      }
+                                      return true;
+                                    })
+                                    .map(([key, value]) => (
+                                      <div key={key} className="flex justify-between gap-4 text-sm">
+                                        <span className="text-foreground-secondary font-medium">
+                                          {getFieldLabel(key, stepItem.fieldDefinitions)}:
+                                        </span>
+                                        <span className="text-foreground-primary text-right">
+                                          {formatDisplayValue(value)}
+                                        </span>
+                                      </div>
+                                    ))
+                                  }
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

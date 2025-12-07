@@ -370,7 +370,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-foreground-secondary border border-border-secondary rounded-lg hover:bg-background-secondary dark:bg-background-tertiary"
             >
               <PencilSimple size={14} />
-              <span className="hidden sm:inline">PencilSimple</span>
+              <span className="hidden sm:inline">Edit</span>
             </button>
             <button
               onClick={() => setShowDeleteConfirm(true)}
@@ -597,7 +597,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950 transition-colors"
                 >
                   <PencilSimple size={16} />
-                  <span className="hidden sm:inline">PencilSimple</span>
+                  <span className="hidden sm:inline">Edit</span>
                 </button>
               </div>
 
@@ -654,7 +654,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 </div>
               ) : (
                 <p className="text-xs sm:text-sm text-foreground-tertiary">
-                  No additional data added. Click "PencilSimple" to add data.
+                  No additional data added. Click "Edit" to add data.
                 </p>
               )}
             </div>

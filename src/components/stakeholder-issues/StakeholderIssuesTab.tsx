@@ -5,7 +5,7 @@ import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { useModalState } from "@/hooks/core/useModalState";
 import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIssueForm";
 import BaseModal from "@/components/ui/modals/BaseModal";
-import { Plus, WarningCircle, Download, TrashSimple, Eye, CheckCircle, Clock } from "@phosphor-icons/react";
+import { Plus, WarningCircle, Download, TrashSimple, Eye, CheckCircle, Clock, Link as LinkIcon } from "@phosphor-icons/react";
 import { StakeholderIssue } from "@/lib/types/schemas";
 import { InlineSpinner } from "@/components/ui";
 
@@ -210,6 +210,16 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                     <div className="text-xs text-foreground-tertiary mb-2">
                       Assigned to: {issue.assigned_employee?.name || issue.assigned_team?.name}
                       {issue.assigned_team && <span className="ml-1">(Team)</span>}
+                    </div>
+                  )}
+
+                  {/* Linked Step Data Info */}
+                  {issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
+                    <div className="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 mb-2">
+                      <LinkIcon size={12} />
+                      <span>
+                        {issue.linked_step_data_ids.length} linked step{issue.linked_step_data_ids.length > 1 ? 's' : ''}
+                      </span>
                     </div>
                   )}
 

@@ -9,7 +9,7 @@ import { useModalState } from "@/hooks/core/useModalState";
 import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIssueForm";
 import BaseModal from "@/components/ui/modals/BaseModal";
 import Pagination from "@/components/ui/Pagination";
-import { WarningCircle, CheckCircle, Clock, Download, Eye, Plus, TrashSimple, Building, Tag, UsersThree } from "@phosphor-icons/react";
+import { WarningCircle, CheckCircle, Clock, Download, Eye, Plus, TrashSimple, Building, Tag, UsersThree, Link as LinkIcon } from "@phosphor-icons/react";
 import { StakeholderIssue } from "@/lib/types/schemas";
 import { useAuth } from "@/lib/auth/auth-context";
 import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
@@ -394,6 +394,16 @@ export default function StakeholderIssuesPage() {
                           <span className="text-foreground-tertiary">(Team)</span>
                         </>
                       )}
+                    </div>
+                  )}
+
+                  {/* Linked Step Data Info */}
+                  {issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
+                    <div className="text-sm text-foreground-secondary mb-2 flex items-center gap-1">
+                      <LinkIcon size={14} className="text-primary-600" />
+                      <span className="text-primary-600 dark:text-primary-400 font-medium">
+                        {issue.linked_step_data_ids.length} linked step{issue.linked_step_data_ids.length > 1 ? 's' : ''}
+                      </span>
                     </div>
                   )}
 

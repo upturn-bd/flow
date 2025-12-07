@@ -109,7 +109,7 @@ export default function UpcomingPage({ setActiveTab }: { setActiveTab: (tab:stri
                           <button
                             onClick={() => setDisplayDraftId(item.draft_id)}
                             className="p-1.5 text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded-full transition-colors"
-                            aria-label="PencilSimple draft"
+                            aria-label="Edit draft"
                           >
                             <NotePencil className="h-5 w-5" />
                           </button>

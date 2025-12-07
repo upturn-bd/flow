@@ -24,7 +24,7 @@ const actionConfig = {
   },
   [PERMISSION_ACTIONS.WRITE]: {
     icon: PencilSimple,
-    label: "PencilSimple",
+    label: "Edit",
     colorGranted: "bg-success/10 dark:bg-success/20 text-success border-success/30 dark:border-success/40",
     colorDenied: "bg-background-secondary dark:bg-background-tertiary text-foreground-tertiary border-border-primary",
   },

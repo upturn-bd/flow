@@ -16,8 +16,11 @@ import { X, Upload, TrashSimple, Download, FileText, User, UsersThree, Tag, Link
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { FormField, SelectField, TextAreaField } from "@/components/forms";
 import { captureError } from "@/lib/sentry";
+import { formatStepDataBrief, getFieldLabel } from "@/lib/utils/step-data-utils";
 
 type AssignmentType = 'employee' | 'team';
+
+import { FieldDefinitionsSchema } from "@/lib/types/schemas";
 
 interface StakeholderStepDataOption {
   id: number;
@@ -25,6 +28,7 @@ interface StakeholderStepDataOption {
   stepOrder: number;
   isCompleted: boolean;
   data: Record<string, any>;
+  fieldDefinitions?: FieldDefinitionsSchema;
 }
 
 interface StakeholderIssueFormProps {
@@ -119,6 +123,7 @@ export default function StakeholderIssueForm({
           stepOrder: sd.step?.step_order || 0,
           isCompleted: sd.is_completed,
           data: sd.data || {},
+          fieldDefinitions: sd.step?.field_definitions,
         }));
         setAvailableStepData(stepDataOptions.sort((a, b) => a.stepOrder - b.stepOrder));
       } catch (err) {
@@ -487,9 +492,8 @@ export default function StakeholderIssueForm({
                         )}
                       </div>
                       {Object.keys(stepData.data).length > 0 && (
-                        <p className="text-xs text-foreground-tertiary mt-1 truncate">
-                          {Object.keys(stepData.data).slice(0, 3).join(', ')}
-                          {Object.keys(stepData.data).length > 3 && ` +${Object.keys(stepData.data).length - 3} more`}
+                        <p className="text-xs text-foreground-tertiary mt-1 line-clamp-2">
+                          {formatStepDataBrief(stepData.data, stepData.fieldDefinitions, 2)}
                         </p>
                       )}
                     </div>

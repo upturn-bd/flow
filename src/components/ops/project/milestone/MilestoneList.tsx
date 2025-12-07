@@ -151,7 +151,7 @@ export default function MilestoneList({
                             console.log(m)
                             m.milestone_title && onEdit(m.milestone_title)
                           }}
-                          title="PencilSimple milestone"
+                          title="Edit milestone"
                         >
                           <Pencil size={14} />
                         </Button>

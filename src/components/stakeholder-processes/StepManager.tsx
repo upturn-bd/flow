@@ -193,7 +193,7 @@ export default function StepManager({
                       onClick={() => handleEditStep(step)}
                       className="px-3 py-1.5 text-xs sm:text-sm text-primary-600 bg-primary-50 hover:bg-primary-100 rounded transition-colors font-medium"
                     >
-                      PencilSimple
+                      Edit
                     </button>
                     <button
                       onClick={() => handleDeleteStep(step)}
@@ -210,7 +210,7 @@ export default function StepManager({
         </div>
       )}
 
-      {/* Add/PencilSimple Step Modal */}
+      {/* Add/Edit Step Modal */}
       {showAddStep && (
         <StepFormModal
           processId={processId}
@@ -418,7 +418,7 @@ function StepFormModal({ processId, step, teams, nextStepOrder, availableSteps, 
       <div className="bg-surface-primary rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border-primary sticky top-0 bg-surface-primary z-10">
           <h3 className="text-lg sm:text-xl font-bold text-foreground-primary">
-            {step ? "PencilSimple Step" : "Add New Step"}
+            {step ? "Edit Step" : "Add New Step"}
           </h3>
           <button 
             onClick={onClose} 
@@ -1000,7 +1000,7 @@ function FieldEditor({
                   ? 'bg-primary-600 text-white hover:bg-primary-700' 
                   : 'bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100'
               }`}
-              title={isEditing ? "Collapse options" : "PencilSimple options"}
+              title={isEditing ? "Collapse options" : "Edit options"}
             >
               {isEditing ? <CaretUp size={16} /> : <CaretDown size={16} />}
               <span>{isEditing ? "Collapse" : "Options"}</span>
@@ -1015,7 +1015,7 @@ function FieldEditor({
                   ? 'bg-success text-white hover:bg-success/90' 
                   : 'bg-success/10 text-success border border-success/20 hover:bg-success/20'
               }`}
-              title={showFormulaEditor ? "Hide formula editor" : "PencilSimple formula"}
+              title={showFormulaEditor ? "Hide formula editor" : "Edit formula"}
             >
               <Calculator size={16} />
               <span>{showFormulaEditor ? "Hide" : "Formula"}</span>

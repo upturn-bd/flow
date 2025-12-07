@@ -184,7 +184,7 @@ export function EntityListItem({
               `}
             >
               <PencilSimple size={sizes.iconSize - 2} />
-              <span className="hidden xs:inline">{actions.editLabel || "PencilSimple"}</span>
+              <span className="hidden xs:inline">{actions.editLabel || "Edit"}</span>
             </button>
           )}
 

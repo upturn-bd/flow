@@ -226,7 +226,7 @@ export default function RequisitionEditModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="PencilSimple Requisition"
+      title="Edit Requisition"
       icon={<Package className="text-blue-600" size={24} />}
       size="lg"
     >

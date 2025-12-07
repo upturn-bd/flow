@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { WarningCircle, Plus, ArrowsClockwise, FileText, Tag, UsersThree, User } from "@phosphor-icons/react";
+import { WarningCircle, Plus, ArrowsClockwise, FileText, Tag, UsersThree, User, Link as LinkIcon } from "@phosphor-icons/react";
 import SectionHeader from '@/app/(home)/home/components/SectionHeader';
 import LoadingSection from '@/app/(home)/home/components/LoadingSection';
 import EmptyState from '@/app/(home)/home/components/EmptyState';
@@ -178,6 +178,20 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
                                   <span>{issue.assigned_employee.name}</span>
                                 </>
                               ) : null}
+                              {/* Linked Step Data indicator */}
+                              {issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
+                                <span className="ml-2 inline-flex items-center gap-0.5 text-primary-600 dark:text-primary-400">
+                                  <LinkIcon size={10} />
+                                  <span>{issue.linked_step_data_ids.length}</span>
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          {/* Show linked data even if no assignment */}
+                          {!issue.assigned_employee && !issue.assigned_team && issue.linked_step_data_ids && issue.linked_step_data_ids.length > 0 && (
+                            <div className="flex items-center gap-1 mt-1 text-[10px] text-primary-600 dark:text-primary-400">
+                              <LinkIcon size={10} />
+                              <span>{issue.linked_step_data_ids.length} linked step{issue.linked_step_data_ids.length > 1 ? 's' : ''}</span>
                             </div>
                           )}
                         </div>

@@ -92,7 +92,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                 className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
               >
                 <Pencil size={12} />
-                <span>PencilSimple</span>
+                <span>Edit</span>
               </motion.button>
             )}
             <div
@@ -219,7 +219,7 @@ export const RequisitionCard: React.FC<RequisitionCardProps> = ({
                 className="flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors"
               >
                 <Pencil size={16} />
-                <span>PencilSimple</span>
+                <span>Edit</span>
               </motion.button>
             )}
             {canApprove && (

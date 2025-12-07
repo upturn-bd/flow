@@ -653,7 +653,7 @@ export default function AccountsTab() {
                             <button
                               onClick={() => handleEditClick(account)}
                               className="text-primary-600 hover:text-primary-800 transition-colors"
-                              title="PencilSimple"
+                              title="Edit"
                             >
                               <PencilSimple size={14} />
                             </button>

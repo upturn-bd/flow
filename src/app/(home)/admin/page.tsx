@@ -1,23 +1,6 @@
 "use client";
 
-import { 
-    Gear, // Basic/Advanced settings
-    CreditCard, // Payroll
-    CurrencyDollar, // Transaction
-    Users, // Teams
-    ClipboardText, // Task Log
-    ChartBar, // Project Log
-    SignIn, // Attendance Log
-    CalendarX, // Leave Log
-    Bell, // Notice Log
-    Clipboard, // Requisition Log
-    WarningCircle, // Complaint Log
-    Building, // Stakeholder Log
-    UserPlus, // Onboarding Log
-    GitBranch, // Stakeholder Processes (workflow/branching)
-    File, 
-    Download // Data Export 
-} from "@phosphor-icons/react";
+import { Gear, File } from "@phosphor-icons/react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -26,143 +9,15 @@ import {
     PageHeader, 
     NavigationCard, 
     NavigationCardGrid,
-    NavigationSectionProps 
 } from "@/components/ui";
-
-// --- New Structure for Admin Management ---
-const sections: NavigationSectionProps[] = [
-    {
-        title: "Company Configurations",
-        description: "Manage core company settings and rules",
-        items: [
-            {
-                name: "Basic Gear",
-                path: "/admin/config/basic",
-                icon: Gear,
-                description: "General company information and essential settings",
-                iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-            },
-            {
-                name: "Advanced Gear",
-                path: "/admin/config/advanced",
-                icon: Gear,
-                description: "Configure system-wide and granular settings",
-                iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
-            },
-            {
-                name: "Payroll",
-                path: "/admin/config/payroll",
-                icon: CreditCard,
-                description: "Manage salary structures, deductions, and payment rules",
-                iconColor: "bg-success/10 text-success dark:bg-success/20"
-            },
-            {
-                name: "Teams",
-                path: "/admin/config/teams",
-                icon: Users,
-                description: "Manage teams and assign granular permissions",
-                iconColor: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400"
-            },
-            {
-                name: "Stakeholder Process",
-                path: "/admin/config/stakeholder-process",
-                icon: GitBranch,
-                description: "Manage workflow processes for stakeholders and leads",
-                iconColor: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400"
-            },
-            {
-                name: "Data Export",
-                path: "/admin/data-export",
-                icon: Download,
-                description: "Export HRIS and stakeholder data to CSV format",
-                iconColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-            },
-        ],
-    },
-    {
-        title: "Company Logs",
-        description: "View system records, audit trails, and historical data",
-        items: [
-            {
-                name: "Task",
-                path: "/admin/logs/tasks",
-                icon: ClipboardText,
-                description: "View historical records for task management",
-                iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
-            },
-            {
-                name: "Project",
-                path: "/admin/logs/project",
-                icon: ChartBar,
-                description: "View historical records for project tracking",
-                iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-            },
-            {
-                name: "Attendance",
-                path: "/admin/logs/attendance",
-                icon: SignIn,
-                description: "Review historical check-in and check-out data",
-                iconColor: "bg-success/10 text-success dark:bg-success/20"
-            },
-            {
-                name: "Leave",
-                path: "/admin/logs/leave",
-                icon: CalendarX,
-                description: "Review all past and pending leave requests",
-                iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-            },
-            {
-                name: "Notice",
-                path: "/admin/logs/notice",
-                icon: Bell,
-                description: "Archive and history of all published company notices",
-                iconColor: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-            },
-            {
-                name: "Requisition",
-                path: "/admin/logs/requisition",
-                icon: Clipboard,
-                description: "History of all equipment/supply requisition requests",
-                iconColor: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400"
-            },
-            {
-                name: "Complaint",
-                path: "/admin/logs/complaint",
-                icon: WarningCircle,
-                description: "Archive of all submitted workplace complaints",
-                iconColor: "bg-error/10 text-error dark:bg-error/20"
-            },
-            {
-                name: "Stakeholder",
-                path: "/admin/stakeholders",
-                icon: Building,
-                description: "Records of all stakeholder interactions and issues",
-                iconColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
-            },
-            {
-                name: "Transaction",
-                path: "/admin/transaction",
-                icon: CurrencyDollar,
-                description: "Define and manage financial transaction types and flows",
-                iconColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-            },
-            {
-                name: "Onboarding",
-                path: "/admin/logs/onboarding",
-                icon: UserPlus,
-                description: "Archive of all employee onboarding processes",
-                iconColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
-            },
-        ],
-    }
-];
+import { ADMIN_SECTIONS } from "@/lib/constants/navigation";
 
 export default function AdminManagementPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedSection, setSelectedSection] = useState<string | null>(null);
 
     // FunnelSimple items based on search query
-    const filteredSections = sections
+    const filteredSections = ADMIN_SECTIONS
         .map((section) => ({
             ...section,
             items: section.items.filter((item) =>
@@ -252,7 +107,7 @@ export default function AdminManagementPage() {
                         All
                     </motion.button>
 
-                    {sections.map((section) => (
+                    {ADMIN_SECTIONS.map((section) => (
                         <motion.button
                             key={section.title}
                             whileHover={{ scale: 1.05 }}

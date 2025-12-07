@@ -1,22 +1,6 @@
 "use client";
 
-import { 
-  ClipboardText, // Task
-  ChartBar, // Project
-  SignIn, // Attendance
-  CalendarX, // Leave
-  Bell, // Notice
-  Clipboard, // Requisition
-  CurrencyDollar, 
-  WarningCircle, 
-  UserPlus, // Onboarding
-  File, 
-  Users, 
-  CreditCard, // Payroll
-  Building, 
-  UserMinus, // Stakeholder
-  Briefcase // Operations icon 
-} from "@phosphor-icons/react";
+import { File, Briefcase } from "@phosphor-icons/react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -25,127 +9,15 @@ import {
   PageHeader, 
   NavigationCard, 
   NavigationCardGrid,
-  NavigationSectionProps 
 } from "@/components/ui";
-
-const sections: NavigationSectionProps[] = [
-  {
-    title: "Workflow",
-    description: "Manage tasks, projects and work processes",
-    items: [
-      {
-        name: "Task",
-        path: "/ops/tasks",
-        icon: ClipboardText,
-        description: "Assign, track and manage day-to-day tasks",
-        iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
-      },
-      {
-        name: "Project",
-        path: "/ops/project",
-        icon: ChartBar,
-        description: "Plan and execute complex projects with milestones",
-        iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-      },
-    ],
-  },
-  {
-    title: "Services",
-    description: "Essential everyday services for employees",
-    items: [
-      {
-        name: "Attendance",
-        path: "/ops/attendance?tab=today",
-        icon: SignIn,
-        description: "Track and manage your daily attendance",
-        iconColor: "bg-success/10 text-success dark:bg-success/20"
-      },
-      {
-        name: "Leave",
-        path: "/ops/leave?tab=apply",
-        icon: CalendarX,
-        description: "Apply and manage time off and leaves",
-        iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-      },
-      {
-        name: "Notice",
-        path: "/ops/notice",
-        icon: Bell,
-        description: "Important company announcements and notices",
-        iconColor: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-      },
-      {
-        name: "Requisition",
-        path: "/ops/requisition?tab=create",
-        icon: Clipboard,
-        description: "Request equipment, supplies and services",
-        iconColor: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400"
-      },
-      {
-        name: "Settlement",
-        path: "/ops/settlement?tab=create",
-        icon: CurrencyDollar,
-        description: "Manage and track expense reimbursements",
-        iconColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-      },
-      {
-        name: "Complaint",
-        path: "/ops/complaint",
-        icon: WarningCircle,
-        description: "Submit and track workplace issues and concerns",
-        iconColor: "bg-error/10 text-error dark:bg-error/20"
-      },
-      {
-        name: "Payroll",
-        path: "/ops/payroll",
-        icon: CreditCard,
-        description: "View payroll history and manage salary information",
-        iconColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
-      },
-      {
-        name: "Stakeholder Issues",
-        path: "/ops/stakeholder-issues",
-        icon: Building,
-        description: "Manage stakeholder relationships and track issues",
-        iconColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
-      },
-    ],
-  },
-  {
-    title: "Operations",
-    description: "Processes for company operations and management",
-    items: [
-      {
-        name: "Onboarding",
-        path: "/ops/onboarding",
-        icon: UserPlus,
-        description: "Employee onboarding workflow and tasks",
-        iconColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
-      },
-      {
-        name: "Offboarding",
-        path: "/ops/offboarding",
-        icon: UserMinus,
-        description: "Employee offboarding workflow and tasks",
-        iconColor: "bg-error/10 text-error dark:bg-error/20"
-      },
-      {
-        name: "HRIS",
-        path: "/ops/hris",
-        icon: Users,
-        description: "Human Resource Information System",
-        iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-      }
-    ],
-  },
-];
+import { OPS_SECTIONS } from "@/lib/constants/navigation";
 
 export default function ServicesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
 
   // FunnelSimple items based on search query
-  const filteredSections = sections
+  const filteredSections = OPS_SECTIONS
     .map((section) => ({
       ...section,
       items: section.items.filter((item) =>
@@ -235,7 +107,7 @@ export default function ServicesPage() {
             All
           </motion.button>
           
-          {sections.map((section) => (
+          {OPS_SECTIONS.map((section) => (
             <motion.button
               key={section.title}
               whileHover={{ scale: 1.05 }}
