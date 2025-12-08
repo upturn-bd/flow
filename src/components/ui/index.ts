@@ -48,6 +48,8 @@ export { StatusIndicator } from './StatusIndicator';
 export { default as NoPermissionMessage } from './NoPermissionMessage';
 export { default as LoadMore } from './LoadMore';
 export { InlineDeleteConfirm } from './InlineDeleteConfirm';
+export { default as ModalActionButtons } from './ModalActionButtons';
+export { default as SectionHeader } from './SectionHeader';
 
 // Utilities
 export * as animations from './animations';

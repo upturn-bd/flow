@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Building, Code, Briefcase, Globe } from "@phosphor-icons/react";
-import FormInputField from "@/components/ui/FormInputField";
-import FormSelectField from "@/components/ui/FormSelectField";
+import { FormField, SelectField } from "@/components/forms";
+import { SectionHeader } from "@/components/ui";
 import { staggerContainer } from "@/components/ui/animations";
 import { validateCompanyBasics, validationErrorsToObject } from "@/lib/utils/validation";
 import { CompanyBasics } from "@/lib/types/schemas";
@@ -133,39 +133,34 @@ export default function SetupStep1({
         transition={{ duration: 0.4 }}
         className="bg-surface-primary rounded-xl shadow-sm mb-8"
       >
-        <div className="border-b border-border-primary px-3 py-4">
-          <h3 className="text-lg font-semibold text-foreground-secondary flex items-center">
-            <Building className="w-5 h-5 mr-2 text-foreground-secondary" />
-            Company Information
-          </h3>
-        </div>
+        <SectionHeader
+          title="Company Information"
+          icon={<Building className="w-5 h-5" />}
+        />
         
         <form onSubmit={onSubmit} className="p-3 sm:p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormInputField
+            <FormField
               name="company_name"
               label="Company Name"
-              icon={<Building size={18} />}
               value={formValues.company_name}
               onChange={handleChange}
               readOnly={true}
               error={errors.company_name}
             />
 
-            <FormInputField
+            <FormField
               name="company_id"
               label="Company Code"
-              icon={<Code size={18} />}
               value={formValues.company_id || ""}
               onChange={handleChange}
               readOnly={true}
               error={errors.company_id}
             />
 
-            <FormSelectField
+            <SelectField
               name="industry_id"
               label="Industry"
-              icon={<Briefcase size={18} />}
               options={industries.map(industry => ({
                 value: industry.id.toString(),
                 label: industry.name
@@ -176,10 +171,9 @@ export default function SetupStep1({
               error={errors.industry_id}
             />
 
-            <FormSelectField
+            <SelectField
               name="country_id"
               label="Country"
-              icon={<Globe size={18} />}
               options={countries.map(country => ({
                 value: country.id.toString(),
                 label: country.name

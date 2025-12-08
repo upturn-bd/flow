@@ -3,9 +3,8 @@
 import { motion } from "framer-motion";
 import { Gear, Calendar, CurrencyDollar, Clock, Pulse, Timer } from "@phosphor-icons/react";
 import { staggerContainer } from "@/components/ui/animations";
-import FormToggleField from "@/components/ui/FormToggleField";
-import FormNumberField from "@/components/ui/FormNumberField";
-import FormDateField from "@/components/ui/FormDateField";
+import { ToggleField, DateField } from "@/components/forms";
+import { SectionHeader } from "@/components/ui";
 
 interface CompanySettingsConfigViewProps {
   formValues: {
@@ -57,18 +56,15 @@ export default function CompanySettingsConfigView({
         transition={{ duration: 0.4 }}
         className="bg-surface-primary rounded-xl shadow-sm"
       >
-        <div className="border-b border-border-primary px-3 py-4">
-          <h3 className="text-lg font-semibold text-foreground-secondary flex items-center">
-            <Pulse className="w-5 h-5 mr-2 text-foreground-tertiary" />
-            Operations Gear
-          </h3>
-        </div>
+        <SectionHeader
+          title="Operations Gear"
+          icon={<Pulse className="w-5 h-5" />}
+        />
         
         <div className="p-3 sm:p-6">
-          <FormToggleField
+          <ToggleField
             name="live_absent_enabled"
             label="Live Absence Tracking"
-            icon={<Clock size={18} />}
             checked={formValues.live_absent_enabled}
             onChange={handleToggleChange('live_absent_enabled')}
             error={errors.live_absent_enabled}
@@ -84,18 +80,15 @@ export default function CompanySettingsConfigView({
         transition={{ duration: 0.4, delay: 0.1 }}
         className="bg-surface-primary rounded-xl shadow-sm"
       >
-        <div className="border-b border-border-primary px-3 py-4">
-          <h3 className="text-lg font-semibold text-foreground-secondary flex items-center">
-            <Timer className="w-5 h-5 mr-2 text-foreground-tertiary" />
-            Time Gear
-          </h3>
-        </div>
+        <SectionHeader
+          title="Time Gear"
+          icon={<Timer className="w-5 h-5" />}
+        />
         
         <div className="p-3 sm:p-6 space-y-4">
-          <FormDateField
+          <DateField
             name="fiscal_year_start"
             label="Fiscal Year Start"
-            icon={<Calendar size={18} />}
             value={formValues.fiscal_year_start}
             onChange={handleInputChange('fiscal_year_start')}
             error={errors.fiscal_year_start}
