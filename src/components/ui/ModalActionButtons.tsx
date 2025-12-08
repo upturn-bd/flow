@@ -9,7 +9,7 @@ interface ModalActionButtonsProps {
   isDisabled?: boolean;
   submitText?: string;
   cancelText?: string;
-  submitVariant?: "primary" | "secondary" | "ghost" | "outline" | "destructive";
+  submitVariant?: "primary" | "secondary" | "ghost" | "outline" | "danger" | "pending" | "complete";
   type?: "button" | "submit";
 }
 

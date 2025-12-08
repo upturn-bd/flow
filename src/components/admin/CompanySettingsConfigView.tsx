@@ -63,7 +63,6 @@ export default function CompanySettingsConfigView({
         
         <div className="p-3 sm:p-6">
           <ToggleField
-            name="live_absent_enabled"
             label="Live Absence Tracking"
             checked={formValues.live_absent_enabled}
             onChange={handleToggleChange('live_absent_enabled')}

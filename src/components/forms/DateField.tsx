@@ -12,6 +12,7 @@ interface DateFieldProps {
   min?: string;
   max?: string;
   className?: string;
+  description?: string;
 }
 
 export const DateField: React.FC<DateFieldProps> = ({
@@ -25,6 +26,7 @@ export const DateField: React.FC<DateFieldProps> = ({
   min,
   max,
   className = "",
+  description,
 }) => {
   return (
     <div className={className}>
@@ -32,6 +34,9 @@ export const DateField: React.FC<DateFieldProps> = ({
         {label}
         {required && <span className="text-error ml-1">*</span>}
       </label>
+      {description && (
+        <p className="text-sm text-foreground-tertiary mb-2">{description}</p>
+      )}
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <Calendar size={18} weight="duotone" className="text-foreground-tertiary" />
