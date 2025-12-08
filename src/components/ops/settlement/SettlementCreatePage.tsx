@@ -8,8 +8,7 @@ import { useSettlementRequests } from "@/hooks/useSettlement";
 import { toast } from "sonner";
 import { FormLayout, FormSection, FormGrid } from "@/components/ui/FormLayout";
 import { Button } from "@/components/ui/button";
-import FormInputField from "@/components/ui/FormInputField";
-import FormSelectField from "@/components/ui/FormSelectField";
+import { FormField, SelectField, NumberField, DateField } from "@/components/forms";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
 import { uploadManyFiles } from "@/lib/utils/files";
@@ -195,10 +194,9 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
           description="Provide the basic details of your settlement request"
         >
           <FormGrid columns={2}>
-            <FormSelectField
+            <SelectField
               name="settlement_type_id"
               label="Settlement Type"
-              icon={<FileText size={18} />}
               value={settlementState.settlement_type_id?.toString() || ""}
               onChange={handleInputChange}
               placeholder="Select settlement type"
@@ -209,30 +207,25 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
               error={errors.settlement_type_id}
             />
 
-            <FormInputField
+            <NumberField
               name="amount"
               label="Amount"
-              icon={<CurrencyDollar size={18} />}
-              value={settlementState.amount !== null ? settlementState.amount.toString() : ""}
+              value={settlementState.amount !== null ? settlementState.amount : ""}
               onChange={handleInputChange}
-              type="number"
               error={errors.amount}
             />
 
-            <FormInputField
+            <DateField
               name="event_date"
               label="Event Date"
-              icon={<Calendar size={18} />}
               value={settlementState.event_date}
               onChange={handleInputChange}
-              type="date"
               error={errors.event_date}
             />
 
-            <FormSelectField
+            <SelectField
               name="requested_to"
               label="Requested To"
-              icon={<User size={18} />}
               value={settlementState.requested_to}
               onChange={handleInputChange}
               placeholder="Select approver"

@@ -13,7 +13,8 @@ import { Card, CardHeader, CardContent, StatusBadge, InfoRow } from "@/component
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import BaseModal from "@/components/ui/modals/BaseModal";
-import FormSelectField from "@/components/ui/FormSelectField";
+import { SelectField } from "@/components/forms";
+import { ModalActionButtons } from "@/components/ui";
 import { toast } from "sonner";
 import LoadingSection from "@/app/(home)/home/components/LoadingSection";
 import { getEmployeeInfo } from "@/lib/utils/auth";
@@ -239,38 +240,24 @@ export default function AttendanceRequestsPage() {
               )}
             </div>
 
-            <FormSelectField
+            <SelectField
               name="status"
               label="Decision"
-              icon={<CheckCircle size={18} />}
               value={updateStatus}
               onChange={(e) => setUpdateStatus(e.target.value)}
               placeholder="Select decision"
-              data-testid="attendance-status-select"
               options={[
                 { value: "approved", label: "Approve" },
                 { value: "rejected", label: "Reject" },
               ]}
             />
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-border-primary">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setSelectedRequest(null)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                disabled={!updateStatus || isSubmitting}
-                isLoading={isSubmitting}
-              >
-                Submit Decision
-              </Button>
-            </div>
+            <ModalActionButtons
+              onCancel={() => setSelectedRequest(null)}
+              isSubmitting={isSubmitting}
+              isDisabled={!updateStatus}
+              submitText="Submit Decision"
+            />
           </form>
         )}
       </BaseModal>
