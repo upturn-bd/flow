@@ -8,8 +8,7 @@ import {
   validationErrorsToObject,
 } from "@/lib/utils/validation";
 import { type MilestoneData } from "@/lib/validation/schemas/advanced";
-import FormInputField from "@/components/ui/FormInputField";
-import FormSelectField from "@/components/ui/FormSelectField";
+import { FormField, SelectField, DateField } from "@/components/forms";
 import { SingleEmployeeSelector } from "@/components/forms";
 import AssigneeSelect from "./AssigneeSelect";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -415,10 +414,9 @@ export default function ProjectForm({
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <FormInputField
+        <FormField
           name="project_title"
           label="Project Name"
-          icon={<FileText size={16} className="text-foreground-secondary dark:text-foreground-secondary" />}
           value={projectDetails.project_title || ""}
           onChange={handleInputChange}
           error={errors.project_title}
@@ -466,10 +464,9 @@ export default function ProjectForm({
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <FormInputField
+        <FormField
           name="goal"
           label="Goal"
-          icon={<Target size={16} className="text-foreground-secondary dark:text-foreground-secondary" />}
           value={projectDetails.goal || ""}
           onChange={handleInputChange}
           error={errors.goal}
@@ -490,10 +487,9 @@ export default function ProjectForm({
           <div className="flex flex-col gap-2">
             {projectDetails.department_ids && projectDetails.department_ids.map((deptId, index) => (
               <div key={index} className="flex items-center gap-2">
-                <FormSelectField
+                <SelectField
                   name={`department_${index}`}
                   value={deptId.toString()}
-                  icon={<Building size={16} className="text-foreground-secondary dark:text-foreground-secondary" />}
                   onChange={(e) => {
                     const newDeptId = Number(e.target.value);
                     setProjectDetails((prev) => {
@@ -564,25 +560,20 @@ export default function ProjectForm({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FormInputField
+        <DateField
           name="start_date"
           label="Start Date"
-          icon={<Calendar size={16} className="text-foreground-secondary dark:text-foreground-secondary" />}
-          type="date"
           value={projectDetails.start_date || ""}
           onChange={handleInputChange}
           error={errors.start_date}
         />
 
-        <FormInputField
+        <DateField
           name="end_date"
           label="End Date"
-          icon={<Calendar size={16} className="text-foreground-secondary dark:text-foreground-secondary" />}
-          type="date"
           value={projectDetails.end_date || ""}
           onChange={handleInputChange}
           error={errors.end_date}
-          readOnly={!projectDetails.start_date}
           min={projectDetails.start_date || ""}
         />
       </div>
