@@ -304,7 +304,7 @@ export default function OffboardingPage() {
                   selectedEmployee?.id === emp.id
                     ? "border-error ring-2 ring-error/30"
                     : "border-border-primary"
-                } cursor-pointer transition-all`}}
+                } cursor-pointer transition-all`}
                 onClick={() => activeTab === "active" && setSelectedEmployee(emp)}
               >
                 <div className="flex justify-between items-start mb-3">
