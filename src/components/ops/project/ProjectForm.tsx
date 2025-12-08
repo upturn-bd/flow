@@ -575,6 +575,7 @@ export default function ProjectForm({
           onChange={handleInputChange}
           error={errors.end_date}
           min={projectDetails.start_date || ""}
+          readOnly={!projectDetails.start_date}
         />
       </div>
 

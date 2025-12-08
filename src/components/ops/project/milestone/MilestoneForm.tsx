@@ -208,6 +208,7 @@ export default function MilestoneForm({
               error={errors.end_date}
               min={milestoneData.start_date || projectStartDate || undefined}
               max={projectEndDate || undefined}
+              readOnly={!milestoneData.start_date}
             />
           </div>
 

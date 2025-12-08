@@ -13,6 +13,8 @@ interface DateFieldProps {
   max?: string;
   className?: string;
   description?: string;
+  readOnly?: boolean;
+  disabled?: boolean;
 }
 
 export const DateField: React.FC<DateFieldProps> = ({
@@ -27,6 +29,8 @@ export const DateField: React.FC<DateFieldProps> = ({
   max,
   className = "",
   description,
+  readOnly = false,
+  disabled = false,
 }) => {
   return (
     <div className={className}>
@@ -49,7 +53,9 @@ export const DateField: React.FC<DateFieldProps> = ({
           min={min}
           max={max}
           placeholder={placeholder}
-          className={`w-full pl-10 rounded-lg bg-surface-primary text-foreground-primary p-2.5 border border-border-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all ${error ? 'border-error focus:ring-error' : ''}`}
+          readOnly={readOnly}
+          disabled={disabled}
+          className={`w-full pl-10 rounded-lg bg-surface-primary text-foreground-primary p-2.5 border border-border-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all ${error ? 'border-error focus:ring-error' : ''} ${readOnly || disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
         />
       </div>
       {error && <p className="text-error text-sm mt-1">{error}</p>}
