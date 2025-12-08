@@ -4,8 +4,7 @@ import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Users, MagnifyingGlass, WarningCircle, X, Check, Target } from "@phosphor-icons/react";
 import { Milestone } from "@/lib/types/schemas";
-import FormInputField from "@/components/ui/FormInputField";
-import FormSelectField from "@/components/ui/FormSelectField";
+import { FormField, DateField } from "@/components/forms";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { matchesEmployeeSearch } from "@/lib/utils/user-search";
 
@@ -170,10 +169,9 @@ export default function MilestoneForm({
 
         {/* removed <form>, replaced with <div> */}
         <div className="space-y-4">
-          <FormInputField
+          <FormField
             name="milestone_title"
             label="Milestone Title"
-            icon={<Target size={16} className="text-foreground-tertiary" strokeWidth={2} />}
             value={milestoneData.milestone_title || ""}
             onChange={handleChange}
             error={errors.milestone_title}
@@ -192,11 +190,9 @@ export default function MilestoneForm({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <FormInputField
+            <DateField
               name="start_date"
               label="Start Date"
-              type="date"
-              icon={<Calendar size={16} className="text-foreground-tertiary" strokeWidth={2} />}
               value={milestoneData.start_date || ""}
               onChange={handleChange}
               error={errors.start_date}
@@ -204,11 +200,9 @@ export default function MilestoneForm({
               max={projectEndDate || undefined}
             />
 
-            <FormInputField
+            <DateField
               name="end_date"
               label="End Date"
-              type="date"
-              icon={<Calendar size={16} className="text-foreground-tertiary" strokeWidth={2} />}
               value={milestoneData.end_date || ""}
               onChange={handleChange}
               error={errors.end_date}

@@ -14,7 +14,7 @@ import {
   TextAreaField,
   SingleEmployeeSelector,
 } from "@/components/forms";
-import { Button } from "@/components/ui/button";
+import { ModalActionButtons } from "@/components/ui";
 import { getCompanyInfo } from "@/lib/utils/auth";
 import { Employee } from "@/lib/types/schemas";
 
@@ -194,32 +194,12 @@ export default function DepartmentModal({
           />
         )}
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4 pt-4 border-t border-border-primary">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="w-full sm:w-auto"
-          >
-            Cancel
-          </Button>
-
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={isDisabled}
-            isLoading={isSubmitting}
-            className="w-full sm:w-auto"
-          >
-            {isSubmitting
-              ? "Saving..."
-              : initialData
-              ? "Update Department"
-              : "Create Department"}
-          </Button>
-        </div>
+        <ModalActionButtons
+          onCancel={onClose}
+          isSubmitting={isSubmitting}
+          isDisabled={isDisabled}
+          submitText={initialData ? "Update Department" : "Create Department"}
+        />
       </form>
     </BaseModal>
   );

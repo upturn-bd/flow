@@ -6,7 +6,7 @@ import { Division } from "@/lib/types/schemas";
 import { validateDivision, validationErrorsToObject } from "@/lib/utils/validation";
 import { BaseModal } from "@/components/ui/modals";
 import { FormField, SingleEmployeeSelector } from "@/components/forms";
-import { Button } from "@/components/ui/button";
+import { ModalActionButtons } from "@/components/ui";
 import { Employee } from "@/lib/types/schemas";
 
 interface DivisionModalProps {
@@ -118,28 +118,12 @@ export default function DivisionModal({
           error={errors.head_id ? String(errors.head_id) : undefined}
         />
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4 pt-4 border-t border-border-primary">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="w-full sm:w-auto"
-          >
-            Cancel
-          </Button>
-          
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={isDisabled}
-            isLoading={isSubmitting}
-            className="w-full sm:w-auto"
-          >
-            {isSubmitting ? "Saving..." : (initialData ? "Update Division" : "Create Division")}
-          </Button>
-        </div>
+        <ModalActionButtons
+          onCancel={onClose}
+          isSubmitting={isSubmitting}
+          isDisabled={isDisabled}
+          submitText={initialData ? "Update Division" : "Create Division"}
+        />
       </form>
     </BaseModal>
   );

@@ -6,7 +6,7 @@ import { validateGrade, validationErrorsToObject } from "@/lib/utils/validation"
 import { dirtyValuesChecker } from "@/lib/utils";
 import { BaseModal } from "@/components/ui/modals";
 import { FormField } from "@/components/forms";
-import { Button } from "@/components/ui/button";
+import { ModalActionButtons } from "@/components/ui";
 
 type FormValues = Grade;
 
@@ -102,28 +102,12 @@ export default function GradeModal({
           required
         />
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4 pt-4 border-t border-border-primary">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="w-full sm:w-auto"
-          >
-            Cancel
-          </Button>
-          
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={isDisabled}
-            isLoading={isSubmitting}
-            className="w-full sm:w-auto"
-          >
-            {isSubmitting ? "Saving..." : (initialData ? "Update Grade" : "Create Grade")}
-          </Button>
-        </div>
+        <ModalActionButtons
+          onCancel={onClose}
+          isSubmitting={isSubmitting}
+          isDisabled={isDisabled}
+          submitText={initialData ? "Update Grade" : "Create Grade"}
+        />
       </form>
     </BaseModal>
   );
