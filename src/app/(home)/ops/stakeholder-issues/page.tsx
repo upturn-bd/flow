@@ -9,7 +9,7 @@ import { useModalState } from "@/hooks/core/useModalState";
 import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIssueForm";
 import BaseModal from "@/components/ui/modals/BaseModal";
 import Pagination from "@/components/ui/Pagination";
-import { WarningCircle, CheckCircle, Clock, Download, Eye, Plus, TrashSimple, Building, Tag, UsersThree, Link as LinkIcon } from "@phosphor-icons/react";
+import { WarningCircle, CheckCircle, Clock, Download, Eye, Plus, TrashSimple, Building, Tag, UsersThree, Link as LinkIcon, Ticket } from "@phosphor-icons/react";
 import { StakeholderIssue } from "@/lib/types/schemas";
 import { useAuth } from "@/lib/auth/auth-context";
 import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
@@ -18,7 +18,7 @@ import { PageHeader, SearchBar, StatCard, StatCardGrid, EmptyState, InlineSpinne
 import { SelectField } from "@/components/forms";
 import { captureError } from "@/lib/sentry";
 
-export default function StakeholderIssuesPage() {
+export default function TicketsPage() {
   const router = useRouter();
   const { employeeInfo, canWrite, canDelete } = useAuth();
   const {
@@ -31,6 +31,7 @@ export default function StakeholderIssuesPage() {
     highPriorityIssues,
     searchIssues,
     fetchIssuesByAssignedEmployee,
+    createIssue,
     updateIssue,
     deleteIssue,
     getAttachmentUrl,
@@ -41,6 +42,7 @@ export default function StakeholderIssuesPage() {
 
   const { modalState, openCreateModal, closeModal } = useModalState();
   const [selectedIssue, setSelectedIssue] = useState<StakeholderIssue | null>(null);
+  const [isCreating, setIsCreating] = useState(false); // Track if creating new vs editing
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "Pending" | "In Progress" | "Resolved">("all");
   const [filterPriority, setFilterPriority] = useState<"all" | "Low" | "Medium" | "High" | "Urgent">("all");
@@ -132,6 +134,21 @@ export default function StakeholderIssuesPage() {
     setCurrentPage(page);
   };
 
+  const handleCreateIssue = async (data: any) => {
+    try {
+      await createIssue(data);
+      closeModal();
+      setIsCreating(false);
+      // Refresh the list
+      if (employeeInfo?.id) {
+        await fetchIssuesByAssignedEmployee(employeeInfo.id, userTeamIds);
+      }
+    } catch (err) {
+      captureError(err, { operation: "createIssue" });
+      console.error("Error creating ticket:", err);
+    }
+  };
+
   const handleUpdateIssue = async (data: any) => {
     if (!selectedIssue?.id) return;
     
@@ -145,12 +162,12 @@ export default function StakeholderIssuesPage() {
       }
     } catch (err) {
       captureError(err, { operation: "updateIssue" });
-      console.error("Error updating issue:", err);
+      console.error("Error updating ticket:", err);
     }
   };
 
   const handleDeleteIssue = async (issueId: number) => {
-    if (!confirm("Are you sure you want to delete this issue?")) return;
+    if (!confirm("Are you sure you want to delete this ticket?")) return;
     
     try {
       await deleteIssue(issueId);
@@ -160,7 +177,7 @@ export default function StakeholderIssuesPage() {
       }
     } catch (err) {
       captureError(err, { operation: "deleteIssue" });
-      console.error("Error deleting issue:", err);
+      console.error("Error deleting ticket:", err);
     }
   };
 
@@ -211,15 +228,40 @@ export default function StakeholderIssuesPage() {
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Header */}
-      <PageHeader
-        title="My Stakeholder Issues"
-        description="Manage issues for stakeholders you are assigned to handle"
-        icon={Building}
-        iconColor="text-purple-600"
-      />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <PageHeader
+          title="My Tickets"
+          description="Manage tickets for stakeholders you are assigned to handle"
+          icon={Ticket}
+          iconColor="text-purple-600"
+        />
+        {canWrite(PERMISSION_MODULES.STAKEHOLDERS) ? (
+          <button
+            onClick={() => {
+              setSelectedIssue(null);
+              setIsCreating(true);
+              openCreateModal();
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm shrink-0"
+          >
+            <Plus size={18} />
+            Create Ticket
+          </button>
+        ) : (
+          <PermissionTooltip message="You don't have permission to create tickets">
+            <button
+              disabled
+              className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg opacity-50 cursor-not-allowed text-sm shrink-0"
+            >
+              <Plus size={18} />
+              Create Ticket
+            </button>
+          </PermissionTooltip>
+        )}
+      </div>
 
       {/* Permission Banner */}
-      <ModulePermissionsBanner module={PERMISSION_MODULES.STAKEHOLDERS} title="Stakeholder Issues" compact />
+      <ModulePermissionsBanner module={PERMISSION_MODULES.STAKEHOLDERS} title="Tickets" compact />
 
       {/* Stats */}
       <StatCardGrid columns={4}>
@@ -261,7 +303,7 @@ export default function StakeholderIssuesPage() {
             <SearchBar
               value={searchTerm}
               onChange={handleSearch}
-              placeholder="Search issues..."
+              placeholder="Search tickets..."
               withContainer={false}
             />
           </div>
@@ -329,16 +371,16 @@ export default function StakeholderIssuesPage() {
       {/* Empty State */}
       {!loading && filteredIssues.length === 0 && (
         <div className="text-center py-12 bg-background-secondary dark:bg-background-tertiary rounded-lg border-2 border-dashed border-border-secondary">
-          <h3 className="text-lg font-semibold text-foreground-primary">No issues found</h3>
+          <h3 className="text-lg font-semibold text-foreground-primary">No tickets found</h3>
           <p className="text-sm text-foreground-tertiary mt-1">
             {searchTerm || filterStatus !== "all" || filterPriority !== "all" || filterCategoryId !== "all"
               ? "Try adjusting your search or filters"
-              : "You don't have any stakeholder issues assigned yet"}
+              : "You don't have any tickets assigned yet"}
           </p>
         </div>
       )}
 
-      {/* Issues List */}
+      {/* Tickets List */}
       {!loading && filteredIssues.length > 0 && (
         <div className="space-y-4">
           {filteredIssues.map((issue) => (
@@ -452,19 +494,20 @@ export default function StakeholderIssuesPage() {
                     <button
                       onClick={() => {
                         setSelectedIssue(issue);
+                        setIsCreating(false);
                         openCreateModal();
                       }}
                       className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
-                      title="Edit issue"
+                      title="Edit ticket"
                     >
                       <Eye size={18} />
                     </button>
                   ) : (
-                    <PermissionTooltip message="You don't have permission to edit issues">
+                    <PermissionTooltip message="You don't have permission to edit tickets">
                       <button
                         disabled
                         className="p-2 text-foreground-tertiary rounded cursor-not-allowed opacity-50"
-                        title="Edit Issue (no permission)"
+                        title="Edit ticket (no permission)"
                       >
                         <Eye size={18} />
                       </button>
@@ -475,16 +518,16 @@ export default function StakeholderIssuesPage() {
                     <button
                       onClick={() => issue.id && handleDeleteIssue(issue.id)}
                       className="p-2 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded transition-colors"
-                      title="Delete issue"
+                      title="Delete ticket"
                     >
                       <TrashSimple size={18} />
                     </button>
                   ) : (
-                    <PermissionTooltip message="You don't have permission to delete issues">
+                    <PermissionTooltip message="You don't have permission to delete tickets">
                       <button
                         disabled
                         className="p-2 text-foreground-tertiary rounded cursor-not-allowed opacity-50"
-                        title="Delete issue (no permission)"
+                        title="Delete ticket (no permission)"
                       >
                         <TrashSimple size={18} />
                       </button>
@@ -498,15 +541,27 @@ export default function StakeholderIssuesPage() {
           {/* Pagination - using filteredIssues length */}
           {filteredIssues.length > 0 && (
             <div className="text-sm text-foreground-tertiary text-center py-2">
-              Showing {filteredIssues.length} issue{filteredIssues.length !== 1 ? 's' : ''}
+              Showing {filteredIssues.length} ticket{filteredIssues.length !== 1 ? 's' : ''}
             </div>
           )}
         </div>
       )}
 
-      {/* Edit Issue Modal */}
-      {modalState.isOpen && selectedIssue && (
-        <BaseModal isOpen={modalState.isOpen} onClose={closeModal} title="Update Issue">
+      {/* Create Ticket Modal */}
+      {modalState.isOpen && isCreating && (
+        <BaseModal isOpen={modalState.isOpen} onClose={() => { closeModal(); setIsCreating(false); }} title="Create New Ticket">
+          <StakeholderIssueForm
+            showStakeholderSelector={true}
+            onSubmit={handleCreateIssue}
+            onCancel={() => { closeModal(); setIsCreating(false); }}
+            submitLabel="Create Ticket"
+          />
+        </BaseModal>
+      )}
+
+      {/* Edit Ticket Modal */}
+      {modalState.isOpen && selectedIssue && !isCreating && (
+        <BaseModal isOpen={modalState.isOpen} onClose={closeModal} title="Update Ticket">
           <StakeholderIssueForm
             stakeholderId={selectedIssue.stakeholder_id}
             issueId={selectedIssue.id}
@@ -525,7 +580,7 @@ export default function StakeholderIssuesPage() {
             }}
             onSubmit={handleUpdateIssue}
             onCancel={closeModal}
-            submitLabel="Update Issue"
+            submitLabel="Update Ticket"
           />
         </BaseModal>
       )}

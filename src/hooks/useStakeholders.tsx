@@ -67,6 +67,8 @@ export interface StakeholderSearchOptions {
   page?: number;
   pageSize?: number;
   filterStatus?: "all" | "Lead" | "Permanent" | "Rejected";
+  kamId?: string; // Filter by Key Account Manager
+  includeAllCompany?: boolean; // If true, fetches all company stakeholders regardless of KAM
 }
 
 export interface StakeholderSearchResult {
@@ -520,7 +522,7 @@ export function useStakeholders() {
   }, []);
 
   const searchStakeholders = useCallback(async (options: StakeholderSearchOptions = {}) => {
-    const { searchQuery = "", page = 1, pageSize = 25, filterStatus = "all" } = options;
+    const { searchQuery = "", page = 1, pageSize = 25, filterStatus = "all", kamId, includeAllCompany = true } = options;
     
     setLoading(true);
     setError(null);
@@ -541,6 +543,11 @@ export function useStakeholders() {
           step_data:stakeholder_step_data(id, stakeholder_id, step_id, data, is_completed)
         `, { count: 'exact' })
         .eq("company_id", company_id);
+      
+      // Add KAM filter if provided (only filter by KAM if not including all company)
+      if (kamId && !includeAllCompany) {
+        query = query.eq("kam_id", kamId);
+      }
       
       // Add search filter if provided
       if (searchQuery.trim()) {

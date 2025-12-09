@@ -92,17 +92,17 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
         <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
           <div className="p-5 shrink-0">
             <SectionHeader
-              title="Stakeholder Issues"
+              title="Tickets"
               icon={WarningCircle}
               iconColor="text-error"
             />
           </div>
 
           {!canViewStakeholders ? (
-            <NoPermissionMessage moduleName="stakeholder issues" />
+            <NoPermissionMessage moduleName="tickets" />
           ) : loading ? (
             <div className="flex-1 flex items-center justify-center overflow-hidden">
-              <LoadingSection text="Loading issues..." icon={WarningCircle} />
+              <LoadingSection text="Loading tickets..." icon={WarningCircle} />
             </div>
           ) : (
             <div
@@ -229,7 +229,7 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
                 ) : (
                   <EmptyState
                     icon={FileText}
-                    message={canManageStakeholders ? "No issues assigned to you. Click + to go to stakeholders." : "No issues assigned to you"}
+                    message={canManageStakeholders ? "No tickets assigned to you. Click + to go to stakeholders." : "No tickets assigned to you"}
                   />
                 )}
               </div>

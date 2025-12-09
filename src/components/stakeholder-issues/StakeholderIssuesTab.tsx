@@ -5,7 +5,7 @@ import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { useModalState } from "@/hooks/core/useModalState";
 import StakeholderIssueForm from "@/components/stakeholder-issues/StakeholderIssueForm";
 import BaseModal from "@/components/ui/modals/BaseModal";
-import { Plus, WarningCircle, Download, TrashSimple, Eye, CheckCircle, Clock, Link as LinkIcon } from "@phosphor-icons/react";
+import { Plus, WarningCircle, Download, TrashSimple, Eye, CheckCircle, Clock, Link as LinkIcon, ShieldCheck } from "@phosphor-icons/react";
 import { StakeholderIssue } from "@/lib/types/schemas";
 import { InlineSpinner } from "@/components/ui";
 
@@ -54,7 +54,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
   };
 
   const handleDeleteIssue = async (issueId: number) => {
-    if (!confirm("Are you sure you want to delete this issue?")) return;
+    if (!confirm("Are you sure you want to delete this ticket?")) return;
     
     try {
       await deleteIssue(issueId);
@@ -78,6 +78,8 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
         return "bg-warning/10 dark:bg-warning/20 text-warning";
       case "In Progress":
         return "bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300";
+      case "Pending Approval":
+        return "bg-info/10 dark:bg-info/20 text-info";
       case "Resolved":
         return "bg-success/10 dark:bg-success/20 text-success";
       default:
@@ -106,6 +108,8 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
         return <Clock size={16} />;
       case "In Progress":
         return <WarningCircle size={16} />;
+      case "Pending Approval":
+        return <ShieldCheck size={16} />;
       case "Resolved":
         return <CheckCircle size={16} />;
       default:
@@ -126,9 +130,9 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg sm:text-xl font-semibold text-foreground-primary">Issues</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-foreground-primary">Tickets</h2>
           <p className="text-xs sm:text-sm text-foreground-tertiary mt-1">
-            Track and manage issues for this stakeholder
+            Track and manage tickets for this stakeholder
           </p>
         </div>
         <button
@@ -139,8 +143,8 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
           className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm shrink-0"
         >
           <Plus size={18} />
-          <span className="hidden sm:inline">Add Issue</span>
-          <span className="sm:hidden">New Issue</span>
+          <span className="hidden sm:inline">Add Ticket</span>
+          <span className="sm:hidden">New Ticket</span>
         </button>
       </div>
 
@@ -154,9 +158,9 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
       {/* Empty State */}
       {!loading && issues.length === 0 && (
         <div className="text-center py-8 sm:py-12 bg-background-secondary rounded-lg border-2 border-dashed border-border-secondary">
-          <h3 className="text-base sm:text-lg font-semibold text-foreground-primary">No issues yet</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-foreground-primary">No tickets yet</h3>
           <p className="text-xs sm:text-sm text-foreground-tertiary mt-1">
-            Create an issue to start tracking problems or requests
+            Create a ticket to start tracking problems or requests
           </p>
           <button
             onClick={() => {
@@ -166,8 +170,8 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
             className="mt-4 inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm"
           >
             <Plus size={18} />
-            <span className="hidden sm:inline">Add Issue</span>
-            <span className="sm:hidden">New Issue</span>
+            <span className="hidden sm:inline">Add Ticket</span>
+            <span className="sm:hidden">New Ticket</span>
           </button>
         </div>
       )}
@@ -273,14 +277,14 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                       openCreateModal();
                     }}
                     className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded transition-colors"
-                    title="Edit Issue"
+                    title="Edit Ticket"
                   >
                     <Eye size={18} />
                   </button>
                   <button
                     onClick={() => issue.id && handleDeleteIssue(issue.id)}
                     className="p-2 text-error hover:bg-error/10 dark:hover:bg-error/20 rounded transition-colors"
-                    title="Delete issue"
+                    title="Delete ticket"
                   >
                     <TrashSimple size={18} />
                   </button>
@@ -291,9 +295,9 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
         </div>
       )}
 
-      {/* Create/Edit Issue Modal */}
+      {/* Create/Edit Ticket Modal */}
       {modalState.isOpen && (
-        <BaseModal isOpen={modalState.isOpen} onClose={closeModal} title={selectedIssue ? "Update Issue" : "Create New Issue"}>
+        <BaseModal isOpen={modalState.isOpen} onClose={closeModal} title={selectedIssue ? "Update Ticket" : "Create New Ticket"}>
           <StakeholderIssueForm
             stakeholderId={stakeholderId}
             issueId={selectedIssue?.id}
@@ -312,7 +316,7 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
             } : undefined}
             onSubmit={selectedIssue ? handleUpdateIssue : handleCreateIssue}
             onCancel={closeModal}
-            submitLabel={selectedIssue ? "Update Issue" : "Create Issue"}
+            submitLabel={selectedIssue ? "Update Ticket" : "Create Ticket"}
           />
         </BaseModal>
       )}

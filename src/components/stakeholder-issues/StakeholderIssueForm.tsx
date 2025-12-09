@@ -7,18 +7,20 @@ import {
   validationErrorsToObject,
 } from "@/lib/validation/schemas/stakeholder-issues";
 import { StakeholderIssueFormData } from "@/hooks/useStakeholderIssues";
-import { StakeholderIssueAttachment, StakeholderIssueCategory, StakeholderIssueSubcategory, LinkedStepField } from "@/lib/types/schemas";
+import { StakeholderIssueAttachment, StakeholderIssueCategory, StakeholderIssueSubcategory, LinkedStepField, StakeholderIssueRequiredField } from "@/lib/types/schemas";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useTeams } from "@/hooks/useTeams";
+import { useStakeholders } from "@/hooks/useStakeholders";
 import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { useStakeholderIssueCategories } from "@/hooks/useStakeholderIssueCategories";
-import { X, Upload, TrashSimple, Download, FileText, User, UsersThree, Tag, Link, CheckCircle, CaretDown, CaretRight, CheckSquare, Square } from "@phosphor-icons/react";
+import { X, Upload, TrashSimple, Download, FileText, User, UsersThree, Tag, Link, CheckCircle, CaretDown, CaretRight, CheckSquare, Square, MagnifyingGlass, Building, ShieldCheck, Plus, ListChecks } from "@phosphor-icons/react";
 import InlineSpinner from "@/components/ui/InlineSpinner";
 import { FormField, SelectField, TextAreaField } from "@/components/forms";
 import { captureError } from "@/lib/sentry";
 import { formatDisplayValue, getFieldLabel } from "@/lib/utils/step-data-utils";
 
 type AssignmentType = 'employee' | 'team';
+type RequiredFieldType = 'text' | 'number' | 'date' | 'select';
 
 import { FieldDefinitionsSchema } from "@/lib/types/schemas";
 
@@ -32,38 +34,51 @@ interface StakeholderStepDataOption {
 }
 
 interface StakeholderIssueFormProps {
-  stakeholderId: number;
+  stakeholderId?: number; // Optional - if not provided, show stakeholder selector
   issueId?: number;
   initialData?: {
     title?: string;
     description?: string;
-    status?: 'Pending' | 'In Progress' | 'Resolved';
+    status?: 'Pending' | 'In Progress' | 'Pending Approval' | 'Resolved';
     priority?: 'Low' | 'Medium' | 'High' | 'Urgent';
     assigned_to?: string;
     assigned_team_id?: number;
+    checker_team_id?: number;
     category_id?: number;
     subcategory_id?: number;
     linked_step_data_ids?: number[];
     linked_fields?: LinkedStepField[];
+    required_fields?: StakeholderIssueRequiredField[];
     attachments?: StakeholderIssueAttachment[];
   };
   onSubmit: (data: StakeholderIssueFormData) => Promise<void>;
   onCancel: () => void;
   submitLabel?: string;
+  showStakeholderSelector?: boolean; // Enable stakeholder selector mode
 }
 
 export default function StakeholderIssueForm({
-  stakeholderId,
+  stakeholderId: initialStakeholderId,
   issueId,
   initialData,
   onSubmit,
   onCancel,
-  submitLabel = "Create Issue",
+  submitLabel = "Create Ticket",
+  showStakeholderSelector = false,
 }: StakeholderIssueFormProps) {
   const { employees, fetchEmployees, loading: loadingEmployees } = useEmployees();
   const { teams, fetchTeams, loading: loadingTeams } = useTeams();
+  const { stakeholders, searchStakeholders, loading: loadingStakeholders } = useStakeholders();
   const { deleteAttachment, downloadAttachment, fetchStakeholderStepData } = useStakeholderIssues();
   const { categories, fetchCategories, loading: loadingCategories } = useStakeholderIssueCategories();
+  
+  // Stakeholder selection state (when showStakeholderSelector is true)
+  const [selectedStakeholderId, setSelectedStakeholderId] = useState<number | undefined>(initialStakeholderId);
+  const [stakeholderSearchTerm, setStakeholderSearchTerm] = useState("");
+  const [showStakeholderDropdown, setShowStakeholderDropdown] = useState(false);
+  
+  // The effective stakeholder ID to use
+  const stakeholderId = selectedStakeholderId || initialStakeholderId;
   
   const [files, setFiles] = useState<File[]>([]);
   const [existingAttachments, setExistingAttachments] = useState<StakeholderIssueAttachment[]>(
@@ -86,16 +101,18 @@ export default function StakeholderIssueForm({
   const [assignmentType, setAssignmentType] = useState<AssignmentType>(getInitialAssignmentType());
   
   const [formData, setFormData] = useState<StakeholderIssueFormData>({
-    stakeholder_id: stakeholderId,
+    stakeholder_id: stakeholderId || 0, // Will be validated before submission
     title: initialData?.title || "",
     description: initialData?.description || "",
     status: initialData?.status || "Pending",
     priority: initialData?.priority || "Medium",
     assigned_to: initialData?.assigned_to || "",
     assigned_team_id: initialData?.assigned_team_id,
+    checker_team_id: initialData?.checker_team_id,
     category_id: initialData?.category_id,
     subcategory_id: initialData?.subcategory_id,
     linked_fields: initialData?.linked_fields || [],
+    required_fields: initialData?.required_fields || [],
     attachments: [],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -103,6 +120,18 @@ export default function StakeholderIssueForm({
   
   // Track which steps are expanded for field selection
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
+  
+  // Required fields management
+  const [showRequiredFieldForm, setShowRequiredFieldForm] = useState(false);
+  const [newRequiredField, setNewRequiredField] = useState<StakeholderIssueRequiredField>({
+    key: '',
+    label: '',
+    type: 'text',
+    required: true,
+    value: null,
+    options: [],
+  });
+  const [newFieldOptions, setNewFieldOptions] = useState<string>('');
 
   // Get subcategories for selected category
   const selectedCategory = categories.find(c => c.id === formData.category_id);
@@ -113,11 +142,50 @@ export default function StakeholderIssueForm({
     fetchEmployees();
     fetchTeams();
     fetchCategories();
-  }, [fetchEmployees, fetchTeams, fetchCategories]);
+    // Load stakeholders if showing selector
+    if (showStakeholderSelector) {
+      searchStakeholders({ includeAllCompany: true });
+    }
+  }, [fetchEmployees, fetchTeams, fetchCategories, showStakeholderSelector, searchStakeholders]);
+
+  // Update formData when stakeholderId changes
+  useEffect(() => {
+    if (stakeholderId) {
+      setFormData(prev => ({ ...prev, stakeholder_id: stakeholderId }));
+    }
+  }, [stakeholderId]);
+
+  // Filter stakeholders based on search term
+  const filteredStakeholders = stakeholders.filter(s => {
+    if (!stakeholderSearchTerm.trim()) return true;
+    const search = stakeholderSearchTerm.toLowerCase();
+    return (
+      s.name.toLowerCase().includes(search) ||
+      s.address?.toLowerCase().includes(search) ||
+      s.status?.toLowerCase().includes(search)
+    );
+  });
+
+  // Get selected stakeholder for display
+  const selectedStakeholder = stakeholders.find(s => s.id === selectedStakeholderId);
+
+  // Handle stakeholder selection
+  const handleStakeholderSelect = (id: number) => {
+    setSelectedStakeholderId(id);
+    setShowStakeholderDropdown(false);
+    setStakeholderSearchTerm("");
+    // Clear linked fields when changing stakeholder
+    setFormData(prev => ({ ...prev, stakeholder_id: id, linked_fields: [] }));
+    setAvailableStepData([]);
+  };
 
   // Load stakeholder step data for linking
   useEffect(() => {
     const loadStepData = async () => {
+      if (!stakeholderId) {
+        setAvailableStepData([]);
+        return;
+      }
       setLoadingStepData(true);
       try {
         const data = await fetchStakeholderStepData(stakeholderId);
@@ -348,8 +416,15 @@ export default function StakeholderIssueForm({
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate stakeholder is selected if showing selector
+    if (showStakeholderSelector && !stakeholderId) {
+      setErrors(prev => ({ ...prev, stakeholder_id: "Please select a stakeholder" }));
+      return;
+    }
+    
     const dataToValidate = {
       ...formData,
+      stakeholder_id: stakeholderId!,
       attachments: files,
     };
 
@@ -373,6 +448,94 @@ export default function StakeholderIssueForm({
   return (
     <form onSubmit={handleFormSubmit} className="space-y-6">
       <div className="space-y-4">
+        {/* Stakeholder Selector - shown when showStakeholderSelector is true */}
+        {showStakeholderSelector && (
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-foreground-primary">
+              Stakeholder <span className="text-error">*</span>
+            </label>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowStakeholderDropdown(!showStakeholderDropdown)}
+                className={`w-full flex items-center justify-between px-3 py-2.5 text-sm border rounded-lg bg-surface-primary
+                  ${errors.stakeholder_id ? 'border-error' : 'border-border-primary'}
+                  hover:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors`}
+              >
+                <div className="flex items-center gap-2">
+                  <Building size={18} className="text-foreground-tertiary" />
+                  {selectedStakeholder ? (
+                    <span className="text-foreground-primary">{selectedStakeholder.name}</span>
+                  ) : (
+                    <span className="text-foreground-tertiary">Select a stakeholder...</span>
+                  )}
+                </div>
+                <CaretDown size={16} className={`text-foreground-tertiary transition-transform ${showStakeholderDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showStakeholderDropdown && (
+                <div className="absolute z-50 w-full mt-1 bg-surface-primary border border-border-primary rounded-lg shadow-lg max-h-64 overflow-hidden">
+                  {/* Search input */}
+                  <div className="p-2 border-b border-border-secondary">
+                    <div className="relative">
+                      <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-tertiary" />
+                      <input
+                        type="text"
+                        value={stakeholderSearchTerm}
+                        onChange={(e) => setStakeholderSearchTerm(e.target.value)}
+                        placeholder="Search stakeholders..."
+                        className="w-full pl-9 pr-3 py-2 text-sm border border-border-secondary rounded-md bg-background-primary focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Stakeholder list */}
+                  <div className="max-h-48 overflow-y-auto">
+                    {loadingStakeholders ? (
+                      <div className="flex items-center justify-center py-4">
+                        <InlineSpinner size="sm" />
+                      </div>
+                    ) : filteredStakeholders.length === 0 ? (
+                      <div className="py-4 text-center text-sm text-foreground-tertiary">
+                        No stakeholders found
+                      </div>
+                    ) : (
+                      filteredStakeholders.map((s) => (
+                        <button
+                          key={s.id}
+                          type="button"
+                          onClick={() => handleStakeholderSelect(s.id!)}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-surface-hover transition-colors
+                            ${selectedStakeholderId === s.id ? 'bg-primary-50 dark:bg-primary-900/20' : ''}`}
+                        >
+                          <Building size={16} className="text-foreground-tertiary shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-foreground-primary truncate">{s.name}</div>
+                            {s.address && (
+                              <div className="text-xs text-foreground-tertiary truncate">{s.address}</div>
+                            )}
+                          </div>
+                          <span className={`shrink-0 px-2 py-0.5 text-xs rounded-full ${
+                            s.status === 'Permanent' ? 'bg-success/10 text-success' :
+                            s.status === 'Lead' ? 'bg-warning/10 text-warning' :
+                            'bg-background-tertiary text-foreground-secondary'
+                          }`}>
+                            {s.status}
+                          </span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+            {errors.stakeholder_id && (
+              <p className="text-sm text-error">{errors.stakeholder_id}</p>
+            )}
+          </div>
+        )}
+        
         {/* Title */}
         <FormField
           label="Title"
@@ -381,7 +544,7 @@ export default function StakeholderIssueForm({
           value={formData.title}
           onChange={handleChange}
           error={errors.title}
-          placeholder="Enter issue title"
+          placeholder="Enter ticket title"
         />
 
         {/* Category and Subcategory */}
@@ -514,6 +677,220 @@ export default function StakeholderIssueForm({
           )}
         </div>
 
+        {/* Checker Team */}
+        <div>
+          <label className="block text-sm font-medium text-foreground-primary mb-2">
+            <div className="flex items-center gap-2">
+              <ShieldCheck size={16} />
+              <span>Checker Team (Optional)</span>
+            </div>
+          </label>
+          <p className="text-xs text-foreground-tertiary mb-3">
+            Assign a team to verify and approve the resolution before final closure.
+          </p>
+          <SelectField
+            label=""
+            name="checker_team_id"
+            value={formData.checker_team_id?.toString() || ""}
+            onChange={(e) => setFormData(prev => ({
+              ...prev,
+              checker_team_id: e.target.value ? parseInt(e.target.value) : undefined
+            }))}
+            disabled={loadingTeams}
+            placeholder="-- No checker team --"
+            options={teams.map((team) => ({
+              value: team.id?.toString() || "",
+              label: team.name,
+            }))}
+            className={loadingTeams ? "opacity-50 cursor-not-allowed" : ""}
+          />
+        </div>
+
+        {/* Required Fields for Resolution */}
+        <div>
+          <label className="block text-sm font-medium text-foreground-primary mb-2">
+            <div className="flex items-center gap-2">
+              <ListChecks size={16} />
+              <span>Required Fields for Resolution</span>
+            </div>
+          </label>
+          <p className="text-xs text-foreground-tertiary mb-3">
+            Define fields that must be filled before this ticket can be marked as resolved.
+          </p>
+          
+          {/* Existing Required Fields */}
+          {formData.required_fields && formData.required_fields.length > 0 && (
+            <div className="space-y-2 mb-3">
+              {formData.required_fields.map((field, index) => (
+                <div
+                  key={field.key}
+                  className="flex items-center justify-between p-3 bg-surface-secondary rounded-lg border border-border-secondary"
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-foreground-primary">{field.label}</span>
+                      <span className="px-1.5 py-0.5 text-xs bg-background-tertiary text-foreground-tertiary rounded capitalize">
+                        {field.type}
+                      </span>
+                      {field.required && (
+                        <span className="px-1.5 py-0.5 text-xs bg-error/10 text-error rounded">
+                          Required
+                        </span>
+                      )}
+                    </div>
+                    {field.type === 'select' && field.options && field.options.length > 0 && (
+                      <p className="text-xs text-foreground-tertiary mt-1">
+                        Options: {field.options.join(', ')}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData(prev => ({
+                        ...prev,
+                        required_fields: prev.required_fields?.filter((_, i) => i !== index) || [],
+                      }));
+                    }}
+                    className="p-1.5 text-error hover:bg-error/10 rounded transition-colors"
+                  >
+                    <TrashSimple size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Add New Required Field */}
+          {showRequiredFieldForm ? (
+            <div className="p-3 bg-surface-secondary rounded-lg border border-border-secondary space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <FormField
+                  label="Field Label"
+                  required
+                  name="newFieldLabel"
+                  value={newRequiredField.label}
+                  onChange={(e) => setNewRequiredField(prev => ({
+                    ...prev,
+                    label: e.target.value,
+                    key: e.target.value.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, ''),
+                  }))}
+                  placeholder="e.g., Final Price"
+                />
+                <SelectField
+                  label="Field Type"
+                  required
+                  name="newFieldType"
+                  value={newRequiredField.type}
+                  onChange={(e) => setNewRequiredField(prev => ({
+                    ...prev,
+                    type: e.target.value as RequiredFieldType,
+                  }))}
+                  options={[
+                    { value: 'text', label: 'Text' },
+                    { value: 'number', label: 'Number' },
+                    { value: 'date', label: 'Date' },
+                    { value: 'select', label: 'Dropdown' },
+                  ]}
+                />
+              </div>
+              
+              {newRequiredField.type === 'select' && (
+                <FormField
+                  label="Options (comma separated)"
+                  required
+                  name="newFieldOptions"
+                  value={newFieldOptions}
+                  onChange={(e) => setNewFieldOptions(e.target.value)}
+                  placeholder="e.g., Option 1, Option 2, Option 3"
+                />
+              )}
+              
+              <div className="flex items-center gap-2">
+                <label className="flex items-center gap-2 text-sm text-foreground-secondary">
+                  <input
+                    type="checkbox"
+                    checked={newRequiredField.required}
+                    onChange={(e) => setNewRequiredField(prev => ({
+                      ...prev,
+                      required: e.target.checked,
+                    }))}
+                    className="rounded border-border-primary text-primary-600 focus:ring-primary-500"
+                  />
+                  <span>Required before resolution</span>
+                </label>
+              </div>
+              
+              <div className="flex items-center gap-2 pt-2 border-t border-border-secondary">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!newRequiredField.label.trim() || !newRequiredField.key.trim()) return;
+                    
+                    const options = newRequiredField.type === 'select'
+                      ? newFieldOptions.split(',').map(o => o.trim()).filter(o => o)
+                      : undefined;
+                    
+                    setFormData(prev => ({
+                      ...prev,
+                      required_fields: [
+                        ...(prev.required_fields || []),
+                        {
+                          ...newRequiredField,
+                          options,
+                        },
+                      ],
+                    }));
+                    
+                    // Reset form
+                    setNewRequiredField({
+                      key: '',
+                      label: '',
+                      type: 'text',
+                      required: true,
+                      value: null,
+                      options: [],
+                    });
+                    setNewFieldOptions('');
+                    setShowRequiredFieldForm(false);
+                  }}
+                  disabled={!newRequiredField.label.trim() || (newRequiredField.type === 'select' && !newFieldOptions.trim())}
+                  className="px-3 py-1.5 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Add Field
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowRequiredFieldForm(false);
+                    setNewRequiredField({
+                      key: '',
+                      label: '',
+                      type: 'text',
+                      required: true,
+                      value: null,
+                      options: [],
+                    });
+                    setNewFieldOptions('');
+                  }}
+                  className="px-3 py-1.5 text-foreground-secondary text-sm hover:bg-surface-hover rounded"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowRequiredFieldForm(true)}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg border border-dashed border-primary-300 dark:border-primary-700 w-full justify-center transition-colors"
+            >
+              <Plus size={16} />
+              <span>Add Required Field</span>
+            </button>
+          )}
+        </div>
+
         {/* Status */}
         <SelectField
           label="Status"
@@ -525,6 +902,7 @@ export default function StakeholderIssueForm({
           options={[
             { value: 'Pending', label: 'Pending' },
             { value: 'In Progress', label: 'In Progress' },
+            { value: 'Pending Approval', label: 'Pending Approval' },
             { value: 'Resolved', label: 'Resolved' },
           ]}
         />
@@ -723,7 +1101,7 @@ export default function StakeholderIssueForm({
           onChange={(e) => handleChange({ target: { name: 'description', value: e.target.value } } as React.ChangeEvent<HTMLInputElement>)}
           rows={4}
           error={errors.description}
-          placeholder="Describe the issue in detail..."
+          placeholder="Describe the ticket in detail..."
         />
 
         {/* File Attachments */}
