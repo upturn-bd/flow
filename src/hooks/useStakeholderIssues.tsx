@@ -650,6 +650,8 @@ export function useStakeholderIssues() {
             status,
             assigned_to,
             title,
+            checker_team_id,
+            is_pending_checker_approval,
             stakeholder:stakeholders(id, name, kam_id)
           `)
           .eq("id", issueId)

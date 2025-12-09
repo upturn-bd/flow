@@ -26,6 +26,7 @@ const priorityColors = {
 
 const statusColors = {
   Pending: 'bg-background-tertiary text-foreground-primary',
+  'Pending Approval': 'bg-warning/10 text-warning dark:bg-warning/20',
   'In Progress': 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300',
   Resolved: 'bg-success/10 text-success dark:bg-success/20',
 };
