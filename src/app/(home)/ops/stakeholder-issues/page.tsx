@@ -11,6 +11,7 @@ import {
   StakeholderIssueForm,
   TicketFilters,
   TicketList,
+  TicketViewModal,
   TicketStatusFilter,
   TicketPriorityFilter,
   TicketCategoryFilter,
@@ -46,6 +47,7 @@ export default function TicketsPage() {
   const { modalState, openCreateModal, closeModal } = useModalState();
 
   const [selectedIssue, setSelectedIssue] = useState<StakeholderIssue | null>(null);
+  const [viewingTicketId, setViewingTicketId] = useState<number | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<TicketStatusFilter>("all");
@@ -185,9 +187,22 @@ export default function TicketsPage() {
   };
 
   const handleEditTicket = (ticket: StakeholderIssue) => {
+    setViewingTicketId(null); // Close view modal if open
     setSelectedIssue(ticket);
     setIsCreating(false);
     openCreateModal();
+  };
+
+  const handleViewTicket = (ticket: StakeholderIssue) => {
+    if (ticket.id) {
+      setViewingTicketId(ticket.id);
+    }
+  };
+
+  const handleViewModalSuccess = async () => {
+    if (employeeInfo?.id) {
+      await fetchIssuesByAssignedEmployee(employeeInfo.id, userTeamIds);
+    }
   };
 
   return (
@@ -304,11 +319,13 @@ export default function TicketsPage() {
             ? "Try adjusting your search or filters"
             : "You don't have any tickets assigned yet"
         }
+        onView={handleViewTicket}
         onEdit={handleEditTicket}
         onDelete={handleDeleteIssue}
         onDownloadAttachment={handleDownloadAttachment}
         canEdit={canWrite(PERMISSION_MODULES.STAKEHOLDERS)}
         canDelete={canDelete(PERMISSION_MODULES.STAKEHOLDERS)}
+        currentUserId={employeeInfo?.id}
         showStakeholder={true}
         currentPage={currentPage}
         totalPages={totalPages}
@@ -353,10 +370,12 @@ export default function TicketsPage() {
               priority: selectedIssue.priority,
               assigned_to: selectedIssue.assigned_to,
               assigned_team_id: selectedIssue.assigned_team_id,
+              checker_team_id: selectedIssue.checker_team_id,
               category_id: selectedIssue.category_id,
               subcategory_id: selectedIssue.subcategory_id,
               linked_step_data_ids: selectedIssue.linked_step_data_ids || [],
               linked_fields: selectedIssue.linked_fields || [],
+              required_fields: selectedIssue.required_fields || [],
               attachments: selectedIssue.attachments,
             }}
             onSubmit={handleUpdateIssue}
@@ -364,6 +383,18 @@ export default function TicketsPage() {
             submitLabel="Update Ticket"
           />
         </BaseModal>
+      )}
+
+      {/* View Ticket Modal */}
+      {viewingTicketId && (
+        <TicketViewModal
+          ticketId={viewingTicketId}
+          onClose={() => setViewingTicketId(null)}
+          onSuccess={handleViewModalSuccess}
+          onEdit={handleEditTicket}
+          canEdit={canWrite(PERMISSION_MODULES.STAKEHOLDERS)}
+          canDelete={canDelete(PERMISSION_MODULES.STAKEHOLDERS)}
+        />
       )}
     </div>
   );

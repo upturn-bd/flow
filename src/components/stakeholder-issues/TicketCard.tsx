@@ -5,7 +5,6 @@ import { StakeholderIssue } from "@/lib/types/schemas";
 import { CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge, PriorityBadge } from "@/components/ui/Badge";
-import { PermissionTooltip } from "@/components/permissions";
 import {
   Download,
   TrashSimple,
@@ -14,21 +13,26 @@ import {
   UsersThree,
   Link as LinkIcon,
   User,
+  Eye,
 } from "@phosphor-icons/react";
 
 export interface TicketCardProps {
   /** The ticket data to display */
   ticket: StakeholderIssue;
+  /** Called when the card is clicked to view details */
+  onView?: (ticket: StakeholderIssue) => void;
   /** Called when edit button is clicked */
   onEdit?: (ticket: StakeholderIssue) => void;
   /** Called when delete button is clicked */
   onDelete?: (ticketId: number) => void;
   /** Called when an attachment is downloaded */
   onDownloadAttachment?: (filePath: string, originalName: string) => void;
-  /** Whether the user has permission to edit */
+  /** Whether the user has permission to edit (base permission) */
   canEdit?: boolean;
-  /** Whether the user has permission to delete */
+  /** Whether the user has permission to delete (base permission) */
   canDelete?: boolean;
+  /** Current user's ID - used to check if user is the creator for edit/delete */
+  currentUserId?: string;
   /** Whether to show stakeholder info */
   showStakeholder?: boolean;
   /** Additional class names */
@@ -37,20 +41,39 @@ export interface TicketCardProps {
 
 export function TicketCard({
   ticket,
+  onView,
   onEdit,
   onDelete,
   onDownloadAttachment,
   canEdit = true,
   canDelete = true,
+  currentUserId,
   showStakeholder = true,
   className = "",
 }: TicketCardProps) {
+  // Check if user is the creator - only creators can edit/delete
+  const isCreator = currentUserId && ticket.created_by === currentUserId;
+  const effectiveCanEdit = canEdit && isCreator;
+  const effectiveCanDelete = canDelete && isCreator;
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't trigger if clicking on buttons or attachments
+    const target = e.target as HTMLElement;
+    if (target.closest("button") || target.closest("[role='button']")) {
+      return;
+    }
+    onView?.(ticket);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className={`bg-surface-primary border border-border-primary shadow-sm hover:shadow-lg transition-all rounded-xl ${className}`}
+      onClick={handleCardClick}
+      className={`bg-surface-primary border border-border-primary shadow-sm hover:shadow-lg transition-all rounded-xl ${
+        onView ? "cursor-pointer hover:border-primary-300 dark:hover:border-primary-700" : ""
+      } ${className}`}
     >
       <CardContent className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -160,54 +183,49 @@ export function TicketCard({
 
           {/* Actions */}
           <div className="flex items-center gap-2 shrink-0">
-            {onEdit && (
-              canEdit ? (
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => onEdit(ticket)}
-                  className="p-2"
-                  title="Edit ticket"
-                >
-                  <PencilSimple size={16} />
-                </Button>
-              ) : (
-                <PermissionTooltip message="You don't have permission to edit tickets">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    disabled
-                    className="p-2 opacity-50 cursor-not-allowed"
-                  >
-                    <PencilSimple size={16} />
-                  </Button>
-                </PermissionTooltip>
-              )
+            {onView && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onView(ticket);
+                }}
+                className="p-2"
+                title="View ticket details"
+              >
+                <Eye size={16} />
+              </Button>
             )}
 
-            {onDelete && (
-              canDelete ? (
-                <Button
-                  size="sm"
-                  variant="danger"
-                  onClick={() => ticket.id && onDelete(ticket.id)}
-                  className="p-2"
-                  title="Delete ticket"
-                >
-                  <TrashSimple size={16} />
-                </Button>
-              ) : (
-                <PermissionTooltip message="You don't have permission to delete tickets">
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    disabled
-                    className="p-2 opacity-50 cursor-not-allowed"
-                  >
-                    <TrashSimple size={16} />
-                  </Button>
-                </PermissionTooltip>
-              )
+            {onEdit && effectiveCanEdit && (
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(ticket);
+                }}
+                className="p-2"
+                title="Edit ticket"
+              >
+                <PencilSimple size={16} />
+              </Button>
+            )}
+
+            {onDelete && effectiveCanDelete && (
+              <Button
+                size="sm"
+                variant="danger"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  ticket.id && onDelete(ticket.id);
+                }}
+                className="p-2"
+                title="Delete ticket"
+              >
+                <TrashSimple size={16} />
+              </Button>
             )}
           </div>
         </div>

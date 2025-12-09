@@ -16,6 +16,8 @@ export interface TicketListProps {
   emptyTitle?: string;
   /** Description for empty state */
   emptyDescription?: string;
+  /** Called when a ticket card is clicked to view */
+  onView?: (ticket: StakeholderIssue) => void;
   /** Called when edit button is clicked */
   onEdit?: (ticket: StakeholderIssue) => void;
   /** Called when delete button is clicked */
@@ -26,6 +28,8 @@ export interface TicketListProps {
   canEdit?: boolean;
   /** Whether the user has permission to delete */
   canDelete?: boolean;
+  /** Current user's ID - used to check if user is the creator for edit/delete */
+  currentUserId?: string;
   /** Whether to show stakeholder info in cards */
   showStakeholder?: boolean;
   /** Current page number (1-indexed) */
@@ -49,11 +53,13 @@ export function TicketList({
   loading = false,
   emptyTitle = "No tickets found",
   emptyDescription = "No tickets have been created yet",
+  onView,
   onEdit,
   onDelete,
   onDownloadAttachment,
   canEdit = true,
   canDelete = true,
+  currentUserId,
   showStakeholder = true,
   currentPage = 1,
   totalPages = 1,
@@ -95,11 +101,13 @@ export function TicketList({
           <TicketCard
             key={ticket.id}
             ticket={ticket}
+            onView={onView}
             onEdit={onEdit}
             onDelete={onDelete}
             onDownloadAttachment={onDownloadAttachment}
             canEdit={canEdit}
             canDelete={canDelete}
+            currentUserId={currentUserId}
             showStakeholder={showStakeholder}
           />
         ))}
