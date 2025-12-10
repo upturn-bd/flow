@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
-import { StakeholderIssue, StakeholderIssueAttachment, LinkedStepField } from "@/lib/types/schemas";
+import { StakeholderIssue, StakeholderIssueAttachment, LinkedStepField, StakeholderIssueRequiredField } from "@/lib/types/schemas";
 import { createStakeholderIssueNotification } from "@/lib/utils/notifications";
 import { captureSupabaseError, logError } from "@/lib/sentry";
 
@@ -15,14 +15,16 @@ export interface StakeholderIssueFormData {
   stakeholder_id: number;
   title: string;
   description?: string;
-  status: 'Pending' | 'In Progress' | 'Resolved';
+  status: 'Pending' | 'In Progress' | 'Pending Approval' | 'Resolved';
   priority: 'Low' | 'Medium' | 'High' | 'Urgent';
   assigned_to?: string; // Employee ID assigned to handle this issue
   assigned_team_id?: number; // Team ID assigned to handle this issue (either employee OR team)
+  checker_team_id?: number; // Team ID assigned to verify and approve the resolution
   category_id?: number; // Optional category
   subcategory_id?: number; // Optional subcategory
   linked_step_data_ids?: number[]; // DEPRECATED: Array of stakeholder_step_data IDs linked to this issue
   linked_fields?: LinkedStepField[]; // Array of specific field references linked to this issue
+  required_fields?: StakeholderIssueRequiredField[]; // Fields that must be filled before resolution
   attachments?: File[];
 }
 
@@ -30,12 +32,14 @@ export interface StakeholderIssueSearchOptions {
   searchQuery?: string;
   page?: number;
   pageSize?: number;
-  filterStatus?: "all" | "Pending" | "In Progress" | "Resolved";
+  filterStatus?: "all" | "Pending" | "In Progress" | "Pending Approval" | "Resolved";
   filterPriority?: "all" | "Low" | "Medium" | "High" | "Urgent";
   filterCategoryId?: number | "all"; // FunnelSimple by category
   filterSubcategoryId?: number | "all"; // FunnelSimple by subcategory
   assignedToId?: string; // FunnelSimple by assigned employee
   assignedTeamId?: number; // FunnelSimple by assigned team
+  checkerTeamId?: number; // Filter by checker team
+  pendingCheckerApproval?: boolean; // Filter for issues pending checker approval
 }
 
 export interface StakeholderIssueSearchResult {
@@ -88,6 +92,10 @@ export function useStakeholderIssues() {
             email
           ),
           assigned_team:teams!stakeholder_issues_assigned_team_id_fkey(
+            id,
+            name
+          ),
+          checker_team:teams!stakeholder_issues_checker_team_id_fkey(
             id,
             name
           ),
@@ -165,6 +173,10 @@ export function useStakeholderIssues() {
             email
           ),
           assigned_team:teams!stakeholder_issues_assigned_team_id_fkey(
+            id,
+            name
+          ),
+          checker_team:teams!stakeholder_issues_checker_team_id_fkey(
             id,
             name
           ),
@@ -246,6 +258,10 @@ export function useStakeholderIssues() {
             id,
             name
           ),
+          checker_team:teams!stakeholder_issues_checker_team_id_fkey(
+            id,
+            name
+          ),
           category:stakeholder_issue_categories(
             id,
             name,
@@ -308,7 +324,9 @@ export function useStakeholderIssues() {
       filterCategoryId = "all",
       filterSubcategoryId = "all",
       assignedToId,
-      assignedTeamId
+      assignedTeamId,
+      checkerTeamId,
+      pendingCheckerApproval
     } = options;
     
     setLoading(true);
@@ -329,7 +347,7 @@ export function useStakeholderIssues() {
       
       const targetAssignedToId = assignedToId || employeeInfo?.id;
 
-      if (!targetAssignedToId && !assignedTeamId) {
+      if (!targetAssignedToId && !assignedTeamId && !checkerTeamId && !pendingCheckerApproval) {
         const emptyResult: StakeholderIssueSearchResult = {
           issues: [],
           totalCount: 0,
@@ -361,6 +379,10 @@ export function useStakeholderIssues() {
             id,
             name
           ),
+          checker_team:teams!stakeholder_issues_checker_team_id_fkey(
+            id,
+            name
+          ),
           category:stakeholder_issue_categories(
             id,
             name,
@@ -373,13 +395,25 @@ export function useStakeholderIssues() {
         `, { count: 'exact' })
         .eq("company_id", company_id);
 
-      // Add assignment filter
-      if (targetAssignedToId && assignedTeamId) {
-        query = query.or(`assigned_to.eq.${targetAssignedToId},assigned_team_id.eq.${assignedTeamId}`);
-      } else if (targetAssignedToId) {
-        query = query.eq("assigned_to", targetAssignedToId);
-      } else if (assignedTeamId) {
-        query = query.eq("assigned_team_id", assignedTeamId);
+      // Add assignment filter (if not filtering by checker team)
+      if (!checkerTeamId && !pendingCheckerApproval) {
+        if (targetAssignedToId && assignedTeamId) {
+          query = query.or(`assigned_to.eq.${targetAssignedToId},assigned_team_id.eq.${assignedTeamId}`);
+        } else if (targetAssignedToId) {
+          query = query.eq("assigned_to", targetAssignedToId);
+        } else if (assignedTeamId) {
+          query = query.eq("assigned_team_id", assignedTeamId);
+        }
+      }
+      
+      // Filter by checker team
+      if (checkerTeamId) {
+        query = query.eq("checker_team_id", checkerTeamId);
+      }
+      
+      // Filter for issues pending checker approval
+      if (pendingCheckerApproval) {
+        query = query.eq("is_pending_checker_approval", true);
       }
       
       // Add search filter if provided
@@ -526,9 +560,12 @@ export function useStakeholderIssues() {
               priority: issueData.priority,
               assigned_to: issueData.assigned_to || null,
               assigned_team_id: issueData.assigned_team_id || null,
+              checker_team_id: issueData.checker_team_id || null,
               category_id: issueData.category_id || null,
               subcategory_id: issueData.subcategory_id || null,
               linked_step_data_ids: issueData.linked_step_data_ids || [],
+              linked_fields: issueData.linked_fields || [],
+              required_fields: issueData.required_fields || [],
               attachments,
               company_id,
               created_by: employeeInfo?.id,
@@ -613,6 +650,8 @@ export function useStakeholderIssues() {
             status,
             assigned_to,
             title,
+            checker_team_id,
+            is_pending_checker_approval,
             stakeholder:stakeholders(id, name, kam_id)
           `)
           .eq("id", issueId)
@@ -679,10 +718,35 @@ export function useStakeholderIssues() {
           updateData.linked_step_data_ids = issueData.linked_step_data_ids;
         }
 
-        // If status is being changed to Resolved, add resolved metadata
+        // Handle checker team
+        if (issueData.checker_team_id !== undefined) {
+          updateData.checker_team_id = issueData.checker_team_id || null;
+        }
+
+        // Handle required fields
+        if (issueData.required_fields !== undefined) {
+          updateData.required_fields = issueData.required_fields;
+        }
+
+        // If status is being changed to Resolved, check if checker team approval is needed
         if (issueData.status === 'Resolved') {
-          updateData.resolved_at = new Date().toISOString();
-          updateData.resolved_by = employeeInfo?.id;
+          // Check if this issue has a checker team
+          if (currentIssue?.checker_team_id && !currentIssue?.is_pending_checker_approval) {
+            // Set to Pending Approval instead of Resolved
+            updateData.status = 'Pending Approval';
+            updateData.is_pending_checker_approval = true;
+            // Don't set resolved_at and resolved_by yet
+          } else if (!currentIssue?.checker_team_id || currentIssue?.is_pending_checker_approval) {
+            // No checker team OR this is a checker approval - mark as fully resolved
+            updateData.resolved_at = new Date().toISOString();
+            updateData.resolved_by = employeeInfo?.id;
+            updateData.is_pending_checker_approval = false;
+            // If this was a checker approval, record it
+            if (currentIssue?.is_pending_checker_approval) {
+              updateData.checker_approved_at = new Date().toISOString();
+              updateData.checker_approved_by = employeeInfo?.id;
+            }
+          }
         }
 
         const { data, error: updateError } = await supabase
@@ -1035,6 +1099,248 @@ export function useStakeholderIssues() {
   );
 
   // ==========================================================================
+  // CHECKER TEAM OPERATIONS
+  // ==========================================================================
+
+  /**
+   * Approve an issue resolution (checker team action)
+   * This marks the issue as fully resolved
+   */
+  const approveResolution = useCallback(
+    async (issueId: number) => {
+      if (!employeeInfo) {
+        console.warn('Cannot approve resolution: Employee info not available');
+        return null;
+      }
+
+      setError(null);
+      setProcessingId(issueId);
+
+      try {
+        const now = new Date().toISOString();
+        
+        const { data, error: updateError } = await supabase
+          .from("stakeholder_issues")
+          .update({
+            status: 'Resolved',
+            is_pending_checker_approval: false,
+            checker_approved_at: now,
+            checker_approved_by: employeeInfo.id,
+            resolved_at: now,
+            resolved_by: employeeInfo.id,
+            updated_by: employeeInfo.id,
+          })
+          .eq("id", issueId)
+          .select(`
+            *,
+            stakeholder:stakeholders(id, name, kam_id)
+          `)
+          .single();
+
+        if (updateError) {
+          captureSupabaseError(updateError, "approveResolution", { issueId });
+          throw updateError;
+        }
+
+        // Send notification about approval
+        try {
+          const stakeholder = Array.isArray(data?.stakeholder) 
+            ? data?.stakeholder[0] 
+            : data?.stakeholder;
+          const stakeholderName = stakeholder?.name || 'Stakeholder';
+          const kamId = stakeholder?.kam_id;
+
+          if (kamId) {
+            await createStakeholderIssueNotification(
+              kamId,
+              'resolved',
+              {
+                stakeholderName,
+                issueTitle: data.title,
+              },
+              {
+                referenceId: issueId,
+                actionUrl: `/stakeholder-issues/${issueId}`,
+              }
+            );
+          }
+        } catch (notificationError) {
+          console.warn('Failed to send approval notification:', notificationError);
+        }
+
+        await fetchIssues(data?.stakeholder_id);
+        return data;
+      } catch (err) {
+        logError("Error approving resolution", err);
+        setError("Failed to approve resolution");
+        throw err;
+      } finally {
+        setProcessingId(null);
+      }
+    },
+    [fetchIssues, employeeInfo]
+  );
+
+  /**
+   * Reject an issue resolution (checker team action)
+   * This sends the issue back to In Progress with a rejection reason
+   */
+  const rejectResolution = useCallback(
+    async (issueId: number, rejectionReason: string) => {
+      if (!employeeInfo) {
+        console.warn('Cannot reject resolution: Employee info not available');
+        return null;
+      }
+
+      setError(null);
+      setProcessingId(issueId);
+
+      try {
+        const { data, error: updateError } = await supabase
+          .from("stakeholder_issues")
+          .update({
+            status: 'In Progress',
+            is_pending_checker_approval: false,
+            checker_rejection_reason: rejectionReason,
+            updated_by: employeeInfo.id,
+          })
+          .eq("id", issueId)
+          .select(`
+            *,
+            stakeholder:stakeholders(id, name, kam_id),
+            assigned_employee:employees!stakeholder_issues_assigned_to_fkey(id)
+          `)
+          .single();
+
+        if (updateError) {
+          captureSupabaseError(updateError, "rejectResolution", { issueId });
+          throw updateError;
+        }
+
+        // Send notification about rejection
+        try {
+          const stakeholder = Array.isArray(data?.stakeholder) 
+            ? data?.stakeholder[0] 
+            : data?.stakeholder;
+          const stakeholderName = stakeholder?.name || 'Stakeholder';
+          
+          // Notify assigned employee/team about rejection
+          const assignedTo = data?.assigned_to;
+          if (assignedTo) {
+            await createStakeholderIssueNotification(
+              assignedTo,
+              'statusChanged',
+              {
+                stakeholderName,
+                issueTitle: data.title,
+                newStatus: 'In Progress (Resolution Rejected)',
+              },
+              {
+                referenceId: issueId,
+                actionUrl: `/stakeholder-issues/${issueId}`,
+              }
+            );
+          }
+        } catch (notificationError) {
+          console.warn('Failed to send rejection notification:', notificationError);
+        }
+
+        await fetchIssues(data?.stakeholder_id);
+        return data;
+      } catch (err) {
+        logError("Error rejecting resolution", err);
+        setError("Failed to reject resolution");
+        throw err;
+      } finally {
+        setProcessingId(null);
+      }
+    },
+    [fetchIssues, employeeInfo]
+  );
+
+  /**
+   * Fetch issues pending checker approval for a specific team
+   */
+  const fetchIssuesPendingCheckerApproval = useCallback(
+    async (checkerTeamId: number) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const company_id = employeeInfo?.company_id as number | undefined;
+        if (!company_id) {
+          setLoading(false);
+          return [];
+        }
+
+        const { data, error: fetchError } = await supabase
+          .from("stakeholder_issues")
+          .select(`
+            *,
+            stakeholder:stakeholders(
+              id,
+              name,
+              address,
+              kam_id
+            ),
+            assigned_employee:employees!stakeholder_issues_assigned_to_fkey(
+              id,
+              first_name,
+              last_name,
+              email
+            ),
+            assigned_team:teams!stakeholder_issues_assigned_team_id_fkey(
+              id,
+              name
+            ),
+            checker_team:teams!stakeholder_issues_checker_team_id_fkey(
+              id,
+              name
+            ),
+            category:stakeholder_issue_categories(
+              id,
+              name,
+              color
+            ),
+            subcategory:stakeholder_issue_subcategories(
+              id,
+              name
+            )
+          `)
+          .eq("company_id", company_id)
+          .eq("checker_team_id", checkerTeamId)
+          .eq("is_pending_checker_approval", true)
+          .order("created_at", { ascending: false });
+
+        if (fetchError) {
+          captureSupabaseError(fetchError, "fetchIssuesPendingCheckerApproval", { company_id, checkerTeamId });
+          setError("Failed to fetch issues pending approval");
+          throw fetchError;
+        }
+
+        // Transform employee data
+        const transformedData = data?.map((issue) => ({
+          ...issue,
+          assigned_employee: issue.assigned_employee ? {
+            id: issue.assigned_employee.id,
+            name: `${issue.assigned_employee.first_name} ${issue.assigned_employee.last_name}`,
+            email: issue.assigned_employee.email,
+          } : undefined,
+        })) || [];
+
+        return transformedData;
+      } catch (err) {
+        logError("Error fetching issues pending checker approval", err);
+        setError("Failed to fetch issues");
+        return [];
+      } finally {
+        setLoading(false);
+      }
+    },
+    [employeeInfo]
+  );
+
+  // ==========================================================================
   // COMPUTED VALUES
   // ==========================================================================
 
@@ -1045,6 +1351,11 @@ export function useStakeholderIssues() {
 
   const inProgressIssues = useMemo(
     () => issues.filter((i) => i.status === 'In Progress'),
+    [issues]
+  );
+
+  const pendingApprovalIssues = useMemo(
+    () => issues.filter((i) => i.status === 'Pending Approval'),
     [issues]
   );
 
@@ -1072,6 +1383,7 @@ export function useStakeholderIssues() {
     // Computed
     pendingIssues,
     inProgressIssues,
+    pendingApprovalIssues,
     resolvedIssues,
     highPriorityIssues,
 
@@ -1086,6 +1398,11 @@ export function useStakeholderIssues() {
     deleteAttachment,
     getAttachmentUrl,
     downloadAttachment,
+    
+    // Checker Team Operations
+    approveResolution,
+    rejectResolution,
+    fetchIssuesPendingCheckerApproval,
     
     // Linked Step Data Operations
     fetchStakeholderStepData,

@@ -715,20 +715,37 @@ export interface LinkedStepField {
   fieldValue?: any;
 }
 
+// Required field definition for stakeholder issues
+// Fields that must be filled before marking an issue as resolved
+export interface StakeholderIssueRequiredField {
+  key: string; // Unique identifier for the field
+  label: string; // Display label
+  type: 'text' | 'number' | 'date' | 'select'; // Field type
+  required: boolean; // Whether the field must be filled
+  value?: string | number | null; // Current value (filled when resolving)
+  options?: string[]; // Options for select type fields
+}
+
 export interface StakeholderIssue {
   id?: number;
   stakeholder_id: number;
   title: string;
   description?: string;
-  status: 'Pending' | 'In Progress' | 'Resolved';
+  status: 'Pending' | 'In Progress' | 'Pending Approval' | 'Resolved';
   priority: 'Low' | 'Medium' | 'High' | 'Urgent';
   attachments: StakeholderIssueAttachment[];
   assigned_to?: string; // Employee ID assigned to handle this specific issue
   assigned_team_id?: number; // Team ID assigned to handle this issue (either employee OR team)
+  checker_team_id?: number; // Team ID assigned to verify and approve the resolution
   category_id?: number; // Optional category for organization
   subcategory_id?: number; // Optional subcategory (must belong to selected category)
   linked_step_data_ids?: number[]; // DEPRECATED: Array of stakeholder_step_data IDs linked to this issue
   linked_fields?: LinkedStepField[]; // Array of specific field references linked to this issue
+  required_fields?: StakeholderIssueRequiredField[]; // Fields that must be filled before resolution
+  is_pending_checker_approval?: boolean; // True when assigned entity has marked as resolved but checker has not approved
+  checker_approved_at?: string; // When checker team approved
+  checker_approved_by?: string; // Employee who approved (from checker team)
+  checker_rejection_reason?: string; // Reason if checker rejects the resolution
   company_id: number;
   created_at?: string;
   updated_at?: string;
@@ -747,6 +764,10 @@ export interface StakeholderIssue {
     id: number;
     name: string;
   };
+  checker_team?: {
+    id: number;
+    name: string;
+  };
   category?: StakeholderIssueCategory;
   subcategory?: StakeholderIssueSubcategory;
   linked_step_data?: StakeholderStepData[]; // Joined step data for linked records
@@ -756,6 +777,11 @@ export interface StakeholderIssue {
     email?: string;
   };
   resolver?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
+  checker_approver?: {
     id: string;
     name: string;
     email?: string;

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useStakeholderIssues } from "@/hooks/useStakeholderIssues";
 import { useStakeholderIssueCategories } from "@/hooks/useStakeholderIssueCategories";
-import { useTeams } from "@/hooks/useTeams";
 import { useModalState } from "@/hooks/core/useModalState";
 import { useAuth } from "@/lib/auth/auth-context";
 import { StakeholderIssue } from "@/lib/types/schemas";
@@ -17,25 +16,23 @@ import {
   TicketCategoryFilter,
 } from "@/components/stakeholder-issues";
 import BaseModal from "@/components/ui/modals/BaseModal";
+import TabView from "@/components/ui/TabView";
+import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { WarningCircle, CheckCircle, Clock, Plus, Ticket } from "@phosphor-icons/react";
 import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
-import { PageHeader, StatCard, StatCardGrid } from "@/components/ui";
+import { InlineSpinner } from "@/components/ui";
 import { captureError } from "@/lib/sentry";
 import { toast } from "sonner";
 
-export default function TicketsPage() {
+export default function TicketsLogsPage() {
   const { employeeInfo, canWrite, canDelete } = useAuth();
   const {
     issues,
     loading,
     error,
-    pendingIssues,
-    inProgressIssues,
-    resolvedIssues,
-    highPriorityIssues,
-    fetchIssuesByAssignedEmployee,
+    fetchIssues,
     createIssue,
     updateIssue,
     deleteIssue,
@@ -43,7 +40,6 @@ export default function TicketsPage() {
   } = useStakeholderIssues();
 
   const { categories, fetchCategories } = useStakeholderIssueCategories();
-  const { getEmployeeTeamIds } = useTeams();
   const { modalState, openCreateModal, closeModal } = useModalState();
 
   const [selectedIssue, setSelectedIssue] = useState<StakeholderIssue | null>(null);
@@ -53,49 +49,40 @@ export default function TicketsPage() {
   const [filterStatus, setFilterStatus] = useState<TicketStatusFilter>("all");
   const [filterPriority, setFilterPriority] = useState<TicketPriorityFilter>("all");
   const [filterCategoryId, setFilterCategoryId] = useState<TicketCategoryFilter>("all");
+  const [activeTab, setActiveTab] = useState<"all" | "pending" | "in-progress" | "resolved">("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [userTeamIds, setUserTeamIds] = useState<number[]>([]);
 
   const pageSize = 25;
 
-  // Load user's teams and categories on mount
+  // Load categories and all issues on mount
   useEffect(() => {
     const loadInitialData = async () => {
       await fetchCategories();
-      if (employeeInfo?.id) {
-        const teamIds = await getEmployeeTeamIds(employeeInfo.id);
-        setUserTeamIds(teamIds);
-      }
+      await fetchIssues();
     };
     loadInitialData();
-  }, [fetchCategories, getEmployeeTeamIds, employeeInfo?.id]);
+  }, [fetchCategories, fetchIssues]);
 
-  // Load issues with user's teams for assignment filtering
-  useEffect(() => {
-    const loadIssues = async () => {
-      if (employeeInfo?.id) {
-        await fetchIssuesByAssignedEmployee(employeeInfo.id, userTeamIds);
-      }
-    };
-
-    loadIssues();
-  }, [employeeInfo?.id, userTeamIds, fetchIssuesByAssignedEmployee]);
-
-  // Apply client-side filters
+  // Filter issues based on current filters and tab
   const filteredIssues = issues.filter((issue) => {
+    // Tab filter
+    if (activeTab === "pending" && issue.status !== "Pending") return false;
+    if (activeTab === "in-progress" && issue.status !== "In Progress") return false;
+    if (activeTab === "resolved" && issue.status !== "Resolved") return false;
+
     // Search filter
     if (searchTerm.trim()) {
       const search = searchTerm.toLowerCase();
-      if (
-        !issue.title.toLowerCase().includes(search) &&
-        !issue.description?.toLowerCase().includes(search)
-      ) {
+      const matchesTitle = issue.title.toLowerCase().includes(search);
+      const matchesDescription = issue.description?.toLowerCase().includes(search);
+      const matchesStakeholder = issue.stakeholder?.name?.toLowerCase().includes(search);
+      if (!matchesTitle && !matchesDescription && !matchesStakeholder) {
         return false;
       }
     }
 
-    // Status filter
-    if (filterStatus !== "all" && issue.status !== filterStatus) {
+    // Status filter (only if not using tab filter)
+    if (activeTab === "all" && filterStatus !== "all" && issue.status !== filterStatus) {
       return false;
     }
 
@@ -117,9 +104,22 @@ export default function TicketsPage() {
   const paginatedIssues = filteredIssues.slice(startIndex, startIndex + pageSize);
   const totalPages = Math.ceil(filteredIssues.length / pageSize);
 
+  // Stats
+  const pendingCount = issues.filter((i) => i.status === "Pending").length;
+  const inProgressCount = issues.filter((i) => i.status === "In Progress").length;
+  const resolvedCount = issues.filter((i) => i.status === "Resolved").length;
+
   const handleSearch = (query: string) => {
     setSearchTerm(query);
     setCurrentPage(1);
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab as "all" | "pending" | "in-progress" | "resolved");
+    setCurrentPage(1);
+    if (tab !== "all") {
+      setFilterStatus("all");
+    }
   };
 
   const handleCreateIssue = async (data: any) => {
@@ -128,9 +128,7 @@ export default function TicketsPage() {
       closeModal();
       setIsCreating(false);
       toast.success("Ticket created successfully");
-      if (employeeInfo?.id) {
-        await fetchIssuesByAssignedEmployee(employeeInfo.id, userTeamIds);
-      }
+      await fetchIssues();
     } catch (err) {
       captureError(err, { operation: "createIssue" });
       toast.error("Failed to create ticket");
@@ -145,9 +143,7 @@ export default function TicketsPage() {
       closeModal();
       setSelectedIssue(null);
       toast.success("Ticket updated successfully");
-      if (employeeInfo?.id) {
-        await fetchIssuesByAssignedEmployee(employeeInfo.id, userTeamIds);
-      }
+      await fetchIssues();
     } catch (err) {
       captureError(err, { operation: "updateIssue" });
       toast.error("Failed to update ticket");
@@ -160,9 +156,7 @@ export default function TicketsPage() {
     try {
       await deleteIssue(issueId);
       toast.success("Ticket deleted successfully");
-      if (employeeInfo?.id) {
-        await fetchIssuesByAssignedEmployee(employeeInfo.id, userTeamIds);
-      }
+      await fetchIssues();
     } catch (err) {
       captureError(err, { operation: "deleteIssue" });
       toast.error("Failed to delete ticket");
@@ -199,141 +193,148 @@ export default function TicketsPage() {
     }
   };
 
-  const handleViewModalSuccess = async () => {
-    if (employeeInfo?.id) {
-      await fetchIssuesByAssignedEmployee(employeeInfo.id, userTeamIds);
-    }
+  const handleViewModalSuccess = () => {
+    fetchIssues();
   };
 
+  const renderTicketList = () => (
+    <TicketList
+      tickets={paginatedIssues}
+      loading={loading}
+      emptyTitle="No tickets found"
+      emptyDescription={
+        searchTerm || filterPriority !== "all" || filterCategoryId !== "all"
+          ? "Try adjusting your search or filters"
+          : "No tickets have been created yet"
+      }
+      onView={handleViewTicket}
+      onEdit={handleEditTicket}
+      onDelete={handleDeleteIssue}
+      onDownloadAttachment={handleDownloadAttachment}
+      canEdit={canWrite(PERMISSION_MODULES.STAKEHOLDERS)}
+      canDelete={canDelete(PERMISSION_MODULES.STAKEHOLDERS)}
+      currentUserId={employeeInfo?.id}
+      showStakeholder={true}
+      currentPage={currentPage}
+      totalPages={totalPages}
+      totalCount={filteredIssues.length}
+      pageSize={pageSize}
+      onPageChange={setCurrentPage}
+      showPagination={true}
+    />
+  );
+
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <PageHeader
-          title="My Tickets"
-          description="Manage tickets for stakeholders you are assigned to handle"
-          icon={Ticket}
-          iconColor="text-purple-600"
+    <div className="w-full">
+      <Card>
+        <CardHeader
+          title="Tickets Log"
+          subtitle="View and manage all tickets across the organization"
+          action={
+            canWrite(PERMISSION_MODULES.STAKEHOLDERS) ? (
+              <Button
+                size="md"
+                variant="primary"
+                onClick={() => {
+                  setSelectedIssue(null);
+                  setIsCreating(true);
+                  openCreateModal();
+                }}
+                className="flex items-center gap-2"
+              >
+                <Plus size={18} weight="bold" />
+                Create Ticket
+              </Button>
+            ) : (
+              <PermissionTooltip message="You don't have permission to create tickets">
+                <Button size="md" variant="primary" disabled className="flex items-center gap-2">
+                  <Plus size={18} weight="bold" />
+                  Create Ticket
+                </Button>
+              </PermissionTooltip>
+            )
+          }
         />
-        {canWrite(PERMISSION_MODULES.STAKEHOLDERS) ? (
-          <Button
-            size="md"
-            variant="primary"
-            onClick={() => {
-              setSelectedIssue(null);
-              setIsCreating(true);
-              openCreateModal();
-            }}
-            className="flex items-center gap-2 shrink-0"
-          >
-            <Plus size={18} weight="bold" />
-            Create Ticket
-          </Button>
-        ) : (
-          <PermissionTooltip message="You don't have permission to create tickets">
-            <Button
-              size="md"
-              variant="primary"
-              disabled
-              className="flex items-center gap-2 shrink-0"
-            >
-              <Plus size={18} weight="bold" />
-              Create Ticket
-            </Button>
-          </PermissionTooltip>
-        )}
-      </div>
+        <CardContent>
+          {/* Permission Banner */}
+          <ModulePermissionsBanner module={PERMISSION_MODULES.STAKEHOLDERS} title="Tickets" compact />
 
-      {/* Permission Banner */}
-      <ModulePermissionsBanner module={PERMISSION_MODULES.STAKEHOLDERS} title="Tickets" compact />
+          {/* Filters Section */}
+          <div className="my-4">
+            <TicketFilters
+              searchTerm={searchTerm}
+              onSearchChange={handleSearch}
+              statusFilter={filterStatus}
+              onStatusFilterChange={(value) => {
+                setFilterStatus(value);
+                setCurrentPage(1);
+              }}
+              priorityFilter={filterPriority}
+              onPriorityFilterChange={(value) => {
+                setFilterPriority(value);
+                setCurrentPage(1);
+              }}
+              categoryFilter={filterCategoryId}
+              onCategoryFilterChange={(value) => {
+                setFilterCategoryId(value);
+                setCurrentPage(1);
+              }}
+              categories={categories}
+              searchPlaceholder="Search tickets by title, description, or stakeholder..."
+              showStatusFilter={activeTab === "all"}
+            />
+          </div>
 
-      {/* Stats */}
-      <StatCardGrid columns={4}>
-        <StatCard
-          title="Pending"
-          value={pendingIssues.length}
-          icon={Clock}
-          iconColor="text-warning"
-          iconBgColor="bg-warning/10 dark:bg-warning/20"
-        />
-        <StatCard
-          title="In Progress"
-          value={inProgressIssues.length}
-          icon={WarningCircle}
-          iconColor="text-primary-600"
-          iconBgColor="bg-primary-100 dark:bg-primary-900/30"
-        />
-        <StatCard
-          title="Resolved"
-          value={resolvedIssues.length}
-          icon={CheckCircle}
-          iconColor="text-success"
-          iconBgColor="bg-success/10 dark:bg-success/20"
-        />
-        <StatCard
-          title="High Priority"
-          value={highPriorityIssues.length}
-          icon={WarningCircle}
-          iconColor="text-error"
-          iconBgColor="bg-error/10 dark:bg-error/20"
-        />
-      </StatCardGrid>
+          {/* Error Message */}
+          {error && (
+            <div className="bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg mb-4">
+              {error}
+            </div>
+          )}
 
-      {/* Filters */}
-      <TicketFilters
-        searchTerm={searchTerm}
-        onSearchChange={handleSearch}
-        statusFilter={filterStatus}
-        onStatusFilterChange={(value) => {
-          setFilterStatus(value);
-          setCurrentPage(1);
-        }}
-        priorityFilter={filterPriority}
-        onPriorityFilterChange={(value) => {
-          setFilterPriority(value);
-          setCurrentPage(1);
-        }}
-        categoryFilter={filterCategoryId}
-        onCategoryFilterChange={(value) => {
-          setFilterCategoryId(value);
-          setCurrentPage(1);
-        }}
-        categories={categories}
-        searchPlaceholder="Search tickets..."
-      />
-
-      {/* Error Message */}
-      {error && (
-        <div className="bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg">
-          {error}
-        </div>
-      )}
-
-      {/* Ticket List */}
-      <TicketList
-        tickets={paginatedIssues}
-        loading={loading}
-        emptyTitle="No tickets found"
-        emptyDescription={
-          searchTerm || filterStatus !== "all" || filterPriority !== "all" || filterCategoryId !== "all"
-            ? "Try adjusting your search or filters"
-            : "You don't have any tickets assigned yet"
-        }
-        onView={handleViewTicket}
-        onEdit={handleEditTicket}
-        onDelete={handleDeleteIssue}
-        onDownloadAttachment={handleDownloadAttachment}
-        canEdit={canWrite(PERMISSION_MODULES.STAKEHOLDERS)}
-        canDelete={canDelete(PERMISSION_MODULES.STAKEHOLDERS)}
-        currentUserId={employeeInfo?.id}
-        showStakeholder={true}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalCount={filteredIssues.length}
-        pageSize={pageSize}
-        onPageChange={setCurrentPage}
-        showPagination={true}
-      />
+          {/* Tabs and Content */}
+          {loading && issues.length === 0 ? (
+            <div className="flex justify-center items-center h-32">
+              <InlineSpinner size="lg" color="primary" />
+            </div>
+          ) : (
+            <TabView
+              tabs={[
+                {
+                  key: "all",
+                  label: `All Tickets (${issues.length})`,
+                  icon: <Ticket size={16} />,
+                  color: "text-primary-600",
+                  content: renderTicketList(),
+                },
+                {
+                  key: "pending",
+                  label: `Pending (${pendingCount})`,
+                  icon: <Clock size={16} />,
+                  color: "text-warning",
+                  content: renderTicketList(),
+                },
+                {
+                  key: "in-progress",
+                  label: `In Progress (${inProgressCount})`,
+                  icon: <WarningCircle size={16} />,
+                  color: "text-primary-600",
+                  content: renderTicketList(),
+                },
+                {
+                  key: "resolved",
+                  label: `Resolved (${resolvedCount})`,
+                  icon: <CheckCircle size={16} />,
+                  color: "text-success",
+                  content: renderTicketList(),
+                },
+              ]}
+              activeTab={activeTab}
+              setActiveTab={handleTabChange}
+            />
+          )}
+        </CardContent>
+      </Card>
 
       {/* Create Ticket Modal */}
       {modalState.isOpen && isCreating && (

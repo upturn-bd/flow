@@ -31,7 +31,7 @@ export function IssueCategoryFormModal({
 
   return (
     <FormModal<IssueCategoryFormData>
-      title={category ? "Edit Issue Category" : "Add Issue Category"}
+      title={category ? "Edit Ticket Category" : "Add Ticket Category"}
       icon={<Tag size={24} weight="duotone" />}
       initialValues={initialValues}
       validationFn={validateIssueCategory}
@@ -47,7 +47,7 @@ export function IssueCategoryFormModal({
             name="name"
             label="Category Name"
             icon={<Tag size={18} weight="duotone" />}
-            placeholder="e.g., Technical Issue, Billing, Support"
+            placeholder="e.g., Technical, Billing, Support"
             value={values.name}
             error={errors.name}
             onChange={handleChange}
@@ -152,7 +152,7 @@ export function IssueSubcategoryFormModal({
             name="name"
             label="Subcategory Name"
             icon={<FolderOpen size={18} weight="duotone" />}
-            placeholder="e.g., Network Issue, Invoice Query"
+            placeholder="e.g., Network Problem, Invoice Query"
             value={values.name}
             error={errors.name}
             onChange={handleChange}

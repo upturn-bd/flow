@@ -141,15 +141,15 @@ export default function IssueCategoryManagementView() {
   };
 
   return (
-    <Collapsible title="Stakeholder Issue Categories">
+    <Collapsible title="Ticket Categories">
       <div className="px-4 space-y-4 py-4">
         <div className="flex items-center gap-3 mb-4">
           <Tag size={22} weight="duotone" className="text-foreground-secondary" />
-          <h3 className="text-lg font-semibold text-foreground-primary">Issue Categories</h3>
+          <h3 className="text-lg font-semibold text-foreground-primary">Ticket Categories</h3>
         </div>
 
         <p className="text-sm text-foreground-tertiary mb-4">
-          Organize stakeholder issues with categories and subcategories. Each category can have a color for visual distinction.
+          Organize tickets with categories and subcategories. Each category can have a color for visual distinction.
         </p>
 
         {error && (
@@ -161,7 +161,7 @@ export default function IssueCategoryManagementView() {
         {loading ? (
           <LoadingSpinner
             icon={Tag}
-            text="Loading issue categories..."
+            text="Loading ticket categories..."
             height="h-40"
             color="gray"
           />
@@ -322,9 +322,9 @@ export default function IssueCategoryManagementView() {
                 <div className="flex justify-center mb-3">
                   <Tag size={40} weight="duotone" className="text-foreground-tertiary" />
                 </div>
-                <p className="text-foreground-tertiary mb-1">No issue categories found</p>
+                <p className="text-foreground-tertiary mb-1">No ticket categories found</p>
                 <p className="text-foreground-tertiary text-sm mb-4">
-                  Create categories to organize stakeholder issues
+                  Create categories to organize tickets
                 </p>
               </div>
             )}

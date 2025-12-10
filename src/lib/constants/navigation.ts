@@ -147,12 +147,20 @@ export const OPS_SERVICES_ITEMS: NavigationItem[] = [
     keywords: ["payroll", "salary", "payment", "wage"],
   },
   {
-    name: "Stakeholder Issues",
+    name: "Stakeholders",
+    path: "/ops/stakeholders",
+    icon: Building,
+    description: "View and manage stakeholder relationships",
+    iconColor: ICON_COLORS.purple,
+    keywords: ["stakeholder", "client", "vendor", "partner", "kam"],
+  },
+  {
+    name: "Tickets",
     path: "/ops/stakeholder-issues",
     icon: Building,
-    description: "Manage stakeholder relationships and track issues",
+    description: "Manage tickets assigned to you",
     iconColor: ICON_COLORS.purple,
-    keywords: ["stakeholder", "client", "vendor", "partner"],
+    keywords: ["stakeholder", "issue", "problem", "ticket"],
   },
 ];
 
@@ -324,9 +332,17 @@ export const ADMIN_LOG_ITEMS: NavigationItem[] = [
     name: "Stakeholder",
     path: "/admin/stakeholders",
     icon: Building,
-    description: "Records of all stakeholder interactions and issues",
+    description: "Records of all stakeholders and leads",
     iconColor: ICON_COLORS.purple,
     keywords: ["stakeholder", "log", "history"],
+  },
+  {
+    name: "Tickets",
+    path: "/admin/logs/stakeholder-issues",
+    icon: Building,
+    description: "View all tickets across the organization",
+    iconColor: ICON_COLORS.purple,
+    keywords: ["stakeholder", "issue", "log", "history", "problem", "ticket"],
   },
   {
     name: "Transaction",

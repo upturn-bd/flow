@@ -73,7 +73,7 @@ export function StatusBadge({ status, variant, size = "sm", className = "" }: St
   const getAutoVariant = (statusText: string): "success" | "warning" | "error" | "info" | "default" => {
     const lower = statusText.toLowerCase();
     
-    if (lower.includes("completed") || lower.includes("approved") || lower.includes("success") || lower.includes("active") || lower.includes("paid")) {
+    if (lower.includes("completed") || lower.includes("approved") || lower.includes("success") || lower.includes("active") || lower.includes("paid") || lower.includes("resolved")) {
       return "success";
     }
     if (lower.includes("pending") || lower.includes("draft") || lower.includes("waiting") || lower.includes("in progress") || lower.includes("processing")) {
@@ -100,23 +100,25 @@ export function StatusBadge({ status, variant, size = "sm", className = "" }: St
 
 // Priority Badge
 export interface PriorityBadgeProps {
-  priority: "urgent" | "high" | "normal" | "low";
+  priority: string;
   size?: "xs" | "sm" | "md";
   className?: string;
 }
 
-const priorityVariants: Record<string, "error" | "warning" | "info" | "default"> = {
-  urgent: "error",
-  high: "warning",
-  normal: "info",
-  low: "default",
+const getPriorityVariant = (priority: string): "error" | "warning" | "info" | "default" | "primary" => {
+  const lower = priority.toLowerCase();
+  if (lower === "urgent") return "error";
+  if (lower === "high") return "warning";
+  if (lower === "medium" || lower === "normal") return "primary";
+  if (lower === "low") return "default";
+  return "default";
 };
 
 export function PriorityBadge({ priority, size = "sm", className = "" }: PriorityBadgeProps) {
-  const label = priority.charAt(0).toUpperCase() + priority.slice(1);
+  const label = priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase();
   
   return (
-    <Badge variant={priorityVariants[priority]} size={size} className={className}>
+    <Badge variant={getPriorityVariant(priority)} size={size} className={className}>
       {label}
     </Badge>
   );

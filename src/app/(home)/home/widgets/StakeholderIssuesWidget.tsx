@@ -26,6 +26,7 @@ const priorityColors = {
 
 const statusColors = {
   Pending: 'bg-background-tertiary text-foreground-primary',
+  'Pending Approval': 'bg-warning/10 text-warning dark:bg-warning/20',
   'In Progress': 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300',
   Resolved: 'bg-success/10 text-success dark:bg-success/20',
 };
@@ -92,17 +93,17 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
         <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
           <div className="p-5 shrink-0">
             <SectionHeader
-              title="Stakeholder Issues"
+              title="Tickets"
               icon={WarningCircle}
               iconColor="text-error"
             />
           </div>
 
           {!canViewStakeholders ? (
-            <NoPermissionMessage moduleName="stakeholder issues" />
+            <NoPermissionMessage moduleName="tickets" />
           ) : loading ? (
             <div className="flex-1 flex items-center justify-center overflow-hidden">
-              <LoadingSection text="Loading issues..." icon={WarningCircle} />
+              <LoadingSection text="Loading tickets..." icon={WarningCircle} />
             </div>
           ) : (
             <div
@@ -229,7 +230,7 @@ export default function StakeholderIssuesWidget({ config, isEditMode, onToggle, 
                 ) : (
                   <EmptyState
                     icon={FileText}
-                    message={canManageStakeholders ? "No issues assigned to you. Click + to go to stakeholders." : "No issues assigned to you"}
+                    message={canManageStakeholders ? "No tickets assigned to you. Click + to go to stakeholders." : "No tickets assigned to you"}
                   />
                 )}
               </div>
