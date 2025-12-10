@@ -124,6 +124,7 @@ export async function getCompanyInfo(): Promise<{
   fiscal_year_start?: string;
   live_payroll_enabled?: boolean;
   has_division?: boolean;
+  max_device_limit?: number;
 }> {
   const companyId = await getCompanyId();
   
@@ -154,6 +155,7 @@ export async function updateCompanySettings(settings: {
   live_payroll_enabled?: boolean;
   industry_id?: number;
   country_id?: number;
+  max_device_limit?: number;
 }): Promise<void> {
   const companyId = await getCompanyId();
   

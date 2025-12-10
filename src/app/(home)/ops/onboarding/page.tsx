@@ -2,14 +2,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
-import { UserPlus, CircleNotch, Check, X, Warning, Users, User, ArrowsClockwise } from "@phosphor-icons/react";
+import { UserPlus, CircleNotch, Check, X, Warning, Users, User, ArrowsClockwise, DeviceMobile, ArrowRight } from "@phosphor-icons/react";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useOnboarding, PendingEmployee } from "@/hooks/useOnboarding";
 import { useDepartments } from "@/hooks/useDepartments";
+import { useDevices } from "@/hooks/useDevices";
 import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
 
@@ -33,12 +35,13 @@ const Textarea = ({
   ...props
 }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
   <textarea
-    className={`w-full p-3 text-sm border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${className}`}
+    className={`w-full p-3 text-sm border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${className}`}
     {...props}
   />
 );
 
 export default function OnboardingApprovalPage() {
+  const router = useRouter();
   const [rejectionReasons, setRejectionReasons] = useState<
     Record<string, string>
   >({});
@@ -52,11 +55,13 @@ export default function OnboardingApprovalPage() {
     processOnboardingAction,
     subscribeToOnboardingUpdates,
   } = useOnboarding();
+  const { pendingDevices, fetchPendingDevices } = useDevices();
 
   useEffect(() => {
     fetchPendingEmployees();
     fetchEmployees();
     fetchDepartments();
+    fetchPendingDevices();
 
     // Set up polling for updates (replaces realtime)
     const unsubscribe = subscribeToOnboardingUpdates((payload) => {
@@ -163,7 +168,7 @@ export default function OnboardingApprovalPage() {
         className="flex items-center mb-8"
       >
         <h1 className="text-2xl font-bold text-foreground-primary flex items-center">
-          <UserPlus className="mr-2 h-7 w-7 text-purple-600" />
+          <UserPlus className="mr-2 h-7 w-7 text-primary-600" />
           Employee Onboarding
         </h1>
       </motion.div>
@@ -171,8 +176,53 @@ export default function OnboardingApprovalPage() {
       {/* Permission Banner */}
       <ModulePermissionsBanner module={PERMISSION_MODULES.ONBOARDING} title="Onboarding" compact />
 
+      {/* Device Approval Box */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="mb-6"
+      >
+        <div
+          onClick={() => router.push('/ops/onboarding/devices')}
+          className="bg-linear-to-br from-primary-500 to-primary-700 dark:from-primary-800 dark:to-primary-950 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer group"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/20 dark:bg-white/10 rounded-lg flex items-center justify-center">
+                <DeviceMobile className="h-6 w-6 text-white" weight="duotone" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold text-lg mb-1">
+                  Device Approval Requests
+                </h3>
+                <p className="text-primary-50 dark:text-primary-200 text-sm">
+                  Manage pending device access requests
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              {pendingDevices.length > 0 && (
+                <div className="bg-white/20 dark:bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
+                  <span className="text-white font-bold text-lg">
+                    {pendingDevices.length}
+                  </span>
+                  <span className="text-primary-50 dark:text-primary-200 text-sm ml-2">
+                    pending
+                  </span>
+                </div>
+              )}
+              <ArrowRight 
+                className="h-6 w-6 text-white group-hover:translate-x-1 transition-transform" 
+                weight="bold"
+              />
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
       {pendingEmployees.length === 0 ? (
-        <div className="mt-10 bg-purple-50/50 rounded-xl border border-purple-100">
+        <div className="mt-10 bg-surface-secondary rounded-xl border border-border-primary">
           <EmptyState
             icon={Users}
             title="No Pending Requests"
@@ -189,7 +239,7 @@ export default function OnboardingApprovalPage() {
             <div className="flex items-center gap-4">
               <button
                 onClick={handleRefresh}
-                className="flex items-center gap-2 px-3 py-2 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-sm bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors"
                 disabled={loading}
               >
                 <ArrowsClockwise className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
@@ -214,7 +264,7 @@ export default function OnboardingApprovalPage() {
             >
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
-                  <div className="shrink-0 w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                  <div className="shrink-0 w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-950 flex items-center justify-center text-primary-600 dark:text-primary-400">
                     <User className="h-5 w-5" />
                   </div>
                   <div>
@@ -224,7 +274,7 @@ export default function OnboardingApprovalPage() {
                     <p className="text-sm text-foreground-tertiary">{emp.designation}</p>
                   </div>
                 </div>
-                <div className="text-xs font-medium text-white bg-purple-500 px-2 py-1 rounded-full">
+                <div className="text-xs font-medium text-white dark:text-foreground-primary bg-primary-500 dark:bg-primary-500/20 px-2 py-1 rounded-full">
                   New Request
                 </div>
               </div>
@@ -310,7 +360,7 @@ export default function OnboardingApprovalPage() {
                     Reject
                   </Button>
                   <Button
-                    className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2"
+                    className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white flex items-center gap-2"
                     onClick={() => handleAction(emp.id, "ACCEPTED")}
                     disabled={loading}
                   >

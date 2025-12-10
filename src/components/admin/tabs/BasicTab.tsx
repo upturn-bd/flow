@@ -32,6 +32,7 @@ export default function BasicTab() {
     live_absent_enabled: false,
     // Payroll Gear
     fiscal_year_start: "2024-01-01",
+    max_device_limit: 3,
   });
   const [errors, setErrors] = useState<Partial<Record<keyof CompanyBasicsFormData, string>>>({});
   const [isValid, setIsValid] = useState(false);
@@ -65,6 +66,7 @@ export default function BasicTab() {
         // Operations Gear - add defaults if not present
         live_absent_enabled: companyInfo.live_absent_enabled ?? false,
         fiscal_year_start: companyInfo.fiscal_year_start ?? "2024-01-01",
+        max_device_limit: companyInfo.max_device_limit ?? 3,
       });
     }
   }, [companyInfo]);

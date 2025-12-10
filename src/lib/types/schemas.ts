@@ -376,6 +376,7 @@ export interface CompanyBasics {
   // Operations Gear
   live_absent_enabled: boolean;
   fiscal_year_start: string; // Date format: YYYY-MM-DD (e.g., "2024-01-01")
+  max_device_limit?: number;
 }
 
 export interface BasicInfo {
@@ -928,6 +929,7 @@ export interface Company {
   fiscal_year_start?: string;
   live_payroll_enabled?: boolean;
   has_division?: boolean;
+  max_device_limit?: number;
   created_at?: string;
   updated_at?: string;
   // Joined data

@@ -62,7 +62,10 @@ export async function proxy(request: NextRequest) {
     url.pathname = "/login";
     return NextResponse.redirect(url);
   } else if (supabaseUser && isAuthRoute) {
-    
+    // Allow access to device approval page for authenticated users
+    if (currentPath === '/auth/device-approval') {
+      return response;
+    }
     url.pathname = "/profile";
     return NextResponse.redirect(url);
   }

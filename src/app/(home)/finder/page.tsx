@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
 import { Users, User, Envelope, Phone, Building, Calendar, FunnelSimple, MagnifyingGlass } from "@phosphor-icons/react";
-import { fadeIn, fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { ExtendedEmployee, useEmployees } from "@/hooks/useEmployees";
 import { matchesEmployeeSearch } from "@/lib/utils/user-search";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -19,7 +18,6 @@ type FilterOptions = {
 
 export default function FinderPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredEmployees, setFilteredEmployees] = useState<ExtendedEmployee[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
     department: "",
@@ -34,31 +32,34 @@ export default function FinderPage() {
     fetchExtendedEmployees();
   }, [fetchExtendedEmployees]);
 
-  // FunnelSimple employees when search query or filters change
-  useEffect(() => {
-    if (extendedEmployees.length === 0) return;
+  // Memoized filtered employees - only recalculates when dependencies change
+  const filteredEmployees = useMemo(() => {
+    if (extendedEmployees.length === 0) return [];
 
-    const filtered = extendedEmployees.filter(employee => {
+    return extendedEmployees.filter(employee => {
       // First check search query using unified search
       const matchesSearch = searchQuery === "" || matchesEmployeeSearch(employee, searchQuery);
       
       if (!matchesSearch) return false;
       
-      // // Then check filters
-      // const matchesDepartment = filters.department === "" || employee.department === filters.department;
-      // const matchesPosition = filters.position === "" || employee.position === filters.position;
-      // const matchesGrade = filters.grade === "" || employee.grade === filters.grade;
-      // const matchesLocation = filters.location === "" || employee.location === filters.location;
+      // Then check filters
+      const matchesDepartment = filters.department === "" || employee.department === filters.department;
+      const matchesDesignation = filters.designation === "" || employee.designation === filters.designation;
       
-      return true;
+      return matchesDepartment && matchesDesignation;
     });
-    
-    setFilteredEmployees(filtered);
   }, [searchQuery, filters, extendedEmployees]);
 
-  // Get unique values for filter dropdowns
-  const departments = [...new Set(extendedEmployees.map(e => e.department))];
-  const positions = [...new Set(extendedEmployees.map(e => e.designation))];
+  // Get unique values for filter dropdowns - memoized
+  const departments = useMemo(() => 
+    [...new Set(extendedEmployees.map(e => e.department).filter(Boolean))],
+    [extendedEmployees]
+  );
+  
+  const positions = useMemo(() => 
+    [...new Set(extendedEmployees.map(e => e.designation).filter(Boolean))],
+    [extendedEmployees]
+  );
 
   // Format date to be more readable
   const formatDate = (dateString: string) => {
@@ -76,9 +77,9 @@ export default function FinderPage() {
 
   return (
     <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={staggerContainer}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
       className="w-full p-4 sm:p-6 lg:p-8 pb-12"
     >
       {/* Header */}
@@ -90,7 +91,7 @@ export default function FinderPage() {
       />
 
       {/* Search and Filters */}
-      <motion.div variants={fadeIn} className="bg-surface-primary rounded-xl shadow-sm mb-8">
+      <div className="bg-surface-primary rounded-xl shadow-sm mb-8">
         <div className="border-b border-border-primary px-6 py-4 flex justify-between items-center">
           <h2 className="text-lg font-semibold text-indigo-700 flex items-center">
             <MagnifyingGlass className="w-5 h-5 mr-2" />
@@ -116,15 +117,9 @@ export default function FinderPage() {
             />
           </div>
           
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-border-primary">
+          {showFilters && (
+            <div className="overflow-hidden">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-border-primary">
                   <div>
                     <label className="block text-sm font-medium text-foreground-secondary mb-1">Department</label>
                     <select
@@ -153,9 +148,7 @@ export default function FinderPage() {
                   </div>
                 </div>
                 <div className="mt-4 flex justify-end">
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
+                  <button
                     onClick={() => setFilters({
                       department: "",
                       designation: "",
@@ -163,44 +156,40 @@ export default function FinderPage() {
                     className="px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
                   >
                     Reset Filters
-                  </motion.button>
+                  </button>
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
         </div>
-      </motion.div>
+      </div>
 
       {/* Results */}
-      <motion.div variants={fadeInUp}>
+      <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-foreground-primary">
             Results {filteredEmployees.length > 0 && `(${filteredEmployees.length})`}
           </h2>
         </div>
 
-        <AnimatePresence>
-          {loading ? (
-            <LoadingSpinner
-              icon={Users}
-              text="Loading employee data..."
-              color="purple"
-              height="h-64"
-            />
-          ) : filteredEmployees.length === 0 ? (
-            <EmptyState
-              icon={Users}
-              title="No employees found"
-              description="No employees match your search criteria. Try adjusting your filters or search query."
-            />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredEmployees.map((employee) => (
-                <motion.div
+        {loading ? (
+          <LoadingSpinner
+            icon={Users}
+            text="Loading employee data..."
+            color="purple"
+            height="h-64"
+          />
+        ) : filteredEmployees.length === 0 ? (
+          <EmptyState
+            icon={Users}
+            title="No employees found"
+            description="No employees match your search criteria. Try adjusting your filters or search query."
+          />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredEmployees.map((employee, index) => (
+              <div
                   key={employee.id}
-                  variants={fadeIn}
-                  whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
-                  className="bg-surface-primary rounded-xl shadow-sm overflow-hidden border border-border-primary transition-all duration-200"
+                  className="bg-surface-primary rounded-xl shadow-sm overflow-hidden border border-border-primary transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
                 >
                   <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-4">
                     <div className="flex items-center">
@@ -234,21 +223,18 @@ export default function FinderPage() {
                   </div>
                   
                   <div className="border-t border-border-primary p-4">
-                    <motion.a
+                    <a
                       href={`/hris?uid=${employee.id}`}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
                       className="block w-full py-2 text-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
                     >
                       View Full Profile
-                    </motion.a>
+                    </a>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           )}
-        </AnimatePresence>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }

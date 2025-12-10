@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "next/navigation";
 import { EyeSlash, Eye, GoogleLogo } from "@phosphor-icons/react";
 import Link from "next/link";
 
 import { googleSignIn, login } from "../auth-actions";
+import { getDeviceId, getDeviceDetails, getUserLocation } from "@/lib/utils/device";
 
 interface SignInFormData {
   email: string;
@@ -19,9 +21,33 @@ const SignIn = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<SignInFormData>();
+  const searchParams = useSearchParams();
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Check for error query parameters from OAuth callback
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error) {
+      switch (error) {
+        case 'device_pending':
+          setGeneralError('Your device is pending approval. Please wait for an administrator to approve your device before logging in.');
+          break;
+        case 'device_pending_new':
+          setGeneralError('New device detected. Your device has been registered and is pending approval. Please wait for an administrator to approve your device before logging in.');
+          break;
+        case 'device_rejected':
+          setGeneralError('This device has been rejected. Please contact your administrator.');
+          break;
+        case 'device_limit':
+          setGeneralError('Device limit reached. Please ask your admin to remove an old device.');
+          break;
+        default:
+          setGeneralError('Authentication error. Please try again.');
+      }
+    }
+  }, [searchParams]);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -32,7 +58,25 @@ const SignIn = () => {
     setLoading(true);
     
     try {
-      const result = await login({ email: data.email, password: data.password });
+      const deviceId = getDeviceId();
+      const deviceDetails = getDeviceDetails();
+      
+      // Request location permission
+      const location = await getUserLocation();
+      
+      console.log('Login - deviceId:', deviceId);
+      console.log('Login - deviceDetails:', deviceDetails);
+      console.log('Login - location:', location);
+
+      const result = await login({ 
+        email: data.email, 
+        password: data.password,
+        deviceId,
+        deviceDetails: {
+          ...deviceDetails,
+          location
+        }
+      });
       
       if (result.error) {
         setGeneralError("Login failed. " + result.error.message);
@@ -50,6 +94,17 @@ const SignIn = () => {
     setGeneralError(null);
     setLoading(true);
     try {
+      // Get device info and store in cookies before OAuth redirect
+      const deviceId = getDeviceId();
+      const deviceDetails = getDeviceDetails();
+      
+      // Request location permission
+      const location = await getUserLocation();
+      
+      // Store device info in cookies (will be read by callback)
+      document.cookie = `device_id=${deviceId}; path=/; max-age=600; SameSite=Lax`;
+      document.cookie = `device_details=${encodeURIComponent(JSON.stringify({ ...deviceDetails, location }))}; path=/; max-age=600; SameSite=Lax`;
+      
       await googleSignIn();
     } catch (err) {
       if (err instanceof Error) {

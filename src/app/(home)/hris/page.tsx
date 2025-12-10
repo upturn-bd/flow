@@ -6,11 +6,13 @@ import { motion } from "framer-motion";
 import BasicInfoTab from "./tabs/BasicInfoTab";
 import PersonalInfoTab from "./tabs/PersonalInfoTab";
 import EducationExperienceTab from "./tabs/EducationExperienceTab";
-import { User, ClipboardText, GraduationCap, ChartBarHorizontal, FileText, ArrowLeft } from "@phosphor-icons/react";
+import DevicesTab from "./tabs/DevicesTab";
+import { User, ClipboardText, GraduationCap, ChartBarHorizontal, FileText, ArrowLeft, Desktop } from "@phosphor-icons/react";
 import TabView, { TabItem } from "@/components/ui/TabView";
 import Link from "next/link";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useAuth } from "@/lib/auth/auth-context";
 
 // Client component that uses useSearchParams
 function ProfileContent() {
@@ -18,6 +20,7 @@ function ProfileContent() {
   const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { employeeInfo } = useAuth();
   const {
     isCurrentUser,
     loading: profileLoading,
@@ -133,6 +136,13 @@ function ProfileContent() {
             </p>
           </div>
         ),
+      },
+      {
+        key: "devices",
+        label: "Devices",
+        icon: <Desktop className="h-5 w-5" />,
+        color: "text-green-600",
+        content: <DevicesTab userId={uid || employeeInfo?.id || ""} canManage={!isCurrentUser} />,
       },
     ],
     [uid]

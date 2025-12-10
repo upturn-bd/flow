@@ -1,15 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Gear, Calendar, CurrencyDollar, Clock, Pulse, Timer } from "@phosphor-icons/react";
+import { Gear, Calendar, CurrencyDollar, Clock, Pulse, Timer, ShieldCheck } from "@phosphor-icons/react";
 import { staggerContainer } from "@/components/ui/animations";
-import { ToggleField, DateField } from "@/components/forms";
+import { ToggleField, DateField, NumberField } from "@/components/forms";
 import { SectionHeader } from "@/components/ui";
 
 interface CompanySettingsConfigViewProps {
   formValues: {
     live_absent_enabled: boolean;
     fiscal_year_start: string;
+    max_device_limit?: number;
   };
   onChange: (field: string, value: any) => void;
   errors: {
@@ -17,6 +18,7 @@ interface CompanySettingsConfigViewProps {
     payroll_generation_day?: string;
     fiscal_year_start?: string;
     live_payroll_enabled?: string;
+    max_device_limit?: string;
   };
 }
 
@@ -34,7 +36,7 @@ export default function CompanySettingsConfigView({
     let value: any = e.target.value;
     
     // Convert to appropriate type based on field
-    if (field === 'payroll_generation_day') {
+    if (field === 'payroll_generation_day' || field === 'max_device_limit') {
       const numValue = parseInt(value);
       value = isNaN(numValue) ? 1 : numValue; // Default to 1 if invalid
     }
@@ -49,6 +51,34 @@ export default function CompanySettingsConfigView({
       variants={staggerContainer}
       className="space-y-6"
     >
+      {/* Security Gear */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="bg-surface-primary rounded-xl shadow-sm"
+      >
+        <SectionHeader
+          title="Security Gear"
+          icon={<ShieldCheck className="w-5 h-5" />}
+        />
+        
+        <div className="p-3 sm:p-6">
+          <NumberField
+            name="max_device_limit"
+            label="Max Device Limit"
+            value={formValues.max_device_limit || 3}
+            onChange={handleInputChange('max_device_limit')}
+            error={errors.max_device_limit}
+            min={1}
+            max={10}
+          />
+          <p className="text-sm text-foreground-secondary mt-1">
+            Maximum number of devices a user can be logged in from simultaneously
+          </p>
+        </div>
+      </motion.div>
+
       {/* Operations Gear */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

@@ -17,6 +17,7 @@ interface CompanyInfo {
   fiscal_year_start?: string;
   live_payroll_enabled?: boolean;
   has_division?: boolean;
+  max_device_limit?: number;
 }
 
 interface Country {
@@ -98,6 +99,7 @@ export function useCompanyInfo() {
     live_payroll_enabled?: boolean;
     industry_id?: number;
     country_id?: number;
+    max_device_limit?: number;
   }) => {
     try {
       await updateCompanySettingsApi(settings);
