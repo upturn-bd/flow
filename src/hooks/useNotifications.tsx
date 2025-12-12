@@ -2,10 +2,11 @@
 
 import { useBaseEntity } from "./core";
 import { Notification, NotificationType } from "@/lib/types/schemas";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
 import { captureSupabaseError, captureApiError } from "@/lib/sentry";
+import { notificationManager } from "@/lib/realtime/notificationManager";
 
 export type { Notification, NotificationType };
 
@@ -40,81 +41,48 @@ export function useNotifications() {
   });
 
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  // Fetch notifications for current user with type information
-  const fetchUserNotifications = useCallback(async (limit = 20) => {
-    try {
-      const companyId = employeeInfo?.company_id;
-      const userId = employeeInfo?.id;
+  // Subscribe to the global notification manager
+  useEffect(() => {
+    const companyId = employeeInfo?.company_id;
+    const userId = employeeInfo?.id;
 
-      if (!companyId || !userId) {
-        console.error('Company ID or User ID not found');
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('notifications')
-        .select(`
-          *,
-          type:notification_types(*)
-        `)
-        .eq('company_id', companyId)
-        .eq('recipient_id', [userId])
-        .order('created_at', { ascending: false })
-        .limit(limit);
-
-      if (error) {
-        throw error;
-      }
-
-      return data || [];
-    } catch (error) {
-      captureSupabaseError(
-        { message: error instanceof Error ? error.message : String(error) },
-        "fetchUserNotifications",
-        { companyId: employeeInfo?.company_id, userId: employeeInfo?.id }
-      );
-      console.error('Error fetching user notifications:', error);
-      return [];
+    if (!companyId || !userId) {
+      console.log('Skipping notification subscription - missing companyId or userId');
+      return;
     }
+
+    console.log('[useNotifications] Subscribing to notification manager');
+
+    // Subscribe to the singleton manager
+    const unsubscribe = notificationManager.subscribe(
+      (newNotifications, newUnreadCount) => {
+        console.log('[useNotifications] Received update:', newNotifications.length, 'notifications,', newUnreadCount, 'unread');
+        setNotifications(newNotifications);
+        setUnreadCount(newUnreadCount);
+      },
+      userId,
+      typeof companyId === 'number' ? companyId : parseInt(companyId)
+    );
+
+    // Cleanup on unmount
+    return () => {
+      console.log('[useNotifications] Unsubscribing from notification manager');
+      unsubscribe();
+    };
   }, [employeeInfo?.company_id, employeeInfo?.id]);
 
   // Fetch unread count
   const fetchUnreadCount = useCallback(async () => {
-    try {
-      const companyId = employeeInfo?.company_id;
-      const userId = employeeInfo?.id;
+    return await notificationManager.refetchUnreadCount();
+  }, []);
 
-      if (!companyId || !userId) {
-        setUnreadCount(0);
-        return 0;
-      }
-
-      const { count, error } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('company_id', companyId)
-        .eq('recipient_id', [userId])
-        .eq('is_read', false);
-
-      if (error) {
-        throw error;
-      }
-
-      const unreadCount = count || 0;
-      setUnreadCount(unreadCount);
-      return unreadCount;
-    } catch (error) {
-      captureSupabaseError(
-        { message: error instanceof Error ? error.message : String(error) },
-        "fetchUnreadCount",
-        { companyId: employeeInfo?.company_id, userId: employeeInfo?.id }
-      );
-      console.error('Error fetching unread count:', error);
-      setUnreadCount(0);
-      return 0;
-    }
-  }, [employeeInfo?.company_id, employeeInfo?.id]);
+  // Fetch notifications for current user with type information
+  const fetchUserNotifications = useCallback(async (limit = 20) => {
+    // This is handled by the manager, but kept for compatibility
+    return notifications.slice(0, limit);
+  }, [notifications]);
 
   // Mark notification as read
   const markAsRead = useCallback(async (notificationId: number) => {
@@ -248,7 +216,7 @@ export function useNotifications() {
   // Memoized result
   return useMemo(() => ({
     ...baseResult,
-    notifications: baseResult.items,
+    notifications: notifications, // Use real-time notifications state
     notification: baseResult.item,
     unreadCount,
 
@@ -266,6 +234,7 @@ export function useNotifications() {
     updateNotification: baseResult.updateItem,
   }), [
     baseResult,
+    notifications, // Add to dependencies
     unreadCount,
     fetchUserNotifications,
     fetchUnreadCount,

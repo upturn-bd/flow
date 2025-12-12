@@ -69,6 +69,7 @@ export default function TopBar() {
   const { 
     fetchUnreadCount, 
     unreadCount, 
+    notifications, // Get notifications from real-time hook
     fetchUserNotifications,
     markAsRead,
     deleteNotification 
@@ -86,39 +87,45 @@ export default function TopBar() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Check for new notifications
-  const checkForNewNotifications = async () => {
-    const currentCount = await fetchUnreadCount();
-    
-    // If count increased, fetch the latest notification
-    if (currentCount > previousUnreadCount && previousUnreadCount > 0) {
-      const notifications = await fetchUserNotifications(1);
-      if (notifications && notifications.length > 0) {
-        const newest = notifications[0];
-        // Only show if it's unread
-        if (!newest.is_read) {
-          setLatestNotification(newest);
+  // Initial fetch only - real-time will handle updates
+  useEffect(() => {
+    if (isApproved) {
+      // Initial fetch of unread count
+      fetchUnreadCount();
+    }
+  }, [isApproved, fetchUnreadCount]);
+
+  // Watch for new notifications and show modal
+  useEffect(() => {
+    console.log('[TopBar] Checking for new notifications...', {
+      notificationsLength: notifications.length,
+      previousUnreadCount,
+      currentUnreadCount: notifications.filter(n => !n.is_read).length
+    });
+
+    if (notifications.length > 0 && previousUnreadCount > 0) {
+      const currentUnreadCount = notifications.filter(n => !n.is_read).length;
+      
+      console.log('[TopBar] Comparing counts:', { currentUnreadCount, previousUnreadCount });
+      
+      // If unread count increased, show the newest unread notification
+      if (currentUnreadCount > previousUnreadCount) {
+        const newestUnread = notifications.find(n => !n.is_read);
+        console.log('[TopBar] New unread notification detected!', newestUnread);
+        if (newestUnread) {
+          setLatestNotification(newestUnread);
           setNewNotificationModal(true);
         }
       }
-    }
-    
-    setPreviousUnreadCount(currentCount);
-  };
-
-  // Initial fetch and polling
-  useEffect(() => {
-    if (isApproved) {
-      const initFetch = async () => {
-        const count = await fetchUnreadCount();
-        setPreviousUnreadCount(count);
-      };
       
-      initFetch();
-      const interval = setInterval(checkForNewNotifications, 30000);
-      return () => clearInterval(interval);
+      setPreviousUnreadCount(currentUnreadCount);
+    } else if (notifications.length > 0) {
+      // Initialize previous count
+      const initialCount = notifications.filter(n => !n.is_read).length;
+      console.log('[TopBar] Initializing previous count:', initialCount);
+      setPreviousUnreadCount(initialCount);
     }
-  }, [isApproved, fetchUnreadCount, previousUnreadCount]);
+  }, [notifications, previousUnreadCount]);
 
   // Close user menu on outside click
   useEffect(() => {

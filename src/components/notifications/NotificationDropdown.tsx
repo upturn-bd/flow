@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, X, Check, Clock, WarningCircle, Calendar, Briefcase, User, TrashSimple, Checks, ArrowSquareOut } from "@phosphor-icons/react";
 import { useNotifications, Notification } from "@/hooks/useNotifications";
@@ -9,7 +9,6 @@ import { Z_INDEX } from "@/lib/theme";
 import Portal from "@/components/ui/Portal";
 import Link from "next/link";
 import { cn } from "@/components/ui/class";
-import { InlineSpinner } from "../ui";
 
 interface NotificationDropdownProps {
   isOpen: boolean;
@@ -48,12 +47,10 @@ export default function NotificationDropdown({
   triggerRef
 }: NotificationDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(false);
   const [position, setPosition] = useState({ top: 0, right: 0 });
 
   const {
-    fetchUserNotifications,
+    notifications, // Use real-time notifications from hook
     markAsRead,
     markAllAsRead,
     deleteNotification
@@ -72,23 +69,6 @@ export default function NotificationDropdown({
       });
     }
   }, [isOpen, triggerRef]);
-  const loadNotifications = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await fetchUserNotifications(20);
-      setNotifications(data || []);
-    } catch (error) {
-      console.error('Error loading notifications:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchUserNotifications]);
-  // Load notifications when dropdown opens
-  useEffect(() => {
-    if (isOpen) {
-      loadNotifications();
-    }
-  }, [isOpen, loadNotifications]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -109,34 +89,19 @@ export default function NotificationDropdown({
     }
   }, [isOpen, onClose, triggerRef]);
 
-
-
   const handleMarkAsRead = async (notificationId: number) => {
     await markAsRead(notificationId);
-    setNotifications(prev => 
-      prev.map(n => 
-        n.id === notificationId 
-          ? { ...n, is_read: true, read_at: new Date().toLocaleDateString('sv-SE') }
-          : n
-      )
-    );
+    // No need to update local state - real-time will handle it
   };
 
   const handleMarkAllAsRead = async () => {
     await markAllAsRead();
-    setNotifications(prev => 
-      prev.map(n => ({ 
-        ...n, 
-        is_read: true, 
-        read_at: new Date().toLocaleDateString('sv-SE')
-
-      }))
-    );
+    // No need to update local state - real-time will handle it
   };
 
   const handleDeleteNotification = async (notificationId: number) => {
     await deleteNotification(notificationId);
-    setNotifications(prev => prev.filter(n => n.id !== notificationId));
+    // No need to update local state - real-time will handle it
   };
 
   const unreadNotifications = notifications.filter(n => !n.is_read);
@@ -182,7 +147,7 @@ export default function NotificationDropdown({
             className={cn(
               "fixed bg-surface-primary rounded-lg shadow-xl border border-border-primary overflow-hidden",
               // Desktop: positioned relative to trigger
-              !isMobile && "w-96 max-h-[28rem]",
+              !isMobile && "w-96 max-h-112",
               // Mobile: full width modal at top
               isMobile && "inset-x-4 top-20 max-h-[70vh]"
             )}
@@ -223,11 +188,7 @@ export default function NotificationDropdown({
 
           {/* Content */}
           <div className="max-h-80 overflow-y-auto">
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <InlineSpinner size="md" color="primary" />
-              </div>
-            ) : notifications.length === 0 ? (
+            {notifications.length === 0 ? (
               <div className="text-center py-8 text-foreground-secondary dark:text-foreground-secondary">
                 <Bell className="h-8 w-8 mx-auto mb-2 text-foreground-tertiary dark:text-foreground-tertiary" />
                 <p>No notifications yet</p>
