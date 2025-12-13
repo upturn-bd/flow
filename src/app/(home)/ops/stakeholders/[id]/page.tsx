@@ -331,19 +331,6 @@ export default function OpsStakeholderDetailPage({ params }: { params: Promise<{
   const steps = process?.steps || [];
   const sortedSteps = [...steps].sort((a, b) => a.step_order - b.step_order);
 
-  // Determine which steps the user can access
-  const canUserAccessStep = (step: StakeholderProcessStep) => {
-    // KAM can access all steps
-    if (stakeholder.kam_id === employeeInfo?.id) return true;
-    // Admin users can access all steps
-    if (canWrite(PERMISSION_MODULES.STAKEHOLDERS)) return true;
-    // Check if user is in any of the step's assigned teams
-    if (step.team_ids && step.team_ids.length > 0) {
-      return step.team_ids.some((teamId) => userTeamIds.includes(teamId));
-    }
-    return false;
-  };
-
   const getStepStatus = (step: StakeholderProcessStep) => {
     const data = stepData.find((sd) => sd.step_id === step.id);
     if (data?.is_completed) return "completed";
@@ -356,171 +343,6 @@ export default function OpsStakeholderDetailPage({ params }: { params: Promise<{
     }
     
     return "pending";
-  };
-
-  const renderStepContent = (step: StakeholderProcessStep) => {
-    const status = getStepStatus(step);
-    const data = stepData.find((sd) => sd.step_id === step.id);
-    const canAccess = canUserAccessStep(step);
-    const canEdit = canEditStakeholder();
-
-    // If user can't access this step, show limited info
-    if (!canAccess) {
-      return (
-        <div className="p-4 bg-background-secondary dark:bg-background-tertiary rounded-lg">
-          <p className="text-sm text-foreground-tertiary">
-            You don't have permission to view this step's data.
-          </p>
-        </div>
-      );
-    }
-
-    if (status === "locked" && process?.is_sequential) {
-      return (
-        <div className="p-4 bg-background-secondary dark:bg-background-tertiary rounded-lg">
-          <p className="text-sm text-foreground-tertiary">
-            Complete the previous steps to unlock this one.
-          </p>
-        </div>
-      );
-    }
-
-    // Show form for current/pending steps that user can edit
-    if ((status === "current" || status === "pending") && activeStepId === step.id && canEdit) {
-      return (
-        <StepDataForm
-          stakeholderId={stakeholderId}
-          step={step}
-          existingData={data}
-          completedStepsData={stepData
-            .filter((sd) => {
-              const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
-              return sdStep && sdStep.step_order < step.step_order;
-            })
-            .map((sd) => {
-              const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
-              return {
-                step_order: sdStep?.step_order || 0,
-                data: sd.data || {},
-              };
-            })}
-          processSteps={sortedSteps}
-          onComplete={handleStepComplete}
-          onCancel={() => setActiveStepId(null)}
-        />
-      );
-    }
-
-    // Show existing data if available
-    if (data?.data && Object.keys(data.data).length > 0) {
-      return (
-        <div className="space-y-4">
-          {/* Step Status if enabled */}
-          {step.status_field?.enabled && data.data["__step_status"] && (
-            <div className="flex items-center gap-2 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
-              <span className="text-sm font-medium text-primary-700 dark:text-primary-300">Status:</span>
-              <span className="px-2 py-1 text-xs font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 rounded">
-                {step.status_field.options?.find(opt => opt.value === data.data["__step_status"])?.label || data.data["__step_status"]}
-              </span>
-            </div>
-          )}
-
-          {/* Render field data */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {step.field_definitions?.fields
-              ?.filter((field) => !field.key.startsWith("__"))
-              .map((field) => {
-                const value = data.data[field.key];
-                if (value === undefined || value === null || value === "") return null;
-
-                // Handle file fields
-                if (field.type === "file") {
-                  const files = Array.isArray(value) ? value : [value];
-                  return (
-                    <div key={field.key} className="bg-surface-primary p-3 rounded-lg border border-border-primary">
-                      <p className="text-xs font-medium text-foreground-tertiary mb-1">
-                        {field.label}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {files.map((file: any, index: number) => (
-                          <a
-                            key={index}
-                            href={getPublicFileUrl(file.path || file)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors"
-                          >
-                            <Download size={12} />
-                            {file.originalName || `File ${index + 1}`}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                }
-
-                // Handle calculated fields - just show the stored value
-                if (field.type === "calculated") {
-                  return (
-                    <div key={field.key} className="bg-surface-primary p-3 rounded-lg border border-border-primary">
-                      <p className="text-xs font-medium text-foreground-tertiary mb-1 flex items-center gap-1">
-                        <Calculator size={12} />
-                        {field.label}
-                      </p>
-                      <p className="text-sm text-foreground-primary font-medium">
-                        {formatDisplayValue(value)}
-                      </p>
-                    </div>
-                  );
-                }
-
-                return (
-                  <div key={field.key} className="bg-surface-primary p-3 rounded-lg border border-border-primary">
-                    <p className="text-xs font-medium text-foreground-tertiary mb-1">
-                      {field.label}
-                    </p>
-                    <p className="text-sm text-foreground-primary">
-                      <ValueWithMapsLink value={value} fieldKey={field.key} />
-                    </p>
-                  </div>
-                );
-              })}
-          </div>
-
-          {/* Action buttons for completed steps */}
-          {status === "completed" && canEdit && process?.allow_rollback && (
-            <div className="flex justify-end pt-2">
-              <button
-                onClick={() => handleStepRollback(step.id!)}
-                className="text-sm text-foreground-secondary hover:text-foreground-primary transition-colors"
-              >
-                Reopen Step
-              </button>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    // Show start button for pending/current steps
-    if (canEdit) {
-      return (
-        <div className="p-4 bg-background-secondary dark:bg-background-tertiary rounded-lg">
-          <button
-            onClick={() => setActiveStepId(step.id!)}
-            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
-          >
-            Start Step
-          </button>
-        </div>
-      );
-    }
-
-    return (
-      <div className="p-4 bg-background-secondary dark:bg-background-tertiary rounded-lg">
-        <p className="text-sm text-foreground-tertiary">No data submitted yet.</p>
-      </div>
-    );
   };
 
   return (
@@ -586,459 +408,607 @@ export default function OpsStakeholderDetailPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      {/* Stakeholder Info Card */}
-      <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {stakeholder.address && (
-            <div className="flex items-start gap-3">
-              <MapPin size={20} className="text-foreground-tertiary shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs text-foreground-tertiary">Address</p>
-                <p className="text-sm text-foreground-primary">{stakeholder.address}</p>
-              </div>
-            </div>
-          )}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Details */}
+        <div className="lg:col-span-1 space-y-6">
+          {/* Basic Information */}
+          <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-foreground-primary">Information</h2>
 
-          {stakeholder.kam && (
-            <div className="flex items-start gap-3">
-              <User size={20} className="text-foreground-tertiary shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs text-foreground-tertiary">Key Account Manager</p>
-                <p className="text-sm text-foreground-primary">{stakeholder.kam.name}</p>
+            {stakeholder.stakeholder_type && (
+              <div className="flex items-start gap-3">
+                <FileText className="text-foreground-tertiary mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm font-medium text-foreground-secondary">Type</p>
+                  <p className="text-sm text-foreground-secondary mt-0.5">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
+                      {stakeholder.stakeholder_type.name}
+                    </span>
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {stakeholder.created_at && (
+            {stakeholder.address && (
+              <div className="flex items-start gap-3">
+                <MapPin className="text-foreground-tertiary mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm font-medium text-foreground-secondary">Address</p>
+                  <p className="text-sm text-foreground-secondary mt-0.5">{stakeholder.address}</p>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-start gap-3">
-              <Calendar size={20} className="text-foreground-tertiary shrink-0 mt-0.5" />
+              <Calendar className="text-foreground-tertiary mt-0.5" size={18} />
               <div>
-                <p className="text-xs text-foreground-tertiary">Created</p>
-                <p className="text-sm text-foreground-primary">
-                  {new Date(stakeholder.created_at).toLocaleDateString()}
+                <p className="text-sm font-medium text-foreground-secondary">Created</p>
+                <p className="text-sm text-foreground-secondary mt-0.5">
+                  {stakeholder.created_at
+                    ? new Date(stakeholder.created_at).toLocaleDateString()
+                    : "N/A"}
                 </p>
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Contact Persons */}
-        {stakeholder.contact_persons && stakeholder.contact_persons.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-border-primary">
-            <h3 className="text-sm font-medium text-foreground-primary mb-3">Contact Persons</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {stakeholder.contact_persons.map((contact, index) => (
-                <div key={index} className="bg-background-secondary dark:bg-background-tertiary p-3 rounded-lg">
-                  <p className="font-medium text-foreground-primary text-sm">{contact.name}</p>
-                  <div className="mt-2 space-y-1">
-                    {contact.phone && (
-                      <div className="flex items-center gap-2 text-xs text-foreground-secondary">
-                        <Phone size={12} />
-                        <a href={`tel:${contact.phone}`} className="hover:text-primary-600">
-                          {contact.phone}
-                        </a>
-                      </div>
+            {stakeholder.completed_at && (
+              <div className="flex items-start gap-3">
+                <CheckCircle className="text-success mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm font-medium text-foreground-secondary">Completed</p>
+                  <p className="text-sm text-foreground-secondary mt-0.5">
+                    {new Date(stakeholder.completed_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* KAM Information */}
+            {stakeholder.kam && (
+              <div className="flex items-start gap-3">
+                <User className="text-foreground-tertiary mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm font-medium text-foreground-secondary">KAM</p>
+                  <p className="text-sm text-foreground-secondary mt-0.5">
+                    {stakeholder.kam.name}
+                    {stakeholder.kam_id === employeeInfo?.id && (
+                      <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
+                        You
+                      </span>
                     )}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Process Info */}
+            {stakeholder.process && (
+              <div className="flex items-start gap-3">
+                <FileText className="text-foreground-tertiary mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm font-medium text-foreground-secondary">Process</p>
+                  <p className="text-sm text-foreground-secondary mt-0.5">{stakeholder.process.name}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Contact Persons */}
+          <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-foreground-primary">Contact Persons</h2>
+
+            {stakeholder.contact_persons && stakeholder.contact_persons.length > 0 ? (
+              <div className="space-y-4">
+                {stakeholder.contact_persons.map((contact, index) => (
+                  <div key={index} className="border-t border-border-primary pt-4 first:border-t-0 first:pt-0">
+                    <div className="flex items-start gap-3 mb-2">
+                      <User className="text-foreground-tertiary mt-0.5" size={18} />
+                      <p className="text-sm font-medium text-foreground-primary">{contact.name}</p>
+                    </div>
                     {contact.email && (
-                      <div className="flex items-center gap-2 text-xs text-foreground-secondary">
-                        <Envelope size={12} />
-                        <a href={`mailto:${contact.email}`} className="hover:text-primary-600">
+                      <div className="flex items-center gap-3 ml-9 mb-1">
+                        <Envelope className="text-foreground-tertiary" size={16} />
+                        <a
+                          href={`mailto:${contact.email}`}
+                          className="text-sm text-primary-600 hover:underline dark:text-primary-400"
+                        >
                           {contact.email}
                         </a>
                       </div>
                     )}
+                    {contact.phone && (
+                      <div className="flex items-center gap-3 ml-9">
+                        <Phone className="text-foreground-tertiary" size={16} />
+                        <a
+                          href={`tel:${contact.phone}`}
+                          className="text-sm text-primary-600 hover:underline dark:text-primary-400"
+                        >
+                          {contact.phone}
+                        </a>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Additional Data - Only show for Permanent stakeholders */}
-      {stakeholder.status === "Permanent" && (
-        <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base sm:text-lg font-semibold text-foreground-primary">Additional Data</h2>
-            {canEditStakeholder() && (
-              <button
-                onClick={() => setShowAdditionalDataModal(true)}
-                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 dark:text-primary-400 dark:border-primary-700 dark:hover:bg-primary-950 transition-colors"
-              >
-                <PencilSimple size={16} />
-                <span className="hidden sm:inline">Edit</span>
-              </button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-foreground-tertiary">No contact persons added</p>
             )}
           </div>
 
-          {stakeholder.additional_data && Object.keys(stakeholder.additional_data).length > 0 ? (
-            <div className="space-y-4">
-              {Object.entries(stakeholder.additional_data).map(([sectionKey, sectionValue]) => {
-                // Check if this is a nested object (step-grouped data)
-                if (typeof sectionValue === "object" && sectionValue !== null && !Array.isArray(sectionValue)) {
-                  return (
-                    <div key={sectionKey} className="border border-border-secondary rounded-lg overflow-hidden">
-                      {/* Section Header */}
-                      <div className="px-3 py-2 bg-background-secondary border-b border-border-secondary">
-                        <span className="text-xs font-semibold text-foreground-secondary uppercase tracking-wide">
-                          {toHumanReadable(sectionKey)}
-                        </span>
-                      </div>
-                      {/* Section Fields */}
-                      <div className="p-3">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {Object.entries(sectionValue as Record<string, any>).map(([fieldKey, fieldValue]) => (
-                            <div key={fieldKey} className="flex items-start gap-2">
-                              <Database className="text-foreground-tertiary mt-0.5 shrink-0" size={16} />
-                              <div className="min-w-0 flex-1">
-                                <p className="text-xs font-medium text-foreground-secondary">
-                                  {toHumanReadable(fieldKey)}
-                                </p>
-                                <p className="text-xs sm:text-sm text-foreground-primary mt-0.5 wrap-break-words">
-                                  <ValueWithMapsLink value={fieldValue} fieldKey={fieldKey} />
-                                </p>
-                              </div>
+          {/* Additional Data - Only show for Permanent stakeholders */}
+          {stakeholder.status === "Permanent" && (
+            <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base sm:text-lg font-semibold text-foreground-primary">Additional Data</h2>
+                {canEditStakeholder() && (
+                  <button
+                    onClick={() => setShowAdditionalDataModal(true)}
+                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 dark:text-primary-400 dark:border-primary-700 dark:hover:bg-primary-950 transition-colors"
+                  >
+                    <PencilSimple size={16} />
+                    <span className="hidden sm:inline">Edit</span>
+                  </button>
+                )}
+              </div>
+
+              {stakeholder.additional_data && Object.keys(stakeholder.additional_data).length > 0 ? (
+                <div className="space-y-4">
+                  {Object.entries(stakeholder.additional_data).map(([sectionKey, sectionValue]) => {
+                    // Check if this is a nested object (step-grouped data)
+                    if (typeof sectionValue === "object" && sectionValue !== null && !Array.isArray(sectionValue)) {
+                      return (
+                        <div key={sectionKey} className="border border-border-secondary rounded-lg overflow-hidden">
+                          {/* Section Header */}
+                          <div className="px-3 py-2 bg-background-secondary border-b border-border-secondary">
+                            <span className="text-xs font-semibold text-foreground-secondary uppercase tracking-wide">
+                              {toHumanReadable(sectionKey)}
+                            </span>
+                          </div>
+                          {/* Section Fields */}
+                          <div className="p-3">
+                            <div className="grid grid-cols-1 gap-3">
+                              {Object.entries(sectionValue as Record<string, any>).map(([fieldKey, fieldValue]) => (
+                                <div key={fieldKey} className="flex items-start gap-2">
+                                  <Database className="text-foreground-tertiary mt-0.5 shrink-0" size={16} />
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-xs font-medium text-foreground-secondary">
+                                      {toHumanReadable(fieldKey)}
+                                    </p>
+                                    <p className="text-xs sm:text-sm text-foreground-primary mt-0.5 wrap-break-words">
+                                      <ValueWithMapsLink value={fieldValue} fieldKey={fieldKey} />
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          ))}
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    // Handle flat data (legacy format or simple values)
+                    return (
+                      <div key={sectionKey} className="flex items-start gap-3">
+                        <Database className="text-foreground-tertiary mt-0.5 shrink-0" size={18} />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs sm:text-sm font-medium text-foreground-secondary wrap-break-words">
+                            {toHumanReadable(sectionKey)}
+                          </p>
+                          <p className="text-xs sm:text-sm text-foreground-primary mt-0.5 wrap-break-words">
+                            <ValueWithMapsLink value={sectionValue} fieldKey={sectionKey} />
+                          </p>
                         </div>
                       </div>
-                    </div>
-                  );
-                }
-                
-                // Handle flat data (legacy format or simple values)
-                return (
-                  <div key={sectionKey} className="flex items-start gap-3">
-                    <Database className="text-foreground-tertiary mt-0.5 shrink-0" size={18} />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs sm:text-sm font-medium text-foreground-secondary wrap-break-words">
-                        {toHumanReadable(sectionKey)}
-                      </p>
-                      <p className="text-xs sm:text-sm text-foreground-primary mt-0.5 wrap-break-words">
-                        <ValueWithMapsLink value={sectionValue} fieldKey={sectionKey} />
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-4">
-              <p className="text-xs sm:text-sm text-foreground-tertiary">
-                No additional data added. {canEditStakeholder() && 'Click "Edit" to add data.'}
-              </p>
-              {canEditStakeholder() && (
-                <button
-                  onClick={() => setShowAdditionalDataModal(true)}
-                  className="mt-2 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                >
-                  Add Data Now
-                </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-xs sm:text-sm text-foreground-tertiary">
+                  No additional data added. {canEditStakeholder() && 'Click "Edit" to add data.'}
+                </p>
               )}
             </div>
           )}
         </div>
-      )}
 
-      {/* Step Data Summary - Show all completed step data */}
-      {stepData.length > 0 && (
-        <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 mb-6">
-          <h2 className="text-base sm:text-lg font-semibold text-foreground-primary mb-4">Completed Step Data</h2>
-          <div className="space-y-4">
-            {sortedSteps.map((step) => {
-              const stepDataEntry = stepData.find((sd) => sd.step_id === step.id);
-              if (!stepDataEntry?.is_completed || !stepDataEntry.data || Object.keys(stepDataEntry.data).length === 0) {
-                return null;
-              }
+        {/* Right Column - Process Steps & Tabs */}
+        <div className="lg:col-span-2">
+          {/* Tabs Container */}
+          <div className="bg-surface-primary rounded-lg border border-border-primary overflow-hidden">
+            <div className="border-b border-border-primary">
+              <div className="flex overflow-x-auto">
+                <button
+                  onClick={() => setActiveTab("process")}
+                  className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+                    activeTab === "process"
+                      ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
+                      : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:hover:bg-background-tertiary"
+                  }`}
+                >
+                  Process Steps
+                </button>
+                <button
+                  onClick={() => setActiveTab("issues")}
+                  className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+                    activeTab === "issues"
+                      ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
+                      : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:hover:bg-background-tertiary"
+                  }`}
+                >
+                  Tickets
+                </button>
+                {stakeholder.status === "Permanent" && (
+                  <button
+                    onClick={() => setActiveTab("transactions")}
+                    className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2 ${
+                      activeTab === "transactions"
+                        ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
+                        : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:hover:bg-background-tertiary"
+                    }`}
+                  >
+                    <CurrencyDollar size={16} />
+                    Transactions
+                  </button>
+                )}
+              </div>
+            </div>
 
-              return (
-                <div key={step.id} className="border border-border-secondary rounded-lg overflow-hidden">
-                  {/* Step Header */}
-                  <div className="px-3 py-2 bg-background-secondary border-b border-border-secondary flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle size={16} className="text-success" />
-                      <span className="text-xs font-semibold text-foreground-secondary uppercase tracking-wide">
-                        Step {step.step_order}: {step.name}
-                      </span>
+            {/* Tab Content */}
+            <div className="p-4 sm:p-6">
+              {activeTab === "process" && (
+                <>
+                  <h2 className="text-base sm:text-lg font-semibold text-foreground-primary mb-4 sm:mb-6">Process Steps</h2>
+
+                  {sortedSteps.length === 0 ? (
+                    <div className="text-center py-8 sm:py-12 text-sm sm:text-base text-foreground-tertiary">
+                      No steps configured for this process
                     </div>
-                    {stepDataEntry.completed_at && (
-                      <span className="text-xs text-foreground-tertiary">
-                        {new Date(stepDataEntry.completed_at).toLocaleDateString()}
-                      </span>
-                    )}
-                  </div>
-                  {/* Step Fields */}
-                  <div className="p-3">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {Object.entries(stepDataEntry.data).map(([key, value]) => {
-                        // Skip internal fields
-                        if (key.startsWith('__')) return null;
+                  ) : (
+                    <div className="space-y-3 sm:space-y-4">
+                      {sortedSteps.map((step) => {
+                        const stepDataEntry = stepData.find((sd) => sd.step_id === step.id);
+                        const isCompleted = stepDataEntry?.is_completed || false;
+                        const isCurrent = stakeholder.current_step_id === step.id;
+                        const isSequential = stakeholder.process?.is_sequential || false;
 
-                        // Get field definition
-                        const fieldDef = step.field_definitions?.fields?.find((f) => f.key === key);
-                        const isFileField = fieldDef?.type === 'file';
-                        const isMultiSelect = fieldDef?.type === 'multi_select';
-                        const isGeolocation = fieldDef?.type === 'geolocation';
-                        const isCalculated = fieldDef?.type === 'calculated';
-                        const isNumber = fieldDef?.type === 'number';
-                        const fieldLabel = fieldDef?.label || toHumanReadable(key);
+                        // Check team access
+                        const stepTeamIds = step.team_ids && Array.isArray(step.team_ids) && step.team_ids.length > 0 
+                          ? step.team_ids 
+                          : [];
+                        const stepHasTeams = stepTeamIds.length > 0;
+                        const isTeamMember = stepHasTeams && stepTeamIds.some(teamId => userTeamIds.includes(teamId));
+                        const isKam = stakeholder.kam_id === employeeInfo?.id;
+                        const hasWritePermission = canWrite(PERMISSION_MODULES.STAKEHOLDERS);
+                        const hasTeamAccess = isKam || hasWritePermission || (stepHasTeams ? isTeamMember : hasWritePermission);
 
-                        // Extract actual value from nested format
-                        const extractActualValue = (val: any) => {
-                          if (val && typeof val === 'object' && 'value' in val) {
-                            return val.value;
-                          }
-                          return val;
-                        };
+                        // Determine if step can be edited (incomplete steps)
+                        const canEdit = !isCompleted && hasTeamAccess && (isSequential ? isCurrent : true);
 
-                        const actualValue = extractActualValue(value);
+                        // Determine if completed step can be edited (for users with team access)
+                        const canEditCompleted = isCompleted && hasTeamAccess;
 
-                        // Format value based on field type
-                        const formatValue = () => {
-                          if (typeof actualValue === "boolean") {
-                            return actualValue ? "Yes" : "No";
-                          }
-                          if (isMultiSelect && Array.isArray(actualValue)) {
-                            if (actualValue.length === 0) return "None selected";
-                            const options = fieldDef?.options || [];
-                            const labels = actualValue.map(val => {
-                              const option = options.find(opt => opt.value === val);
-                              return option ? option.label : toHumanReadable(val);
-                            });
-                            return labels.join(", ");
-                          }
-                          if (fieldDef?.type === 'dropdown' && typeof actualValue === 'string') {
-                            const options = fieldDef?.options || [];
-                            const option = options.find(opt => opt.value === actualValue);
-                            return option ? option.label : toHumanReadable(actualValue);
-                          }
-                          if (isGeolocation && typeof actualValue === 'object' && actualValue !== null && 'latitude' in actualValue && 'longitude' in actualValue) {
-                            return `${actualValue.latitude}, ${actualValue.longitude}`;
-                          }
-                          if (isNumber) {
-                            return typeof actualValue === 'number' ? actualValue.toLocaleString() : String(actualValue);
-                          }
-                          if (typeof actualValue === 'string' && actualValue.includes('_')) {
-                            return toHumanReadable(actualValue);
-                          }
-                          return formatDisplayValue(actualValue);
-                        };
+                        // Determine if this step can be rolled back
+                        const canRollback = isCompleted && stakeholder.process?.allow_rollback && hasTeamAccess && step.id;
 
-                        // Get file info helper
-                        const getFileInfo = () => {
-                          if (typeof value === 'object' && value !== null && 'path' in value) {
-                            return {
-                              url: getPublicFileUrl(value.path),
-                              name: value.originalName || value.path.split('/').pop(),
-                              size: value.size,
-                            };
-                          } else if (typeof value === 'string') {
-                            return {
-                              url: getPublicFileUrl(value),
-                              name: value.split('/').pop(),
-                            };
-                          }
-                          return null;
-                        };
-
-                        const fileInfo = isFileField ? getFileInfo() : null;
-
-                        // Render calculated fields
-                        if (isCalculated && fieldDef?.formula) {
-                          return (
-                            <div key={key} className="col-span-2">
-                              <p className="text-xs font-medium text-foreground-tertiary uppercase flex items-center gap-1">
-                                <Calculator size={12} />
-                                {fieldLabel}
-                                <span className="ml-1 px-1.5 py-0.5 bg-success/10 text-success dark:bg-success/20 text-[10px] rounded normal-case">
-                                  Calculated
-                                </span>
-                              </p>
-                              <p className="text-sm font-semibold text-foreground-primary mt-1">
-                                {actualValue !== null && actualValue !== undefined 
-                                  ? formatCalculatedValue(actualValue) 
-                                  : "—"}
-                              </p>
-                              <p className="text-xs text-foreground-tertiary mt-1">
-                                Formula: <code className="bg-background-tertiary dark:bg-surface-secondary px-1 py-0.5 rounded">{formulaToReadable(fieldDef.formula, sortedSteps)}</code>
-                              </p>
-                            </div>
-                          );
-                        }
+                        const status = getStepStatus(step);
 
                         return (
-                          <div key={key}>
-                            <p className="text-xs font-medium text-foreground-tertiary uppercase">
-                              {fieldLabel}
-                            </p>
-                            {isFileField && fileInfo ? (
-                              <div className="mt-1">
-                                <a
-                                  href={fileInfo.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-                                >
-                                  <FileText size={16} />
-                                  <span className="truncate">{fileInfo.name}</span>
-                                  <Download size={14} />
-                                </a>
-                                {fileInfo.size && (
-                                  <p className="text-xs text-foreground-tertiary mt-1">
-                                    {(fileInfo.size / 1024).toFixed(2)} KB
-                                  </p>
-                                )}
+                          <div
+                            key={step.id}
+                            className={`border rounded-lg ${
+                              isCompleted
+                                ? "border-success/50 bg-success/5 dark:bg-success/10"
+                                : isCurrent
+                                  ? "border-primary-300 bg-primary-50 dark:bg-primary-950 dark:border-primary-700"
+                                  : canEdit && !isSequential
+                                    ? "border-primary-200 bg-primary-50/50 dark:border-primary-800 dark:bg-primary-950/50"
+                                    : "border-border-primary bg-surface-secondary"
+                            }`}
+                          >
+                            <div className="p-3 sm:p-4">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                                <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                                  <div
+                                    className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-medium shrink-0 ${
+                                      isCompleted
+                                        ? "bg-success text-white"
+                                        : isCurrent
+                                          ? "bg-info text-white"
+                                          : "bg-background-tertiary text-foreground-secondary dark:bg-surface-secondary"
+                                    }`}
+                                  >
+                                    {isCompleted ? (
+                                      <CheckCircle size={16} />
+                                    ) : (
+                                      <span>{step.step_order}</span>
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h3 className="text-sm sm:text-base font-semibold text-foreground-primary">{step.name}</h3>
+                                    {step.description && (
+                                      <p className="text-xs sm:text-sm text-foreground-secondary mt-1">{step.description}</p>
+                                    )}
+                                    <div className="flex items-center flex-wrap gap-2 sm:gap-4 mt-2 text-xs text-foreground-tertiary">
+                                      <span>
+                                        {step.teams && step.teams.length > 1 ? "Teams: " : "Team: "}
+                                        {step.teams && step.teams.length > 0 ? (
+                                          step.teams.map((team, idx) => (
+                                            <span key={team.id}>
+                                              {team.name}
+                                              {idx < step.teams!.length - 1 && ", "}
+                                            </span>
+                                          ))
+                                        ) : step.team?.name ? (
+                                          step.team.name
+                                        ) : (
+                                          "N/A"
+                                        )}
+                                      </span>
+                                    </div>
+                                    {/* Show permission/access warnings */}
+                                    {!isCompleted && !hasTeamAccess && (
+                                      <div className="mt-2 text-xs text-warning bg-warning/10 px-2 py-1 rounded dark:bg-warning/20">
+                                        You must be a member of {
+                                          step.teams && step.teams.length > 0 
+                                            ? `one of these teams: ${step.teams.map(t => t.name).join(', ')}`
+                                            : step.team?.name 
+                                              ? `the ${step.team.name} team`
+                                              : "the assigned team"
+                                        } to work on this step
+                                      </div>
+                                    )}
+                                    {!isCompleted && hasTeamAccess && isSequential && !isCurrent && (
+                                      <div className="mt-2 text-xs text-foreground-secondary bg-background-secondary dark:bg-background-tertiary px-2 py-1 rounded">
+                                        This step will become available after completing the previous steps
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 shrink-0 sm:flex-col sm:items-end">
+                                  {canEdit && (
+                                    <button
+                                      onClick={() =>
+                                        setActiveStepId(activeStepId === step.id ? null : (step.id || null))
+                                      }
+                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white text-xs sm:text-sm rounded-lg hover:bg-primary-700 whitespace-nowrap"
+                                    >
+                                      {activeStepId === step.id ? "Cancel" : "Work on Step"}
+                                    </button>
+                                  )}
+                                  {canEditCompleted && (
+                                    <button
+                                      onClick={() =>
+                                        setActiveStepId(activeStepId === step.id ? null : (step.id || null))
+                                      }
+                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white text-xs sm:text-sm rounded-lg hover:bg-primary-700 whitespace-nowrap flex items-center gap-1 sm:gap-2"
+                                    >
+                                      <PencilSimple size={14} />
+                                      {activeStepId === step.id ? "Cancel" : "Edit Step"}
+                                    </button>
+                                  )}
+                                  {canRollback && activeStepId !== step.id && (
+                                    <button
+                                      onClick={() => {
+                                        if (window.confirm(`Are you sure you want to rollback "${step.name}"?`)) {
+                                          handleStepRollback(step.id!);
+                                        }
+                                      }}
+                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-amber-600 text-white text-xs sm:text-sm rounded-lg hover:bg-amber-700 flex items-center gap-1 sm:gap-2 whitespace-nowrap"
+                                      title="Rollback this step"
+                                    >
+                                      <ArrowLeft size={14} />
+                                      <span className="hidden sm:inline">Rollback</span>
+                                      <span className="sm:hidden">Back</span>
+                                    </button>
+                                  )}
+                                </div>
                               </div>
-                            ) : isGeolocation && typeof actualValue === 'object' && actualValue !== null && 'latitude' in actualValue && 'longitude' in actualValue ? (
-                              <div className="mt-1">
-                                <p className="text-sm text-foreground-primary flex items-center gap-2">
-                                  <MapPin size={14} className="text-foreground-tertiary" />
-                                  {actualValue.latitude.toFixed(6)}, {actualValue.longitude.toFixed(6)}
-                                </p>
-                                <a
-                                  href={`https://www.google.com/maps?q=${actualValue.latitude},${actualValue.longitude}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-xs text-primary-600 hover:underline mt-1 inline-block dark:text-primary-400"
-                                >
-                                  View on Google Maps
-                                </a>
-                              </div>
-                            ) : (
-                              <p className="text-sm text-foreground-primary mt-1">
-                                {formatValue()}
-                              </p>
-                            )}
+
+                              {/* Step Data Form - Show for both incomplete and completed steps being edited */}
+                              {activeStepId === step.id && (canEdit || canEditCompleted) && step.id && (
+                                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border-primary">
+                                  <StepDataForm
+                                    stakeholderId={stakeholderId}
+                                    step={step}
+                                    existingData={stepDataEntry}
+                                    completedStepsData={stepData
+                                      .filter((sd) => {
+                                        const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
+                                        return sdStep && sdStep.step_order < step.step_order;
+                                      })
+                                      .map((sd) => {
+                                        const sdStep = sortedSteps.find((s) => s.id === sd.step_id);
+                                        return {
+                                          step_order: sdStep?.step_order || 0,
+                                          data: sd.data || {},
+                                        };
+                                      })}
+                                    processSteps={sortedSteps}
+                                    onComplete={handleStepComplete}
+                                    onCancel={() => setActiveStepId(null)}
+                                    isEditMode={isCompleted}
+                                  />
+                                </div>
+                              )}
+
+                              {/* Display Completed Data - Only show when not actively editing */}
+                              {isCompleted && stepDataEntry && activeStepId !== step.id && (
+                                <div className="mt-4 pt-4 border-t border-border-primary">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {Object.entries(stepDataEntry.data).map(([key, value]) => {
+                                      // Skip internal fields
+                                      if (key.startsWith('__')) return null;
+
+                                      // Get field definition
+                                      const fieldDef = step.field_definitions?.fields?.find((f) => f.key === key);
+                                      const isFileField = fieldDef?.type === 'file';
+                                      const isMultiSelect = fieldDef?.type === 'multi_select';
+                                      const isGeolocation = fieldDef?.type === 'geolocation';
+                                      const isCalculated = fieldDef?.type === 'calculated';
+                                      const isNumber = fieldDef?.type === 'number';
+                                      const fieldLabel = fieldDef?.label || toHumanReadable(key);
+
+                                      // Helper to extract actual value from nested format
+                                      const extractActualValue = (val: any) => {
+                                        if (val && typeof val === 'object' && 'value' in val) {
+                                          return val.value;
+                                        }
+                                        return val;
+                                      };
+
+                                      const actualValue = extractActualValue(value);
+
+                                      // Helper to format value based on field type
+                                      const formatValue = () => {
+                                        if (typeof actualValue === "boolean") {
+                                          return actualValue ? "Yes" : "No";
+                                        }
+                                        if (isMultiSelect && Array.isArray(actualValue)) {
+                                          if (actualValue.length === 0) return "None selected";
+                                          const options = fieldDef?.options || [];
+                                          const labels = actualValue.map(val => {
+                                            const option = options.find(opt => opt.value === val);
+                                            return option ? option.label : toHumanReadable(val);
+                                          });
+                                          return labels.join(", ");
+                                        }
+                                        if (fieldDef?.type === 'dropdown' && typeof actualValue === 'string') {
+                                          const options = fieldDef?.options || [];
+                                          const option = options.find(opt => opt.value === actualValue);
+                                          return option ? option.label : toHumanReadable(actualValue);
+                                        }
+                                        if (isGeolocation && typeof actualValue === 'object' && actualValue !== null && 'latitude' in actualValue && 'longitude' in actualValue) {
+                                          return `${actualValue.latitude}, ${actualValue.longitude}`;
+                                        }
+                                        if (isNumber) {
+                                          return typeof actualValue === 'number' ? actualValue.toLocaleString() : String(actualValue);
+                                        }
+                                        if (typeof actualValue === 'string' && actualValue.includes('_')) {
+                                          return toHumanReadable(actualValue);
+                                        }
+                                        return formatDisplayValue(actualValue);
+                                      };
+
+                                      // Helper to get file info
+                                      const getFileInfo = () => {
+                                        if (typeof value === 'object' && value !== null && 'path' in value) {
+                                          return {
+                                            url: getPublicFileUrl(value.path),
+                                            name: value.originalName || value.path.split('/').pop(),
+                                            size: value.size,
+                                          };
+                                        } else if (typeof value === 'string') {
+                                          return {
+                                            url: getPublicFileUrl(value),
+                                            name: value.split('/').pop(),
+                                          };
+                                        }
+                                        return null;
+                                      };
+
+                                      const fileInfo = isFileField ? getFileInfo() : null;
+
+                                      // Render calculated fields with stored value
+                                      if (isCalculated && fieldDef?.formula) {
+                                        return (
+                                          <div key={key} className="col-span-2">
+                                            <p className="text-xs font-medium text-foreground-tertiary uppercase flex items-center gap-1">
+                                              <Calculator size={12} />
+                                              {fieldLabel}
+                                              <span className="ml-2 px-1.5 py-0.5 bg-success/10 text-success dark:bg-success/20 text-xs rounded normal-case">
+                                                Calculated
+                                              </span>
+                                            </p>
+                                            <div className="mt-1 flex items-baseline gap-3">
+                                              <p className="text-lg font-semibold text-foreground-primary">
+                                                {actualValue !== null && actualValue !== undefined 
+                                                  ? formatCalculatedValue(actualValue) 
+                                                  : "—"}
+                                              </p>
+                                            </div>
+                                            <p className="text-xs text-foreground-tertiary mt-1">
+                                              Formula: <code className="bg-background-tertiary dark:bg-surface-secondary px-1 py-0.5 rounded">{formulaToReadable(fieldDef.formula, sortedSteps)}</code>
+                                            </p>
+                                          </div>
+                                        );
+                                      }
+
+                                      return (
+                                        <div key={key}>
+                                          <p className="text-xs font-medium text-foreground-tertiary uppercase">
+                                            {fieldLabel}
+                                          </p>
+                                          {isFileField && fileInfo ? (
+                                            <div className="mt-1">
+                                              <a
+                                                href={fileInfo.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                                              >
+                                                <FileText size={16} />
+                                                <span className="truncate">{fileInfo.name}</span>
+                                                <Download size={14} />
+                                              </a>
+                                              {fileInfo.size && (
+                                                <p className="text-xs text-foreground-tertiary mt-1">
+                                                  {(fileInfo.size / 1024).toFixed(2)} KB
+                                                </p>
+                                              )}
+                                            </div>
+                                          ) : isGeolocation && typeof actualValue === 'object' && actualValue !== null && 'latitude' in actualValue && 'longitude' in actualValue ? (
+                                            <div className="mt-1">
+                                              <p className="text-sm text-foreground-primary flex items-center gap-2">
+                                                <MapPin size={14} className="text-foreground-tertiary" />
+                                                {actualValue.latitude.toFixed(6)}, {actualValue.longitude.toFixed(6)}
+                                              </p>
+                                              <a
+                                                href={`https://www.google.com/maps?q=${actualValue.latitude},${actualValue.longitude}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-xs text-primary-600 hover:underline mt-1 inline-block dark:text-primary-400"
+                                              >
+                                                View on Google Maps
+                                              </a>
+                                            </div>
+                                          ) : (
+                                            <p className="text-sm text-foreground-primary mt-1">
+                                              {formatValue()}
+                                            </p>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                  {stepDataEntry.completed_at && (
+                                    <p className="text-xs text-foreground-tertiary mt-4">
+                                      Completed on{" "}
+                                      {new Date(stepDataEntry.completed_at).toLocaleDateString()}
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         );
                       })}
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+                  )}
+                </>
+              )}
+
+              {activeTab === "issues" && (
+                <StakeholderIssuesTab stakeholderId={stakeholderId} />
+              )}
+
+              {activeTab === "transactions" && stakeholder.status === "Permanent" && (
+                <StakeholderTransactions stakeholderId={stakeholderId} stakeholderName={stakeholder.name} />
+              )}
+            </div>
           </div>
         </div>
-      )}
-
-      {/* Tabs */}
-      <div className="border-b border-border-primary mb-6">
-        <div className="flex gap-1 overflow-x-auto">
-          {stakeholder.status !== "Permanent" && (
-            <button
-              onClick={() => setActiveTab("process")}
-              className={`px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
-                activeTab === "process"
-                  ? "text-primary-600 border-b-2 border-primary-600"
-                  : "text-foreground-secondary hover:text-foreground-primary"
-              }`}
-            >
-              Process
-            </button>
-          )}
-          <button
-            onClick={() => setActiveTab("issues")}
-            className={`px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
-              activeTab === "issues"
-                ? "text-primary-600 border-b-2 border-primary-600"
-                : "text-foreground-secondary hover:text-foreground-primary"
-            }`}
-          >
-            Tickets
-          </button>
-          {stakeholder.status === "Permanent" && (
-            <button
-              onClick={() => setActiveTab("transactions")}
-              className={`px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
-                activeTab === "transactions"
-                  ? "text-primary-600 border-b-2 border-primary-600"
-                  : "text-foreground-secondary hover:text-foreground-primary"
-              }`}
-            >
-              Transactions
-            </button>
-          )}
-        </div>
       </div>
-
-      {/* Tab Content */}
-      {activeTab === "process" && stakeholder.status !== "Permanent" && (
-        <div className="space-y-4">
-          {sortedSteps.length === 0 ? (
-            <div className="text-center py-8 bg-surface-primary rounded-lg border border-border-primary">
-              <p className="text-foreground-tertiary">No process steps defined</p>
-            </div>
-          ) : (
-            sortedSteps.map((step) => {
-              const status = getStepStatus(step);
-              return (
-                <div
-                  key={step.id}
-                  className={`bg-surface-primary rounded-lg border ${
-                    status === "current"
-                      ? "border-primary-500"
-                      : status === "completed"
-                      ? "border-success"
-                      : "border-border-primary"
-                  } overflow-hidden`}
-                >
-                  <div className="p-4 border-b border-border-primary">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                            status === "completed"
-                              ? "bg-success/10 text-success"
-                              : status === "current"
-                              ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
-                              : "bg-background-tertiary text-foreground-tertiary"
-                          }`}
-                        >
-                          {status === "completed" ? <CheckCircle size={18} /> : step.step_order}
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-foreground-primary">{step.name}</h3>
-                          {step.description && (
-                            <p className="text-xs text-foreground-tertiary">{step.description}</p>
-                          )}
-                        </div>
-                      </div>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          status === "completed"
-                            ? "bg-success/10 text-success"
-                            : status === "current"
-                            ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
-                            : status === "locked"
-                            ? "bg-background-tertiary text-foreground-tertiary"
-                            : "bg-warning/10 text-warning"
-                        }`}
-                      >
-                        {status === "completed"
-                          ? "Completed"
-                          : status === "current"
-                          ? "In Progress"
-                          : status === "locked"
-                          ? "Locked"
-                          : "Pending"}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-4">{renderStepContent(step)}</div>
-                </div>
-              );
-            })
-          )}
-        </div>
-      )}
-
-      {activeTab === "issues" && (
-        <StakeholderIssuesTab stakeholderId={stakeholderId} />
-      )}
-
-      {activeTab === "transactions" && stakeholder.status === "Permanent" && (
-        <StakeholderTransactions stakeholderId={stakeholderId} stakeholderName={stakeholder.name} />
-      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (

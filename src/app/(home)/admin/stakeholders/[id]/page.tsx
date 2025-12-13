@@ -737,6 +737,9 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                           hasTeamAccess &&
                           (isSequential ? isCurrent : true);
 
+                        // Allow editing completed steps if user has team access
+                        const canEditCompleted = isCompleted && hasTeamAccess;
+
                         // Determine if this step can be rolled back
                         // Allow rollback of any completed step when rollback is enabled
                         const canRollback = (() => {
@@ -832,7 +835,18 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       {activeStepId === step.id ? "Cancel" : "Work on Step"}
                                     </button>
                                   )}
-                                  {canRollback && (
+                                  {canEditCompleted && (
+                                    <button
+                                      onClick={() =>
+                                        setActiveStepId(activeStepId === step.id ? null : (step.id || null))
+                                      }
+                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white text-xs sm:text-sm rounded-lg hover:bg-primary-700 whitespace-nowrap flex items-center gap-1 sm:gap-2"
+                                    >
+                                      <PencilSimple size={14} />
+                                      {activeStepId === step.id ? "Cancel" : "Edit Step"}
+                                    </button>
+                                  )}
+                                  {canRollback && activeStepId !== step.id && (
                                     <button
                                       onClick={() => {
                                         // For sequential processes, calculate how many steps will be affected
@@ -868,8 +882,8 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                 </div>
                               </div>
 
-                              {/* Step Data Form */}
-                              {activeStepId === step.id && canEdit && step.id && (
+                              {/* Step Data Form - Show for both incomplete and completed steps being edited */}
+                              {activeStepId === step.id && (canEdit || canEditCompleted) && step.id && (
                                 <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border-primary">
                                   <StepDataForm
                                     stakeholderId={stakeholderId}
@@ -891,12 +905,13 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                     processSteps={sortedSteps}
                                     onComplete={handleStepComplete}
                                     onCancel={() => setActiveStepId(null)}
+                                    isEditMode={isCompleted}
                                   />
                                 </div>
                               )}
 
-                              {/* Display Completed Data */}
-                              {isCompleted && stepDataEntry && (
+                              {/* Display Completed Data - Only show when not actively editing */}
+                              {isCompleted && stepDataEntry && activeStepId !== step.id && (
                                 <div className="mt-4 pt-4 border-t border-border-primary">
                                   <div className="grid grid-cols-2 gap-4">
                                     {Object.entries(stepDataEntry.data).map(([key, value]) => {
