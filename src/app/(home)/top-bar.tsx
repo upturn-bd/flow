@@ -65,12 +65,10 @@ export default function TopBar() {
   const { moduleName, moduleCategory } = getModuleInfo(pathname);
   const showReportProblem = REPORT_ENABLED_ROUTES.some(route => pathname.startsWith(route));
   
-  // Notification hook
+  // Notification hook - realtime handles all updates
   const { 
-    fetchUnreadCount, 
     unreadCount, 
-    notifications, // Get notifications from real-time hook
-    fetchUserNotifications,
+    notifications,
     markAsRead,
     deleteNotification 
   } = useNotifications();
@@ -86,14 +84,6 @@ export default function TopBar() {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
-
-  // Initial fetch only - real-time will handle updates
-  useEffect(() => {
-    if (isApproved) {
-      // Initial fetch of unread count
-      fetchUnreadCount();
-    }
-  }, [isApproved, fetchUnreadCount]);
 
   // Watch for new notifications and show modal
   useEffect(() => {
@@ -152,12 +142,10 @@ export default function TopBar() {
 
   const handleMarkAsRead = async (id: number) => {
     await markAsRead(id);
-    await fetchUnreadCount();
   };
 
   const handleDeleteNotification = async (id: number) => {
     await deleteNotification(id);
-    await fetchUnreadCount();
   };
 
   if (!isAuthorized) return null;

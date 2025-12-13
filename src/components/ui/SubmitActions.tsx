@@ -20,7 +20,7 @@ export default function SubmitActions({
   isDirty,
   isValid,
   onCancel,
-  submitText = "FloppyDisk Changes",
+  submitText = "Save Changes",
   cancelText = "Cancel",
   className = "",
   disabled = false,

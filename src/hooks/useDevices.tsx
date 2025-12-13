@@ -11,6 +11,7 @@ export interface DeviceRequest {
   created_at: string;
   // Joined from employees table
   employee?: {
+    id: string;
     name: string;
     email: string;
     designation: string | null;
