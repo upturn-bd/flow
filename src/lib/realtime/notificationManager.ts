@@ -1,11 +1,13 @@
 // Global real-time notification manager
-// This ensures only ONE subscription exists across the entire app
+// Single WebSocket subscription per user for instant notifications
 
 import { supabase } from "@/lib/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import type { Notification } from "@/lib/types/schemas";
 
 type NotificationCallback = (notifications: Notification[], unreadCount: number) => void;
+
+const NOTIFICATION_LIMIT = 20;
 
 class NotificationManager {
   private channel: RealtimeChannel | null = null;
@@ -18,21 +20,26 @@ class NotificationManager {
   subscribe(callback: NotificationCallback, userId: string, companyId: number) {
     this.subscribers.add(callback);
     
-    // If this is the first subscriber or user changed, set up the channel
-    if (!this.channel || this.userId !== userId || this.companyId !== companyId) {
+    // If user changed, reset and reconnect
+    if (this.userId !== userId || this.companyId !== companyId) {
       this.userId = userId;
       this.companyId = companyId;
+      this.notifications = [];
+      this.unreadCount = 0;
+      
+      if (this.channel) {
+        supabase.removeChannel(this.channel);
+        this.channel = null;
+      }
+      
       this.setupChannel();
     } else {
-      // Immediately notify new subscriber with current state
+      // Same user, give them current state immediately
       callback(this.notifications, this.unreadCount);
     }
 
-    // Return unsubscribe function
     return () => {
       this.subscribers.delete(callback);
-      
-      // If no more subscribers, clean up the channel
       if (this.subscribers.size === 0) {
         this.cleanup();
       }
@@ -42,17 +49,12 @@ class NotificationManager {
   private async setupChannel() {
     if (!this.userId || !this.companyId) return;
 
-    // Clean up existing channel
-    if (this.channel) {
-      await supabase.removeChannel(this.channel);
-    }
+    console.log('[NotificationManager] Setting up realtime for user:', this.userId);
 
-    console.log('[NotificationManager] Setting up channel for user:', this.userId);
-
-    // Fetch initial data
+    // Fetch initial notifications (single query)
     await this.fetchNotifications();
 
-    // Set up real-time subscription
+    // Subscribe to realtime changes
     const channelName = `notifications:${this.userId}:${this.companyId}`;
     
     this.channel = supabase
@@ -65,13 +67,13 @@ class NotificationManager {
           table: 'notifications',
           filter: `recipient_id=eq.${this.userId}`,
         },
-        async (payload) => {
-          console.log('[NotificationManager] Real-time event:', payload.eventType);
-          await this.handleRealtimeEvent(payload);
+        (payload) => {
+          console.log('[NotificationManager] Realtime event:', payload.eventType);
+          this.handleRealtimeEvent(payload);
         }
       )
       .subscribe((status) => {
-        console.log('[NotificationManager] Subscription status:', status);
+        console.log('[NotificationManager] Channel status:', status);
       });
   }
 
@@ -79,59 +81,57 @@ class NotificationManager {
     if (!this.userId || !this.companyId) return;
 
     try {
-      const { data: notificationData } = await supabase
+      const { data, error } = await supabase
         .from('notifications')
         .select(`*, type:notification_types(*)`)
         .eq('company_id', this.companyId)
         .eq('recipient_id', this.userId)
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(NOTIFICATION_LIMIT);
 
-      const { count } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('company_id', this.companyId)
-        .eq('recipient_id', this.userId)
-        .eq('is_read', false);
+      if (error) throw error;
 
-      this.notifications = notificationData || [];
-      this.unreadCount = count || 0;
+      this.notifications = data || [];
+      this.unreadCount = this.notifications.filter(n => !n.is_read).length;
       
-      console.log('[NotificationManager] Fetched:', this.notifications.length, 'notifications,', this.unreadCount, 'unread');
-      
+      console.log('[NotificationManager] Loaded:', this.notifications.length, 'notifications,', this.unreadCount, 'unread');
       this.notifySubscribers();
     } catch (error) {
       console.error('[NotificationManager] Fetch error:', error);
     }
   }
 
-  private async handleRealtimeEvent(payload: any) {
+  private handleRealtimeEvent(payload: any) {
     if (payload.eventType === 'INSERT') {
-      const newNotification = payload.new;
-      
-      // Fetch with type information
-      const { data } = await supabase
-        .from('notifications')
-        .select(`*, type:notification_types(*)`)
-        .eq('id', newNotification.id)
-        .single();
-
-      if (data) {
-        this.notifications = [data, ...this.notifications];
-        if (!data.is_read) {
-          this.unreadCount++;
-        }
-        this.notifySubscribers();
+      const newNotification = payload.new as Notification;
+      this.notifications = [newNotification, ...this.notifications].slice(0, NOTIFICATION_LIMIT);
+      if (!newNotification.is_read) {
+        this.unreadCount++;
       }
+      this.notifySubscribers();
+      
     } else if (payload.eventType === 'UPDATE') {
-      const updatedNotification = payload.new;
+      const updated = payload.new as Notification;
+      const old = this.notifications.find(n => n.id === updated.id);
+      
       this.notifications = this.notifications.map(n =>
-        n.id === updatedNotification.id ? { ...n, ...updatedNotification } : n
+        n.id === updated.id ? { ...n, ...updated } : n
       );
-      await this.fetchNotifications(); // Refresh unread count
+      
+      // Adjust unread count if is_read changed
+      if (old && old.is_read !== updated.is_read) {
+        this.unreadCount += updated.is_read ? -1 : 1;
+        this.unreadCount = Math.max(0, this.unreadCount);
+      }
+      this.notifySubscribers();
+      
     } else if (payload.eventType === 'DELETE') {
+      const deleted = this.notifications.find(n => n.id === payload.old.id);
       this.notifications = this.notifications.filter(n => n.id !== payload.old.id);
-      await this.fetchNotifications(); // Refresh unread count
+      if (deleted && !deleted.is_read) {
+        this.unreadCount = Math.max(0, this.unreadCount - 1);
+      }
+      this.notifySubscribers();
     }
   }
 
@@ -142,28 +142,49 @@ class NotificationManager {
   }
 
   private cleanup() {
-    console.log('[NotificationManager] Cleaning up channel');
+    console.log('[NotificationManager] Cleanup');
     if (this.channel) {
       supabase.removeChannel(this.channel);
       this.channel = null;
     }
     this.userId = null;
     this.companyId = null;
+    this.notifications = [];
+    this.unreadCount = 0;
   }
 
-  async refetchUnreadCount() {
-    if (!this.userId || !this.companyId) return 0;
+  // Optimistic local updates (UI updates instantly, realtime syncs from DB)
+  markAsReadLocally(notificationId: number) {
+    const notification = this.notifications.find(n => n.id === notificationId);
+    if (notification && !notification.is_read) {
+      this.notifications = this.notifications.map(n =>
+        n.id === notificationId ? { ...n, is_read: true } : n
+      );
+      this.unreadCount = Math.max(0, this.unreadCount - 1);
+      this.notifySubscribers();
+    }
+  }
 
-    const { count } = await supabase
-      .from('notifications')
-      .select('*', { count: 'exact', head: true })
-      .eq('company_id', this.companyId)
-      .eq('recipient_id', this.userId)
-      .eq('is_read', false);
-
-    this.unreadCount = count || 0;
+  markAllAsReadLocally() {
+    this.notifications = this.notifications.map(n => ({ ...n, is_read: true }));
+    this.unreadCount = 0;
     this.notifySubscribers();
-    return this.unreadCount;
+  }
+
+  removeLocally(notificationId: number) {
+    const notification = this.notifications.find(n => n.id === notificationId);
+    if (notification) {
+      this.notifications = this.notifications.filter(n => n.id !== notificationId);
+      if (!notification.is_read) {
+        this.unreadCount = Math.max(0, this.unreadCount - 1);
+      }
+      this.notifySubscribers();
+    }
+  }
+
+  // Force refresh (for error recovery)
+  async refetchAll() {
+    await this.fetchNotifications();
   }
 }
 

@@ -10,26 +10,6 @@ import { notificationManager } from "@/lib/realtime/notificationManager";
 
 export type { Notification, NotificationType };
 
-// Hook for notification types
-export function useNotificationTypes() {
-  const baseResult = useBaseEntity<NotificationType>({
-    tableName: "notification_types",
-    entityName: "notification type",
-    companyScoped: true,
-  });
-
-  return {
-    ...baseResult,
-    notificationTypes: baseResult.items,
-    notificationType: baseResult.item,
-    fetchNotificationTypes: baseResult.fetchItems,
-    fetchNotificationType: baseResult.fetchItem,
-    createNotificationType: baseResult.createItem,
-    updateNotificationType: baseResult.updateItem,
-    deleteNotificationType: baseResult.deleteItem,
-  };
-}
-
 // Hook for notifications with enhanced functionality
 export function useNotifications() {
   const { employeeInfo } = useAuth();
@@ -73,25 +53,23 @@ export function useNotifications() {
     };
   }, [employeeInfo?.company_id, employeeInfo?.id]);
 
-  // Fetch unread count
-  const fetchUnreadCount = useCallback(async () => {
-    return await notificationManager.refetchUnreadCount();
-  }, []);
-
   // Fetch notifications for current user with type information
   const fetchUserNotifications = useCallback(async (limit = 20) => {
     // This is handled by the manager, but kept for compatibility
     return notifications.slice(0, limit);
   }, [notifications]);
 
-  // Mark notification as read
+  // Mark notification as read (optimistic update + database)
   const markAsRead = useCallback(async (notificationId: number) => {
+    // Optimistic update - immediate UI feedback
+    notificationManager.markAsReadLocally(notificationId);
+    
     try {
       const { error } = await supabase
         .from('notifications')
         .update({
           is_read: true,
-          read_at: new Date().toLocaleDateString('sv-SE')
+          read_at: new Date().toISOString()
         })
         .eq('id', notificationId);
 
@@ -99,10 +77,10 @@ export function useNotifications() {
         throw error;
       }
 
-      // Update unread count
-      await fetchUnreadCount();
       return { success: true };
     } catch (error) {
+      // Revert on error by refetching
+      await notificationManager.refetchAll();
       captureSupabaseError(
         { message: error instanceof Error ? error.message : String(error) },
         "markAsRead",
@@ -111,10 +89,13 @@ export function useNotifications() {
       console.error('Error marking notification as read:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
-  }, [fetchUnreadCount]);
+  }, []);
 
-  // Mark all notifications as read for current user
+  // Mark all notifications as read for current user (optimistic update + database)
   const markAllAsRead = useCallback(async () => {
+    // Optimistic update - immediate UI feedback
+    notificationManager.markAllAsReadLocally();
+    
     try {
       const companyId = employeeInfo?.company_id;
       const userId = employeeInfo?.id;
@@ -127,7 +108,7 @@ export function useNotifications() {
         .from('notifications')
         .update({
           is_read: true,
-          read_at: new Date().toLocaleDateString('sv-SE')
+          read_at: new Date().toISOString()
         })
         .eq('company_id', companyId)
         .eq('recipient_id', userId)
@@ -137,9 +118,10 @@ export function useNotifications() {
         throw error;
       }
 
-      setUnreadCount(0);
       return { success: true };
     } catch (error) {
+      // Revert on error by refetching
+      await notificationManager.refetchAll();
       captureSupabaseError(
         { message: error instanceof Error ? error.message : String(error) },
         "markAllAsRead",
@@ -187,8 +169,11 @@ export function useNotifications() {
     }
   }, [employeeInfo?.company_id]);
 
-  // Delete notification
+  // Delete notification (optimistic update + database)
   const deleteNotification = useCallback(async (notificationId: number) => {
+    // Optimistic update - immediate UI feedback
+    notificationManager.removeLocally(notificationId);
+    
     try {
       const { error } = await supabase
         .from('notifications')
@@ -199,10 +184,10 @@ export function useNotifications() {
         throw error;
       }
 
-      // Update unread count
-      await fetchUnreadCount();
       return { success: true };
     } catch (error) {
+      // Revert on error by refetching
+      await notificationManager.refetchAll();
       captureSupabaseError(
         { message: error instanceof Error ? error.message : String(error) },
         "deleteNotification",
@@ -211,7 +196,7 @@ export function useNotifications() {
       console.error('Error deleting notification:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
-  }, [fetchUnreadCount]);
+  }, []);
 
   // Memoized result
   return useMemo(() => ({
@@ -222,7 +207,6 @@ export function useNotifications() {
 
     // Enhanced functions
     fetchUserNotifications,
-    fetchUnreadCount,
     markAsRead,
     markAllAsRead,
     createNotification,
@@ -234,10 +218,9 @@ export function useNotifications() {
     updateNotification: baseResult.updateItem,
   }), [
     baseResult,
-    notifications, // Add to dependencies
+    notifications,
     unreadCount,
     fetchUserNotifications,
-    fetchUnreadCount,
     markAsRead,
     markAllAsRead,
     createNotification,
