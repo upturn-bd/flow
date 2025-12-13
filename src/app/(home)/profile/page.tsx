@@ -2,8 +2,7 @@
 
 import { useState, useEffect, Suspense, useMemo } from "react";
 import { motion } from "framer-motion";
-import BasicInfoTab from "./tabs/BasicInfoTab";
-import PersonalInfoTab from "./tabs/PersonalInfoTab";
+import { BasicInfoTab, PersonalInfoTab } from "@/components/profile";
 import EducationExperienceTab from "./tabs/EducationExperienceTab";
 import { User, ClipboardText, GraduationCap, ChartBarHorizontal, FileText } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";

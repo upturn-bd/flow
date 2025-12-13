@@ -3,14 +3,16 @@
 import { useEffect, useState, useCallback } from "react";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useSalaryManagement } from "@/hooks/useSalaryManagement";
+import { useEmployees } from "@/hooks/useEmployees";
 import {
   BasicInfoFormData,
   JOB_STATUS_OPTIONS,
-} from "./basicInfo.constants";
+} from "./constants";
 import { validateBasicInfo, validationErrorsToObject } from "@/lib/utils/validation";
 import { BasicInfoField } from "./BasicInfoField";
+import SingleEmployeeSelector from "@/components/forms/SingleEmployeeSelector";
 import { motion } from "framer-motion";
-import { User, Briefcase, Calendar, CheckCircle, WarningCircle, CurrencyDollar } from "@phosphor-icons/react";
+import { User, Briefcase, Calendar, CheckCircle, WarningCircle } from "@phosphor-icons/react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { fadeIn } from "@/components/ui/animations";
 import { useProfile } from "@/hooks/useProfile";
@@ -33,12 +35,13 @@ const initialFormState: BasicInfoFormData = {
   hire_date: "",
   id_input: "",
   basic_salary: 0,
+  supervisor_id: null,
 };
 
 const fieldGroups = [
   {
     title: "Personal Info",
-    icon: <User className="h-5 w-5 text-blue-600" />,
+    icon: <User className="h-5 w-5 text-primary-600" />,
     fields: [
       { name: "first_name", label: "First Name", type: "text" },
       { name: "last_name", label: "Last Name", type: "text" },
@@ -48,13 +51,14 @@ const fieldGroups = [
   },
   {
     title: "Job Info",
-    icon: <Briefcase className="h-5 w-5 text-blue-600" />,
+    icon: <Briefcase className="h-5 w-5 text-primary-600" />,
     fields: [
       { name: "department_id", label: "Department", type: "number" },
       { name: "designation", label: "Designation", type: "text" },
       { name: "job_status", label: "Job Status", type: "text" },
       { name: "hire_date", label: "Hire Date", type: "date" },
       { name: "id_input", label: "Employee ID", type: "text" },
+      { name: "supervisor_id", label: "Supervisor", type: "select", adminOnly: true },
       { name: "basic_salary", label: "Basic Salary (BDT)", type: "number", adminOnly: true },
     ],
   },
@@ -72,10 +76,12 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [targetEmployeeId, setTargetEmployeeId] = useState<string>("");
   
-  const { canWrite } = useAuth();
+  const { canWrite, employeeInfo } = useAuth();
   const canEditSalary = canWrite(PERMISSION_MODULES.PAYROLL) || canWrite(PERMISSION_MODULES.HRIS);
+  const canEditSupervisor = canWrite(PERMISSION_MODULES.HRIS);
   
   const { departments, fetchDepartments } = useDepartments();
+  const { employees, fetchEmployees, loading: loadingEmployees } = useEmployees();
   const { updateEmployeeSalary } = useSalaryManagement();
   const [loadingDepartments, setLoadingDepartments] = useState(true);
   
@@ -110,7 +116,8 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
         target: {
           ...e.target,
           name,
-          value: name === "department_id" ? Number(value) : value,
+          value: name === "department_id" ? Number(value) : 
+                 name === "supervisor_id" ? (value === "" ? null : value) : value,
         }
       });
     },
@@ -240,9 +247,15 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
   }, [isEditMode, resetForm]);
 
   useEffect(() => {
+    // Only fetch when employeeInfo is available (company_id needed for queries)
+    if (!employeeInfo?.company_id) return;
+    
     setLoadingDepartments(true);
-    fetchDepartments().finally(() => setLoadingDepartments(false));
-  }, []);
+    Promise.all([
+      fetchDepartments(),
+      fetchEmployees()
+    ]).finally(() => setLoadingDepartments(false));
+  }, [fetchDepartments, fetchEmployees, employeeInfo?.company_id]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -264,11 +277,19 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
     };
     
     fetchData();
-  }, [uid]);
+  }, [uid, fetchUserBasicInfo, fetchCurrentUserBasicInfo]);
 
   const departmentName = useCallback(
     (id: number) => departments.find((dep) => dep.id === id)?.name || "Data unavailable",
     [departments]
+  );
+
+  const supervisorName = useCallback(
+    (id: string | null | undefined) => {
+      if (!id) return "Not assigned";
+      return employees.find((emp) => emp.id === id)?.name || "Unknown";
+    },
+    [employees]
   );
 
   if (loading)
@@ -355,20 +376,23 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                 <h3 className="font-medium text-lg text-foreground-primary">{group.title}</h3>
               </div>
               
-              <div className="overflow-hidden border border-border-primary rounded-lg shadow-sm">
+              <div className="border border-border-primary rounded-lg shadow-sm">
                 <table className="min-w-full divide-y divide-border-primary">
                   <tbody className="bg-background-primary divide-y divide-border-primary">
                     {group.fields
                       .filter((field: any) => {
-                        // Show admin-only fields only to those with salary permission or for viewing
+                        // Show admin-only fields only to those with appropriate permissions or for viewing
                         if (field.adminOnly) {
+                          if (field.name === "supervisor_id") {
+                            return canEditSupervisor || !isEditMode;
+                          }
                           return canEditSalary || !isEditMode;
                         }
                         return true;
                       })
                       .map((field: any, fieldIndex) => {
                         const canEditField = field.adminOnly 
-                          ? canEditSalary
+                          ? (field.name === "supervisor_id" ? canEditSupervisor : canEditSalary)
                           : isCurrentUser;
                         
                         return (
@@ -386,41 +410,67 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                         </td>
                         <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal text-sm text-foreground-secondary">
                           {isEditMode && canEditField ? (
-                            <div className="max-w-full overflow-hidden">
-                              <BasicInfoField
-                                name={field.name as keyof BasicInfoFormData}
-                                label=""
-                                type={field.type}
-                                value={
-                                  field.name === "department_id"
-                                    ? (formValues[field.name as keyof BasicInfoFormData] as number)?.toString() || ""
-                                    : field.name === "basic_salary"
-                                    ? (formValues[field.name as keyof BasicInfoFormData] as number)?.toString() || ""
-                                    : (formValues[field.name as keyof BasicInfoFormData] as string) || ""
-                                }
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                error={errors[field.name as keyof BasicInfoFormData]}
-                                touched={!!touched[field.name as keyof BasicInfoFormData]}
-                                options={
-                                  field.name === "department_id"
-                                    ? departments.filter(dep => dep.id != null).map((dep) => ({
-                                        value: dep.id!.toString(),
-                                        label: dep.name,
-                                      }))
-                                    : field.name === "job_status"
-                                    ? JOB_STATUS_OPTIONS.map(status => ({
-                                        value: status,
-                                        label: status
-                                      }))
-                                    : undefined
-                                }
-                                readOnly={field.adminOnly && !canEditSalary}
-                                disabled={!canEditField}
-                                loading={field.name === "department_id" ? loadingDepartments : false}
-                              />
-                              {field.adminOnly && !canEditSalary && (
-                                <p className="text-xs text-amber-600 mt-1">Only administrators can edit this field</p>
+                            <div className="max-w-full">
+                              {field.name === "supervisor_id" ? (
+                                <>
+                                  <SingleEmployeeSelector
+                                    value={(formValues.supervisor_id as string) || ""}
+                                    onChange={(value) => {
+                                      handleChange({
+                                        target: {
+                                          name: "supervisor_id",
+                                          value: value || null,
+                                        },
+                                      } as React.ChangeEvent<HTMLInputElement>);
+                                    }}
+                                    employees={employees.filter(emp => emp.id !== targetEmployeeId)}
+                                    label=""
+                                    placeholder="Search and select supervisor..."
+                                    error={errors.supervisor_id}
+                                    disabled={!canEditSupervisor || loadingEmployees}
+                                  />
+                                  {!canEditSupervisor && (
+                                    <p className="text-xs text-amber-600 mt-1">Only HRIS administrators can edit supervisor</p>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  <BasicInfoField
+                                    name={field.name as keyof BasicInfoFormData}
+                                    label=""
+                                    type={field.type}
+                                    value={
+                                      field.name === "department_id"
+                                        ? (formValues[field.name as keyof BasicInfoFormData] as number)?.toString() || ""
+                                        : field.name === "basic_salary"
+                                        ? (formValues[field.name as keyof BasicInfoFormData] as number)?.toString() || ""
+                                        : (formValues[field.name as keyof BasicInfoFormData] as string) || ""
+                                    }
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    error={errors[field.name as keyof BasicInfoFormData]}
+                                    touched={!!touched[field.name as keyof BasicInfoFormData]}
+                                    options={
+                                      field.name === "department_id"
+                                        ? departments.filter(dep => dep.id != null).map((dep) => ({
+                                            value: dep.id!.toString(),
+                                            label: dep.name,
+                                          }))
+                                        : field.name === "job_status"
+                                        ? JOB_STATUS_OPTIONS.map(status => ({
+                                            value: status,
+                                            label: status
+                                          }))
+                                        : undefined
+                                    }
+                                    readOnly={field.adminOnly && !canEditSalary}
+                                    disabled={!canEditField}
+                                    loading={field.name === "department_id" ? loadingDepartments : false}
+                                  />
+                                  {field.adminOnly && !canEditSalary && (
+                                    <p className="text-xs text-amber-600 mt-1">Only administrators can edit this field</p>
+                                  )}
+                                </>
                               )}
                             </div>
                           ) : (
@@ -431,6 +481,8 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
                                 ? new Date(formValues[field.name as keyof BasicInfoFormData] as string).toLocaleDateString()
                                 : field.name === "basic_salary"
                                 ? `৳${((formValues[field.name as keyof BasicInfoFormData] as number) || 0).toLocaleString()}`
+                                : field.name === "supervisor_id"
+                                ? supervisorName(formValues[field.name as keyof BasicInfoFormData] as string | null)
                                 : (formValues[field.name as keyof BasicInfoFormData] as string) || "—"}
                             </div>
                           )}

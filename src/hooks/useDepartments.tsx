@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useRef } from "react";
 import { useBaseEntity } from "./core";
 import { Department } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
@@ -18,17 +18,12 @@ export function useDepartments() {
 
   const [departments, setDepartments] = useState<Department[]>([])
   const [loading, setLoading] = useState(false)
+  
+  // Use ref to store the fetch function to avoid circular dependency
+  const fetchDepartmentsRef = useRef<(company_id?: number) => Promise<Department[]>>();
 
   // Manual fetch all departments
-  const fetchDepartments = async (company_id?: number | undefined) => {
-    // Don't fetch if auth is still loading or user isn't authenticated
-    // if (!user) {
-    //   setDepartments([]);
-    //         console.log("Auth loading")
-
-    //   return [];
-    // }
-
+  const fetchDepartments = useCallback(async (company_id?: number | undefined) => {
     try {
       setLoading(true);
       const supabase = await createClient();
@@ -56,11 +51,13 @@ export function useDepartments() {
       setLoading(false);
       throw error;
     }
-  };
+  }, [employeeInfo?.company_id]);
+
+  // Store the fetch function in ref for use in other callbacks
+  fetchDepartmentsRef.current = fetchDepartments;
 
   // Manual create department
-  // Manual create department
-  const createDepartment = async (dept: Department) => {
+  const createDepartment = useCallback(async (dept: Department) => {
     if (authLoading || !user) {
       throw new Error('User not authenticated');
     }
@@ -95,7 +92,7 @@ export function useDepartments() {
           .eq("id", data.head_id);
       }
 
-      fetchDepartments();
+      fetchDepartmentsRef.current?.();
       setLoading(false);
 
       return data;
@@ -104,10 +101,10 @@ export function useDepartments() {
       setLoading(false);
       throw error;
     }
-  };
+  }, [authLoading, user, employeeInfo?.company_id]);
 
   // Manual update department
-  const updateDepartment = async (id: number, dept: Partial<Department>) => {
+  const updateDepartment = useCallback(async (id: number, dept: Partial<Department>) => {
     if (authLoading || !user) {
       throw new Error('User not authenticated');
     }
@@ -134,7 +131,7 @@ export function useDepartments() {
           .eq("id", dept.head_id);
       }
 
-      fetchDepartments()
+      fetchDepartmentsRef.current?.()
       setLoading(false)
 
       return data;
@@ -142,10 +139,10 @@ export function useDepartments() {
       console.error("Error updating department:", error);
       throw error;
     }
-  };
+  }, [authLoading, user]);
 
   // Manual delete department
-  const deleteDepartment = async (id: number) => {
+  const deleteDepartment = useCallback(async (id: number) => {
     if (authLoading || !user) {
       throw new Error('User not authenticated');
     }
@@ -170,7 +167,7 @@ export function useDepartments() {
 
       if (error) throw error;
 
-      fetchDepartments()
+      fetchDepartmentsRef.current?.()
       setLoading(false)
 
       return data;
@@ -178,7 +175,7 @@ export function useDepartments() {
       console.error("Error deleting department:", error);
       throw error;
     }
-  };
+  }, [authLoading, user]);
 
   return {
     ...baseResult,

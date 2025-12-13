@@ -15,8 +15,20 @@ interface PersonalInfoFieldProps {
   touched?: boolean;
 }
 
-const inputClass =
-  "w-full rounded-md border border-border-primary bg-background-primary px-3 py-2 text-sm text-foreground-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500";
+const inputClasses = (showError: boolean) => `
+  w-full rounded-md border 
+  ${
+    showError
+      ? "border-error focus:border-error focus:ring-error"
+      : "border-border-secondary focus:border-primary-500 focus:ring-primary-500"
+  }
+  px-3 py-2 text-sm
+  shadow-sm focus:outline-none focus:ring-1
+  disabled:bg-background-secondary disabled:cursor-not-allowed
+  transition-colors
+  placeholder:text-foreground-tertiary
+  max-w-full
+`;
 
 export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
   id,
@@ -32,22 +44,7 @@ export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
   touched,
 }) => {
   const fieldId = id || `field-${name}`;
-  const showError = error && touched;
-
-  const inputClasses = `
-    w-full rounded-md border 
-    ${
-      showError
-        ? "border-error focus:border-error focus:ring-error"
-        : "border-border-secondary focus:border-primary-500 focus:ring-primary-500"
-    }
-    px-3 py-2 text-sm
-    shadow-sm focus:outline-none focus:ring-1
-    disabled:bg-background-secondary disabled:cursor-not-allowed
-    transition-colors
-    placeholder:text-foreground-tertiary
-    max-w-full
-  `;
+  const showError = !!(error && touched);
 
   if (type === "select") {
     return (
@@ -64,7 +61,7 @@ export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
           onChange={onChange}
           onBlur={onBlur}
           disabled={disabled}
-          className={inputClasses}
+          className={inputClasses(showError)}
           aria-invalid={showError ? "true" : "false"}
           aria-describedby={showError ? `${fieldId}-error` : undefined}
         >
@@ -116,7 +113,7 @@ export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
           onBlur={onBlur}
           disabled={disabled}
           rows={3}
-          className={inputClasses}
+          className={inputClasses(showError)}
           aria-invalid={showError ? "true" : "false"}
           aria-describedby={showError ? `${fieldId}-error` : undefined}
         />
@@ -150,7 +147,7 @@ export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
         onChange={onChange}
         onBlur={onBlur}
         disabled={disabled}
-        className={inputClasses}
+        className={inputClasses(showError)}
         aria-invalid={showError ? "true" : "false"}
         aria-describedby={showError ? `${fieldId}-error` : undefined}
         max={type === "date" ? "9999-12-31" : undefined}
@@ -168,4 +165,4 @@ export const PersonalInfoField: React.FC<PersonalInfoFieldProps> = ({
       )}
     </div>
   );
-}; 
+};

@@ -11,6 +11,8 @@ export interface ExtendedEmployee extends Employee {
   phone?: string;
   joinDate?: string;
   basic_salary?: number;
+  supervisor_id?: string | null;
+  supervisor_name?: string;
 }
 
 export function useEmployees() {
@@ -75,10 +77,17 @@ export function useEmployees() {
 
       const { data, error } = await supabase
         .from("employees")
-        .select("id, first_name, last_name, email, phone_number, department_id(name), designation, hire_date, basic_salary")
+        .select("id, first_name, last_name, email, phone_number, department_id(name), designation, hire_date, basic_salary, supervisor_id")
+        .eq("job_status", 'Active')
         .eq("company_id", companyId);
 
       if (error) throw error;
+
+      // Create a map for quick supervisor name lookup
+      const employeeMap = new Map<string, string>();
+      data?.forEach((emp) => {
+        employeeMap.set(emp.id, `${emp.first_name} ${emp.last_name}`);
+      });
 
       const employees: ExtendedEmployee[] = data?.map((employee) => ({
         id: employee.id,
@@ -89,6 +98,8 @@ export function useEmployees() {
         phone: employee.phone_number,
         joinDate: employee.hire_date,
         basic_salary: employee.basic_salary,
+        supervisor_id: employee.supervisor_id,
+        supervisor_name: employee.supervisor_id ? employeeMap.get(employee.supervisor_id) || "Unknown" : undefined,
       })) || [];
 
       setExtendedEmployees(employees);

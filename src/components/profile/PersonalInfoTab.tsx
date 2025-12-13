@@ -6,7 +6,7 @@ import {
   Gender,
   BloodGroup,
   MaritalStatus,
-} from "./personalInfo.constants";
+} from "./constants";
 
 // Simple validation function that always passes since all fields are optional
 const validatePersonalInfo = (data: PersonalFormData) => ({
@@ -191,7 +191,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
   const personalInfoFields = [
     {
       title: "Personal Details",
-      icon: <User className="h-5 w-5 text-blue-600" />,
+      icon: <User className="h-5 w-5 text-primary-600" />,
       fields: [
         {
           name: "gender",
@@ -222,7 +222,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
     },
     {
       title: "Family Information",
-      icon: <Users className="h-5 w-5 text-blue-600" />,
+      icon: <Users className="h-5 w-5 text-primary-600" />,
       fields: [
         { name: "father_name", label: "Father's Name", type: "text" as const },
         { name: "mother_name", label: "Mother's Name", type: "text" as const },
@@ -231,7 +231,7 @@ export default function PersonalInfoTab({ uid }: PersonalInfoTabProps) {
     },
     {
       title: "Emergency Contact",
-      icon: <Phone className="h-5 w-5 text-blue-600" />,
+      icon: <Phone className="h-5 w-5 text-primary-600" />,
       fields: [
         {
           name: "emergency_contact_name",

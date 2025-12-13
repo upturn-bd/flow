@@ -390,6 +390,7 @@ export interface BasicInfo {
   hire_date: string;
   id_input: string;
   basic_salary?: number; // Added for admin/manager editable salary
+  supervisor_id?: string | null; // Supervisor employee ID
 }
 
 export interface PersonalInfo {
