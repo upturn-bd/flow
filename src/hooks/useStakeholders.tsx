@@ -279,22 +279,37 @@ export function useStakeholders() {
         throw error;
       }
 
-      // Fetch teams for each step based on team_ids array
-      const stepsWithTeams = await Promise.all(
-        (data || []).map(async (step) => {
-          if (step.team_ids && Array.isArray(step.team_ids) && step.team_ids.length > 0) {
-            const { data: teams, error: teamsError } = await supabase
-              .from("teams")
-              .select("id, name")
-              .in("id", step.team_ids);
+      // Collect all unique team IDs from all steps to batch fetch
+      const allTeamIds = new Set<number>();
+      (data || []).forEach((step) => {
+        if (step.team_ids && Array.isArray(step.team_ids)) {
+          step.team_ids.forEach((id: number) => allTeamIds.add(id));
+        }
+      });
 
-            if (!teamsError && teams) {
-              return { ...step, teams };
-            }
-          }
-          return step;
-        })
-      );
+      // Fetch all teams in a single query
+      let teamsMap = new Map<number, { id: number; name: string }>();
+      if (allTeamIds.size > 0) {
+        const { data: teams, error: teamsError } = await supabase
+          .from("teams")
+          .select("id, name")
+          .in("id", Array.from(allTeamIds));
+
+        if (!teamsError && teams) {
+          teams.forEach((team) => teamsMap.set(team.id, team));
+        }
+      }
+
+      // Map teams to their respective steps
+      const stepsWithTeams = (data || []).map((step) => {
+        if (step.team_ids && Array.isArray(step.team_ids) && step.team_ids.length > 0) {
+          const teams = step.team_ids
+            .map((id: number) => teamsMap.get(id))
+            .filter(Boolean);
+          return { ...step, teams };
+        }
+        return step;
+      });
 
       setProcessSteps(stepsWithTeams || []);
       return stepsWithTeams;
@@ -644,23 +659,38 @@ export function useStakeholders() {
       if (data.process?.steps) {
         data.process.steps.sort((a: any, b: any) => a.step_order - b.step_order);
         
-        // Fetch teams for each step with team_ids
-        data.process.steps = await Promise.all(
-          data.process.steps.map(async (step: any) => {
-            if (step.team_ids && Array.isArray(step.team_ids) && step.team_ids.length > 0) {
-              const { data: teams, error: teamsError } = await supabase
-                .from("teams")
-                .select("id, name")
-                .in("id", step.team_ids);
+        // Collect all unique team IDs from all steps to batch fetch
+        const allTeamIds = new Set<number>();
+        data.process.steps.forEach((step: any) => {
+          if (step.team_ids && Array.isArray(step.team_ids)) {
+            step.team_ids.forEach((id: number) => allTeamIds.add(id));
+          }
+        });
 
-              if (!teamsError && teams) {
-                return { ...step, teams };
-              }
-            }
-            // If no team_ids but has team relation, use that
-            return step;
-          })
-        );
+        // Fetch all teams in a single query
+        let teamsMap = new Map<number, { id: number; name: string }>();
+        if (allTeamIds.size > 0) {
+          const { data: teams, error: teamsError } = await supabase
+            .from("teams")
+            .select("id, name")
+            .in("id", Array.from(allTeamIds));
+
+          if (!teamsError && teams) {
+            teams.forEach((team) => teamsMap.set(team.id, team));
+          }
+        }
+
+        // Map teams to their respective steps
+        data.process.steps = data.process.steps.map((step: any) => {
+          if (step.team_ids && Array.isArray(step.team_ids) && step.team_ids.length > 0) {
+            const teams = step.team_ids
+              .map((id: number) => teamsMap.get(id))
+              .filter(Boolean);
+            return { ...step, teams };
+          }
+          // If no team_ids but has team relation, use that
+          return step;
+        });
       }
 
       if(data.kam) {

@@ -392,12 +392,12 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
       {/* Additional Data Prompt Banner - for Permanent stakeholders without additional data */}
       {stakeholder.status === "Permanent" && (!stakeholder.additional_data || Object.keys(stakeholder.additional_data).length === 0) && (
-        <div className="bg-blue-50 border-l-4 border-blue-500 px-4 py-3 rounded-lg">
+        <div className="bg-info/10 border-l-4 border-info px-4 py-3 rounded-lg dark:bg-info/20">
           <div className="flex items-start gap-3">
-            <Database className="text-blue-500 mt-0.5 shrink-0" size={20} />
+            <Database className="text-info mt-0.5 shrink-0" size={20} />
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-blue-800">Add Additional Data</p>
-              <p className="text-sm text-blue-700 mt-1">
+              <p className="font-medium text-info">Add Additional Data</p>
+              <p className="text-sm text-info/80 mt-1">
                 This stakeholder is now permanent. Add additional data from completed steps or create custom fields.
               </p>
               <button
@@ -446,7 +446,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 <div>
                   <p className="text-sm font-medium text-foreground-secondary">Type</p>
                   <p className="text-sm text-foreground-secondary mt-0.5">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
                       {stakeholder.stakeholder_type.name}
                     </span>
                   </p>
@@ -562,7 +562,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         <Envelope className="text-foreground-tertiary" size={16} />
                         <a
                           href={`mailto:${contact.email}`}
-                          className="text-sm text-blue-600 hover:underline"
+                          className="text-sm text-primary-600 hover:underline dark:text-primary-400"
                         >
                           {contact.email}
                         </a>
@@ -573,7 +573,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         <Phone className="text-foreground-tertiary" size={16} />
                         <a
                           href={`tel:${contact.phone}`}
-                          className="text-sm text-blue-600 hover:underline"
+                          className="text-sm text-primary-600 hover:underline dark:text-primary-400"
                         >
                           {contact.phone}
                         </a>
@@ -594,7 +594,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 <h2 className="text-base sm:text-lg font-semibold text-foreground-primary">Additional Data</h2>
                 <button
                   onClick={() => setShowAdditionalDataModal(true)}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950 transition-colors"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 dark:text-primary-400 dark:border-primary-700 dark:hover:bg-primary-950 transition-colors"
                 >
                   <PencilSimple size={16} />
                   <span className="hidden sm:inline">Edit</span>
@@ -758,7 +758,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                 : isCurrent
                                   ? "border-primary-300 bg-primary-50 dark:bg-primary-950 dark:border-primary-700"
                                   : canEdit && !isSequential
-                                    ? "border-blue-200 bg-blue-25"
+                                    ? "border-primary-200 bg-primary-50/50 dark:border-primary-800 dark:bg-primary-950/50"
                                     : "border-border-primary bg-surface-secondary"
                               }`}
                           >
@@ -770,7 +770,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                         ? "bg-success text-white"
                                         : isCurrent
                                           ? "bg-info text-white"
-                                          : "bg-gray-300 text-foreground-secondary"
+                                          : "bg-background-tertiary text-foreground-secondary dark:bg-surface-secondary"
                                       }`}
                                   >
                                     {isCompleted ? (
@@ -803,7 +803,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                     </div>
                                     {/* Show permission/access warnings */}
                                     {!isCompleted && !hasTeamAccess && (
-                                      <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded wrap-break-words">
+                                      <div className="mt-2 text-xs text-warning bg-warning/10 px-2 py-1 rounded wrap-break-words dark:bg-warning/20">
                                         You must be a member of {
                                           step.teams && step.teams.length > 0 
                                             ? `one of these teams: ${step.teams.map(t => t.name).join(', ')}`
@@ -1020,7 +1020,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                                 href={fileInfo.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+                                                className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                                               >
                                                 <FileText size={16} />
                                                 <span className="truncate">{fileInfo.name}</span>
@@ -1042,7 +1042,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                                 href={`https://www.google.com/maps?q=${actualValue.latitude},${actualValue.longitude}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-xs text-blue-600 hover:underline mt-1 inline-block"
+                                                className="text-xs text-primary-600 hover:underline mt-1 inline-block dark:text-primary-400"
                                               >
                                                 View on Google Maps
                                               </a>

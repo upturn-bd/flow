@@ -6,6 +6,7 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getPublicFileUrl } from "@/lib/utils/files";
+import { formatCalculatedValue, formulaToReadable } from "@/lib/utils/formula-evaluator";
 import { ArrowLeft, CheckCircle, Clock, Calendar, MapPin, Envelope, Phone, User, PencilSimple, TrashSimple, WarningCircle, FileText, Download, CurrencyDollar, Database, Calculator } from "@phosphor-icons/react";
 import { Stakeholder, StakeholderProcessStep, StakeholderStepData } from "@/lib/types/schemas";
 import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
@@ -653,6 +654,272 @@ export default function OpsStakeholderDetailPage({ params }: { params: Promise<{
           </div>
         )}
       </div>
+
+      {/* Additional Data - Only show for Permanent stakeholders */}
+      {stakeholder.status === "Permanent" && (
+        <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base sm:text-lg font-semibold text-foreground-primary">Additional Data</h2>
+            {canEditStakeholder() && (
+              <button
+                onClick={() => setShowAdditionalDataModal(true)}
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 dark:text-primary-400 dark:border-primary-700 dark:hover:bg-primary-950 transition-colors"
+              >
+                <PencilSimple size={16} />
+                <span className="hidden sm:inline">Edit</span>
+              </button>
+            )}
+          </div>
+
+          {stakeholder.additional_data && Object.keys(stakeholder.additional_data).length > 0 ? (
+            <div className="space-y-4">
+              {Object.entries(stakeholder.additional_data).map(([sectionKey, sectionValue]) => {
+                // Check if this is a nested object (step-grouped data)
+                if (typeof sectionValue === "object" && sectionValue !== null && !Array.isArray(sectionValue)) {
+                  return (
+                    <div key={sectionKey} className="border border-border-secondary rounded-lg overflow-hidden">
+                      {/* Section Header */}
+                      <div className="px-3 py-2 bg-background-secondary border-b border-border-secondary">
+                        <span className="text-xs font-semibold text-foreground-secondary uppercase tracking-wide">
+                          {toHumanReadable(sectionKey)}
+                        </span>
+                      </div>
+                      {/* Section Fields */}
+                      <div className="p-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {Object.entries(sectionValue as Record<string, any>).map(([fieldKey, fieldValue]) => (
+                            <div key={fieldKey} className="flex items-start gap-2">
+                              <Database className="text-foreground-tertiary mt-0.5 shrink-0" size={16} />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs font-medium text-foreground-secondary">
+                                  {toHumanReadable(fieldKey)}
+                                </p>
+                                <p className="text-xs sm:text-sm text-foreground-primary mt-0.5 wrap-break-words">
+                                  <ValueWithMapsLink value={fieldValue} fieldKey={fieldKey} />
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                
+                // Handle flat data (legacy format or simple values)
+                return (
+                  <div key={sectionKey} className="flex items-start gap-3">
+                    <Database className="text-foreground-tertiary mt-0.5 shrink-0" size={18} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-foreground-secondary wrap-break-words">
+                        {toHumanReadable(sectionKey)}
+                      </p>
+                      <p className="text-xs sm:text-sm text-foreground-primary mt-0.5 wrap-break-words">
+                        <ValueWithMapsLink value={sectionValue} fieldKey={sectionKey} />
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-xs sm:text-sm text-foreground-tertiary">
+                No additional data added. {canEditStakeholder() && 'Click "Edit" to add data.'}
+              </p>
+              {canEditStakeholder() && (
+                <button
+                  onClick={() => setShowAdditionalDataModal(true)}
+                  className="mt-2 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  Add Data Now
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Step Data Summary - Show all completed step data */}
+      {stepData.length > 0 && (
+        <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 mb-6">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground-primary mb-4">Completed Step Data</h2>
+          <div className="space-y-4">
+            {sortedSteps.map((step) => {
+              const stepDataEntry = stepData.find((sd) => sd.step_id === step.id);
+              if (!stepDataEntry?.is_completed || !stepDataEntry.data || Object.keys(stepDataEntry.data).length === 0) {
+                return null;
+              }
+
+              return (
+                <div key={step.id} className="border border-border-secondary rounded-lg overflow-hidden">
+                  {/* Step Header */}
+                  <div className="px-3 py-2 bg-background-secondary border-b border-border-secondary flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle size={16} className="text-success" />
+                      <span className="text-xs font-semibold text-foreground-secondary uppercase tracking-wide">
+                        Step {step.step_order}: {step.name}
+                      </span>
+                    </div>
+                    {stepDataEntry.completed_at && (
+                      <span className="text-xs text-foreground-tertiary">
+                        {new Date(stepDataEntry.completed_at).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                  {/* Step Fields */}
+                  <div className="p-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {Object.entries(stepDataEntry.data).map(([key, value]) => {
+                        // Skip internal fields
+                        if (key.startsWith('__')) return null;
+
+                        // Get field definition
+                        const fieldDef = step.field_definitions?.fields?.find((f) => f.key === key);
+                        const isFileField = fieldDef?.type === 'file';
+                        const isMultiSelect = fieldDef?.type === 'multi_select';
+                        const isGeolocation = fieldDef?.type === 'geolocation';
+                        const isCalculated = fieldDef?.type === 'calculated';
+                        const isNumber = fieldDef?.type === 'number';
+                        const fieldLabel = fieldDef?.label || toHumanReadable(key);
+
+                        // Extract actual value from nested format
+                        const extractActualValue = (val: any) => {
+                          if (val && typeof val === 'object' && 'value' in val) {
+                            return val.value;
+                          }
+                          return val;
+                        };
+
+                        const actualValue = extractActualValue(value);
+
+                        // Format value based on field type
+                        const formatValue = () => {
+                          if (typeof actualValue === "boolean") {
+                            return actualValue ? "Yes" : "No";
+                          }
+                          if (isMultiSelect && Array.isArray(actualValue)) {
+                            if (actualValue.length === 0) return "None selected";
+                            const options = fieldDef?.options || [];
+                            const labels = actualValue.map(val => {
+                              const option = options.find(opt => opt.value === val);
+                              return option ? option.label : toHumanReadable(val);
+                            });
+                            return labels.join(", ");
+                          }
+                          if (fieldDef?.type === 'dropdown' && typeof actualValue === 'string') {
+                            const options = fieldDef?.options || [];
+                            const option = options.find(opt => opt.value === actualValue);
+                            return option ? option.label : toHumanReadable(actualValue);
+                          }
+                          if (isGeolocation && typeof actualValue === 'object' && actualValue !== null && 'latitude' in actualValue && 'longitude' in actualValue) {
+                            return `${actualValue.latitude}, ${actualValue.longitude}`;
+                          }
+                          if (isNumber) {
+                            return typeof actualValue === 'number' ? actualValue.toLocaleString() : String(actualValue);
+                          }
+                          if (typeof actualValue === 'string' && actualValue.includes('_')) {
+                            return toHumanReadable(actualValue);
+                          }
+                          return formatDisplayValue(actualValue);
+                        };
+
+                        // Get file info helper
+                        const getFileInfo = () => {
+                          if (typeof value === 'object' && value !== null && 'path' in value) {
+                            return {
+                              url: getPublicFileUrl(value.path),
+                              name: value.originalName || value.path.split('/').pop(),
+                              size: value.size,
+                            };
+                          } else if (typeof value === 'string') {
+                            return {
+                              url: getPublicFileUrl(value),
+                              name: value.split('/').pop(),
+                            };
+                          }
+                          return null;
+                        };
+
+                        const fileInfo = isFileField ? getFileInfo() : null;
+
+                        // Render calculated fields
+                        if (isCalculated && fieldDef?.formula) {
+                          return (
+                            <div key={key} className="col-span-2">
+                              <p className="text-xs font-medium text-foreground-tertiary uppercase flex items-center gap-1">
+                                <Calculator size={12} />
+                                {fieldLabel}
+                                <span className="ml-1 px-1.5 py-0.5 bg-success/10 text-success dark:bg-success/20 text-[10px] rounded normal-case">
+                                  Calculated
+                                </span>
+                              </p>
+                              <p className="text-sm font-semibold text-foreground-primary mt-1">
+                                {actualValue !== null && actualValue !== undefined 
+                                  ? formatCalculatedValue(actualValue) 
+                                  : "—"}
+                              </p>
+                              <p className="text-xs text-foreground-tertiary mt-1">
+                                Formula: <code className="bg-background-tertiary dark:bg-surface-secondary px-1 py-0.5 rounded">{formulaToReadable(fieldDef.formula, sortedSteps)}</code>
+                              </p>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <div key={key}>
+                            <p className="text-xs font-medium text-foreground-tertiary uppercase">
+                              {fieldLabel}
+                            </p>
+                            {isFileField && fileInfo ? (
+                              <div className="mt-1">
+                                <a
+                                  href={fileInfo.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                                >
+                                  <FileText size={16} />
+                                  <span className="truncate">{fileInfo.name}</span>
+                                  <Download size={14} />
+                                </a>
+                                {fileInfo.size && (
+                                  <p className="text-xs text-foreground-tertiary mt-1">
+                                    {(fileInfo.size / 1024).toFixed(2)} KB
+                                  </p>
+                                )}
+                              </div>
+                            ) : isGeolocation && typeof actualValue === 'object' && actualValue !== null && 'latitude' in actualValue && 'longitude' in actualValue ? (
+                              <div className="mt-1">
+                                <p className="text-sm text-foreground-primary flex items-center gap-2">
+                                  <MapPin size={14} className="text-foreground-tertiary" />
+                                  {actualValue.latitude.toFixed(6)}, {actualValue.longitude.toFixed(6)}
+                                </p>
+                                <a
+                                  href={`https://www.google.com/maps?q=${actualValue.latitude},${actualValue.longitude}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-primary-600 hover:underline mt-1 inline-block dark:text-primary-400"
+                                >
+                                  View on Google Maps
+                                </a>
+                              </div>
+                            ) : (
+                              <p className="text-sm text-foreground-primary mt-1">
+                                {formatValue()}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="border-b border-border-primary mb-6">

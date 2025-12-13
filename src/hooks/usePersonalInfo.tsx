@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo } from "@/lib/utils/auth";
-import { PersonalFormData } from "@/app/(home)/hris/tabs/personalInfo.constants";
+import { PersonalFormData } from "@/components/profile";
 
 export function usePersonalInfo() {
   const [data, setData] = useState<PersonalFormData | null>(null);
