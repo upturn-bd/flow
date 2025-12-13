@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, useRef } from "react";
+import { useCallback, useState } from "react";
 import { useBaseEntity } from "./core";
 import { Department } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
@@ -18,9 +18,6 @@ export function useDepartments() {
 
   const [departments, setDepartments] = useState<Department[]>([])
   const [loading, setLoading] = useState(false)
-  
-  // Use ref to store the fetch function to avoid circular dependency
-  const fetchDepartmentsRef = useRef<(company_id?: number) => Promise<Department[]>>();
 
   // Manual fetch all departments
   const fetchDepartments = useCallback(async (company_id?: number | undefined) => {
@@ -52,9 +49,6 @@ export function useDepartments() {
       throw error;
     }
   }, [employeeInfo?.company_id]);
-
-  // Store the fetch function in ref for use in other callbacks
-  fetchDepartmentsRef.current = fetchDepartments;
 
   // Manual create department
   const createDepartment = useCallback(async (dept: Department) => {
@@ -92,7 +86,7 @@ export function useDepartments() {
           .eq("id", data.head_id);
       }
 
-      fetchDepartmentsRef.current?.();
+      await fetchDepartments();
       setLoading(false);
 
       return data;
@@ -101,7 +95,7 @@ export function useDepartments() {
       setLoading(false);
       throw error;
     }
-  }, [authLoading, user, employeeInfo?.company_id]);
+  }, [authLoading, user, employeeInfo?.company_id, fetchDepartments]);
 
   // Manual update department
   const updateDepartment = useCallback(async (id: number, dept: Partial<Department>) => {
@@ -131,15 +125,16 @@ export function useDepartments() {
           .eq("id", dept.head_id);
       }
 
-      fetchDepartmentsRef.current?.()
+      await fetchDepartments()
       setLoading(false)
 
       return data;
     } catch (error) {
       console.error("Error updating department:", error);
+      setLoading(false);
       throw error;
     }
-  }, [authLoading, user]);
+  }, [authLoading, user, fetchDepartments]);
 
   // Manual delete department
   const deleteDepartment = useCallback(async (id: number) => {
@@ -167,15 +162,16 @@ export function useDepartments() {
 
       if (error) throw error;
 
-      fetchDepartmentsRef.current?.()
+      await fetchDepartments()
       setLoading(false)
 
       return data;
     } catch (error) {
       console.error("Error deleting department:", error);
+      setLoading(false);
       throw error;
     }
-  }, [authLoading, user]);
+  }, [authLoading, user, fetchDepartments]);
 
   return {
     ...baseResult,
