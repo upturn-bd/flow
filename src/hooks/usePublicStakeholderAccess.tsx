@@ -4,6 +4,8 @@ import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { Stakeholder, StakeholderIssue, StakeholderIssueAttachment } from "@/lib/types/schemas";
 import { captureSupabaseError, logError } from "@/lib/sentry";
+import { createStakeholderIssueNotification } from "@/lib/utils/notifications";
+import { sendPublicTicketNotificationEmail } from "@/lib/email/stakeholder-ticket-email";
 
 // ==============================================================================
 // Form Data Interfaces for Public Access
@@ -236,8 +238,6 @@ export function usePublicStakeholderAccess() {
         // Send notification to KAM if assigned
         try {
           if (stakeholder.kam_id) {
-            // Import notification function only when needed
-            const { createStakeholderIssueNotification } = await import("@/lib/utils/notifications");
             await createStakeholderIssueNotification(
               stakeholder.kam_id,
               'created',
@@ -260,8 +260,10 @@ export function usePublicStakeholderAccess() {
         // Send email notification
         try {
           if (stakeholder.kam && stakeholder.kam.email) {
-            // Import email function dynamically
-            const { sendPublicTicketNotificationEmail } = await import("@/lib/email/stakeholder-ticket-email");
+            // Use configured site URL or fall back to window.location
+            const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
+                           (typeof window !== 'undefined' ? window.location.origin : '');
+            
             await sendPublicTicketNotificationEmail({
               recipientEmail: stakeholder.kam.email,
               recipientName: stakeholder.kam.name || undefined,
@@ -269,7 +271,7 @@ export function usePublicStakeholderAccess() {
               ticketTitle: issueData.title,
               ticketDescription: issueData.description || "",
               priority: issueData.priority,
-              ticketUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/stakeholder-issues/${data.id}`,
+              ticketUrl: `${baseUrl}/stakeholder-issues/${data.id}`,
             });
           }
         } catch (emailError) {

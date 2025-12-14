@@ -29,7 +29,8 @@ CREATE INDEX IF NOT EXISTS idx_stakeholder_issues_created_from_public ON stakeho
 CREATE OR REPLACE FUNCTION generate_stakeholder_access_code()
 RETURNS VARCHAR(8) AS $$
 DECLARE
-  characters TEXT := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; -- Removed ambiguous characters
+  -- Removed ambiguous characters: 0, O, 1, I, L to prevent confusion
+  characters TEXT := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   result VARCHAR(32) := '';
   i INTEGER;
 BEGIN
