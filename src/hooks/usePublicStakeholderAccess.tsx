@@ -172,7 +172,7 @@ export function usePublicStakeholderAccess() {
    * Create a new ticket from the public page
    */
   const createPublicTicket = useCallback(
-    async (issueData: PublicStakeholderIssueFormData, companyId: number): Promise<StakeholderIssue | null> => {
+    async (issueData: PublicStakeholderIssueFormData, companyId: number, stakeholder: Stakeholder): Promise<StakeholderIssue | null> => {
       setLoading(true);
       setError(null);
 
@@ -231,6 +231,50 @@ export function usePublicStakeholderAccess() {
         if (insertError) {
           captureSupabaseError(insertError, "createPublicTicket", { companyId });
           throw new Error("Failed to create ticket");
+        }
+
+        // Send notification to KAM if assigned
+        try {
+          if (stakeholder.kam_id) {
+            // Import notification function only when needed
+            const { createStakeholderIssueNotification } = await import("@/lib/utils/notifications");
+            await createStakeholderIssueNotification(
+              stakeholder.kam_id,
+              'created',
+              {
+                stakeholderName: stakeholder.name,
+                issueTitle: issueData.title,
+                priority: issueData.priority,
+              },
+              {
+                referenceId: data.id,
+                actionUrl: `/stakeholder-issues/${data.id}`,
+              }
+            );
+          }
+        } catch (notificationError) {
+          // Log but don't fail the ticket creation
+          logError("Failed to send public ticket notification", notificationError);
+        }
+
+        // Send email notification
+        try {
+          if (stakeholder.kam?.email) {
+            // Import email function dynamically
+            const { sendPublicTicketNotificationEmail } = await import("@/lib/email/stakeholder-ticket-email");
+            await sendPublicTicketNotificationEmail({
+              recipientEmail: stakeholder.kam.email,
+              recipientName: stakeholder.kam.name,
+              stakeholderName: stakeholder.name,
+              ticketTitle: issueData.title,
+              ticketDescription: issueData.description || "",
+              priority: issueData.priority,
+              ticketUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/stakeholder-issues/${data.id}`,
+            });
+          }
+        } catch (emailError) {
+          // Log but don't fail the ticket creation
+          logError("Failed to send public ticket email", emailError);
         }
 
         return data;

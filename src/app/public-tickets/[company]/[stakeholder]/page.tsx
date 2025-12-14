@@ -113,7 +113,8 @@ export default function PublicTicketsPage() {
           ...data,
           stakeholder_id: stakeholder.id,
         },
-        stakeholder.company_id
+        stakeholder.company_id,
+        stakeholder
       );
 
       if (newTicket) {
