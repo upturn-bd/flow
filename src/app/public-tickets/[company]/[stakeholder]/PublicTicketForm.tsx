@@ -155,10 +155,12 @@ export default function PublicTicketForm({
             onChange={(value) => handleInputChange("category_id", value ? parseInt(value) : undefined)}
             options={[
               { value: "", label: "Select a category (optional)" },
-              ...activCategories.map(cat => ({
-                value: cat.id!.toString(),
-                label: cat.name,
-              })),
+              ...activCategories
+                .filter(cat => cat.id !== undefined)
+                .map(cat => ({
+                  value: cat.id!.toString(),
+                  label: cat.name,
+                })),
             ]}
             disabled={isSubmitting}
           />

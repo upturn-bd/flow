@@ -6,8 +6,9 @@
 
 -- Add access_code column to stakeholders table
 -- This code allows stakeholders to access a public page to create tickets
+-- Using VARCHAR(8) as codes are exactly 8 characters
 ALTER TABLE stakeholders
-ADD COLUMN IF NOT EXISTS access_code VARCHAR(32) UNIQUE;
+ADD COLUMN IF NOT EXISTS access_code VARCHAR(8) UNIQUE;
 
 -- Create index for faster lookups by access code
 CREATE INDEX IF NOT EXISTS idx_stakeholders_access_code ON stakeholders(access_code);
@@ -26,7 +27,7 @@ CREATE INDEX IF NOT EXISTS idx_stakeholder_issues_created_from_public ON stakeho
 -- Function to generate a random access code
 -- Format: 8 characters, alphanumeric, uppercase
 CREATE OR REPLACE FUNCTION generate_stakeholder_access_code()
-RETURNS VARCHAR(32) AS $$
+RETURNS VARCHAR(8) AS $$
 DECLARE
   characters TEXT := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; -- Removed ambiguous characters
   result VARCHAR(32) := '';
@@ -41,9 +42,9 @@ $$ LANGUAGE plpgsql;
 
 -- Function to ensure unique access code generation
 CREATE OR REPLACE FUNCTION ensure_unique_access_code(p_company_id INTEGER)
-RETURNS VARCHAR(32) AS $$
+RETURNS VARCHAR(8) AS $$
 DECLARE
-  new_code VARCHAR(32);
+  new_code VARCHAR(8);
   code_exists BOOLEAN;
 BEGIN
   LOOP

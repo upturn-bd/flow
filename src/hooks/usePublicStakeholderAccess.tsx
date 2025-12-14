@@ -259,12 +259,12 @@ export function usePublicStakeholderAccess() {
 
         // Send email notification
         try {
-          if (stakeholder.kam?.email) {
+          if (stakeholder.kam && stakeholder.kam.email) {
             // Import email function dynamically
             const { sendPublicTicketNotificationEmail } = await import("@/lib/email/stakeholder-ticket-email");
             await sendPublicTicketNotificationEmail({
               recipientEmail: stakeholder.kam.email,
-              recipientName: stakeholder.kam.name,
+              recipientName: stakeholder.kam.name || undefined,
               stakeholderName: stakeholder.name,
               ticketTitle: issueData.title,
               ticketDescription: issueData.description || "",
