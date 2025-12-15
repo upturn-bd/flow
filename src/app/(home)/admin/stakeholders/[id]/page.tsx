@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/lib/auth/auth-context";
+import { useCompanyInfo } from "@/hooks/useCompanyInfo";
 import { getPublicFileUrl } from "@/lib/utils/files";
 import { calculateFieldValue, formatCalculatedValue, formulaToReadable } from "@/lib/utils/formula-evaluator";
 import { ArrowLeft, CheckCircle, Clock, Calendar, MapPin, Envelope, Phone, User, PencilSimple, TrashSimple, WarningCircle, FileText, Download, CurrencyDollar, Database, Calculator } from "@phosphor-icons/react";
@@ -13,6 +14,7 @@ import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
 import StakeholderIssuesTab from "@/components/stakeholder-issues/StakeholderIssuesTab";
 import StakeholderTransactions from "@/components/stakeholders/StakeholderTransactions";
 import AdditionalDataModal from "@/components/stakeholders/AdditionalDataModal";
+import PublicAccessSection from "@/components/stakeholders/PublicAccessSection";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { toast } from "sonner";
@@ -158,6 +160,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
   const { getEmployeeTeamIds } = useTeams();
   const { hasPermission } = useAuth();
+  const { companyInfo } = useCompanyInfo();
 
   const [stakeholder, setStakeholder] = useState<Stakeholder | null>(null);
   const [stepData, setStepData] = useState<StakeholderStepData[]>([]);
@@ -586,6 +589,13 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               <p className="text-sm text-foreground-tertiary">No contact persons added</p>
             )}
           </div>
+
+          {/* Public Access Section */}
+          <PublicAccessSection
+            stakeholderName={stakeholder.name}
+            companyName={companyInfo?.name || companyInfo?.code || "Company"}
+            accessCode={stakeholder.access_code}
+          />
 
           {/* Additional Data - Only show for Permanent stakeholders */}
           {stakeholder.status === "Permanent" && (

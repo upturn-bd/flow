@@ -625,6 +625,7 @@ export interface Stakeholder {
   rejected_by_id?: string; // UUID of the employee who rejected (database column: rejected_by)
   rejection_reason?: string;
   additional_data?: Record<string, any>; // Additional key-value data for permanent stakeholders
+  access_code?: string; // Unique code for public ticket access
   company_id: number;
   created_at?: string;
   updated_at?: string;
@@ -747,6 +748,7 @@ export interface StakeholderIssue {
   checker_approved_at?: string; // When checker team approved
   checker_approved_by?: string; // Employee who approved (from checker team)
   checker_rejection_reason?: string; // Reason if checker rejects the resolution
+  created_from_public_page?: boolean; // True if ticket was created via public page
   company_id: number;
   created_at?: string;
   updated_at?: string;
