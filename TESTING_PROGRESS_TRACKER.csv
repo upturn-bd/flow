@@ -1,0 +1,210 @@
+Module,Sub-Module,Feature,Create/Add,Read/View,Update/Edit,Delete,Approve/Reject,Search/Filter,Status Change,File Upload,Notifications,Notes,Tester,Test Date,Status
+#
+# ======================== ADMIN CONFIGURATION ========================
+#
+Admin Config,Departments,Department Management,[ ],[ ],[ ],[ ],-,-,-,-,-,"CRUD operations for departments",,,
+Admin Config,Divisions,Division Management,[ ],[ ],[ ],[ ],-,-,-,-,-,"CRUD operations for divisions",,,
+Admin Config,Grades,Grade Management,[ ],[ ],[ ],[ ],-,-,-,-,-,"CRUD operations for grades",,,
+Admin Config,Positions,Position Management,[ ],[ ],[ ],[ ],-,-,-,-,-,"CRUD operations for positions",,,
+Admin Config,Teams,Team Management,[ ],[ ],[ ],[ ],-,-,-,-,-,"CRUD operations for teams",,,
+Admin Config,Teams,Team Members,[ ],[ ],-,[ ],-,-,-,-,-,"Add/remove team members",,,
+Admin Config,Teams,Team Permissions,[ ],[ ],[ ],[ ],-,-,-,-,-,"Manage team permissions",,,
+Admin Config,Supervisor Lineage,Lineage Management,[ ],[ ],[ ],[ ],-,-,-,-,-,"Create/manage supervisor lineages",,,
+#
+# ======================== LEAVE MANAGEMENT ========================
+#
+Leave Management,Leave Types,Leave Type Config,[ ],[ ],[ ],[ ],-,-,-,-,-,"Admin configures leave types",,,
+Leave Management,Holiday Configs,Holiday Configuration,[ ],[ ],[ ],[ ],-,-,-,-,-,"Admin configures holidays",,,
+Leave Management,Leave Requests,Submit Leave Request,[ ],-,-,-,-,-,-,-,[ ],"Employee submits leave request with notification",,,
+Leave Management,Leave Requests,View Leave Requests,-,[ ],-,-,-,[ ],-,-,-,"View pending/history requests with filters",,,
+Leave Management,Leave Requests,Approve/Reject Leave,-,-,-,-,[ ],-,[ ],-,[ ],"Supervisor approves/rejects with notification",,,
+Leave Management,Leave Balances,View Balance,-,[ ],-,-,-,-,-,-,-,"Employee views leave balance",,,
+Leave Management,Leave Balances,Update Balance,-,-,[ ],-,-,-,-,-,-,"Admin updates leave balance",,,
+Leave Management,Leave Balances,Auto-Deduction,-,-,[ ],-,-,-,-,-,-,"Balance auto-deducts on approval",,,
+#
+# ======================== ATTENDANCE MANAGEMENT ========================
+#
+Attendance,Sites,Site/Location Management,[ ],[ ],[ ],[ ],-,-,-,-,-,"Admin manages attendance sites",,,
+Attendance,Records,Check-in/Check-out,[ ],[ ],-,-,-,-,-,-,-,"Employee records attendance",,,
+Attendance,Records,View Attendance History,-,[ ],-,-,-,[ ],-,-,-,"View attendance with date range filter",,,
+Attendance,Records,Admin Create Attendance,[ ],-,-,-,-,-,-,-,-,"Admin can create attendance records",,,
+Attendance,Records,Update Attendance,-,-,[ ],-,-,-,-,-,-,"Admin can update attendance records",,,
+Attendance,Records,Delete Attendance,-,-,-,[ ],-,-,-,-,-,"Admin can delete attendance records",,,
+Attendance,Records,View by Tag,-,[ ],-,-,-,[ ],-,-,-,"Filter attendance by status tag",,,
+#
+# ======================== PROJECT MANAGEMENT ========================
+#
+Projects,Projects,Create Project,[ ],-,-,-,-,-,-,-,[ ],"Create new project with notification",,,
+Projects,Projects,View Projects,-,[ ],-,-,-,[ ],-,-,-,"View ongoing/completed projects with search",,,
+Projects,Projects,Update Project,-,-,[ ],-,-,-,-,-,-,"Edit project details",,,
+Projects,Projects,Delete Project,-,-,-,[ ],-,-,-,-,-,"Delete project",,,
+Projects,Projects,Project Status Change,-,-,[ ],-,-,-,[ ],-,-,"Change project status (Ongoing/Completed)",,,
+Projects,Projects,Pagination,-,[ ],-,-,-,-,-,-,-,"Cursor-based pagination for projects",,,
+Projects,Milestones,Create Milestone,[ ],-,-,-,-,-,-,-,-,"Add milestone to project",,,
+Projects,Milestones,View Milestones,-,[ ],-,-,-,-,-,-,-,"View project milestones",,,
+Projects,Milestones,Update Milestone,-,-,[ ],-,-,-,-,-,-,"Edit milestone details",,,
+Projects,Milestones,Delete Milestone,-,-,-,[ ],-,-,-,-,-,"Delete milestone",,,
+Projects,Milestones,Milestone Status,-,-,[ ],-,-,-,[ ],-,-,"Update milestone status (auto-updates project progress)",,,
+#
+# ======================== TASK MANAGEMENT ========================
+#
+Tasks,Tasks,Create Task,[ ],-,-,-,-,-,-,-,[ ],"Create task with notification",,,
+Tasks,Tasks,View Tasks,-,[ ],-,-,-,[ ],-,-,-,"View tasks with multiple filters",,,
+Tasks,Tasks,Update Task,-,-,[ ],-,-,-,-,-,-,"Edit task details",,,
+Tasks,Tasks,Delete Task,-,-,-,[ ],-,-,-,-,-,"Delete task",,,
+Tasks,Tasks,Complete Task,-,-,[ ],-,-,-,[ ],-,-,"Mark task as complete",,,
+Tasks,Tasks,Filter by Scope,-,[ ],-,-,-,[ ],-,-,-,"Filter: user/project/milestone/company/department",,,
+Tasks,Tasks,Filter by Assignee,-,[ ],-,-,-,[ ],-,-,-,"Filter tasks by assignee",,,
+Tasks,Tasks,Pagination,-,[ ],-,-,-,-,-,-,-,"Cursor-based pagination for tasks",,,
+#
+# ======================== REQUISITION MANAGEMENT ========================
+#
+Requisition,Types,Requisition Type Config,[ ],[ ],[ ],[ ],-,-,-,-,-,"Admin configures requisition types",,,
+Requisition,Inventory,Inventory Management,[ ],[ ],[ ],[ ],-,-,-,-,-,"Admin manages requisition inventory",,,
+Requisition,Requests,Create Requisition,[ ],-,-,-,-,-,-,[ ],[ ],"Employee creates requisition with attachments",,,
+Requisition,Requests,View Requests,-,[ ],-,-,-,[ ],-,-,-,"View pending/history requests",,,
+Requisition,Requests,Update Requisition,-,-,[ ],-,-,-,-,-,-,"Edit pending requisition",,,
+Requisition,Requests,Approve/Reject,-,-,-,-,[ ],-,[ ],-,[ ],"Supervisor approves/rejects with notification",,,
+Requisition,Requests,Global vs Personal View,-,[ ],-,-,-,[ ],-,-,-,"Toggle between global and personal view",,,
+#
+# ======================== COMPLAINT MANAGEMENT ========================
+#
+Complaints,Types,Complaint Type Config,[ ],[ ],[ ],[ ],-,-,-,-,-,"Admin configures complaint types",,,
+Complaints,Records,Submit Complaint,[ ],-,-,-,-,-,-,[ ],-,"Employee submits complaint (supports anonymous)",,,
+Complaints,Records,View Complaints,-,[ ],-,-,-,-,-,-,-,"View complaint requests/history",,,
+Complaints,Records,Update Complaint,-,-,[ ],-,[ ],-,[ ],-,[ ],"Admin updates complaint status with notification",,,
+Complaints,Records,Anonymous Handling,-,[ ],-,-,-,-,-,-,-,"Handle anonymous complaints properly",,,
+#
+# ======================== NOTICE MANAGEMENT ========================
+#
+Notice,Types,Notice Type Config,[ ],[ ],[ ],[ ],-,-,-,-,-,"Admin configures notice types",,,
+Notice,Records,Create Notice,[ ],-,-,-,-,-,-,-,[ ],"Create notice with notification to department",,,
+Notice,Records,View Notices,-,[ ],-,-,-,[ ],-,-,-,"View notices (department/global filter)",,,
+Notice,Records,Update Notice,-,-,[ ],-,-,-,-,-,[ ],"Update notice with notification",,,
+Notice,Records,Delete Notice,-,-,-,[ ],-,-,-,-,-,"Delete notice",,,
+Notice,Records,Validity Filter,-,[ ],-,-,-,[ ],-,-,-,"Show only valid notices (valid_till check)",,,
+#
+# ======================== SETTLEMENT MANAGEMENT ========================
+#
+Settlement,Records,Create Settlement,[ ],-,-,-,-,-,-,[ ],[ ],"Create settlement request with attachments",,,
+Settlement,Records,View Requests,-,[ ],-,-,-,-,-,-,-,"View settlement requests",,,
+Settlement,Records,View History,-,[ ],-,-,-,-,-,-,-,"View settlement history",,,
+Settlement,Records,Approve/Reject,-,-,-,-,[ ],-,[ ],-,[ ],"Supervisor approves/rejects with notification",,,
+#
+# ======================== PAYROLL MANAGEMENT ========================
+#
+Payroll,Records,Generate Payroll,[ ],-,-,-,-,-,-,-,-,"Generate payroll records",,,
+Payroll,Records,View Payroll History,-,[ ],-,-,-,[ ],-,-,-,"View payroll history with filters",,,
+Payroll,Records,View Supervised Payrolls,-,[ ],-,-,-,-,-,-,-,"Supervisor views team payrolls",,,
+Payroll,Records,Update Payroll Status,-,-,[ ],-,-,-,[ ],-,[ ],"Update status (Pending/Published/Paid)",,,
+Payroll,Records,Add Adjustments,-,-,[ ],-,-,-,-,-,-,"Add salary adjustments",,,
+Payroll,Records,Accounts Integration,-,-,-,-,-,-,[ ],-,-,"Auto-create account entry on publish",,,
+Payroll,Salary,Update Employee Salary,-,-,[ ],-,-,-,-,-,-,"Admin updates employee salary with audit",,,
+Payroll,Salary,View Salary History,-,[ ],-,-,-,-,-,-,-,"View salary change history",,,
+#
+# ======================== ONBOARDING/OFFBOARDING ========================
+#
+Onboarding,Employees,Submit Onboarding,[ ],-,-,-,-,-,-,-,-,"New employee submits onboarding data",,,
+Onboarding,Employees,View Pending Employees,-,[ ],-,-,-,-,-,-,-,"Admin views pending employees",,,
+Onboarding,Employees,Approve/Reject Employee,-,-,[ ],-,[ ],-,[ ],-,-,"Admin approves/rejects employee",,,
+Onboarding,Employees,Get Onboarding Info,-,[ ],-,-,-,-,-,-,-,"Get current user onboarding status",,,
+Offboarding,Employees,View Active Employees,-,[ ],-,-,-,-,-,-,-,"View active employees for offboarding",,,
+Offboarding,Employees,View Offboarded Employees,-,[ ],-,-,-,-,-,-,-,"View offboarded employees",,,
+Offboarding,Employees,Process Offboarding,-,-,[ ],-,-,-,[ ],-,-,"Process employee offboarding (Resigned/Terminated)",,,
+#
+# ======================== STAKEHOLDER MANAGEMENT ========================
+#
+Stakeholders,Processes,Create Process,[ ],-,-,-,-,-,-,-,-,"Create stakeholder process",,,
+Stakeholders,Processes,View Processes,-,[ ],-,-,-,-,-,-,-,"View stakeholder processes",,,
+Stakeholders,Processes,Update Process,-,-,[ ],-,-,-,-,-,-,"Update process details",,,
+Stakeholders,Processes,Delete Process,-,-,-,[ ],-,-,-,-,-,"Delete process",,,
+Stakeholders,Process Steps,Create Step,[ ],-,-,-,-,-,-,-,-,"Add step to process",,,
+Stakeholders,Process Steps,View Steps,-,[ ],-,-,-,-,-,-,-,"View process steps",,,
+Stakeholders,Process Steps,Update Step,-,-,[ ],-,-,-,-,-,-,"Update step details",,,
+Stakeholders,Process Steps,Delete Step,-,-,-,[ ],-,-,-,-,-,"Delete step",,,
+Stakeholders,Stakeholders,Create Stakeholder,[ ],-,-,-,-,-,-,-,[ ],"Create new stakeholder with notification",,,
+Stakeholders,Stakeholders,View Stakeholders,-,[ ],-,-,-,[ ],-,-,-,"View stakeholders with search/pagination",,,
+Stakeholders,Stakeholders,Update Stakeholder,-,-,[ ],-,-,-,-,-,-,"Update stakeholder details",,,
+Stakeholders,Stakeholders,Delete Stakeholder,-,-,-,[ ],-,-,-,-,-,"Delete stakeholder",,,
+Stakeholders,Stakeholders,Status Change,-,-,[ ],-,-,-,[ ],-,-,"Change status (Lead/Permanent/Rejected)",,,
+Stakeholders,Stakeholders,KAM Filter,-,[ ],-,-,-,[ ],-,-,-,"Filter by Key Account Manager",,,
+Stakeholders,Step Data,Submit Step Data,[ ],-,-,-,-,-,-,[ ],-,"Submit data for process step with file upload",,,
+Stakeholders,Step Data,View Step Data,-,[ ],-,-,-,-,-,-,-,"View submitted step data",,,
+Stakeholders,Step Data,Update Step Data,-,-,[ ],-,-,-,-,-,-,"Update step data",,,
+Stakeholders,Step Data,Approve Step,-,-,-,-,[ ],-,[ ],-,-,"Approve/complete step",,,
+Stakeholders,Types,Stakeholder Type Config,[ ],[ ],[ ],[ ],-,-,-,-,-,"Admin configures stakeholder types",,,
+Stakeholders,Transactions,View Transactions,-,[ ],-,-,-,-,-,-,-,"View stakeholder transactions",,,
+Stakeholders,Additional Data,Manage Additional Data,[ ],[ ],[ ],[ ],-,-,-,-,-,"Manage stakeholder additional data",,,
+#
+# ======================== STAKEHOLDER ISSUES ========================
+#
+Stakeholder Issues,Categories,Create Category,[ ],-,-,-,-,-,-,-,-,"Create issue category",,,
+Stakeholder Issues,Categories,View Categories,-,[ ],-,-,-,-,-,-,-,"View issue categories",,,
+Stakeholder Issues,Categories,Update Category,-,-,[ ],-,-,-,-,-,-,"Update category",,,
+Stakeholder Issues,Categories,Delete Category,-,-,-,[ ],-,-,-,-,-,"Delete category",,,
+Stakeholder Issues,Subcategories,Create Subcategory,[ ],-,-,-,-,-,-,-,-,"Create subcategory",,,
+Stakeholder Issues,Subcategories,View Subcategories,-,[ ],-,-,-,-,-,-,-,"View subcategories",,,
+Stakeholder Issues,Subcategories,Update Subcategory,-,-,[ ],-,-,-,-,-,-,"Update subcategory",,,
+Stakeholder Issues,Subcategories,Delete Subcategory,-,-,-,[ ],-,-,-,-,-,"Delete subcategory",,,
+Stakeholder Issues,Issues,Create Issue,[ ],-,-,-,-,-,-,[ ],[ ],"Create stakeholder issue with attachments",,,
+Stakeholder Issues,Issues,View Issues,-,[ ],-,-,-,[ ],-,-,-,"View issues with filters",,,
+Stakeholder Issues,Issues,Update Issue,-,-,[ ],-,-,-,-,-,-,"Update issue details",,,
+Stakeholder Issues,Issues,Delete Issue,-,-,-,[ ],-,-,-,-,-,"Delete issue",,,
+Stakeholder Issues,Issues,Status Change,-,-,[ ],-,-,-,[ ],-,[ ],"Change status (Pending/In Progress/Pending Approval/Resolved)",,,
+Stakeholder Issues,Issues,Checker Approval,-,-,-,-,[ ],-,[ ],-,[ ],"Checker team approves resolution",,,
+Stakeholder Issues,Issues,Filter by Priority,-,[ ],-,-,-,[ ],-,-,-,"Filter by priority (Low/Medium/High/Urgent)",,,
+Stakeholder Issues,Issues,Filter by Category,-,[ ],-,-,-,[ ],-,-,-,"Filter by category/subcategory",,,
+Stakeholder Issues,Issues,Filter by Assignee,-,[ ],-,-,-,[ ],-,-,-,"Filter by assigned employee/team",,,
+Stakeholder Issues,Issues,Linked Fields,-,[ ],[ ],-,-,-,-,-,-,"View/manage linked step fields",,,
+Stakeholder Issues,Issues,Required Fields,-,[ ],[ ],-,-,-,-,-,-,"View/manage required fields",,,
+#
+# ======================== ACCOUNTS/TRANSACTIONS ========================
+#
+Accounts,Transactions,Create Transaction,[ ],-,-,-,-,-,-,-,[ ],"Create account transaction with notification",,,
+Accounts,Transactions,View Transactions,-,[ ],-,-,-,[ ],-,-,-,"View transactions with filters",,,
+Accounts,Transactions,Update Transaction,-,-,[ ],-,-,-,-,-,-,"Update transaction details",,,
+Accounts,Transactions,Delete Transaction,-,-,-,[ ],-,-,-,-,-,"Delete transaction",,,
+Accounts,Transactions,Filter by Status,-,[ ],-,-,-,[ ],-,-,-,"Filter by Complete/Pending",,,
+Accounts,Transactions,Filter by Stakeholder,-,[ ],-,-,-,[ ],-,-,-,"Filter by stakeholder",,,
+Accounts,Transactions,Filter by Date Range,-,[ ],-,-,-,[ ],-,-,-,"Filter by date range",,,
+Accounts,Transactions,Filter by Amount,-,[ ],-,-,-,[ ],-,-,-,"Filter by amount range",,,
+Accounts,Transactions,Search,-,[ ],-,-,-,[ ],-,-,-,"Search by title/source/method",,,
+Accounts,Transactions,Large Transaction Alert,-,-,-,-,-,-,-,-,[ ],"Alert for transactions > 50000",,,
+#
+# ======================== EMPLOYEE MANAGEMENT ========================
+#
+Employees,Employees,View Employees,-,[ ],-,-,-,-,-,-,-,"View company employees",,,
+Employees,Employees,View Extended Info,-,[ ],-,-,-,-,-,-,-,"View extended employee info (salary/supervisor)",,,
+Employees,Education,Add Education,[ ],-,-,-,-,-,-,-,-,"Add education record",,,
+Employees,Education,View Education,-,[ ],-,-,-,-,-,-,-,"View education records",,,
+Employees,Experience,Add Experience,[ ],-,-,-,-,-,-,-,-,"Add experience record",,,
+Employees,Experience,View Experience,-,[ ],-,-,-,-,-,-,-,"View experience records",,,
+Employees,Finder,Employee Search,-,[ ],-,-,-,[ ],-,-,-,"Search employees by name/email/designation",,,
+#
+# ======================== DEVICE MANAGEMENT ========================
+#
+Devices,Devices,View Pending Devices,-,[ ],-,-,-,-,-,-,-,"View pending device requests",,,
+Devices,Devices,View All Devices,-,[ ],-,-,-,-,-,-,-,"View all registered devices",,,
+Devices,Devices,Approve/Reject Device,-,-,[ ],-,[ ],-,[ ],-,-,"Approve/reject device request",,,
+Devices,Devices,Delete Device,-,-,-,[ ],-,-,-,-,-,"Delete device",,,
+#
+# ======================== NOTIFICATIONS ========================
+#
+Notifications,Notifications,Create Notification,[ ],-,-,-,-,-,-,-,-,"System creates notification",,,
+Notifications,Notifications,View Notifications,-,[ ],-,-,-,-,-,-,-,"View user notifications",,,
+Notifications,Notifications,Mark as Read,-,-,[ ],-,-,-,-,-,-,"Mark notification as read",,,
+Notifications,Notifications,Mark All as Read,-,-,[ ],-,-,-,-,-,-,"Mark all notifications as read",,,
+Notifications,Notifications,Delete Notification,-,-,-,[ ],-,-,-,-,-,"Delete notification",,,
+Notifications,Notifications,Unread Count,-,[ ],-,-,-,-,-,-,-,"View unread notification count",,,
+Notifications,Notifications,Real-time Updates,-,[ ],-,-,-,-,-,-,-,"Real-time notification updates via Supabase",,,
+#
+# ======================== USER PROFILE ========================
+#
+Profile,Personal Info,View Profile,-,[ ],-,-,-,-,-,-,-,"View personal profile information",,,
+Profile,Personal Info,Update Profile,-,-,[ ],-,-,-,-,-,-,"Update personal information",,,
+Profile,Company Info,View Company Info,-,[ ],-,-,-,-,-,-,-,"View company information",,,
+#
+# ======================== HOME/DASHBOARD ========================
+#
+Home,Layout,Manage Home Layout,[ ],[ ],[ ],[ ],-,-,-,-,-,"Customize dashboard layout",,,
+Home,Dashboard,View Dashboard,-,[ ],-,-,-,-,-,-,-,"View dashboard with relevant data",,,
