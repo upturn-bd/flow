@@ -1,177 +1,139 @@
 ````instructions
 # Copilot Instructions for Flow HRIS System
 
-## Project Architecture
+## Project Overview
 
-This is a **Next.js 15 + Supabase Operations Management System** with role-based access control for Employee, Manager, and Admin roles. The app uses server-side rendering with Supabase Auth for authentication and PostgreSQL for data persistence.
+**Next.js 15 + Supabase Operations Management System** with team-based permissions (not legacy roles). Uses `bun` as the JavaScript runtime.
 
-### Key Architectural Patterns
+## Architecture
 
-**App Router Structure**: Uses Next.js App Router with route groups:
-- `(auth)/*` - Authentication pages (login, signup, forgot-password)
-- `(home)/*` - Main application with role-based navigation (requires approval)
-- Route-level middleware handles authentication and role-based access control
+### Route Groups
+- `(auth)/*` - Authentication (login, signup, forgot-password)
+- `(home)/*` - Main app (requires `has_approval` = "ACCEPTED")
+- `(superadmin)/sa/*` - Superadmin panel for platform management
+- `public-tickets/[company]/[stakeholder]` - Public stakeholder ticket submission (no auth required)
 
-**Authentication Flow**: 
-- Server actions in `src/app/(auth)/auth-actions.ts` handle login/signup
-- `src/middleware.ts` manages session validation and role-based routing with path arrays from `src/lib/utils/path-utils.ts`
-- `AuthProvider` context provides user state and approval status across the app
-- Users must have `has_approval` set to access main application features
+### Permission System (Team-Based - NOT Legacy Roles)
+**IMPORTANT**: Legacy roles (Admin, Manager, Employee) are being phased out. Use team-based permissions:
 
-**Supabase Integration**:
-- Server components use `createClient()` from `src/lib/supabase/server.ts`
-- Client components use `supabase` from `src/lib/supabase/client.ts`
-- All database operations go through custom hooks in `src/hooks/`
+```typescript
+// Use AuthContext for permission checks
+const { canRead, canWrite, canDelete, canApprove } = useAuth();
 
-## Development Patterns
+// Check permissions by module (from PERMISSION_MODULES in constants)
+if (canWrite('tasks')) { /* can create/edit tasks */ }
+if (canApprove('leave')) { /* can approve leave requests */ }
 
-### Form Architecture & Validation
-- **BaseForm**: All forms extend `src/components/forms/BaseForm.tsx` with Framer Motion animations
-- **Form State Management**: 
-  - Primary: `useFormState` hook from `src/hooks/useFormState.ts` for validation and dirty tracking
-  - Alternative: `useFormValidation` from `src/hooks/core/useFormValidation.tsx` for complex forms
-  - Both support real-time validation, dirty checking, and error management
-- **Validation Pattern**: Pure TypeScript validation functions (no Zod) with `validationErrorsToObject` helper
-- **Modal Forms**: Use `FormModal` component from `src/components/ui/modals/FormModal.tsx` for consistent modal form patterns
-
-### Data Fetching & State Management
-- **Custom Hooks**: Follow pattern in `src/hooks/useEmployees.tsx` - loading states, error handling, memoization
-- **Hook Organization**: 
-  - Domain hooks in `src/hooks/` (useEmployees, useDepartments, etc.)
-  - Core reusable hooks in `src/hooks/core/` (useModalState, useFormValidation)
-- **Authentication**: `AuthProvider` context manages user session and role-based permissions
-- **Company Context**: Most data operations require company_id from `getCompanyId()` utility
-
-### User/Employee Search Pattern (CRITICAL)
-- **ALWAYS** use unified search utilities from `src/lib/utils/user-search.ts` for user/employee selection
-- **Searchable Fields** (in priority order):
-  1. `name` - Employee's full name (required)
-  2. `email` - Employee's email address (optional)
-  3. `designation` - Employee's job title/position (optional)
-- **Standard Functions**:
-  - `matchesEmployeeSearch(employee, searchTerm)` - Returns boolean if employee matches search
-  - `filterEmployeesBySearch(employees, searchTerm)` - Filters array of employees by search term
-- **Implementation**: All user selection components (AssigneeField, SingleEmployeeSelector, AssigneeSelect, etc.) use these utilities
-- **Rule**: Users must ALWAYS be searchable by name, email, and designation across the entire application
-
-### Type System & Constants
-- **Single Source of Truth**: All types exported from `src/lib/types/index.ts` → `schemas.ts`
-- **No Runtime Validation**: Uses pure TypeScript interfaces instead of Zod schemas
-- **Constants Structure**: Centralized in `src/lib/constants/index.ts`:
-  - STATUS enums for all entity states
-  - ROUTES object with nested auth/employee/admin paths
-  - Role definitions and path arrays for middleware
-
-### UI & Styling Conventions
-
-#### Theming System (CRITICAL)
-- **Theme Provider**: All applications must be wrapped with `ThemeProvider` from `src/contexts/ThemeContext.tsx`
-- **Theme Modes**: Supports light and dark modes with system preference detection
-- **Color Schemes**: Four built-in color schemes (blue, green, purple, orange) - default is blue
-- **Theme Hook**: Use `useTheme()` hook to access and modify theme settings
-  ```typescript
-  const { mode, colorScheme, setMode, setColorScheme, toggleMode } = useTheme();
-  ```
-- **CSS Custom Properties**: All colors defined as CSS variables in `src/app/globals.css`
-- **Theme Configuration**: Color definitions in `src/lib/theme/theme-config.ts`
-
-#### Color Usage Guidelines
-- **ALWAYS** use theme color variables, **NEVER** hardcode colors (e.g., `bg-gray-100`)
-- **Primary Colors**: Use `bg-primary-{50-950}`, `text-primary-{50-950}`, `border-primary-{50-950}`
-- **Background**: Use `bg-background-{primary|secondary|tertiary}`
-- **Text/Foreground**: Use `text-foreground-{primary|secondary|tertiary}`
-- **Borders**: Use `border-border-{primary|secondary}`
-- **Surfaces**: Use `bg-surface-{primary|secondary|hover}`
-- **Semantic Colors**: Use `text-success`, `text-warning`, `text-error`, `text-info` for status indicators
-- **Dark Mode Support**: All components automatically adapt to dark mode via CSS variables
-
-#### Icon System (CRITICAL)
-- **ONLY** use Phosphor Icons (`@phosphor-icons/react`) - **NO** Lucide React or React Icons
-- **Unified Import**: Import from `src/lib/icons.ts` for consistent icon usage
-  ```typescript
-  import { User, Settings, Calendar } from '@/lib/icons';
-  ```
-- **Icon Props**: Use `size` and `weight` props for consistency
-  ```tsx
-  <User size={20} weight="duotone" />
-  ```
-- **Common Patterns**:
-  - Regular text icons: `size={16-20}`, `weight="regular"`
-  - Headers/Important: `size={24}`, `weight="bold"`
-  - Decorative: `weight="duotone"` or `weight="fill"`
-
-#### Component Styling Standards
-- **Buttons**: Use `Button` component from `src/components/ui/button.tsx` with theme-aware variants
-- **Form Fields**: All form fields use theme colors (border-border-primary, bg-surface-primary, etc.)
-- **Cards**: Use `Card` components from `src/components/ui/Card.tsx` with theme support
-- **Modals**: `BaseModal` and `FormModal` are fully theme-aware
-- **Animations**: Framer Motion with reusable variants in `src/components/ui/animations.ts`
-- **Rich Text**: TipTap editor integration for content editing features
-
-#### Accessibility & Dark Mode
-- All interactive elements have proper focus states with `focus:ring-primary-500`
-- Dark mode variants automatically apply via `dark:` prefix
-- Ensure sufficient contrast ratios for text on backgrounds
-- Test components in both light and dark modes before committing
-
-## Role-Based Access Control
-
-Navigation and features are controlled by user roles defined in `src/app/(home)/nav-items.ts`:
-- **Employee**: Basic HRIS features (home, hris, operations-and-services)
-- **Manager**: Employee features + finder access
-- **Admin**: Full access including admin panel
-
-Role validation happens at:
-1. **Middleware level**: `src/middleware.ts` with route arrays from `src/lib/utils/path-utils.ts`
-2. **Component level**: Nav items filtered by roles array in nav-items.ts
-3. **Hook level**: Data filtering based on permissions and company_id
-
-## Development Workflow
-
-### Running the Application
-```bash
-npm run dev          # Development with Turbopack
-npm run build        # Production build (ignores TS/ESLint errors)
-npm run lint         # ESLint checking
+// Available modules: tasks, projects, milestones, attendance, leave, notice,
+// requisition, settlement, complaints, payroll, stakeholders, stakeholder_processes,
+// onboarding, offboarding, hris, admin_config, departments, divisions, grades, positions, teams
 ```
 
-### Critical Development Notes
-- **Build Configuration**: `next.config.ts` ignores TypeScript and ESLint errors in builds
-- **Environment**: Requires Supabase environment variables for database connection
-- **Authentication Flow**: Always check `has_approval` status for main app access
-- **Company Context**: Most database queries require company_id filtering
+Permissions are aggregated from all teams a user belongs to via `get_user_permissions` RPC.
 
-### Common Patterns When Adding Features
+### Supabase Integration
+- **Server**: `createClient()` from `src/lib/supabase/server.ts`
+- **Client**: `supabase` from `src/lib/supabase/client.ts`
+- **Realtime**: `NotificationManager` in `src/lib/realtime/notificationManager.ts` for WebSocket subscriptions
 
-1. **New Data Entity**: 
-   - Add interface to `src/lib/types/schemas.ts`
-   - Create custom hook in `src/hooks/` following useEmployees pattern
-   - Add validation function to `src/lib/validation/`
-   - Include company_id in all queries
+## Key Patterns
 
-2. **New Form Component**:
-   - Extend `BaseForm` for layout and animations
-   - Use `useFormState` for validation and state management
-   - Follow validation pattern: pure TS function + `validationErrorsToObject`
-   - Add `ValidationFeedback` component for user feedback
+### Form Architecture
+```typescript
+// Use BaseForm + useFormState for all forms
+import { BaseForm } from '@/components/forms/BaseForm';
+import { useFormState } from '@/hooks/useFormState';
 
-3. **New Admin Feature**:
-   - Add route to `ROUTES.ADMIN` in constants
-   - Update role arrays in `path-utils.ts`
-   - Use `CollapsibleComponent` pattern in admin
-   - Follow modal patterns with `useModalState` hook
+// Validation: Pure TypeScript functions (NO Zod)
+// Use validationErrorsToObject helper for error display
+```
 
-4. **New Page Route**:
-   - Follow route group structure in app directory
-   - Add to appropriate role array in constants
-   - Implement middleware protection via path arrays
+### User/Employee Search (CRITICAL)
+Always use utilities from `src/lib/utils/user-search.ts`:
+```typescript
+import { matchesEmployeeSearch, filterEmployeesBySearch } from '@/lib/utils/user-search';
+// Searches by: name, email, designation (in priority order)
+```
 
-### File Organization Patterns
-- `src/lib/validation/schemas/` - Validation functions organized by domain
-- `src/hooks/core/` - Reusable hook abstractions (useModalState, useFormValidation)
-- `src/components/admin/` - Admin-specific components with collapsible patterns
-- `src/components/ui/modals/` - Reusable modal components (BaseModal, FormModal)
+### UI Conventions
+- **Icons**: ONLY Phosphor Icons (`@phosphor-icons/react`) - import from `src/lib/icons.ts`
+- **Colors**: NEVER hardcode - use theme variables (`bg-primary-500`, `text-foreground-primary`)
+- **Components**: Use existing UI components from `src/components/ui/`
 
-When working with this codebase, always consider company-scoped data, role-based permissions, and use the established form validation patterns. The architecture strongly favors composition and reusable patterns over large monolithic components.
+### Error Tracking (Sentry)
+```typescript
+import { captureError, captureSupabaseError } from '@/lib/sentry';
 
+// In catch blocks:
+captureError(error, { operation: 'createTask', taskId: id });
+
+// For Supabase errors:
+captureSupabaseError(error, 'fetchEmployees', { companyId });
+
+// Set user context in authenticated layouts:
+import { useSentryUser } from '@/lib/sentry';
+useSentryUser(); // Call in layout component
+```
+
+### Email Notifications (Resend)
+```typescript
+import { sendEmail, sendNotificationEmail } from '@/lib/email';
+// Requires RESEND_API_KEY environment variable
+// Templates in src/lib/email/notification-email.ts and stakeholder-ticket-email.ts
+```
+
+## Device Management
+Users are restricted by `max_device_limit` (configurable per company, default 3). Device approval flow:
+- New devices create `user_devices` records with `status: 'pending'`
+- Admins approve/reject via device management UI
+- Exceeded limits block login until devices are approved or removed
+
+## Stakeholder/Public Tickets System
+Public-facing ticket submission at `/public-tickets/[company]/[stakeholder]`:
+- Stakeholders access via unique `access_code`
+- No authentication required
+- Uses `usePublicStakeholderAccess` hook
+- Categories/subcategories for ticket organization
+- Checker team workflow for ticket resolution approval
+
+## Development Commands
+```bash
+bun run dev          # Development server
+bun run build        # Production build
+bun test             # Run Playwright E2E tests
+bun test:ui          # Tests with Playwright UI
+```
+
+## Adding New Features
+
+### New Permission-Protected Feature
+1. Add module to `PERMISSION_MODULES` in `src/lib/constants/index.ts`
+2. Add `ModulePermissionsBanner` component for UI feedback
+3. Use `canRead/canWrite/canDelete/canApprove` from `useAuth()`
+
+### New Data Entity
+1. Add interface to `src/lib/types/schemas.ts`
+2. Create hook in `src/hooks/use[Entity].tsx` following `useEmployees` pattern
+3. Always filter by `company_id`
+
+### New Admin Page
+1. Add route under `src/app/(home)/admin/`
+2. Use `CollapsibleComponent` pattern for sections
+3. Add `ModulePermissionsBanner` for access feedback
+
+## Superadmin System
+Platform-level management at `/sa/*`:
+- Companies, countries, industries management
+- Global team configuration
+- User superadmin status management
+- Requires `is_superadmin` flag (not team permissions)
+
+## Key Files Reference
+- Types: `src/lib/types/schemas.ts`
+- Constants: `src/lib/constants/index.ts`
+- Auth Context: `src/lib/auth/auth-context.tsx`
+- Permissions Hook: `src/hooks/usePermissions.tsx`
+- Teams Hook: `src/hooks/useTeams.tsx`
+- Sentry Utils: `src/lib/sentry.ts`
+- Email Utils: `src/lib/email/`
 ````
