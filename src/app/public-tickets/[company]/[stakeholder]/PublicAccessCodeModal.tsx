@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/Card";
 import BaseModal from "@/components/ui/modals/BaseModal";
+import { FormField } from "@/components/forms";
 import { LockKey, Warning } from "@phosphor-icons/react";
 
 interface PublicAccessCodeModalProps {
@@ -50,14 +52,16 @@ export default function PublicAccessCodeModal({
           <p className="text-sm text-foreground-secondary">
             Enter your 8-character access code to view and create tickets for:
           </p>
-          <div className="mt-3 p-3 bg-surface-secondary rounded-lg">
-            <p className="text-sm font-medium text-foreground-primary">
-              {stakeholderName}
-            </p>
-            <p className="text-xs text-foreground-tertiary mt-1">
-              {companyName}
-            </p>
-          </div>
+          <Card className="mt-3" padding="sm" hover={false}>
+            <CardContent className="py-2">
+              <p className="text-sm font-medium text-foreground-primary">
+                {stakeholderName}
+              </p>
+              <p className="text-xs text-foreground-tertiary mt-1">
+                {companyName}
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Error Message */}
@@ -72,10 +76,7 @@ export default function PublicAccessCodeModal({
         )}
 
         {/* Access Code Input */}
-        <div>
-          <label htmlFor="access-code" className="block text-sm font-medium text-foreground-primary mb-2">
-            Access Code
-          </label>
+        <FormField label="Access Code" required>
           <input
             type="text"
             id="access-code"
@@ -95,7 +96,7 @@ export default function PublicAccessCodeModal({
           <p className="text-xs text-foreground-tertiary mt-2 text-center">
             The access code was provided to you by your account manager
           </p>
-        </div>
+        </FormField>
 
         {/* Submit Button */}
         <Button
@@ -104,15 +105,9 @@ export default function PublicAccessCodeModal({
           size="md"
           className="w-full"
           disabled={loading || accessCode.trim().length !== 8}
+          isLoading={loading}
         >
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <span className="animate-spin">⏳</span>
-              Verifying...
-            </span>
-          ) : (
-            "Verify Access"
-          )}
+          Verify Access
         </Button>
 
         {/* Help Text */}

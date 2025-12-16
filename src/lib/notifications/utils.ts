@@ -17,10 +17,10 @@ interface NotificationData {
  */
 export async function createServerNotification(notificationData: NotificationData) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('Supabase URL or Anon Key is not defined.');
+  if (!supabaseUrl || !supabasePublishableKey) {
+    console.error('Supabase URL or Publishable Key is not defined.');
     return { success: false, error: 'Server configuration error.' };
   }
 
@@ -29,7 +29,7 @@ export async function createServerNotification(notificationData: NotificationDat
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'Authorization': `Bearer ${supabasePublishableKey}`,
       },
       body: JSON.stringify({ notificationData }),
     });

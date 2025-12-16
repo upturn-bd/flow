@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { usePublicStakeholderAccess } from "@/hooks/usePublicStakeholderAccess";
-import { useStakeholderIssueCategories } from "@/hooks/useStakeholderIssueCategories";
-import { StakeholderIssue } from "@/lib/types/schemas";
+import { StakeholderIssue, StakeholderIssueCategory } from "@/lib/types/schemas";
 import { Button } from "@/components/ui/button";
 import { 
   Ticket, 
@@ -35,41 +34,24 @@ export default function PublicTicketsPage() {
     verifyStakeholderAccess,
     fetchPublicTickets,
     createPublicTicket,
+    fetchPublicIssueCategories,
     getAttachmentUrl,
   } = usePublicStakeholderAccess();
 
-  const { categories, fetchCategories } = useStakeholderIssueCategories();
-
+  const [categories, setCategories] = useState<StakeholderIssueCategory[]>([]);
   const [isVerified, setIsVerified] = useState(false);
   const [stakeholder, setStakeholder] = useState<any>(null);
-  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [showCodeModal, setShowCodeModal] = useState(!codeFromUrl);
   const [tickets, setTickets] = useState<StakeholderIssue[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
 
-  // Load categories on mount
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
-
-  // Verify access on mount if code is provided in URL
-  useEffect(() => {
-    if (codeFromUrl) {
-      handleVerifyAccess(codeFromUrl);
-    } else {
-      setShowCodeModal(true);
-    }
-  }, [codeFromUrl]);
-
-  // Load tickets when stakeholder is verified
-  useEffect(() => {
-    if (isVerified && stakeholder?.id) {
-      loadTickets();
-    }
-  }, [isVerified, stakeholder?.id]);
-
-  const handleVerifyAccess = async (code: string) => {
+  const handleVerifyAccess = useCallback(async (code: string) => {
+    if (isVerified || isVerifying) return;
+    
     setVerificationError(null);
+    setIsVerifying(true);
     
     try {
       const result = await verifyStakeholderAccess(
@@ -85,11 +67,35 @@ export default function PublicTicketsPage() {
         toast.success("Access verified successfully");
       } else {
         setVerificationError(result.error || "Invalid access code");
+        setShowCodeModal(true);
       }
     } catch (err) {
       captureError(err, { context: "Public ticket access verification" });
       setVerificationError("An error occurred while verifying access");
+      setShowCodeModal(true);
+    } finally {
+      setIsVerifying(false);
     }
+  }, [isVerified, isVerifying, verifyStakeholderAccess, companyIdentifier, stakeholderName]);
+
+  // Verify access on mount if code is provided in URL
+  useEffect(() => {
+    if (codeFromUrl && !isVerified && !isVerifying) {
+      handleVerifyAccess(codeFromUrl);
+    }
+  }, [codeFromUrl, isVerified, isVerifying, handleVerifyAccess]);
+
+  // Load tickets and categories when stakeholder is verified
+  useEffect(() => {
+    if (isVerified && stakeholder?.id) {
+      loadTickets();
+      loadCategories();
+    }
+  }, [isVerified, stakeholder?.id]);
+
+  const loadCategories = async () => {
+    const fetchedCategories = await fetchPublicIssueCategories(companyIdentifier);
+    setCategories(fetchedCategories);
   };
 
   const loadTickets = async () => {
@@ -165,7 +171,7 @@ export default function PublicTicketsPage() {
           </div>
 
           {/* Verified Badge */}
-          <div className="flex items-center gap-2 text-sm text-success bg-success/10 dark:bg-success/20 px-3 py-2 rounded-lg inline-flex">
+          <div className="items-center gap-2 text-sm text-success bg-success/10 dark:bg-success/20 px-3 py-2 rounded-lg inline-flex">
             <CheckCircle size={18} weight="fill" />
             <span className="font-medium">Access Verified</span>
           </div>
@@ -225,11 +231,9 @@ export default function PublicTicketsPage() {
         {/* Create Form or Ticket List */}
         {showCreateForm ? (
           <PublicTicketForm
-            stakeholder={stakeholder}
             categories={categories}
             onSubmit={handleCreateTicket}
             onCancel={() => setShowCreateForm(false)}
-            loading={loading}
           />
         ) : (
           <PublicTicketList

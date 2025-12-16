@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { LockKey, Link as LinkIcon, Copy, CheckCircle, ShareNetwork } from "@phosphor-icons/react";
+import { useState, useEffect } from "react";
+import { LockKey, Link as LinkIcon, Copy, CheckCircle, ShareNetwork, Export } from "@phosphor-icons/react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 interface PublicAccessSectionProps {
   stakeholderName: string;
@@ -16,6 +17,12 @@ export default function PublicAccessSection({
   accessCode,
 }: PublicAccessSectionProps) {
   const [copied, setCopied] = useState<"code" | "linkWithCode" | "linkWithoutCode" | null>(null);
+  const [canNativeShare, setCanNativeShare] = useState(false);
+
+  // Check for native share support on mount
+  useEffect(() => {
+    setCanNativeShare(typeof navigator !== "undefined" && !!navigator.share);
+  }, []);
 
   if (!accessCode) {
     return null;
@@ -45,11 +52,42 @@ export default function PublicAccessSection({
     }
   };
 
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${stakeholderName} - Ticket Portal`,
+          text: `Access the ticket portal for ${stakeholderName}.\n\nAccess Code: ${accessCode}`,
+          url: publicPageUrlWithCode,
+        });
+      } catch (error) {
+        // User cancelled sharing or share failed
+        if ((error as Error).name !== "AbortError") {
+          toast.error("Failed to share");
+        }
+      }
+    } else {
+      // Fallback to copy link with code
+      copyToClipboard(publicPageUrlWithCode, "linkWithCode");
+    }
+  };
+
   return (
     <div className="bg-surface-primary rounded-lg border border-border-primary p-6 space-y-4">
-      <div className="flex items-center gap-2 mb-4">
-        <ShareNetwork size={20} weight="duotone" className="text-primary-600" />
-        <h2 className="text-lg font-semibold text-foreground-primary">Public Ticket Access</h2>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <ShareNetwork size={20} weight="duotone" className="text-primary-600" />
+          <h2 className="text-lg font-semibold text-foreground-primary">Public Ticket Access</h2>
+        </div>
+        <Button
+          size="sm"
+          variant="primary"
+          onClick={handleNativeShare}
+          className="flex items-center gap-2"
+        >
+          <Export size={16} weight="bold" />
+          {canNativeShare ? "Share" : "Copy Link"}
+        </Button>
       </div>
 
       <p className="text-sm text-foreground-secondary mb-4">

@@ -3,7 +3,7 @@
 
 ## Project Architecture
 
-This is a **Next.js 15 + Supabase HRIS (Human Resource Information System)** with role-based access control for Employee, Manager, and Admin roles. The app uses server-side rendering with Supabase Auth for authentication and PostgreSQL for data persistence.
+This is a **Next.js 15 + Supabase Operations Management System** with role-based access control for Employee, Manager, and Admin roles. The app uses server-side rendering with Supabase Auth for authentication and PostgreSQL for data persistence.
 
 ### Key Architectural Patterns
 

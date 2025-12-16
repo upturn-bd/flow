@@ -2,25 +2,21 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FormField, SelectField, TextAreaField } from "@/components/forms";
-import { ModalActionButtons } from "@/components/ui/ModalActionButtons";
-import { Warning, PaperPlaneTilt, Paperclip, X } from "@phosphor-icons/react";
+import { Card } from "@/components/ui/Card";
+import { FormField, SelectField, TextAreaField, FileUploadField } from "@/components/forms";
+import { Info } from "@phosphor-icons/react";
 import { StakeholderIssueCategory } from "@/lib/types/schemas";
 
 interface PublicTicketFormProps {
-  stakeholder: any;
   categories: StakeholderIssueCategory[];
   onSubmit: (data: any) => Promise<void>;
   onCancel: () => void;
-  loading?: boolean;
 }
 
 export default function PublicTicketForm({
-  stakeholder,
   categories,
   onSubmit,
   onCancel,
-  loading = false,
 }: PublicTicketFormProps) {
   const [formData, setFormData] = useState({
     title: "",
@@ -44,15 +40,8 @@ export default function PublicTicketForm({
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      setAttachments(prev => [...prev, ...newFiles]);
-    }
-  };
-
-  const removeAttachment = (index: number) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
+  const handleFilesChange = (files: File[]) => {
+    setAttachments(files);
   };
 
   const validate = () => {
@@ -89,7 +78,7 @@ export default function PublicTicketForm({
   const activCategories = categories.filter(cat => cat.is_active);
 
   return (
-    <div className="bg-surface-primary rounded-xl border border-border-primary p-6">
+    <Card padding="lg" hover={false}>
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Form Header */}
         <div>
@@ -106,25 +95,18 @@ export default function PublicTicketForm({
           label="Ticket Title"
           required
           error={errors.title}
-        >
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) => handleInputChange("title", e.target.value)}
-            placeholder="Brief description of your issue"
-            className="w-full px-4 py-2 bg-surface-primary border border-border-primary rounded-lg
-                     text-foreground-primary placeholder-foreground-tertiary
-                     focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                     transition-colors"
-            disabled={isSubmitting}
-          />
-        </FormField>
+          type="text"
+          value={formData.title}
+          onChange={(e) => handleInputChange("title", e.target.value)}
+          placeholder="Brief description of your issue"
+          disabled={isSubmitting}
+        />
 
         {/* Description */}
         <TextAreaField
           label="Description"
           value={formData.description || ""}
-          onChange={(value) => handleInputChange("description", value)}
+          onChange={(e) => handleInputChange("description", e.target.value)}
           placeholder="Provide detailed information about your issue..."
           required
           rows={5}
@@ -135,8 +117,9 @@ export default function PublicTicketForm({
         {/* Priority */}
         <SelectField
           label="Priority"
+          name="priority"
           value={formData.priority}
-          onChange={(value) => handleInputChange("priority", value)}
+          onChange={(e) => handleInputChange("priority", e.target.value)}
           options={[
             { value: "Low", label: "Low" },
             { value: "Medium", label: "Medium" },
@@ -151,8 +134,9 @@ export default function PublicTicketForm({
         {activCategories.length > 0 && (
           <SelectField
             label="Category"
+            name="category_id"
             value={formData.category_id?.toString() || ""}
-            onChange={(value) => handleInputChange("category_id", value ? parseInt(value) : undefined)}
+            onChange={(e) => handleInputChange("category_id", e.target.value ? parseInt(e.target.value) : undefined)}
             options={[
               { value: "", label: "Select a category (optional)" },
               ...activCategories
@@ -172,110 +156,49 @@ export default function PublicTicketForm({
             Contact Information (Optional)
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormField label="Contact Name">
-              <input
-                type="text"
-                value={formData.contact_name}
-                onChange={(e) => handleInputChange("contact_name", e.target.value)}
-                placeholder="Your name"
-                className="w-full px-4 py-2 bg-surface-primary border border-border-primary rounded-lg
-                         text-foreground-primary placeholder-foreground-tertiary
-                         focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                         transition-colors"
-                disabled={isSubmitting}
-              />
-            </FormField>
+            <FormField
+              label="Contact Name"
+              type="text"
+              value={formData.contact_name}
+              onChange={(e) => handleInputChange("contact_name", e.target.value)}
+              placeholder="Your name"
+              disabled={isSubmitting}
+            />
 
-            <FormField label="Contact Email">
-              <input
-                type="email"
-                value={formData.contact_email}
-                onChange={(e) => handleInputChange("contact_email", e.target.value)}
-                placeholder="your.email@example.com"
-                className="w-full px-4 py-2 bg-surface-primary border border-border-primary rounded-lg
-                         text-foreground-primary placeholder-foreground-tertiary
-                         focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                         transition-colors"
-                disabled={isSubmitting}
-              />
-            </FormField>
+            <FormField
+              label="Contact Email"
+              type="email"
+              value={formData.contact_email}
+              onChange={(e) => handleInputChange("contact_email", e.target.value)}
+              placeholder="your.email@example.com"
+              disabled={isSubmitting}
+            />
 
-            <FormField label="Contact Phone">
-              <input
-                type="tel"
-                value={formData.contact_phone}
-                onChange={(e) => handleInputChange("contact_phone", e.target.value)}
-                placeholder="+1234567890"
-                className="w-full px-4 py-2 bg-surface-primary border border-border-primary rounded-lg
-                         text-foreground-primary placeholder-foreground-tertiary
-                         focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                         transition-colors"
-                disabled={isSubmitting}
-              />
-            </FormField>
+            <FormField
+              label="Contact Phone"
+              type="tel"
+              value={formData.contact_phone}
+              onChange={(e) => handleInputChange("contact_phone", e.target.value)}
+              placeholder="+1234567890"
+              disabled={isSubmitting}
+            />
           </div>
         </div>
 
         {/* File Attachments */}
         <div className="border-t border-border-primary pt-6">
-          <FormField label="Attachments">
-            <div className="space-y-3">
-              <label
-                className="flex items-center justify-center gap-2 px-4 py-3 
-                         bg-surface-secondary border-2 border-dashed border-border-primary 
-                         rounded-lg cursor-pointer hover:bg-surface-hover transition-colors"
-              >
-                <Paperclip size={20} className="text-foreground-secondary" />
-                <span className="text-sm font-medium text-foreground-secondary">
-                  Choose files or drag and drop
-                </span>
-                <input
-                  type="file"
-                  multiple
-                  onChange={handleFileChange}
-                  className="hidden"
-                  disabled={isSubmitting}
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif"
-                />
-              </label>
-
-              {/* Attached Files List */}
-              {attachments.length > 0 && (
-                <div className="space-y-2">
-                  {attachments.map((file, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between px-3 py-2 
-                               bg-surface-secondary rounded-lg border border-border-primary"
-                    >
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <Paperclip size={16} className="text-foreground-tertiary shrink-0" />
-                        <span className="text-sm text-foreground-primary truncate">
-                          {file.name}
-                        </span>
-                        <span className="text-xs text-foreground-tertiary shrink-0">
-                          ({(file.size / 1024).toFixed(1)} KB)
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeAttachment(index)}
-                        className="p-1 hover:bg-error/10 rounded text-error transition-colors"
-                        disabled={isSubmitting}
-                      >
-                        <X size={16} weight="bold" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </FormField>
+          <FileUploadField
+            label="Attachments"
+            files={attachments}
+            onFilesChange={handleFilesChange}
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif"
+            multiple
+          />
         </div>
 
         {/* Info Banner */}
         <div className="bg-info/10 dark:bg-info/20 border border-info/30 rounded-lg p-4 flex items-start gap-3">
-          <Warning size={20} weight="fill" className="text-info shrink-0 mt-0.5" />
+          <Info size={20} weight="fill" className="text-info shrink-0 mt-0.5" />
           <div className="text-xs text-foreground-primary">
             <p className="font-medium mb-1">Important Information</p>
             <ul className="list-disc list-inside space-y-1 text-foreground-secondary">
@@ -287,14 +210,27 @@ export default function PublicTicketForm({
         </div>
 
         {/* Action Buttons */}
-        <ModalActionButtons
-          submitLabel={isSubmitting ? "Creating..." : "Create Ticket"}
-          cancelLabel="Cancel"
-          onCancel={onCancel}
-          isSubmitting={isSubmitting}
-          submitIcon={<PaperPlaneTilt size={18} weight="fill" />}
-        />
+        <div className="flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4 pt-4 border-t border-border-primary">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            className="w-full sm:w-auto"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={isSubmitting}
+            isLoading={isSubmitting}
+            className="w-full sm:w-auto"
+          >
+            {isSubmitting ? "Creating..." : "Create Ticket"}
+          </Button>
+        </div>
       </form>
-    </div>
+    </Card>
   );
 }

@@ -1,11 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { supabase } from "@/lib/supabase/client";
-import { Stakeholder, StakeholderIssue, StakeholderIssueAttachment } from "@/lib/types/schemas";
-import { captureSupabaseError, logError } from "@/lib/sentry";
-import { createStakeholderIssueNotification } from "@/lib/utils/notifications";
-import { sendPublicTicketNotificationEmail } from "@/lib/email/stakeholder-ticket-email";
+import { useState, useCallback, useRef } from "react";
+import { Stakeholder, StakeholderIssue } from "@/lib/types/schemas";
+import { logError, captureError } from "@/lib/sentry";
 
 // ==============================================================================
 // Form Data Interfaces for Public Access
@@ -37,6 +34,13 @@ export interface PublicStakeholderVerificationResult {
 export function usePublicStakeholderAccess() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Store verification credentials for subsequent API calls
+  const credentialsRef = useRef<{
+    companyIdentifier: string;
+    stakeholderName: string;
+    accessCode: string;
+  } | null>(null);
 
   // ==========================================================================
   // VERIFICATION
@@ -44,6 +48,7 @@ export function usePublicStakeholderAccess() {
 
   /**
    * Verify stakeholder access using company name/code and stakeholder name with access code
+   * Uses server-side API route to bypass RLS
    */
   const verifyStakeholderAccess = useCallback(
     async (companyIdentifier: string, stakeholderName: string, accessCode: string): Promise<PublicStakeholderVerificationResult> => {
@@ -51,70 +56,27 @@ export function usePublicStakeholderAccess() {
       setError(null);
 
       try {
-        // First, find the company by name or code
-        const { data: companies, error: companyError } = await supabase
-          .from("companies")
-          .select("id, name, code")
-          .or(`name.ilike.%${companyIdentifier}%,code.ilike.%${companyIdentifier}%`)
-          .limit(1);
+        const response = await fetch('/api/public/stakeholder/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ companyIdentifier, stakeholderName, accessCode }),
+        });
 
-        if (companyError) {
-          captureSupabaseError(companyError, "verifyStakeholderAccess - company lookup", { companyIdentifier });
-          throw new Error("Failed to verify company");
-        }
+        const data = await response.json();
 
-        if (!companies || companies.length === 0) {
+        if (!response.ok) {
           return {
             valid: false,
-            error: "Company not found. Please check the company name.",
+            error: data.error || 'Failed to verify access',
           };
         }
 
-        const company = companies[0];
-
-        // Now verify stakeholder with access code
-        const { data: stakeholder, error: stakeholderError } = await supabase
-          .from("stakeholders")
-          .select(`
-            *,
-            stakeholder_type:stakeholder_types(id, name),
-            kam:employees!kam_id(id, first_name, last_name, email)
-          `)
-          .eq("company_id", company.id)
-          .ilike("name", `%${stakeholderName}%`)
-          .eq("access_code", accessCode.toUpperCase())
-          .eq("is_active", true)
-          .single();
-
-        if (stakeholderError) {
-          if (stakeholderError.code === "PGRST116") {
-            // No rows returned
-            return {
-              valid: false,
-              error: "Invalid stakeholder name or access code. Please check and try again.",
-            };
-          }
-          captureSupabaseError(stakeholderError, "verifyStakeholderAccess - stakeholder lookup", { 
-            companyId: company.id, 
-            stakeholderName 
-          });
-          throw new Error("Failed to verify stakeholder");
+        // Store credentials for subsequent API calls
+        if (data.valid) {
+          credentialsRef.current = { companyIdentifier, stakeholderName, accessCode };
         }
 
-        // Transform KAM data
-        const transformedStakeholder = {
-          ...stakeholder,
-          kam: stakeholder.kam ? {
-            id: stakeholder.kam.id,
-            name: `${stakeholder.kam.first_name} ${stakeholder.kam.last_name}`,
-            email: stakeholder.kam.email,
-          } : undefined,
-        };
-
-        return {
-          valid: true,
-          stakeholder: transformedStakeholder,
-        };
+        return data;
       } catch (err) {
         logError("Error verifying stakeholder access", err);
         setError(err instanceof Error ? err.message : "Failed to verify access");
@@ -135,6 +97,7 @@ export function usePublicStakeholderAccess() {
 
   /**
    * Fetch tickets created by this stakeholder from the public page
+   * Uses server-side API route to bypass RLS
    */
   const fetchPublicTickets = useCallback(
     async (stakeholderId: number): Promise<StakeholderIssue[]> => {
@@ -142,23 +105,26 @@ export function usePublicStakeholderAccess() {
       setError(null);
 
       try {
-        const { data, error: fetchError } = await supabase
-          .from("stakeholder_issues")
-          .select(`
-            *,
-            category:stakeholder_issue_categories(id, name, color),
-            subcategory:stakeholder_issue_subcategories(id, name)
-          `)
-          .eq("stakeholder_id", stakeholderId)
-          .eq("created_from_public_page", true)
-          .order("created_at", { ascending: false });
-
-        if (fetchError) {
-          captureSupabaseError(fetchError, "fetchPublicTickets", { stakeholderId });
-          throw new Error("Failed to fetch tickets");
+        if (!credentialsRef.current) {
+          throw new Error("Not verified");
         }
 
-        return data || [];
+        const response = await fetch('/api/public/stakeholder/tickets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            stakeholderId,
+            accessCode: credentialsRef.current.accessCode,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to fetch tickets');
+        }
+
+        return data.tickets || [];
       } catch (err) {
         logError("Error fetching public tickets", err);
         setError("Failed to load tickets");
@@ -172,118 +138,90 @@ export function usePublicStakeholderAccess() {
 
   /**
    * Create a new ticket from the public page
+   * Uses server-side API route to bypass RLS
    */
   const createPublicTicket = useCallback(
-    async (issueData: PublicStakeholderIssueFormData, companyId: number, stakeholder: Stakeholder): Promise<StakeholderIssue | null> => {
+    async (issueData: PublicStakeholderIssueFormData, _companyId: number, stakeholder: Stakeholder): Promise<StakeholderIssue | null> => {
       setLoading(true);
       setError(null);
 
       try {
-        // Process file attachments if any
-        const attachments: StakeholderIssueAttachment[] = [];
-        
-        if (issueData.attachments && issueData.attachments.length > 0) {
-          for (const file of issueData.attachments) {
-            const fileName = `${Date.now()}_${file.name}`;
-            const filePath = `${companyId}/stakeholder-issues/${issueData.stakeholder_id}/${fileName}`;
-
-            const { error: uploadError } = await supabase.storage
-              .from('stakeholder-documents')
-              .upload(filePath, file, {
-                cacheControl: '3600',
-                upsert: false
-              });
-
-            if (uploadError) {
-              logError("File upload error", uploadError);
-              throw new Error(`Failed to upload ${file.name}`);
-            }
-
-            attachments.push({
-              path: filePath,
-              originalName: file.name,
-              size: file.size,
-              type: file.type,
-              uploadedAt: new Date().toISOString(),
-            });
-          }
+        if (!credentialsRef.current) {
+          throw new Error("Not verified");
         }
 
-        // Create the ticket
-        const { data, error: insertError } = await supabase
-          .from("stakeholder_issues")
-          .insert([
-            {
-              stakeholder_id: issueData.stakeholder_id,
-              title: issueData.title,
-              description: issueData.description,
-              status: 'Pending', // Always start as Pending for public tickets
-              priority: issueData.priority,
-              category_id: issueData.category_id || null,
-              subcategory_id: issueData.subcategory_id || null,
-              attachments,
-              company_id: companyId,
-              created_from_public_page: true, // Mark as public page creation
-              // Note: created_by will be null for public tickets
-            },
-          ])
-          .select()
-          .single();
+        const response = await fetch('/api/public/stakeholder/tickets/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            stakeholderId: issueData.stakeholder_id,
+            accessCode: credentialsRef.current.accessCode,
+            title: issueData.title,
+            description: issueData.description,
+            priority: issueData.priority,
+            category_id: issueData.category_id,
+            subcategory_id: issueData.subcategory_id,
+          }),
+        });
 
-        if (insertError) {
-          captureSupabaseError(insertError, "createPublicTicket", { companyId });
-          throw new Error("Failed to create ticket");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to create ticket');
         }
 
-        // Send notification to KAM if assigned
-        try {
-          if (stakeholder.kam_id) {
-            await createStakeholderIssueNotification(
-              stakeholder.kam_id,
-              'created',
-              {
-                stakeholderName: stakeholder.name,
-                issueTitle: issueData.title,
-                priority: issueData.priority,
-              },
-              {
-                referenceId: data.id,
-                actionUrl: `/stakeholder-issues/${data.id}`,
-              }
-            );
-          }
-        } catch (notificationError) {
-          // Log but don't fail the ticket creation
-          logError("Failed to send public ticket notification", notificationError);
-        }
-
-        // Send email notification
-        try {
-          if (stakeholder.kam && stakeholder.kam.email) {
-            // Use configured site URL or fall back to window.location
-            const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
-                           (typeof window !== 'undefined' ? window.location.origin : '');
-            
-            await sendPublicTicketNotificationEmail({
-              recipientEmail: stakeholder.kam.email,
-              recipientName: stakeholder.kam.name || undefined,
-              stakeholderName: stakeholder.name,
-              ticketTitle: issueData.title,
-              ticketDescription: issueData.description || "",
-              priority: issueData.priority,
-              ticketUrl: `${baseUrl}/stakeholder-issues/${data.id}`,
-            });
-          }
-        } catch (emailError) {
-          // Log but don't fail the ticket creation
-          logError("Failed to send public ticket email", emailError);
-        }
-
-        return data;
+        return data.ticket;
       } catch (err) {
         logError("Error creating public ticket", err);
+        captureError(err, { context: "createPublicTicket" });
         setError(err instanceof Error ? err.message : "Failed to create ticket");
         return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  /**
+   * Fetch issue categories for a company (public access - no auth required)
+   * Uses server-side API route to bypass RLS
+   */
+  const fetchPublicIssueCategories = useCallback(
+    async (companyIdentifier: string, stakeholderName?: string, accessCode?: string) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        // Use provided credentials or stored credentials
+        const creds = {
+          companyIdentifier,
+          stakeholderName: stakeholderName || credentialsRef.current?.stakeholderName || '',
+          accessCode: accessCode || credentialsRef.current?.accessCode || '',
+        };
+
+        if (!creds.stakeholderName || !creds.accessCode) {
+          // Can't fetch categories without verification
+          return [];
+        }
+
+        const response = await fetch('/api/public/stakeholder/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(creds),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to fetch categories');
+        }
+
+        return data.categories || [];
+      } catch (err) {
+        logError("Error fetching public issue categories", err);
+        setError("Failed to load categories");
+        return [];
       } finally {
         setLoading(false);
       }
@@ -297,15 +235,11 @@ export function usePublicStakeholderAccess() {
   const getAttachmentUrl = useCallback(
     async (filePath: string) => {
       try {
-        const { data: publicData } = supabase.storage
-          .from('stakeholder-documents')
-          .getPublicUrl(filePath);
+        // For public URLs, we can construct them directly
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        if (!supabaseUrl) return null;
         
-        if (publicData?.publicUrl) {
-          return publicData.publicUrl;
-        }
-
-        return null;
+        return `${supabaseUrl}/storage/v1/object/public/stakeholder-documents/${filePath}`;
       } catch (err) {
         logError("Error getting attachment URL", err);
         return null;
@@ -327,6 +261,7 @@ export function usePublicStakeholderAccess() {
     verifyStakeholderAccess,
     fetchPublicTickets,
     createPublicTicket,
+    fetchPublicIssueCategories,
     getAttachmentUrl,
   };
 }

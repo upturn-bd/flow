@@ -9,10 +9,13 @@ import {
   Paperclip,
   CalendarBlank,
   Tag,
-  ArrowsClockwise,
-  Package
+  ArrowsClockwise
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/Card";
+import { Badge, StatusBadge, PriorityBadge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface PublicTicketListProps {
   tickets: StakeholderIssue[];
@@ -21,56 +24,17 @@ interface PublicTicketListProps {
   getAttachmentUrl: (path: string) => Promise<string | null>;
 }
 
-const getPriorityColor = (priority: string) => {
-  switch (priority) {
-    case "Urgent":
-      return "text-error bg-error/10 border-error/30";
-    case "High":
-      return "text-warning bg-warning/10 border-warning/30";
-    case "Medium":
-      return "text-info bg-info/10 border-info/30";
-    case "Low":
-      return "text-success bg-success/10 border-success/30";
-    default:
-      return "text-foreground-secondary bg-surface-secondary border-border-primary";
-  }
-};
-
-const getStatusConfig = (status: string) => {
+const getStatusIcon = (status: string) => {
   switch (status) {
     case "Resolved":
-      return {
-        icon: CheckCircle,
-        label: "Resolved",
-        color: "text-success",
-        bgColor: "bg-success/10",
-        borderColor: "border-success/30",
-      };
+      return CheckCircle;
     case "In Progress":
-      return {
-        icon: HourglassMedium,
-        label: "In Progress",
-        color: "text-primary-600",
-        bgColor: "bg-primary-100 dark:bg-primary-900/30",
-        borderColor: "border-primary-300",
-      };
+      return HourglassMedium;
     case "Pending Approval":
-      return {
-        icon: WarningCircle,
-        label: "Pending Approval",
-        color: "text-warning",
-        bgColor: "bg-warning/10",
-        borderColor: "border-warning/30",
-      };
+      return WarningCircle;
     case "Pending":
     default:
-      return {
-        icon: Clock,
-        label: "Pending",
-        color: "text-info",
-        bgColor: "bg-info/10",
-        borderColor: "border-info/30",
-      };
+      return Clock;
   }
 };
 
@@ -111,30 +75,22 @@ export default function PublicTicketList({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="animate-spin mb-4 mx-auto">
-            <ArrowsClockwise size={32} className="text-primary-600" />
-          </div>
-          <p className="text-foreground-secondary">Loading tickets...</p>
-        </div>
-      </div>
+      <LoadingSpinner
+        icon={ArrowsClockwise}
+        text="Loading tickets..."
+        color="blue"
+        height="h-48"
+      />
     );
   }
 
   if (tickets.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="mx-auto w-20 h-20 bg-surface-secondary rounded-full flex items-center justify-center mb-4">
-          <Package size={40} weight="duotone" className="text-foreground-tertiary" />
-        </div>
-        <h3 className="text-lg font-semibold text-foreground-primary mb-2">
-          No Tickets Yet
-        </h3>
-        <p className="text-sm text-foreground-secondary mb-6">
-          You haven't created any tickets yet. Create your first ticket to get started.
-        </p>
-      </div>
+      <EmptyState
+        icon={CalendarBlank}
+        title="No Tickets Yet"
+        description="You haven't created any tickets yet. Create your first ticket to get started."
+      />
     );
   }
 
@@ -159,14 +115,13 @@ export default function PublicTicketList({
       {/* Ticket Cards */}
       <div className="space-y-4">
         {tickets.map((ticket) => {
-          const statusConfig = getStatusConfig(ticket.status);
-          const StatusIcon = statusConfig.icon;
+          const StatusIcon = getStatusIcon(ticket.status);
 
           return (
-            <div
+            <Card
               key={ticket.id}
-              className="bg-surface-primary border border-border-primary rounded-xl p-5 
-                       hover:shadow-lg transition-shadow"
+              padding="lg"
+              hover
             >
               {/* Header Row */}
               <div className="flex items-start justify-between gap-4 mb-4">
@@ -177,29 +132,13 @@ export default function PublicTicketList({
                   
                   {/* Status and Priority Badges */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
-                               border ${statusConfig.bgColor} ${statusConfig.borderColor} ${statusConfig.color}`}
-                    >
-                      <StatusIcon size={14} weight="fill" />
-                      {statusConfig.label}
-                    </span>
-                    
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
-                               border ${getPriorityColor(ticket.priority)}`}
-                    >
-                      {ticket.priority}
-                    </span>
+                    <StatusBadge status={ticket.status} size="sm" />
+                    <PriorityBadge priority={ticket.priority} size="sm" />
 
                     {ticket.category && (
-                      <span
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
-                                 bg-surface-secondary border border-border-primary text-foreground-secondary"
-                      >
-                        <Tag size={14} />
+                      <Badge variant="default" size="sm" icon={<Tag size={14} />}>
                         {ticket.category.name}
-                      </span>
+                      </Badge>
                     )}
                   </div>
                 </div>
@@ -254,7 +193,7 @@ export default function PublicTicketList({
                   </div>
                 )}
               </div>
-            </div>
+            </Card>
           );
         })}
       </div>
