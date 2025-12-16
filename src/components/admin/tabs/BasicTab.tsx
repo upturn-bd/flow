@@ -23,7 +23,7 @@ export default function BasicTab() {
     loading,
     updateCompanySettings
   } = useAdminData();
-  
+
   const [formValues, setFormValues] = useState<CompanyBasicsFormData>({
     company_name: "",
     industry_id: "",
@@ -33,6 +33,7 @@ export default function BasicTab() {
     // Payroll Gear
     fiscal_year_start: "2024-01-01",
     max_device_limit: 3,
+    max_users: 50,
   });
   const [errors, setErrors] = useState<Partial<Record<keyof CompanyBasicsFormData, string>>>({});
   const [isValid, setIsValid] = useState(false);
@@ -67,6 +68,7 @@ export default function BasicTab() {
         live_absent_enabled: companyInfo.live_absent_enabled ?? false,
         fiscal_year_start: companyInfo.fiscal_year_start ?? "2024-01-01",
         max_device_limit: companyInfo.max_device_limit ?? 3,
+        max_users: companyInfo.max_users ?? 50,
       });
     }
   }, [companyInfo]);
@@ -106,7 +108,7 @@ export default function BasicTab() {
           title="Company Basics"
           icon={<Building className="w-5 h-5" />}
         />
-        
+
         <form onSubmit={onSubmit} className="p-3 sm:p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
@@ -144,6 +146,7 @@ export default function BasicTab() {
               error={errors.country_id}
             />
           </div>
+
         </form>
       </div>
 
@@ -152,6 +155,8 @@ export default function BasicTab() {
           formValues={{
             live_absent_enabled: formValues.live_absent_enabled,
             fiscal_year_start: formValues.fiscal_year_start,
+            max_device_limit: formValues.max_device_limit,
+            max_users: formValues.max_users,
           }}
           onChange={handleSettingsChange}
           errors={{

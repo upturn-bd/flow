@@ -28,7 +28,9 @@ export default function CompaniesPage() {
     payroll_generation_day: 1,
     fiscal_year_start: "",
     live_payroll_enabled: false,
+
     has_division: false,
+    max_users: 50,
   });
   const [codeError, setCodeError] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
@@ -50,7 +52,7 @@ export default function CompaniesPage() {
 
       if (companiesResult.data) {
         setCompanies(companiesResult.data as Company[]);
-        
+
         // Fetch stats for each company
         const stats: Record<number, { employees: number; teams: number }> = {};
         await Promise.all(
@@ -99,7 +101,7 @@ export default function CompaniesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const validationError = validateCode(formData.code);
     if (validationError) {
       setCodeError(validationError);
@@ -117,7 +119,9 @@ export default function CompaniesPage() {
         payroll_generation_day: formData.payroll_generation_day,
         fiscal_year_start: formData.fiscal_year_start || null,
         live_payroll_enabled: formData.live_payroll_enabled,
+
         has_division: formData.has_division,
+        max_users: formData.max_users,
       };
 
       if (editingCompany) {
@@ -168,7 +172,9 @@ export default function CompaniesPage() {
       payroll_generation_day: company.payroll_generation_day || 1,
       fiscal_year_start: company.fiscal_year_start || "",
       live_payroll_enabled: company.live_payroll_enabled || false,
+
       has_division: company.has_division || false,
+      max_users: company.max_users || 50,
     });
     setShowModal(true);
   };
@@ -184,7 +190,9 @@ export default function CompaniesPage() {
       payroll_generation_day: 1,
       fiscal_year_start: "",
       live_payroll_enabled: false,
+
       has_division: false,
+      max_users: 50,
     });
     setCodeError("");
   };
@@ -201,8 +209,8 @@ export default function CompaniesPage() {
         .update({ [feature]: !company[feature] })
         .eq("id", company.id);
       if (error) throw error;
-      
-      setCompanies(prev => prev.map(c => 
+
+      setCompanies(prev => prev.map(c =>
         c.id === company.id ? { ...c, [feature]: !c[feature] } : c
       ));
       toast.success("Setting updated");
@@ -615,7 +623,10 @@ export default function CompaniesPage() {
             min={1}
             max={31}
             value={formData.payroll_generation_day}
-            onChange={(e) => setFormData({ ...formData, payroll_generation_day: parseInt(e.target.value) })}
+            onChange={(e) => {
+              const val = parseInt(e.target.value);
+              setFormData({ ...formData, payroll_generation_day: isNaN(val) ? 0 : val });
+            }}
           />
 
           <DateField
@@ -623,6 +634,17 @@ export default function CompaniesPage() {
             label="Fiscal Year Start"
             value={formData.fiscal_year_start}
             onChange={(e) => setFormData({ ...formData, fiscal_year_start: e.target.value })}
+          />
+
+          <NumberField
+            name="max_users"
+            label="Max Users"
+            min={1}
+            value={formData.max_users}
+            onChange={(e) => {
+              const val = parseInt(e.target.value);
+              setFormData({ ...formData, max_users: isNaN(val) ? 0 : val });
+            }}
           />
         </div>
 

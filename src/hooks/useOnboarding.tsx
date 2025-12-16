@@ -76,10 +76,10 @@ export function useOnboarding() {
   const getUserOnboardingInfo = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
+
       if (authError || !user) {
         throw new Error("Not authenticated");
       }
@@ -144,7 +144,7 @@ export function useOnboarding() {
 
     try {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
+
       if (authError || !user) {
         throw new Error("Not authenticated");
       }
@@ -163,6 +163,31 @@ export function useOnboarding() {
 
       if (existingEmployee) {
         throw new Error("This email is already associated with another employee account. Please use a different email address.");
+      }
+
+      // Check max_users limit
+      const { data: companyData, error: companyError } = await supabase
+        .from("companies")
+        .select("max_users")
+        .eq("id", data.company_id)
+        .single();
+
+      if (companyError) {
+        throw new Error("Failed to fetch company settings: " + companyError.message);
+      }
+
+      const { count: currentEmployeeCount, error: countError } = await supabase
+        .from("employees")
+        .select("*", { count: "exact", head: true })
+        .eq("company_id", data.company_id)
+        .eq("job_status", "Active");
+
+      if (countError) {
+        throw new Error("Failed to count employees: " + countError.message);
+      }
+
+      if (companyData.max_users && (currentEmployeeCount || 0) >= companyData.max_users) {
+        throw new Error(`Company has reached its maximum user limit of ${companyData.max_users}. Please contact support or upgrade your plan.`);
       }
 
       const { error } = await supabase.from("employees").upsert([
@@ -206,7 +231,7 @@ export function useOnboarding() {
 
     try {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
+
       if (authError || !user) {
         throw new Error("Not authenticated");
       }
@@ -245,8 +270,8 @@ export function useOnboarding() {
 
   // Approve or reject employee onboarding
   const processOnboardingAction = useCallback(async (
-    employeeId: string, 
-    action: "ACCEPTED" | "REJECTED", 
+    employeeId: string,
+    action: "ACCEPTED" | "REJECTED",
     reason?: string
   ) => {
     setLoading(true);
@@ -254,7 +279,7 @@ export function useOnboarding() {
 
     try {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
+
       if (authError || !user) {
         throw new Error("Not authenticated");
       }
@@ -309,7 +334,7 @@ export function useOnboarding() {
   // Set up polling for pending employees (replaces realtime)
   const subscribeToOnboardingUpdates = useCallback((callback?: (payload: any) => void) => {
     let intervalId: NodeJS.Timeout;
-    
+
     const pollForUpdates = async () => {
       try {
         await fetchPendingEmployees();
@@ -334,7 +359,7 @@ export function useOnboarding() {
   // Set up polling for user's onboarding status (replaces realtime)
   const subscribeToUserOnboardingUpdates = useCallback((userId: string, callback?: (payload: any) => void) => {
     let intervalId: NodeJS.Timeout;
-    
+
     const pollForUserUpdates = async () => {
       try {
         const { data, error } = await supabase
@@ -367,14 +392,14 @@ export function useOnboarding() {
     error,
     pendingEmployees,
     userInfo,
-    
+
     // Actions
     getUserOnboardingInfo,
     submitOnboarding,
     fetchPendingEmployees,
     processOnboardingAction,
     clearError,
-    
+
     // Polling subscriptions (replaces realtime)
     subscribeToOnboardingUpdates,
     subscribeToUserOnboardingUpdates,
