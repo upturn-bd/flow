@@ -20,6 +20,7 @@ interface StepDataFormProps {
   processSteps?: StakeholderProcessStep[]; // For human-readable formula labels
   onComplete: () => void;
   onCancel: () => void;
+  isEditMode?: boolean; // When true, editing completed step data (uses save instead of complete)
 }
 
 export default function StepDataForm({
@@ -30,6 +31,7 @@ export default function StepDataForm({
   processSteps = [],
   onComplete,
   onCancel,
+  isEditMode = false,
 }: StepDataFormProps) {
   const { saveStepData, completeStep, updateStakeholder } = useStakeholders();
 
@@ -493,6 +495,48 @@ export default function StepDataForm({
     } catch (error) {
       console.error("Error completing step:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to complete step. Please try again.";
+      setErrors({ submit: errorMessage });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Handler for saving edits to already completed step data
+  const handleSaveEdit = async () => {
+    if (!validateForm()) return;
+
+    setSubmitting(true);
+    try {
+      // Delete files that were marked for deletion
+      if (filesToDelete.length > 0) {
+        for (const filePath of filesToDelete) {
+          try {
+            await deleteFile(filePath);
+          } catch (error) {
+            console.error('Error deleting file:', filePath, error);
+            // Continue even if deletion fails
+          }
+        }
+        // Clear the deletion queue
+        setFilesToDelete([]);
+      }
+
+      const newFormData = { ...formData };
+      calculatedFields.current.forEach((value, key) => {
+        newFormData[key] = value;
+      });
+      
+      // Save the data while keeping it marked as completed
+      await saveStepData({
+        stakeholder_id: stakeholderId,
+        step_id: step.id!,
+        data: newFormData,
+        is_completed: true,
+      });
+      onComplete();
+    } catch (error) {
+      console.error("Error saving step edit:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to save changes. Please try again.";
       setErrors({ submit: errorMessage });
     } finally {
       setSubmitting(false);
@@ -1234,7 +1278,7 @@ export default function StepDataForm({
             >
               Cancel
             </button>
-            {step.can_reject && (
+            {step.can_reject && !isEditMode && (
               <button
                 type="button"
                 onClick={() => setShowRejectionDialog(true)}
@@ -1247,22 +1291,26 @@ export default function StepDataForm({
             )}
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+            {!isEditMode && (
+              <button
+                type="button"
+                onClick={handleSaveDraft}
+                disabled={submitting || rejecting}
+                className="w-full sm:w-auto px-4 py-2 text-sm border border-primary-300 text-primary-700 rounded-lg hover:bg-primary-50"
+              >
+                FloppyDisk Draft
+              </button>
+            )}
             <button
               type="button"
-              onClick={handleSaveDraft}
-              disabled={submitting || rejecting}
-              className="w-full sm:w-auto px-4 py-2 text-sm border border-primary-300 text-primary-700 rounded-lg hover:bg-primary-50"
-            >
-              FloppyDisk Draft
-            </button>
-            <button
-              type="button"
-              onClick={handleCompleteStep}
+              onClick={isEditMode ? handleSaveEdit : handleCompleteStep}
               disabled={submitting || rejecting}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
             >
               <CheckCircle size={16} />
-              {submitting ? "Completing..." : "Complete Step"}
+              {submitting 
+                ? (isEditMode ? "Saving..." : "Completing...") 
+                : (isEditMode ? "Save Changes" : "Complete Step")}
             </button>
           </div>
         </div>

@@ -284,17 +284,17 @@ export default function StakeholderTransactions({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <motion.div
           variants={fadeInUp}
-          className="bg-linear-to-br from-primary-50 to-primary-100 rounded-lg p-3 sm:p-4 border border-primary-200"
+          className="bg-linear-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-900/50 rounded-lg p-3 sm:p-4 border border-primary-200 dark:border-primary-800"
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs sm:text-sm text-primary-600 font-medium">Total Transactions</p>
-              <p className="text-xl sm:text-2xl font-bold text-primary-900 mt-1">
+              <p className="text-xs sm:text-sm text-primary-600 dark:text-primary-400 font-medium">Total Transactions</p>
+              <p className="text-xl sm:text-2xl font-bold text-primary-900 dark:text-primary-100 mt-1">
                 {summary.totalTransactions}
               </p>
             </div>
-            <div className="p-2 sm:p-3 bg-primary-200 rounded-lg">
-              <Pulse className="text-primary-700" size={20} />
+            <div className="p-2 sm:p-3 bg-primary-200 dark:bg-primary-800 rounded-lg">
+              <Pulse className="text-primary-700 dark:text-primary-300" size={20} />
             </div>
           </div>
         </motion.div>
@@ -335,19 +335,19 @@ export default function StakeholderTransactions({
 
         <motion.div
           variants={fadeInUp}
-          className="bg-linear-to-br from-primary-50/50 to-primary-100/50 rounded-lg p-3 sm:p-4 border border-primary-200/50"
+          className="bg-linear-to-br from-primary-50/50 to-primary-100/50 dark:from-primary-900/20 dark:to-primary-900/30 rounded-lg p-3 sm:p-4 border border-primary-200/50 dark:border-primary-800/50"
         >
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm text-primary-600 font-medium">Net Amount</p>
+              <p className="text-xs sm:text-sm text-primary-600 dark:text-primary-400 font-medium">Net Amount</p>
               <p className={`text-lg sm:text-2xl font-bold mt-1 truncate ${
                 summary.netAmount >= 0 ? 'text-success' : 'text-error'
               }`}>
                 {summary.netAmount.toLocaleString()} BDT
               </p>
             </div>
-            <div className="p-2 sm:p-3 bg-primary-200/50 rounded-lg shrink-0">
-              <Wallet className="text-primary-700" size={20} />
+            <div className="p-2 sm:p-3 bg-primary-200/50 dark:bg-primary-800/50 rounded-lg shrink-0">
+              <Wallet className="text-primary-700 dark:text-primary-300" size={20} />
             </div>
           </div>
         </motion.div>
@@ -511,7 +511,7 @@ export default function StakeholderTransactions({
                     setAmountFilter('all');
                     setDateRangeFilter('30days');
                   }}
-                  className="text-primary-600 hover:text-primary-800 font-medium"
+                  className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
                 >
                   Clear filters
                 </button>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useStakeholders } from "@/hooks/useStakeholders";
 import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/lib/auth/auth-context";
+import { useCompanyInfo } from "@/hooks/useCompanyInfo";
 import { getPublicFileUrl } from "@/lib/utils/files";
 import { calculateFieldValue, formatCalculatedValue, formulaToReadable } from "@/lib/utils/formula-evaluator";
 import { ArrowLeft, CheckCircle, Clock, Calendar, MapPin, Envelope, Phone, User, PencilSimple, TrashSimple, WarningCircle, FileText, Download, CurrencyDollar, Database, Calculator } from "@phosphor-icons/react";
@@ -13,6 +14,7 @@ import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
 import StakeholderIssuesTab from "@/components/stakeholder-issues/StakeholderIssuesTab";
 import StakeholderTransactions from "@/components/stakeholders/StakeholderTransactions";
 import AdditionalDataModal from "@/components/stakeholders/AdditionalDataModal";
+import PublicAccessSection from "@/components/stakeholders/PublicAccessSection";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { toast } from "sonner";
@@ -158,6 +160,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
   const { getEmployeeTeamIds } = useTeams();
   const { hasPermission } = useAuth();
+  const { companyInfo } = useCompanyInfo();
 
   const [stakeholder, setStakeholder] = useState<Stakeholder | null>(null);
   const [stepData, setStepData] = useState<StakeholderStepData[]>([]);
@@ -392,12 +395,12 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
       {/* Additional Data Prompt Banner - for Permanent stakeholders without additional data */}
       {stakeholder.status === "Permanent" && (!stakeholder.additional_data || Object.keys(stakeholder.additional_data).length === 0) && (
-        <div className="bg-blue-50 border-l-4 border-blue-500 px-4 py-3 rounded-lg">
+        <div className="bg-info/10 border-l-4 border-info px-4 py-3 rounded-lg dark:bg-info/20">
           <div className="flex items-start gap-3">
-            <Database className="text-blue-500 mt-0.5 shrink-0" size={20} />
+            <Database className="text-info mt-0.5 shrink-0" size={20} />
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-blue-800">Add Additional Data</p>
-              <p className="text-sm text-blue-700 mt-1">
+              <p className="font-medium text-info">Add Additional Data</p>
+              <p className="text-sm text-info/80 mt-1">
                 This stakeholder is now permanent. Add additional data from completed steps or create custom fields.
               </p>
               <button
@@ -446,7 +449,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 <div>
                   <p className="text-sm font-medium text-foreground-secondary">Type</p>
                   <p className="text-sm text-foreground-secondary mt-0.5">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
                       {stakeholder.stakeholder_type.name}
                     </span>
                   </p>
@@ -562,7 +565,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         <Envelope className="text-foreground-tertiary" size={16} />
                         <a
                           href={`mailto:${contact.email}`}
-                          className="text-sm text-blue-600 hover:underline"
+                          className="text-sm text-primary-600 hover:underline dark:text-primary-400"
                         >
                           {contact.email}
                         </a>
@@ -573,7 +576,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                         <Phone className="text-foreground-tertiary" size={16} />
                         <a
                           href={`tel:${contact.phone}`}
-                          className="text-sm text-blue-600 hover:underline"
+                          className="text-sm text-primary-600 hover:underline dark:text-primary-400"
                         >
                           {contact.phone}
                         </a>
@@ -587,6 +590,13 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
             )}
           </div>
 
+          {/* Public Access Section */}
+          <PublicAccessSection
+            stakeholderName={stakeholder.name}
+            companyName={companyInfo?.name || companyInfo?.code || "Company"}
+            accessCode={stakeholder.access_code}
+          />
+
           {/* Additional Data - Only show for Permanent stakeholders */}
           {stakeholder.status === "Permanent" && (
             <div className="bg-surface-primary rounded-lg border border-border-primary p-4 sm:p-6 space-y-4">
@@ -594,7 +604,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                 <h2 className="text-base sm:text-lg font-semibold text-foreground-primary">Additional Data</h2>
                 <button
                   onClick={() => setShowAdditionalDataModal(true)}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950 transition-colors"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 dark:text-primary-400 dark:border-primary-700 dark:hover:bg-primary-950 transition-colors"
                 >
                   <PencilSimple size={16} />
                   <span className="hidden sm:inline">Edit</span>
@@ -737,6 +747,9 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                           hasTeamAccess &&
                           (isSequential ? isCurrent : true);
 
+                        // Allow editing completed steps if user has team access
+                        const canEditCompleted = isCompleted && hasTeamAccess;
+
                         // Determine if this step can be rolled back
                         // Allow rollback of any completed step when rollback is enabled
                         const canRollback = (() => {
@@ -758,7 +771,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                 : isCurrent
                                   ? "border-primary-300 bg-primary-50 dark:bg-primary-950 dark:border-primary-700"
                                   : canEdit && !isSequential
-                                    ? "border-blue-200 bg-blue-25"
+                                    ? "border-primary-200 bg-primary-50/50 dark:border-primary-800 dark:bg-primary-950/50"
                                     : "border-border-primary bg-surface-secondary"
                               }`}
                           >
@@ -770,7 +783,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                         ? "bg-success text-white"
                                         : isCurrent
                                           ? "bg-info text-white"
-                                          : "bg-gray-300 text-foreground-secondary"
+                                          : "bg-background-tertiary text-foreground-secondary dark:bg-surface-secondary"
                                       }`}
                                   >
                                     {isCompleted ? (
@@ -803,7 +816,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                     </div>
                                     {/* Show permission/access warnings */}
                                     {!isCompleted && !hasTeamAccess && (
-                                      <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded wrap-break-words">
+                                      <div className="mt-2 text-xs text-warning bg-warning/10 px-2 py-1 rounded wrap-break-words dark:bg-warning/20">
                                         You must be a member of {
                                           step.teams && step.teams.length > 0 
                                             ? `one of these teams: ${step.teams.map(t => t.name).join(', ')}`
@@ -832,7 +845,18 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                       {activeStepId === step.id ? "Cancel" : "Work on Step"}
                                     </button>
                                   )}
-                                  {canRollback && (
+                                  {canEditCompleted && (
+                                    <button
+                                      onClick={() =>
+                                        setActiveStepId(activeStepId === step.id ? null : (step.id || null))
+                                      }
+                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white text-xs sm:text-sm rounded-lg hover:bg-primary-700 whitespace-nowrap flex items-center gap-1 sm:gap-2"
+                                    >
+                                      <PencilSimple size={14} />
+                                      {activeStepId === step.id ? "Cancel" : "Edit Step"}
+                                    </button>
+                                  )}
+                                  {canRollback && activeStepId !== step.id && (
                                     <button
                                       onClick={() => {
                                         // For sequential processes, calculate how many steps will be affected
@@ -868,8 +892,8 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                 </div>
                               </div>
 
-                              {/* Step Data Form */}
-                              {activeStepId === step.id && canEdit && step.id && (
+                              {/* Step Data Form - Show for both incomplete and completed steps being edited */}
+                              {activeStepId === step.id && (canEdit || canEditCompleted) && step.id && (
                                 <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border-primary">
                                   <StepDataForm
                                     stakeholderId={stakeholderId}
@@ -891,12 +915,13 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                     processSteps={sortedSteps}
                                     onComplete={handleStepComplete}
                                     onCancel={() => setActiveStepId(null)}
+                                    isEditMode={isCompleted}
                                   />
                                 </div>
                               )}
 
-                              {/* Display Completed Data */}
-                              {isCompleted && stepDataEntry && (
+                              {/* Display Completed Data - Only show when not actively editing */}
+                              {isCompleted && stepDataEntry && activeStepId !== step.id && (
                                 <div className="mt-4 pt-4 border-t border-border-primary">
                                   <div className="grid grid-cols-2 gap-4">
                                     {Object.entries(stepDataEntry.data).map(([key, value]) => {
@@ -1020,7 +1045,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                                 href={fileInfo.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+                                                className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                                               >
                                                 <FileText size={16} />
                                                 <span className="truncate">{fileInfo.name}</span>
@@ -1042,7 +1067,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                                                 href={`https://www.google.com/maps?q=${actualValue.latitude},${actualValue.longitude}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-xs text-blue-600 hover:underline mt-1 inline-block"
+                                                className="text-xs text-primary-600 hover:underline mt-1 inline-block dark:text-primary-400"
                                               >
                                                 View on Google Maps
                                               </a>

@@ -1,7 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { JOB_STATUS_OPTIONS } from "./basicInfo.constants";
 
 interface Option {
   value: string;
@@ -68,7 +67,7 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
     if (loading) {
       return (
         <div className="flex items-center justify-center py-2">
-          <LoadingSpinner className="h-5 w-5 text-blue-500" />
+          <LoadingSpinner className="h-5 w-5 text-primary-500" />
           <span className="ml-2 text-sm text-foreground-tertiary">Loading...</span>
         </div>
       );
@@ -112,6 +111,29 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
             onBlur={onBlur}
           >
             <option value="">{loading || loadingDepartments ? "Loading..." : "Select Department"}</option>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+          {showError && <p id={`${fieldId}-error`} className="mt-1 text-sm text-error" aria-live="polite">{error}</p>}
+        </div>
+      );
+    }
+    if (name === "supervisor_id") {
+      return (
+        <div>
+          <select
+            id={fieldId}
+            name={name}
+            value={value || ""}
+            onChange={onChange}
+            className={inputClass}
+            aria-invalid={!!showError}
+            aria-describedby={showError ? `${fieldId}-error` : undefined}
+            disabled={loading || disabled}
+            onBlur={onBlur}
+          >
+            <option value="">{loading ? "Loading..." : "Not assigned"}</option>
             {options.map((option) => (
               <option key={option.value} value={option.value}>{option.label}</option>
             ))}
@@ -254,4 +276,4 @@ export const BasicInfoField: React.FC<BasicInfoFieldProps> = ({
       {renderField()}
     </div>
   );
-}; 
+};

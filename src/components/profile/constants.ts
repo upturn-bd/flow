@@ -1,5 +1,17 @@
-import { PersonalInfo } from "@/lib/types/schemas";
+import { BasicInfo, PersonalInfo } from "@/lib/types/schemas";
 
+// Basic Info Types and Constants
+export type BasicInfoFormData = BasicInfo;
+
+export const JOB_STATUS_OPTIONS = [
+  "Active",
+  "Inactive",
+  "Probation",
+  "Resigned",
+  "Terminated",
+] as const;
+
+// Personal Info Types and Constants
 export type PersonalFormData = PersonalInfo;
 
 export const Gender = {
@@ -23,4 +35,4 @@ export const MaritalStatus = {
   MARRIED: "Married",
   UNMARRIED: "Unmarried",
   SINGLE: "Single",
-} as const; 
+} as const;

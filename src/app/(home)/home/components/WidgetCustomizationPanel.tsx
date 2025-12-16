@@ -389,7 +389,7 @@ export default function WidgetCustomizationPanel({
               className="flex-1 sm:flex-none px-6 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
             >
               <FloppyDisk size={16} />
-              {saving ? 'Saving...' : 'FloppyDisk Changes'}
+              {saving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </div>

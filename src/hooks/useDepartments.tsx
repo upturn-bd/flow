@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useBaseEntity } from "./core";
 import { Department } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
@@ -20,15 +20,7 @@ export function useDepartments() {
   const [loading, setLoading] = useState(false)
 
   // Manual fetch all departments
-  const fetchDepartments = async (company_id?: number | undefined) => {
-    // Don't fetch if auth is still loading or user isn't authenticated
-    // if (!user) {
-    //   setDepartments([]);
-    //         console.log("Auth loading")
-
-    //   return [];
-    // }
-
+  const fetchDepartments = useCallback(async (company_id?: number | undefined) => {
     try {
       setLoading(true);
       const supabase = await createClient();
@@ -56,11 +48,10 @@ export function useDepartments() {
       setLoading(false);
       throw error;
     }
-  };
+  }, [employeeInfo?.company_id]);
 
   // Manual create department
-  // Manual create department
-  const createDepartment = async (dept: Department) => {
+  const createDepartment = useCallback(async (dept: Department) => {
     if (authLoading || !user) {
       throw new Error('User not authenticated');
     }
@@ -95,7 +86,7 @@ export function useDepartments() {
           .eq("id", data.head_id);
       }
 
-      fetchDepartments();
+      await fetchDepartments();
       setLoading(false);
 
       return data;
@@ -104,10 +95,10 @@ export function useDepartments() {
       setLoading(false);
       throw error;
     }
-  };
+  }, [authLoading, user, employeeInfo?.company_id, fetchDepartments]);
 
   // Manual update department
-  const updateDepartment = async (id: number, dept: Partial<Department>) => {
+  const updateDepartment = useCallback(async (id: number, dept: Partial<Department>) => {
     if (authLoading || !user) {
       throw new Error('User not authenticated');
     }
@@ -134,18 +125,19 @@ export function useDepartments() {
           .eq("id", dept.head_id);
       }
 
-      fetchDepartments()
+      await fetchDepartments()
       setLoading(false)
 
       return data;
     } catch (error) {
       console.error("Error updating department:", error);
+      setLoading(false);
       throw error;
     }
-  };
+  }, [authLoading, user, fetchDepartments]);
 
   // Manual delete department
-  const deleteDepartment = async (id: number) => {
+  const deleteDepartment = useCallback(async (id: number) => {
     if (authLoading || !user) {
       throw new Error('User not authenticated');
     }
@@ -170,15 +162,16 @@ export function useDepartments() {
 
       if (error) throw error;
 
-      fetchDepartments()
+      await fetchDepartments()
       setLoading(false)
 
       return data;
     } catch (error) {
       console.error("Error deleting department:", error);
+      setLoading(false);
       throw error;
     }
-  };
+  }, [authLoading, user, fetchDepartments]);
 
   return {
     ...baseResult,

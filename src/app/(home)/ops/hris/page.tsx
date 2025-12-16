@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, User, Envelope, Phone, Building, Calendar, FunnelSimple, Download } from "@phosphor-icons/react";
+import { Users, User, Envelope, Phone, Building, Calendar, FunnelSimple, Download, UserCircle } from "@phosphor-icons/react";
 import SearchBar from "@/components/ui/SearchBar";
 import PageHeader from "@/components/ui/PageHeader";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -263,6 +263,7 @@ useEffect(() => {
                       <th className="px-6 py-3">Phone</th>
                       <th className="px-6 py-3">Department</th>
                       <th className="px-6 py-3">Designation</th>
+                      <th className="px-6 py-3">Supervisor</th>
                       <th className="px-6 py-3">Join Date</th>
                       <th className="px-6 py-3 text-center">Profile</th>
                     </tr>
@@ -288,6 +289,9 @@ useEffect(() => {
                         </td>
                         <td className="px-6 py-3 text-sm text-foreground-secondary">
                           {employee.designation}
+                        </td>
+                        <td className="px-6 py-3 text-sm text-foreground-secondary">
+                          {employee.supervisor_name || "Not assigned"}
                         </td>
                         <td className="px-6 py-3 text-sm text-foreground-secondary">
                           {employee.joinDate
@@ -352,6 +356,12 @@ useEffect(() => {
                         <Building className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
                         <span className="text-foreground-secondary text-sm">
                           {employee.department}
+                        </span>
+                      </div>
+                      <div className="flex">
+                        <UserCircle className="w-5 h-5 text-foreground-tertiary mr-3 shrink-0" />
+                        <span className="text-foreground-secondary text-sm">
+                          Supervisor: {employee.supervisor_name || "Not assigned"}
                         </span>
                       </div>
                       <div className="flex">

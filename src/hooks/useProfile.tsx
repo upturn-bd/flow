@@ -5,9 +5,8 @@ import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
 
 // Types
-import { BasicInfoFormData } from "@/app/(home)/hris/tabs/basicInfo.constants";
-import { PersonalFormData } from "@/app/(home)/hris/tabs/personalInfo.constants";
 import { Schooling, Experience } from "@/lib/types";
+import { BasicInfoFormData, PersonalFormData } from "@/components/profile";
 
 // Type aliases for consistency
 export type Education = Schooling;

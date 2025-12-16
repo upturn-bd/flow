@@ -98,6 +98,17 @@ export function TicketCard({
                   )}
                 </span>
               )}
+              {/* Public Page Badge */}
+              {ticket.created_from_public_page && (
+                <span
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium 
+                           bg-info/20 text-info border border-info/30"
+                  title="Created from public page"
+                >
+                  <LinkIcon size={12} weight="bold" />
+                  Public
+                </span>
+              )}
             </div>
 
             {/* Stakeholder Info */}

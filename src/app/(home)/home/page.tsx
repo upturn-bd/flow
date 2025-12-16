@@ -1,7 +1,6 @@
 "use client";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { pageVariants } from "@/app/(home)/home/components/animations";
 import { useHomeLayout } from "@/hooks/useHomeLayout";
 import AttendanceWidget from "@/app/(home)/home/widgets/AttendanceWidget";
 import NoticesWidget from "@/app/(home)/home/widgets/NoticesWidget";
@@ -30,6 +29,9 @@ export default function HomePage() {
   const [isMobile, setIsMobile] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Store original widget state when entering edit mode for cancel functionality
+  const [originalWidgets, setOriginalWidgets] = useState<WidgetConfig[] | null>(null);
 
   // Measure container width for responsive grid
   useEffect(() => {
@@ -280,9 +282,28 @@ export default function HomePage() {
     }
   };
 
+  // Enter edit mode - save current state for potential cancel
+  const handleEnterEditMode = useCallback(() => {
+    if (homeLayout?.widgets) {
+      // Deep clone to preserve original positions
+      setOriginalWidgets(JSON.parse(JSON.stringify(homeLayout.widgets)));
+    }
+    setIsEditMode(true);
+  }, [homeLayout?.widgets]);
+
+  // Cancel edit mode - restore original positions
+  const handleCancelEditMode = useCallback(() => {
+    if (originalWidgets && updateAllWidgets) {
+      updateAllWidgets(originalWidgets);
+    }
+    setOriginalWidgets(null);
+    setIsEditMode(false);
+  }, [originalWidgets, updateAllWidgets]);
+
   const handleSaveLayout = async () => {
     if (homeLayout?.widgets && saveLayout) {
       await saveLayout(homeLayout.widgets);
+      setOriginalWidgets(null);
       setIsEditMode(false);
     }
   };
@@ -306,12 +327,24 @@ export default function HomePage() {
     }
   };
 
+  // Track if this is the initial render to avoid double animation
+  const [isInitialRender, setIsInitialRender] = useState(true);
+  
+  // Once layout is loaded and container has width, mark initial render complete
+  useEffect(() => {
+    if (!layoutLoading && containerWidth > 0 && isInitialRender) {
+      // Small delay to let the grid stabilize before showing
+      const timer = setTimeout(() => setIsInitialRender(false), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [layoutLoading, containerWidth, isInitialRender]);
+
+  // Show loading state while data is loading OR while measuring container
+  const showLoading = layoutLoading || (isInitialRender && containerWidth === 0);
+
   return (
     <>
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={pageVariants}
+    <div
       className="min-h-screen bg-background-primary px-2 py-4 sm:px-4 sm:py-6 lg:px-8 lg:py-8"
     >
       <div className="w-full max-w-full">
@@ -322,7 +355,7 @@ export default function HomePage() {
             {isEditMode && !isMobile ? (
               <>
                 <button
-                  onClick={() => setIsEditMode(false)}
+                  onClick={handleCancelEditMode}
                   className="px-3 py-2 sm:px-4 text-sm sm:text-base text-foreground-primary bg-surface-primary border border-border-primary rounded-lg hover:bg-surface-hover transition-colors"
                 >
                   Cancel
@@ -331,12 +364,12 @@ export default function HomePage() {
                   onClick={handleSaveLayout}
                   className="px-3 py-2 sm:px-4 text-sm sm:text-base text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
                 >
-                  FloppyDisk Changes
+                  Save Changes
                 </button>
               </>
             ) : (
               <button
-                onClick={() => isMobile ? setShowMobileCustomization(true) : setIsEditMode(true)}
+                onClick={() => isMobile ? setShowMobileCustomization(true) : handleEnterEditMode()}
                 className="flex items-center gap-2 px-3 py-2 sm:px-4 text-sm sm:text-base text-foreground-primary bg-surface-primary border border-border-primary rounded-lg hover:bg-surface-hover transition-colors"
               >
                 <Gear size={18} />
@@ -346,27 +379,34 @@ export default function HomePage() {
           </div>
         </div>
 
-        {layoutLoading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-foreground-secondary">Loading dashboard...</div>
-          </div>
-        ) : (
-          <div ref={containerRef} className="w-full">
-            {containerWidth > 0 && (
-              <GridLayout
-                className="layout"
-                layout={gridLayout}
-                cols={gridCols}
-              rowHeight={isMobile ? 60 : ROW_HEIGHT}
-              width={containerWidth}
-              margin={isMobile ? [8, 8] : [16, 16]}
-              containerPadding={[0, 0]}
-              isDraggable={isEditMode && !isMobile}
-              isResizable={isEditMode && !isMobile}
-              onLayoutChange={handleLayoutChange}
-              compactType={null}
-              preventCollision={true}
+        {/* Container always rendered to measure width */}
+        <div ref={containerRef} className="w-full">
+          {showLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-foreground-secondary">Loading dashboard...</div>
+            </div>
+          ) : (
+            <motion.div 
+              className="w-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
             >
+              {containerWidth > 0 && (
+                <GridLayout
+                  className="layout"
+                  layout={gridLayout}
+                  cols={gridCols}
+                  rowHeight={isMobile ? 60 : ROW_HEIGHT}
+                  width={containerWidth}
+                  margin={isMobile ? [8, 8] : [16, 16]}
+                  containerPadding={[0, 0]}
+                  isDraggable={isEditMode && !isMobile}
+                  isResizable={isEditMode && !isMobile}
+                  onLayoutChange={handleLayoutChange}
+                  compactType="vertical"
+                  preventCollision={false}
+                >
               {(isEditMode ? homeLayout?.widgets : homeLayout?.widgets.filter(w => w.enabled))?.map((widget) => (
                 <div key={widget.id} className="h-full w-full relative">
                   {renderWidget(widget)}
@@ -417,9 +457,10 @@ export default function HomePage() {
                 </div>
               ))}
             </GridLayout>
-            )}
-          </div>
-        )}
+              )}
+            </motion.div>
+          )}
+        </div>
       </div>
       
       {/* Task Detail Modal - Rendered in Portal */}
@@ -448,7 +489,7 @@ export default function HomePage() {
           />
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
     </>
   );
 }

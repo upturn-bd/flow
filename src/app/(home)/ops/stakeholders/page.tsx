@@ -316,6 +316,9 @@ export default function OpsStakeholdersPage() {
                     KAM
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
+                    Process
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
                     Current Step
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase tracking-wider">
@@ -373,6 +376,9 @@ export default function OpsStakeholdersPage() {
                         <span className="text-foreground-tertiary">Unassigned</span>
                       )}
                     </td>
+                    <td className="px-6 py-4 text-sm text-foreground-primary">
+                      {stakeholder.process?.name || "N/A"}
+                    </td>
                     <td className="px-6 py-4">
                       {stakeholder.status === 'Permanent' || stakeholder.is_completed ? (
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success dark:bg-success/20">
@@ -386,6 +392,25 @@ export default function OpsStakeholdersPage() {
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
                             Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}
                           </span>
+                          {(() => {
+                            // Find step data for current step and extract status
+                            const currentStepData = stakeholder.step_data?.find(
+                              (sd) => sd.step_id === stakeholder.current_step_id
+                            );
+                            const stepStatus = currentStepData?.data?.["__step_status"];
+                            
+                            if (stepStatus && stakeholder.current_step?.status_field?.enabled) {
+                              const statusOption = stakeholder.current_step.status_field.options?.find(
+                                opt => opt.value === stepStatus
+                              );
+                              return (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success dark:bg-success/20">
+                                  {statusOption?.label || stepStatus}
+                                </span>
+                              );
+                            }
+                            return null;
+                          })()}
                         </div>
                       ) : (
                         <span className="text-sm text-foreground-tertiary">Not started</span>
@@ -506,6 +531,11 @@ export default function OpsStakeholdersPage() {
                       )}
                     </div>
                   </div>
+
+                  <div>
+                    <p className="text-foreground-tertiary text-[10px] uppercase tracking-wide mb-0.5">Process</p>
+                    <p className="text-foreground-primary truncate">{stakeholder.process?.name || "N/A"}</p>
+                  </div>
                   
                   <div>
                     <p className="text-foreground-tertiary text-[10px] uppercase tracking-wide mb-0.5">Current Step</p>
@@ -517,9 +547,29 @@ export default function OpsStakeholdersPage() {
                     ) : stakeholder.status === 'Rejected' ? (
                       <p className="text-foreground-tertiary">—</p>
                     ) : stakeholder.current_step ? (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                        Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}
-                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                          Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}
+                        </span>
+                        {(() => {
+                          const currentStepData = stakeholder.step_data?.find(
+                            (sd) => sd.step_id === stakeholder.current_step_id
+                          );
+                          const stepStatus = currentStepData?.data?.["__step_status"];
+                          
+                          if (stepStatus && stakeholder.current_step?.status_field?.enabled) {
+                            const statusOption = stakeholder.current_step.status_field.options?.find(
+                              opt => opt.value === stepStatus
+                            );
+                            return (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-success/10 text-success dark:bg-success/20">
+                                {statusOption?.label || stepStatus}
+                              </span>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
                     ) : (
                       <p className="text-foreground-tertiary">Not started</p>
                     )}

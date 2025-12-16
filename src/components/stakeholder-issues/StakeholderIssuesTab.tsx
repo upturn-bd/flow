@@ -207,6 +207,17 @@ export default function StakeholderIssuesTab({ stakeholderId }: StakeholderIssue
                         )}
                       </span>
                     )}
+                    {/* Public Page Badge */}
+                    {issue.created_from_public_page && (
+                      <span 
+                        className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                 bg-info/20 text-info border border-info/30"
+                        title="Created from public page"
+                      >
+                        <LinkIcon size={12} weight="bold" />
+                        <span className="hidden sm:inline">Public</span>
+                      </span>
+                    )}
                   </div>
 
                   {/* Assignment Info */}
