@@ -1,4 +1,4 @@
--- Quick Test: Check if Real-time is Enabled for Notifications
+eno-- Quick Test: Check if Real-time is Enabled for Notifications
 -- Run this in Supabase SQL Editor to verify setup
 
 -- 1. Check if notifications table is in the real-time publication

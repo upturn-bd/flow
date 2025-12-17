@@ -1,0 +1,4 @@
+// This file was accidentally created with a PowerShell snippet.
+// The real Gradle include must live at `android/capacitor.settings.gradle`.
+// The correct include file has been added at `android/capacitor.settings.gradle`.
+// You can safely delete this root-level file.
