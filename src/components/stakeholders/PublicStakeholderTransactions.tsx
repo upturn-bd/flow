@@ -92,11 +92,13 @@ export default function PublicStakeholderTransactions({
 
   // Filter and search transactions
   const filteredTransactions = useMemo(() => {
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    
     return dateFilteredTransactions.filter(txn => {
       const matchesSearch = 
-        txn.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        txn.from_source.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        txn.method?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        txn.title.toLowerCase().includes(lowerSearchTerm) ||
+        txn.from_source.toLowerCase().includes(lowerSearchTerm) ||
+        txn.method?.toLowerCase().includes(lowerSearchTerm) ||
         txn.amount.toString().includes(searchTerm);
       
       const matchesStatus = statusFilter === 'All' || txn.status === statusFilter;
@@ -125,7 +127,7 @@ export default function PublicStakeholderTransactions({
   }, [searchTerm, statusFilter, amountFilter, dateRangeFilter]);
 
   const formatAmount = (amount: number, currency: string) => {
-    const sign = amount >= 0 ? '+' : '';
+    const sign = amount >= 0 ? '+' : '-';
     const absAmount = Math.abs(amount);
     return `${sign}${absAmount.toLocaleString()} ${currency}`;
   };
