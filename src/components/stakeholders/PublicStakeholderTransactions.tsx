@@ -42,7 +42,6 @@ export default function PublicStakeholderTransactions({
   loading = false,
   stakeholderName 
 }: PublicStakeholderTransactionsProps) {
-  const [transactions, setTransactions] = useState<Account[]>(allTransactions);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<'All' | 'Complete' | 'Pending'>('All');
   const [dateRangeFilter, setDateRangeFilter] = useState<'7days' | '30days' | '90days' | 'all'>('30days');
@@ -70,14 +69,12 @@ export default function PublicStakeholderTransactions({
     };
   }, [allTransactions]);
 
-  // Apply date range filter
-  useEffect(() => {
+  // Apply date range filter using useMemo
+  const dateFilteredTransactions = useMemo(() => {
     if (dateRangeFilter === 'all') {
-      setTransactions(allTransactions);
-      return;
+      return allTransactions;
     }
 
-    const now = new Date();
     const daysMap = {
       '7days': 7,
       '30days': 30,
@@ -87,17 +84,15 @@ export default function PublicStakeholderTransactions({
     const daysAgo = new Date();
     daysAgo.setDate(daysAgo.getDate() - daysMap[dateRangeFilter]);
     
-    const filtered = allTransactions.filter(txn => {
+    return allTransactions.filter(txn => {
       const txnDate = new Date(txn.transaction_date);
       return txnDate >= daysAgo;
     });
-    
-    setTransactions(filtered);
   }, [allTransactions, dateRangeFilter]);
 
   // Filter and search transactions
   const filteredTransactions = useMemo(() => {
-    return transactions.filter(txn => {
+    return dateFilteredTransactions.filter(txn => {
       const matchesSearch = 
         txn.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         txn.from_source.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -113,7 +108,7 @@ export default function PublicStakeholderTransactions({
       
       return matchesSearch && matchesStatus && matchesAmount;
     });
-  }, [transactions, searchTerm, statusFilter, amountFilter]);
+  }, [dateFilteredTransactions, searchTerm, statusFilter, amountFilter]);
 
   // Paginate filtered transactions
   const paginatedTransactions = useMemo(() => {
@@ -131,7 +126,8 @@ export default function PublicStakeholderTransactions({
 
   const formatAmount = (amount: number, currency: string) => {
     const sign = amount >= 0 ? '+' : '';
-    return `${sign}${amount.toLocaleString()} ${currency}`;
+    const absAmount = Math.abs(amount);
+    return `${sign}${absAmount.toLocaleString()} ${currency}`;
   };
 
   if (loading) {
@@ -356,7 +352,7 @@ export default function PublicStakeholderTransactions({
           {/* Results count and active filters */}
           <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
             <span className="text-foreground-secondary">
-              Showing {filteredTransactions.length} of {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}
+              Showing {filteredTransactions.length} of {dateFilteredTransactions.length} transaction{dateFilteredTransactions.length !== 1 ? 's' : ''}
             </span>
             {(searchTerm || statusFilter !== 'All' || amountFilter !== 'all' || dateRangeFilter !== '30days') && (
               <>
@@ -381,13 +377,13 @@ export default function PublicStakeholderTransactions({
           <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
             <CurrencyDollar size={40} className="mx-auto text-foreground-tertiary mb-3" />
             <p className="text-foreground-secondary text-xs sm:text-sm">
-              {transactions.length === 0 
+              {dateFilteredTransactions.length === 0 
                 ? 'No transactions found' 
                 : 'No transactions match your search criteria'
               }
             </p>
             <p className="text-foreground-tertiary text-xs mt-1">
-              {transactions.length === 0
+              {dateFilteredTransactions.length === 0
                 ? 'Transactions will appear here once created'
                 : 'Try adjusting your search or filter'
               }
