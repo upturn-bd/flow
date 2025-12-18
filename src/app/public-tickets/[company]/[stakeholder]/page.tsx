@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { usePublicStakeholderAccess } from "@/hooks/usePublicStakeholderAccess";
-import { StakeholderIssue, StakeholderIssueCategory } from "@/lib/types/schemas";
+import { StakeholderIssue, StakeholderIssueCategory, Account } from "@/lib/types/schemas";
 import { Button } from "@/components/ui/button";
 import { 
   Ticket, 
@@ -12,13 +12,17 @@ import {
   Warning, 
   Info,
   Plus,
-  ArrowLeft
+  ArrowLeft,
+  User,
+  CurrencyDollar
 } from "@phosphor-icons/react";
 import { captureError } from "@/lib/sentry";
 import { toast } from "sonner";
 import PublicAccessCodeModal from "./PublicAccessCodeModal";
 import PublicTicketForm from "./PublicTicketForm";
 import PublicTicketList from "./PublicTicketList";
+import StakeholderInfoPanel from "@/components/stakeholders/StakeholderInfoPanel";
+import PublicStakeholderTransactions from "@/components/stakeholders/PublicStakeholderTransactions";
 
 export default function PublicTicketsPage() {
   const params = useParams();
@@ -36,6 +40,7 @@ export default function PublicTicketsPage() {
     createPublicTicket,
     fetchPublicIssueCategories,
     getAttachmentUrl,
+    fetchPublicTransactions,
   } = usePublicStakeholderAccess();
 
   const [categories, setCategories] = useState<StakeholderIssueCategory[]>([]);
@@ -43,9 +48,11 @@ export default function PublicTicketsPage() {
   const [stakeholder, setStakeholder] = useState<any>(null);
   const [showCodeModal, setShowCodeModal] = useState(!codeFromUrl);
   const [tickets, setTickets] = useState<StakeholderIssue[]>([]);
+  const [transactions, setTransactions] = useState<Account[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [activeTab, setActiveTab] = useState<"info" | "tickets" | "transactions">("tickets");
 
   const handleVerifyAccess = useCallback(async (code: string) => {
     if (isVerified || isVerifying) return;
@@ -85,10 +92,11 @@ export default function PublicTicketsPage() {
     }
   }, [codeFromUrl, isVerified, isVerifying, handleVerifyAccess]);
 
-  // Load tickets and categories when stakeholder is verified
+  // Load tickets, transactions and categories when stakeholder is verified
   useEffect(() => {
     if (isVerified && stakeholder?.id) {
       loadTickets();
+      loadTransactions();
       loadCategories();
     }
   }, [isVerified, stakeholder?.id]);
@@ -107,6 +115,18 @@ export default function PublicTicketsPage() {
     } catch (err) {
       captureError(err, { context: "Loading public tickets" });
       toast.error("Failed to load tickets");
+    }
+  };
+
+  const loadTransactions = async () => {
+    if (!stakeholder?.id) return;
+
+    try {
+      const fetchedTransactions = await fetchPublicTransactions(stakeholder.id);
+      setTransactions(fetchedTransactions);
+    } catch (err) {
+      captureError(err, { context: "Loading public transactions" });
+      toast.error("Failed to load transactions");
     }
   };
 
@@ -162,10 +182,10 @@ export default function PublicTicketsPage() {
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground-primary">
-                {stakeholder?.name} Tickets
+                {stakeholder?.name}
               </h1>
               <p className="text-sm text-foreground-secondary mt-1">
-                View and create support tickets
+                Stakeholder Portal
               </p>
             </div>
           </div>
@@ -184,37 +204,11 @@ export default function PublicTicketsPage() {
         <div className="bg-info/10 dark:bg-info/20 border border-info/30 rounded-lg p-4 mb-6 flex items-start gap-3">
           <Info size={20} weight="fill" className="text-info shrink-0 mt-0.5" />
           <div className="text-sm text-foreground-primary">
-            <p className="font-medium mb-1">Welcome to your ticket portal</p>
+            <p className="font-medium mb-1">Welcome to your stakeholder portal</p>
             <p className="text-foreground-secondary">
-              You can view all your previously created tickets and submit new ones. 
-              Our team will be notified and will respond to your tickets promptly.
+              View your information, create and manage support tickets, and track your transactions.
             </p>
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          {!showCreateForm ? (
-            <Button
-              size="md"
-              variant="primary"
-              onClick={() => setShowCreateForm(true)}
-              className="flex items-center justify-center gap-2"
-            >
-              <Plus size={18} weight="bold" />
-              Create New Ticket
-            </Button>
-          ) : (
-            <Button
-              size="md"
-              variant="outline"
-              onClick={() => setShowCreateForm(false)}
-              className="flex items-center justify-center gap-2"
-            >
-              <ArrowLeft size={18} weight="bold" />
-              Back to Tickets
-            </Button>
-          )}
         </div>
 
         {/* Error Message */}
@@ -228,19 +222,119 @@ export default function PublicTicketsPage() {
           </div>
         )}
 
-        {/* Create Form or Ticket List */}
-        {showCreateForm ? (
-          <PublicTicketForm
-            categories={categories}
-            onSubmit={handleCreateTicket}
-            onCancel={() => setShowCreateForm(false)}
-          />
+        {/* Tabs */}
+        <div className="bg-surface-primary rounded-lg border border-border-primary overflow-hidden mb-6">
+          <div className="border-b border-border-primary">
+            <div className="flex overflow-x-auto">
+              <button
+                onClick={() => {
+                  setActiveTab("info");
+                  setShowCreateForm(false);
+                }}
+                className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === "info"
+                    ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
+                    : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary"
+                }`}
+              >
+                <User size={16} />
+                Information
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("tickets");
+                  setShowCreateForm(false);
+                }}
+                className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === "tickets"
+                    ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
+                    : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary"
+                }`}
+              >
+                <Ticket size={16} />
+                Tickets ({tickets.length})
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("transactions");
+                  setShowCreateForm(false);
+                }}
+                className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === "transactions"
+                    ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
+                    : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary"
+                }`}
+              >
+                <CurrencyDollar size={16} />
+                Transactions ({transactions.length})
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === "info" ? (
+          // Information Tab
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-3">
+              {stakeholder && (
+                <StakeholderInfoPanel 
+                  stakeholder={stakeholder} 
+                  showAdditionalData={true}
+                />
+              )}
+            </div>
+          </div>
+        ) : activeTab === "tickets" ? (
+          // Tickets Tab
+          <>
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              {!showCreateForm ? (
+                <Button
+                  size="md"
+                  variant="primary"
+                  onClick={() => setShowCreateForm(true)}
+                  className="flex items-center justify-center gap-2"
+                >
+                  <Plus size={18} weight="bold" />
+                  Create New Ticket
+                </Button>
+              ) : (
+                <Button
+                  size="md"
+                  variant="outline"
+                  onClick={() => setShowCreateForm(false)}
+                  className="flex items-center justify-center gap-2"
+                >
+                  <ArrowLeft size={18} weight="bold" />
+                  Back to Tickets
+                </Button>
+              )}
+            </div>
+
+            {/* Create Form or Ticket List */}
+            {showCreateForm ? (
+              <PublicTicketForm
+                categories={categories}
+                onSubmit={handleCreateTicket}
+                onCancel={() => setShowCreateForm(false)}
+              />
+            ) : (
+              <PublicTicketList
+                tickets={tickets}
+                loading={loading}
+                onRefresh={loadTickets}
+                getAttachmentUrl={getAttachmentUrl}
+              />
+            )}
+          </>
         ) : (
-          <PublicTicketList
-            tickets={tickets}
+          // Transactions Tab
+          <PublicStakeholderTransactions
+            transactions={transactions}
             loading={loading}
-            onRefresh={loadTickets}
-            getAttachmentUrl={getAttachmentUrl}
+            stakeholderName={stakeholder?.name || ""}
           />
         )}
       </div>
