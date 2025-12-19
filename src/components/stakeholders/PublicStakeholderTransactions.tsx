@@ -51,21 +51,35 @@ export default function PublicStakeholderTransactions({
 
   // Calculate summary from all transactions
   const summary: TransactionSummary = useMemo(() => {
-    const totalIncome = allTransactions
-      .filter(t => t.amount >= 0)
-      .reduce((sum, t) => sum + t.amount, 0);
-    
-    const totalExpense = allTransactions
-      .filter(t => t.amount < 0)
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    const aggregated = allTransactions.reduce<TransactionSummary>(
+      (acc, t) => {
+        if (t.amount >= 0) {
+          acc.totalIncome += t.amount;
+        } else {
+          acc.totalExpense += Math.abs(t.amount);
+        }
+
+        if (t.status === "Pending") {
+          acc.pendingTransactions += 1;
+        } else if (t.status === "Complete") {
+          acc.completedTransactions += 1;
+        }
+
+        return acc;
+      },
+      {
+        totalTransactions: allTransactions.length,
+        totalIncome: 0,
+        totalExpense: 0,
+        netAmount: 0,
+        pendingTransactions: 0,
+        completedTransactions: 0,
+      }
+    );
 
     return {
-      totalTransactions: allTransactions.length,
-      totalIncome,
-      totalExpense,
-      netAmount: totalIncome - totalExpense,
-      pendingTransactions: allTransactions.filter(t => t.status === 'Pending').length,
-      completedTransactions: allTransactions.filter(t => t.status === 'Complete').length,
+      ...aggregated,
+      netAmount: aggregated.totalIncome - aggregated.totalExpense,
     };
   }, [allTransactions]);
 
