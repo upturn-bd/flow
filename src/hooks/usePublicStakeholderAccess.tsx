@@ -281,7 +281,7 @@ export function usePublicStakeholderAccess() {
       } catch (err) {
         logError("Error fetching public transactions", err);
         setError("Failed to load transactions");
-        return [];
+        throw err;
       } finally {
         setLoading(false);
       }
