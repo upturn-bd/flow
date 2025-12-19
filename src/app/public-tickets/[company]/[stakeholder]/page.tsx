@@ -92,21 +92,12 @@ export default function PublicTicketsPage() {
     }
   }, [codeFromUrl, isVerified, isVerifying, handleVerifyAccess]);
 
-  // Load tickets, transactions and categories when stakeholder is verified
-  useEffect(() => {
-    if (isVerified && stakeholder?.id) {
-      loadTickets();
-      loadTransactions();
-      loadCategories();
-    }
-  }, [isVerified, stakeholder?.id]);
-
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     const fetchedCategories = await fetchPublicIssueCategories(companyIdentifier);
     setCategories(fetchedCategories);
-  };
+  }, [fetchPublicIssueCategories, companyIdentifier]);
 
-  const loadTickets = async () => {
+  const loadTickets = useCallback(async () => {
     if (!stakeholder?.id) return;
 
     try {
@@ -116,9 +107,9 @@ export default function PublicTicketsPage() {
       captureError(err, { context: "Loading public tickets" });
       toast.error("Failed to load tickets");
     }
-  };
+  }, [stakeholder?.id, fetchPublicTickets]);
 
-  const loadTransactions = async () => {
+  const loadTransactions = useCallback(async () => {
     if (!stakeholder?.id) return;
 
     try {
@@ -128,7 +119,16 @@ export default function PublicTicketsPage() {
       captureError(err, { context: "Loading public transactions" });
       toast.error("Failed to load transactions");
     }
-  };
+  }, [stakeholder?.id, fetchPublicTransactions]);
+
+  // Load tickets, transactions and categories when stakeholder is verified
+  useEffect(() => {
+    if (isVerified && stakeholder?.id) {
+      loadTickets();
+      loadTransactions();
+      loadCategories();
+    }
+  }, [isVerified, stakeholder?.id, loadTickets, loadTransactions, loadCategories]);
 
   const handleCreateTicket = async (data: any) => {
     if (!stakeholder?.id || !stakeholder?.company_id) return;

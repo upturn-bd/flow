@@ -48,6 +48,19 @@ export default function PublicStakeholderTransactions({
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
+  // Get the most common currency from transactions
+  const displayCurrency = useMemo(() => {
+    if (allTransactions.length === 0) return 'BDT';
+    
+    const currencyCount = allTransactions.reduce((acc, t) => {
+      const currency = t.currency || 'BDT';
+      acc[currency] = (acc[currency] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    return Object.entries(currencyCount).sort((a, b) => b[1] - a[1])[0]?.[0] || 'BDT';
+  }, [allTransactions]);
+
   // Calculate summary from all transactions
   const summary: TransactionSummary = useMemo(() => {
     const aggregated = allTransactions.reduce<TransactionSummary>(
@@ -185,7 +198,7 @@ export default function PublicStakeholderTransactions({
             <div className="min-w-0 flex-1">
               <p className="text-xs sm:text-sm text-success font-medium">Total Income</p>
               <p className="text-lg sm:text-2xl font-bold text-success mt-1 truncate">
-                {summary.totalIncome.toLocaleString()} BDT
+                {summary.totalIncome.toLocaleString()} {displayCurrency}
               </p>
             </div>
             <div className="p-2 sm:p-3 bg-success/30 rounded-lg shrink-0">
@@ -202,7 +215,7 @@ export default function PublicStakeholderTransactions({
             <div className="min-w-0 flex-1">
               <p className="text-xs sm:text-sm text-error font-medium">Total Expense</p>
               <p className="text-lg sm:text-2xl font-bold text-error mt-1 truncate">
-                {summary.totalExpense.toLocaleString()} BDT
+                {summary.totalExpense.toLocaleString()} {displayCurrency}
               </p>
             </div>
             <div className="p-2 sm:p-3 bg-error/30 rounded-lg shrink-0">
@@ -221,7 +234,7 @@ export default function PublicStakeholderTransactions({
               <p className={`text-lg sm:text-2xl font-bold mt-1 truncate ${
                 summary.netAmount >= 0 ? 'text-success' : 'text-error'
               }`}>
-                {summary.netAmount.toLocaleString()} BDT
+                {summary.netAmount.toLocaleString()} {displayCurrency}
               </p>
             </div>
             <div className="p-2 sm:p-3 bg-primary-200/50 dark:bg-primary-800/50 rounded-lg shrink-0">

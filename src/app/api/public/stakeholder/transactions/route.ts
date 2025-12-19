@@ -12,9 +12,24 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { stakeholderId, accessCode } = body
 
+    // Validate input types and formats
     if (!stakeholderId || !accessCode) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+    if (typeof stakeholderId !== 'number' || !Number.isInteger(stakeholderId) || stakeholderId <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid stakeholder ID format' },
+        { status: 400 }
+      )
+    }
+
+    if (typeof accessCode !== 'string' || accessCode.trim().length === 0) {
+      return NextResponse.json(
+        { error: 'Invalid access code format' },
         { status: 400 }
       )
     }
@@ -47,9 +62,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch transactions for this stakeholder
+    // Only select fields that should be visible to stakeholders
     const { data: transactions, error: transactionsError } = await supabase
       .from('accounts')
-      .select('*')
+      .select('id, title, transaction_date, amount, currency, status, method, from_source')
       .eq('stakeholder_id', stakeholderId)
       .order('transaction_date', { ascending: false })
 

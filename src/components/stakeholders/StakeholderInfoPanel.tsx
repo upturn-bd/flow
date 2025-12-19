@@ -54,7 +54,10 @@ const isCoordinates = (value: any): { lat: number; lng: number } | null => {
 };
 
 // Helper to format values for display
-const formatDisplayValue = (value: any): string => {
+const formatDisplayValue = (value: any, depth: number = 0): string => {
+  // Prevent infinite recursion and stack overflow
+  if (depth > 5) return "[Complex Object]";
+  
   if (value === null || value === undefined) return "—";
   if (typeof value === "boolean") return value ? "Yes" : "No";
   if (typeof value === "number") return value.toLocaleString();
@@ -63,7 +66,7 @@ const formatDisplayValue = (value: any): string => {
   // Handle arrays
   if (Array.isArray(value)) {
     if (value.length === 0) return "—";
-    return value.map(item => formatDisplayValue(item)).join(", ");
+    return value.map(item => formatDisplayValue(item, depth + 1)).join(", ");
   }
   
   // Handle objects (not file objects)
@@ -84,7 +87,7 @@ const formatDisplayValue = (value: any): string => {
     // Return a summary of keys
     const keys = Object.keys(value);
     if (keys.length === 0) return "—";
-    return keys.map(k => `${toHumanReadable(k)}: ${formatDisplayValue(value[k])}`).join(", ");
+    return keys.map(k => `${toHumanReadable(k)}: ${formatDisplayValue(value[k], depth + 1)}`).join(", ");
   }
   
   // Handle string values
@@ -95,10 +98,12 @@ const formatDisplayValue = (value: any): string => {
       return `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
     }
     
-    // Check if it looks like a date string
-    if (!isNaN(Date.parse(value)) && value.includes("-") && value.length >= 10) {
-      const date = new Date(value);
-      if (!isNaN(date.getTime())) {
+    // Check if it looks like a date string (ISO 8601 or similar format)
+    // Use a more robust check to avoid false positives
+    if (value.length >= 10 && value.length <= 30 && /^\d{4}-\d{2}-\d{2}/.test(value)) {
+      const timestamp = Date.parse(value);
+      if (!isNaN(timestamp)) {
+        const date = new Date(timestamp);
         return date.toLocaleDateString();
       }
     }
