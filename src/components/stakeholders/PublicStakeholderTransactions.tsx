@@ -19,7 +19,6 @@ import { Account } from "@/lib/types/schemas";
 import { formatDate } from "@/lib/utils";
 import { fadeInUp } from "@/components/ui/animations";
 import Pagination from "@/components/ui/Pagination";
-import { InlineSpinner } from "@/components/ui";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface PublicStakeholderTransactionsProps {
