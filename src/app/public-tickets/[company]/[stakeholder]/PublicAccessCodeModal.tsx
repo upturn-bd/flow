@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/Card";
+import { Alert } from "@/components/ui";
 import BaseModal from "@/components/ui/modals/BaseModal";
-import { FormField } from "@/components/forms";
-import { LockKey, Warning } from "@phosphor-icons/react";
+import { LockKey } from "@phosphor-icons/react";
 
 interface PublicAccessCodeModalProps {
   isOpen: boolean;
@@ -66,17 +66,17 @@ export default function PublicAccessCodeModal({
 
         {/* Error Message */}
         {error && (
-          <div className="bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg flex items-start gap-3">
-            <Warning size={20} weight="fill" className="shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-medium mb-1">Verification Failed</p>
-              <p>{error}</p>
-            </div>
-          </div>
+          <Alert variant="error" title="Verification Failed">
+            {error}
+          </Alert>
         )}
 
         {/* Access Code Input */}
-        <FormField label="Access Code" required>
+        <div>
+          <label className="block font-medium text-foreground-primary mb-1 text-sm sm:text-base">
+            Access Code
+            <span className="text-error ml-1">*</span>
+          </label>
           <input
             type="text"
             id="access-code"
@@ -96,7 +96,7 @@ export default function PublicAccessCodeModal({
           <p className="text-xs text-foreground-tertiary mt-2 text-center">
             The access code was provided to you by your account manager
           </p>
-        </FormField>
+        </div>
 
         {/* Submit Button */}
         <Button

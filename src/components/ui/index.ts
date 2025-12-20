@@ -3,6 +3,7 @@ export { Button } from './button';
 export { default as LoadingSpinner } from './LoadingSpinner';
 export { InlineSpinner } from './InlineSpinner';
 export { default as TabView } from './TabView';
+export { Tabs } from './Tabs';
 
 // Layout Components
 export * from './Layout';
@@ -40,6 +41,7 @@ export { default as ReportProblemButton } from './ReportProblemButton';
 export { default as FloatingReportButton } from './FloatingReportButton';
 export { default as ValidationFeedback } from './ValidationFeedback';
 export { default as SuccessToast } from './SuccessToast';
+export { Alert } from './Alert';
 
 // Other Components
 export { default as Pagination } from './Pagination';
@@ -64,6 +66,7 @@ export { default as MultiSelectDropdown } from './MultiSelectDropdown';
 
 // Page Templates
 export { default as ServicePageTemplate } from './ServicePageTemplate';
+export { default as PublicPageFooter } from './PublicPageFooter';
 
 // Entity Components (EntityCard for card grids, EntityListItem for vertical lists)
 export { EntityCard, EntityCardGrid, EntityCardMetaItem, EntityCardBadge } from './EntityCard';
@@ -81,5 +84,5 @@ export type { EntityCardProps, EntityCardGridProps, EntityCardMetaItemProps, Ent
 export type { NavigationCardProps, NavigationCardGridProps, NavigationSectionProps } from './NavigationCard';
 export type { DataTableProps, DataTableColumn } from './DataTable';
 export type { BadgeProps, StatusBadgeProps, PriorityBadgeProps, RoleBadgeProps, CountBadgeProps } from './Badge';
-
-
+export type { AlertProps } from './Alert';
+export type { TabsProps, TabItem } from './Tabs';

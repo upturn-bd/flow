@@ -1,16 +1,14 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { usePublicStakeholderAccess } from "@/hooks/usePublicStakeholderAccess";
 import { StakeholderIssue, StakeholderIssueCategory, Account } from "@/lib/types/schemas";
 import { Button } from "@/components/ui/button";
+import { Badge, Alert, Tabs, PublicPageFooter } from "@/components/ui";
 import { 
   Ticket, 
-  LockKey, 
   CheckCircle, 
-  Warning, 
-  Info,
   Plus,
   ArrowLeft,
   User,
@@ -53,6 +51,18 @@ export default function PublicTicketsPage() {
   const [verificationError, setVerificationError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [activeTab, setActiveTab] = useState<"info" | "tickets" | "transactions">("tickets");
+
+  // Tab configuration
+  const tabs = useMemo(() => [
+    { key: "info", label: "Information", icon: <User size={16} /> },
+    { key: "tickets", label: "Tickets", icon: <Ticket size={16} />, count: tickets.length },
+    { key: "transactions", label: "Transactions", icon: <CurrencyDollar size={16} />, count: transactions.length },
+  ], [tickets.length, transactions.length]);
+
+  const handleTabChange = useCallback((key: string) => {
+    setActiveTab(key as "info" | "tickets" | "transactions");
+    setShowCreateForm(false);
+  }, []);
 
   const handleVerifyAccess = useCallback(async (code: string) => {
     if (isVerified || isVerifying) return;
@@ -191,86 +201,33 @@ export default function PublicTicketsPage() {
           </div>
 
           {/* Verified Badge */}
-          <div className="items-center gap-2 text-sm text-success bg-success/10 dark:bg-success/20 px-3 py-2 rounded-lg inline-flex">
-            <CheckCircle size={18} weight="fill" />
-            <span className="font-medium">Access Verified</span>
-          </div>
+          <Badge variant="success" icon={<CheckCircle size={16} weight="fill" />}>
+            Access Verified
+          </Badge>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Info Banner */}
-        <div className="bg-info/10 dark:bg-info/20 border border-info/30 rounded-lg p-4 mb-6 flex items-start gap-3">
-          <Info size={20} weight="fill" className="text-info shrink-0 mt-0.5" />
-          <div className="text-sm text-foreground-primary">
-            <p className="font-medium mb-1">Welcome to your stakeholder portal</p>
-            <p className="text-foreground-secondary">
-              View your information, create and manage support tickets, and track your transactions.
-            </p>
-          </div>
-        </div>
+        <Alert variant="info" title="Welcome to your stakeholder portal" className="mb-6">
+          View your information, create and manage support tickets, and track your transactions.
+        </Alert>
 
         {/* Error Message */}
         {hookError && (
-          <div className="bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg mb-6 flex items-start gap-3">
-            <Warning size={20} weight="fill" className="shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-medium mb-1">Error</p>
-              <p>{hookError}</p>
-            </div>
-          </div>
+          <Alert variant="error" title="Error" className="mb-6">
+            {hookError}
+          </Alert>
         )}
 
         {/* Tabs */}
-        <div className="bg-surface-primary rounded-lg border border-border-primary overflow-hidden mb-6">
-          <div className="border-b border-border-primary">
-            <div className="flex overflow-x-auto">
-              <button
-                onClick={() => {
-                  setActiveTab("info");
-                  setShowCreateForm(false);
-                }}
-                className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2 ${
-                  activeTab === "info"
-                    ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
-                    : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary"
-                }`}
-              >
-                <User size={16} />
-                Information
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab("tickets");
-                  setShowCreateForm(false);
-                }}
-                className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2 ${
-                  activeTab === "tickets"
-                    ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
-                    : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary"
-                }`}
-              >
-                <Ticket size={16} />
-                Tickets ({tickets.length})
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab("transactions");
-                  setShowCreateForm(false);
-                }}
-                className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2 ${
-                  activeTab === "transactions"
-                    ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
-                    : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary"
-                }`}
-              >
-                <CurrencyDollar size={16} />
-                Transactions ({transactions.length})
-              </button>
-            </div>
-          </div>
-        </div>
+        <Tabs
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          className="mb-6"
+        />
 
         {/* Tab Content */}
         {activeTab === "info" ? (
@@ -340,17 +297,7 @@ export default function PublicTicketsPage() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-border-primary mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between text-sm text-foreground-secondary">
-            <p>Powered by Flow HRIS</p>
-            <div className="flex items-center gap-2">
-              <LockKey size={16} />
-              <span>Secure Access</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PublicPageFooter />
     </div>
   );
 }
