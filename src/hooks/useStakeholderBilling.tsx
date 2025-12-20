@@ -385,7 +385,9 @@ export function useStakeholderBilling() {
 
         // Calculate totals
         const subtotal = formData.items.reduce((sum, item) => sum + item.quantity * item.unit_price, 0);
-        const total = subtotal;
+        const taxAmount = 0; // Tax amount can be added later
+        const discountAmount = 0; // Discount amount can be added later
+        const total = subtotal + taxAmount - discountAmount;
 
         // Create invoice
         const { data: invoice, error: invoiceError } = await supabase
@@ -401,6 +403,8 @@ export function useStakeholderBilling() {
             due_date: formData.due_date,
             currency: formData.currency,
             subtotal,
+            tax_amount: taxAmount,
+            discount_amount: discountAmount,
             total_amount: total,
             status: "draft",
             notes: formData.notes,

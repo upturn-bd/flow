@@ -992,14 +992,11 @@ export type InvoiceItemType = 'standard' | 'calculated' | 'manual' | 'adjustment
 // Field change types for audit
 export type FieldChangeType = 'created' | 'updated' | 'deleted';
 
-// Billing cycle configuration per process
-export interface StakeholderBillingCycle {
+// Base billing cycle configuration
+interface BaseBillingCycle {
   id?: number;
   process_id: number;
   company_id: number;
-  cycle_type: BillingCycleType;
-  billing_day_of_month?: number; // For date_to_date cycle
-  cycle_days?: number; // For x_days cycle
   billing_field_keys: string[]; // Field keys to include in billing
   default_currency: string;
   finance_team_id?: number;
@@ -1015,6 +1012,23 @@ export interface StakeholderBillingCycle {
     name: string;
   };
 }
+
+// Date-to-date billing cycle (monthly on same date)
+interface DateToDateBillingCycle extends BaseBillingCycle {
+  cycle_type: 'date_to_date';
+  billing_day_of_month: number; // Required for date_to_date
+  cycle_days?: never; // Not used for date_to_date
+}
+
+// X-days billing cycle (every X days)
+interface XDaysBillingCycle extends BaseBillingCycle {
+  cycle_type: 'x_days';
+  cycle_days: number; // Required for x_days
+  billing_day_of_month?: never; // Not used for x_days
+}
+
+// Discriminated union for type-safe billing cycles
+export type StakeholderBillingCycle = DateToDateBillingCycle | XDaysBillingCycle;
 
 // Stakeholder invoice
 export interface StakeholderInvoice {

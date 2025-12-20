@@ -83,6 +83,12 @@ export default function BillingConfigForm({ processId, fieldKeys, onSave }: Bill
 
     if (formData.billing_field_keys.length === 0) {
       newErrors.billing_field_keys = "Please select at least one billing field";
+    } else {
+      // Validate that all selected field keys exist in available fieldKeys
+      const invalidKeys = formData.billing_field_keys.filter(key => !fieldKeys.includes(key));
+      if (invalidKeys.length > 0) {
+        newErrors.billing_field_keys = `Invalid field keys selected: ${invalidKeys.join(', ')}`;
+      }
     }
 
     return newErrors;

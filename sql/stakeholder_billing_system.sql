@@ -250,17 +250,24 @@ CREATE TRIGGER update_invoice_items_updated_at
 -- Function to update invoice totals when items change
 CREATE OR REPLACE FUNCTION update_invoice_totals()
 RETURNS TRIGGER AS $$
+DECLARE
+  v_subtotal DECIMAL(15, 2);
+  v_invoice_id INTEGER;
 BEGIN
-  -- Recalculate subtotal from invoice items
+  v_invoice_id := COALESCE(NEW.invoice_id, OLD.invoice_id);
+  
+  -- Calculate subtotal from invoice items
+  SELECT COALESCE(SUM(amount), 0)
+  INTO v_subtotal
+  FROM stakeholder_invoice_items
+  WHERE invoice_id = v_invoice_id;
+  
+  -- Update invoice with new subtotal and recalculate total
   UPDATE stakeholder_invoices
   SET 
-    subtotal = COALESCE((
-      SELECT SUM(amount)
-      FROM stakeholder_invoice_items
-      WHERE invoice_id = COALESCE(NEW.invoice_id, OLD.invoice_id)
-    ), 0),
-    total_amount = subtotal + COALESCE(tax_amount, 0) - COALESCE(discount_amount, 0)
-  WHERE id = COALESCE(NEW.invoice_id, OLD.invoice_id);
+    subtotal = v_subtotal,
+    total_amount = v_subtotal + COALESCE(tax_amount, 0) - COALESCE(discount_amount, 0)
+  WHERE id = v_invoice_id;
   
   RETURN COALESCE(NEW, OLD);
 END;

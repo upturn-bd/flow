@@ -564,15 +564,6 @@ export const PAYMENT_METHODS = [
   'Online Transfer',
 ] as const;
 
-export const CURRENCIES = [
-  'BDT', // Bangladesh Taka - Default
-  'USD', // US Dollar
-  'EUR', // Euro
-  'GBP', // British Pound
-  'JPY', // Japanese Yen
-  'INR', // Indian Rupee
-] as const;
-
 export const ACCOUNT_CATEGORIES = {
   INCOME: 'Income',
   EXPENSE: 'Expense',
@@ -606,7 +597,6 @@ export const SELECT_OPTIONS = {
 
 
 export type PaymentMethod = typeof PAYMENT_METHODS[number];
-export type Currency = typeof CURRENCIES[number];
 export type AccountCategory = typeof ACCOUNT_CATEGORIES[keyof typeof ACCOUNT_CATEGORIES];
 
 // ==============================================================================
