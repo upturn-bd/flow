@@ -70,7 +70,7 @@ export function ModulePermissionsBanner({
           exit={{ opacity: 0, y: -10 }}
           className="mb-4"
         >
-          <div className="bg-gradient-to-r from-primary-50 to-indigo-50 dark:from-primary-900/20 dark:to-indigo-900/20 border border-primary-100 dark:border-primary-800 rounded-lg px-4 py-2">
+          <div className="bg-linear-to-r from-primary-50 to-indigo-50 dark:from-primary-900/20 dark:to-indigo-900/20 border border-primary-100 dark:border-primary-800 rounded-lg px-4 py-2">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
                 <Info size={18} className="text-primary-600 dark:text-primary-400 shrink-0" />
@@ -105,7 +105,7 @@ export function ModulePermissionsBanner({
         exit={{ opacity: 0, y: -10 }}
         className="mb-6"
       >
-        <div className="bg-gradient-to-r from-primary-50 to-indigo-50 dark:from-primary-900/20 dark:to-indigo-900/20 border border-primary-100 dark:border-primary-800 rounded-lg p-4">
+        <div className="bg-linear-to-r from-primary-50 to-indigo-50 dark:from-primary-900/20 dark:to-indigo-900/20 border border-primary-100 dark:border-primary-800 rounded-lg p-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
               <Info size={24} weight="duotone" className="text-primary-600 dark:text-primary-400 shrink-0 mt-0.5" />

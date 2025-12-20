@@ -34,7 +34,7 @@ export default function PublicAccessSection({
   
   // Build public page URLs
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-  const publicPageUrlWithoutCode = `${baseUrl}/public-tickets/${encodedCompany}/${encodedStakeholder}`;
+  const publicPageUrlWithoutCode = `${baseUrl}/public-stakeholders/${encodedCompany}/${encodedStakeholder}`;
   const publicPageUrlWithCode = `${publicPageUrlWithoutCode}?code=${accessCode}`;
 
   const copyToClipboard = async (text: string, type: "code" | "linkWithCode" | "linkWithoutCode") => {

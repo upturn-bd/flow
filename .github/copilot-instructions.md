@@ -11,7 +11,7 @@
 - `(auth)/*` - Authentication (login, signup, forgot-password)
 - `(home)/*` - Main app (requires `has_approval` = "ACCEPTED")
 - `(superadmin)/sa/*` - Superadmin panel for platform management
-- `public-tickets/[company]/[stakeholder]` - Public stakeholder ticket submission (no auth required)
+- `public-stakeholders/[company]/[stakeholder]` - Public stakeholder ticket submission (no auth required)
 
 ### Permission System (Team-Based - NOT Legacy Roles)
 **IMPORTANT**: Legacy roles (Admin, Manager, Employee) are being phased out. Use team-based permissions:
@@ -89,7 +89,7 @@ Users are restricted by `max_device_limit` (configurable per company, default 3)
 - Exceeded limits block login until devices are approved or removed
 
 ## Stakeholder/Public Tickets System
-Public-facing ticket submission at `/public-tickets/[company]/[stakeholder]`:
+Public-facing ticket submission at `/public-stakeholders/[company]/[stakeholder]`:
 - Stakeholders access via unique `access_code`
 - No authentication required
 - Uses `usePublicStakeholderAccess` hook
