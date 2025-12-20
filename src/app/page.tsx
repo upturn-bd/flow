@@ -19,6 +19,8 @@ import {
   CheckCircle,
   ArrowRight,
   Gear,
+  IdentificationCard,
+  Receipt,
 } from '@phosphor-icons/react/dist/ssr';
 
 export default function LandingPage() {
@@ -162,7 +164,7 @@ export default function LandingPage() {
                 iconColor="bg-indigo-100 text-indigo-700"
               />
               <FeatureCard
-                icon={<Users size={32} weight="duotone" />}
+                icon={<IdentificationCard size={32} weight="duotone" />}
                 title="HRIS"
                 description="Comprehensive employee information and records system"
                 iconColor="bg-blue-100 text-blue-700"
@@ -258,7 +260,7 @@ export default function LandingPage() {
                 iconColor="bg-emerald-100 text-emerald-700"
               />
               <FeatureCard
-                icon={<Building size={32} weight="duotone" />}
+                icon={<Receipt size={32} weight="duotone" />}
                 title="Stakeholder Billing"
                 description="Manage stakeholder-specific billing and transaction workflows"
                 iconColor="bg-purple-100 text-purple-700"
