@@ -7,26 +7,36 @@ import { supabase } from "@/lib/supabase/client";
 import { getCompanyId, getCompanyInfo, getEmployeeId } from "./auth";
 
 /**
- * Validate company code and name combination
+ * Validate company code and return company details
+ * Uses API route to bypass RLS for new users during onboarding
  */
-export async function validateCompanyCode(name: string, code: string) {
-  const { data, error } = await supabase
-    .from('companies')
-    .select('id, name')
-    .eq('code', code)
-    .eq('name', name)
-    .single();
+export async function validateCompanyCode(code: string) {
+  try {
+    const response = await fetch('/api/onboarding/verify-company', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code }),
+    });
 
-  if (error && error.code !== 'PGRST116') {
+    const data = await response.json();
+
+    if (!response.ok && response.status !== 200) {
+      throw new Error(data.error || 'Failed to verify company code');
+    }
+
+    return {
+      exists: data.isValid,
+      isValid: data.isValid,
+      id: data.id || null,
+      name: data.name || null,
+      error: data.error,
+    };
+  } catch (error) {
+    console.error('Error validating company code:', error);
     throw error;
   }
-
-  return { 
-    exists: !!data,
-    isValid: !!data,
-    id: data?.id || null,
-    name: data?.name || null
-  };
 }
 
 export async function getDepartmentIds () {
