@@ -11,6 +11,12 @@ export {
   type NotificationEmailData,
 } from "./notification-email";
 
+export {
+  generateInvoiceEmailHTML,
+  generateInvoiceEmailText,
+  type InvoiceEmailData,
+} from "./invoice-email";
+
 // Re-export server actions for client-side use
 // These are the recommended way to send emails from client components
 export {
