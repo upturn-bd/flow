@@ -967,3 +967,155 @@ export interface Company {
   industry?: Industry;
   country?: Country;
 }
+
+// ==============================================================================
+// Stakeholder Billing System
+// ==============================================================================
+
+// Billing cycle types
+export type BillingCycleType = 'date_to_date' | 'x_days';
+
+// Invoice status types
+export type InvoiceStatus = 
+  | 'draft' 
+  | 'sent' 
+  | 'viewed' 
+  | 'partially_paid' 
+  | 'paid' 
+  | 'overdue' 
+  | 'cancelled' 
+  | 'void';
+
+// Invoice item types
+export type InvoiceItemType = 'standard' | 'calculated' | 'manual' | 'adjustment';
+
+// Field change types for audit
+export type FieldChangeType = 'created' | 'updated' | 'deleted';
+
+// Billing cycle configuration per process
+export interface StakeholderBillingCycle {
+  id?: number;
+  process_id: number;
+  company_id: number;
+  cycle_type: BillingCycleType;
+  billing_day_of_month?: number; // For date_to_date cycle
+  cycle_days?: number; // For x_days cycle
+  billing_field_keys: string[]; // Field keys to include in billing
+  default_currency: string;
+  finance_team_id?: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+  // Joined data
+  process?: StakeholderProcess;
+  finance_team?: {
+    id: number;
+    name: string;
+  };
+}
+
+// Stakeholder invoice
+export interface StakeholderInvoice {
+  id?: number;
+  invoice_number: string;
+  stakeholder_id: number;
+  process_id: number;
+  company_id: number;
+  billing_start_date: string; // ISO date string
+  billing_end_date: string; // ISO date string
+  invoice_date: string; // ISO date string
+  due_date?: string; // ISO date string
+  currency: string;
+  subtotal: number;
+  tax_amount: number;
+  discount_amount: number;
+  total_amount: number;
+  status: InvoiceStatus;
+  notes?: string; // Additional notes on invoice
+  internal_notes?: string; // Internal notes (not shown on invoice)
+  customer_name: string; // Snapshot from stakeholder
+  customer_address?: string; // Snapshot from stakeholder
+  customer_contact_persons?: ContactPerson[]; // Snapshot from stakeholder
+  paid_amount: number;
+  payment_date?: string; // ISO date string
+  account_id?: number; // Link to accounts table
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+  sent_at?: string;
+  sent_by?: string;
+  // Joined data
+  stakeholder?: Stakeholder;
+  process?: StakeholderProcess;
+  items?: StakeholderInvoiceItem[];
+  account?: Account;
+  creator?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
+  sender?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
+}
+
+// Invoice line item
+export interface StakeholderInvoiceItem {
+  id?: number;
+  invoice_id: number;
+  item_order: number;
+  description: string;
+  field_key?: string; // Reference to step data field
+  step_id?: number;
+  quantity: number;
+  unit_price: number;
+  amount: number;
+  item_type: InvoiceItemType;
+  formula?: string; // If calculated
+  metadata?: Record<string, any>;
+  created_at?: string;
+  updated_at?: string;
+  // Joined data
+  step?: StakeholderProcessStep;
+}
+
+// Field change audit trail
+export interface StakeholderFieldChangeAudit {
+  id?: number;
+  stakeholder_id: number;
+  step_id: number;
+  step_data_id?: number;
+  field_key: string;
+  old_value?: any;
+  new_value?: any;
+  change_type: FieldChangeType;
+  field_label?: string;
+  field_type?: string;
+  changed_at: string;
+  changed_by?: string;
+  company_id: number;
+  change_reason?: string;
+  ip_address?: string;
+  // Joined data
+  stakeholder?: Stakeholder;
+  step?: StakeholderProcessStep;
+  changer?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
+}
+
+// Invoice summary for a stakeholder
+export interface StakeholderInvoiceSummary {
+  total_invoices: number;
+  total_amount: number;
+  paid_amount: number;
+  outstanding_amount: number;
+  overdue_count: number;
+}
