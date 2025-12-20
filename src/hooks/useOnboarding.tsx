@@ -137,62 +137,18 @@ export function useOnboarding() {
     }
   }, []);
 
-  // Submit onboarding data
+  // Submit onboarding data via API route (bypasses RLS)
   const submitOnboarding = useCallback(async (data: OnboardingData) => {
     setLoading(true);
     setError(null);
 
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-      if (authError || !user) {
-        throw new Error("Not authenticated");
-      }
-
-      // Check if email already exists for a different user
-      const { data: existingEmployee, error: checkError } = await supabase
-        .from("employees")
-        .select("id, email")
-        .eq("email", data.email)
-        .neq("id", user.id)
-        .maybeSingle();
-
-      if (checkError) {
-        throw new Error(checkError.message);
-      }
-
-      if (existingEmployee) {
-        throw new Error("This email is already associated with another employee account. Please use a different email address.");
-      }
-
-      // Check max_users limit
-      const { data: companyData, error: companyError } = await supabase
-        .from("companies")
-        .select("max_users")
-        .eq("id", data.company_id)
-        .single();
-
-      if (companyError) {
-        throw new Error("Failed to fetch company settings: " + companyError.message);
-      }
-
-      const { count: currentEmployeeCount, error: countError } = await supabase
-        .from("employees")
-        .select("*", { count: "exact", head: true })
-        .eq("company_id", data.company_id)
-        .eq("job_status", "Active");
-
-      if (countError) {
-        throw new Error("Failed to count employees: " + countError.message);
-      }
-
-      if (companyData.max_users && (currentEmployeeCount || 0) >= companyData.max_users) {
-        throw new Error(`Company has reached its maximum user limit of ${companyData.max_users}. Please contact support or upgrade your plan.`);
-      }
-
-      const { error } = await supabase.from("employees").upsert([
-        {
-          id: user.id,
+      const response = await fetch('/api/onboarding/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,
@@ -200,22 +156,19 @@ export function useOnboarding() {
           designation: data.designation,
           department_id: data.department_id,
           job_status: data.job_status,
-          role: "Employee",
-          is_supervisor: false,
           hire_date: data.hire_date,
           company_id: data.company_id,
-          rejection_reason: null,
-          has_approval: "PENDING",
-          id_input: generateIdInput(),
-          supervisor_id: data.supervisor_id || null,
-        },
-      ]);
+          supervisor_id: data.supervisor_id,
+        }),
+      });
 
-      if (error) {
-        throw new Error(error.message);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to submit onboarding data');
       }
 
-      return { success: true, message: "Employee data submitted successfully." };
+      return { success: true, message: result.message };
     } catch (err: any) {
       setError(err.message);
       throw err;
