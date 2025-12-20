@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Building, User, Envelope, Phone, Briefcase, Users, CheckCircle, WarningCircle, Clock, XCircle, SealCheck, PaperPlaneTilt, SignOut } from "@phosphor-icons/react";
+import { Calendar, Building, User, Envelope, Phone, Briefcase, Users, CheckCircle, WarningCircle, Clock, XCircle, SealCheck, PaperPlaneTilt, SignOut, DeviceMobile } from "@phosphor-icons/react";
 import { logout } from "@/app/(auth)/auth-actions";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
@@ -15,6 +15,7 @@ import { useOnboarding } from "@/hooks/useOnboarding";
 import { validateOnboardingForm, validationErrorsToObject } from "@/lib/utils/validation";
 import { OnboardingFormData } from "@/lib/types/schemas";
 import { getEmployeeId, getUser } from "@/lib/utils/auth";
+import { getDeviceId, getDeviceDetails, getUserLocation, DeviceDetails } from "@/lib/utils/device";
 
 // Types for onboarding data from API
 interface OnboardingEmployee {
@@ -63,6 +64,10 @@ export default function EmployeeOnboarding() {
   const [companyCode, setCompanyCode] = useState("");
   const [userId, setUserId] = useState<string>("");
   const [activeSection, setActiveSection] = useState("company");
+  
+  // Device info state - collected automatically for seamless onboarding
+  const [deviceInfo, setDeviceInfo] = useState<DeviceDetails | null>(null);
+  const [deviceId, setDeviceId] = useState<string>("");
 
   const { 
     validateCompanyCode, 
@@ -92,6 +97,20 @@ export default function EmployeeOnboarding() {
     } catch (error) {
       console.error('Error fetching onboarding data:', error);
     }
+  }, []);
+
+  // Collect device information on mount for seamless device registration
+  useEffect(() => {
+    const collectDeviceInfo = async () => {
+      const id = getDeviceId();
+      const details = getDeviceDetails();
+      const location = await getUserLocation();
+      
+      setDeviceId(id);
+      setDeviceInfo({ ...details, location });
+    };
+    
+    collectDeviceInfo();
   }, []);
 
   useEffect(() => {
@@ -200,7 +219,18 @@ export default function EmployeeOnboarding() {
       setErrors({});
       setLoading(true);
       
-      await submitOnboarding(result.data!);
+      // Include device info with the onboarding submission
+      await submitOnboarding({
+        ...result.data!,
+        device_id: deviceId,
+        device_info: deviceInfo?.device_info,
+        device_browser: deviceInfo?.browser,
+        device_os: deviceInfo?.os,
+        device_type: deviceInfo?.device_type,
+        device_model: deviceInfo?.model,
+        device_user_agent: deviceInfo?.user_agent,
+        device_location: deviceInfo?.location,
+      });
       router.push("/onboarding?status=pending");
     } catch (err: any) {
       console.error("Submission error:", err);
@@ -635,6 +665,42 @@ export default function EmployeeOnboarding() {
                       placeholder="Search and select supervisor..."
                       error={errors.supervisor_id}
                     />
+                    
+                    {/* Device Information Section */}
+                    {deviceInfo && (
+                      <motion.div 
+                        variants={fadeInUp}
+                        className="mt-6 p-4 bg-primary-50 dark:bg-primary-950/30 rounded-lg border border-primary-200 dark:border-primary-800"
+                      >
+                        <div className="flex items-center mb-3">
+                          <DeviceMobile className="h-5 w-5 text-primary-600 mr-2" />
+                          <h3 className="font-medium text-foreground-primary">Device Registration</h3>
+                        </div>
+                        <p className="text-sm text-foreground-secondary mb-3">
+                          Your current device will be automatically registered for access upon approval.
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-foreground-tertiary">Browser:</span>
+                            <span className="font-medium text-foreground-secondary">{deviceInfo.browser}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-foreground-tertiary">Operating System:</span>
+                            <span className="font-medium text-foreground-secondary">{deviceInfo.os}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-foreground-tertiary">Device Type:</span>
+                            <span className="font-medium text-foreground-secondary capitalize">{deviceInfo.device_type}</span>
+                          </div>
+                          {deviceInfo.model && deviceInfo.model !== 'Desktop Computer' && (
+                            <div className="flex justify-between">
+                              <span className="text-foreground-tertiary">Model:</span>
+                              <span className="font-medium text-foreground-secondary">{deviceInfo.model}</span>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
                     
                     <motion.div 
                       variants={fadeInUp}

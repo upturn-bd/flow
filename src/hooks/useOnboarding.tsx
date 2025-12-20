@@ -15,6 +15,15 @@ export interface OnboardingData {
   hire_date: string;
   company_id: number;
   supervisor_id?: string;
+  // Device information for automatic approval
+  device_id?: string;
+  device_info?: string;
+  device_browser?: string;
+  device_os?: string;
+  device_type?: string;
+  device_model?: string;
+  device_user_agent?: string;
+  device_location?: string;
 }
 
 export interface PendingEmployee {
@@ -30,6 +39,15 @@ export interface PendingEmployee {
   supervisor_id: string;
   has_approval: string;
   rejection_reason?: string;
+  // Device info associated with the onboarding request
+  pending_device?: {
+    id: string;
+    device_info: string | null;
+    browser: string | null;
+    os: string | null;
+    device_type: string | null;
+    model: string | null;
+  } | null;
 }
 
 export interface UserOnboardingInfo {
@@ -159,6 +177,15 @@ export function useOnboarding() {
           hire_date: data.hire_date,
           company_id: data.company_id,
           supervisor_id: data.supervisor_id,
+          // Include device information for automatic approval
+          device_id: data.device_id,
+          device_info: data.device_info,
+          device_browser: data.device_browser,
+          device_os: data.device_os,
+          device_type: data.device_type,
+          device_model: data.device_model,
+          device_user_agent: data.device_user_agent,
+          device_location: data.device_location,
         }),
       });
 
@@ -211,8 +238,25 @@ export function useOnboarding() {
         throw new Error(error.message);
       }
 
-      setPendingEmployees(data || []);
-      return data;
+      // Fetch pending device info for each employee
+      const employeesWithDevices = await Promise.all(
+        (data || []).map(async (emp) => {
+          const { data: deviceData } = await supabase
+            .from("user_devices")
+            .select("id, device_info, browser, os, device_type, model")
+            .eq("user_id", emp.id)
+            .eq("status", "pending")
+            .maybeSingle();
+
+          return {
+            ...emp,
+            pending_device: deviceData || null
+          };
+        })
+      );
+
+      setPendingEmployees(employeesWithDevices);
+      return employeesWithDevices;
     } catch (err: any) {
       setError(err.message);
       return [];
@@ -254,6 +298,20 @@ export function useOnboarding() {
 
       if (updateError) {
         throw new Error(updateError.message);
+      }
+
+      // If accepted, also approve any pending devices for this employee
+      if (action === "ACCEPTED") {
+        const { error: deviceError } = await supabase
+          .from("user_devices")
+          .update({ status: "approved" })
+          .eq("user_id", employeeId)
+          .eq("status", "pending");
+
+        if (deviceError) {
+          console.error("Error approving device:", deviceError);
+          // Don't throw here as the main action succeeded
+        }
       }
 
       // If accepted and has supervisor, add to supervisor_employees

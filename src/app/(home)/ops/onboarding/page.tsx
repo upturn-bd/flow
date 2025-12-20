@@ -320,6 +320,45 @@ export default function OnboardingApprovalPage() {
                 </div>
               </div>
 
+              {/* Device Information Section */}
+              {emp.pending_device && (
+                <div className="mt-2 p-3 bg-primary-50 dark:bg-primary-950/30 rounded-lg border border-primary-200 dark:border-primary-800">
+                  <div className="flex items-center gap-2 mb-2">
+                    <DeviceMobile className="h-4 w-4 text-primary-600" weight="duotone" />
+                    <span className="text-sm font-medium text-foreground-primary">Pending Device</span>
+                    <span className="text-xs text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/50 px-2 py-0.5 rounded-full">
+                      Auto-approves on accept
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    {emp.pending_device.browser && (
+                      <div>
+                        <span className="text-foreground-tertiary">Browser: </span>
+                        <span className="font-medium text-foreground-secondary">{emp.pending_device.browser}</span>
+                      </div>
+                    )}
+                    {emp.pending_device.os && (
+                      <div>
+                        <span className="text-foreground-tertiary">OS: </span>
+                        <span className="font-medium text-foreground-secondary">{emp.pending_device.os}</span>
+                      </div>
+                    )}
+                    {emp.pending_device.device_type && (
+                      <div>
+                        <span className="text-foreground-tertiary">Type: </span>
+                        <span className="font-medium text-foreground-secondary capitalize">{emp.pending_device.device_type}</span>
+                      </div>
+                    )}
+                    {emp.pending_device.model && emp.pending_device.model !== 'Desktop Computer' && (
+                      <div>
+                        <span className="text-foreground-tertiary">Model: </span>
+                        <span className="font-medium text-foreground-secondary">{emp.pending_device.model}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <Textarea
                 placeholder="Reason for rejection (required if rejecting)"
                 value={rejectionReasons[emp.id] || ""}

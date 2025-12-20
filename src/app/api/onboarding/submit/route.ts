@@ -21,7 +21,16 @@ export async function POST(request: NextRequest) {
       job_status, 
       hire_date, 
       company_id,
-      supervisor_id 
+      supervisor_id,
+      // Device information for automatic approval during onboarding
+      device_id,
+      device_info,
+      device_browser,
+      device_os,
+      device_type,
+      device_model,
+      device_user_agent,
+      device_location
     } = body
 
     // Validate required fields
@@ -155,6 +164,40 @@ export async function POST(request: NextRequest) {
         { error: upsertError.message },
         { status: 500 }
       )
+    }
+
+    // Register device as pending for approval along with the onboarding request
+    if (device_id) {
+      // Check if device already exists
+      const { data: existingDevice } = await adminSupabase
+        .from('user_devices')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('device_id', device_id)
+        .maybeSingle()
+
+      if (!existingDevice) {
+        // Register new device as pending (will be approved with onboarding)
+        const { error: deviceError } = await adminSupabase
+          .from('user_devices')
+          .insert({
+            user_id: user.id,
+            device_id,
+            device_info: device_info || 'Unknown Device',
+            status: 'pending',
+            browser: device_browser,
+            os: device_os,
+            device_type,
+            model: device_model,
+            user_agent: device_user_agent,
+            location: device_location
+          })
+
+        if (deviceError) {
+          console.error('Device registration error:', deviceError)
+          // Don't fail the onboarding if device registration fails
+        }
+      }
     }
 
     return NextResponse.json({

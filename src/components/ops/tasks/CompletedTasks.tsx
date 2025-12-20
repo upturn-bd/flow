@@ -166,6 +166,7 @@ const CompletedTasksList = memo(({
 
   const userIdInit = async () => {
     const user = await getEmployeeInfo();
+    if (!user) return;
     setUserId(user.id);
   }
 

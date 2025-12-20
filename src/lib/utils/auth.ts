@@ -80,13 +80,13 @@ export async function getEmployeeInfo(): Promise<{
     .eq('id', user.id)
     .maybeSingle();
 
+  if (error) {
+    throw new DatabaseError('Failed to get employee info', error.code);
+  }
+
   // Return null if no employee record found (new user in onboarding)
   if (!data) {
     return null;
-  }
-
-  if (error) {
-    throw new DatabaseError('Failed to get employee info', error.code);
   }
 
   return { 

@@ -57,6 +57,7 @@ export default function AttendanceRequestsPage() {
     setLoading(true);
 
     const user = await getEmployeeInfo();
+    if (!user) return;
     try {
       const { data, error } = await supabase
         .from("attendance_requests")
@@ -104,6 +105,7 @@ export default function AttendanceRequestsPage() {
 
     setIsSubmitting(true);
     const user = await getEmployeeInfo();
+    if (!user) return;
 
     try {
       // Update the request status

@@ -24,6 +24,7 @@ export default function LeaveHistoryPage() {
 
     const user = await getEmployeeInfo();
     const company_id = await getCompanyId();
+    if (!user) return;
     try {
       const { data, error } = await supabase
         .from("leave_records")
@@ -39,9 +40,7 @@ export default function LeaveHistoryPage() {
       setLeaveRequests(data);
       
       // Fetch only the current user's employee info for display
-      if (user.id) {
-        fetchEmployeesByIds([user.id]);
-      }
+      fetchEmployeesByIds([user.id]);
     } catch (error) {
       setError("Failed to fetch leave requests");
     } finally {

@@ -60,6 +60,7 @@ export default function OngoingTaskPage({
 
   const userIdInit = async () => {
     const user = await getEmployeeInfo();
+    if (!user) return;
     setUserId(user.id);
   };
 

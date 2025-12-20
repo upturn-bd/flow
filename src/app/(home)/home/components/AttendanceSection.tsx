@@ -135,6 +135,7 @@ export default function AttendanceSection({
   async function fetchAttendanceDataToday() {
     setAttendanceLoading(true);
     const user = await getEmployeeInfo();
+    if (!user) return;
     try {
       const { data, error } = await supabase
         .from("attendance_records")
