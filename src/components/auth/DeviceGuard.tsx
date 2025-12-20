@@ -44,6 +44,19 @@ export default function DeviceGuard({ children }: { children: React.ReactNode })
       // Mark as checked
       hasChecked.current = true;
 
+      // Check if user is a superadmin - they bypass device checks entirely
+      try {
+        const { data: isSuperadmin } = await supabase.rpc('is_superadmin', { check_user_id: user.id });
+        if (isSuperadmin) {
+          console.log('[DeviceGuard] Superadmin detected - bypassing device check');
+          if (mounted) setDeviceStatus('approved');
+          return;
+        }
+      } catch (err) {
+        console.error('[DeviceGuard] Error checking superadmin status:', err);
+        // Continue with normal device check if superadmin check fails
+      }
+
       const deviceId = getDeviceId();
       if (!deviceId) {
         console.error('[DeviceGuard] No device ID');

@@ -31,6 +31,24 @@ export async function GET(request: Request) {
       // Device verification for OAuth logins
       if (deviceId && deviceId.length > 0) {
         const userId = sessionData.user.id;
+        
+        // Check if user is a superadmin - they bypass device checks entirely
+        const { data: isSuperadmin } = await supabase.rpc('is_superadmin', { check_user_id: userId });
+        
+        if (isSuperadmin) {
+          console.log('OAuth - Superadmin detected - bypassing device check');
+          // Proceed with normal redirect
+          const forwardedHost = request.headers.get('x-forwarded-host');
+          const isLocalEnv = process.env.NODE_ENV === 'development';
+          if (isLocalEnv) {
+            return NextResponse.redirect(`${origin}${next}`);
+          } else if (forwardedHost) {
+            return NextResponse.redirect(`https://${forwardedHost}${next}`);
+          } else {
+            return NextResponse.redirect(`${origin}${next}`);
+          }
+        }
+        
         const headersList = await headers();
         const userAgent = headersList.get('user-agent') || 'Unknown';
         
