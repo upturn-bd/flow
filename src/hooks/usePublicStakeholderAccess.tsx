@@ -248,6 +248,49 @@ export function usePublicStakeholderAccess() {
     []
   );
 
+  /**
+   * Fetch transactions for a stakeholder (public access)
+   * Uses server-side API route to bypass RLS
+   */
+  const fetchPublicTransactions = useCallback(
+    async (stakeholderId: number) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        if (!credentialsRef.current) {
+          throw new Error("Not verified");
+        }
+
+        const response = await fetch('/api/public/stakeholder/transactions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            stakeholderId,
+            accessCode: credentialsRef.current.accessCode,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          const errorMessage = data.error || 'Failed to fetch transactions';
+          setError(errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        return data.transactions || [];
+      } catch (err) {
+        logError("Error fetching public transactions", err);
+        setError("Failed to load transactions");
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
   // ==========================================================================
   // RETURN
   // ==========================================================================
@@ -263,5 +306,6 @@ export function usePublicStakeholderAccess() {
     createPublicTicket,
     fetchPublicIssueCategories,
     getAttachmentUrl,
+    fetchPublicTransactions,
   };
 }
