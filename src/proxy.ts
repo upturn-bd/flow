@@ -8,6 +8,16 @@ import { ROUTE_PERMISSION_MAP } from "./lib/constants/permissions";
 const UPDATED_EXCLUDE_PATHS = [...excludePaths, "/verify"];
 
 export async function proxy(request: NextRequest) {
+  const url = request.nextUrl.clone();
+  const currentPath = url.pathname;
+
+  // Allow landing page (root) without authentication
+  if (currentPath === "/") {
+    return NextResponse.next({
+      request,
+    });
+  }
+
   // Initialize Supabase client for session management
   let response = NextResponse.next({
     request,
@@ -40,9 +50,6 @@ export async function proxy(request: NextRequest) {
   const {
     data: { user: supabaseUser },
   } = await supabase.auth.getUser();
-
-  const url = request.nextUrl.clone();
-  const currentPath = url.pathname;
 
   
 
@@ -95,12 +102,6 @@ export async function proxy(request: NextRequest) {
     }
 
     return response;
-  }
-
-  // Redirect "/" to "/home"
-  if (currentPath === "/") {
-    url.pathname = "/home";
-    return NextResponse.redirect(url);
   }
 
   // Fetch employee data and cached permissions
