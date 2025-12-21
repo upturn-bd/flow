@@ -9,6 +9,7 @@ export interface InvoiceEmailData {
   companyEmail?: string;
   companyPhone?: string;
   logoUrl?: string;
+  locale?: string; // Optional locale for formatting (defaults to 'en-US')
 }
 
 /**
@@ -23,18 +24,19 @@ export function generateInvoiceEmailHTML(data: InvoiceEmailData): string {
     companyEmail,
     companyPhone,
     logoUrl,
+    locale = 'en-US', // Default to en-US if not provided
   } = data;
 
   const currencySymbol = CURRENCY_SYMBOLS[invoice.currency] || invoice.currency;
 
   // Format currency
   const formatCurrency = (amount: number) => {
-    return `${currencySymbol} ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return `${currencySymbol} ${amount.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   // Format date
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
+    return new Date(dateStr).toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -221,15 +223,15 @@ export function generateInvoiceEmailHTML(data: InvoiceEmailData): string {
  * Generate plain text version of invoice email (for email clients that don't support HTML)
  */
 export function generateInvoiceEmailText(data: InvoiceEmailData): string {
-  const { invoice, items, companyName } = data;
+  const { invoice, items, companyName, locale = 'en-US' } = data;
   const currencySymbol = CURRENCY_SYMBOLS[invoice.currency] || invoice.currency;
 
   const formatCurrency = (amount: number) => {
-    return `${currencySymbol} ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return `${currencySymbol} ${amount.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
+    return new Date(dateStr).toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

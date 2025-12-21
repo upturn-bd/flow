@@ -5,7 +5,6 @@ import { supabase } from "@/lib/supabase/client";
 import { getEmployeeInfo, getCompanyId } from "@/lib/utils/auth";
 import {
   StakeholderInvoice,
-  StakeholderInvoiceItem,
   StakeholderBillingCycle,
   StakeholderFieldChangeAudit,
   StakeholderInvoiceSummary,
@@ -13,7 +12,6 @@ import {
   BillingCycleType,
   InvoiceItemType,
   FieldChangeType,
-  StakeholderStepData,
   FieldDefinition,
 } from "@/lib/types/schemas";
 import { captureError, captureSupabaseError } from "@/lib/sentry";
@@ -443,34 +441,46 @@ export function useStakeholderBilling() {
           if (itemsError) throw itemsError;
         }
 
-        // Fetch the KAM email to notify
-        const { data: kamData } = await supabase
-          .from("stakeholders")
-          .select("kam_id, kam:employees!stakeholders_kam_id_fkey(email, name)")
-          .eq("id", formData.stakeholder_id)
-          .single();
+        // Notify KAM about the invoice
+        try {
+          // Fetch the KAM email to notify
+          const { data: kamData } = await supabase
+            .from("stakeholders")
+            .select("kam_id, kam:employees!stakeholders_kam_id_fkey(email, name)")
+            .eq("id", formData.stakeholder_id)
+            .single();
 
-        // Notify KAM
-        if (kamData?.kam?.email) {
-          await sendNotificationEmail({
-            to: kamData.kam.email,
-            subject: `New Invoice Generated: ${invoiceNumber}`,
-            title: "New Invoice Generated",
-            message: `A new invoice (${invoiceNumber}) has been generated for ${stakeholder.name}.`,
-            ctaText: "View Invoice",
-            ctaUrl: `${process.env.NEXT_PUBLIC_APP_URL}/admin/stakeholders/billing/${invoice.id}`,
-          });
-        }
+          // Notify KAM
+          if (kamData?.kam?.email) {
+            await sendNotificationEmail({
+              to: kamData.kam.email,
+              subject: `New Invoice Generated: ${invoiceNumber}`,
+              title: "New Invoice Generated",
+              message: `A new invoice (${invoiceNumber}) has been generated for ${stakeholder.name}.`,
+              ctaText: "View Invoice",
+              ctaUrl: `${process.env.NEXT_PUBLIC_APP_URL}/admin/stakeholders/billing/${invoice.id}`,
+            });
+          }
 
-        // Create notification for KAM
-        if (kamData?.kam_id) {
-          await createNotification({
-            employee_id: kamData.kam_id,
-            title: "New Invoice Generated",
-            message: `Invoice ${invoiceNumber} has been generated for ${stakeholder.name}`,
-            type: "invoice",
-            link: `/admin/stakeholders/billing/${invoice.id}`,
+          // Create notification for KAM
+          if (kamData?.kam_id) {
+            await createNotification({
+              employee_id: kamData.kam_id,
+              title: "New Invoice Generated",
+              message: `Invoice ${invoiceNumber} has been generated for ${stakeholder.name}`,
+              type: "invoice",
+              link: `/admin/stakeholders/billing/${invoice.id}`,
+            });
+          }
+        } catch (notificationError) {
+          console.error("Failed to send KAM notification for newly created invoice:", notificationError);
+          captureError(notificationError, {
+            operation: "notifyKamInvoiceCreated",
+            stakeholderId: formData.stakeholder_id,
+            invoiceId: invoice.id,
+            invoiceNumber,
           });
+          // Continue execution - invoice was created successfully
         }
 
         await fetchInvoices({ stakeholder_id: formData.stakeholder_id });
@@ -657,16 +667,27 @@ export function useStakeholderBilling() {
         
         // Calculate start date (previous billing day)
         const startDate = new Date(refDate);
-        startDate.setDate(day);
+        
+        // Get the last day of the month to handle months with fewer days
+        const lastDayOfMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
+        const actualDay = Math.min(day, lastDayOfMonth);
+        
+        startDate.setDate(actualDay);
         
         // If reference date is before billing day, go back a month
-        if (refDate.getDate() < day) {
+        if (refDate.getDate() < actualDay) {
           startDate.setMonth(startDate.getMonth() - 1);
+          // Recalculate for the previous month's last day
+          const prevMonthLastDay = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
+          startDate.setDate(Math.min(day, prevMonthLastDay));
         }
         
         // Calculate end date (next billing day - 1)
         const endDate = new Date(startDate);
         endDate.setMonth(endDate.getMonth() + 1);
+        // Handle day overflow for next month
+        const nextMonthLastDay = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
+        endDate.setDate(Math.min(day, nextMonthLastDay));
         endDate.setDate(endDate.getDate() - 1);
         
         return {
@@ -804,6 +825,17 @@ export function useStakeholderBilling() {
 
       if (error) throw error;
 
+      // Handle empty result set
+      if (!data || data.length === 0) {
+        return {
+          total_invoices: 0,
+          total_amount: 0,
+          paid_amount: 0,
+          outstanding_amount: 0,
+          overdue_count: 0,
+        };
+      }
+
       return data[0] as StakeholderInvoiceSummary;
     } catch (err) {
       console.error("Error fetching invoice summary:", err);
@@ -836,13 +868,17 @@ export function useStakeholderBilling() {
 
         if (stepDataError) throw stepDataError;
 
-        // Extract billing fields
+        // Extract billing fields with deduplication
         const billingItems: InvoiceItemFormData[] = [];
+        const seenFieldKeys = new Set<string>(); // Track fields to prevent duplicates
 
         for (const stepData of stepDataRecords || []) {
           const fieldDefinitions = stepData.step?.field_definitions?.fields || [];
           
           for (const fieldKey of billingFieldKeys) {
+            // Skip if we've already added this field
+            if (seenFieldKeys.has(fieldKey)) continue;
+            
             const fieldDef = fieldDefinitions.find((f: FieldDefinition) => f.key === fieldKey);
             if (!fieldDef) continue;
 
@@ -870,6 +906,9 @@ export function useStakeholderBilling() {
                   field_type: fieldDef.type,
                 },
               });
+              
+              // Mark this field as seen
+              seenFieldKeys.add(fieldKey);
             }
           }
         }

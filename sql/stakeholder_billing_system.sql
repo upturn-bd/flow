@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS stakeholder_invoices (
   customer_contact_persons JSONB, -- Array of contact persons
   
   -- Payment tracking
-  paid_amount DECIMAL(15, 2) DEFAULT 0,
+  paid_amount DECIMAL(15, 2) NOT NULL DEFAULT 0,
   payment_date DATE,
   
   -- Integration with accounts system
@@ -184,6 +184,11 @@ CREATE TABLE IF NOT EXISTS stakeholder_invoice_items (
 CREATE INDEX IF NOT EXISTS idx_invoice_items_invoice_id ON stakeholder_invoice_items(invoice_id);
 CREATE INDEX IF NOT EXISTS idx_invoice_items_field_key ON stakeholder_invoice_items(field_key);
 CREATE INDEX IF NOT EXISTS idx_invoice_items_step_id ON stakeholder_invoice_items(step_id);
+
+-- Prevent duplicate step-based line items per invoice
+CREATE UNIQUE INDEX IF NOT EXISTS uniq_invoice_items_invoice_field_step
+  ON stakeholder_invoice_items(invoice_id, field_key, step_id)
+  WHERE field_key IS NOT NULL AND step_id IS NOT NULL;
 
 -- ==============================================================================
 -- PART 4: FIELD CHANGE AUDIT TABLE
@@ -284,8 +289,13 @@ CREATE TRIGGER trigger_update_invoice_totals_on_item_change
 CREATE OR REPLACE FUNCTION update_invoice_status_on_payment()
 RETURNS TRIGGER AS $$
 BEGIN
+  -- Prevent overpayment
+  IF NEW.paid_amount > NEW.total_amount THEN
+    RAISE EXCEPTION 'Paid amount (%) cannot exceed invoice total (%)', NEW.paid_amount, NEW.total_amount;
+  END IF;
+  
   -- Update status based on paid amount
-  IF NEW.paid_amount >= NEW.total_amount THEN
+  IF NEW.paid_amount >= NEW.total_amount AND NEW.total_amount > 0 THEN
     NEW.status = 'paid';
   ELSIF NEW.paid_amount > 0 THEN
     NEW.status = 'partially_paid';
@@ -302,10 +312,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger to update invoice status on payment changes
+-- Trigger to update invoice status on payment changes (including total_amount changes)
 DROP TRIGGER IF EXISTS trigger_update_invoice_status ON stakeholder_invoices;
 CREATE TRIGGER trigger_update_invoice_status
-  BEFORE UPDATE OF paid_amount ON stakeholder_invoices
+  BEFORE UPDATE OF paid_amount, total_amount ON stakeholder_invoices
   FOR EACH ROW
   EXECUTE FUNCTION update_invoice_status_on_payment();
 
@@ -381,32 +391,162 @@ ALTER TABLE stakeholder_field_change_audit ENABLE ROW LEVEL SECURITY;
 
 -- Billing Cycles Policies
 DROP POLICY IF EXISTS billing_cycles_company_isolation ON stakeholder_billing_cycles;
-CREATE POLICY billing_cycles_company_isolation ON stakeholder_billing_cycles
-  FOR ALL
-  USING (company_id = current_setting('app.current_company_id', TRUE)::INTEGER);
+DROP POLICY IF EXISTS billing_cycles_select ON stakeholder_billing_cycles;
+DROP POLICY IF EXISTS billing_cycles_modify ON stakeholder_billing_cycles;
+
+CREATE POLICY billing_cycles_select ON stakeholder_billing_cycles
+  FOR SELECT
+  USING (
+    company_id = get_auth_company_id()
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_read')
+  );
+
+CREATE POLICY billing_cycles_modify ON stakeholder_billing_cycles
+  FOR INSERT
+  WITH CHECK (
+    company_id = get_auth_company_id()
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_write')
+  );
+
+CREATE POLICY billing_cycles_update ON stakeholder_billing_cycles
+  FOR UPDATE
+  USING (
+    company_id = get_auth_company_id()
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_write')
+  )
+  WITH CHECK (
+    company_id = get_auth_company_id()
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_write')
+  );
+
+CREATE POLICY billing_cycles_delete ON stakeholder_billing_cycles
+  FOR DELETE
+  USING (
+    company_id = get_auth_company_id()
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_delete')
+  );
 
 -- Invoices Policies
 DROP POLICY IF EXISTS invoices_company_isolation ON stakeholder_invoices;
-CREATE POLICY invoices_company_isolation ON stakeholder_invoices
-  FOR ALL
-  USING (company_id = current_setting('app.current_company_id', TRUE)::INTEGER);
+DROP POLICY IF EXISTS invoices_select ON stakeholder_invoices;
+DROP POLICY IF EXISTS invoices_modify ON stakeholder_invoices;
+
+CREATE POLICY invoices_select ON stakeholder_invoices
+  FOR SELECT
+  USING (
+    company_id = get_auth_company_id()
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_read')
+  );
+
+CREATE POLICY invoices_insert ON stakeholder_invoices
+  FOR INSERT
+  WITH CHECK (
+    company_id = get_auth_company_id()
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_write')
+  );
+
+CREATE POLICY invoices_update ON stakeholder_invoices
+  FOR UPDATE
+  USING (
+    company_id = get_auth_company_id()
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_write')
+  )
+  WITH CHECK (
+    company_id = get_auth_company_id()
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_write')
+  );
+
+CREATE POLICY invoices_delete ON stakeholder_invoices
+  FOR DELETE
+  USING (
+    company_id = get_auth_company_id()
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_delete')
+  );
 
 -- Invoice Items Policies (through invoice's company_id)
 DROP POLICY IF EXISTS invoice_items_company_isolation ON stakeholder_invoice_items;
-CREATE POLICY invoice_items_company_isolation ON stakeholder_invoice_items
-  FOR ALL
+DROP POLICY IF EXISTS invoice_items_select ON stakeholder_invoice_items;
+DROP POLICY IF EXISTS invoice_items_modify ON stakeholder_invoice_items;
+
+CREATE POLICY invoice_items_select ON stakeholder_invoice_items
+  FOR SELECT
   USING (
     invoice_id IN (
-      SELECT id FROM stakeholder_invoices 
-      WHERE company_id = current_setting('app.current_company_id', TRUE)::INTEGER
+      SELECT id
+      FROM stakeholder_invoices
+      WHERE company_id = get_auth_company_id()
     )
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_read')
+  );
+
+CREATE POLICY invoice_items_insert ON stakeholder_invoice_items
+  FOR INSERT
+  WITH CHECK (
+    invoice_id IN (
+      SELECT id
+      FROM stakeholder_invoices
+      WHERE company_id = get_auth_company_id()
+    )
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_write')
+  );
+
+CREATE POLICY invoice_items_update ON stakeholder_invoice_items
+  FOR UPDATE
+  USING (
+    invoice_id IN (
+      SELECT id
+      FROM stakeholder_invoices
+      WHERE company_id = get_auth_company_id()
+    )
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_write')
+  )
+  WITH CHECK (
+    invoice_id IN (
+      SELECT id
+      FROM stakeholder_invoices
+      WHERE company_id = get_auth_company_id()
+    )
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_write')
+  );
+
+CREATE POLICY invoice_items_delete ON stakeholder_invoice_items
+  FOR DELETE
+  USING (
+    invoice_id IN (
+      SELECT id
+      FROM stakeholder_invoices
+      WHERE company_id = get_auth_company_id()
+    )
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_delete')
   );
 
 -- Field Change Audit Policies
 DROP POLICY IF EXISTS field_audit_company_isolation ON stakeholder_field_change_audit;
-CREATE POLICY field_audit_company_isolation ON stakeholder_field_change_audit
-  FOR ALL
-  USING (company_id = current_setting('app.current_company_id', TRUE)::INTEGER);
+DROP POLICY IF EXISTS field_audit_select ON stakeholder_field_change_audit;
+DROP POLICY IF EXISTS field_audit_modify ON stakeholder_field_change_audit;
+
+CREATE POLICY field_audit_select ON stakeholder_field_change_audit
+  FOR SELECT
+  USING (
+    company_id = get_auth_company_id()
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_read')
+  );
+
+CREATE POLICY field_audit_insert ON stakeholder_field_change_audit
+  FOR INSERT
+  WITH CHECK (
+    company_id = get_auth_company_id()
+    AND has_permission(auth.uid(), 'stakeholder_billing', 'can_write')
+  );
+
+-- Audit records should not be updated or deleted (immutable audit log)
+CREATE POLICY field_audit_no_update ON stakeholder_field_change_audit
+  FOR UPDATE
+  USING (false);
+
+CREATE POLICY field_audit_no_delete ON stakeholder_field_change_audit
+  FOR DELETE
+  USING (false);
 
 -- ==============================================================================
 -- PART 8: COMMENTS

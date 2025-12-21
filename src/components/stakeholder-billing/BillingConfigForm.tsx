@@ -38,7 +38,7 @@ export default function BillingConfigForm({ processId, fieldKeys, onSave }: Bill
     is_active: true,
   };
 
-  const { formData, errors, handleChange, setFormData, resetForm } = useFormState(initialState);
+  const { formData, errors, handleChange, setFormData } = useFormState(initialState);
 
   useEffect(() => {
     loadBillingConfig();
@@ -308,7 +308,10 @@ export default function BillingConfigForm({ processId, fieldKeys, onSave }: Bill
                         className="form-checkbox h-4 w-4 text-primary-600 rounded border-border-primary focus:ring-primary-500"
                       />
                       <span className="text-sm font-medium text-foreground-primary">
-                        {fieldKey.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                        {fieldKey
+                          .replace(/([a-z])([A-Z])/g, '$1 $2')
+                          .replace(/_/g, ' ')
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
                       </span>
                     </label>
                   ))}
