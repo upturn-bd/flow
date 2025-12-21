@@ -116,6 +116,7 @@ export default function LeaveCreatePage({ setActiveTab }: { setActiveTab: (key: 
 
     const client = createClient();
     const user = await getEmployeeInfo();
+    if (!user) return;
     setIsSubmitting(true);
 
     try {

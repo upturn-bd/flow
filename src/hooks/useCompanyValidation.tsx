@@ -6,27 +6,29 @@ import { validateCompanyCode as validateCompanyCodeApi } from "@/lib/utils/compa
 interface ValidationResult {
   isValid: boolean;
   id: number | null;
+  name: string | null;
   error?: string;
 }
 
 export function useCompanyValidation() {
   const [isValid, setIsValid] = useState(false);
   const [companyId, setCompanyId] = useState<number | null>(null);
+  const [companyName, setCompanyName] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const validateCompanyCode = useCallback(
     async (
-      companyName: string,
       companyCode: string
     ): Promise<ValidationResult> => {
       setLoading(true);
       setError(null);
 
       try {
-        const result = await validateCompanyCodeApi(companyName, companyCode);
+        const result = await validateCompanyCodeApi(companyCode);
         setIsValid(result.isValid);
         setCompanyId(result.id);
+        setCompanyName(result.name);
         if (result.id !== null)
           localStorage.setItem("company_id", result.id?.toString() ?? "0");
         return result;
@@ -37,7 +39,7 @@ export function useCompanyValidation() {
             : "Failed to validate company code";
         setError(errorMessage);
         console.error(errorMessage, err);
-        return { isValid: false, id: null, error: errorMessage };
+        return { isValid: false, id: null, name: null, error: errorMessage };
       } finally {
         setLoading(false);
       }
@@ -48,12 +50,14 @@ export function useCompanyValidation() {
   const reset = useCallback(() => {
     setIsValid(false);
     setCompanyId(null);
+    setCompanyName(null);
     setError(null);
   }, []);
 
   return {
     isValid,
     companyId,
+    companyName,
     loading,
     error,
     validateCompanyCode,

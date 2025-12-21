@@ -424,6 +424,15 @@ export interface OnboardingFormData {
   company_id: number;
   supervisor_id: string | null;
   basic_salary?: number; // Added for salary management
+  // Device information for automatic approval
+  device_id?: string;
+  device_info?: string;
+  device_browser?: string;
+  device_os?: string;
+  device_type?: string;
+  device_model?: string;
+  device_user_agent?: string;
+  device_location?: string;
 }
 
 // Account System Interface

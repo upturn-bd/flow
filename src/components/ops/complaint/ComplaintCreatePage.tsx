@@ -69,6 +69,7 @@ export default function ComplaintCreatePage({ onClose, setActiveTab }: Complaint
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const user = await getEmployeeInfo();
+    if (!user) return;
     setIsSubmitting(true);
     try {
       const { uploadedFilePaths, error: uploadError, publicUrls } = await uploadManyFiles(

@@ -79,6 +79,10 @@ export async function handleCheckIn(
     attendanceRecord.tag = attendanceStatus;
     const date = getTodaysDate()
     
+    if (!user) {
+      return { success: false, message: "User not authenticated. Please try again." };
+    }
+    
     const { data, error } = await supabase.from("attendance_records").insert({
       ...attendanceRecord,
       attendance_date: date, // Just the date part (YYYY-MM-DD)
@@ -111,6 +115,9 @@ export async function handleCheckOut(
   attendanceId: number,
 ): Promise<{ success: boolean; message?: string; isEarly?: boolean }> {
   const user = await getEmployeeInfo();
+  if (!user) {
+    return { success: false, message: "User not authenticated. Please try again." };
+  }
   const coordinates = await getCurrentCoordinates();
   
   if (!coordinates) {

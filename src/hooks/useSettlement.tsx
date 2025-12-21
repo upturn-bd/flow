@@ -20,6 +20,7 @@ export function useSettlementRequests() {
       try {
         const user = await getEmployeeInfo();
         const company_id = await getCompanyId();
+        if (!user) return [];
 
         const { data, error } = await supabase
           .from("settlement_records")
@@ -53,6 +54,7 @@ export function useSettlementRequests() {
     try {
       const user = await getEmployeeInfo();
       const company_id = await getCompanyId();
+      if (!user) return [];
 
       const { data, error } = await supabase
         .from("settlement_records")
@@ -84,6 +86,7 @@ export function useSettlementRequests() {
       try {
         const user = await getEmployeeInfo();
         const company_id = await getCompanyId();
+        if (!user) return false;
 
         const { data, error } = await supabase
           .from("settlement_records")
@@ -137,6 +140,7 @@ export function useSettlementRequests() {
       try {
         const user = await getEmployeeInfo();
         const company_id = await getCompanyId();
+        if (!user) return { success: false, error: "User not authenticated" };
 
         // Upload files if any
         let uploadedFilePaths: string[] = [];

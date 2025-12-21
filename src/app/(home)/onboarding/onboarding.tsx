@@ -1,21 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Building, User, Envelope, Phone, Briefcase, Users, CheckCircle, WarningCircle, Clock, XCircle, SealCheck, PaperPlaneTilt, SignOut } from "@phosphor-icons/react";
+import { Calendar, Building, User, Envelope, Phone, Briefcase, Users, CheckCircle, WarningCircle, Clock, XCircle, SealCheck, PaperPlaneTilt, SignOut, DeviceMobile } from "@phosphor-icons/react";
 import { logout } from "@/app/(auth)/auth-actions";
 import FormInputField from "@/components/ui/FormInputField";
 import FormSelectField from "@/components/ui/FormSelectField";
+import SingleEmployeeSelector from "@/components/forms/SingleEmployeeSelector";
 import { fadeInUp, staggerContainer } from "@/components/ui/animations";
 import { InlineSpinner } from "@/components/ui";
 import { useCompanyValidation } from "@/hooks/useCompanyValidation";
-import { useEmployees } from "@/hooks/useEmployees";
-import { useDepartments } from "@/hooks/useDepartments";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { validateOnboardingForm, validationErrorsToObject } from "@/lib/utils/validation";
 import { OnboardingFormData } from "@/lib/types/schemas";
 import { getEmployeeId, getUser } from "@/lib/utils/auth";
+import { getDeviceId, getDeviceDetails, getUserLocation, DeviceDetails } from "@/lib/utils/device";
+
+// Types for onboarding data from API
+interface OnboardingEmployee {
+  id: string;
+  name: string;
+  email?: string;
+  designation?: string;
+}
+
+interface OnboardingDepartment {
+  id: number;
+  name: string;
+}
 
 const jobStatuses = [
   "Active",
@@ -51,20 +64,59 @@ export default function EmployeeOnboarding() {
   const [companyCode, setCompanyCode] = useState("");
   const [userId, setUserId] = useState<string>("");
   const [activeSection, setActiveSection] = useState("company");
+  
+  // Device info state - collected automatically for seamless onboarding
+  const [deviceInfo, setDeviceInfo] = useState<DeviceDetails | null>(null);
+  const [deviceId, setDeviceId] = useState<string>("");
 
   const { 
     validateCompanyCode, 
     companyId,
+    companyName: validatedCompanyName,
   } = useCompanyValidation();
   
-  const { employees, fetchEmployees } = useEmployees();
-  const { departments, fetchDepartments } = useDepartments();
+  // State for employees and departments fetched via API (bypasses RLS)
+  const [employees, setEmployees] = useState<OnboardingEmployee[]>([]);
+  const [departments, setDepartments] = useState<OnboardingDepartment[]>([]);
   const { getUserOnboardingInfo, submitOnboarding, subscribeToUserOnboardingUpdates } = useOnboarding();
+
+  // Fetch employees and departments via API (bypasses RLS for new users)
+  const fetchOnboardingData = useCallback(async (companyIdToFetch: number) => {
+    try {
+      const response = await fetch(
+        `/api/onboarding/employees?companyId=${companyIdToFetch}&includeDepartments=true`
+      );
+      const data = await response.json();
+      
+      if (response.ok) {
+        setEmployees(data.employees || []);
+        setDepartments(data.departments || []);
+      } else {
+        console.error('Failed to fetch onboarding data:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching onboarding data:', error);
+    }
+  }, []);
+
+  // Collect device information on mount for seamless device registration
+  useEffect(() => {
+    const collectDeviceInfo = async () => {
+      const id = getDeviceId();
+      const details = getDeviceDetails();
+      const location = await getUserLocation();
+      
+      setDeviceId(id);
+      setDeviceInfo({ ...details, location });
+    };
+    
+    collectDeviceInfo();
+  }, []);
 
   useEffect(() => {
     console.log(departments, "Departments fetched in onboarding");
     console.log(employees, "Employees fetched in onboarding");
-  }, [departments,employees]);
+  }, [departments, employees]);
     
 
 
@@ -86,15 +138,8 @@ export default function EmployeeOnboarding() {
             setFormData(formatted);
             setActiveSection("personal");
             
-            // Fetch departments when application is rejected
-            await (async () => {
-              try {
-                await fetchDepartments(companyId!);
-              } catch (error) {
-                console.error("Error fetching departments:", error);
-              }
-            })();
-            await fetchEmployees();
+            // Fetch departments and employees via API
+            await fetchOnboardingData(userInfo.userData.company_id);
           }
         } catch (e) {
           console.error("Failed to fetch rejected data:", e);
@@ -105,6 +150,7 @@ export default function EmployeeOnboarding() {
         const user = await getUser();
         if (user) {
           setFormData((prev) => ({
+            ...prev,
             ...prev,
             email: user.email ?? "",
             phone_number: user.phone ?? "",
@@ -117,16 +163,10 @@ export default function EmployeeOnboarding() {
 
   useEffect(() => {
     if (isCompanyCodeValid && formData.company_id) {
-      try{
-        fetchDepartments(companyId!);
-        fetchEmployees(companyId!);
-        getEmployeeId().then(id => setUserId(id));
-      }
-      catch (error) {
-        console.error("Error fetching departments or employees:", error);
-      }
+      fetchOnboardingData(formData.company_id);
+      getEmployeeId().then(id => setUserId(id)).catch(() => {});
     }
-  }, [companyId]);
+  }, [isCompanyCodeValid, formData.company_id, fetchOnboardingData]);
 
   // Set up polling for user's onboarding status (replaces realtime)
   useEffect(() => {
@@ -179,7 +219,18 @@ export default function EmployeeOnboarding() {
       setErrors({});
       setLoading(true);
       
-      await submitOnboarding(result.data!);
+      // Include device info with the onboarding submission
+      await submitOnboarding({
+        ...result.data!,
+        device_id: deviceId,
+        device_info: deviceInfo?.device_info,
+        device_browser: deviceInfo?.browser,
+        device_os: deviceInfo?.os,
+        device_type: deviceInfo?.device_type,
+        device_model: deviceInfo?.model,
+        device_user_agent: deviceInfo?.user_agent,
+        device_location: deviceInfo?.location,
+      });
       router.push("/onboarding?status=pending");
     } catch (err: any) {
       console.error("Submission error:", err);
@@ -207,11 +258,15 @@ export default function EmployeeOnboarding() {
     try {
       setVerifyLoading(true);
       
-      const result = await validateCompanyCode(formData.company_name, companyCode);
+      const result = await validateCompanyCode(companyCode);
       
       if (result.isValid && result.id !== null) {
         setIsCompanyCodeValid(true);
-        setFormData((prev) => ({ ...prev, company_id: result.id || 0 }));
+        setFormData((prev) => ({ 
+          ...prev, 
+          company_id: result.id || 0,
+          company_name: result.name || ""
+        }));
         setActiveSection("personal");
         
         // Fetch departments and employees for the validated company
@@ -224,7 +279,7 @@ export default function EmployeeOnboarding() {
         setIsCompanyCodeValid(false);
         setVerifyLoading(false);
         setErrors({ 
-          company_code: result.error || "Invalid company code or name. Please check and try again." 
+          company_code: result.error || "Invalid company code. Please check and try again." 
         });
       }
     } catch (error) {
@@ -242,7 +297,7 @@ export default function EmployeeOnboarding() {
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="w-full min-h-screen bg-linear-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-6"
+        className="w-full min-h-screen bg-background-primary flex items-center justify-center p-6"
       >
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
@@ -259,20 +314,20 @@ export default function EmployeeOnboarding() {
           
           <div className="p-6">
             <div className="flex items-center justify-center mb-6">
-              <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
                 <Clock className="h-12 w-12 text-primary-600" />
               </div>
             </div>
             
-            <h3 className="text-xl font-semibold text-center mb-4">Your information is being reviewed</h3>
+            <h3 className="text-xl font-semibold text-center text-foreground-primary mb-4">Your information is being reviewed</h3>
             
             <p className="text-foreground-secondary text-center mb-6">
               Thank you for submitting your details. Your application is currently under review by the administrative team.
               You will be notified once the review process is complete.
             </p>
             
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6">
-              <p className="text-sm text-blue-700 flex items-start">
+            <div className="bg-info/10 dark:bg-info/20 p-4 rounded-lg border border-info/30 mb-6">
+              <p className="text-sm text-info flex items-start">
                 <WarningCircle size={16} className="mr-2 mt-0.5 shrink-0" />
                 If you have any questions about your application status, please contact your supervisor or the HR department.
               </p>
@@ -297,7 +352,7 @@ export default function EmployeeOnboarding() {
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="w-full min-h-screen bg-linear-to-br from-blue-50 to-indigo-50 py-10 px-4 sm:px-6"
+      className="w-full min-h-screen bg-background-primary py-10 px-4 sm:px-6"
     >
       <div className="max-w-5xl mx-auto">
         {/* Header */}
@@ -307,7 +362,7 @@ export default function EmployeeOnboarding() {
           transition={{ duration: 0.5 }}
           className="mb-8 text-center"
         >
-          <h1 className="text-3xl font-bold text-blue-800 mb-2">Employee Onboarding</h1>
+          <h1 className="text-3xl font-bold text-foreground-primary mb-2">Employee Onboarding</h1>
           <p className="text-foreground-secondary max-w-2xl mx-auto">
             Complete your employee profile information to get started with our system.
           </p>
@@ -323,13 +378,13 @@ export default function EmployeeOnboarding() {
             <div className="relative">
               <div className="flex items-center">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  activeSection === "company" ? "bg-primary-600" : isCompanyCodeValid ? "bg-success" : "bg-gray-300"
+                  activeSection === "company" ? "bg-primary-600" : isCompanyCodeValid ? "bg-success" : "bg-foreground-tertiary/50"
                 } text-white font-medium`}>
                   {isCompanyCodeValid ? <CheckCircle size={18} /> : 1}
                 </div>
-                <div className={`h-1 w-20 sm:w-32 ${isCompanyCodeValid ? "bg-success" : "bg-gray-300"}`}></div>
+                <div className={`h-1 w-20 sm:w-32 ${isCompanyCodeValid ? "bg-success" : "bg-foreground-tertiary/30"}`}></div>
               </div>
-              <div className="absolute -bottom-6 left-5 transform -translate-x-1/2 text-sm font-medium">
+              <div className="absolute -bottom-6 left-5 transform -translate-x-1/2 text-sm font-medium text-foreground-secondary">
                 Company
               </div>
             </div>
@@ -337,24 +392,24 @@ export default function EmployeeOnboarding() {
             <div className="relative">
               <div className="flex items-center">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  activeSection === "personal" ? "bg-primary-600" : "bg-gray-300"
+                  activeSection === "personal" ? "bg-primary-600" : "bg-foreground-tertiary/50"
                 } text-white font-medium`}>
                   2
                 </div>
-                <div className="h-1 w-20 sm:w-32 bg-gray-300"></div>
+                <div className="h-1 w-20 sm:w-32 bg-foreground-tertiary/30"></div>
               </div>
-              <div className="absolute -bottom-6 left-5 transform -translate-x-1/2 text-sm font-medium">
+              <div className="absolute -bottom-6 left-5 transform -translate-x-1/2 text-sm font-medium text-foreground-secondary">
                 Personal
               </div>
             </div>
 
             <div className="relative">
               <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-300 text-white font-medium">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-foreground-tertiary/50 text-white font-medium">
                   3
                 </div>
               </div>
-              <div className="absolute -bottom-6 left-5 transform -translate-x-1/2 text-sm font-medium">
+              <div className="absolute -bottom-6 left-5 transform -translate-x-1/2 text-sm font-medium text-foreground-secondary">
                 Submit
               </div>
             </div>
@@ -427,16 +482,6 @@ export default function EmployeeOnboarding() {
                     className="space-y-2"
                   >
                     <FormInputField
-                      name="company_name"
-                      label="Company Name"
-                      icon={<Building size={18} />}
-                      value={formData.company_name}
-                      onChange={handleChange}
-                      readOnly={!!status}
-                      error={errors.company_name}
-                    />
-                    
-                    <FormInputField
                       name="companyCode"
                       label="Company Code"
                       icon={<SealCheck size={18} />}
@@ -445,6 +490,18 @@ export default function EmployeeOnboarding() {
                       readOnly={!!status || isCompanyCodeValid}
                       error={errors.company_code}
                     />
+                    
+                    {/* Show company name after successful validation */}
+                    {isCompanyCodeValid && formData.company_name && (
+                      <FormInputField
+                        name="company_name"
+                        label="Company Name"
+                        icon={<Building size={18} />}
+                        value={formData.company_name}
+                        onChange={handleChange}
+                        readOnly={true}
+                      />
+                    )}
                     
                     <motion.div 
                       variants={fadeInUp}
@@ -461,7 +518,7 @@ export default function EmployeeOnboarding() {
                       ) : (
                         <button
                           type="button"
-                          disabled={!formData.company_name || !companyCode || verifyLoading}
+                          disabled={!companyCode || verifyLoading}
                           onClick={handleValidateCompanyCode}
                           className="flex items-center justify-center w-full sm:w-auto px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
@@ -589,19 +646,61 @@ export default function EmployeeOnboarding() {
                       />
                     </div>
                     
-                    <FormSelectField
-                      name="supervisor_id"
-                      label="Supervisor"
-                      icon={<Users size={18} />}
-                      options={(status !== "rejected"
+                    <SingleEmployeeSelector
+                      value={formData.supervisor_id || ""}
+                      onChange={(value) => {
+                        setFormData((prev) => ({ ...prev, supervisor_id: value || null }));
+                        setDirty(true);
+                      }}
+                      employees={(status !== "rejected"
                         ? employees
                         : employees.filter(employee => employee.id !== userId)
-                      ).map(emp => ({ value: emp.id, label: emp.name }))}
-                      placeholder="Not Applicable"
-                      value={formData.supervisor_id === null ? "" : formData.supervisor_id}
-                      onChange={handleChange}
+                      ).map(emp => ({
+                        id: emp.id,
+                        name: emp.name,
+                        email: emp.email || "",
+                        designation: emp.designation,
+                      }))}
+                      label="Supervisor"
+                      placeholder="Search and select supervisor..."
                       error={errors.supervisor_id}
                     />
+                    
+                    {/* Device Information Section */}
+                    {deviceInfo && (
+                      <motion.div 
+                        variants={fadeInUp}
+                        className="mt-6 p-4 bg-primary-50 dark:bg-primary-950/30 rounded-lg border border-primary-200 dark:border-primary-800"
+                      >
+                        <div className="flex items-center mb-3">
+                          <DeviceMobile className="h-5 w-5 text-primary-600 mr-2" />
+                          <h3 className="font-medium text-foreground-primary">Device Registration</h3>
+                        </div>
+                        <p className="text-sm text-foreground-secondary mb-3">
+                          Your current device will be automatically registered for access upon approval.
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-foreground-tertiary">Browser:</span>
+                            <span className="font-medium text-foreground-secondary">{deviceInfo.browser}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-foreground-tertiary">Operating System:</span>
+                            <span className="font-medium text-foreground-secondary">{deviceInfo.os}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-foreground-tertiary">Device Type:</span>
+                            <span className="font-medium text-foreground-secondary capitalize">{deviceInfo.device_type}</span>
+                          </div>
+                          {deviceInfo.model && deviceInfo.model !== 'Desktop Computer' && (
+                            <div className="flex justify-between">
+                              <span className="text-foreground-tertiary">Model:</span>
+                              <span className="font-medium text-foreground-secondary">{deviceInfo.model}</span>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
                     
                     <motion.div 
                       variants={fadeInUp}

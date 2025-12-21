@@ -25,6 +25,7 @@ export default function AttendanceLatePage() {
   const fetchAttendanceData = async () => {
     setLoading(true);
     const user = await getEmployeeInfo();
+    if (!user) return;
 
     try {
       let query = supabase

@@ -24,6 +24,7 @@ export default function AttendanceRecordsPage() {
    async function fetchAttendanceData() {
       setLoading(true);
       const user = await getEmployeeInfo();
+      if (!user) return;
 
       try {
          // Calculate start and end of selected month

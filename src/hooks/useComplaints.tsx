@@ -56,6 +56,7 @@ export function useComplaints() {
       const result = await baseResult.updateItem(complaintId, complaintData);
 
       const user = await getEmployeeInfo()
+      if (!user) return result;
 
       const recipients = [user.id].filter(Boolean) as string[]
 
@@ -84,6 +85,7 @@ export function useComplaints() {
       console.log("Fetching complaint requests...");
       setRequestLoading(true);
       const user = await getEmployeeInfo();
+      if (!user) return [];
 
       // Start the query
       let query = supabase
@@ -120,6 +122,7 @@ export function useComplaints() {
       console.log("isGlobal:", isGlobal);
       setHistoryLoading(true);
       const user = await getEmployeeInfo();
+      if (!user) return [];
       console.log("User info:", { userId: user.id, companyId: user.company_id });
 
       // Start the query

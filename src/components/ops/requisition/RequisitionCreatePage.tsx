@@ -162,6 +162,7 @@ export default function RequisitionCreatePage({
 
     const company_id = await getCompanyId();
     const user = await getEmployeeInfo();
+    if (!user) return;
     setIsSubmitting(true);
     try {
       const { uploadedFilePaths, error: uploadError, publicUrls } = await uploadManyFiles(
@@ -688,6 +689,7 @@ export function RequisitionDraftPage({
 
     const company_id = await getCompanyId();
     const user = await getEmployeeInfo();
+    if (!user) return;
     setIsSubmitting(true);
     try {
       const { uploadedFilePaths, error: uploadError, publicUrls } = await uploadManyFiles(

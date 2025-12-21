@@ -24,6 +24,7 @@ export default function AttendanceAbsentPage() {
   const fetchAttendanceData = async () => {
     setLoading(true);
     const user = await getEmployeeInfo();
+    if (!user) return;
 
     try {
       let query = supabase

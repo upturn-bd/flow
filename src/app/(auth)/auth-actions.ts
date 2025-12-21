@@ -75,6 +75,15 @@ export async function login({
     
     console.log('Device check - deviceId:', deviceId, 'userId:', userId);
     
+    // Check if user is a superadmin - they bypass device checks entirely
+    const { data: isSuperadmin } = await supabase.rpc('is_superadmin', { check_user_id: userId });
+    
+    if (isSuperadmin) {
+      console.log('Superadmin detected - bypassing device check');
+      revalidatePath("/", "layout");
+      return { success: true };
+    }
+    
     // Get employee info to find company
     const { data: employee } = await supabase
         .from('employees')
