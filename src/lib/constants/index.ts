@@ -355,6 +355,89 @@ export type StakeholderIssuePriority = typeof STAKEHOLDER_ISSUE_PRIORITY[keyof t
 export const STAKEHOLDER_ISSUE_PRIORITY_OPTIONS = Object.values(STAKEHOLDER_ISSUE_PRIORITY);
 
 // ==============================================================================
+// Stakeholder Billing Constants
+// ==============================================================================
+
+// Billing Cycle Types
+export const BILLING_CYCLE_TYPE = {
+  DATE_TO_DATE: 'date_to_date', // Billing on same date each month (e.g., 5th to 5th)
+  X_DAYS: 'x_days', // Billing every X days
+} as const;
+
+export type BillingCycleType = typeof BILLING_CYCLE_TYPE[keyof typeof BILLING_CYCLE_TYPE];
+
+export const BILLING_CYCLE_TYPE_OPTIONS = Object.values(BILLING_CYCLE_TYPE);
+
+// Invoice Status
+export const INVOICE_STATUS = {
+  DRAFT: 'draft',
+  SENT: 'sent',
+  VIEWED: 'viewed',
+  PARTIALLY_PAID: 'partially_paid',
+  PAID: 'paid',
+  OVERDUE: 'overdue',
+  CANCELLED: 'cancelled',
+  VOID: 'void',
+} as const;
+
+export type InvoiceStatus = typeof INVOICE_STATUS[keyof typeof INVOICE_STATUS];
+
+export const INVOICE_STATUS_OPTIONS = Object.values(INVOICE_STATUS);
+
+// Invoice Status Display Names
+export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
+  [INVOICE_STATUS.DRAFT]: 'Draft',
+  [INVOICE_STATUS.SENT]: 'Sent',
+  [INVOICE_STATUS.VIEWED]: 'Viewed',
+  [INVOICE_STATUS.PARTIALLY_PAID]: 'Partially Paid',
+  [INVOICE_STATUS.PAID]: 'Paid',
+  [INVOICE_STATUS.OVERDUE]: 'Overdue',
+  [INVOICE_STATUS.CANCELLED]: 'Cancelled',
+  [INVOICE_STATUS.VOID]: 'Void',
+};
+
+// Invoice Item Types
+export const INVOICE_ITEM_TYPE = {
+  STANDARD: 'standard', // From step data
+  CALCULATED: 'calculated', // Calculated from formula
+  MANUAL: 'manual', // Manually added
+  ADJUSTMENT: 'adjustment', // Adjustment/discount
+} as const;
+
+export type InvoiceItemType = typeof INVOICE_ITEM_TYPE[keyof typeof INVOICE_ITEM_TYPE];
+
+// Field Change Types (for audit)
+export const FIELD_CHANGE_TYPE = {
+  CREATED: 'created',
+  UPDATED: 'updated',
+  DELETED: 'deleted',
+} as const;
+
+export type FieldChangeType = typeof FIELD_CHANGE_TYPE[keyof typeof FIELD_CHANGE_TYPE];
+
+// Supported currencies (can be extended)
+export const CURRENCIES = {
+  BDT: 'BDT', // Bangladeshi Taka (default)
+  USD: 'USD',
+  EUR: 'EUR',
+  GBP: 'GBP',
+  INR: 'INR',
+} as const;
+
+export type Currency = typeof CURRENCIES[keyof typeof CURRENCIES];
+
+export const CURRENCY_OPTIONS = Object.values(CURRENCIES);
+
+// Currency symbols
+export const CURRENCY_SYMBOLS: Record<string, string> = {
+  BDT: '৳',
+  USD: '$',
+  EUR: '€',
+  GBP: '£',
+  INR: '₹',
+};
+
+// ==============================================================================
 // Blood Group Constants
 // ==============================================================================
 
@@ -482,15 +565,6 @@ export const PAYMENT_METHODS = [
   'Online Transfer',
 ] as const;
 
-export const CURRENCIES = [
-  'BDT', // Bangladesh Taka - Default
-  'USD', // US Dollar
-  'EUR', // Euro
-  'GBP', // British Pound
-  'JPY', // Japanese Yen
-  'INR', // Indian Rupee
-] as const;
-
 export const ACCOUNT_CATEGORIES = {
   INCOME: 'Income',
   EXPENSE: 'Expense',
@@ -524,7 +598,6 @@ export const SELECT_OPTIONS = {
 
 
 export type PaymentMethod = typeof PAYMENT_METHODS[number];
-export type Currency = typeof CURRENCIES[number];
 export type AccountCategory = typeof ACCOUNT_CATEGORIES[keyof typeof ACCOUNT_CATEGORIES];
 
 // ==============================================================================
@@ -557,6 +630,7 @@ export const PERMISSION_MODULES = {
   PAYROLL: 'payroll',
   STAKEHOLDERS: 'stakeholders',
   STAKEHOLDER_PROCESSES: 'stakeholder_processes',
+  STAKEHOLDER_BILLING: 'stakeholder_billing',
 
   // Operations
   ONBOARDING: 'onboarding',
@@ -598,6 +672,7 @@ export const MODULE_DISPLAY_NAMES: Record<PermissionModule, string> = {
   [PERMISSION_MODULES.PAYROLL]: 'Payroll',
   [PERMISSION_MODULES.STAKEHOLDERS]: 'Stakeholders & Leads',
   [PERMISSION_MODULES.STAKEHOLDER_PROCESSES]: 'Stakeholder Processes',
+  [PERMISSION_MODULES.STAKEHOLDER_BILLING]: 'Stakeholder Billing',
   [PERMISSION_MODULES.ONBOARDING]: 'Onboarding',
   [PERMISSION_MODULES.OFFBOARDING]: 'Offboarding',
   [PERMISSION_MODULES.HRIS]: 'HRIS',
@@ -690,6 +765,12 @@ export const MODULE_INFO: Record<PermissionModule, ModuleInfo> = {
     displayName: 'Stakeholder Processes',
     description: 'Manage stakeholder process definitions and steps',
     category: 'admin',
+  },
+  [PERMISSION_MODULES.STAKEHOLDER_BILLING]: {
+    name: PERMISSION_MODULES.STAKEHOLDER_BILLING,
+    displayName: 'Stakeholder Billing',
+    description: 'Manage invoices and billing for stakeholders',
+    category: 'services',
   },
   [PERMISSION_MODULES.ONBOARDING]: {
     name: PERMISSION_MODULES.ONBOARDING,
