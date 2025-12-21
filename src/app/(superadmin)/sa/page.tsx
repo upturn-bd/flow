@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { ChartBar, Buildings, Users, GlobeHemisphereWest, Factory, Warning as Warning, ArrowRight, Clock, CheckCircle } from "@phosphor-icons/react";
+import { ChartBar, Buildings, Users, GlobeHemisphereWest, Factory, Warning as Warning, ArrowRight, Clock, CheckCircle, DeviceMobile, UsersThree } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { StatCard, StatCardGrid, EmptyState } from "@/components/ui";
 
@@ -11,17 +11,18 @@ interface Stats {
   companies: number;
   countries: number;
   industries: number;
-  employees: number;
   superadmins: number;
-  teams: number;
   pendingApprovals: number;
+  pendingDevices: number;
 }
 
-interface RecentCompany {
+interface CompanyStats {
   id: number;
   name: string;
   created_at: string;
-  employee_count?: number;
+  employee_count: number;
+  team_count: number;
+  pending_devices: number;
 }
 
 export default function SuperadminDashboard() {
@@ -29,17 +30,16 @@ export default function SuperadminDashboard() {
     companies: 0,
     countries: 0,
     industries: 0,
-    employees: 0,
     superadmins: 0,
-    teams: 0,
     pendingApprovals: 0,
+    pendingDevices: 0,
   });
-  const [recentCompanies, setRecentCompanies] = useState<RecentCompany[]>([]);
+  const [companyStats, setCompanyStats] = useState<CompanyStats[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchStats();
-    fetchRecentCompanies();
+    fetchCompanyStats();
   }, []);
 
   const fetchStats = async () => {
@@ -49,28 +49,25 @@ export default function SuperadminDashboard() {
         companiesResult,
         countriesResult,
         industriesResult,
-        employeesResult,
         superadminsResult,
-        teamsResult,
         pendingResult,
+        pendingDevicesResult,
       ] = await Promise.all([
         supabase.from("companies").select("id", { count: "exact", head: true }),
         supabase.from("countries").select("id", { count: "exact", head: true }),
         supabase.from("industries").select("id", { count: "exact", head: true }),
-        supabase.from("employees").select("id", { count: "exact", head: true }),
         supabase.from("superadmins").select("id", { count: "exact", head: true }),
-        supabase.from("teams").select("id", { count: "exact", head: true }),
-        supabase.from("employees").select("id", { count: "exact", head: true }).eq("has_approval", false),
+        supabase.from("employees").select("id", { count: "exact", head: true }).eq("has_approval", "PENDING"),
+        supabase.from("user_devices").select("id", { count: "exact", head: true }).eq("status", "pending"),
       ]);
 
       setStats({
         companies: companiesResult.count || 0,
         countries: countriesResult.count || 0,
         industries: industriesResult.count || 0,
-        employees: employeesResult.count || 0,
         superadmins: superadminsResult.count || 0,
-        teams: teamsResult.count || 0,
         pendingApprovals: pendingResult.count || 0,
+        pendingDevices: pendingDevicesResult.count || 0,
       });
     } catch (error) {
       console.error("Error fetching stats:", error);
@@ -79,29 +76,57 @@ export default function SuperadminDashboard() {
     }
   };
 
-  const fetchRecentCompanies = async () => {
+  const fetchCompanyStats = async () => {
     try {
       const { data: companies } = await supabase
         .from("companies")
         .select("id, name, created_at")
-        .order("created_at", { ascending: false })
-        .limit(5);
+        .order("name", { ascending: true });
 
       if (companies) {
-        // Fetch employee counts for each company
+        // Fetch employee, team, and pending device counts for each company
         const companiesWithCounts = await Promise.all(
           companies.map(async (company) => {
-            const { count } = await supabase
+            const [employeeResult, teamResult] = await Promise.all([
+              supabase
+                .from("employees")
+                .select("id", { count: "exact", head: true })
+                .eq("company_id", company.id),
+              supabase
+                .from("teams")
+                .select("id", { count: "exact", head: true })
+                .eq("company_id", company.id),
+            ]);
+            
+            // Get pending devices for this company by joining through employees
+            const { data: companyEmployees } = await supabase
               .from("employees")
-              .select("id", { count: "exact", head: true })
+              .select("id")
               .eq("company_id", company.id);
-            return { ...company, employee_count: count || 0 };
+            
+            let pendingDeviceCount = 0;
+            if (companyEmployees && companyEmployees.length > 0) {
+              const employeeIds = companyEmployees.map(e => e.id);
+              const { count } = await supabase
+                .from("user_devices")
+                .select("id", { count: "exact", head: true })
+                .eq("status", "pending")
+                .in("user_id", employeeIds);
+              pendingDeviceCount = count || 0;
+            }
+            
+            return {
+              ...company,
+              employee_count: employeeResult.count || 0,
+              team_count: teamResult.count || 0,
+              pending_devices: pendingDeviceCount,
+            };
           })
         );
-        setRecentCompanies(companiesWithCounts);
+        setCompanyStats(companiesWithCounts);
       }
     } catch (error) {
-      console.error("Error fetching recent companies:", error);
+      console.error("Error fetching company stats:", error);
     }
   };
 
@@ -112,6 +137,13 @@ export default function SuperadminDashboard() {
       icon: Buildings,
       href: "/sa/companies",
       color: "blue",
+    },
+    {
+      label: "Manage Devices",
+      description: "Approve or reject device access",
+      icon: DeviceMobile,
+      href: "/sa/devices",
+      color: "emerald",
     },
     {
       label: "Manage Teams",
@@ -145,6 +177,7 @@ export default function SuperadminDashboard() {
 
   const colorClasses: Record<string, { bg: string; hover: string; text: string; border: string }> = {
     blue: { bg: "bg-primary-50 dark:bg-primary-950/30", hover: "hover:bg-primary-100 dark:hover:bg-primary-900/40", text: "text-primary-600 dark:text-primary-400", border: "border-primary-200 dark:border-primary-800" },
+    emerald: { bg: "bg-emerald-50 dark:bg-emerald-950/30", hover: "hover:bg-emerald-100 dark:hover:bg-emerald-900/40", text: "text-emerald-600 dark:text-emerald-400", border: "border-emerald-200 dark:border-emerald-800" },
     violet: { bg: "bg-purple-50 dark:bg-purple-950/30", hover: "hover:bg-purple-100 dark:hover:bg-purple-900/40", text: "text-purple-600 dark:text-purple-400", border: "border-purple-200 dark:border-purple-800" },
     amber: { bg: "bg-amber-50 dark:bg-amber-950/30", hover: "hover:bg-amber-100 dark:hover:bg-amber-900/40", text: "text-amber-600 dark:text-amber-400", border: "border-amber-200 dark:border-amber-800" },
     rose: { bg: "bg-rose-50 dark:bg-rose-950/30", hover: "hover:bg-rose-100 dark:hover:bg-rose-900/40", text: "text-rose-600 dark:text-rose-400", border: "border-rose-200 dark:border-rose-800" },
@@ -160,24 +193,36 @@ export default function SuperadminDashboard() {
           <p className="text-foreground-secondary mt-1">Platform overview and management</p>
         </div>
         
-        {stats.pendingApprovals > 0 && (
+        {(stats.pendingApprovals > 0 || stats.pendingDevices > 0) && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex items-center gap-2 px-4 py-2 bg-warning/10 border border-warning/30 rounded-lg"
+            className="flex items-center gap-4 flex-wrap"
           >
-            <Warning size={20} className="text-warning" />
-            <span className="text-sm font-medium text-warning">
-              {stats.pendingApprovals} pending approval{stats.pendingApprovals !== 1 ? "s" : ""}
-            </span>
+            {stats.pendingApprovals > 0 && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-warning/10 border border-warning/30 rounded-lg">
+                <Warning size={20} className="text-warning" />
+                <span className="text-sm font-medium text-warning">
+                  {stats.pendingApprovals} pending employee approval{stats.pendingApprovals !== 1 ? "s" : ""}
+                </span>
+              </div>
+            )}
+            {stats.pendingDevices > 0 && (
+              <Link href="/sa/devices" className="flex items-center gap-2 px-4 py-2 bg-primary-500/10 border border-primary-500/30 rounded-lg hover:bg-primary-500/20 transition-colors">
+                <DeviceMobile size={20} className="text-primary-500" />
+                <span className="text-sm font-medium text-primary-600 dark:text-primary-400">
+                  {stats.pendingDevices} pending device{stats.pendingDevices !== 1 ? "s" : ""}
+                </span>
+              </Link>
+            )}
           </motion.div>
         )}
       </div>
 
       {/* Stats Grid */}
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {[...Array(6)].map((_, i) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {[...Array(5)].map((_, i) => (
             <div key={i} className="bg-surface-primary rounded-xl shadow-sm border border-border-primary p-5 animate-pulse">
               <div className="h-10 w-10 bg-background-tertiary dark:bg-surface-secondary rounded-lg mb-3"></div>
               <div className="h-4 bg-background-tertiary dark:bg-surface-secondary rounded w-16 mb-2"></div>
@@ -186,7 +231,7 @@ export default function SuperadminDashboard() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <Link href="/sa/companies">
             <StatCard
               icon={Buildings}
@@ -195,19 +240,11 @@ export default function SuperadminDashboard() {
               color="blue"
             />
           </Link>
-          <Link href="/sa/companies">
+          <Link href="/sa/devices">
             <StatCard
-              icon={Users}
-              value={stats.employees}
-              label="Employees"
-              color="green"
-            />
-          </Link>
-          <Link href="/sa/teams">
-            <StatCard
-              icon={Users}
-              value={stats.teams}
-              label="Teams"
+              icon={DeviceMobile}
+              value={stats.pendingDevices}
+              label="Pending Devices"
               color="purple"
             />
           </Link>
@@ -273,11 +310,11 @@ export default function SuperadminDashboard() {
         <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary overflow-hidden">
           <div className="p-5 border-b border-border-primary flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-foreground-primary">Recent Companies</h2>
-              <p className="text-sm text-foreground-tertiary mt-0.5">Latest additions</p>
+              <h2 className="text-lg font-semibold text-foreground-primary">Company Statistics</h2>
+              <p className="text-sm text-foreground-tertiary mt-0.5">Employees, teams & pending devices</p>
             </div>
             <Link href="/sa/companies" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
-              View all
+              Manage
             </Link>
           </div>
           
@@ -293,30 +330,33 @@ export default function SuperadminDashboard() {
                 </div>
               ))}
             </div>
-          ) : recentCompanies.length > 0 ? (
-            <div className="divide-y divide-border-primary">
-              {recentCompanies.map((company) => (
-                <Link key={company.id} href="/sa/companies">
-                  <div className="p-4 hover:bg-surface-hover transition-colors flex items-center gap-3">
-                    <div className="w-10 h-10 bg-linear-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                      {company.name.substring(0, 2).toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-foreground-primary truncate">{company.name}</div>
-                      <div className="text-xs text-foreground-tertiary flex items-center gap-2">
-                        <span className="flex items-center gap-1">
-                          <Users size={12} />
-                          {company.employee_count} employee{company.employee_count !== 1 ? "s" : ""}
+          ) : companyStats.length > 0 ? (
+            <div className="divide-y divide-border-primary max-h-100 overflow-y-auto">
+              {companyStats.map((company) => (
+                <div key={company.id} className="p-4 hover:bg-surface-hover transition-colors flex items-center gap-3">
+                  <div className="w-10 h-10 bg-linear-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">
+                    {company.name.substring(0, 2).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-foreground-primary truncate">{company.name}</div>
+                    <div className="text-xs text-foreground-tertiary flex items-center gap-3 flex-wrap">
+                      <span className="flex items-center gap-1">
+                        <Users size={12} />
+                        {company.employee_count} employee{company.employee_count !== 1 ? "s" : ""}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <UsersThree size={12} />
+                        {company.team_count} team{company.team_count !== 1 ? "s" : ""}
+                      </span>
+                      {company.pending_devices > 0 && (
+                        <span className="flex items-center gap-1 text-warning">
+                          <DeviceMobile size={12} />
+                          {company.pending_devices} pending
                         </span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <Clock size={12} />
-                          {new Date(company.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
+                      )}
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           ) : (

@@ -62,6 +62,7 @@ function AttendancePageContent() {
   const handleSendRequest = async (recordId: number, reason: string) => {
     try {
       const user = await getEmployeeInfo();
+      if (!user) return;
       
       const { error } = await supabase
         .from('attendance_requests')

@@ -15,6 +15,7 @@ export function usePersonalInfo() {
     setError(null);
     try {
       const employeeInfo = await getEmployeeInfo();
+      if (!employeeInfo) throw new Error("User not authenticated");
       
       const { data: result, error } = await supabase
         .from('personal_infos')
@@ -65,6 +66,7 @@ export function usePersonalInfo() {
     setError(null);
     try {
       const employeeInfo = await getEmployeeInfo();
+      if (!employeeInfo) throw new Error("User not authenticated");
       
       const { data: result, error } = await supabase
         .from('personal_infos')

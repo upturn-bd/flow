@@ -177,6 +177,7 @@ export const ROUTES = {
     BASE: '/sa',
     DASHBOARD: '/sa',
     COMPANIES: '/sa/companies',
+    DEVICES: '/sa/devices',
     COUNTRIES: '/sa/countries',
     INDUSTRIES: '/sa/industries',
     TEAMS: '/sa/teams',

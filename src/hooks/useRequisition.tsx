@@ -42,6 +42,7 @@ export function useRequisitionRequests() {
       try {
         const user = await getEmployeeInfo();
         const company_id = await getCompanyId();
+        if (!user) return [];
 
         let query = supabase
           .from("requisition_records")
@@ -89,6 +90,7 @@ export function useRequisitionRequests() {
     try {
       const user = await getEmployeeInfo();
       const company_id = await getCompanyId();
+      if (!user) return [];
 
       let query = supabase
         .from("requisition_records")
@@ -128,6 +130,10 @@ export function useRequisitionRequests() {
       try {
         const user = await getEmployeeInfo();
         const company_id = await getCompanyId();
+        if (!user) {
+          setError("User not authenticated");
+          return false;
+        }
 
         // Check permission: user must have requisition approval permission OR be supervisor of employee
         const hasTeamPermission = canApprove('requisition');
@@ -191,6 +197,10 @@ export function useRequisitionRequests() {
       try {
         const user = await getEmployeeInfo();
         const company_id = await getCompanyId();
+        if (!user) {
+          setError("User not authenticated");
+          throw new Error("User not authenticated");
+        }
 
         // Get the existing requisition to check ownership
         const { data: existingReq, error: fetchError } = await supabase

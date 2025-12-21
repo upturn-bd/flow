@@ -103,6 +103,7 @@ export default function RequisitionCreateModal({
     try {
       const company_id = await getCompanyId();
       const user = await getEmployeeInfo();
+      if (!user) return;
 
       let uploadedFilePaths: string[] = [];
       let publicUrls: string[] = [];

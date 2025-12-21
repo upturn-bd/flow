@@ -267,7 +267,9 @@ export default function BasicInfoTab({ uid }: BasicInfoTabProps) {
         } else {
           data = await fetchCurrentUserBasicInfo();
           const employeeInfo = await getEmployeeInfo();
-          setTargetEmployeeId(employeeInfo.id);
+          if (employeeInfo) {
+            setTargetEmployeeId(employeeInfo.id);
+          }
         }
         
         setInitialData(data);

@@ -23,6 +23,7 @@ const ClickableStatusCell = ({
         console.log("Request sent for", id);
 
         const user = await getEmployeeInfo();
+        if (!user) return;
         try {
             const { error } = await supabase
                 .from("attendance_records")

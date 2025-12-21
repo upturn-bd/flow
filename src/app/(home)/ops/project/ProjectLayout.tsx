@@ -81,6 +81,7 @@ export default function ProjectLayout({
         async function fetchUserData() {
             try {
                 const retrievedUser = await getEmployeeInfo();
+                if (!retrievedUser) return;
                 setUser(retrievedUser);
 
                 // FunnelSimple tabs based on role AND permissions

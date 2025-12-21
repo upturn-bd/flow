@@ -54,6 +54,7 @@ export async function getCompanyId(): Promise<number> {
 
 /**
  * Get the current employee information
+ * Returns null if user has no employee record (e.g., during onboarding)
  */
 export async function getEmployeeInfo(): Promise<{ 
   id: string; 
@@ -66,7 +67,7 @@ export async function getEmployeeInfo(): Promise<{
   email?: string;
   phone_number?: string;
   designation?: string;
-}> {
+} | null> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   
   if (userError || !user) {
@@ -77,10 +78,15 @@ export async function getEmployeeInfo(): Promise<{
     .from('employees')
     .select('id, company_id, department_id, role, supervisor_id, first_name, last_name, has_approval, email, phone_number, designation')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     throw new DatabaseError('Failed to get employee info', error.code);
+  }
+
+  // Return null if no employee record found (new user in onboarding)
+  if (!data) {
+    return null;
   }
 
   return { 

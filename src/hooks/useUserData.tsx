@@ -48,6 +48,10 @@ export function useUserData() {
         
         // Get current user employee info
         const employeeInfo = await getEmployeeInfo();
+        if (!employeeInfo) {
+          setError("User not authenticated");
+          return;
+        }
         
         // Fetch complete employee data
         const { data, error } = await supabase
@@ -109,6 +113,10 @@ export function useUserData() {
       
       // Get current user employee info
       const employeeInfo = await getEmployeeInfo();
+      if (!employeeInfo) {
+        setError("User not authenticated");
+        return;
+      }
       
       // Fetch complete employee data
       const { data, error } = await supabase

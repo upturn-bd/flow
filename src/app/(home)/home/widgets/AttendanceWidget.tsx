@@ -54,6 +54,7 @@ export default function AttendanceWidget({ config, isEditMode, onToggle, onSizeC
   const handleSendRequest = async (recordId: number, reason: string) => {
     try {
       const user = await getEmployeeInfo();
+      if (!user) return;
       
       // Create a request in the attendance_requests table
       const { error } = await supabase
