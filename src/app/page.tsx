@@ -52,10 +52,10 @@ export default function LandingPage() {
                 Sign In
               </Link>
               <Link
-                href="/signup"
+                href="/contact"
                 className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
-                Get Started
+                Contact Sales
               </Link>
             </div>
           </div>
@@ -77,10 +77,10 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
-                href="/signup"
+                href="/contact"
                 className="px-8 py-4 bg-primary-600 text-white text-lg font-semibold rounded-lg hover:bg-primary-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
               >
-                Start Free Trial
+                Contact Sales
                 <ArrowRight size={24} weight="bold" />
               </Link>
               <a
@@ -369,10 +369,10 @@ export default function LandingPage() {
                 <div className="text-4xl font-bold text-primary-600 mb-2">300 BDT</div>
                 <div className="text-foreground-secondary mb-4">per stakeholder/month</div>
                 <Link
-                  href="/signup"
+                  href="/contact"
                   className="inline-block px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors"
                 >
-                  Get Started
+                  Contact Sales
                 </Link>
               </div>
             </div>
@@ -448,10 +448,10 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
-              href="/signup"
+              href="/contact"
               className="px-8 py-4 bg-white text-primary-600 text-lg font-semibold rounded-lg hover:bg-gray-50 transition-colors shadow-lg flex items-center gap-2"
             >
-              Start Your Free Trial
+              Contact Sales
               <ArrowRight size={24} weight="bold" />
             </Link>
             <Link
@@ -521,8 +521,8 @@ export default function LandingPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/signup" className="text-foreground-secondary text-sm hover:text-primary-600 transition-colors">
-                    Sign Up
+                  <Link href="/contact" className="text-foreground-secondary text-sm hover:text-primary-600 transition-colors">
+                    Contact Sales
                   </Link>
                 </li>
               </ul>
@@ -614,14 +614,14 @@ function PricingCard({ title, price, period, description, features, highlighted 
       </ul>
 
       <Link
-        href="/signup"
+        href="/contact"
         className={`block w-full text-center px-6 py-3 rounded-lg font-semibold transition-colors ${
           highlighted
             ? 'bg-white text-primary-600 hover:bg-gray-50'
             : 'bg-primary-600 text-white hover:bg-primary-700'
         }`}
       >
-        Get Started
+        Contact Sales
       </Link>
     </div>
   );
