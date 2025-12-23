@@ -144,7 +144,7 @@ export const FEATURE_TUTORIALS: FeatureTutorial[] = [
                 title: "Today's Attendance",
                 content: "Check in and out for today. Select your work site if you work from multiple locations.",
                 placement: "bottom",
-                route: "/ops/attendance",
+                route: "/ops/attendance?tab=today",
             },
             {
                 target: "[data-tutorial='attendance-records-tab']",

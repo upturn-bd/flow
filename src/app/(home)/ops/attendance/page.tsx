@@ -58,6 +58,10 @@ function AttendancePageContent() {
     getTodaysAttendance();
   }, [user]);
 
+  useEffect(() => {
+    setActiveTab(tab || "today");
+  }, [tab]);
+
   // Send request to supervisor
   const handleSendRequest = async (recordId: number, reason: string) => {
     try {
