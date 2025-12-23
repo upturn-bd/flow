@@ -34,35 +34,35 @@ export default function FinderPage() {
 
   const { extendedEmployees, loading, fetchExtendedEmployees } = useEmployees();
 
-  useEffect(() => { 
+  useEffect(() => {
     fetchExtendedEmployees();
   }, [fetchExtendedEmployees]);
 
-useEffect(() => {
-  if (extendedEmployees.length === 0) return;
+  useEffect(() => {
+    if (extendedEmployees.length === 0) return;
 
-  const filtered = extendedEmployees.filter((employee) => {
-    // Search query using unified search (includes name, email, designation)
-    // Note: department is not part of the unified search fields but kept here for backward compatibility
-    const matchesSearch =
-      searchQuery === "" ||
-      matchesEmployeeSearch(employee, searchQuery) ||
-      employee.department?.toLowerCase().includes(searchQuery.toLowerCase());
+    const filtered = extendedEmployees.filter((employee) => {
+      // Search query using unified search (includes name, email, designation)
+      // Note: department is not part of the unified search fields but kept here for backward compatibility
+      const matchesSearch =
+        searchQuery === "" ||
+        matchesEmployeeSearch(employee, searchQuery) ||
+        employee.department?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    if (!matchesSearch) return false;
+      if (!matchesSearch) return false;
 
-    // Filters
-    const matchesDepartment =
-      filters.department === "" || employee.department === filters.department;
+      // Filters
+      const matchesDepartment =
+        filters.department === "" || employee.department === filters.department;
 
-    const matchesDesignation =
-      filters.designation === "" || employee.designation === filters.designation;
+      const matchesDesignation =
+        filters.designation === "" || employee.designation === filters.designation;
 
-    return matchesDepartment && matchesDesignation;
-  });
+      return matchesDepartment && matchesDesignation;
+    });
 
-  setFilteredEmployees(filtered);
-}, [searchQuery, filters, extendedEmployees]);
+    setFilteredEmployees(filtered);
+  }, [searchQuery, filters, extendedEmployees]);
 
 
   const departments = [...new Set(extendedEmployees.map((e) => e.department))];
@@ -111,7 +111,7 @@ useEffect(() => {
       className="w-full p-4 sm:p-6 lg:p-8 pb-12"
     >
       {/* Header */}
-      <motion.div variants={fadeInUp} className="flex items-center justify-between mb-8">
+      <motion.div variants={fadeInUp} className="flex items-center justify-between mb-8" data-tutorial="hris-header">
         <PageHeader
           title="Employee Finder"
           description="Search and find detailed information about employees"

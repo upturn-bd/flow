@@ -1,7 +1,8 @@
 "use client";
 
 import { AuthProvider, useAuth } from "@/lib/auth/auth-context";
-import { useSentryUser } from "@/lib/sentry";
+import { TutorialProvider } from "@/contexts/TutorialContext";
+import { TutorialOverlay, TutorialTooltip } from "@/components/tutorial";
 import Sidebar from "./side-navbar";
 import TopBar from "./top-bar";
 
@@ -12,7 +13,12 @@ export default function HomeLayout({
 }) {
   return (
     <AuthProvider>
-      <ApprovalLayout>{children}</ApprovalLayout>
+      <TutorialProvider>
+        <ApprovalLayout>{children}</ApprovalLayout>
+        {/* Tutorial components rendered at root level */}
+        <TutorialOverlay />
+        <TutorialTooltip />
+      </TutorialProvider>
     </AuthProvider>
   );
 }
@@ -32,3 +38,4 @@ function ApprovalLayout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+

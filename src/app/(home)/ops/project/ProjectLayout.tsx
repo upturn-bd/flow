@@ -140,7 +140,7 @@ export default function ProjectLayout({
             variants={fadeInUp}
             className="bg-surface-primary p-4 sm:p-6 lg:p-8 rounded-lg w-full"
         >
-            <div className="border-b border-border-primary pb-4 mb-4">
+            <div className="border-b border-border-primary pb-4 mb-4" data-tutorial="project-header">
                 <h1 className="text-2xl font-bold text-foreground-primary flex items-center mb-1">
                     <Folder className="mr-2 h-6 w-6 text-primary-500" />
                     Project Management
@@ -164,6 +164,7 @@ export default function ProjectLayout({
                             router.push(`/ops/project?tab=${tab}`);
                             setActiveTab(tab);
                         }}
+                        tutorialPrefix="project"
                     />
                     <div className="p-4">{overrideContent}</div>
                 </>
@@ -175,6 +176,7 @@ export default function ProjectLayout({
                         router.push(`/ops/project?tab=${tab}`);
                         setActiveTab(tab);
                     }}
+                    tutorialPrefix="project"
                 />
             )}
         </motion.section>

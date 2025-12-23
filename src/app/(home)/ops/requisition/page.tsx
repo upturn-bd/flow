@@ -4,7 +4,7 @@ import RequisitionRequestsPage from "@/components/ops/requisition/RequisitionReq
 import UpcomingPage from "@/components/ops/requisition/UpcomingPage";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FilePlus, ClipboardText, ClockCounterClockwise, BookOpen, Warning, Scroll } from "@phosphor-icons/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -16,6 +16,10 @@ function RequisitionPageContent() {
   const tab = searchParams.get("tab");
 
   const [activeTab, setActiveTab] = useState(tab || "create");
+
+  useEffect(() => {
+    setActiveTab(tab || "create");
+  }, [tab]);
 
   const tabs: TabItem[] = [
     {
@@ -94,6 +98,7 @@ function RequisitionPageContent() {
       isLinked={true}
       module={PERMISSION_MODULES.REQUISITION}
       showPermissionBanner={true}
+      tutorialPrefix="requisition"
     />
   );
 }

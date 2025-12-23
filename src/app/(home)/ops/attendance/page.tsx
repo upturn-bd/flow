@@ -33,8 +33,8 @@ function AttendancePageContent() {
     site_id: undefined as number | undefined,
   });
 
-  const {sites, fetchSites, loading: sitesLoading} = useSites();
-  const {user} = useAuth();
+  const { sites, fetchSites, loading: sitesLoading } = useSites();
+  const { user } = useAuth();
   const { today, todayLoading, getTodaysAttendance } = useAttendanceStatus();
 
   // Modal states
@@ -63,7 +63,7 @@ function AttendancePageContent() {
     try {
       const user = await getEmployeeInfo();
       if (!user) return;
-      
+
       const { error } = await supabase
         .from('attendance_requests')
         .insert({
@@ -204,6 +204,7 @@ function AttendancePageContent() {
         isLinked={true}
         module={PERMISSION_MODULES.ATTENDANCE}
         showPermissionBanner={true}
+        tutorialPrefix="attendance"
       />
 
       {/* Attendance Status Modal */}

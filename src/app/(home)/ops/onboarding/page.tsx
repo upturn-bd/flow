@@ -79,7 +79,7 @@ export default function OnboardingApprovalPage() {
 
   const handleAction = async (id: string, action: "ACCEPTED" | "REJECTED") => {
     const reason = rejectionReasons[id] || undefined;
-    
+
     try {
       const result = await processOnboardingAction(id, action, reason);
       if (result.success) {
@@ -109,8 +109,8 @@ export default function OnboardingApprovalPage() {
 
   const pageVariants = {
     hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       transition: {
         duration: 0.5,
         when: "beforeChildren"
@@ -120,8 +120,8 @@ export default function OnboardingApprovalPage() {
 
   const contentVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         staggerChildren: 0.1
@@ -131,14 +131,14 @@ export default function OnboardingApprovalPage() {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { 
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
         type: "spring" as const,
         stiffness: 260,
-        damping: 20 
-      } 
+        damping: 20
+      }
     }
   };
 
@@ -160,12 +160,13 @@ export default function OnboardingApprovalPage() {
       className="w-full p-4 sm:p-6 lg:p-8"
     >
       <Toaster position="top-right" />
-      
+
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
         className="flex items-center mb-8"
+        data-tutorial="onboarding-header"
       >
         <h1 className="text-2xl font-bold text-foreground-primary flex items-center">
           <UserPlus className="mr-2 h-7 w-7 text-primary-600" />
@@ -212,8 +213,8 @@ export default function OnboardingApprovalPage() {
                   </span>
                 </div>
               )}
-              <ArrowRight 
-                className="h-6 w-6 text-white group-hover:translate-x-1 transition-transform" 
+              <ArrowRight
+                className="h-6 w-6 text-white group-hover:translate-x-1 transition-transform"
                 weight="bold"
               />
             </div>
@@ -230,7 +231,7 @@ export default function OnboardingApprovalPage() {
           />
         </div>
       ) : (
-        <motion.div 
+        <motion.div
           variants={contentVariants}
           className="space-y-6"
         >
@@ -256,9 +257,9 @@ export default function OnboardingApprovalPage() {
               key={emp.id}
               variants={itemVariants}
               layout
-              whileHover={{ 
+              whileHover={{
                 y: -4,
-                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)" 
+                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)"
               }}
               className="bg-surface-primary rounded-xl p-6 shadow-sm border border-border-primary space-y-4"
             >
@@ -304,10 +305,10 @@ export default function OnboardingApprovalPage() {
                   <div className="flex justify-between">
                     <span className="text-foreground-tertiary">Joining Date</span>
                     <span className="font-medium text-foreground-secondary">
-                      {new Date(emp.hire_date).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'short', 
-                        day: 'numeric' 
+                      {new Date(emp.hire_date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
                       })}
                     </span>
                   </div>
@@ -366,8 +367,8 @@ export default function OnboardingApprovalPage() {
               />
 
               <div className="flex gap-4 justify-end">
-                <PermissionGate 
-                  module={PERMISSION_MODULES.ONBOARDING} 
+                <PermissionGate
+                  module={PERMISSION_MODULES.ONBOARDING}
                   action="can_approve"
                   fallback={
                     <PermissionTooltip message="You don't have permission to approve onboarding requests">

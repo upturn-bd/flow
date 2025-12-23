@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { CreditCard, ClipboardText, Warning, Users } from "@phosphor-icons/react";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
 import { TabItem } from "@/components/ui/TabView";
@@ -12,22 +11,22 @@ import PayrollGenerationModal from "@/components/ops/payroll/PayrollGenerationMo
 import { PERMISSION_MODULES } from "@/lib/constants";
 
 const tabs: TabItem[] = [
-  { 
-    key: "pending", 
+  {
+    key: "pending",
     label: "Pending",
     icon: <ClipboardText className="h-5 w-5" />,
     color: "text-primary-600",
     content: <PendingPayrolls />
   },
-  { 
-    key: "published", 
+  {
+    key: "published",
     label: "Published",
     icon: <Warning className="h-5 w-5" />,
     color: "text-amber-600",
     content: <PublishedPayrolls />
   },
-  { 
-    key: "paid", 
+  {
+    key: "paid",
     label: "Paid",
     icon: <CreditCard className="h-5 w-5" />,
     color: "text-success",
@@ -59,8 +58,9 @@ export default function PayrollPage() {
         actionButtonOnClick={() => setShowGenerationModal(true)}
         module={PERMISSION_MODULES.PAYROLL}
         showPermissionBanner={true}
+        tutorialPrefix="payroll"
       />
-      
+
       <PayrollGenerationModal
         isOpen={showGenerationModal}
         onClose={() => setShowGenerationModal(false)}

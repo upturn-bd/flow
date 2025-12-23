@@ -215,7 +215,7 @@ export default function OffboardingPage() {
       <Toaster position="top-right" />
 
       {/* Header */}
-      <motion.div variants={fadeInUp} className="flex items-center mb-8">
+      <motion.div variants={fadeInUp} className="flex items-center mb-8" data-tutorial="offboarding-header">
         <h1 className="text-2xl font-bold text-foreground-primary flex items-center">
           <UserMinus className="mr-2 h-7 w-7 text-error" />
           Employee Offboarding
@@ -232,21 +232,19 @@ export default function OffboardingPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setActiveTab("active")}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  activeTab === "active"
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === "active"
                     ? "bg-error text-white"
                     : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
-                }`}
+                  }`}
               >
                 Active Employees ({activeEmployees.length})
               </button>
               <button
                 onClick={() => setActiveTab("offboarded")}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  activeTab === "offboarded"
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === "offboarded"
                     ? "bg-error text-white"
                     : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
-                }`}
+                  }`}
               >
                 Offboarded ({offboardedEmployees.length})
               </button>
@@ -300,11 +298,10 @@ export default function OffboardingPage() {
                   boxShadow:
                     "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
                 }}
-                className={`bg-surface-primary rounded-xl p-4 shadow-sm border ${
-                  selectedEmployee?.id === emp.id
+                className={`bg-surface-primary rounded-xl p-4 shadow-sm border ${selectedEmployee?.id === emp.id
                     ? "border-error ring-2 ring-error/30"
                     : "border-border-primary"
-                } cursor-pointer transition-all`}
+                  } cursor-pointer transition-all`}
                 onClick={() => activeTab === "active" && setSelectedEmployee(emp)}
               >
                 <div className="flex justify-between items-start mb-3">
@@ -320,9 +317,8 @@ export default function OffboardingPage() {
                     </div>
                   </div>
                   {activeTab === "offboarded" && (
-                    <div className={`text-xs font-medium text-white px-2 py-1 rounded-full ${
-                      emp.job_status === "Resigned" ? "bg-warning" : "bg-error"
-                    }`}>
+                    <div className={`text-xs font-medium text-white px-2 py-1 rounded-full ${emp.job_status === "Resigned" ? "bg-warning" : "bg-error"
+                      }`}>
                       {emp.job_status}
                     </div>
                   )}
@@ -356,8 +352,8 @@ export default function OffboardingPage() {
 
                 {activeTab === "offboarded" && (
                   <div className="mt-3 pt-3 border-t border-border-primary">
-                    <PermissionGate 
-                      module={PERMISSION_MODULES.OFFBOARDING} 
+                    <PermissionGate
+                      module={PERMISSION_MODULES.OFFBOARDING}
                       action="can_write"
                       fallback={
                         <PermissionTooltip message="You don't have permission to reactivate employees">
@@ -483,8 +479,8 @@ export default function OffboardingPage() {
                       <X className="h-4 w-4" />
                       Cancel
                     </Button>
-                    <PermissionGate 
-                      module={PERMISSION_MODULES.OFFBOARDING} 
+                    <PermissionGate
+                      module={PERMISSION_MODULES.OFFBOARDING}
                       action="can_write"
                       fallback={
                         <PermissionTooltip message="You don't have permission to offboard employees">

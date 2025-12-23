@@ -158,6 +158,7 @@ export default function NoticePage() {
             className="w-full p-4 sm:p-6 lg:p-8"
           >
             <motion.div
+              data-tutorial="notice-header"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
@@ -172,6 +173,7 @@ export default function NoticePage() {
               />
               {canWrite(PERMISSION_MODULES.NOTICE) ? (
                 <motion.button
+                  data-tutorial="notice-create-btn"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   type="button"

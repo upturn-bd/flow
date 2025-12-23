@@ -96,6 +96,7 @@ function LeavePageContent() {
       isLinked={true}
       module={PERMISSION_MODULES.LEAVE}
       showPermissionBanner={true}
+      tutorialPrefix="leave"
     />
   );
 }

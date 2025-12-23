@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Receipt, ClipboardText, ClockCounterClockwise, BookOpen, CurrencyDollar, Warning, FilePlus } from "@phosphor-icons/react";
 import ServicePageTemplate from "@/components/ui/ServicePageTemplate";
@@ -18,6 +18,10 @@ function SettlementPageContent() {
   const tab = searchParams.get("tab");
 
   const [activeTab, setActiveTab] = useState(tab || "create");
+
+  useEffect(() => {
+    setActiveTab(tab || "create");
+  }, [tab]);
   const tabs: TabItem[] = [
     {
       key: "create",
@@ -93,6 +97,7 @@ function SettlementPageContent() {
       isLinked={true}
       module={PERMISSION_MODULES.SETTLEMENT}
       showPermissionBanner={true}
+      tutorialPrefix="settlement"
     />
   );
 }

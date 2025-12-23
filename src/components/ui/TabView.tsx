@@ -19,6 +19,8 @@ export type TabViewProps = {
   setActiveTab: (key: string) => void;
   contentVariants?: any;
   isLinked?: boolean;
+  /** Prefix for data-tutorial attributes, e.g. "task" generates "task-ongoing-tab" */
+  tutorialPrefix?: string;
 };
 
 export const TabView = ({
@@ -45,6 +47,7 @@ export const TabView = ({
     },
   },
   isLinked = false,
+  tutorialPrefix,
 }: TabViewProps) => {
   return (
     <>
@@ -62,6 +65,7 @@ export const TabView = ({
               onClick={() => setActiveTab(tab.key)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              data-tutorial={tutorialPrefix ? `${tutorialPrefix}-${tab.key}-tab` : undefined}
               className={`relative px-4 py-2.5 text-sm font-medium transition-all duration-200 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 flex items-center gap-2
                 ${activeTab === tab.key
                   ? `bg-primary-50 dark:bg-primary-900/30 ${tab.color} shadow-sm`

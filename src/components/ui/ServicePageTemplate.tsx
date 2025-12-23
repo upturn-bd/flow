@@ -3,9 +3,8 @@
 import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import TabView, { TabItem } from './TabView';
-import { Icon } from "@phosphor-icons/react";
 import { useAuth } from '@/lib/auth/auth-context';
-import { ModulePermissionsBanner, PermissionGate, PermissionTooltip } from '@/components/permissions';
+import { ModulePermissionsBanner, PermissionTooltip } from '@/components/permissions';
 import { PermissionModule } from '@/lib/constants';
 
 interface ServicePageProps {
@@ -26,6 +25,8 @@ interface ServicePageProps {
   actionPermission?: string;
   /** Show permission banner */
   showPermissionBanner?: boolean;
+  /** Prefix for data-tutorial attributes on tabs */
+  tutorialPrefix?: string;
 }
 
 export default function ServicePageTemplate({
@@ -43,33 +44,34 @@ export default function ServicePageTemplate({
   module,
   actionPermission = 'can_write',
   showPermissionBanner = true,
+  tutorialPrefix,
 }: ServicePageProps) {
   const { hasPermission } = useAuth();
-  
+
   // Check if user has permission for the action button
   const hasActionPermission = module ? hasPermission(module, actionPermission) : true;
-  
+
   // Animation variants
   const pageVariants = {
     hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1, 
-      transition: { 
-        duration: 0.5, 
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.5,
         when: "beforeChildren",
         staggerChildren: 0.1
-      } 
+      }
     },
-    exit: { 
-      opacity: 0, 
-      transition: { duration: 0.3 } 
+    exit: {
+      opacity: 0,
+      transition: { duration: 0.3 }
     }
   };
 
   const contentVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         type: "spring",
@@ -100,9 +102,9 @@ export default function ServicePageTemplate({
         transition={{ duration: 0.3 }}
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
       >
-        <div>
+        <div data-tutorial={tutorialPrefix ? `${tutorialPrefix}-header` : undefined}>
           <h1 className="text-2xl font-bold text-foreground-primary flex items-center mb-2">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0.5 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5 }}
@@ -116,11 +118,12 @@ export default function ServicePageTemplate({
             {description}
           </p>
         </div>
-        
+
         {actionButtonLabel && actionButtonIcon && actionButtonOnClick && (
           <>
             {hasActionPermission ? (
               <motion.button
+                data-tutorial={tutorialPrefix ? `${tutorialPrefix}-action-btn` : undefined}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={actionButtonOnClick}
@@ -149,13 +152,14 @@ export default function ServicePageTemplate({
         <ModulePermissionsBanner module={module} title={title} compact />
       )}
 
-      <TabView 
+      <TabView
         tabs={tabs}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         contentVariants={contentVariants}
         isLinked={isLinked}
+        tutorialPrefix={tutorialPrefix}
       />
     </motion.div>
   );
-} 
+}

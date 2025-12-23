@@ -28,7 +28,7 @@ export default function ComplaintPage() {
       color: "text-primary-600",
       content: <ComplaintHistoryPage />
     },
-        {
+    {
       key: "requests",
       label: "Requests",
       icon: <ClipboardText className="h-5 w-5" />,
@@ -117,6 +117,7 @@ export default function ComplaintPage() {
       actionButtonOnClick={() => setActiveTab("home")}
       module={PERMISSION_MODULES.COMPLAINTS}
       showPermissionBanner={true}
+      tutorialPrefix="complaint"
     />
   );
 }

@@ -187,7 +187,7 @@ export default function TaskLayout({
       className="w-full p-4 sm:p-6 lg:p-8"
     >
       <motion.div className="mb-8 flex justify-between items-center">
-        <div>
+        <div data-tutorial="task-header">
           <h1 className="text-2xl font-bold text-foreground-primary flex items-center mb-2">
             <ClipboardText className="mr-2 h-6 w-6 text-indigo-500" />
             Task Management
@@ -197,6 +197,7 @@ export default function TaskLayout({
           </p>
         </div>
         <button
+          data-tutorial="task-create-btn"
           onClick={() => setShowCreateModal(true)}
           className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
@@ -209,7 +210,7 @@ export default function TaskLayout({
         tabs={tabs}
         activeTab={selectedTaskId ? "" : activeTab || ""} // no tab active if viewing task
         setActiveTab={handleTabChange}
-
+        tutorialPrefix="task"
       />
 
       {/* Only show tab content when no task is selected

@@ -6,13 +6,13 @@ import { useStakeholders } from "@/hooks/useStakeholders";
 import { useAuth } from "@/lib/auth/auth-context";
 import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
-import { 
-  Plus, 
-  Eye, 
-  CheckCircle, 
-  Clock, 
-  Download, 
-  Building, 
+import {
+  Plus,
+  Eye,
+  CheckCircle,
+  Clock,
+  Download,
+  Building,
   User,
   PencilSimple,
   UsersIcon
@@ -64,7 +64,7 @@ export default function OpsStakeholdersPage() {
       });
       setSearchResult(result);
     };
-    
+
     loadStakeholders();
   }, [searchTerm, currentPage, filterStatus, searchStakeholders]);
 
@@ -120,7 +120,7 @@ export default function OpsStakeholdersPage() {
       toast.error("No data to export");
       return;
     }
-    
+
     try {
       exportStakeholdersToCSV(dataToExport, {
         includeAddress: true,
@@ -145,21 +145,23 @@ export default function OpsStakeholdersPage() {
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
       {/* Header */}
-      <PageHeader
-        title="Stakeholders"
-        description="View and manage your stakeholder relationships"
-        icon={Building}
-        iconColor="text-purple-600"
-      >
-        <button
-          onClick={handleExportCSV}
-          disabled={loading || filteredStakeholders.length === 0}
-          className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs sm:text-sm bg-success text-white rounded-lg hover:bg-success/90 active:bg-success/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      <div data-tutorial="stakeholders-header">
+        <PageHeader
+          title="Stakeholders"
+          description="View and manage your stakeholder relationships"
+          icon={Building}
+          iconColor="text-purple-600"
         >
-          <Download size={16} className="sm:w-[18px] sm:h-[18px]" />
-          <span>Export</span>
-        </button>
-      </PageHeader>
+          <button
+            onClick={handleExportCSV}
+            disabled={loading || filteredStakeholders.length === 0}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs sm:text-sm bg-success text-white rounded-lg hover:bg-success/90 active:bg-success/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download size={16} className="sm:w-[18px] sm:h-[18px]" />
+            <span>Export</span>
+          </button>
+        </PageHeader>
+      </div>
 
       {/* Permission Banner */}
       <ModulePermissionsBanner module={PERMISSION_MODULES.STAKEHOLDERS} title="Stakeholders" compact />
@@ -213,41 +215,37 @@ export default function OpsStakeholdersPage() {
             <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 flex-1">
               <button
                 onClick={() => handleFilterChange("all")}
-                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
-                  filterStatus === "all"
-                    ? "bg-primary-600 text-white"
-                    : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
-                }`}
+                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${filterStatus === "all"
+                  ? "bg-primary-600 text-white"
+                  : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
+                  }`}
               >
                 All ({searchResult?.totalCount || 0})
               </button>
               <button
                 onClick={() => handleFilterChange("Lead")}
-                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
-                  filterStatus === "Lead"
-                    ? "bg-primary-600 text-white"
-                    : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
-                }`}
+                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${filterStatus === "Lead"
+                  ? "bg-primary-600 text-white"
+                  : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
+                  }`}
               >
                 Leads ({leads.length})
               </button>
               <button
                 onClick={() => handleFilterChange("Permanent")}
-                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
-                  filterStatus === "Permanent"
-                    ? "bg-primary-600 text-white"
-                    : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
-                }`}
+                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${filterStatus === "Permanent"
+                  ? "bg-primary-600 text-white"
+                  : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
+                  }`}
               >
                 Permanent ({completedStakeholders.length})
               </button>
               <button
                 onClick={() => handleFilterChange("Rejected")}
-                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
-                  filterStatus === "Rejected"
-                    ? "bg-primary-600 text-white"
-                    : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
-                }`}
+                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${filterStatus === "Rejected"
+                  ? "bg-primary-600 text-white"
+                  : "bg-background-tertiary dark:bg-surface-secondary text-foreground-secondary hover:bg-surface-hover"
+                  }`}
               >
                 Rejected
               </button>
@@ -398,7 +396,7 @@ export default function OpsStakeholdersPage() {
                               (sd) => sd.step_id === stakeholder.current_step_id
                             );
                             const stepStatus = currentStepData?.data?.["__step_status"];
-                            
+
                             if (stepStatus && stakeholder.current_step?.status_field?.enabled) {
                               const statusOption = stakeholder.current_step.status_field.options?.find(
                                 opt => opt.value === stepStatus
@@ -462,7 +460,7 @@ export default function OpsStakeholdersPage() {
                 ))}
               </tbody>
             </table>
-            
+
             {/* Pagination */}
             {searchResult && searchResult.totalPages > 1 && (
               <Pagination
@@ -536,7 +534,7 @@ export default function OpsStakeholdersPage() {
                     <p className="text-foreground-tertiary text-[10px] uppercase tracking-wide mb-0.5">Process</p>
                     <p className="text-foreground-primary truncate">{stakeholder.process?.name || "N/A"}</p>
                   </div>
-                  
+
                   <div>
                     <p className="text-foreground-tertiary text-[10px] uppercase tracking-wide mb-0.5">Current Step</p>
                     {stakeholder.status === 'Permanent' || stakeholder.is_completed ? (
@@ -556,7 +554,7 @@ export default function OpsStakeholdersPage() {
                             (sd) => sd.step_id === stakeholder.current_step_id
                           );
                           const stepStatus = currentStepData?.data?.["__step_status"];
-                          
+
                           if (stepStatus && stakeholder.current_step?.status_field?.enabled) {
                             const statusOption = stakeholder.current_step.status_field.options?.find(
                               opt => opt.value === stepStatus
@@ -574,7 +572,7 @@ export default function OpsStakeholdersPage() {
                       <p className="text-foreground-tertiary">Not started</p>
                     )}
                   </div>
-                  
+
                   <div>
                     <p className="text-foreground-tertiary text-[10px] uppercase tracking-wide mb-0.5">Created</p>
                     <p className="text-foreground-primary">

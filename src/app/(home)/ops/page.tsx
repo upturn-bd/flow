@@ -3,13 +3,14 @@
 import { File, Briefcase } from "@phosphor-icons/react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  SearchBar, 
-  EmptyState, 
-  PageHeader, 
-  NavigationCard, 
+import {
+  SearchBar,
+  EmptyState,
+  PageHeader,
+  NavigationCard,
   NavigationCardGrid,
 } from "@/components/ui";
+import { TutorialSelector } from "@/components/tutorial";
 import { OPS_SECTIONS } from "@/lib/constants/navigation";
 
 export default function ServicesPage() {
@@ -25,15 +26,15 @@ export default function ServicesPage() {
         (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()))
       ),
     }))
-    .filter((section) => 
-      section.items.length > 0 && 
+    .filter((section) =>
+      section.items.length > 0 &&
       (selectedSection === null || section.title === selectedSection)
     );
 
   // Animation variants
   const pageVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
       transition: {
         when: "beforeChildren",
@@ -67,22 +68,23 @@ export default function ServicesPage() {
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="p-4 sm:p-6 lg:p-8"
       initial="hidden"
       animate="visible"
       variants={pageVariants}
     >
-      <motion.div variants={itemVariants}>
+      <motion.div variants={itemVariants} className="flex items-start justify-between gap-4 mb-6">
         <PageHeader
           title="Operations & Services"
           description="Access all operational tools and employee services"
           icon={Briefcase}
           iconColor="text-primary-600"
         />
+        <TutorialSelector />
       </motion.div>
 
-      <motion.div 
+      <motion.div
         className="mb-6"
         variants={itemVariants}
       >
@@ -99,14 +101,14 @@ export default function ServicesPage() {
             whileTap={{ scale: 0.95 }}
             onClick={() => setSelectedSection(null)}
             className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
-              ${!selectedSection 
-                ? 'bg-primary-100 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:text-primary-400' 
+              ${!selectedSection
+                ? 'bg-primary-100 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:text-primary-400'
                 : 'bg-surface-secondary text-foreground-secondary hover:bg-surface-hover'}`
             }
           >
             All
           </motion.button>
-          
+
           {OPS_SECTIONS.map((section) => (
             <motion.button
               key={section.title}
@@ -114,8 +116,8 @@ export default function ServicesPage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setSelectedSection(section.title)}
               className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
-                ${selectedSection === section.title 
-                  ? 'bg-primary-100 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:text-primary-400' 
+                ${selectedSection === section.title
+                  ? 'bg-primary-100 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:text-primary-400'
                   : 'bg-surface-secondary text-foreground-secondary hover:bg-surface-hover'}`
               }
             >
@@ -146,8 +148,8 @@ export default function ServicesPage() {
       ) : (
         <AnimatePresence>
           {filteredSections.map((section) => (
-            <motion.div 
-              key={section.title} 
+            <motion.div
+              key={section.title}
               className="mb-8"
               variants={sectionVariants}
               initial="hidden"
@@ -155,7 +157,7 @@ export default function ServicesPage() {
               exit="hidden"
               layout
             >
-              <motion.div 
+              <motion.div
                 className="flex items-center mb-3"
                 variants={itemVariants}
               >
@@ -164,13 +166,13 @@ export default function ServicesPage() {
                 </h2>
                 <div className="h-px grow bg-border-primary"></div>
               </motion.div>
-              <motion.p 
+              <motion.p
                 className="text-sm sm:text-base text-foreground-secondary mb-4"
                 variants={itemVariants}
               >
                 {section.description}
               </motion.p>
-              
+
               <NavigationCardGrid columns={4}>
                 {section.items.map((item) => (
                   <motion.div
