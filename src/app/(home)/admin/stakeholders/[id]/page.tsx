@@ -8,11 +8,12 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { useCompanyInfo } from "@/hooks/useCompanyInfo";
 import { getPublicFileUrl } from "@/lib/utils/files";
 import { calculateFieldValue, formatCalculatedValue, formulaToReadable } from "@/lib/utils/formula-evaluator";
-import { ArrowLeft, CheckCircle, Clock, Calendar, MapPin, Envelope, Phone, User, PencilSimple, TrashSimple, WarningCircle, FileText, Download, CurrencyDollar, Database, Calculator } from "@phosphor-icons/react";
+import { ArrowLeft, CheckCircle, Clock, Calendar, MapPin, Envelope, Phone, User, PencilSimple, TrashSimple, WarningCircle, FileText, Download, CurrencyDollar, Database, Calculator, Package } from "@phosphor-icons/react";
 import { Stakeholder, StakeholderProcessStep, StakeholderStepData } from "@/lib/types/schemas";
 import StepDataForm from "@/components/stakeholder-processes/StepDataForm";
 import StakeholderIssuesTab from "@/components/stakeholder-issues/StakeholderIssuesTab";
 import StakeholderTransactions from "@/components/stakeholders/StakeholderTransactions";
+import { StakeholderServicesList } from "@/components/stakeholder-services";
 import AdditionalDataModal from "@/components/stakeholders/AdditionalDataModal";
 import PublicAccessSection from "@/components/stakeholders/PublicAccessSection";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -167,7 +168,7 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
   const [activeStepId, setActiveStepId] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [activeTab, setActiveTab] = useState<"process" | "issues" | "transactions">("process");
+  const [activeTab, setActiveTab] = useState<"process" | "issues" | "transactions" | "services">("process");
   const [userTeamIds, setUserTeamIds] = useState<number[]>([]);
   const [showAdditionalDataModal, setShowAdditionalDataModal] = useState(false);
 
@@ -705,6 +706,16 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
                   <CurrencyDollar size={16} />
                   Transactions
                 </button>
+                <button
+                  onClick={() => setActiveTab("services")}
+                  className={`px-6 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "services"
+                      ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50 dark:bg-primary-950"
+                      : "text-foreground-secondary hover:text-foreground-primary hover:bg-background-secondary dark:bg-background-tertiary"
+                    }`}
+                >
+                  <Package size={16} />
+                  Services
+                </button>
               </div>
             </div>
 
@@ -1099,9 +1110,15 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
               ) : activeTab === "issues" ? (
                 // Issues Tab Content
                 <StakeholderIssuesTab stakeholderId={stakeholderId} />
-              ) : (
+              ) : activeTab === "transactions" ? (
                 // Transactions Tab Content
                 <StakeholderTransactions
+                  stakeholderId={stakeholderId}
+                  stakeholderName={stakeholder.name}
+                />
+              ) : (
+                // Services Tab Content
+                <StakeholderServicesList
                   stakeholderId={stakeholderId}
                   stakeholderName={stakeholder.name}
                 />

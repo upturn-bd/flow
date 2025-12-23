@@ -1,9 +1,13 @@
 import { CURRENCY_SYMBOLS } from "@/lib/constants";
-import { StakeholderInvoice, StakeholderInvoiceItem, ContactPerson } from "@/lib/types/schemas";
+import { 
+  StakeholderServiceInvoice, 
+  StakeholderInvoiceLineItem 
+} from "@/lib/types/stakeholder-services";
+import { ContactPerson } from "@/lib/types/schemas";
 
 export interface InvoiceEmailData {
-  invoice: StakeholderInvoice;
-  items: StakeholderInvoiceItem[];
+  invoice: StakeholderServiceInvoice;
+  items: StakeholderInvoiceLineItem[];
   companyName: string;
   companyAddress?: string;
   companyEmail?: string;
@@ -29,6 +33,11 @@ export function generateInvoiceEmailHTML(data: InvoiceEmailData): string {
 
   const currencySymbol = CURRENCY_SYMBOLS[invoice.currency] || invoice.currency;
 
+  // Get customer info from snapshot or stakeholder
+  const customerName = invoice.customer_snapshot?.name || invoice.stakeholder?.name || 'Customer';
+  const customerAddress = invoice.customer_snapshot?.address || invoice.stakeholder?.address;
+  const customerContactPersons = invoice.customer_snapshot?.contact_persons || invoice.stakeholder?.contact_persons || [];
+
   // Format currency
   const formatCurrency = (amount: number) => {
     return `${currencySymbol} ${amount.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -44,7 +53,7 @@ export function generateInvoiceEmailHTML(data: InvoiceEmailData): string {
   };
 
   // Contact persons HTML
-  const contactPersonsHTML = (invoice.customer_contact_persons || [])
+  const contactPersonsHTML = customerContactPersons
     .map(
       (contact: ContactPerson) => `
       <div style="margin-bottom: 8px;">
@@ -109,8 +118,8 @@ export function generateInvoiceEmailHTML(data: InvoiceEmailData): string {
         <div style="flex: 1; padding-left: 20px;">
           <h2 style="color: #667eea; font-size: 14px; font-weight: 600; text-transform: uppercase; margin: 0 0 15px 0; letter-spacing: 0.5px;">Bill To</h2>
           <div style="font-size: 16px;">
-            <strong style="font-size: 18px; display: block; margin-bottom: 8px;">${invoice.customer_name}</strong>
-            ${invoice.customer_address ? `<p style="margin: 0 0 8px 0;">${invoice.customer_address}</p>` : ''}
+            <strong style="font-size: 18px; display: block; margin-bottom: 8px;">${customerName}</strong>
+            ${customerAddress ? `<p style="margin: 0 0 8px 0;">${customerAddress}</p>` : ''}
             ${contactPersonsHTML ? `<div style="margin-top: 12px;">${contactPersonsHTML}</div>` : ''}
           </div>
         </div>
@@ -131,7 +140,7 @@ export function generateInvoiceEmailHTML(data: InvoiceEmailData): string {
           ` : ''}
           <div style="margin-bottom: 10px;">
             <span style="color: #6b7280; font-size: 14px; display: block;">Billing Period</span>
-            <span style="font-weight: 600; font-size: 16px;">${formatDate(invoice.billing_start_date)} - ${formatDate(invoice.billing_end_date)}</span>
+            <span style="font-weight: 600; font-size: 16px;">${formatDate(invoice.billing_period_start)} - ${formatDate(invoice.billing_period_end)}</span>
           </div>
         </div>
       </div>
@@ -161,14 +170,8 @@ export function generateInvoiceEmailHTML(data: InvoiceEmailData): string {
           </div>
           ${invoice.tax_amount > 0 ? `
           <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
-            <span style="color: #6b7280;">Tax:</span>
+            <span style="color: #6b7280;">Tax (${invoice.tax_rate}%):</span>
             <span style="font-weight: 600;">${formatCurrency(invoice.tax_amount)}</span>
-          </div>
-          ` : ''}
-          ${invoice.discount_amount > 0 ? `
-          <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
-            <span style="color: #6b7280;">Discount:</span>
-            <span style="font-weight: 600;">-${formatCurrency(invoice.discount_amount)}</span>
           </div>
           ` : ''}
           <div style="display: flex; justify-content: space-between; padding: 15px 0; border-top: 2px solid #667eea; margin-top: 5px;">
@@ -226,6 +229,11 @@ export function generateInvoiceEmailText(data: InvoiceEmailData): string {
   const { invoice, items, companyName, locale = 'en-US' } = data;
   const currencySymbol = CURRENCY_SYMBOLS[invoice.currency] || invoice.currency;
 
+  // Get customer info from snapshot or stakeholder
+  const customerName = invoice.customer_snapshot?.name || invoice.stakeholder?.name || 'Customer';
+  const customerAddress = invoice.customer_snapshot?.address || invoice.stakeholder?.address;
+  const customerContactPersons = invoice.customer_snapshot?.contact_persons || invoice.stakeholder?.contact_persons || [];
+
   const formatCurrency = (amount: number) => {
     return `${currencySymbol} ${amount.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
@@ -238,7 +246,7 @@ export function generateInvoiceEmailText(data: InvoiceEmailData): string {
     });
   };
 
-  const contactPersons = (invoice.customer_contact_persons || [])
+  const contactPersons = customerContactPersons
     .map((contact: ContactPerson) => {
       return `${contact.name}\n${contact.email ? `Email: ${contact.email}\n` : ''}${contact.phone ? `Phone: ${contact.phone}` : ''}`;
     })
@@ -261,22 +269,21 @@ ${data.companyEmail ? `Email: ${data.companyEmail}` : ''}
 ${data.companyPhone ? `Phone: ${data.companyPhone}` : ''}
 
 BILL TO:
-${invoice.customer_name}
-${invoice.customer_address || ''}
+${customerName}
+${customerAddress || ''}
 ${contactPersons}
 
 INVOICE DETAILS:
 Invoice Date: ${formatDate(invoice.invoice_date)}
 ${invoice.due_date ? `Due Date: ${formatDate(invoice.due_date)}` : ''}
-Billing Period: ${formatDate(invoice.billing_start_date)} - ${formatDate(invoice.billing_end_date)}
+Billing Period: ${formatDate(invoice.billing_period_start)} - ${formatDate(invoice.billing_period_end)}
 
 ITEMS:
 ${itemsList}
 
 TOTALS:
 Subtotal: ${formatCurrency(invoice.subtotal)}
-${invoice.tax_amount > 0 ? `Tax: ${formatCurrency(invoice.tax_amount)}` : ''}
-${invoice.discount_amount > 0 ? `Discount: -${formatCurrency(invoice.discount_amount)}` : ''}
+${invoice.tax_amount > 0 ? `Tax (${invoice.tax_rate}%): ${formatCurrency(invoice.tax_amount)}` : ''}
 ---
 Total: ${formatCurrency(invoice.total_amount)}
 ${invoice.paid_amount > 0 ? `\nPaid: -${formatCurrency(invoice.paid_amount)}\nBalance Due: ${formatCurrency(invoice.total_amount - invoice.paid_amount)}` : ''}

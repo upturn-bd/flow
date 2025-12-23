@@ -1,181 +1,187 @@
 # Stakeholder Billing System - Context Document
 
-## Current Stakeholder System Overview
+## System Overview (IMPLEMENTED)
 
-### Core Entities
+The stakeholder billing system handles both **incoming** and **outgoing** services between the company and stakeholders:
 
-1. **StakeholderProcess** - Defines a workflow template with sequential/non-sequential steps
-2. **StakeholderProcessStep** - Individual steps with customizable field definitions
-3. **Stakeholder** - Main entity (Lead/Permanent/Rejected) assigned to a process
-4. **StakeholderStepData** - Actual data entered for each step per stakeholder
-
-### Field Types Supported
-- `text`, `number`, `boolean`, `date`, `file`, `geolocation`
-- `dropdown`, `multi_select` (with nested fields per option)
-- `calculated` - Uses formulas referencing fields from current/previous steps
-
-### Formula System
-Located in `/src/lib/utils/formula-evaluator.ts`:
-- Cell references: `[Step1.fieldKey]` or `[Step2.nested.field]`
-- Supports basic arithmetic: `+`, `-`, `*`, `/`, `()`, etc.
-- Can reference fields across steps and nested fields
-
-### Data Storage
-- Step data stored in `stakeholder_step_data` table
-- JSONB `data` column stores field values
-- `field_definitions_snapshot` preserves the field schema at save time
-- `updated_at` timestamp tracks last modification
+- **Outgoing Services**: Services the company provides TO stakeholders (generates invoices to stakeholders)
+- **Incoming Services**: Services stakeholders provide TO the company (payment records to pay stakeholders)
 
 ---
 
-## Proposed Billing System Design
+## Database Tables
 
-### Key Requirements
+### Core Tables (all in `stakeholder_*` schema)
 
-1. **Billing Period**: 1st to 28th of each month (user selects billing date)
-2. **Formula-Based**: Uses existing calculated field pattern
-3. **Pro-rata Support**: Handle price/quantity changes mid-period on daily basis
-4. **PDF Generation**: Human-readable invoice with stakeholder info and line items
-5. **Multiple Changes**: Support multiple price changes in one billing period (latest change effective from next day)
+1. **stakeholder_services** - Service definitions
+   - `direction`: 'incoming' | 'outgoing'
+   - `service_type`: 'one_off' | 'recurring'
+   - `billing_cycle_type`: 'daily' | 'weekly' | 'monthly' | 'yearly' | 'x_days'
+   - `status`: 'draft' | 'active' | 'paused' | 'cancelled' | 'completed'
+   - Pro-rata settings: `enable_pro_rata`, `pro_rata_calculation`
+   - Tax settings: `tax_rate`, `currency`
 
-### Questions to Clarify
+2. **stakeholder_service_line_items** - Line items for services
+   - `description`, `quantity`, `unit_price`, `amount`
+   - Optional pro-rata fields: `pro_rata_days`, `pro_rata_total_days`
 
-1. **Billing Configuration**:
-   - Where should the billing formula be configured? (Per process? Per stakeholder type? Per stakeholder?)
-   - Should there be a dedicated "billing step" in processes, or separate billing configuration?
-   
-2. **Field Selection for Billing**:
-   - Which fields should be selectable for billing? (Only number fields? Calculated fields?)
-   - Should users be able to label fields differently for invoices (e.g., "Monthly Rate" → "Service Fee")?
+3. **stakeholder_service_invoices** - Invoices for outgoing services
+   - `invoice_number` (auto-generated)
+   - `status`: 'draft' | 'sent' | 'viewed' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled'
+   - `billing_period_start/end`
+   - `stakeholder_snapshot` - Captures stakeholder info at invoice time
+   - `paid_amount`, `total_amount` for partial payment tracking
 
-3. **Price Change Tracking**:
-   - Currently, step data only has `updated_at` but no history tracking
-   - Need to create a history table for tracking field value changes with timestamps
-   - Should we track ALL field changes or only "billable" fields?
+4. **stakeholder_invoice_line_items** - Line items for invoices
 
-4. **Invoice Details**:
-   - What stakeholder information should appear on invoices? (Name, address, contact persons, etc.)
-   - Should there be customizable invoice templates per company?
-   - What about invoice numbering scheme? (e.g., INV-2024-001)
+5. **stakeholder_invoice_payments** - Payment records against invoices
 
-5. **Currency & Tax**:
-   - Should billing support multiple currencies per company?
-   - Is tax calculation needed? (VAT, Service tax, etc.)
-   - Should there be separate line items for taxes/discounts?
+6. **stakeholder_service_payments** - Payment records for incoming services
+   - `status`: 'pending' | 'paid' | 'cancelled'
+   - `billing_period_start/end`
+   - `vendor_snapshot` - Captures stakeholder info at payment time
 
-6. **Invoice Storage & Status**:
-   - Should generated invoices be stored in the database?
-   - Invoice statuses? (Draft, Sent, Paid, Overdue, Cancelled)
-   - Payment tracking integration with existing Accounts system?
+7. **stakeholder_payment_line_items** - Line items for payments
+
+8. **stakeholder_service_templates** - Reusable service templates
+9. **stakeholder_invoice_settings** - Company invoice configuration
 
 ---
 
-## Proposed Database Schema
+## React Hooks
 
-```sql
--- Table to track billing-relevant field changes for pro-rata calculation
-CREATE TABLE stakeholder_billing_field_history (
-  id SERIAL PRIMARY KEY,
-  stakeholder_id INTEGER NOT NULL REFERENCES stakeholders(id) ON DELETE CASCADE,
-  step_id INTEGER NOT NULL REFERENCES stakeholder_process_steps(id),
-  field_key VARCHAR(255) NOT NULL,
-  old_value JSONB,
-  new_value JSONB NOT NULL,
-  effective_date DATE NOT NULL, -- When this value becomes effective
-  changed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  changed_by UUID REFERENCES employees(id),
-  company_id INTEGER NOT NULL REFERENCES companies(id),
-  
-  CONSTRAINT unique_field_change_date UNIQUE(stakeholder_id, step_id, field_key, effective_date)
-);
+### useStakeholderServices.tsx
+- `fetchServices(options)` - List services with filters
+- `fetchServiceById(id)` - Get single service
+- `createService(data)` - Create new service
+- `updateService(id, data)` - Update service
+- `updateServiceStatus(id, status)` - Change service status
+- `deleteService(id)` - Soft delete
 
--- Billing configuration per process or stakeholder type
-CREATE TABLE stakeholder_billing_config (
-  id SERIAL PRIMARY KEY,
-  company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  process_id INTEGER REFERENCES stakeholder_processes(id) ON DELETE CASCADE,
-  stakeholder_type_id INTEGER REFERENCES stakeholder_types(id) ON DELETE CASCADE,
-  
-  -- Billing formula configuration
-  name VARCHAR(255) NOT NULL, -- e.g., "Monthly Service Fee"
-  description TEXT,
-  
-  -- Fields to include in billing (references to step fields)
-  billing_fields JSONB NOT NULL DEFAULT '[]',
-  -- Format: [
-  --   { "stepId": 1, "fieldKey": "rate", "label": "Monthly Rate", "type": "unit_price" },
-  --   { "stepId": 2, "fieldKey": "quantity", "label": "Quantity", "type": "quantity" }
-  -- ]
-  
-  -- The billing formula using referenced fields
-  billing_formula TEXT, -- e.g., "[Step1.rate] * [Step2.quantity]"
-  
-  -- Billing date (1-28)
-  billing_day INTEGER DEFAULT 1 CHECK (billing_day >= 1 AND billing_day <= 28),
-  
-  currency VARCHAR(10) DEFAULT 'BDT',
-  
-  is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  created_by UUID REFERENCES employees(id),
-  updated_by UUID,
-  
-  CONSTRAINT at_least_one_reference CHECK (process_id IS NOT NULL OR stakeholder_type_id IS NOT NULL)
-);
+### useServiceInvoices.tsx
+- `fetchInvoices(options)` - List invoices with filters
+- `fetchInvoiceById(id)` - Get single invoice with line items
+- `previewInvoice(data)` - Calculate invoice preview with pro-rata
+- `createInvoice(data)` - Generate and save invoice
+- `sendInvoice(id)` - Mark as sent
+- `recordPayment(invoiceId, amount, date, reference)` - Record payment
+- `updateInvoiceStatus(id, status)` - Change status
 
--- Generated invoices
-CREATE TABLE stakeholder_invoices (
-  id SERIAL PRIMARY KEY,
-  invoice_number VARCHAR(100) NOT NULL,
-  stakeholder_id INTEGER NOT NULL REFERENCES stakeholders(id) ON DELETE CASCADE,
-  billing_config_id INTEGER REFERENCES stakeholder_billing_config(id),
-  
-  -- Billing period
-  period_start DATE NOT NULL,
-  period_end DATE NOT NULL,
-  
-  -- Invoice details snapshot
-  stakeholder_info JSONB NOT NULL, -- Snapshot of stakeholder details at generation
-  line_items JSONB NOT NULL DEFAULT '[]',
-  -- Format: [
-  --   { "description": "Service Fee (Jan 1-15)", "quantity": 1, "unitPrice": 1000, "amount": 1000, "effectiveFrom": "2024-01-01", "effectiveTo": "2024-01-15" },
-  --   { "description": "Service Fee (Jan 16-28) - Updated Rate", "quantity": 1, "unitPrice": 1200, "amount": 1200, "effectiveFrom": "2024-01-16", "effectiveTo": "2024-01-28" }
-  -- ]
-  
-  subtotal DECIMAL(15,2) NOT NULL,
-  tax_amount DECIMAL(15,2) DEFAULT 0,
-  discount_amount DECIMAL(15,2) DEFAULT 0,
-  total_amount DECIMAL(15,2) NOT NULL,
-  currency VARCHAR(10) DEFAULT 'BDT',
-  
-  status VARCHAR(50) DEFAULT 'draft' CHECK (status IN ('draft', 'sent', 'paid', 'overdue', 'cancelled')),
-  
-  -- PDF storage
-  pdf_path TEXT, -- Path in storage bucket
-  
-  -- Dates
-  issue_date DATE NOT NULL,
-  due_date DATE,
-  paid_at TIMESTAMP WITH TIME ZONE,
-  
-  -- Audit
-  company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  created_by UUID REFERENCES employees(id),
-  updated_by UUID,
-  
-  CONSTRAINT unique_invoice_number_per_company UNIQUE(company_id, invoice_number)
-);
+### useServicePayments.tsx
+- `fetchPayments(options)` - List payment records
+- `fetchPaymentById(id)` - Get single payment
+- `createPayment(data)` - Create payment record for incoming service
+- `updatePaymentStatus(id, status, paymentDate)` - Update status
+- `deletePayment(id)` - Delete payment record
+
+### useServiceTemplates.tsx
+- `fetchTemplates()` - List templates
+- `createTemplate(data)` - Create template
+- `fetchInvoiceSettings()` - Get invoice config
+- `saveInvoiceSettings(data)` - Save invoice config
+
+---
+
+## UI Components
+
+### Service Management
+- **StakeholderServicesList** - Main services list with filters
+- **ServiceFormModal** - Create/edit service form
+- **ServiceDetailModal** - Service details with Invoices/Payments tabs
+- **ServiceLineItemsEditor** - Manage service line items
+
+### Invoice Management (for outgoing services)
+- **InvoicesList** - List invoices with filters, summary cards
+- **InvoiceDetailModal** - Full invoice view with actions
+- **InvoiceGenerationForm** - Generate invoice from service
+- **RecordPaymentModal** - Record payment against invoice
+
+### Payment Management (for incoming services)
+- **PaymentRecordsList** - List payment records with filters
+- **PaymentFormModal** - Create payment record
+- **PaymentDetailModal** - View payment details with status actions
+
+### Public Access (for stakeholders)
+- **PublicStakeholderServices** - View services (read-only)
+- **PublicStakeholderInvoices** - View invoices (read-only)
+
+---
+
+## API Routes (Admin Access via Supabase Admin Client)
+
+- `/api/stakeholders/public/services` - Public service listing
+- `/api/stakeholders/public/invoices` - Public invoice listing
+
+These use admin Supabase client to bypass RLS for public stakeholder access.
+
+---
+
+## Pro-Rata Calculation
+
+The system supports pro-rata billing for partial periods:
+
+```typescript
+// Located in src/lib/utils/pro-rata-calculation.ts
+calculateProRataInvoice({
+  service_id,
+  billing_period_start,
+  billing_period_end,
+}) => {
+  // Returns: lineItems[], subtotal, taxAmount, totalAmount, proRataDetails
+}
 ```
 
-## Next Steps
+Calculation methods:
+- `daily` - Divide monthly rate by 30 days
+- `calendar_days` - Divide by actual days in month
+- `business_days` - Only count business days
 
-1. Get answers to clarifying questions
-2. Create database migration SQL
-3. Implement billing field history tracking (trigger on step data updates)
-4. Create billing configuration UI
-5. Implement invoice generation logic with pro-rata calculation
-6. Create PDF generation utility
-7. Build invoice management UI
+---
+
+## Status Workflows
+
+### Invoice Status Flow
+```
+draft → sent → viewed → partially_paid → paid
+                   ↘          ↘
+                   overdue → cancelled
+```
+
+### Payment Status Flow
+```
+pending → paid
+       ↘
+       cancelled
+```
+
+---
+
+## Next Steps (TODO)
+
+1. ~~**Edge Function for Auto-Payments**~~ ✅ - Implemented in `supabase/functions/auto-create-stakeholder-payments/`
+2. **Email Notifications** - Send invoice to stakeholders via email
+3. **PDF Generation** - Generate downloadable invoice PDFs
+4. **Overdue Detection** - Cron job to mark overdue invoices
+5. **Integration with Accounts** - Link payments to company accounts system
+
+---
+
+## Migration Notes
+
+The old process-based billing system has been completely replaced:
+
+**Deleted Files:**
+- `sql/stakeholder_billing_system.sql` - Old SQL schema
+- `src/hooks/useStakeholderBilling.tsx` - Old hook
+- `src/components/stakeholder-billing/` - Old components
+- Old types in `schemas.ts` (StakeholderBillingCycle, StakeholderInvoice, etc.)
+
+**New System Files:**
+- `sql/stakeholder_services_system.sql` - New service-based SQL schema
+- `src/lib/types/stakeholder-services.ts` - All service billing types
+- `src/hooks/useStakeholderServices.tsx` - Service management
+- `src/hooks/useServiceInvoices.tsx` - Invoice management
+- `src/hooks/useServicePayments.tsx` - Payment management
+- `src/hooks/useServiceTemplates.tsx` - Templates and settings
+- `src/components/stakeholder-services/` - All UI components
+- `supabase/functions/auto-create-stakeholder-payments/` - Edge function for auto-payments

@@ -292,6 +292,101 @@ export function usePublicStakeholderAccess() {
   );
 
   // ==========================================================================
+  // SERVICES (Public Access)
+  // ==========================================================================
+
+  /**
+   * Fetch services for a stakeholder (public access)
+   * Uses server-side API route to bypass RLS
+   */
+  const fetchPublicServices = useCallback(
+    async (stakeholderId: number) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        if (!credentialsRef.current) {
+          throw new Error("Not verified");
+        }
+
+        const response = await fetch('/api/public/stakeholder/services', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            stakeholderId,
+            accessCode: credentialsRef.current.accessCode,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          const errorMessage = data.error || 'Failed to fetch services';
+          setError(errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        return data.services || [];
+      } catch (err) {
+        logError("Error fetching public services", err);
+        setError("Failed to load services");
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  // ==========================================================================
+  // INVOICES (Public Access)
+  // ==========================================================================
+
+  /**
+   * Fetch invoices for a stakeholder (public access)
+   * Uses server-side API route to bypass RLS
+   */
+  const fetchPublicInvoices = useCallback(
+    async (stakeholderId: number, serviceId?: number) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        if (!credentialsRef.current) {
+          throw new Error("Not verified");
+        }
+
+        const response = await fetch('/api/public/stakeholder/invoices', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            stakeholderId,
+            accessCode: credentialsRef.current.accessCode,
+            serviceId,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          const errorMessage = data.error || 'Failed to fetch invoices';
+          setError(errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        return data.invoices || [];
+      } catch (err) {
+        logError("Error fetching public invoices", err);
+        setError("Failed to load invoices");
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  // ==========================================================================
   // RETURN
   // ==========================================================================
 
@@ -307,5 +402,7 @@ export function usePublicStakeholderAccess() {
     fetchPublicIssueCategories,
     getAttachmentUrl,
     fetchPublicTransactions,
+    fetchPublicServices,
+    fetchPublicInvoices,
   };
 }

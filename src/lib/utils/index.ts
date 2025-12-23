@@ -101,6 +101,40 @@ export function formatDate(date: string | Date): string {
   return `${day} ${monthName}, ${year}`;
 }
 
+/**
+ * Format a number as currency with the given currency code
+ */
+export function formatCurrency(amount: number, currency: string = 'BDT'): string {
+  try {
+    // Map common currency codes to locales for better formatting
+    const localeMap: Record<string, string> = {
+      'BDT': 'en-BD',
+      'USD': 'en-US',
+      'EUR': 'de-DE',
+      'GBP': 'en-GB',
+      'INR': 'en-IN',
+      'JPY': 'ja-JP',
+      'CNY': 'zh-CN',
+      'AUD': 'en-AU',
+      'CAD': 'en-CA',
+      'SGD': 'en-SG',
+      'AED': 'ar-AE',
+    };
+    
+    const locale = localeMap[currency] || 'en-US';
+    
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch (error) {
+    // Fallback if currency code is not valid
+    return `${currency} ${amount.toFixed(2)}`;
+  }
+}
+
 
 export function formatRelativeTime(dateStr: string): string {
   if (!dateStr) return '';

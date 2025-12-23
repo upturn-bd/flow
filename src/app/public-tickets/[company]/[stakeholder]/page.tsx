@@ -12,7 +12,9 @@ import {
   Plus,
   ArrowLeft,
   User,
-  CurrencyDollar
+  CurrencyDollar,
+  Package,
+  Receipt
 } from "@phosphor-icons/react";
 import { captureError } from "@/lib/sentry";
 import { toast } from "sonner";
@@ -21,6 +23,8 @@ import PublicTicketForm from "./PublicTicketForm";
 import PublicTicketList from "./PublicTicketList";
 import StakeholderInfoPanel from "@/components/stakeholders/StakeholderInfoPanel";
 import PublicStakeholderTransactions from "@/components/stakeholders/PublicStakeholderTransactions";
+import PublicStakeholderServices from "@/components/stakeholders/PublicStakeholderServices";
+import PublicStakeholderInvoices from "@/components/stakeholders/PublicStakeholderInvoices";
 
 export default function PublicTicketsPage() {
   const params = useParams();
@@ -39,6 +43,8 @@ export default function PublicTicketsPage() {
     fetchPublicIssueCategories,
     getAttachmentUrl,
     fetchPublicTransactions,
+    fetchPublicServices,
+    fetchPublicInvoices,
   } = usePublicStakeholderAccess();
 
   const [categories, setCategories] = useState<StakeholderIssueCategory[]>([]);
@@ -47,21 +53,27 @@ export default function PublicTicketsPage() {
   const [showCodeModal, setShowCodeModal] = useState(!codeFromUrl);
   const [tickets, setTickets] = useState<StakeholderIssue[]>([]);
   const [transactions, setTransactions] = useState<Account[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+  const [invoices, setInvoices] = useState<any[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [activeTab, setActiveTab] = useState<"info" | "tickets" | "transactions">("tickets");
+  const [activeTab, setActiveTab] = useState<"info" | "tickets" | "transactions" | "services" | "invoices">("tickets");
+  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
 
   // Tab configuration
   const tabs = useMemo(() => [
     { key: "info", label: "Information", icon: <User size={16} /> },
     { key: "tickets", label: "Tickets", icon: <Ticket size={16} />, count: tickets.length },
     { key: "transactions", label: "Transactions", icon: <CurrencyDollar size={16} />, count: transactions.length },
-  ], [tickets.length, transactions.length]);
+    { key: "services", label: "Services", icon: <Package size={16} />, count: services.length },
+    { key: "invoices", label: "Invoices", icon: <Receipt size={16} />, count: invoices.length },
+  ], [tickets.length, transactions.length, services.length, invoices.length]);
 
   const handleTabChange = useCallback((key: string) => {
-    setActiveTab(key as "info" | "tickets" | "transactions");
+    setActiveTab(key as "info" | "tickets" | "transactions" | "services" | "invoices");
     setShowCreateForm(false);
+    setSelectedServiceId(null);
   }, []);
 
   const handleVerifyAccess = useCallback(async (code: string) => {
@@ -131,14 +143,47 @@ export default function PublicTicketsPage() {
     }
   }, [stakeholder?.id, fetchPublicTransactions]);
 
+  const loadServices = useCallback(async () => {
+    if (!stakeholder?.id) return;
+
+    try {
+      const fetchedServices = await fetchPublicServices(stakeholder.id);
+      setServices(fetchedServices);
+    } catch (err) {
+      captureError(err, { context: "Loading public services" });
+      toast.error("Failed to load services");
+    }
+  }, [stakeholder?.id, fetchPublicServices]);
+
+  const loadInvoices = useCallback(async (serviceId?: number) => {
+    if (!stakeholder?.id) return;
+
+    try {
+      const fetchedInvoices = await fetchPublicInvoices(stakeholder.id, serviceId);
+      setInvoices(fetchedInvoices);
+    } catch (err) {
+      captureError(err, { context: "Loading public invoices" });
+      toast.error("Failed to load invoices");
+    }
+  }, [stakeholder?.id, fetchPublicInvoices]);
+
   // Load tickets, transactions and categories when stakeholder is verified
   useEffect(() => {
     if (isVerified && stakeholder?.id) {
       loadTickets();
       loadTransactions();
       loadCategories();
+      loadServices();
+      loadInvoices();
     }
-  }, [isVerified, stakeholder?.id, loadTickets, loadTransactions, loadCategories]);
+  }, [isVerified, stakeholder?.id, loadTickets, loadTransactions, loadCategories, loadServices, loadInvoices]);
+
+  // Handler for viewing invoices from a specific service
+  const handleViewServiceInvoices = useCallback((serviceId: number) => {
+    setSelectedServiceId(serviceId);
+    loadInvoices(serviceId);
+    setActiveTab("invoices");
+  }, [loadInvoices]);
 
   const handleCreateTicket = async (data: any) => {
     if (!stakeholder?.id || !stakeholder?.company_id) return;
@@ -286,12 +331,33 @@ export default function PublicTicketsPage() {
               />
             )}
           </>
-        ) : (
+        ) : activeTab === "transactions" ? (
           // Transactions Tab
           <PublicStakeholderTransactions
             transactions={transactions}
             loading={loading}
             stakeholderName={stakeholder?.name || ""}
+          />
+        ) : activeTab === "services" ? (
+          // Services Tab
+          <PublicStakeholderServices
+            services={services}
+            loading={loading}
+            stakeholderName={stakeholder?.name || ""}
+            onViewInvoices={handleViewServiceInvoices}
+          />
+        ) : (
+          // Invoices Tab
+          <PublicStakeholderInvoices
+            invoices={invoices}
+            loading={loading}
+            stakeholderName={stakeholder?.name || ""}
+            serviceId={selectedServiceId || undefined}
+            onBack={selectedServiceId ? () => {
+              setSelectedServiceId(null);
+              loadInvoices();
+              setActiveTab("services");
+            } : undefined}
           />
         )}
       </div>
