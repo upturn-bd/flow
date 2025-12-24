@@ -1,4 +1,4 @@
-// /app/ops/layout.tsx
+// /app/(home)/ops/layout.tsx
 "use client";
 
 import Link from "next/link";
