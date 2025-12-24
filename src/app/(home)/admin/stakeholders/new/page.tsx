@@ -8,6 +8,7 @@ import { useStakeholderTypes } from "@/hooks/useStakeholderTypes";
 import { ArrowLeft, WarningCircle, Plus, TrashSimple } from "@phosphor-icons/react";
 import { ContactPerson } from "@/lib/types/schemas";
 import { FormField, TextAreaField, SelectField, ToggleField } from "@/components/forms";
+import { AdminBreadcrumbs } from "@/components/admin/AdminBreadcrumbs";
 
 export default function NewStakeholderPage() {
   const router = useRouter();
@@ -156,6 +157,13 @@ export default function NewStakeholderPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
+      {/* Breadcrumbs */}
+      <AdminBreadcrumbs 
+        section="Company Logs"
+        pageName="Add New Lead"
+        icon={<Plus className="w-4 h-4" />}
+      />
+      
       {/* Header */}
       <button
         onClick={() => router.back()}

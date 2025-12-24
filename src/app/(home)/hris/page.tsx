@@ -168,11 +168,11 @@ function ProfileContent() {
           </p>
         </div>
         <a
-          href="/home/finder"
+          href="/ops/hris"
           className="flex items-center text-indigo-600 hover:text-indigo-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
-          Back to Employee Finder
+          Back
         </a>
       </div>
     );
@@ -193,11 +193,11 @@ function ProfileContent() {
           className="mb-6"
         >
           <Link
-            href="/finder"
+            href="/ops/hris"
             className="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
-            Back to Employee Finder
+            Back
           </Link>
         </motion.div>
       )}

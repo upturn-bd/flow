@@ -65,7 +65,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     // Set color scheme data attribute
     root.setAttribute('data-color-scheme', colorScheme);
     
-    // FloppyDisk to localStorage
+    // Save to localStorage
     localStorage.setItem('theme-mode', mode);
     localStorage.setItem('color-scheme', colorScheme);
   }, [mode, colorScheme, mounted]);

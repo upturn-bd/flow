@@ -268,7 +268,7 @@ export default function TeamDetailPage() {
     setPermissionsDirty(false);
   };
 
-  // FloppyDisk team details
+  // Save team details
   const saveTeamDetails = async () => {
     if (!editedTeam.name.trim()) {
       toast.error("Team name is required");
@@ -478,7 +478,7 @@ export default function TeamDetailPage() {
                   className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
                 >
                   {savingTeam ? <InlineSpinner size="sm" color="white" /> : <Check size={16} weight="bold" />}
-                  FloppyDisk
+                  Save
                 </button>
               </div>
             </div>
@@ -613,7 +613,7 @@ export default function TeamDetailPage() {
               ) : (
                 <>
                   <FloppyDisk size={16} weight="bold" />
-                  FloppyDisk Permissions
+                  Save Permissions
                 </>
               )}
             </button>

@@ -139,7 +139,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
       // FunnelSimple out empty adjustments
       const validAdjustments = adjustments.filter(adj => adj.type.trim() && adj.amount !== 0);
       
-      const status = 'Published'; // FloppyDisk adjustments and publish
+      const status = 'Published'; // Save adjustments and publish
       await updatePayrollStatus(editingPayroll, status, validAdjustments);
       
       setEditingPayroll(null);
@@ -437,7 +437,7 @@ export default function PayrollHistoryPage({ statusFilter }: PayrollHistoryProps
                               ) : (
                                 <>
                                   <FloppyDisk className="h-3 w-3 mr-1" />
-                                  FloppyDisk & Publish
+                                  Save & Publish
                                 </>
                               )}
                             </button>

@@ -3,14 +3,29 @@
 
 import { AdminDataProvider } from "@/contexts/AdminDataContext";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // Hook to get the current URL
-import { House, CaretRight, Gear } from "@phosphor-icons/react";
+import { usePathname } from "next/navigation";
+import { CaretRight, Gear } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
+import { ADMIN_CONFIG_ITEMS } from "@/lib/constants/navigation";
 
-// Helper function to capitalize and format the path segment
-const formatSegment = (segment: string) => {
+// Page title mapping for better display names
+const PAGE_TITLES: Record<string, string> = {
+    basic: "Basic Settings",
+    advanced: "Advanced Settings",
+    payroll: "Payroll Configuration",
+    teams: "Teams & Permissions",
+    transaction: "Transaction Configuration",
+    "stakeholder-process": "Stakeholder Process",
+};
+
+// Helper function to format path segment for display
+const formatSegment = (segment: string): string => {
     if (!segment) return "";
-    // Replace hyphens/underscores with spaces and capitalize each word
+    // Check if we have a custom title
+    if (PAGE_TITLES[segment]) {
+        return PAGE_TITLES[segment];
+    }
+    // Otherwise, format by replacing hyphens/underscores with spaces and capitalizing
     return segment
         .split(/[-_]/)
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -19,40 +34,39 @@ const formatSegment = (segment: string) => {
 
 const ConfigurationBreadcrumbs = () => {
     const pathname = usePathname();
-    const pathSegments = pathname.split('/').filter(segment => segment); // Split and remove empty strings
-
-    // The complete base path for configurations, including House
-    const baseBreadcrumbs = [
-        // Added House back for the start of the trail
-        { href: "/admin", label: "Admin Management" },
-        // This is the item that was being excluded by the old logic:
-        { href: "/admin", label: "Company Configurations" }, 
-    ];
+    const pathSegments = pathname.split('/').filter(segment => segment);
     
-    // The current page is the last segment of the path
-    const currentSegment = pathSegments[pathSegments.length - 1];
-    // Example: /basic -> Basic Gear
-    const currentPageLabel = formatSegment(currentSegment) + " Gear";
+    // Find the config section (basic, advanced, etc.)
+    const configIndex = pathSegments.indexOf('config');
+    const configSection = configIndex !== -1 && pathSegments[configIndex + 1] 
+        ? pathSegments[configIndex + 1] 
+        : null;
+    
+    // Check if we're in a nested route (e.g., /admin/config/stakeholder-process/[id])
+    const isNestedRoute = configIndex !== -1 && pathSegments.length > configIndex + 2;
+    const nestedId = isNestedRoute ? pathSegments[pathSegments.length - 1] : null;
+    
+    // Find the navigation item to get proper title
+    const navItem = ADMIN_CONFIG_ITEMS.find(item => 
+        item.path.includes(configSection || '')
+    );
+    
+    const baseBreadcrumbs = [
+        { href: "/admin", label: "Admin Management" },
+        { href: "/admin", label: "Company Configurations" },
+    ];
     
     return (
         <nav className="flex mb-6 text-sm font-medium text-foreground-tertiary" aria-label="Breadcrumb">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
-                
-                {/* 1. Render Base Breadcrumbs (House, Admin Management, Company Configurations) */}
+                {/* Base Breadcrumbs */}
                 {baseBreadcrumbs.map((item, index) => (
                     <li key={index} className="inline-flex items-center">
-                        {/* Corrected Logic: 
-                            - Always show the link.
-                            - Only show the CaretRight separator for items after the first one (i.e., index > 0). 
-                        */}
                         <div className="flex items-center">
-                            {/* Check if it's not the first item to render the separator */}
                             {index > 0 && <CaretRight className="w-4 h-4 text-foreground-tertiary" />}
-                            
                             <Link 
                                 href={item.href} 
-                                // Adjust margin for items after House
-                                className={`ml-1 ${index > 0 ? 'md:ml-3' : 'md:ml-0'} text-foreground-tertiary hover:text-blue-600 transition-colors inline-flex items-center`}
+                                className={`${index > 0 ? 'ml-1 md:ml-3' : ''} text-foreground-secondary hover:text-primary-600 transition-colors`}
                             >
                                 {item.label}
                             </Link>
@@ -60,16 +74,43 @@ const ConfigurationBreadcrumbs = () => {
                     </li>
                 ))}
                 
-                {/* 2. Current Active Page */}
-                <li aria-current="page">
-                    <div className="flex items-center">
-                        <CaretRight className="w-4 h-4 text-foreground-tertiary" />
-                        <span className="ml-1 text-blue-600 md:ml-3 flex items-center">
-                            <Gear className="w-4 h-4 mr-1.5" />
-                            {currentPageLabel}
-                        </span>
-                    </div>
-                </li>
+                {/* Current Configuration Page */}
+                {configSection && !isNestedRoute && (
+                    <li aria-current="page">
+                        <div className="flex items-center">
+                            <CaretRight className="w-4 h-4 text-foreground-tertiary" />
+                            <span className="ml-1 text-primary-600 md:ml-3 flex items-center font-semibold">
+                                <Gear className="w-4 h-4 mr-1.5" />
+                                {navItem?.name || formatSegment(configSection)}
+                            </span>
+                        </div>
+                    </li>
+                )}
+                
+                {/* Nested Route Breadcrumbs (e.g., specific stakeholder process) */}
+                {configSection && isNestedRoute && (
+                    <>
+                        <li>
+                            <div className="flex items-center">
+                                <CaretRight className="w-4 h-4 text-foreground-tertiary" />
+                                <Link 
+                                    href={`/admin/config/${configSection}`}
+                                    className="ml-1 md:ml-3 text-foreground-secondary hover:text-primary-600 transition-colors"
+                                >
+                                    {navItem?.name || formatSegment(configSection)}
+                                </Link>
+                            </div>
+                        </li>
+                        <li aria-current="page">
+                            <div className="flex items-center">
+                                <CaretRight className="w-4 h-4 text-foreground-tertiary" />
+                                <span className="ml-1 text-primary-600 md:ml-3 flex items-center font-semibold">
+                                    {nestedId === 'new' ? 'New' : `Details`}
+                                </span>
+                            </div>
+                        </li>
+                    </>
+                )}
             </ol>
         </nav>
     );

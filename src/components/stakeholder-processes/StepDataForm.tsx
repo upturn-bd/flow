@@ -1298,7 +1298,7 @@ export default function StepDataForm({
                 disabled={submitting || rejecting}
                 className="w-full sm:w-auto px-4 py-2 text-sm border border-primary-300 text-primary-700 rounded-lg hover:bg-primary-50"
               >
-                FloppyDisk Draft
+                Save Draft
               </button>
             )}
             <button

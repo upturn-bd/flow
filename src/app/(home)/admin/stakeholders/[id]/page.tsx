@@ -18,6 +18,7 @@ import AdditionalDataModal from "@/components/stakeholders/AdditionalDataModal";
 import PublicAccessSection from "@/components/stakeholders/PublicAccessSection";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { AdminBreadcrumbs } from "@/components/admin/AdminBreadcrumbs";
 import { toast } from "sonner";
 
 // Helper to convert programming values to human-readable labels
@@ -332,6 +333,13 @@ export default function StakeholderDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+      {/* Breadcrumbs */}
+      <AdminBreadcrumbs 
+        section="Company Logs"
+        pageName={stakeholder.name}
+        icon={<User className="w-4 h-4" />}
+      />
+      
       {/* Header */}
       <div>
         <button
