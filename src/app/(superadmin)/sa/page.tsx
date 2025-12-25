@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { ChartBar, Buildings, Users, GlobeHemisphereWest, Factory, Warning as Warning, ArrowRight, Clock, CheckCircle, DeviceMobile, UsersThree } from "@phosphor-icons/react";
+import { ChartBar, Buildings, Users, GlobeHemisphereWest, Factory, Warning as Warning, ArrowRight, Clock, CheckCircle, DeviceMobile, UsersThree, Plus } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { StatCard, StatCardGrid, EmptyState } from "@/components/ui";
 
@@ -97,13 +97,13 @@ export default function SuperadminDashboard() {
                 .select("id", { count: "exact", head: true })
                 .eq("company_id", company.id),
             ]);
-            
+
             // Get pending devices for this company by joining through employees
             const { data: companyEmployees } = await supabase
               .from("employees")
               .select("id")
               .eq("company_id", company.id);
-            
+
             let pendingDeviceCount = 0;
             if (companyEmployees && companyEmployees.length > 0) {
               const employeeIds = companyEmployees.map(e => e.id);
@@ -114,7 +114,7 @@ export default function SuperadminDashboard() {
                 .in("user_id", employeeIds);
               pendingDeviceCount = count || 0;
             }
-            
+
             return {
               ...company,
               employee_count: employeeResult.count || 0,
@@ -132,11 +132,18 @@ export default function SuperadminDashboard() {
 
   const quickActions = [
     {
+      label: "Create Company",
+      description: "Launch the new company wizard",
+      icon: Plus,
+      href: "/sa/companies?action=create",
+      color: "blue",
+    },
+    {
       label: "Manage Companies",
-      description: "View, create, and edit companies",
+      description: "View and edit existing companies",
       icon: Buildings,
       href: "/sa/companies",
-      color: "blue",
+      color: "slate",
     },
     {
       label: "Manage Devices",
@@ -192,7 +199,7 @@ export default function SuperadminDashboard() {
           <h1 className="text-3xl font-bold text-foreground-primary">Dashboard</h1>
           <p className="text-foreground-secondary mt-1">Platform overview and management</p>
         </div>
-        
+
         {(stats.pendingApprovals > 0 || stats.pendingDevices > 0) && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -317,7 +324,7 @@ export default function SuperadminDashboard() {
               Manage
             </Link>
           </div>
-          
+
           {loading ? (
             <div className="p-5 space-y-3">
               {[...Array(5)].map((_, i) => (

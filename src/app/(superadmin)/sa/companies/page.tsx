@@ -31,6 +31,9 @@ export default function CompaniesPage() {
 
     has_division: false,
     max_users: 50,
+    pay_frequency: "monthly",
+    file_size_limit_mb: 10,
+    max_device_limit: 3,
   });
   const [codeError, setCodeError] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
@@ -81,6 +84,15 @@ export default function CompaniesPage() {
 
   useEffect(() => {
     fetchData();
+
+    // Handle action=create query param
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'create') {
+      resetForm();
+      setShowModal(true);
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
   }, [fetchData]);
 
   const validateCode = (code: string): string => {
@@ -122,6 +134,9 @@ export default function CompaniesPage() {
 
         has_division: formData.has_division,
         max_users: formData.max_users,
+        pay_frequency: formData.pay_frequency,
+        file_size_limit_mb: formData.file_size_limit_mb,
+        max_device_limit: formData.max_device_limit,
       };
 
       if (editingCompany) {
@@ -175,6 +190,9 @@ export default function CompaniesPage() {
 
       has_division: company.has_division || false,
       max_users: company.max_users || 50,
+      pay_frequency: company.pay_frequency || "monthly",
+      file_size_limit_mb: company.file_size_limit_mb || 10,
+      max_device_limit: company.max_device_limit || 3,
     });
     setShowModal(true);
   };
@@ -193,6 +211,9 @@ export default function CompaniesPage() {
 
       has_division: false,
       max_users: 50,
+      pay_frequency: "monthly",
+      file_size_limit_mb: 10,
+      max_device_limit: 3,
     });
     setCodeError("");
   };
@@ -644,6 +665,41 @@ export default function CompaniesPage() {
             onChange={(e) => {
               const val = parseInt(e.target.value);
               setFormData({ ...formData, max_users: isNaN(val) ? 0 : val });
+            }}
+          />
+
+          <SelectField
+            label="Pay Frequency"
+            required
+            value={formData.pay_frequency}
+            onChange={(e) => setFormData({ ...formData, pay_frequency: e.target.value })}
+            options={[
+              { value: "monthly", label: "Monthly" },
+              { value: "weekly", label: "Weekly" },
+              { value: "bi-weekly", label: "Bi-Weekly" },
+              { value: "daily", label: "Daily" }
+            ]}
+          />
+
+          <NumberField
+            name="file_size_limit_mb"
+            label="File Size Limit (MB)"
+            min={1}
+            value={formData.file_size_limit_mb}
+            onChange={(e) => {
+              const val = parseInt(e.target.value);
+              setFormData({ ...formData, file_size_limit_mb: isNaN(val) ? 0 : val });
+            }}
+          />
+
+          <NumberField
+            name="max_device_limit"
+            label="Max Device Limit"
+            min={1}
+            value={formData.max_device_limit}
+            onChange={(e) => {
+              const val = parseInt(e.target.value);
+              setFormData({ ...formData, max_device_limit: isNaN(val) ? 0 : val });
             }}
           />
         </div>

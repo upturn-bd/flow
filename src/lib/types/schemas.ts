@@ -968,6 +968,8 @@ export interface Company {
   fiscal_year_start?: string;
   live_payroll_enabled?: boolean;
   has_division?: boolean;
+  pay_frequency?: string;
+  file_size_limit_mb?: number;
   max_device_limit?: number;
   max_users?: number;
   created_at?: string;
