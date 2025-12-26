@@ -48,6 +48,7 @@ import { Button } from "@/components/ui/button";
 import BaseModal from "@/components/ui/modals/BaseModal";
 import FormModal from "@/components/ui/modals/FormModal";
 import FormInputField from "@/components/ui/FormInputField";
+import { AdminBreadcrumbs } from "@/components/admin/AdminBreadcrumbs";
 import FormSelectField from "@/components/ui/FormSelectField";
 import FormNumberField from "@/components/ui/FormNumberField";
 import ServiceLineItemsEditor, {
@@ -412,6 +413,13 @@ export default function ServiceTemplatesPage() {
       animate="visible"
       className="p-4 sm:p-6 lg:p-8 space-y-6"
     >
+      {/* Breadcrumbs */}
+      <AdminBreadcrumbs 
+        section="Company Configurations"
+        pageName="Service Templates"
+        icon={<FileText className="w-4 h-4" />}
+      />
+      
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

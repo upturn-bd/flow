@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, FloppyDisk } from "@phosphor-icons/react";
+import { X, Save } from "@phosphor-icons/react";
 import { TeamWithPermissions, TeamPermission, PermissionCategory, Permission } from '@/lib/types';
 import { supabase } from '@/lib/supabase/client';
 import { useTeams } from '@/hooks/useTeams';

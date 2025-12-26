@@ -11,6 +11,7 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { ModulePermissionsBanner, PermissionTooltip } from "@/components/permissions";
 import { PERMISSION_MODULES } from "@/lib/constants";
 import { PageHeader, SearchBar, StatCard, StatCardGrid, EmptyState, InlineSpinner } from "@/components/ui";
+import { AdminBreadcrumbs } from "@/components/admin/AdminBreadcrumbs";
 
 export default function StakeholdersPage() {
   const router = useRouter();
@@ -100,6 +101,13 @@ export default function StakeholdersPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+      {/* Breadcrumbs */}
+      <AdminBreadcrumbs 
+        section="Company Logs"
+        pageName="Stakeholders"
+        icon={<Building className="w-4 h-4" />}
+      />
+      
       {/* Header */}
       <PageHeader
         title="Stakeholders & Leads"

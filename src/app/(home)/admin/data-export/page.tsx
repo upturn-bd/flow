@@ -21,6 +21,7 @@ import {
 } from "@/lib/utils/csv-export";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
+import { AdminBreadcrumbs } from "@/components/admin/AdminBreadcrumbs";
 
 type ExportType = "employees" | "stakeholders" | "projects" | "tasks" | "leaves" | "attendance";
 
@@ -452,6 +453,13 @@ export default function DataExportPage() {
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6">
+      {/* Breadcrumbs */}
+      <AdminBreadcrumbs 
+        section="Company Configurations"
+        pageName="Data Export"
+        icon={<Download className="w-4 h-4" />}
+      />
+      
       {/* Header */}
       <motion.div
         initial="hidden"

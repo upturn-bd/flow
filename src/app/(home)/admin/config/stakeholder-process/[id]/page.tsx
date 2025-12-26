@@ -15,7 +15,6 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
 
   const {
     fetchProcessById,
-    fetchProcessSteps,
     createProcessStep,
     updateProcessStep,
     deleteProcessStep,

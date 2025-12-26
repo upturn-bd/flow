@@ -269,7 +269,7 @@ export default function LineageCreateModal({
               }
               className="bg-primary-600 hover:bg-primary-700 text-white"
             >
-              FloppyDisk
+              Save
             </Button>
           </motion.div>
         </motion.div>
@@ -562,7 +562,7 @@ export function LineageUpdateModal({
               }
               className="bg-primary-600 hover:bg-primary-700 text-white"
             >
-              FloppyDisk
+              Save
             </Button>
           </motion.div>
         </motion.div>

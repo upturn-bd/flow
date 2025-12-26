@@ -56,7 +56,7 @@ export default function NoticesSection({
     setReadNotices(prev => new Set(prev).add(noticeId));
     const readNoticesSet = new Set(readNotices);
     readNoticesSet.add(noticeId);
-    // FloppyDisk updated read notices to localStorage
+    // Save updated read notices to localStorage
     localStorage.setItem('readNotices', JSON.stringify(Array.from(readNoticesSet)));
     onNoticeClick(noticeId);
   };

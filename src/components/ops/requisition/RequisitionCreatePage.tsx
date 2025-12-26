@@ -97,7 +97,7 @@ function saveDraftToLocalStorage(
     parsedDrafts.push(draftToSave);
   }
 
-  // FloppyDisk back to localStorage
+  // Save back to localStorage
   localStorage.setItem("requisition-drafts", JSON.stringify(parsedDrafts));
 }
 

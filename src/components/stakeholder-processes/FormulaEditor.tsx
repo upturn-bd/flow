@@ -308,7 +308,7 @@ export default function FormulaEditor({
     ));
   };
 
-  // FloppyDisk and restore cursor position
+  // Save and restore cursor position
   const saveCursorPosition = (element: HTMLElement) => {
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return null;
@@ -862,7 +862,7 @@ export default function FormulaEditor({
         )}
       </div>
 
-      {/* FloppyDisk Button */}
+      {/* Save Button */}
       <div className="flex justify-end gap-2 pt-2 border-t border-border-primary">
         {onClose && (
           <button
@@ -879,7 +879,7 @@ export default function FormulaEditor({
           disabled={!elementsToFormula(elements).trim()}
           className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          FloppyDisk Formula
+          Save Formula
         </button>
       </div>
     </div>

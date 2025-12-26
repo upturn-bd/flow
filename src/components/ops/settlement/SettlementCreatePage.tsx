@@ -369,7 +369,7 @@ export default function SettlementCreatePage({ onClose, setActiveTab }: Settleme
             className="flex items-center gap-2"
           >
             <FileText size={16} />
-            FloppyDisk as Draft
+            Save as Draft
           </Button>
 
           {/* Right side */}

@@ -140,7 +140,7 @@ export default function TeamsManagementPage() {
     setEditingTeam(null);
   };
 
-  // FloppyDisk team changes
+  // Save team changes
   const saveTeamChanges = async () => {
     if (!editingTeam) return;
 
@@ -449,7 +449,7 @@ export default function TeamsManagementPage() {
                             ) : (
                               <Check size={16} weight="bold" />
                             )}
-                            FloppyDisk
+                            Save
                           </button>
                         </div>
                       </div>
