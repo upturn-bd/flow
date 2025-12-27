@@ -6,6 +6,12 @@ import { UserPlus, User, Building, Check, X, ArrowsClockwise, DeviceMobile, Cale
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase/client";
 import { PageHeader, EmptyState, InlineSpinner } from "@/components/ui";
+import { TextAreaField } from "@/components/forms";
+
+// Constants
+const POLLING_INTERVAL_MS = 30000; // 30 seconds
+const DESKTOP_MODEL_NAME = 'Desktop Computer';
+const NOT_APPLICABLE_SUPERVISOR = 'Not Applicable';
 
 interface PendingDevice {
   id: string;
@@ -42,16 +48,6 @@ interface PendingEmployee {
   } | null;
   pending_device?: PendingDevice | null;
 }
-
-const Textarea = ({
-  className,
-  ...props
-}: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
-  <textarea
-    className={`w-full p-3 text-sm border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors bg-surface-primary text-foreground-primary placeholder:text-foreground-tertiary ${className}`}
-    {...props}
-  />
-);
 
 export default function SAOnboardingPage() {
   const [loading, setLoading] = useState(true);
@@ -120,7 +116,7 @@ export default function SAOnboardingPage() {
     fetchPendingEmployees();
 
     // Set up polling for updates
-    const intervalId = setInterval(fetchPendingEmployees, 30000);
+    const intervalId = setInterval(fetchPendingEmployees, POLLING_INTERVAL_MS);
     return () => clearInterval(intervalId);
   }, [fetchPendingEmployees]);
 
@@ -165,7 +161,7 @@ export default function SAOnboardingPage() {
       }
 
       // If accepted and has supervisor, add to supervisor_employees
-      if (action === "ACCEPTED" && updateData.supervisor_id && updateData.supervisor_id !== "Not Applicable") {
+      if (action === "ACCEPTED" && updateData.supervisor_id && updateData.supervisor_id !== NOT_APPLICABLE_SUPERVISOR) {
         const { error: supervisorError } = await supabase
           .from("supervisor_employees")
           .insert({
@@ -361,7 +357,7 @@ export default function SAOnboardingPage() {
                           <span className="font-medium text-foreground-secondary capitalize">{emp.pending_device.device_type}</span>
                         </div>
                       )}
-                      {emp.pending_device.model && emp.pending_device.model !== 'Desktop Computer' && (
+                      {emp.pending_device.model && emp.pending_device.model !== DESKTOP_MODEL_NAME && (
                         <div>
                           <span className="text-foreground-tertiary">Model: </span>
                           <span className="font-medium text-foreground-secondary">{emp.pending_device.model}</span>
@@ -371,11 +367,13 @@ export default function SAOnboardingPage() {
                   </div>
                 )}
 
-                <Textarea
+                <TextAreaField
+                  label=""
                   placeholder="Reason for rejection (required if rejecting)"
                   value={rejectionReasons[emp.id] || ""}
                   onChange={(e) => handleInputChange(emp.id, e.target.value)}
                   rows={2}
+                  containerClassName="mb-0"
                 />
 
                 <div className="flex gap-3 justify-end">
