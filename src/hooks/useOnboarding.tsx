@@ -314,21 +314,7 @@ export function useOnboarding() {
         }
       }
 
-      // If accepted and has supervisor, add to supervisor_employees
-      if (action === "ACCEPTED" && updateData.supervisor_id && updateData.supervisor_id !== "Not Applicable") {
-        const { error: supervisorError } = await supabase
-          .from("supervisor_employees")
-          .insert({
-            supervisor_id: updateData.supervisor_id,
-            employee_id: employeeId,
-            company_id: updateData.company_id,
-          });
-
-        if (supervisorError) {
-          console.error("Error adding supervisor relationship:", supervisorError);
-          // Don't throw here as the main action succeeded
-        }
-      }
+      // Note: supervisor relationship is now stored directly in employees.supervisor_id (FK)
 
       // Remove from pending list in local state
       setPendingEmployees(prev => prev.filter(emp => emp.id !== employeeId));

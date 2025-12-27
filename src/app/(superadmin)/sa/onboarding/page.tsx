@@ -75,13 +75,32 @@ export default function SAOnboardingPage() {
           has_approval,
           rejection_reason,
           company:companies!inner(name),
-          department:departments(name),
-          supervisor:employees!employees_supervisor_id_fkey(first_name, last_name)
+          department:departments!employees_department_id_fkey(name)
         `)
         .eq("has_approval", "PENDING")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
+
+      // Get unique supervisor IDs to fetch their names
+      const supervisorIds = [...new Set(
+        (data || [])
+          .map((emp: any) => emp.supervisor_id)
+          .filter((id: string | null) => id && id !== NOT_APPLICABLE_SUPERVISOR)
+      )];
+
+      // Fetch supervisor names if there are any
+      const supervisorMap = new Map<string, { first_name: string; last_name: string }>();
+      if (supervisorIds.length > 0) {
+        const { data: supervisors } = await supabase
+          .from("employees")
+          .select("id, first_name, last_name")
+          .in("id", supervisorIds);
+
+        supervisors?.forEach((sup: any) => {
+          supervisorMap.set(sup.id, { first_name: sup.first_name, last_name: sup.last_name });
+        });
+      }
 
       // Fetch pending device info for each employee and normalize the data
       const employeesWithDevices = await Promise.all(
@@ -93,11 +112,15 @@ export default function SAOnboardingPage() {
             .eq("status", "pending")
             .maybeSingle();
 
+          const supervisor = emp.supervisor_id && emp.supervisor_id !== NOT_APPLICABLE_SUPERVISOR
+            ? supervisorMap.get(emp.supervisor_id) || null
+            : null;
+
           return {
             ...emp,
             company: Array.isArray(emp.company) ? emp.company[0] : emp.company,
             department: Array.isArray(emp.department) ? emp.department[0] : emp.department,
-            supervisor: Array.isArray(emp.supervisor) ? emp.supervisor[0] : emp.supervisor,
+            supervisor,
             pending_device: deviceData || null
           };
         })
@@ -160,20 +183,7 @@ export default function SAOnboardingPage() {
         }
       }
 
-      // If accepted and has supervisor, add to supervisor_employees
-      if (action === "ACCEPTED" && updateData.supervisor_id && updateData.supervisor_id !== NOT_APPLICABLE_SUPERVISOR) {
-        const { error: supervisorError } = await supabase
-          .from("supervisor_employees")
-          .insert({
-            supervisor_id: updateData.supervisor_id,
-            employee_id: id,
-            company_id: updateData.company_id,
-          });
-
-        if (supervisorError) {
-          console.error("Error adding supervisor relationship:", supervisorError);
-        }
-      }
+      // Note: supervisor relationship is now stored directly in employees.supervisor_id (FK)
 
       toast.success(`Employee ${action.toLowerCase()} successfully`);
       
@@ -195,7 +205,7 @@ export default function SAOnboardingPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-100">
         <div className="text-center">
           <InlineSpinner size="xl" color="primary" className="mb-4" />
           <p className="text-foreground-tertiary">Loading onboarding requests...</p>
