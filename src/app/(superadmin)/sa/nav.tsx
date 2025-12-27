@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Buildings, GlobeHemisphereWest, Factory, Users, UserGear, House as House, SignOut, X, List, DeviceMobile } from "@phosphor-icons/react";
+import { Buildings, GlobeHemisphereWest, Factory, Users, UserGear, House as House, SignOut, X, List, DeviceMobile, UserPlus } from "@phosphor-icons/react";
 import { ROUTES } from "@/lib/constants";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -22,6 +22,11 @@ const navItems = [
     label: "Devices",
     href: ROUTES.SUPERADMIN.DEVICES,
     icon: DeviceMobile,
+  },
+  {
+    label: "Onboarding",
+    href: ROUTES.SUPERADMIN.ONBOARDING,
+    icon: UserPlus,
   },
   {
     label: "Countries",
