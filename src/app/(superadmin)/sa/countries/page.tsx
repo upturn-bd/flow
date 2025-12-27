@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { captureSupabaseError } from "@/lib/sentry";
 import type { Country } from "@/lib/types/schemas";
-import { Plus, Pencil, TrashSimple, GlobeHemisphereWest, Buildings, Check, X } from "@phosphor-icons/react";
+import { Plus, Pencil, GlobeHemisphereWest, Buildings } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, SearchBar, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
@@ -49,7 +50,7 @@ export default function CountriesPage() {
         setCountryStats(stats);
       }
     } catch (error) {
-      console.error("Error fetching countries:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchCountries");
       toast.error("Failed to fetch countries");
     } finally {
       setLoading(false);
@@ -86,7 +87,7 @@ export default function CountriesPage() {
       setFormData({ name: "" });
       fetchData();
     } catch (error) {
-      console.error("Error saving country:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, editingCountry ? "updateCountry" : "createCountry");
       toast.error("Failed to save country");
     } finally {
       setSaving(false);
@@ -111,7 +112,7 @@ export default function CountriesPage() {
       ));
       toast.success("Country updated");
     } catch (error) {
-      console.error("Error updating country:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "updateCountryInline", { countryId: country.id });
       toast.error("Failed to update country");
     } finally {
       setInlineEditing(null);
@@ -126,7 +127,7 @@ export default function CountriesPage() {
       setDeleteConfirm(null);
       fetchData();
     } catch (error) {
-      console.error("Error deleting country:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "deleteCountry", { countryId: id });
       toast.error("Failed to delete country. It may be in use by companies.");
     }
   };
@@ -288,7 +289,7 @@ export default function CountriesPage() {
           setFormData({ name: "" });
         }}
         onSubmit={handleSubmit}
-        title={editingCountry ? "PencilSimple Country" : "Add Country"}
+        title={editingCountry ? "Edit Country" : "Add Country"}
         subtitle={editingCountry ? "Update country name" : "Add a new country"}
         icon={GlobeHemisphereWest}
         colorScheme="emerald"

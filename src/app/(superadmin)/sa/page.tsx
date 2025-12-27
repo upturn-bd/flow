@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { captureSupabaseError } from "@/lib/sentry";
 import { ChartBar, Buildings, Users, GlobeHemisphereWest, Factory, Warning as Warning, ArrowRight, Clock, CheckCircle, DeviceMobile, UsersThree, Plus } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { StatCard, StatCardGrid, EmptyState } from "@/components/ui";
@@ -36,11 +37,50 @@ export default function SuperadminDashboard() {
   });
   const [companyStats, setCompanyStats] = useState<CompanyStats[]>([]);
   const [loading, setLoading] = useState(true);
+  const [systemStatus, setSystemStatus] = useState({
+    database: { status: "loading" as "connected" | "error" | "loading", message: "Checking..." },
+    auth: { status: "loading" as "connected" | "error" | "loading", message: "Checking..." },
+  });
 
   useEffect(() => {
     fetchStats();
     fetchCompanyStats();
+    checkSystemStatus();
   }, []);
+
+  const checkSystemStatus = async () => {
+    // Check database connection by trying a simple query
+    try {
+      const { error: dbError } = await supabase.from("companies").select("id", { count: "exact", head: true });
+      setSystemStatus(prev => ({
+        ...prev,
+        database: dbError 
+          ? { status: "error", message: "Connection issue" }
+          : { status: "connected", message: "Connected" }
+      }));
+    } catch {
+      setSystemStatus(prev => ({
+        ...prev,
+        database: { status: "error", message: "Connection failed" }
+      }));
+    }
+
+    // Check auth by getting current session
+    try {
+      const { error: authError } = await supabase.auth.getSession();
+      setSystemStatus(prev => ({
+        ...prev,
+        auth: authError 
+          ? { status: "error", message: "Auth issue" }
+          : { status: "connected", message: "Active" }
+      }));
+    } catch {
+      setSystemStatus(prev => ({
+        ...prev,
+        auth: { status: "error", message: "Auth unavailable" }
+      }));
+    }
+  };
 
   const fetchStats = async () => {
     setLoading(true);
@@ -70,7 +110,7 @@ export default function SuperadminDashboard() {
         pendingDevices: pendingDevicesResult.count || 0,
       });
     } catch (error) {
-      console.error("Error fetching stats:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchDashboardStats");
     } finally {
       setLoading(false);
     }
@@ -126,7 +166,7 @@ export default function SuperadminDashboard() {
         setCompanyStats(companiesWithCounts);
       }
     } catch (error) {
-      console.error("Error fetching company stats:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchCompanyStats");
     }
   };
 
@@ -383,26 +423,75 @@ export default function SuperadminDashboard() {
         <div className="p-5 border-b border-border-primary">
           <h2 className="text-lg font-semibold text-foreground-primary">System Status</h2>
         </div>
-        <div className="p-5 grid sm:grid-cols-3 gap-4">
-          <div className="flex items-center gap-3 p-3 bg-success/10 rounded-lg border border-success/30">
-            <CheckCircle size={24} weight="fill" className="text-success" />
+        <div className="p-5 grid sm:grid-cols-2 gap-4">
+          <div className={`flex items-center gap-3 p-3 rounded-lg border ${
+            systemStatus.database.status === "connected" 
+              ? "bg-success/10 border-success/30" 
+              : systemStatus.database.status === "error"
+              ? "bg-error/10 border-error/30"
+              : "bg-background-tertiary border-border-primary"
+          }`}>
+            <CheckCircle 
+              size={24} 
+              weight="fill" 
+              className={
+                systemStatus.database.status === "connected" 
+                  ? "text-success" 
+                  : systemStatus.database.status === "error"
+                  ? "text-error"
+                  : "text-foreground-tertiary animate-pulse"
+              } 
+            />
             <div>
-              <p className="font-medium text-success">Database</p>
-              <p className="text-sm text-success/80">Connected</p>
+              <p className={`font-medium ${
+                systemStatus.database.status === "connected" 
+                  ? "text-success" 
+                  : systemStatus.database.status === "error"
+                  ? "text-error"
+                  : "text-foreground-secondary"
+              }`}>Database</p>
+              <p className={`text-sm ${
+                systemStatus.database.status === "connected" 
+                  ? "text-success/80" 
+                  : systemStatus.database.status === "error"
+                  ? "text-error/80"
+                  : "text-foreground-tertiary"
+              }`}>{systemStatus.database.message}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-success/10 rounded-lg border border-success/30">
-            <CheckCircle size={24} weight="fill" className="text-success" />
+          <div className={`flex items-center gap-3 p-3 rounded-lg border ${
+            systemStatus.auth.status === "connected" 
+              ? "bg-success/10 border-success/30" 
+              : systemStatus.auth.status === "error"
+              ? "bg-error/10 border-error/30"
+              : "bg-background-tertiary border-border-primary"
+          }`}>
+            <CheckCircle 
+              size={24} 
+              weight="fill" 
+              className={
+                systemStatus.auth.status === "connected" 
+                  ? "text-success" 
+                  : systemStatus.auth.status === "error"
+                  ? "text-error"
+                  : "text-foreground-tertiary animate-pulse"
+              } 
+            />
             <div>
-              <p className="font-medium text-success">Authentication</p>
-              <p className="text-sm text-success/80">Active</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-success/10 rounded-lg border border-success/30">
-            <CheckCircle size={24} weight="fill" className="text-success" />
-            <div>
-              <p className="font-medium text-success">Storage</p>
-              <p className="text-sm text-success/80">Operational</p>
+              <p className={`font-medium ${
+                systemStatus.auth.status === "connected" 
+                  ? "text-success" 
+                  : systemStatus.auth.status === "error"
+                  ? "text-error"
+                  : "text-foreground-secondary"
+              }`}>Authentication</p>
+              <p className={`text-sm ${
+                systemStatus.auth.status === "connected" 
+                  ? "text-success/80" 
+                  : systemStatus.auth.status === "error"
+                  ? "text-error/80"
+                  : "text-foreground-tertiary"
+              }`}>{systemStatus.auth.message}</p>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { captureSupabaseError } from "@/lib/sentry";
 import type { Company } from "@/lib/types/schemas";
 import { filterEmployeesBySearch } from "@/lib/utils/user-search";
 import { Plus, TrashSimple, ShieldCheck, X, Check, User, Buildings, Calendar, Lightning as Power, Warning as Warning, Star as Crown, CaretDown, MagnifyingGlass } from "@phosphor-icons/react";
@@ -55,7 +56,7 @@ export default function SuperadminUsersPage() {
       if (superadminsResult.data) setSuperadmins(superadminsResult.data);
       if (companiesResult.data) setCompanies(companiesResult.data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchSuperadmins");
       toast.error("Failed to fetch data");
     } finally {
       setLoading(false);
@@ -91,7 +92,7 @@ export default function SuperadminUsersPage() {
         
         setEmployees(availableEmployees);
       } catch (error) {
-        console.error("Error fetching employees:", error);
+        captureSupabaseError(error as { code?: string; message?: string }, "fetchEmployeesForSuperadmin", { companyId: selectedCompany });
         toast.error("Failed to fetch employees");
       }
     };
@@ -119,7 +120,7 @@ export default function SuperadminUsersPage() {
       resetForm();
       fetchData();
     } catch (error) {
-      console.error("Error adding superadmin:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "addSuperadmin", { userId: selectedEmployee?.id });
       toast.error("Failed to add superadmin");
     } finally {
       setSaving(false);
@@ -134,7 +135,7 @@ export default function SuperadminUsersPage() {
       setDeleteConfirm(null);
       fetchData();
     } catch (error) {
-      console.error("Error removing superadmin:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "removeSuperadmin", { superadminId: id });
       toast.error("Failed to remove superadmin");
     }
   };
@@ -152,7 +153,7 @@ export default function SuperadminUsersPage() {
       ));
       toast.success(`Superadmin ${!currentStatus ? 'activated' : 'deactivated'}`);
     } catch (error) {
-      console.error("Error toggling superadmin status:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "toggleSuperadminStatus", { superadminId: id });
       toast.error("Failed to update superadmin status");
     }
   };
@@ -387,7 +388,7 @@ export default function SuperadminUsersPage() {
               onClick={(e) => e.stopPropagation()}
               className="bg-surface-primary rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
             >
-              <div className="p-6 border-b bg-gradient-to-r from-warning/10 to-warning/5 dark:from-warning/20 dark:to-warning/10">
+              <div className="p-6 border-b bg-linear-to-r from-warning/10 to-warning/5 dark:from-warning/20 dark:to-warning/10">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-warning/20 rounded-xl">
@@ -559,7 +560,7 @@ export default function SuperadminUsersPage() {
                 <button
                   onClick={handleAddSuperadmin}
                   disabled={saving || !selectedEmployee}
-                  className="px-6 py-2.5 bg-gradient-to-r from-warning to-warning/80 text-white rounded-xl hover:from-warning/90 hover:to-warning/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                  className="px-6 py-2.5 bg-linear-to-r from-warning to-warning/80 text-white rounded-xl hover:from-warning/90 hover:to-warning/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
                 >
                   {saving ? (
                     <>

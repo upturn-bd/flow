@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { captureSupabaseError } from "@/lib/sentry";
 import type { Company, Team } from "@/lib/types/schemas";
-import { MagnifyingGlass, Users, Pencil, TrashSimple, Plus, Buildings, CaretDown, X, Spinner, Check, Star, Star as StarHalf } from "@phosphor-icons/react";
+import { Users, Pencil, TrashSimple, Plus, Buildings, Star, Star as StarHalf, Check } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, SearchBar, EmptyState, InlineSpinner, LoadingSpinner } from "@/components/ui";
@@ -67,7 +68,7 @@ export default function TeamsManagementPage() {
       if (error) throw error;
       if (data) setCompanies(data);
     } catch (error) {
-      console.error("Error fetching companies:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchCompaniesForTeams");
       toast.error("Failed to load companies");
     } finally {
       setLoading(false);
@@ -111,7 +112,7 @@ export default function TeamsManagementPage() {
 
       setTeams(teamsWithCount);
     } catch (error) {
-      console.error("Error fetching teams:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchTeams", { companyId: selectedCompany });
       toast.error("Failed to load teams");
     } finally {
       setLoading(false);
@@ -172,7 +173,7 @@ export default function TeamsManagementPage() {
       toast.success("Team updated successfully");
       setEditingTeam(null);
     } catch (error) {
-      console.error("Error updating team:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "updateTeam", { teamId: editingTeam.id });
       toast.error("Failed to update team");
     } finally {
       setSavingTeamId(null);
@@ -220,7 +221,7 @@ export default function TeamsManagementPage() {
         toast.success("Set as default team");
       }
     } catch (error) {
-      console.error("Error toggling default status:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "toggleTeamDefault", { teamId: team.id });
       toast.error("Failed to update default status");
     } finally {
       setTogglingDefaultId(null);
@@ -244,7 +245,7 @@ export default function TeamsManagementPage() {
       toast.success("Team deleted successfully");
       setTeamToDelete(null);
     } catch (error) {
-      console.error("Error deleting team:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "deleteTeam", { teamId: teamToDelete.id });
       toast.error("Failed to delete team. It may be in use.");
     } finally {
       setDeletingTeamId(null);
@@ -300,7 +301,7 @@ export default function TeamsManagementPage() {
       setShowCreateModal(false);
       setNewTeam({ name: "", description: "", isDefault: false });
     } catch (error: unknown) {
-      console.error("Error creating team:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "createTeam", { companyId: selectedCompany });
       if ((error as { code?: string })?.code === "23505") {
         toast.error("A team with this name already exists");
       } else {

@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { captureSupabaseError } from "@/lib/sentry";
 import type { Company } from "@/lib/types/schemas";
-import { DeviceMobile, Check, X, User, Buildings, Desktop, DeviceMobileCamera, Laptop, Clock, MagnifyingGlass, FunnelSimple, Warning } from "@phosphor-icons/react";
+import { DeviceMobile, Check, X, User, Buildings, Desktop, DeviceMobileCamera, Laptop, Clock } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, EmptyState, SearchBar } from "@/components/ui";
@@ -53,49 +54,45 @@ export default function SuperadminDevicesPage() {
       const [devicesResult, companiesResult] = await Promise.all([
         supabase
           .from("user_devices")
-          .select("*")
+          .select(`
+            *,
+            employee:employees!user_devices_user_id_fkey(
+              id,
+              first_name,
+              last_name,
+              email,
+              designation,
+              company_id,
+              company:companies!employees_company_id_fkey(id, name)
+            )
+          `)
           .order("created_at", { ascending: false }),
         supabase.from("companies").select("*").order("name"),
       ]);
 
       if (devicesResult.error) {
-        console.error("Error fetching devices:", devicesResult.error);
+        captureSupabaseError(devicesResult.error, "fetchDevices");
         toast.error("Failed to fetch devices");
         return;
       }
 
-      // Fetch employee data for each device
-      const devicesWithEmployees = await Promise.all(
-        (devicesResult.data || []).map(async (device) => {
-          const { data: employee } = await supabase
-            .from("employees")
-            .select("id, first_name, last_name, email, designation, company_id")
-            .eq("id", device.user_id)
-            .single();
-
-          let company = null;
-          if (employee?.company_id) {
-            const { data: companyData } = await supabase
-              .from("companies")
-              .select("id, name")
-              .eq("id", employee.company_id)
-              .single();
-            company = companyData;
-          }
-
-          return {
-            ...device,
-            employee: employee ? { ...employee, company } : null,
-          };
-        })
-      );
+      // Transform the data to match expected structure
+      const devicesWithEmployees = (devicesResult.data || []).map((device) => ({
+        ...device,
+        employee: device.employee ? {
+          ...device.employee,
+          company: Array.isArray(device.employee.company) 
+            ? device.employee.company[0] 
+            : device.employee.company
+        } : null,
+      }));
 
       setDevices(devicesWithEmployees as DeviceRequest[]);
       if (companiesResult.data) {
         setCompanies(companiesResult.data);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchDevices");
       toast.error("Failed to fetch devices");
     } finally {
       setLoading(false);
@@ -123,7 +120,7 @@ export default function SuperadminDevicesPage() {
         d.id === deviceId ? { ...d, status } : d
       ));
     } catch (error) {
-      console.error("Error updating device status:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "updateDeviceStatus", { deviceId, status });
       toast.error("Failed to update device status");
     } finally {
       setActionLoading(null);
@@ -143,7 +140,7 @@ export default function SuperadminDevicesPage() {
       toast.success("Device removed successfully");
       setDevices(prev => prev.filter(d => d.id !== deviceId));
     } catch (error) {
-      console.error("Error deleting device:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "deleteDevice", { deviceId });
       toast.error("Failed to remove device");
     } finally {
       setActionLoading(null);

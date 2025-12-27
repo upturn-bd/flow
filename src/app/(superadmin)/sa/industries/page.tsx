@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { captureSupabaseError } from "@/lib/sentry";
 import type { Industry } from "@/lib/types/schemas";
-import { Plus, Pencil, TrashSimple, Factory, Buildings, Check, X } from "@phosphor-icons/react";
+import { Plus, Pencil, Factory, Buildings } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader, SearchBar, StatCard, EmptyState, InlineDeleteConfirm, InlineSpinner } from "@/components/ui";
@@ -49,7 +50,7 @@ export default function IndustriesPage() {
         setIndustryStats(stats);
       }
     } catch (error) {
-      console.error("Error fetching industries:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchIndustries");
       toast.error("Failed to fetch industries");
     } finally {
       setLoading(false);
@@ -86,7 +87,7 @@ export default function IndustriesPage() {
       setFormData({ name: "" });
       fetchData();
     } catch (error) {
-      console.error("Error saving industry:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, editingIndustry ? "updateIndustry" : "createIndustry");
       toast.error("Failed to save industry");
     } finally {
       setSaving(false);
@@ -111,7 +112,7 @@ export default function IndustriesPage() {
       ));
       toast.success("Industry updated");
     } catch (error) {
-      console.error("Error updating industry:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "updateIndustryInline", { industryId: industry.id });
       toast.error("Failed to update industry");
     } finally {
       setInlineEditing(null);
@@ -126,7 +127,7 @@ export default function IndustriesPage() {
       setDeleteConfirm(null);
       fetchData();
     } catch (error) {
-      console.error("Error deleting industry:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "deleteIndustry", { industryId: id });
       toast.error("Failed to delete industry. It may be in use by companies.");
     }
   };
@@ -313,7 +314,7 @@ export default function IndustriesPage() {
           setFormData({ name: "" });
         }}
         onSubmit={handleSubmit}
-        title={editingIndustry ? "PencilSimple Industry" : "Add Industry"}
+        title={editingIndustry ? "Edit Industry" : "Add Industry"}
         subtitle={editingIndustry ? "Update industry name" : "Add a new industry"}
         icon={Factory}
         colorScheme="violet"

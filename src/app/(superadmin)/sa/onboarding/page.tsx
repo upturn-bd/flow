@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { UserPlus, User, Building, Check, X, ArrowsClockwise, DeviceMobile, Calendar, Envelope, Phone, Briefcase } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase/client";
+import { captureSupabaseError } from "@/lib/sentry";
 import { PageHeader, EmptyState, InlineSpinner } from "@/components/ui";
 import { TextAreaField } from "@/components/forms";
 
@@ -128,7 +129,7 @@ export default function SAOnboardingPage() {
 
       setPendingEmployees(employeesWithDevices);
     } catch (error: any) {
-      console.error("Error fetching pending employees:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchPendingEmployees");
       toast.error("Failed to fetch pending employees");
     } finally {
       setLoading(false);
@@ -196,7 +197,7 @@ export default function SAOnboardingPage() {
       // Refresh the list
       await fetchPendingEmployees();
     } catch (error: any) {
-      console.error("Error processing onboarding:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "processOnboarding", { employeeId: id, action });
       toast.error(error.message || "Failed to process request");
     } finally {
       setProcessing(null);

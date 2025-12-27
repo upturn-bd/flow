@@ -3,8 +3,9 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { captureSupabaseError } from "@/lib/sentry";
 import type { Team, TeamMember, TeamPermission, Permission } from "@/lib/types/schemas";
-import { ArrowLeft, UserPlus, TrashSimple, MagnifyingGlass, Shield, X, FloppyDisk, Spinner, Check, Warning as Warning, Star, ArrowCounterClockwise as ArrowCounterClockwise, CaretDown, CaretUp, CheckCircle, Pencil, Users } from "@phosphor-icons/react";
+import { ArrowLeft, UserPlus, TrashSimple, MagnifyingGlass, Shield, X, FloppyDisk, Check, Warning as Warning, Star, ArrowCounterClockwise as ArrowCounterClockwise, CaretDown, CaretUp, CheckCircle, Pencil, Users } from "@phosphor-icons/react";
 import { filterEmployeesBySearch } from "@/lib/utils/user-search";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -155,7 +156,7 @@ export default function TeamDetailPage() {
       if (permissionsError) throw permissionsError;
       setPermissions((permissionsData as TeamPermissionWithModule[]) || []);
     } catch (error) {
-      console.error("Error fetching team data:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchTeamData", { teamId, companyId });
       toast.error("Failed to load team data");
     } finally {
       setLoading(false);
@@ -173,7 +174,7 @@ export default function TeamDetailPage() {
       if (error) throw error;
       setAllPermissions(data || []);
     } catch (error) {
-      console.error("Error fetching permissions:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchAllPermissions");
     }
   };
 
@@ -188,7 +189,7 @@ export default function TeamDetailPage() {
       if (error) throw error;
       setEmployees(data || []);
     } catch (error) {
-      console.error("Error fetching employees:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchEmployeesForTeam", { companyId });
     }
   };
 
@@ -244,7 +245,7 @@ export default function TeamDetailPage() {
       
       setPermissions((permissionsData as TeamPermissionWithModule[]) || []);
     } catch (error) {
-      console.error("Error saving permissions:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "saveTeamPermissions", { teamId });
       toast.error("Failed to save permissions");
     } finally {
       setSavingPermissions(false);
@@ -292,7 +293,7 @@ export default function TeamDetailPage() {
       setIsEditingTeam(false);
       toast.success("Team details updated");
     } catch (error) {
-      console.error("Error updating team:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "updateTeamDetails", { teamId });
       toast.error("Failed to update team");
     } finally {
       setSavingTeam(false);
@@ -334,7 +335,7 @@ export default function TeamDetailPage() {
         setSearchTerm("");
       }
     } catch (error) {
-      console.error("Error adding team member:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "addTeamMember", { teamId, employeeId: selectedEmployee.id });
       toast.error("Failed to add team member");
     } finally {
       setAddingMember(false);
@@ -353,7 +354,7 @@ export default function TeamDetailPage() {
       toast.success("Team member removed");
       setMemberToRemove(null);
     } catch (error) {
-      console.error("Error removing team member:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "removeTeamMember", { memberId: memberToRemove.id });
       toast.error("Failed to remove team member");
     } finally {
       setRemovingMember(false);

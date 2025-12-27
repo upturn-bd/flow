@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { captureSupabaseError } from "@/lib/sentry";
 import type { Company, Country, Industry } from "@/lib/types/schemas";
 import { Plus, Pencil, TrashSimple, Buildings, Users, UsersThree, X, Check, Factory, Globe, Lightning, CurrencyDollar as CurrencyDollar, SquaresFour as TreeStructure, List, SquaresFour as SquaresFour, Gear as Gear, CaretUp, CaretDown, Warning as Warning } from "@phosphor-icons/react";
 import { toast } from "sonner";
@@ -75,7 +76,7 @@ export default function CompaniesPage() {
       if (countriesResult.data) setCountries(countriesResult.data);
       if (industriesResult.data) setIndustries(industriesResult.data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "fetchCompanies");
       toast.error("Failed to fetch data");
     } finally {
       setLoading(false);
@@ -156,7 +157,7 @@ export default function CompaniesPage() {
       resetForm();
       fetchData();
     } catch (error) {
-      console.error("Error saving company:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, editingCompany ? "updateCompany" : "createCompany");
       toast.error("Failed to save company");
     } finally {
       setSaving(false);
@@ -171,7 +172,7 @@ export default function CompaniesPage() {
       setDeleteConfirm(null);
       fetchData();
     } catch (error) {
-      console.error("Error deleting company:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "deleteCompany", { companyId: id });
       toast.error("Failed to delete company");
     }
   };
@@ -236,7 +237,7 @@ export default function CompaniesPage() {
       ));
       toast.success("Setting updated");
     } catch (error) {
-      console.error("Error updating feature:", error);
+      captureSupabaseError(error as { code?: string; message?: string }, "toggleCompanyFeature", { companyId: company.id, feature });
       toast.error("Failed to update setting");
     }
   };
@@ -574,7 +575,7 @@ export default function CompaniesPage() {
           resetForm();
         }}
         onSubmit={handleSubmit}
-        title={editingCompany ? "PencilSimple Company" : "Add Company"}
+        title={editingCompany ? "Edit Company" : "Add Company"}
         subtitle={editingCompany ? "Update company details" : "Create a new company"}
         icon={Buildings}
         colorScheme="blue"
