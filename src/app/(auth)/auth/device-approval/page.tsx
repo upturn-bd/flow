@@ -36,7 +36,7 @@ export default function DeviceApprovalPage() {
           if (newStatus === 'approved') {
             // Auto redirect
             setTimeout(() => {
-                window.location.href = '/';
+                window.location.href = '/home';
             }, 1000);
           }
         }
@@ -65,7 +65,7 @@ export default function DeviceApprovalPage() {
     if (data) {
       setStatus(data.status);
       if (data.status === 'approved') {
-        router.push('/');
+        router.push('/home');
       }
     }
   }

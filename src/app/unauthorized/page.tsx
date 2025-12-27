@@ -27,7 +27,7 @@ export default function UnauthorizedPage() {
               href="/home"
               className="block w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
             >
-              Go to House
+              Go to Home
             </Link>
             
             <Link

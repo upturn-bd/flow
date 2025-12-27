@@ -82,7 +82,7 @@ const SignIn = () => {
         setGeneralError("Login failed. " + result.error.message);
         setLoading(false);
       } else if (result.success) {
-        window.location.href = "/";
+        window.location.href = "/home";
       }
     } catch (err) {
       setGeneralError("An unexpected error occurred. Please try again.");

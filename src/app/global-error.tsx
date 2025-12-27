@@ -54,7 +54,7 @@ export default function GlobalError({
                 Try again
               </button>
               <button
-                onClick={() => (window.location.href = "/")}
+                onClick={() => (window.location.href = "/home")}
                 className="rounded-lg border border-border-secondary bg-background-primary px-6 py-3 font-medium text-foreground-secondary transition-colors hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
               >
                 Go home
