@@ -182,6 +182,7 @@ export const ROUTES = {
     INDUSTRIES: '/sa/industries',
     TEAMS: '/sa/teams',
     USERS: '/sa/users',
+    ONBOARDING: '/sa/onboarding',
   },
 
   // API Routes
