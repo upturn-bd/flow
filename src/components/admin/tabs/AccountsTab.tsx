@@ -899,7 +899,7 @@ export default function AccountsTab() {
                 value={values.currency}
                 onChange={handleChange}
                 error={errors.currency}
-                options={CURRENCIES.map(currency => ({ value: currency, label: currency }))}
+                options={Object.values(CURRENCIES).map(currency => ({ value: currency, label: currency }))}
                 placeholder="Select currency"
               />
             </div>
@@ -1057,7 +1057,7 @@ export default function AccountsTab() {
                   value={values.currency}
                   onChange={handleChange}
                   error={errors.currency}
-                  options={CURRENCIES.map(currency => ({ value: currency, label: currency }))}
+                  options={Object.values(CURRENCIES).map(currency => ({ value: currency, label: currency }))}
                   placeholder="Select currency"
                 />
               </div>

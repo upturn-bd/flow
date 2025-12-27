@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, Save } from "@phosphor-icons/react";
+import { FloppyDisk, X, } from "@phosphor-icons/react";
 import { TeamWithPermissions, TeamPermission, PermissionCategory, Permission } from '@/lib/types';
 import { supabase } from '@/lib/supabase/client';
 import { useTeams } from '@/hooks/useTeams';
@@ -219,7 +219,7 @@ export default function TeamPermissionsModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-surface-primary rounded-2xl shadow-2xl max-w-7xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border-primary bg-gradient-to-r from-purple-50 to-primary-50 dark:from-purple-900/30 dark:to-primary-900/30">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border-primary bg-linear-to-r from-purple-50 to-primary-50 dark:from-purple-900/30 dark:to-primary-900/30">
           <div>
             <h2 className="text-2xl font-bold text-foreground-primary">
               Configure Permissions
@@ -259,7 +259,7 @@ export default function TeamPermissionsModal({
                   return (
                     <div key={categoryKey} className="space-y-4">
                       <div className="flex items-center gap-3 pb-2">
-                        <div className="h-8 w-1 bg-gradient-to-b from-purple-500 to-primary-500 rounded-full"></div>
+                        <div className="h-8 w-1 bg-linear-to-b from-purple-500 to-primary-500 rounded-full"></div>
                         <h3 className="text-xl font-bold text-foreground-primary capitalize">
                           {categoryName} Permissions
                         </h3>
@@ -269,7 +269,7 @@ export default function TeamPermissionsModal({
                       <div className="border-2 border-border-primary rounded-xl overflow-hidden shadow-sm">
                         <div className="overflow-x-auto">
                           <table className="min-w-full divide-y divide-border-primary">
-                            <thead className="bg-gradient-to-r from-background-secondary to-background-tertiary">
+                            <thead className="bg-linear-to-r from-background-secondary to-background-tertiary">
                               <tr>
                                 <th className="px-6 py-4 text-left text-xs font-bold text-foreground-secondary uppercase tracking-wider w-1/3 sticky left-0 bg-background-secondary">
                                   Module
@@ -371,7 +371,7 @@ export default function TeamPermissionsModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-between items-center gap-3 px-6 py-4 border-t border-border-primary bg-gradient-to-r from-background-secondary to-background-tertiary">
+        <div className="flex justify-between items-center gap-3 px-6 py-4 border-t border-border-primary bg-linear-to-r from-background-secondary to-background-tertiary">
           <p className="text-sm text-foreground-tertiary">
             Changes will apply to all team members
           </p>
@@ -386,7 +386,7 @@ export default function TeamPermissionsModal({
             <button
               onClick={handleSave}
               disabled={isSaving || loading}
-              className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-lg hover:from-primary-700 hover:to-purple-700 active:scale-[0.98] transition-all disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed font-medium shadow-md hover:shadow-lg"
+              className="flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-primary-600 to-purple-600 text-white rounded-lg hover:from-primary-700 hover:to-purple-700 active:scale-[0.98] transition-all disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed font-medium shadow-md hover:shadow-lg"
             >
               <FloppyDisk size={20} />
               {isSaving ? 'Saving...' : 'FloppyDisk Permissions'}

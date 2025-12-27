@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
-import { captureSupabaseError } from "@/lib/sentry";
+import { captureError } from "@/lib/sentry";
 import {
   StakeholderServiceTemplate,
   ServiceTemplateFormData,
@@ -82,7 +82,8 @@ export function useServiceTemplates(): UseServiceTemplatesReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch templates";
       setError(message);
-      captureSupabaseError(err, "fetchTemplates", { 
+      captureError(err, { 
+        operation: "fetchTemplates",
         companyId: employeeInfo?.company_id 
       });
       return [];
@@ -122,7 +123,8 @@ export function useServiceTemplates(): UseServiceTemplatesReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch template";
       setError(message);
-      captureSupabaseError(err, "fetchTemplateById", { 
+      captureError(err, { 
+        operation: "fetchTemplateById",
         companyId: employeeInfo?.company_id,
         templateId 
       });
@@ -182,7 +184,8 @@ export function useServiceTemplates(): UseServiceTemplatesReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to create template";
       setError(message);
-      captureSupabaseError(err, "createTemplate", { 
+      captureError(err, { 
+        operation: "createTemplate",
         companyId: employeeInfo?.company_id 
       });
       return null;
@@ -247,7 +250,8 @@ export function useServiceTemplates(): UseServiceTemplatesReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to update template";
       setError(message);
-      captureSupabaseError(err, "updateTemplate", { 
+      captureError(err, { 
+        operation: "updateTemplate",
         companyId: employeeInfo?.company_id,
         templateId 
       });
@@ -292,7 +296,8 @@ export function useServiceTemplates(): UseServiceTemplatesReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to delete template";
       setError(message);
-      captureSupabaseError(err, "deleteTemplate", { 
+      captureError(err, { 
+        operation: "deleteTemplate",
         companyId: employeeInfo?.company_id,
         templateId 
       });
@@ -343,7 +348,8 @@ export function useServiceTemplates(): UseServiceTemplatesReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch invoice settings";
       setError(message);
-      captureSupabaseError(err, "fetchInvoiceSettings", { 
+      captureError(err, { 
+        operation: "fetchInvoiceSettings",
         companyId: employeeInfo?.company_id 
       });
       return null;
@@ -420,7 +426,8 @@ export function useServiceTemplates(): UseServiceTemplatesReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to save invoice settings";
       setError(message);
-      captureSupabaseError(err, "saveInvoiceSettings", { 
+      captureError(err, { 
+        operation: "saveInvoiceSettings",
         companyId: employeeInfo?.company_id 
       });
       return null;
