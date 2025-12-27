@@ -116,7 +116,7 @@ export default function FinderPage() {
           title="Employee Finder"
           description="Search and find detailed information about employees"
           icon={Users}
-          iconColor="text-indigo-700"
+          iconColor="text-primary-700"
           className="mb-0"
         />
         <motion.button
@@ -178,7 +178,7 @@ export default function FinderPage() {
                       onChange={(e) =>
                         setFilters({ ...filters, department: e.target.value })
                       }
-                      className="w-full rounded-lg border border-border-secondary bg-[#EAF4FF] px-3 py-2 text-foreground-secondary focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-foreground-secondary focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                     >
                       <option value="">All Departments</option>
                       {departments.map((dept) => (
@@ -197,7 +197,7 @@ export default function FinderPage() {
                       onChange={(e) =>
                         setFilters({ ...filters, designation: e.target.value })
                       }
-                      className="w-full rounded-lg border border-border-secondary bg-[#EAF4FF] px-3 py-2 text-foreground-secondary focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-foreground-secondary focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                     >
                       <option value="">All Positions</option>
                       {positions.map((position) => (
@@ -218,7 +218,7 @@ export default function FinderPage() {
                         designation: "",
                       })
                     }
-                    className="px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-800 transition-colors"
                   >
                     Reset Filters
                   </motion.button>
@@ -257,7 +257,7 @@ export default function FinderPage() {
               <div className="hidden lg:block overflow-x-auto">
                 <table className="min-w-full bg-surface-primary rounded-xl shadow-sm border border-border-primary">
                   <thead>
-                    <tr className="bg-indigo-50 text-indigo-700 text-left text-sm font-medium">
+                    <tr className="bg-primary-50 text-primary-700 text-left text-sm font-medium dark:bg-primary-900/20 dark:text-primary-400">
                       <th className="px-6 py-3 truncate">Name</th>
                       <th className="px-6 py-3">Email</th>
                       <th className="px-6 py-3">Phone</th>
@@ -275,7 +275,7 @@ export default function FinderPage() {
                         className="hover:bg-background-secondary dark:bg-background-tertiary transition-colors"
                       >
                         <td className="px-6 py-3 font-medium text-foreground-primary flex items-center gap-2">
-                          <User className="w-5 h-5 text-indigo-500" />
+                          <User className="w-5 h-5 text-primary-500" />
                           {employee.name}
                         </td>
                         <td className="px-6 py-3 text-sm text-foreground-secondary">

@@ -804,7 +804,7 @@ export default function OpsStakeholderDetailPage({ params }: { params: Promise<{
                                           handleStepRollback(step.id!);
                                         }
                                       }}
-                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-amber-600 text-white text-xs sm:text-sm rounded-lg hover:bg-amber-700 flex items-center gap-1 sm:gap-2 whitespace-nowrap"
+                                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-warning text-white text-xs sm:text-sm rounded-lg hover:brightness-110 flex items-center gap-1 sm:gap-2 whitespace-nowrap"
                                       title="Rollback this step"
                                     >
                                       <ArrowLeft size={14} />

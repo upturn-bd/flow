@@ -124,12 +124,12 @@ export default function StakeholderProcessesPage() {
                   <div className="text-foreground-secondary">
                     {process.is_sequential ? (
                       <span className="inline-flex items-center gap-1">
-                        <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        <span className="w-2 h-2 bg-info rounded-full"></span>
                         Sequential
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1">
-                        <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                        <span className="w-2 h-2 bg-primary-500 rounded-full"></span>
                         Independent
                       </span>
                     )}
@@ -145,7 +145,7 @@ export default function StakeholderProcessesPage() {
                     onClick={() => {
                       router.push(`/admin/config/stakeholder-process/${process.id}`);
                     }}
-                    className="p-2 text-foreground-secondary hover:text-blue-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
+                    className="p-2 text-foreground-secondary hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950 rounded transition-colors"
                     title="Edit process"
                   >
                     <PencilSimple size={18} />

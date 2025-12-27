@@ -73,7 +73,7 @@ export async function proxy(request: NextRequest) {
     if (currentPath === '/auth/device-approval') {
       return response;
     }
-    url.pathname = "/profile";
+    url.pathname = "/home";
     return NextResponse.redirect(url);
   }
 

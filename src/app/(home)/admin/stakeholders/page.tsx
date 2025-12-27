@@ -139,8 +139,8 @@ export default function StakeholdersPage() {
           title="Active Leads"
           value={leads.length}
           icon={Clock}
-          iconColor="text-blue-600"
-          iconBgColor="bg-blue-100"
+          iconColor="text-info"
+          iconBgColor="bg-info/10 dark:bg-info/20"
         />
         <StatCard
           title="Stakeholders"
@@ -153,8 +153,8 @@ export default function StakeholdersPage() {
           title="Total Records"
           value={searchResult?.totalCount || 0}
           icon={Building}
-          iconColor="text-purple-600"
-          iconBgColor="bg-purple-100"
+          iconColor="text-primary-600"
+          iconBgColor="bg-primary-100 dark:bg-primary-900/30"
         />
       </StatCardGrid>
 

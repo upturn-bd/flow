@@ -166,7 +166,7 @@ export default function NoticePage() {
             >
               <PageHeader
                 icon={Bell}
-                iconColor="text-amber-500"
+                iconColor="text-warning"
                 title="Notices & Announcements"
                 description="View and manage company-wide notices and important announcements."
                 className="mb-0"
@@ -178,7 +178,7 @@ export default function NoticePage() {
                   whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={() => setIsCreatingNotice(true)}
-                  className="flex items-center justify-center gap-2 bg-amber-500 hover:brightness-110 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm"
+                  className="flex items-center justify-center gap-2 bg-warning hover:brightness-110 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm"
                 >
                   <Plus className="h-4 w-4" />
                   <span>Create Notice</span>
@@ -204,14 +204,14 @@ export default function NoticePage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
-                className="mt-10 flex flex-col items-center justify-center p-10 bg-amber-50/50 rounded-xl border border-amber-100"
+                className="mt-10 flex flex-col items-center justify-center p-10 bg-warning/10 rounded-xl border border-warning/30 dark:bg-warning/5 dark:border-warning/20"
               >
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.2, duration: 0.4 }}
                 >
-                  <Info className="h-16 w-16 text-amber-300 mb-4" />
+                  <Info className="h-16 w-16 text-warning mb-4" />
                 </motion.div>
                 <h3 className="text-xl font-medium text-foreground-secondary mb-2">No Notices Available</h3>
                 <p className="text-foreground-secondary text-center max-w-md mb-5">
@@ -221,7 +221,7 @@ export default function NoticePage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setIsCreatingNotice(true)}
-                  className="px-5 py-2.5 bg-amber-500 text-white rounded-lg shadow-sm hover:bg-amber-600 transition-colors font-medium flex items-center gap-2"
+                  className="px-5 py-2.5 bg-warning text-white rounded-lg shadow-sm hover:brightness-110 transition-colors font-medium flex items-center gap-2"
                 >
                   <Plus className="h-4 w-4" />
                   Create your first notice

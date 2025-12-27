@@ -85,7 +85,7 @@ export default function FinderPage() {
       {/* Header */}
       <PageHeader
         icon={Users}
-        iconColor="text-indigo-600"
+        iconColor="text-primary-600"
         title="Employee Finder"
         description="Search and find detailed information about employees"
       />

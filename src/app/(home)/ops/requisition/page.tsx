@@ -58,18 +58,18 @@ function RequisitionPageContent() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <BookOpen className="h-16 w-16 text-cyan-200 mb-4" />
+            <BookOpen className="h-16 w-16 text-info/40 mb-4" />
           </motion.div>
           <h3 className="text-xl font-medium mb-2">Requisition Policy</h3>
           <p className="mt-2 text-center max-w-md mb-6">
             Company requisition policies and guidelines will appear here. Please check back later or contact the procurement department for more information.
           </p>
-          <div className="bg-cyan-50 border border-cyan-100 rounded-lg p-4 max-w-md">
+          <div className="bg-info/10 border border-info/30 rounded-lg p-4 max-w-md dark:bg-info/5 dark:border-info/20">
             <div className="flex gap-3">
-              <Warning className="h-5 w-5 text-cyan-500 shrink-0 mt-0.5" />
+              <Warning className="h-5 w-5 text-info shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-semibold text-cyan-800 mb-1">Important Information</h4>
-                <p className="text-sm text-cyan-700">
+                <h4 className="text-sm font-semibold text-foreground-primary mb-1">Important Information</h4>
+                <p className="text-sm text-foreground-secondary">
                   All requisitions require manager approval and should be submitted at least 7 days before the requested items are needed. Emergency requisitions follow a different approval process.
                 </p>
               </div>

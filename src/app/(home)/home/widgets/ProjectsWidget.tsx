@@ -57,7 +57,7 @@ export default function ProjectsWidget({ config, isEditMode, onToggle, onSizeCha
     <BaseWidget config={config} isEditMode={isEditMode} onToggle={onToggle} onSizeChange={onSizeChange}>
       <div className="bg-surface-primary rounded-xl shadow-sm border border-border-primary h-full flex flex-col overflow-hidden">
         <div className="p-5 shrink-0">
-          <SectionHeader title="My Projects" icon={FolderOpen} iconColor="text-purple-600" />
+          <SectionHeader title="My Projects" icon={FolderOpen} iconColor="text-primary-600" />
         </div>
         
         {!canViewProjects ? (

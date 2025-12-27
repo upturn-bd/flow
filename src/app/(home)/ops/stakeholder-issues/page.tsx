@@ -213,7 +213,7 @@ export default function TicketsPage() {
           title="My Tickets"
           description="Manage tickets for stakeholders you are assigned to handle"
           icon={Ticket}
-          iconColor="text-purple-600"
+          iconColor="text-primary-600"
         />
         {canWrite(PERMISSION_MODULES.STAKEHOLDERS) ? (
           <Button

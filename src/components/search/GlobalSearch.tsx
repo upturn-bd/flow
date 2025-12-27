@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MagnifyingGlass, X, CaretRight } from "@phosphor-icons/react";
 import { cn } from "@/components/ui/class";
 import { useAuth } from "@/lib/auth/auth-context";
+import { useTutorial } from "@/contexts/TutorialContext";
 import Portal from "@/components/ui/Portal";
 import { 
   ALL_OPS_ITEMS, 
@@ -13,14 +14,38 @@ import {
   ADMIN_LOG_ITEMS,
   NavigationItem 
 } from "@/lib/constants/navigation";
+import { FEATURE_TUTORIALS } from "@/lib/constants/tutorial-steps";
+import * as PhosphorIcons from "@phosphor-icons/react";
 
 interface SearchItem extends NavigationItem {
   category: string;
+  isTutorial?: boolean;
+  tutorialId?: string;
 }
 
 // Transform navigation items to search items with category
 const transformToSearchItems = (items: NavigationItem[], category: string): SearchItem[] =>
   items.map(item => ({ ...item, category }));
+
+// Transform tutorials to search items
+const transformTutorialsToSearchItems = (): SearchItem[] => {
+  return FEATURE_TUTORIALS.map(tutorial => {
+    // Get icon component from Phosphor Icons
+    const IconComponent = (PhosphorIcons as any)[tutorial.icon] || PhosphorIcons.GraduationCap;
+    
+    return {
+      name: tutorial.name,
+      path: tutorial.route,
+      icon: IconComponent,
+      description: tutorial.description,
+      iconColor: "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400",
+      keywords: ["tutorial", "learn", "guide", "help", tutorial.name.toLowerCase(), ...tutorial.description.toLowerCase().split(" ")],
+      category: "Tutorials",
+      isTutorial: true,
+      tutorialId: tutorial.id,
+    };
+  });
+};
 
 // Operations modules
 const opsSearchItems: SearchItem[] = transformToSearchItems(ALL_OPS_ITEMS, "Operations");
@@ -30,6 +55,9 @@ const adminConfigSearchItems: SearchItem[] = transformToSearchItems(ADMIN_CONFIG
 
 // Admin log items
 const adminLogSearchItems: SearchItem[] = transformToSearchItems(ADMIN_LOG_ITEMS, "Admin Logs");
+
+// Tutorial items
+const tutorialSearchItems: SearchItem[] = transformTutorialsToSearchItems();
 
 interface GlobalSearchProps {
   isOpen: boolean;
@@ -42,6 +70,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { hasPermission } = useAuth();
+  const { startTutorial } = useTutorial();
 
   // Check if user has admin access
   const hasAdminAccess = hasPermission("teams","can_write") || hasPermission("admin_config","can_write");
@@ -51,6 +80,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
     ...opsSearchItems,
     ...(hasAdminAccess ? adminConfigSearchItems : []),
     ...(hasAdminAccess ? adminLogSearchItems : []),
+    ...tutorialSearchItems,
   ];
 
   // FunnelSimple items based on query
@@ -104,7 +134,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
         case "Enter":
           e.preventDefault();
           if (flatItems[selectedIndex]) {
-            navigateTo(flatItems[selectedIndex].path);
+            navigateTo(flatItems[selectedIndex].path, flatItems[selectedIndex]);
           }
           break;
         case "Escape":
@@ -119,11 +149,22 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
   }, [isOpen, selectedIndex, flatItems, onClose]);
 
   const navigateTo = useCallback(
-    (path: string) => {
-      router.push(path);
-      onClose();
+    (path: string, item?: SearchItem) => {
+      if (item?.isTutorial && item.tutorialId) {
+        // For tutorials, navigate first then start tutorial
+        router.push(path);
+        onClose();
+        // Start tutorial after a short delay to allow navigation
+        setTimeout(() => {
+          startTutorial(item.tutorialId!);
+        }, 500);
+      } else {
+        // Regular navigation
+        router.push(path);
+        onClose();
+      }
     },
-    [router, onClose]
+    [router, onClose, startTutorial]
   );
 
   if (!isOpen) return null;
@@ -135,7 +176,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-start justify-center pt-[10vh] md:pt-[15vh] px-4"
+          className="fixed inset-0 z-100 flex items-start justify-center pt-[10vh] md:pt-[15vh] px-4"
           onClick={onClose}
         >
           {/* Backdrop */}
@@ -161,7 +202,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                   setQuery(e.target.value);
                   setSelectedIndex(0);
                 }}
-                placeholder="Search modules, logs, settings..."
+                placeholder="Search modules, logs, settings, tutorials..."
                 className="flex-1 bg-transparent text-foreground-primary placeholder:text-foreground-tertiary outline-none text-base"
               />
               {query && (
@@ -190,7 +231,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
               ) : (
                 Object.entries(groupedItems).map(([category, items]) => (
                   <div key={category}>
-                    <div className="px-4 py-2 text-xs font-semibold text-foreground-tertiary uppercase tracking-wider bg-surface-secondary">
+                    <div className="sticky top-0 px-4 py-2.5 text-sm font-bold text-foreground-tertiary uppercase tracking-wide bg-surface-secondary border-b border-border-primary shadow-sm">
                       {category}
                     </div>
                     {items.map((item) => {
@@ -201,7 +242,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                       return (
                         <button
                           key={item.path}
-                          onClick={() => navigateTo(item.path)}
+                          onClick={() => navigateTo(item.path, item)}
                           onMouseEnter={() => setSelectedIndex(globalIndex)}
                           className={cn(
                             "w-full flex items-center gap-3 px-4 py-3 text-left transition-colors",

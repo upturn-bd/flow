@@ -243,6 +243,13 @@ export const createSystemNotification = async (
     referenceTable?: string;
   } = {}
 ) => {
+  // Validate inputs
+  if (!recipientId) {
+    const errorMsg = 'recipientId is required for notification';
+    console.error(errorMsg, { title, companyId });
+    return { success: false, error: errorMsg };
+  }
+  
   if (!companyId) {
     return { success: false, error: 'Company ID not found' };
   }
@@ -306,12 +313,41 @@ export const createSystemNotification = async (
 
     return { success: true, data };
   } catch (error) {
+    // Extract meaningful error details from Supabase error
+    const errorDetails = error instanceof Error 
+      ? { message: error.message, name: error.name, stack: error.stack }
+      : typeof error === 'object' && error !== null
+        ? { ...error, stringified: JSON.stringify(error, null, 2) }
+        : { raw: String(error) };
+    
+    const errorContext = {
+      recipientId,
+      companyId,
+      title,
+      priority: options.priority,
+      context: options.context,
+      referenceId: options.referenceId,
+      referenceTable: options.referenceTable,
+      operation: 'createSystemNotification',
+      errorDetails
+    };
+    
+    // Capture to Sentry with full context
     captureSupabaseError(
       { message: error instanceof Error ? error.message : String(error) },
       "createSystemNotification",
-      { recipientId, companyId, title }
+      errorContext
     );
-    console.error('Error creating system notification:', error);
+    
+    console.error('Error creating system notification:', {
+      error,
+      errorDetails,
+      recipientId,
+      companyId,
+      title,
+      options
+    });
+    
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 };

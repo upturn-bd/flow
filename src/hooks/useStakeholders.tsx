@@ -16,6 +16,7 @@ import {
   createStakeholderNotification, 
   createAccountNotification 
 } from "@/lib/utils/notifications";
+import { captureError } from "@/lib/sentry";
 
 // ==============================================================================
 // Form Data Interfaces
@@ -808,18 +809,36 @@ export function useStakeholders() {
         try {
           // Notify KAM if assigned
           if (stakeholderData.kam_id) {
-            await createStakeholderNotification(
-              stakeholderData.kam_id,
-              'created',
-              {
+            console.log('[useStakeholders] Sending notification to KAM:', stakeholderData.kam_id);
+            try {
+              await createStakeholderNotification(
+                stakeholderData.kam_id,
+                'created',
+                {
+                  stakeholderName: stakeholderData.name,
+                  processName: process.name,
+                },
+                {
+                  referenceId: data.id,
+                  actionUrl: `/stakeholders/${data.id}`,
+                }
+              );
+            } catch (kamNotificationError) {
+              const errorContext = {
+                kamId: stakeholderData.kam_id,
+                stakeholderId: data.id,
                 stakeholderName: stakeholderData.name,
-                processName: process.name,
-              },
-              {
-                referenceId: data.id,
-                actionUrl: `/stakeholders/${data.id}`,
-              }
-            );
+                operation: 'notifyKAM'
+              };
+              
+              console.error('[useStakeholders] Failed to notify KAM:', {
+                ...errorContext,
+                error: kamNotificationError,
+                errorMessage: kamNotificationError instanceof Error ? kamNotificationError.message : String(kamNotificationError)
+              });
+              
+              captureError(kamNotificationError, errorContext, 'warning');
+            }
           }
 
           // Notify team members of the first step
@@ -834,9 +853,17 @@ export function useStakeholders() {
               // Get unique employee IDs to avoid duplicate notifications
               const uniqueEmployeeIds = [...new Set(teamMembers.map(m => m.employee_id))];
               
-              await Promise.all(
-                uniqueEmployeeIds.map((employeeId) =>
-                  createStakeholderNotification(
+              console.log('[useStakeholders] Sending notifications to team members:', uniqueEmployeeIds);
+              
+              // Send notifications sequentially to better track errors
+              for (const employeeId of uniqueEmployeeIds) {
+                if (!employeeId) {
+                  console.warn('[useStakeholders] Skipping notification for null/undefined employeeId');
+                  continue;
+                }
+                
+                try {
+                  await createStakeholderNotification(
                     employeeId,
                     'assignedToTeam',
                     {
@@ -848,13 +875,43 @@ export function useStakeholders() {
                       referenceId: data.id,
                       actionUrl: `/stakeholders/${data.id}`,
                     }
-                  )
-                )
-              );
+                  );
+                } catch (memberNotificationError) {
+                  const errorContext = {
+                    employeeId,
+                    stakeholderId: data.id,
+                    stakeholderName: stakeholderData.name,
+                    stepName: firstStep.name,
+                    operation: 'notifyTeamMember'
+                  };
+                  
+                  console.error('[useStakeholders] Failed to notify team member:', {
+                    ...errorContext,
+                    error: memberNotificationError,
+                    errorMessage: memberNotificationError instanceof Error ? memberNotificationError.message : String(memberNotificationError)
+                  });
+                  
+                  captureError(memberNotificationError, errorContext, 'warning');
+                }
+              }
             }
           }
         } catch (notificationError) {
-          console.warn('Failed to send stakeholder creation notifications:', notificationError);
+          const errorContext = {
+            stakeholderId: data.id,
+            stakeholderName: stakeholderData.name,
+            kamId: stakeholderData.kam_id,
+            processId: stakeholderData.stakeholder_process_id,
+            operation: 'sendStakeholderCreationNotifications'
+          };
+          
+          console.error('[useStakeholders] Failed to send stakeholder creation notifications:', {
+            ...errorContext,
+            error: notificationError,
+            errorMessage: notificationError instanceof Error ? notificationError.message : String(notificationError)
+          });
+          
+          captureError(notificationError, errorContext, 'error');
         }
 
         await fetchStakeholders();

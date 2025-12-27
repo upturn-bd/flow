@@ -157,7 +157,7 @@ export default function TopBar() {
         {/* Left side */}
         <div className="flex items-center">
           {!isApproved && (
-            <div className="flex items-center text-amber-600">
+            <div className="flex items-center text-warning">
               <ShieldWarning className="h-5 w-5 mr-2" />
               <span className="text-sm font-medium hidden md:inline">Restricted access</span>
             </div>
@@ -254,7 +254,7 @@ export default function TopBar() {
                   <p className="text-sm font-medium text-foreground-primary">{employeeInfo?.name || 'User'}</p>
                   <p className="text-xs text-foreground-tertiary">{employeeInfo?.role || 'Role'}</p>
                   {!isApproved && (
-                    <p className="text-xs mt-1 text-amber-500">Pending approval</p>
+                    <p className="text-xs mt-1 text-warning">Pending approval</p>
                   )}
                 </div>
 

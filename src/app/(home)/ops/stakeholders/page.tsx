@@ -150,7 +150,12 @@ export default function OpsStakeholdersPage() {
           title="Stakeholders"
           description="View and manage your stakeholder relationships"
           icon={Building}
-          iconColor="text-purple-600"
+          iconColor="text-primary-600"
+          action={canWrite(PERMISSION_MODULES.STAKEHOLDERS) ? {
+            label: "Create Lead",
+            onClick: () => router.push("/ops/stakeholders/new"),
+            icon: Plus
+          } : undefined}
         >
           <button
             onClick={handleExportCSV}
@@ -172,8 +177,8 @@ export default function OpsStakeholdersPage() {
           title="Total Stakeholders"
           value={searchResult?.totalCount || 0}
           icon={Building}
-          iconColor="text-purple-600"
-          iconBgColor="bg-purple-100 dark:bg-purple-900/30"
+          iconColor="text-primary-600"
+          iconBgColor="bg-primary-100 dark:bg-primary-900/30"
         />
         <StatCard
           title="Active Leads"
@@ -351,7 +356,7 @@ export default function OpsStakeholdersPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-foreground-primary">
                       {stakeholder.stakeholder_type ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
                           {stakeholder.stakeholder_type.name}
                         </span>
                       ) : (
@@ -387,7 +392,7 @@ export default function OpsStakeholdersPage() {
                         <span className="text-sm text-foreground-tertiary">—</span>
                       ) : stakeholder.current_step ? (
                         <div className="flex flex-col gap-1">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-info/10 text-info dark:bg-info/20">
                             Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}
                           </span>
                           {(() => {
@@ -504,7 +509,7 @@ export default function OpsStakeholdersPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-foreground-tertiary text-[10px] uppercase tracking-wide mb-0.5">Type</p>
                       {stakeholder.stakeholder_type ? (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
                           {stakeholder.stakeholder_type.name}
                         </span>
                       ) : (
@@ -546,7 +551,7 @@ export default function OpsStakeholdersPage() {
                       <p className="text-foreground-tertiary">—</p>
                     ) : stakeholder.current_step ? (
                       <div className="flex flex-wrap gap-1">
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-info/10 text-info dark:bg-info/20">
                           Step {stakeholder.current_step.step_order}: {stakeholder.current_step.name}
                         </span>
                         {(() => {

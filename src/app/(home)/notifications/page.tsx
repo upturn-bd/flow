@@ -19,7 +19,7 @@ export default function NotificationsPage() {
       <div className="flex items-center justify-center mb-4">
         <PageHeader
           icon={Bell}
-          iconColor="text-blue-600"
+          iconColor="text-primary-600"
           title="Notifications"
           className="text-center"
         />

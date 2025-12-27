@@ -438,7 +438,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-600 to-primary-800">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-br from-primary-600 to-primary-800">
         <div className="max-w-4xl mx-auto text-center">
           <h3 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Ready to Transform Your Operations?

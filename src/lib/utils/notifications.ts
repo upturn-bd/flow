@@ -2,6 +2,7 @@
 
 import { createSystemNotification } from "@/hooks/useNotifications";
 import { getCompanyId } from "@/lib/utils/auth";
+import { captureError } from "@/lib/sentry";
 
 export interface NotificationOptions {
   message: string;
@@ -580,53 +581,75 @@ export const createStakeholderNotification = async (
   data: any,
   options: { referenceId?: number; actionUrl?: string } = {}
 ) => {
-  let template;
-  
-  switch (type) {
-    case 'created':
-      template = NotificationTemplates.stakeholder.created(data.stakeholderName, data.processName);
-      break;
-    case 'updated':
-      template = NotificationTemplates.stakeholder.updated(data.stakeholderName);
-      break;
-    case 'statusChanged':
-      template = NotificationTemplates.stakeholder.statusChanged(data.stakeholderName, data.oldStatus, data.newStatus);
-      break;
-    case 'rejected':
-      template = NotificationTemplates.stakeholder.rejected(data.stakeholderName, data.reason);
-      break;
-    case 'completed':
-      template = NotificationTemplates.stakeholder.completed(data.stakeholderName);
-      break;
-    case 'stepCompleted':
-      template = NotificationTemplates.stakeholder.stepCompleted(data.stakeholderName, data.stepName);
-      break;
-    case 'stepUpdated':
-      template = NotificationTemplates.stakeholder.stepUpdated(data.stakeholderName, data.stepName);
-      break;
-    case 'stepRolledBack':
-      template = NotificationTemplates.stakeholder.stepRolledBack(data.stakeholderName, data.stepName);
-      break;
-    case 'assignedToTeam':
-      template = NotificationTemplates.stakeholder.assignedToTeam(data.stakeholderName, data.stepName, data.teamName);
-      break;
-    default:
-      throw new Error('Invalid stakeholder notification type');
-  }
-
-  const companyId = await getCompanyId();
-  return await createSystemNotification(
-    recipientId,
-    template.title,
-    template.message,
-    companyId,
-    {
-      priority: template.priority,
-      context: template.context,
-      referenceId: options.referenceId,
-      actionUrl: options.actionUrl,
+  try {
+    let template;
+    
+    switch (type) {
+      case 'created':
+        template = NotificationTemplates.stakeholder.created(data.stakeholderName, data.processName);
+        break;
+      case 'updated':
+        template = NotificationTemplates.stakeholder.updated(data.stakeholderName);
+        break;
+      case 'statusChanged':
+        template = NotificationTemplates.stakeholder.statusChanged(data.stakeholderName, data.oldStatus, data.newStatus);
+        break;
+      case 'rejected':
+        template = NotificationTemplates.stakeholder.rejected(data.stakeholderName, data.reason);
+        break;
+      case 'completed':
+        template = NotificationTemplates.stakeholder.completed(data.stakeholderName);
+        break;
+      case 'stepCompleted':
+        template = NotificationTemplates.stakeholder.stepCompleted(data.stakeholderName, data.stepName);
+        break;
+      case 'stepUpdated':
+        template = NotificationTemplates.stakeholder.stepUpdated(data.stakeholderName, data.stepName);
+        break;
+      case 'stepRolledBack':
+        template = NotificationTemplates.stakeholder.stepRolledBack(data.stakeholderName, data.stepName);
+        break;
+      case 'assignedToTeam':
+        template = NotificationTemplates.stakeholder.assignedToTeam(data.stakeholderName, data.stepName, data.teamName);
+        break;
+      default:
+        throw new Error('Invalid stakeholder notification type');
     }
-  );
+
+    const companyId = await getCompanyId();
+    return await createSystemNotification(
+      recipientId,
+      template.title,
+      template.message,
+      companyId,
+      {
+        priority: template.priority,
+        context: template.context,
+        referenceId: options.referenceId,
+        actionUrl: options.actionUrl,
+      }
+    );
+  } catch (error) {
+    const errorContext = {
+      recipientId,
+      type,
+      data,
+      options,
+      operation: 'createStakeholderNotification'
+    };
+    
+    console.error('Error in createStakeholderNotification:', {
+      error,
+      errorMessage: error instanceof Error ? error.message : String(error),
+      ...errorContext
+    });
+    
+    // Capture to Sentry
+    captureError(error, errorContext, 'error');
+    
+    // Re-throw to let the caller handle it
+    throw error;
+  }
 };
 
 // Stakeholder issue notification helper

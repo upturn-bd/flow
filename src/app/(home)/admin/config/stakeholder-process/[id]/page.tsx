@@ -68,7 +68,7 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
           <h3 className="text-lg font-semibold text-foreground-primary">Process not found</h3>
           <button
             onClick={() => router.back()}
-            className="mt-4 text-blue-600 hover:underline"
+            className="mt-4 text-primary-600 hover:underline"
           >
             Go back
           </button>
@@ -109,12 +109,12 @@ export default function ProcessDetailPage({ params }: { params: Promise<{ id: st
               <span>
                 {process.is_sequential ? (
                   <span className="inline-flex items-center gap-1">
-                    <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                    <span className="w-2 h-2 bg-info rounded-full"></span>
                     Sequential Process
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1">
-                    <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                    <span className="w-2 h-2 bg-primary-500 rounded-full"></span>
                     Independent Steps
                   </span>
                 )}

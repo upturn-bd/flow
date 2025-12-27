@@ -1026,8 +1026,8 @@ function FieldEditor({
             onClick={() => setShowNestedFields(!showNestedFields)}
             className={`flex-1 sm:flex-initial px-3 py-2 rounded-lg transition-colors font-medium text-sm flex items-center justify-center gap-1.5 ${
               showNestedFields 
-                ? 'bg-purple-600 text-white hover:bg-purple-700' 
-                : 'bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100'
+                ? 'bg-primary-600 text-white hover:bg-primary-700' 
+                : 'bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:border-primary-800 dark:hover:bg-primary-900/50'
             }`}
             title={showNestedFields ? "Hide nested fields" : "Configure nested fields"}
           >
