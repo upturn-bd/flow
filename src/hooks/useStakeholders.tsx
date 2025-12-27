@@ -901,7 +901,7 @@ export function useStakeholders() {
             stakeholderId: data.id,
             stakeholderName: stakeholderData.name,
             kamId: stakeholderData.kam_id,
-            processId: stakeholderData.stakeholder_process_id,
+            processId: stakeholderData.process_id,
             operation: 'sendStakeholderCreationNotifications'
           };
           
